@@ -17,7 +17,7 @@
                 <div class="col-md-4 mb-3">
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
-                            <input placeholder="" value="" class="form-control dateStart" id="dateStart" name="dateStart" aria-label="Floating label select example" />
+                            <input placeholder="" value="" class="form-control dateStart" id="dateStart" name="dateStart" />
                             <label style="z-index: 1;" style="z-index: 1;">Tanggal Awal SPP</label>
                         </div>
                         <div class="input-group-append" style="height:50px;">
@@ -30,7 +30,7 @@
                 <div class="col-md-4 mb-3">
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
-                            <input placeholder="" value="" class="form-control dateEnd" id="dateEnd" name="dateEnd" aria-label="Floating label select example" />
+                            <input placeholder="" value="" class="form-control dateEnd" id="dateEnd" name="dateEnd" />
                             <label style="z-index: 1;" style="z-index: 1;">Tanggal Akhir SPP</label>
                         </div>
                         <div class="input-group-append" style="height:50px;">
@@ -55,13 +55,13 @@
                                 <th onclick="changeSort('createdAt')">No</th>
                                 <th onclick="changeSort('division_id')">Dept</th>
                                 <th onclick="changeSort('spp_no')">No Spp</th>
-                                <th onclick="changeSort('request_date')">Tgl Spp</th>
+                                <!-- <th onclick="changeSort('request_date')">Tgl Spp</th>
                                 <th onclick="changeSort('supplier_id')">Supplier</th>
                                 <th onclick="changeSort('po_date')">Tgl Po</th>
-                                <th onclick="changeSort('po_no')">No Po</th>
+                                <th onclick="changeSort('po_no')">No Po</th> -->
                                 <th onclick="changeSort('barang_id')">Barang</th>
                                 <th onclick="changeSort('spesifikasi_id')">Spesifikasi</th>
-                                <th onclick="changeSort('note')">Note</th>
+                                <!-- <th onclick="changeSort('note')">Note</th> -->
                                 <th onclick="changeSort('qty')">Qty Order</th>
                                 <th onclick="changeSort('qty_diterima')">Qty Diterima</th>
                                 <th onclick="changeSort('remaining_qty')">Qty Sisa</th>
@@ -129,22 +129,22 @@
                 data: "spp_no",
                 className: "text-left"
             },
-            {
-                data: "request_date",
-                className: "text-left"
-            },
-            {
-                data: "supplier_name",
-                className: "text-left",
-            },
-            {
-                data: "po_date",
-                className: "text-left"
-            },
-            {
-                data: "po_no",
-                className: "text-left"
-            },
+            // {
+            //     data: "request_date",
+            //     className: "text-left"
+            // },
+            // {
+            //     data: "supplier_name",
+            //     className: "text-left",
+            // },
+            // {
+            //     data: "po_date",
+            //     className: "text-left"
+            // },
+            // {
+            //     data: "po_no",
+            //     className: "text-left"
+            // },
             {
                 data: "barang_name",
                 className: "text-left"
@@ -153,10 +153,10 @@
                 data: "spesifikasi",
                 className: "text-left"
             },
-            {
-                data: "note",
-                className: "text-left"
-            },
+            // {
+            //     data: "note",
+            //     className: "text-left"
+            // },
             {
                 data: "qty",
                 className: "text-left",

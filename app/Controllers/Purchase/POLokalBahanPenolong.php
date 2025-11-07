@@ -167,7 +167,8 @@ class POLokalBahanPenolong extends BaseController
             $this->barangMasterSpesifikasiModel
                 ->update($d->spesifikasi_id, [
                     'harga_terakhir' => $d->harga_satuan,
-                    'supplier_terakhir' => $dataAmPurchaseOrderData['supplier_id']
+                    'supplier_terakhir' => $dataAmPurchaseOrderData['supplier_id'],
+                    'unit_terakhir' => $d->satuan_id
                 ]);
 
             $this->aMPurchaseOrderDetailModel->insert([
@@ -520,20 +521,23 @@ class POLokalBahanPenolong extends BaseController
             $hargaTerakhir = $this->aMPurchaseOrderDetailModel
                 ->historiHargaPOBahanPenolongFirst(
                     $p['spesifikasi_id'],
-                    $this->this_company_id
+                    $this->this_company_id,
+                    $p['unit']
                 );
 
             if ($hargaTerakhir) {
                 $this->barangMasterSpesifikasiModel
                     ->update($p['spesifikasi_id'], [
                         'harga_terakhir' => $hargaTerakhir['price'],
-                        'supplier_terakhir' => $hargaTerakhir['supplier_id']
+                        'supplier_terakhir' => $hargaTerakhir['supplier_id'],
+                        'unit_terakhir' => $hargaTerakhir['unit'],
                     ]);
             } else {
                 $this->barangMasterSpesifikasiModel
                     ->update($p['spesifikasi_id'], [
                         'harga_terakhir' => null,
-                        'supplier_terakhir' => null
+                        'supplier_terakhir' => null,
+                        'unit_terakhir' => null,
                     ]);
             }
         }
@@ -668,20 +672,23 @@ class POLokalBahanPenolong extends BaseController
                 $hargaTerakhir = $this->aMPurchaseOrderDetailModel
                     ->historiHargaPOBahanPenolongFirst(
                         $p['spesifikasi_id'],
-                        $this->this_company_id
+                        $this->this_company_id,
+                        $p['unit']
                     );
 
                 if ($hargaTerakhir) {
                     $this->barangMasterSpesifikasiModel
                         ->update($p['spesifikasi_id'], [
                             'harga_terakhir' => $hargaTerakhir['price'],
-                            'supplier_terakhir' => $hargaTerakhir['supplier_id']
+                            'supplier_terakhir' => $hargaTerakhir['supplier_id'],
+                            'unit_terakhir' => $hargaTerakhir['unit'],
                         ]);
                 } else {
                     $this->barangMasterSpesifikasiModel
                         ->update($p['spesifikasi_id'], [
                             'harga_terakhir' => null,
-                            'supplier_terakhir' => null
+                            'supplier_terakhir' => null,
+                            'unit_terakhir' => null,
                         ]);
                 }
             }
@@ -929,6 +936,7 @@ class POLokalBahanPenolong extends BaseController
                     $s['barang2_id'],
                     "Lokal",
                     $this->this_company_id,
+                    $s['unit']
                 );
 
                 $result[] = [

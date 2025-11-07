@@ -230,7 +230,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating" style="height: 50px;">
-                            <select class="form-select satuan_id" name="satuan_id" id="satuan_id">
+                            <select disabled class="form-select satuan_id" name="satuan_id" id="satuan_id">
                                 <option value=""></option>
                                 <?php foreach ($satuan as $s) : ?>
                                     <option
@@ -828,154 +828,126 @@
             } else {
                 var id = $('#id').val();
                 if (id) {
-                    // UPDATE
-                    Swal.fire({
-                        icon: 'question',
-                        title: 'Update Data ?',
-                        confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        showCancelButton: true,
-                        reverseButtons: true,
-                        confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Kembali',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            var id = $('#id').val();
-                            var poDate = $('#po_date').val();
-                            var poNo = $('#po_no').val();
-                            var divisionID = $('#division_id').val();
-                            var supplierID = $('#supplier_id').val();
-                            var paymentDate = $('#payment_date').val();
-                            var sppID = $('#spp_id').val();
-                            var note = $('#note').val();
-                            var statusClosedSpp = $('#status_closed_spp option:selected').val();
-                            // append
-                            var formData = new FormData();
-                            formData.append("id", id);
-                            formData.append("spp_id", sppID);
-                            formData.append("poDate", poDate);
-                            formData.append("poNo", poNo);
-                            formData.append("divisionID", divisionID);
-                            formData.append("supplierID", supplierID);
-                            formData.append("paymentDate", paymentDate);
-                            formData.append("total", totalHarga);
-                            formData.append("note", note);
-                            formData.append("status_closed_spp", statusClosedSpp);
-                            formData.append("listBarang", JSON.stringify(listBarang));
+                    var id = $('#id').val();
+                    var poDate = $('#po_date').val();
+                    var poNo = $('#po_no').val();
+                    var divisionID = $('#division_id').val();
+                    var supplierID = $('#supplier_id').val();
+                    var paymentDate = $('#payment_date').val();
+                    var sppID = $('#spp_id').val();
+                    var note = $('#note').val();
+                    var statusClosedSpp = $('#status_closed_spp option:selected').val();
+                    // append
+                    var formData = new FormData();
+                    formData.append("id", id);
+                    formData.append("spp_id", sppID);
+                    formData.append("poDate", poDate);
+                    formData.append("poNo", poNo);
+                    formData.append("divisionID", divisionID);
+                    formData.append("supplierID", supplierID);
+                    formData.append("paymentDate", paymentDate);
+                    formData.append("total", totalHarga);
+                    formData.append("note", note);
+                    formData.append("status_closed_spp", statusClosedSpp);
+                    formData.append("listBarang", JSON.stringify(listBarang));
 
-                            $.ajax({
-                                url: "<?= base_url("po-lokal-bahan-penolong/update"); ?>",
-                                data: formData,
-                                method: "POST",
-                                dataType: "json",
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                    setLoading();
-                                },
-                                complete: function() {
-                                    stopLoading();
-                                },
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    if (response.status) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                            reverseButtons: true,
-                                            confirmButtonText: 'Oke',
-                                        }).then((result) => {
-                                            window.location.href = "<?= base_url('po-lokal-bahan-penolong') ?>"
-                                        })
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                            cancelButtonColor: '#d33',
-                                            reverseButtons: true,
-                                            confirmButtonText: 'Oke',
-                                        })
-                                    }
+                    $.ajax({
+                        url: "<?= base_url("po-lokal-bahan-penolong/update"); ?>",
+                        data: formData,
+                        method: "POST",
+                        dataType: "json",
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            if (response.status) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                    reverseButtons: true,
+                                    confirmButtonText: 'Oke',
+                                }).then((result) => {
+                                    window.location.href = "<?= base_url('po-lokal-bahan-penolong') ?>"
+                                })
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                    cancelButtonColor: '#d33',
+                                    reverseButtons: true,
+                                    confirmButtonText: 'Oke',
+                                })
+                            }
 
-                                }
-                            });
                         }
-                    })
+                    });
                 } else {
-                    // CREATE
-                    Swal.fire({
-                        icon: 'question',
-                        title: 'Simpan Data ?',
-                        confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        showCancelButton: true,
-                        reverseButtons: true,
-                        confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Kembali',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            var poDate = $('#po_date').val();
-                            var poNo = $('#po_no').val();
-                            var divisionID = $('#division_id').val();
-                            var supplierID = $('#supplier_id').val();
-                            var paymentDate = $('#payment_date').val();
-                            var sppID = $('#spp_id').val();
-                            var note = $('#note').val();
-                            var statusClosedSpp = $('#status_closed_spp option:selected').val();
-                            // append
-                            var formData = new FormData();
-                            formData.append("poDate", poDate);
-                            formData.append("spp_id", sppID);
-                            formData.append("poNo", poNo);
-                            formData.append("divisionID", divisionID);
-                            formData.append("supplierID", supplierID);
-                            formData.append("paymentDate", paymentDate);
-                            formData.append("total", totalHarga);
-                            formData.append("note", note);
-                            formData.append("status_closed_spp", statusClosedSpp);
-                            formData.append("listBarang", JSON.stringify(listBarang));
+                    var poDate = $('#po_date').val();
+                    var poNo = $('#po_no').val();
+                    var divisionID = $('#division_id').val();
+                    var supplierID = $('#supplier_id').val();
+                    var paymentDate = $('#payment_date').val();
+                    var sppID = $('#spp_id').val();
+                    var note = $('#note').val();
+                    var statusClosedSpp = $('#status_closed_spp option:selected').val();
+                    // append
+                    var formData = new FormData();
+                    formData.append("poDate", poDate);
+                    formData.append("spp_id", sppID);
+                    formData.append("poNo", poNo);
+                    formData.append("divisionID", divisionID);
+                    formData.append("supplierID", supplierID);
+                    formData.append("paymentDate", paymentDate);
+                    formData.append("total", totalHarga);
+                    formData.append("note", note);
+                    formData.append("status_closed_spp", statusClosedSpp);
+                    formData.append("listBarang", JSON.stringify(listBarang));
 
-                            $.ajax({
-                                url: "<?= base_url("po-lokal-bahan-penolong/save"); ?>",
-                                data: formData,
-                                method: "POST",
-                                dataType: "json",
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                    setLoading();
-                                },
-                                complete: function() {
-                                    stopLoading();
-                                },
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    if (response.status) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                            reverseButtons: true,
-                                            confirmButtonText: 'Oke',
-                                        }).then((result) => {
-                                            window.location.href = "<?= base_url('po-lokal-bahan-penolong') ?>"
+                    $.ajax({
+                        url: "<?= base_url("po-lokal-bahan-penolong/save"); ?>",
+                        data: formData,
+                        method: "POST",
+                        dataType: "json",
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            if (response.status) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                    reverseButtons: true,
+                                    confirmButtonText: 'Oke',
+                                }).then((result) => {
+                                    window.location.href = "<?= base_url('po-lokal-bahan-penolong') ?>"
 
-                                        })
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                            cancelButtonColor: '#d33',
-                                            reverseButtons: true,
-                                            confirmButtonText: 'Oke',
-                                        })
-                                    }
+                                })
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                    cancelButtonColor: '#d33',
+                                    reverseButtons: true,
+                                    confirmButtonText: 'Oke',
+                                })
+                            }
 
-                                }
-                            });
                         }
                     });
                 }
@@ -1335,6 +1307,36 @@
             });
         });
     }
+
+    // function activeFieldSatuanId(satuan_1, satuan_2, satuan_3) {
+    //     const allowedValues = [satuan_1, satuan_2, satuan_3]
+    //         .filter(v => v !== null && v !== undefined && v !== '')
+    //         .map(String);
+
+    //     $('#satuan_id').on('select2:open', function() {
+    //         const $select = $(this);
+
+    //         if (allowedValues.length > 0) {
+    //             $select.find('option').each(function() {
+    //                 const val = String($(this).val());
+    //                 // hanya tampilkan yang di allowedValues
+    //                 if (allowedValues.includes(val)) {
+    //                     $(this).show();
+    //                 } else {
+    //                     $(this).hide();
+    //                 }
+    //             });
+    //         } else {
+    //             // jika allowedValues kosong, tampilkan semua
+    //             $select.find('option').show();
+    //         }
+
+    //         // refresh tampilan select2 agar efek langsung terlihat
+    //         $select.trigger('change.select2');
+    //     });
+    // }
+
+
 
     function setGlobalPpn() {
         // Set PPN

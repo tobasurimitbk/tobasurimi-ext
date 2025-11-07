@@ -682,8 +682,13 @@ class AMPurchaseOrderModel extends Model
         ];
     }
 
-    public function historiHargaPOBahanPenolongFirst($barangID, $spesifikasiBarangID, $poType, $companyID)
-    {
+    public function historiHargaPOBahanPenolongFirst(
+        $barangID,
+        $spesifikasiBarangID,
+        $poType,
+        $companyID,
+        $unitId = null
+    ) {
         $condition = [
             "am_purchase_orders.company_id"  => $companyID,
             "am_purchase_order_details.barang_id" => $barangID,
@@ -708,9 +713,13 @@ class AMPurchaseOrderModel extends Model
             ->join('am_purchase_order_details', 'am_purchase_order_details.am_purchase_order_id = am_purchase_orders.id')
             ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = am_purchase_order_details.spesifikasi_id')
-            ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id')
-            ->orderBy('am_purchase_orders.createdAt', "DESC")
-            ->first();
+            ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id');
+
+        if ($unitId != null) {
+            $res = $res->where('am_purchase_order_details.unit', $unitId);
+        }
+
+        $res = $res->orderBy('am_purchase_orders.createdAt', "DESC")->first();
 
         if ($res == null) {
             return [

@@ -1262,6 +1262,9 @@ class PenerimaanBarangLokalBP extends BaseController
                 ->set(['status_post' => 'WAITING'])
                 ->update();
 
+            $this->penerimaanBarangModel->autoOpenPO($id);
+
+
             $db->transCommit();
             return response()->setJSON([
                 'status' => true,

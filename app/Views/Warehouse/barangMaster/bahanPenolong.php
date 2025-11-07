@@ -452,11 +452,12 @@
             {
                 data: "harga_terakhir",
                 className: "text-left",
-                render: function(data) {
+                render: function(data, type, row) {
                     if (data == "") {
                         return "-";
                     } else {
-                        return greatFormatRupiah(data)
+                        var satuan_terakhir = row.satuan_terakhir;
+                        return satuan_terakhir == null ? greatFormatRupiah(data) : greatFormatRupiah(data) + " / " + row.satuan_terakhir;
                     }
                 }
             },

@@ -592,111 +592,61 @@
                     confirmButtonColor: '#4e73df',
                 })
             } else {
-                Swal.fire({
-                    icon: 'question',
-                    title: 'Simpan Data?',
-                    confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Kembali',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const csrf = $(`[name="${csrfToken}"]`);
-                        var id = $('#id').val();
-                        var divisiId = $('#divisi_id').val();
-                        var warehouseId = $('#warehouse_id').val();
-                        var supplierId = $('#supplier_id').val();
-                        var po_no = $('.multiple_po_id').select2('data').map(function(elem) {
-                            return elem.text;
-                        });
-                        var ongkosKirim = destroyFormatRupiah($('#ongkos_kirim').val() || 0);
+                const csrf = $(`[name="${csrfToken}"]`);
+                var id = $('#id').val();
+                var divisiId = $('#divisi_id').val();
+                var warehouseId = $('#warehouse_id').val();
+                var supplierId = $('#supplier_id').val();
+                var po_no = $('.multiple_po_id').select2('data').map(function(elem) {
+                    return elem.text;
+                });
+                var ongkosKirim = destroyFormatRupiah($('#ongkos_kirim').val() || 0);
+                var url = id == '' ? "<?= base_url('penerimaan-barang-lokal-bp/insert') ?>" : "<?= base_url('penerimaan-barang-lokal-bp/update') ?>";
 
-                        var formData = new FormData(document.querySelector(".create-form"));
-                        formData.append("acceptance_type", po_no.length > 1 ? "MULTIPLE ORDER" : "SINGLE ORDER");
-                        formData.append("multiple_po_id", JSON.stringify($('.multiple_po_id').val()));
-                        formData.append("multiple_po_no", JSON.stringify(po_no));
-                        formData.append("divisi_id", divisiId);
-                        formData.append("supplier_id", supplierId);
-                        formData.append("warehouse_id", warehouseId);
+                var formData = new FormData(document.querySelector(".create-form"));
+                formData.append("id", id);
+                formData.append("acceptance_type", po_no.length > 1 ? "MULTIPLE ORDER" : "SINGLE ORDER");
+                formData.append("multiple_po_id", JSON.stringify($('.multiple_po_id').val()));
+                formData.append("multiple_po_no", JSON.stringify(po_no));
+                formData.append("divisi_id", divisiId);
+                formData.append("supplier_id", supplierId);
+                formData.append("warehouse_id", warehouseId);
+                formData.append("barangs", JSON.stringify(listData.result));
+                formData.set("ongkos_kirim", ongkosKirim);
 
-                        formData.append("barangs", JSON.stringify(listData.result));
-                        formData.set("ongkos_kirim", ongkosKirim);
-
-                        if (id) {
-                            formData.append("id", id);
-                            $.ajax({
-                                url: "<?= base_url("penerimaan-barang-lokal-bp/update"); ?>",
-                                data: formData,
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                beforeSend: function(xhr) {
-                                    setLoading();
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                complete: function() {
-                                    stopLoading();
-                                },
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        }).then(() => {
-                                            window.location.href = "<?= base_url('penerimaan-barang-lokal-bp') ?>"
-                                        });
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                    }
-                                }
+                $.ajax({
+                    url: url,
+                    data: formData,
+                    method: "POST",
+                    dataType: "json",
+                    processData: false,
+                    contentType: false,
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            }).then(() => {
+                                window.location.href = "<?= base_url('penerimaan-barang-lokal-bp') ?>"
                             });
                         } else {
-                            $.ajax({
-                                url: "<?= base_url("penerimaan-barang-lokal-bp/insert"); ?>",
-                                data: formData,
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                beforeSend: function(xhr) {
-                                    setLoading();
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                complete: function() {
-                                    stopLoading();
-                                },
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        }).then(() => {
-                                            window.location.href = "<?= base_url("penerimaan-barang-lokal-bp"); ?>";
-                                        });
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                    }
-                                }
-                            });
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
                         }
                     }
-
-                })
+                });
             }
 
         }

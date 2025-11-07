@@ -468,7 +468,7 @@ class Barang extends BaseController
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        $aksesSupplierLokalBP = can('Pembelian', 'PO Lokal BP', 'r');
+        $aksesSupplierLokalBP = true; // tampilkan harga terakhir
         $aksesSupplierImportBP = can('Pembelian', 'PO Import BP', 'r');
 
         $res = $barangMasterModel->getList($condition, $addCondition, $limit, $offset);
@@ -478,8 +478,6 @@ class Barang extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($res['data'] as $data) {
-            // $lokalDetail = $amPurchaseOrderModel->historiHargaPOBahanPenolongFirst($data['id'], $data['spesifikasi_id'], "Lokal", $this->this_company_id);
-            // $importDetail = $amPurchaseOrderModel->historiHargaPOBahanPenolongFirst($data['id'], $data['spesifikasi_id'], "Import", $this->this_company_id);
             $satuan1 = $satuanModel->asObject()->where('id', $data['satuan_1'])->where('deletedAt', null)->first();
             $satuan2 = $satuanModel->asObject()->where('id', $data['satuan_2'])->where('deletedAt', null)->first();
             $satuan3 = $satuanModel->asObject()->where('id', $data['satuan_3'])->where('deletedAt', null)->first();
@@ -512,9 +510,10 @@ class Barang extends BaseController
                 "satuan"                => $satuan1_kode, // Adjust 'some_property' to the actual property you want to display
                 "satuan2"               => $satuan2_kode == "-" ? "-" : $satuan2_kode,
                 "satuan3"               => $satuan3_kode == "-" ? "-" : $satuan3_kode,
-                "akun_coa"               => $accountBarang ? $accountBarang : "",
-                "harga_terakhir"  => $hargaTerakhir == null ? "" : (float)$hargaTerakhir,
-                "supplier_terakhir" => $supplierTerakhir,
+                "akun_coa"              => $accountBarang ? $accountBarang : "",
+                "harga_terakhir"        => $hargaTerakhir == null ? "" : (float)$hargaTerakhir,
+                "supplier_terakhir"     => $supplierTerakhir,
+                "satuan_terakhir"       => $data['kode_satuan_terakhir']
             ]);
         }
 
