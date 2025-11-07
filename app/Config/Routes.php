@@ -2097,6 +2097,10 @@ $routes->group('bea-cukai-bc-41', ['filter' => 'Auth'], function ($routes) {
 $routes->get('/employee/jam-kerja/(:segment)', 'HR\EmployeeJamKerja::index/$1', ['filter' => 'Auth']);
 $routes->get('/employee/get-jam-kerja-detail', 'HR\EmployeeJamKerja::getDetailJamKerja', ['filter' => 'Auth']);
 $routes->post('/employee/update-jam-kerja', 'HR\EmployeeJamKerja::createOrUpdate', ['filter' => 'Auth']);
+$routes->get('/jam-kerja/setting', 'HR\EmployeeJamKerja::setting', ['filter' => 'Auth']);
+$routes->get('/jam-kerja/get-by-divisi', 'HR\EmployeeJamKerja::dropdownJamKerja', ['filter' => 'Auth']);
+$routes->get('/jam-kerja/get-jam-kerja-karyawan', 'HR\EmployeeJamKerja::getJamKerjaKaryawan', ['filter' => 'Auth']);
+$routes->post('/jam-kerja/update-jam-kerja-karyawan', 'HR\EmployeeJamKerja::updateJamKerjaKaryawan', ['filter' => 'Auth']);
 
 // Attendance
 $routes->get('/log-attendance', 'HR\Attendance::indexLog', ['filter' => 'Auth']);
@@ -2121,6 +2125,7 @@ $routes->get('/list-attendance/export-bulanan', 'HR\Attendance::exportExcelPrese
 $routes->get('/list-attendance/export-triwulan', 'HR\Attendance::exportTriwulanPresensi', ['filter' => 'Auth']);
 $routes->get('/list-attendance/export-harian', 'HR\Attendance::exportExcelPresensiHarian', ['filter' => 'Auth']);
 $routes->post('/list-attendance/get-bagian', 'Master\Bagian::getBagianByDivisionNoEncrypt', ['filter' => 'Auth']);
+$routes->get('/list-attendance/export-bulanan-employee', 'HR\Attendance::exportExcelPresensiKaryawanBulanan', ['filter' => 'Auth']);
 
 // Big Day
 $routes->get('/big-days', 'Master\BigDays::ListBigDay', ['filter' => 'Auth']);
@@ -3072,6 +3077,8 @@ $routes->get('/hr-outsourcing-scale', 'HROutsourcing\Scale::generateQrBarangView
 $routes->post('/hr-outsourcing-scale', 'HROutsourcing\Scale::generateQrBarang', ['filter' => 'Auth']);
 $routes->get('/hr-outsourcing-scale/id/(:segment)', 'HROutsourcing\Scale::getBarangByIdQr/$1');
 $routes->get('/hr-outsourcing-company/employee/detail/(:segment)', 'HROutsourcing\Employee::getEmployeeByIdQr/$1');
+$routes->get('/hr-outsourcing-company/search-barang',  'HROutsourcing\Scale::searchBarang', ['filter' => 'Auth']);
+$routes->get('/hr-outsourcing-company/search-master-barang',  'HROutsourcing\Scale::searchMasterBarang', ['filter' => 'Auth']);
 $routes->get('/get-spesifikasi-by-qr', 'Setting\Auth::login');
 
 /*

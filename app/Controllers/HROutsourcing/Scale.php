@@ -1,6 +1,7 @@
 <?php namespace App\Controllers\HROutsourcing;
 
 use App\Controllers\BaseController;
+use App\Models\BarangMasterModel;
 use App\Models\BarangMasterSpesifikasiModel;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\ErrorCorrectionLevel;
@@ -20,7 +21,6 @@ class Scale extends BaseController
         $html = "";
 
         $spesifikasiModel = new BarangMasterSpesifikasiModel();
-
 
         try {
             // Ambil data barang dan spesifikasi
@@ -45,32 +45,66 @@ class Scale extends BaseController
             // QR text langsung isi type + value
             $qrText = "{$type}-{$encryptedId}";
 
-            // Generate QR Code (isi text-nya aja)
+            // Generate QR Code
             $qrCode = new QrCode($qrText);
-            $qrCode->setSize(350);
-            $qrCode->setMargin(10);
+            $qrCode->setSize(380);
+            $qrCode->setMargin(12);
             $qrCode->setErrorCorrectionLevel(new ErrorCorrectionLevel(ErrorCorrectionLevel::HIGH));
 
-            // Convert ke data URI
             $dataUri = $qrCode->writeDataUri();
 
-            // Output tampilan HTML-nya
+            // ==== HTML tampilannya ====
             $html .= "
-                <div class='col-md-12 mb-4 text-center'>
-                    <div style='font-size: 22px; font-weight: bold; text-transform: uppercase;'>
-                        {$barangName}
-                    </div>
-                    <div style='font-size: 16px; margin-bottom: 10px;'>
-                        {$spesifikasiName}
-                    </div>
-                    <a href='{$dataUri}' download='qr-{$type}-{$spesifikasiId}.png'>
-                        <img src='{$dataUri}' alt='QR Code' style='width: 350px; height: 350px;'>
-                    </a>
-                    <div style='margin-top: 10px; font-size: 13px;'>
-                        <strong>SCAN VALUE:</strong> {$qrText}<br>
-                        <strong>ID:</strong> {$spesifikasiId}
+                <div style='
+                    width:100%;
+                    text-align:center;
+                    font-family:Arial, Helvetica, sans-serif;
+                    padding:30px 10px;
+                '>
+                    <div style='
+                        font-size:26px;
+                        font-weight:900;
+                        letter-spacing:1px;
+                        text-transform:uppercase;
+                        margin-bottom:5px;
+                    '>{$barangName}</div>
+
+                    <div style='
+                        font-size:23px;
+                        font-weight:600;
+                        color:#555;
+                        margin-bottom:20px;
+                        text-transform:uppercase;
+                    '>{$spesifikasiName}</div>
+
+                    <img src='{$dataUri}' alt='QR Code' 
+                        style='width:350px;height:350px;display:block;margin:0 auto;border:5px solid #000;border-radius:8px;'>
+
+                    <div style='
+                        margin-top:15px;
+                        font-size:14px;
+                        color:#222;
+                        font-weight:500;
+                    '>
                     </div>
                 </div>
+
+                <style>
+                    @media print {
+                        body {
+                            margin:0;
+                            padding:0;
+                            text-align:center;
+                            background:#fff;
+                        }
+                        img {
+                            page-break-inside: avoid;
+                        }
+                        div {
+                            page-break-inside: avoid;
+                        }
+                    }
+                </style>
             ";
 
             return $this->response->setJSON([
@@ -85,7 +119,6 @@ class Scale extends BaseController
             ]);
         }
     }
-
 
 
     public function getBarangByIdQr($encryptedId)
@@ -148,6 +181,68 @@ class Scale extends BaseController
                 'message' => 'Gagal membaca QR: ' . $e->getMessage()
             ]);
         }
+    }
+
+    public function searchMasterBarang()
+    {
+        $barangMasterModel = new BarangMasterModel();
+
+        $term = $this->request->getGet('q');
+
+        if (strlen($term) < 3) {
+            return $this->response->setJSON([
+                'data' => [],
+                'status' => false,
+                'message' => 'Minimal 3 karakter'
+            ]);
+        }
+        
+
+        $builder = $barangMasterModel
+            ->select('barang_master.barang_name as master_barang, barang_master.id as id')
+            ->where('barang_master.deletedAt', null)
+            ->where('barang_master.company_id', session()->get("login")->this_company_id)
+            ->where('barang_master.type_barang', 'bahan_baku')
+            ->groupStart()
+                ->like('barang_master.barang_name', "%{$term}%")
+            ->groupEnd();
+
+        $data = $builder->get()->getResultArray();
+
+        return $this->response->setJSON([
+            'data'   => $data,
+            'status' => true,
+            'token'  => csrf_hash()
+        ]);
+    }
+
+    public function searchBarang()
+    {
+        $term = $this->request->getGet('q');
+        $barang = $this->request->getGet('barang_id');
+
+        $barangSpesifikasiModel = new BarangMasterSpesifikasiModel();
+
+        $builder = $barangSpesifikasiModel
+            ->select('barang_master_spesifikasi.id as spesifikasi_id, barang_master.barang_name as master_barang, barang_master_spesifikasi.spesifikasi as spesifikasi, satuans.kode_satuan')
+            ->join('barang_master', 'barang_master.id = barang_master_spesifikasi.barang_master_id')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1')
+            ->where('barang_master_spesifikasi.deletedAt', null)
+            ->where('barang_master.deletedAt', null)
+            ->where('barang_master.id', $barang)
+            ->where('barang_master.company_id', session()->get("login")->this_company_id)
+            ->where('barang_master.type_barang', 'bahan_baku')
+            ->groupStart()
+                ->like('barang_master_spesifikasi.spesifikasi', "%{$term}%")
+            ->groupEnd();
+
+        $data = $builder->get()->getResultArray();
+
+        return $this->response->setJSON([
+            'data'   => $data,
+            'status' => true,
+            'token'  => csrf_hash()
+        ]);
     }
 
 

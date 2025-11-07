@@ -251,6 +251,8 @@
     var listData = []; // UNTUK FRONT END
     var listDataServer = []; // YANG DIKIRIM KE PHP
     var listFilterSPP = [];
+    var listDataEdit = [];
+    var listDataDelete = [];
 
     $(".tanggal_penerimaan_lpb").datepicker({
         todayHighlight: true,
@@ -283,6 +285,11 @@
                 listData = res;
                 listDataServer = res;
                 addValueFilterSpp(listData);
+                listData.result = syncListData(
+                    listData.result,
+                    listDataEdit,
+                    listDataDelete
+                );
                 drawTable(listData);
             }
         })
@@ -642,84 +649,48 @@
                             return elem.text;
                         });
                         var ongkosKirim = destroyFormatRupiah($('#ongkos_kirim').val() || 0);
-
+                        var url = id == '' ? '<?= base_url("penerimaan-barang-lokal-bp/insert"); ?>' : '<?= base_url("penerimaan-barang-lokal-bp/update"); ?>';
                         var formData = new FormData(document.querySelector(".create-form"));
                         formData.append("acceptance_type", po_no.length > 1 ? "MULTIPLE ORDER" : "SINGLE ORDER");
                         formData.append("multiple_po_id", JSON.stringify($('.multiple_po_id').val()));
                         formData.append("multiple_po_no", JSON.stringify(po_no));
                         formData.append("barangs", JSON.stringify(listData.result));
                         formData.set("ongkos_kirim", ongkosKirim);
+                        formData.append("id", id);
 
-                        if (id) {
-                            formData.append("id", id);
-                            $.ajax({
-                                url: "<?= base_url("penerimaan-barang-lokal-bp/update"); ?>",
-                                data: formData,
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                beforeSend: function(xhr) {
-                                    setLoading();
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                complete: function() {
-                                    stopLoading();
-                                },
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        }).then(() => {
-                                            window.location.href = "<?= base_url('penerimaan-barang-lokal-bp') ?>"
-                                        });
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                    }
+                        $.ajax({
+                            url: url,
+                            data: formData,
+                            method: "POST",
+                            dataType: "json",
+                            processData: false,
+                            contentType: false,
+                            beforeSend: function(xhr) {
+                                setLoading();
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            },
+                            complete: function() {
+                                stopLoading();
+                            },
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    }).then(() => {
+                                        window.location.href = "<?= base_url("penerimaan-barang-lokal-bp"); ?>";
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
                                 }
-                            });
-                        } else {
-                            $.ajax({
-                                url: "<?= base_url("penerimaan-barang-lokal-bp/insert"); ?>",
-                                data: formData,
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                beforeSend: function(xhr) {
-                                    setLoading();
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                complete: function() {
-                                    stopLoading();
-                                },
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        }).then(() => {
-                                            window.location.href = "<?= base_url("penerimaan-barang-lokal-bp"); ?>";
-                                        });
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                    }
-                                }
-                            });
-                        }
+                            }
+                        });
                     }
 
                 })
@@ -766,6 +737,8 @@
                     listData.result[i].sisa_total = Number(destroyFormatRupiah($('.sisa_total').val()));
                     listData.result[i].sub_total = Number(destroyFormatRupiah($('.sub_total').val()));
                     listData.result[i].jml_diterima_lpb_konversi = Number(jml_diterima_lpb * nilai_konversi);
+                    // Simpan kedalam variabel session
+                    listDataEdit.push(listData.result[i]);
                     // drawTable(listData);
                     $('.filter_spp').change(); // draw
                     $('.detail-modal').modal('hide');
@@ -985,6 +958,9 @@
                 break;
             }
         }
+        var deleteData = listData.result[indexToRemove];
+        // push yang didelete
+        listDataDelete.push(deleteData);
         if (indexToRemove !== -1) {
             listData.result.splice(indexToRemove, 1);
         }
@@ -1056,6 +1032,28 @@
         })
         $("#filter_spp").val(null).change();
     }
+
+    function syncListData(listData, listDataEdit, listDataDelete) {
+        // 1. Update data berdasarkan listDataEdit
+        listData = listData.map(item => {
+            const edited = listDataEdit.find(e => e.am_purchase_order_details_id === item.am_purchase_order_details_id);
+            if (edited) {
+                item.jml_diterima_lpb = edited.jml_diterima_lpb;
+                item.jml_diterima_total = edited.jml_diterima_total;
+                item.sisa_total = edited.sisa_total;
+                item.sub_total = edited.sub_total;
+                item.jml_diterima_lpb_konversi = edited.jml_diterima_lpb_konversi;
+            }
+            return item;
+        });
+
+        // 2. Hapus data berdasarkan listDataDelete
+        listData = listData.filter(item => {
+            return !listDataDelete.some(del => del.am_purchase_order_details_id === item.am_purchase_order_details_id);
+        });
+
+        return listData;
+    }
 </script>
 
 <?php if (!empty($dataPenerimaanBarang)) : ?>
@@ -1079,6 +1077,8 @@
                 // ISI DATA
                 listData = res;
                 listDataServer = res;
+                // typo
+                // listData.result = syncListData(listData, listDataEdit, listDataDelete);
                 drawTable(listData);
             }
         });

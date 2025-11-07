@@ -430,7 +430,7 @@ class JasaVendorOutKepitingKukusModel extends Model
         $builder->like('no_surat_jalan', $lastStr);
         $query = $builder->get();
 
-        $kode = 'TOBA-VBM/' . $divisi;
+        $kode = 'TOBA-VBK/' . $divisi;
 
         $lastPenerimaan = '1';
 

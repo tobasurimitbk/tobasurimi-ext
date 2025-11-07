@@ -18,11 +18,13 @@ use App\Models\StockRevampDetailModel;
 use App\Models\StockRevampModel;
 use App\Models\SupplierModel;
 use App\Models\WarehousesModel;
+use App\Models\VendorModel;
 
 class ProsesRebus extends BaseController
 {
     protected $this_user_id;
     protected $this_company_id;
+    protected $vendorModel;
     protected $divisiModel;
     protected $stockModel;
     protected $stockDetailModel;
@@ -52,6 +54,7 @@ class ProsesRebus extends BaseController
         $this->supplierModel = new SupplierModel();
         $this->stockRevampModel = new StockRevampModel();
         $this->stockRevampDetailModel = new StockRevampDetailModel();
+        $this->vendorModel = new VendorModel();
     }
 
     public function index()
@@ -148,11 +151,11 @@ class ProsesRebus extends BaseController
     }
 
 
-
     public function create()
     {
         $data = [
             'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->findAll(),
+            'vendor' => $this->vendorModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', "ASC")->findAll(),
             'tanggal' => date('Y-m-d'),
             'divisi' => $this->divisiModel->getDivisiAccess(),
             'supplier' => $this->supplierModel->getSupplierAll()
@@ -172,6 +175,7 @@ class ProsesRebus extends BaseController
         $data = [
             'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->findAll(),
             'prosesRebus' => $prosesRebus,
+            'vendor' => $this->vendorModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', "ASC")->findAll(),
             'prosesRebusDetail' => $this->prosesRebusDetailModel->getProsesRebusDetail2($id),
             'divisi' => $this->divisiModel->where('id', $prosesRebus['divisi_id'])->findAll(),
             'warehouse' => $this->warehouseModel->where('id', $prosesRebus['warehouse_id'])->findAll(),
@@ -227,7 +231,8 @@ class ProsesRebus extends BaseController
                 'proses_rebus_id' => $id,
                 'stock_rebus_id' => $b->stock_id,
                 'stock_detail_rebus_id' => $b->id,
-                'po_id' => $b->rm_purchase_order_id,
+                'po_id' => $b->rm_purchase_order_id ?? NULL,
+                'jasa_vendor_id' => $b->jasa_vendor_in_id ?? NULL,
                 'bc_rebus_id' => $b->bc_id,
                 'qty_rebus' => $b->qty,
                 'unit_out_id' => $b->satuan_id,
@@ -283,7 +288,8 @@ class ProsesRebus extends BaseController
                     'stock_rebus_id' => $b->stock_id,
                     'stock_detail_rebus_id' => $b->id,
                     'bc_rebus_id' => $b->bc_id,
-                    'po_id' => $b->po_id,
+                    'po_id' => $b->rm_purchase_order_id ?? NULL,
+                    'jasa_vendor_id' => $b->jasa_vendor_in_id ?? NULL,
                     'qty_rebus' => $b->qty,
                     'barang_out_spesifikasi_id' => $b->output->barang_id,
                     'qty_hasil_rebus' => $b->output->qty,
@@ -479,7 +485,7 @@ class ProsesRebus extends BaseController
                     "barang_master_id" => $spesifikasiData["barang_master_id"],
                     "unit_id"          => $p["unit_out_id"],
                     "stock_detail_id"  => $p["stock_detail_rebus_id"],
-                    "stock_detail_asal"  => $p["stock_detail_rebus_id"],
+                    "stock_detail_asal" => $p["stock_detail_rebus_id"],
                     "stock_detail_result_id"  => $p["stock_detail_hasil_rebus_id"],
                     "divisi_id"        => $prosoesRebus["divisi_id"],
                     "warehouse_id"     => $prosoesRebus["warehouse_id"],
@@ -490,6 +496,8 @@ class ProsesRebus extends BaseController
                     "qty_diterima"     => round($p["qty_hasil_rebus"], 2),
                     "qty_bersih"       => round($p["qty_hasil_rebus"], 2),
                     "qty_digunakan"    => round($p["qty_rebus"], 2),
+                    "qty_bersih_asal"  => round($p["qty_rebus"], 2) ?? 0,
+                    "qty_diterima_asal"=> round($p["qty_kotor"], 2) ?? 0,
                     'reference_id'     => $id,
                     'po_type'          => "LOKAL BAKU",
                     'reference_type'   => "PROSES REBUS",
@@ -504,9 +512,13 @@ class ProsesRebus extends BaseController
 
                 $stockDetail = $this->stockRevampModel->insertStockRevamp($db, $data);
 
-                $this->prosesRebusDetailModel->update($p['id'], [
-                    'stock_detail_hasil_rebus_id' => $stockDetail,
-                ]);
+                if ($stockDetail) {
+                    $this->prosesRebusDetailModel->update($p['id'], [
+                        'stock_detail_hasil_rebus_id' => $stockDetail,
+                    ]);
+                } else {
+                    throw new \Exception("Gagal membuat stock detail hasil rebus untuk detail ID {$p['id']}");
+                }
             }
 
             // update status proses rebus

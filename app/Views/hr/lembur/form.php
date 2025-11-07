@@ -36,7 +36,7 @@
                     Informasi Karyawan
                 </label>
                 <div class="row mt-2">
-                    <div class="col-sm-4 mt-1">
+                    <div class="col-sm-3 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= (!empty($lemburDetail)) ? "disabled" : "" ?> class="form-select" name="divisionID" id="divisionID">
                                 <option value=""> Pilih Nama Karyawan</option>
@@ -49,7 +49,21 @@
                             <label for="floatingInput">Pilih Departemen</label>
                         </div>
                     </div>
-                    <div class="col-sm-4 mt-1">
+                    <div class="col-sm-3 mt-1">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= (!empty($lemburDetail)) ? "disabled" : "" ?> class="form-select" name="bagian_id" id="bagian_id">
+                                <?php if (!empty($lemburDetail)): ?>
+                                    <?php foreach ($bagian as $b) : ?>
+                                        <option selected value="<?= $b['id'] ?>">
+                                            <?= $b['kode_bagian'] . " - " . $b['nama_bagian'] ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </select>
+                            <label for="floatingInput">Pilih Bagian</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select" name="employeeID" id="employeeID" aria-label="Floating label select example">
                                 <option value="">
@@ -66,7 +80,7 @@
                             <label for="floatingInput">Pilih Nama Karyawan</label>
                         </div>
                     </div>
-                    <div class="col-sm-4 mt-1">
+                    <div class="col-sm-3 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input readonly autocomplete="one-time-code" type="text" id="nip" placeholder="" class="form-control target input-picker" value="-">
                             <label for="floatingInput">NIP</label>
@@ -208,6 +222,36 @@
 
     $("select[name='divisionID']").select2({
         placeholder: "Pilih Departemen",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function(e) {
+        e.preventDefault();
+        let csrf = $(`[name="${csrfToken}"]`);
+        var formData = new FormData();
+        formData.append('divisionID', $(this).val());
+        $.ajax({
+            url: `<?= base_url("list-attendance/get-bagian"); ?>`,
+            data: formData,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            method: "POST",
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success: function(result) {
+                csrf.val(result.token);
+                $("#bagian_id").empty()
+                $("#bagian_id").append(`<option value=""></option>`)
+                result.data.forEach(function(item) {
+                    $("#bagian_id").append(`<option value="${item.id}">${item.kode_bagian.toUpperCase()} - ${item.nama_bagian.toUpperCase()}</option>`)
+                });
+            }
+        });
+    });
+
+    $("select[name='bagian_id']").select2({
+        placeholder: "Pilih Bagian",
         theme: "bootstrap-5",
         allowClear: true
     });
@@ -520,15 +564,39 @@
                             processData: false,
                             contentType: false,
                             success: function(response) {
+                                csrf.val(response.token)
                                 if (response.status) {
                                     Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
+                                        icon: 'success',
+                                        title: response.message,
+                                        showCancelButton: true,
+                                        showDenyButton: true,
+                                        confirmButtonText: 'Buat Lembur Lagi',
+                                        denyButtonText: 'Tidak Buat Lagi',
+                                        confirmButtonColor: '#4e73df',
+                                        denyButtonColor: '#dc3545',
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            // Buat Lagi
+                                            $('#employeeID').val(null).change();
+                                            var table = $('#tabelGaji');
+                                            table.find('tbody').empty();
+                                            hideRincianUangLembur();
+
+                                            $('input[name="jamKerjaMasuk"]').val(null);
+                                            $('input[name="jamKerjaKeluar"]').val(null);
+                                            $('input[name="jamMulaiLembur"]').val(null);
+                                            $('input[name="jamSelesaiLembur"]').val(null);
+                                            $('input[name="jumlahJamIstirahat"]').val(null);
+                                            $('input[name="jumlahJamKerjaBersih"]').val(null);
+                                            $('input[name="totalUangLembur"]').val(null);
+                                            $('input[name="gajiPokokPerHari"]').val(null);
+                                            generateLembur();
+                                        } else if (result.isDenied) {
+                                            // Buat baru
                                             window.location.href = "<?= base_url("lembur"); ?>";
-                                        })
+                                        }
+                                    });
                                 } else {
                                     Swal.fire({
                                         icon: 'error',
@@ -551,22 +619,21 @@
         }
     });
 
-    $("select[name='divisionID']").on('change', function(e) {
+    $("select[name='bagian_id']").on('change', function(e) {
         e.preventDefault();
         const csrf = $(`[name="${csrfToken}"]`);
-        var divisionID = $(this).val();
+        var divisionID = $('#divisionID').val();
+        var bagianID = $('#bagian_id').val();
+
         var formData = new FormData();
         formData.append('divisionID', divisionID);
+        formData.append("bagianID", bagianID);
 
         $.ajax({
             url: "<?= base_url("lembur/employees"); ?>",
             data: formData,
             beforeSend: function(xhr) {
                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
             },
             method: "POST",
             dataType: "json",

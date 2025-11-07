@@ -236,6 +236,7 @@ class StockRevampModel extends Model
                 'reference_id'   => $data['reference_id'] ?? null,
                 'po_type'        => $data['po_type'] ?? null,
                 'reference_type' => $data['reference_type'] ?? null,
+                'keterangan'      => $data['keterangan'],
                 'qty_bersih'     => $data['qty_bersih'],
                 'qty_diterima'   => $data['qty_diterima'],
                 'createdAt'      => date('Y-m-d H:i:s'),

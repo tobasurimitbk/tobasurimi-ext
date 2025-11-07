@@ -93,7 +93,7 @@
                 }
                 abortController = new AbortController();
 
-                fetch("<?= base_url('jasa-vendor-out-kepiting-kukus/search-master-barang'); ?>?" + new URLSearchParams({
+                fetch("<?= base_url('hr-outsourcing-company/search-master-barang'); ?>?" + new URLSearchParams({
                     q: params.data.term
                 }), {
                     signal: abortController.signal
@@ -126,7 +126,7 @@
                 }
                 abortController = new AbortController();
 
-                fetch("<?= base_url('jasa-vendor-out-kepiting-kukus/search-barang'); ?>?" + new URLSearchParams({
+                fetch("<?= base_url('hr-outsourcing-company/search-barang'); ?>?" + new URLSearchParams({
                     barang_id: $('#barang_id option:selected').val(),
                     q: params.data.term
                 }), {

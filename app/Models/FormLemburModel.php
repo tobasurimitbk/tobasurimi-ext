@@ -90,7 +90,7 @@ class FormLemburModel extends Model
 
         $totalData = $dataQry->countAllResults(false);
 
-        if ($addCondition['search'] || $addCondition['divisi_id'] || $addCondition['tipe']) {
+        if ($addCondition['search'] || $addCondition['divisi_id'] || $addCondition['tipe'] || $addCondition['bagian_id']) {
             $dataQry->groupStart();
         }
 
@@ -102,13 +102,17 @@ class FormLemburModel extends Model
             $dataQry->where('employees.tipe', $addCondition['tipe']);
         }
 
+        if ($addCondition['bagian_id']) {
+            $dataQry->where('employees.bagian_id', $addCondition['bagian_id']);
+        }
+
         if ($addCondition['search']) {
             $dataQry->like('employees.nip', $addCondition['search'])
                 ->orLike('employees.name', $addCondition['search'])
                 ->orLike('bagian.nama_bagian', $addCondition['search']);
         }
 
-        if ($addCondition['search'] || $addCondition['divisi_id'] || $addCondition['tipe']) {
+        if ($addCondition['search'] || $addCondition['divisi_id'] || $addCondition['tipe'] || $addCondition['bagian_id']) {
             $dataQry->groupEnd();
         }
 

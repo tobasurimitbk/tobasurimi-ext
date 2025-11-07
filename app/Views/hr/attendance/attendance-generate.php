@@ -116,6 +116,7 @@
                     <li><a class="dropdown-item" href="#" id="btnShowExportHarianModal">Lap. Harian</a></li>
                     <li><a class="dropdown-item" href="#" onclick="exportExcelBulan()">Lap. Bulanan</a></li>
                     <li><a class="dropdown-item" href="#" id="btnTriwulanModal">Lap. Triwulan</a></li>
+                    <li><a class="dropdown-item" href="#" id="btnPerKaryawan">Lap. Per Karyawan</a></li>
                 </ul>
             <?php endif; ?>
         </div>
@@ -1541,6 +1542,40 @@
             window.open(url, '_blank');
         }
     });
+
+    $('#btnPerKaryawan').click(function(e) {
+        e.preventDefault();
+        var month = $('#month').val();
+        var divisiId = $('#divisi_id').val();
+        var bagianId = $('#bagian_id').val();
+
+        if (month == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pilih bulan dahulu',
+                confirmButtonColor: '#4e73df',
+            });
+            return;
+        } else if (divisiId == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pilih departemen dahulu',
+                confirmButtonColor: '#4e73df',
+            });
+            return;
+        } else if (bagianId == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pilih bagian dahulu',
+                confirmButtonColor: '#4e73df',
+            });
+            return;
+        } else {
+            var url = "<?= base_url('list-attendance/export-bulanan-employee') ?>?month=" + month + "&divisi_id=" + divisiId + '&bagian_id=' + bagianId + '&bagian_id=' + bagianId;
+            window.location.href = url;
+        }
+
+    })
 
     // datepicker checkin dan checkout
     $(function() {
