@@ -73,8 +73,22 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($biayaKepiting) ? 'disabled' : '' ?> autocomplete="one-time-code" class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Dibuat" value="<?= date('d/m/Y', strtotime(!empty($biayaKepiting) ? $biayaKepiting['tanggal'] : $tanggal)); ?>">
-                                    <label for="floatingInput">Tanggal Pembayaran</label>
+                                    <?php
+                                        $isDisabled = !empty($biayaKepiting) ? 'disabled' : '';
+                                        $tanggalValue = !empty($biayaKepiting)
+                                            ? date('d/m/Y', strtotime($biayaKepiting['tanggal']))
+                                            : date('d/m/Y');
+                                    ?>
+                                    <input 
+                                        <?= $isDisabled ?> 
+                                        autocomplete="one-time-code" 
+                                        class="form-control input-picker tanggal" 
+                                        id="tanggal" 
+                                        name="tanggal" 
+                                        placeholder="Tanggal Dibuat" 
+                                        value="<?= $tanggalValue; ?>"
+                                    >
+                                    <label for="tanggal">Tanggal Pembayaran</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
                                     <i style="cursor: pointer; z-index: 99; margin-bottom: 8px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
@@ -83,30 +97,24 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating mb-3 form-add-spp" style="height: 50px;">
-                            <select <?= !empty($biayaKepiting) ? 'disabled' : '' ?> class="form-select jasa_vendor_in_id" id="jasa_vendor_in_id" name="jasa_vendor_in_id" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                <?php if (!empty($jasaVendorIn)) : ?>
-                                    <?php foreach ($jasaVendorIn as $j) : ?>
-                                        <option data-warehouse_id="<?= $j['warehouse_id'] ?>" data-vendor="<?= strtoupper($j['name']) ?>" data-divisi="<?= strtoupper($j['divisi']) ?>" value="<?= $j['id'] ?>">
-                                            <?= $j['no_penerimaan_surat_jalan'] ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                <?php else : ?>
-                                    <?php if (!empty($jasaVendorInDetail)) : ?>
-                                        <option selected value="<?= $jasaVendorInDetail['id'] ?>">
-                                            <?= $jasaVendorInDetail['no_penerimaan_surat_jalan'] ?>
-                                        </option>
-                                    <?php endif; ?>
-                                <?php endif; ?>
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($biayaKepiting) ? 'disabled' : '' ?> class="form-select vendor_id" id="vendor_id" name="vendor_id" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php foreach ($vendor as $v) : ?>
+                                    <option <?= !empty($biayaKepiting) ? ($biayaKepiting['vendor_id'] == $v['id'] ? 'selected' : '') : '' ?> value="<?= $v['id'] ?>">
+                                        <?= strtoupper($v['name']); ?>
+                                    </option>
+                                <?php endforeach; ?>
                             </select>
-                            <label for="floatingInput" style="z-index: 1;">Pilih Nomor Penerimaan</label>
+                            <label for="floatingInput" style="z-index: 1;">Pilih Vendor</label>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="<?= !empty($biayaKepiting) ? $jasaVendorInDetail['name'] : '' ?>" autocomplete="one-time-code" disabled type="text" class="form-control vendor" id="vendor" name="vendor" placeholder="Vendor">
-                            <label for="floatingInput">Vendor</label>
+                        <div class="form-floating mb-3 form-add-spp" style="height: 50px;">
+                            <select class="form-select jasa_vendor_in_id" id="jasa_vendor_in_id" name="jasa_vendor_in_id[]" aria-label="Floating label select example">
+                                   
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Pilih Nomor Penerimaan</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -259,9 +267,53 @@
         autoclose: true
     });
 
+    $('#vendor_id').select2({
+        placeholder: "Pilih Vendor",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function () {
+        const vendorId = $(this).val();
+
+        // Kosongkan select surat jalan setiap ganti vendor
+        const $selectSuratJalan = $('.jasa_vendor_in_id');
+        $selectSuratJalan.empty().trigger('change');
+
+        if (!vendorId) return;
+
+        // 🔹 Panggil AJAX ke backend
+        $.ajax({
+            url: `/biaya-kepiting/get-jasa-vendor-in/${vendorId}`, // ubah sesuai endpoint kamu
+            type: 'GET',
+            dataType: 'json',
+            success: function (response) {
+                $selectSuratJalan.empty(); // clear existing
+                if (response && response.length > 0) {
+                    response.forEach(item => {
+                        const option = new Option(
+                            `${item.no_penerimaan_surat_jalan} - ${item.tanggal}`, // text tampil
+                            item.id, // value
+                            false,
+                            false
+                        );
+                        $selectSuratJalan.append(option);
+                    });
+                } else {
+                    $selectSuratJalan.append('<option value="">Tidak ada surat jalan</option>');
+                }
+
+                // trigger select2 refresh
+                $selectSuratJalan.trigger('change');
+            },
+            error: function () {
+                $selectSuratJalan.html('<option value="">Gagal memuat data</option>');
+            }
+        });
+    });
+
     $('.jasa_vendor_in_id').select2({
         placeholder: "Pilih Surat Jalan",
         theme: "bootstrap-5",
+        multiple: true,
     }).change(function() {
         var selected = $('.jasa_vendor_in_id option:selected');
         $('.vendor').val(selected.data('vendor'));
@@ -271,38 +323,6 @@
         listDataBarang();
         changeStatus();
     })
-    
-    
-    // $('.jasa_vendor_in_id').select2({
-    //     placeholder: "Pilih Barang Dan Spesifikasi",
-    //     theme: "bootstrap-5",
-    //     minimumInputLength: 3, // ngetik min 3 huruf baru jalanin ajax
-    //     ajax: {
-    //         url: "<?= base_url('biaya-kepiting/search-barang'); ?>", // endpoint buat search
-    //         dataType: 'json',
-    //         delay: 250, // kasih jeda biar ga nembak server tiap huruf
-    //         data: function (params) {
-    //             return {
-    //                 q: params.term // keyword pencarian
-    //             };
-    //         },
-    //         processResults: function (data) {
-    //             return {
-    //                 results: data.map(function(item) {
-    //                     return {
-    //                         id: item.id, // value select
-    //                         text: item.barang_name, // label yang tampil
-    //                     }
-    //                 })
-    //             };
-    //         }
-    //     }
-    // }).on("change", function () {
-    //     var selected = $('.jasa_vendor_in_id').select2('data')[0];
-
-    //     listDataBarang();
-    //     changeStatus();
-    // });
 
     $(".jasa_vendor_in_id")
         .parent('div')
@@ -352,395 +372,6 @@
         },
     });
 
-    // $('.btn-submit-parent').click(function() {
-    //     if (listBarang.length == 0) {
-    //         Swal.fire({
-    //             icon: 'error',
-    //             title: 'Barang masuk tidak boleh kosong !',
-    //             confirmButtonColor: '#4e73df',
-    //             confirmButtonText: 'Ok'
-    //         });
-    //     } else {
-    //         if ($('.create-form').valid()) {
-    //             // VALIDASI FORM 1 & FORM 3
-    //             var isValidBarangJumbo = true;
-    //             var dataErrorBarangJumbo = null;
-
-    //             var isValidBarangExLump = true;
-    //             var dataErrorBarangExLump = null;
-
-    //             var isValidBarangLump = true;
-    //             var dataErrorBarangLump = null;
-
-    //             var isValidBarangSpecial = true;
-    //             var dataErrorBarangSpecial = null;
-
-    //             var isValidBarangClaw = true;
-    //             var dataErrorBarangClaw = null;
-
-    //             var isValidBarangMh = true;
-    //             var dataErrorBarangMh = null;
-
-    //             var isValidBarangCf = true;
-    //             var dataErrorBarangCf = null;
-
-    //             var isValidBonusKg = true;
-    //             var dataErrorBonusKg = null;
-
-    //             var isValidBonusNominal = true;
-    //             var dataErrorBonusNominal = null;
-
-    //             $.each(listBarang, function(i, v) {
-    //                 var barangJumboElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].jumbo');
-    //                 var barangExLumpElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].ex_lump');
-    //                 var barangLumpElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].lump');
-    //                 var barangSpecialElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].special');
-    //                 var barangClawElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].claw');
-    //                 var barangMhElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].mh');
-    //                 var barangCfElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].cf');
-
-    //                 if (barangJumboElement.val() === undefined || barangJumboElement.val() === '') {
-    //                     isValidBarangJumbo = false;
-    //                     dataErrorBarangJumbo = listBarang[i];
-    //                 } else {
-    //                     listBarang[i].jumbo = barangJumboElement.val();
-    //                 }
-
-    //                 if (barangExLumpElement.val() === undefined || barangExLumpElement.val() === '') {
-    //                     isValidBarangExLump = false;
-    //                     dataErrorBarangExLump = listBarang[i];
-    //                 } else {
-    //                     listBarang[i].ex_lump = barangExLumpElement.val();
-    //                 }
-
-    //                 if (barangLumpElement.val() === undefined || barangLumpElement.val() === '') {
-    //                     isValidBarangLump = false;
-    //                     dataErrorBarangLump = listBarang[i];
-    //                 } else {
-    //                     listBarang[i].lump = barangLumpElement.val();
-    //                 }
-
-    //                 if (barangSpecialElement.val() === undefined || barangSpecialElement.val() === '') {
-    //                     isValidBarangSpecial = false;
-    //                     dataErrorBarangSpecial = listBarang[i];
-    //                 } else {
-    //                     listBarang[i].special = barangSpecialElement.val();
-    //                 }
-
-    //                 if (barangClawElement.val() === undefined || barangClawElement.val() === '') {
-    //                     isValidBarangClaw = false;
-    //                     dataErrorBarangClaw = listBarang[i];
-    //                 } else {
-    //                     listBarang[i].claw = barangClawElement.val();
-    //                 }
-
-    //                 if (barangMhElement.val() === undefined || barangMhElement.val() === '') {
-    //                     isValidBarangMh = false;
-    //                     dataErrorBarangMh = listBarang[i];
-    //                 } else {
-    //                     listBarang[i].mh = barangMhElement.val();
-    //                 }
-
-    //                 if (barangCfElement.val() === undefined || barangCfElement.val() === '') {
-    //                     isValidBarangCf = false;
-    //                     dataErrorBarangCf = listBarang[i];
-    //                 } else {
-    //                     listBarang[i].cf = barangCfElement.val();
-    //                 }
-    //             });
-    //         }
-
-    //         // VALIDASI FORM 2
-    //         var isValidPerolehanGaji = true;
-
-    //         $.each(listPerolehanGaji, function(i, v) {
-    //             var hargaJumboElement = $('input.' + v.value + '_jumbo');
-    //             var hargaExLumpElement = $('input.' + v.value + '_ex_lump');
-    //             var hargaLumpElement = $('input.' + v.value + '_lump');
-    //             var hargaSpecialElement = $('input.' + v.value + '_special');
-    //             var hargaClawElement = $('input.' + v.value + '_claw');
-    //             var hargaMhElement = $('input.' + v.value + '_mh');
-    //             var hargaCfElement = $('input.' + v.value + '_cf');
-
-    //             if (hargaJumboElement.val() === undefined || hargaJumboElement.val() === '') {
-    //                 isValidPerolehanGaji = false;
-    //                 Swal.fire({
-    //                     icon: 'error',
-    //                     title: v.description + ' Jumbo tidak valid !',
-    //                     confirmButtonColor: '#4e73df',
-    //                     confirmButtonText: 'Ok'
-    //                 });
-    //             } else {
-    //                 listPerolehanGaji[i].jumbo = hargaJumboElement.val();
-    //             }
-
-    //             if (hargaExLumpElement.val() === undefined || hargaExLumpElement.val() === '') {
-    //                 isValidPerolehanGaji = false;
-    //                 Swal.fire({
-    //                     icon: 'error',
-    //                     title: v.description + ' Ex Lump tidak valid !',
-    //                     confirmButtonColor: '#4e73df',
-    //                     confirmButtonText: 'Ok'
-    //                 });
-    //             } else {
-    //                 listPerolehanGaji[i].ex_lump = hargaExLumpElement.val();
-    //             }
-
-    //             if (hargaLumpElement.val() === undefined || hargaLumpElement.val() === '') {
-    //                 isValidPerolehanGaji = false;
-    //                 Swal.fire({
-    //                     icon: 'error',
-    //                     title: v.description + ' Lump tidak valid !',
-    //                     confirmButtonColor: '#4e73df',
-    //                     confirmButtonText: 'Ok'
-    //                 });
-    //             } else {
-    //                 listPerolehanGaji[i].lump = hargaLumpElement.val();
-    //             }
-
-    //             if (hargaSpecialElement.val() === undefined || hargaSpecialElement.val() === '') {
-    //                 isValidPerolehanGaji = false;
-    //                 Swal.fire({
-    //                     icon: 'error',
-    //                     title: v.description + ' Special tidak valid !',
-    //                     confirmButtonColor: '#4e73df',
-    //                     confirmButtonText: 'Ok'
-    //                 });
-    //             } else {
-    //                 listPerolehanGaji[i].special = hargaSpecialElement.val();
-    //             }
-
-    //             if (hargaClawElement.val() === undefined || hargaClawElement.val() === '') {
-    //                 isValidPerolehanGaji = false;
-    //                 Swal.fire({
-    //                     icon: 'error',
-    //                     title: v.description + ' Claw tidak valid !',
-    //                     confirmButtonColor: '#4e73df',
-    //                     confirmButtonText: 'Ok'
-    //                 });
-    //             } else {
-    //                 listPerolehanGaji[i].claw = hargaClawElement.val();
-    //             }
-
-    //             if (hargaMhElement.val() === undefined || hargaMhElement.val() === '') {
-    //                 isValidPerolehanGaji = false;
-    //                 Swal.fire({
-    //                     icon: 'error',
-    //                     title: v.description + ' Mh tidak valid !',
-    //                     confirmButtonColor: '#4e73df',
-    //                     confirmButtonText: 'Ok'
-    //                 });
-    //             } else {
-    //                 listPerolehanGaji[i].mh = hargaMhElement.val();
-    //             }
-
-    //             if (hargaCfElement.val() === undefined || hargaCfElement.val() === '') {
-    //                 isValidPerolehanGaji = false;
-    //                 Swal.fire({
-    //                     icon: 'error',
-    //                     title: v.description + ' Cf tidak valid !',
-    //                     confirmButtonColor: '#4e73df',
-    //                     confirmButtonText: 'Ok'
-    //                 });
-    //             } else {
-    //                 listPerolehanGaji[i].cf = hargaCfElement.val();
-    //             }
-    //         });
-
-    //         // VALIDASI BONUS
-    //         $.each(listBonus, function(i, v) {
-    //             var barangBonusKgElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].kg_bonus');
-    //             var barangBonusNominalElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].bonus_nominal');
-
-    //             if (barangBonusKgElement.val() === undefined || barangBonusKgElement.val() === '') {
-    //                 isValidBonusKg = false;
-    //                 dataErrorBonusKg = listBonus[i];
-    //             } else {
-    //                 listBonus[i].kg_bonus = barangBonusKgElement.val();
-    //             }
-
-    //             if (barangBonusNominalElement.val() === undefined || barangBonusNominalElement.val() === '') {
-    //                 isValidBonusNominal = false;
-    //                 dataErrorBonusNominal = listBonus[i];
-    //             } else {
-    //                 listBonus[i].bonus_nominal = barangBonusNominalElement.val();
-    //             }
-    //         });
-
-    //         // ALERT FORM 1
-    //         if (!isValidBarangJumbo) {
-    //             Swal.fire({
-    //                 icon: 'error',
-    //                 title: dataErrorBarangJumbo.nama_barang + ' Jumbo tidak valid !',
-    //                 confirmButtonColor: '#4e73df',
-    //                 confirmButtonText: 'Ok'
-    //             });
-    //         } else if (!isValidBarangExLump) {
-    //             Swal.fire({
-    //                 icon: 'error',
-    //                 title: dataErrorBarangExLump.nama_barang + ' Ex Lump tidak valid !',
-    //                 confirmButtonColor: '#4e73df',
-    //                 confirmButtonText: 'Ok'
-    //             });
-    //         } else if (!isValidBarangLump) {
-    //             Swal.fire({
-    //                 icon: 'error',
-    //                 title: dataErrorBarangLump.nama_barang + ' Lump tidak valid !',
-    //                 confirmButtonColor: '#4e73df',
-    //                 confirmButtonText: 'Ok'
-    //             });
-    //         } else if (!isValidBarangSpecial) {
-    //             Swal.fire({
-    //                 icon: 'error',
-    //                 title: dataErrorBarangSpecial.nama_barang + ' Special tidak valid !',
-    //                 confirmButtonColor: '#4e73df',
-    //                 confirmButtonText: 'Ok'
-    //             });
-    //         } else if (!isValidBarangClaw) {
-    //             Swal.fire({
-    //                 icon: 'error',
-    //                 title: dataErrorBarangClaw.nama_barang + ' Claw tidak valid !',
-    //                 confirmButtonColor: '#4e73df',
-    //                 confirmButtonText: 'Ok'
-    //             });
-    //         } else if (!isValidBarangMh) {
-    //             Swal.fire({
-    //                 icon: 'error',
-    //                 title: dataErrorBarangMh.nama_barang + ' Mh tidak valid !',
-    //                 confirmButtonColor: '#4e73df',
-    //                 confirmButtonText: 'Ok'
-    //             });
-    //         } else if (!isValidBarangCf) {
-    //             Swal.fire({
-    //                 icon: 'error',
-    //                 title: dataErrorBarangCf.nama_barang + ' Cf tidak valid !',
-    //                 confirmButtonColor: '#4e73df',
-    //                 confirmButtonText: 'Ok'
-    //             });
-    //         } else if (!isValidBonusKg) {
-    //             Swal.fire({
-    //                 icon: 'error',
-    //                 title: dataErrorBonusKg.nama_barang + ' Bonus KG tidak valid !',
-    //                 confirmButtonColor: '#4e73df',
-    //                 confirmButtonText: 'Ok'
-    //             });
-    //         } else if (!isValidBonusNominal) {
-    //             Swal.fire({
-    //                 icon: 'error',
-    //                 title: dataErrorBonusNominal.nama_barang + ' Bonus Nominal tidak valid !',
-    //                 confirmButtonColor: '#4e73df',
-    //                 confirmButtonText: 'Ok'
-    //             });
-    //         } else if (!isValidPerolehanGaji) {
-    //             console.log("Validasi perolehan gaji");
-    //         } else {
-    //             Swal.fire({
-    //                 icon: 'question',
-    //                 title: 'Simpan Data ?',
-    //                 confirmButtonColor: '#4e73df',
-    //                 cancelButtonColor: '#d33',
-    //                 showCancelButton: true,
-    //                 reverseButtons: true,
-    //                 confirmButtonText: 'Simpan',
-    //                 cancelButtonText: 'Kembali',
-    //             }).then((result) => {
-    //                 if (result.isConfirmed) {
-    //                     let id = $('#id').val();
-    //                     let data = new FormData(document.querySelector(".create-form"));
-    //                     data.append('listBarang', JSON.stringify(listBarang));
-    //                     data.append('listPerolehanGaji', JSON.stringify(listPerolehanGaji));
-    //                     data.append("listBonus", JSON.stringify(listBonus));
-    //                     data.append("listDataVendor", JSON.stringify(listDataVendor));
-
-    //                     if (id) {
-    //                         // UPDATE
-    //                         data.append("jasa_vendor_in_id", $('#jasa_vendor_in_id option:selected').val());
-    //                         $.ajax({
-    //                             url: "<?= base_url("biaya-kepiting/update"); ?>",
-    //                             data: data,
-    //                             beforeSend: function(xhr) {
-    //                                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-    //                                 setLoading();
-    //                             },
-    //                             complete: function() {
-    //                                 stopLoading()
-    //                             },
-    //                             method: "POST",
-    //                             dataType: "json",
-    //                             processData: false,
-    //                             contentType: false,
-    //                             success: function(response) {
-    //                                 if (response.status) {
-    //                                     Swal.fire({
-    //                                         icon: 'success',
-    //                                         title: response.message,
-    //                                         confirmButtonColor: '#4e73df',
-    //                                         confirmButtonText: 'Ok'
-    //                                     }).then((result) => {
-    //                                         if (result.isConfirmed) {
-    //                                             window.location.href = "<?= base_url("biaya-kepiting") ?>";
-    //                                         }
-    //                                     });
-    //                                 } else {
-    //                                     Swal.fire({
-    //                                         icon: 'error',
-    //                                         title: response.message,
-    //                                         confirmButtonColor: '#4e73df',
-    //                                         confirmButtonText: 'Ok'
-    //                                     });
-    //                                 }
-
-    //                             },
-    //                         });
-    //                     } else {
-    //                         // INSERT
-    //                         $.ajax({
-    //                             url: "<?= base_url("biaya-kepiting/save"); ?>",
-    //                             data: data,
-    //                             beforeSend: function(xhr) {
-    //                                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-    //                                 setLoading();
-    //                             },
-    //                             complete: function() {
-    //                                 stopLoading()
-    //                             },
-    //                             method: "POST",
-    //                             dataType: "json",
-    //                             processData: false,
-    //                             contentType: false,
-    //                             success: function(response) {
-    //                                 if (response.status) {
-    //                                     Swal.fire({
-    //                                         icon: 'success',
-    //                                         title: response.message,
-    //                                         confirmButtonColor: '#4e73df',
-    //                                         confirmButtonText: 'Ok'
-    //                                     }).then((result) => {
-    //                                         if (result.isConfirmed) {
-    //                                             window.location.href = "<?= base_url("biaya-kepiting") ?>";
-    //                                         }
-    //                                     });
-    //                                 } else {
-    //                                     Swal.fire({
-    //                                         icon: 'error',
-    //                                         title: response.message,
-    //                                         confirmButtonColor: '#4e73df',
-    //                                         confirmButtonText: 'Ok'
-    //                                     });
-    //                                 }
-
-    //                             },
-    //                         });
-    //                     }
-    //                 }
-    //             });
-    //         }
-    //     }
-    // });
-
-
-
-
     changeStatus();
 
     function changeStatus() {
@@ -786,7 +417,7 @@
                 stopLoading();
             },
             data: {
-                jasa_vendor_in_id: $(".jasa_vendor_in_id option:selected").val(),
+                jasa_vendor_in_id: $(".jasa_vendor_in_id").val(),
             },
             dataType: "json",
             success: function(res) {
@@ -800,19 +431,23 @@
         });
     }
 
-   // Fungsi untuk membuat header tabel secara dinamis
+    // Fungsi untuk membuat header tabel secara dinamis
     function buildDynamicHeader() {
         const thead = $('#dynamicHeader');
         thead.empty();
-        
+
+        // Pastikan listBarang punya struktur dasar
+        if (!window.listBarang) window.listBarang = {};
+        if (!listBarang.thead) listBarang.thead = [];
+
         // Baris pertama header
         let firstRow = `<tr>
             <th style="text-align: center;" colspan="3"></th>
             <th style="text-align: center;" colspan="2">Kg Bahan Baku</th>
-            <th style="text-align: center;" colspan="${listBarang.thead ? listBarang.thead.length : 7}">Hasil Kopek</th>
+            <th style="text-align: center;" colspan="${listBarang.thead.length || 7}">Hasil Kopek</th>
             <th style="text-align: center;" colspan="1"></th>
         </tr>`;
-        
+
         // Baris kedua header
         let secondRow = `<tr>
             <th style="text-align: center;">No</th>
@@ -820,14 +455,13 @@
             <th style="text-align: center;">Supplier - Keterangan</th>
             <th style="text-align: center;">Qty Sebelum Kopek</th>
             <th style="text-align: center;">Rasio (%)</th>`;
-        
-        // Tambahkan kolom untuk setiap spesifikasi
-        if (listBarang.thead && listBarang.thead.length > 0) {
+
+        if (listBarang.thead.length > 0) {
             listBarang.thead.forEach(spec => {
                 secondRow += `<th style="text-align: center;">${spec}</th>`;
             });
         } else {
-            // Fallback jika tidak ada data thead
+            // fallback default header
             secondRow += `
                 <th style="text-align: center;">JUMBO</th>
                 <th style="text-align: center;">EX LUMP</th>
@@ -838,19 +472,28 @@
                 <th style="text-align: center;">CF</th>
             `;
         }
-        
+
         secondRow += `<th style="text-align: center;">TOTAL</th></tr>`;
-        
+
         thead.append(firstRow);
         thead.append(secondRow);
     }
 
+
     // Fungsi utama untuk menggambar tabel
     function drawTable() {
+        // Pastikan semua variabel global ada
+        if (!window.listBarang) window.listBarang = {};
+        if (!listBarang.data) listBarang.data = [];
+        if (!listBarang.thead) listBarang.thead = [];
+        if (!window.listPerolehanGaji) window.listPerolehanGaji = [];
+        if (!window.listDataVendor) window.listDataVendor = {};
+        if (!window.listBonus) window.listBonus = [];
+
         const table = $('#dataTable');
         $('.foot-detail-table').empty();
         $('.body-table').empty();
-        
+
         // Bangun header dinamis
         buildDynamicHeader();
         
