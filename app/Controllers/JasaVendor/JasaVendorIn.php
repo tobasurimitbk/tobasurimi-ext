@@ -525,6 +525,7 @@ class JasaVendorIn extends BaseController
     public function createKepitingAction()
     {
         $barangs = json_decode($_POST['listBarang']);
+        // var_dump($barangs); exit;
         $jasaVendorOutNo = $this->jasaVendorInModel->getJasaVendorOutNo(
             $this->request->getVar('multiple_jasa_vendor_out_id')
         );
@@ -596,6 +597,7 @@ class JasaVendorIn extends BaseController
                             'bc_in_id' => $b->bc_id ?? null,
                             'no_aju_in' => $b->no_aju ?? null,
                             'stock_dokumen' => $b->stock_dokumen,
+                            'keterangan' => $b->keterangan,
                             'qty_kotor' => 0,
                             'qty_bersih' => 0
                         ];
@@ -618,6 +620,7 @@ class JasaVendorIn extends BaseController
                 'bc_in_id' => $gb['bc_in_id'],
                 'no_aju_in' => $gb['no_aju_in'],
                 'stock_dokumen' => $gb['stock_dokumen'],
+                'keterangan' => $gb['keterangan'],
                 'qty_kotor' => $gb['qty_kotor'],
                 'qty_bersih' => $gb['qty_bersih']
             ]);
@@ -694,6 +697,7 @@ class JasaVendorIn extends BaseController
                             'bc_in_id' => $b->bc_id ?? null,
                             'no_aju_in' => $b->no_aju ?? null,
                             'stock_dokumen' => $b->stock_dokumen,
+                            'keterangan' => $b->keterangan,
                             'qty_kotor' => 0,
                             'qty_bersih' => 0
                         ];
@@ -715,6 +719,7 @@ class JasaVendorIn extends BaseController
                 'bc_in_id' => $gb['bc_in_id'],
                 'no_aju_in' => $gb['no_aju_in'],
                 'stock_dokumen' => $gb['stock_dokumen'],
+                'keterangan' => $gb['keterangan'],
                 'qty_kotor' => $gb['qty_kotor'],
                 'qty_bersih' => $gb['qty_bersih']
             ]);
