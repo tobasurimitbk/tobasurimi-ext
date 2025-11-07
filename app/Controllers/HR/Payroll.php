@@ -68,8 +68,8 @@ class Payroll extends BaseController
     public function index()
     {
         $data = [
-            'divisi' => $this->divisiModel->get_by_company_id($this->this_company_id),
-            'bagian' => $this->bagianModel->get_by_company_id($this->this_company_id),
+            'divisi' => $this->divisiModel->getDivisiAccess(),
+            'bagian' => [],
             'golongan' => $this->golonganModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll(),
         ];
 
@@ -447,6 +447,14 @@ class Payroll extends BaseController
                 ]);
             }
 
+            // Total Karyawan Masuk di Hari Libur
+            $mapTotalEmployeeMasukLibur = $this->attendanceModel->getTotalHariLiburEmployeeHadir(
+                $startDate,
+                $endDate,
+                $this->this_company_id,
+                $employeeIds,
+            );
+
             // Mapping divisi
             $divisiList = $this->employeeModel->getDivisiByEmployeeAmt($employeeIds);
             $mapDivisi  = [];
@@ -486,6 +494,10 @@ class Payroll extends BaseController
             // Insert payroll batch awal
             $dataPayroll = [];
             foreach ($employeeIds as $e) {
+                if (isset($mapStatusAttendance[$e])) {
+                    $mapStatusAttendance[$e]['HADIR_H'] = $mapStatusAttendance[$e]['HADIR_H'] - $mapTotalEmployeeMasukLibur[$e];
+                }
+
                 $att = $mapStatusAttendance[$e] ?? [];
 
                 $dataPayroll[] = [
@@ -719,6 +731,7 @@ class Payroll extends BaseController
             $totalAbsensi = $dataAbsensiGeneratedQry->countAllResults();
 
             if ($totalAbsensi == 0) {
+                $db->transRollback();
                 return response()->setJSON([
                     'message' => "Data absensi bulan " . $yearMonth . " tidak ada",
                     'status'  => false,
@@ -754,6 +767,14 @@ class Payroll extends BaseController
                     'token'   => csrf_hash()
                 ]);
             }
+
+            // Total Karyawan Masuk di Hari Libur
+            $mapTotalEmployeeMasukLibur = $this->attendanceModel->getTotalHariLiburEmployeeHadir(
+                $startDate,
+                $endDate,
+                $this->this_company_id,
+                $employeeIds,
+            );
 
             // Mapping divisi
             $divisiList = $this->employeeModel->getDivisiByEmployeeAmt($employeeIds);
@@ -794,6 +815,9 @@ class Payroll extends BaseController
             // Insert payroll batch awal
             $dataPayroll = [];
             foreach ($employeeIds as $e) {
+                if (isset($mapStatusAttendance[$e])) {
+                    $mapStatusAttendance[$e]['HADIR_H'] = $mapStatusAttendance[$e]['HADIR_H'] - $mapTotalEmployeeMasukLibur[$e];
+                }
                 $att = $mapStatusAttendance[$e] ?? [];
 
                 $dataPayroll[] = [
@@ -1023,7 +1047,7 @@ class Payroll extends BaseController
             'totalPerhitunganGaji' => $this->payrollGajiModel->getTotalKomponenGajiPayroll($id),
             'rekapKeterlambatanPresensi' => $this->attendanceKeterlambatanModel->rekap($id),
             'totalNominalKeterlambatanPresensi' => $this->attendanceKeterlambatanModel->getTotalRekap($id),
-            'rekapLembur' => $this->formLemburModel->rekap($payroll['employee_id'], $payroll['year_month']),
+            'rekapLembur' => $this->formLemburModel->rekapLemburDateRange($payroll['employee_id'], $payroll['start_date'], $payroll['end_date']),
             'rekapPerizinanNotApproved' => $this->rekapPerizinanNotApprovedModel->rekap($id),
             'totalNominalRekapPerizinanNotApproved' => $this->rekapPerizinanNotApprovedModel->getTotalRekap($id),
             'rekapPinjaman' => $this->pinjamanKaryawanModel->getPinjamanKaryawanDiambil($payroll['employee_id'], $payroll['year_month']),
@@ -1108,6 +1132,18 @@ class Payroll extends BaseController
         ]);
     }
 
+    public function getEmployeeByBagian()
+    {
+        return response()->setJSON([
+            'data' => $this->employeeModel->where('deletedAt', null)
+                ->where('bagian_id', $this->request->getVar('bagianId'))
+                ->orderBy('name', "ASC")
+                ->findAll(),
+            'token' => \csrf_hash(),
+        ]);
+    }
+
+
     public function exportPdfPayrollSingle($payrollID)
     {
         $dompdf = new Dompdf();
@@ -1126,7 +1162,7 @@ class Payroll extends BaseController
         }
         // set variable
         $employee = $this->employeeModel->getSingleEmployee($payrollDetail['employee_id']);
-        $splitJamLembur = $this->formLemburModel->getTotalLemburJamPertamaKedua($payrollDetail['employee_id'], $payrollDetail['year_month']);
+        $splitJamLembur = $this->formLemburModel->getTotalLemburJamPertamaKeduaByDateRange($payrollDetail['employee_id'], $payrollDetail['start_date'], $payrollDetail['end_date']);
         $company =  $this->companyModel->where('id', $this->this_company_id)->first();
 
         $data = [
@@ -1134,7 +1170,7 @@ class Payroll extends BaseController
             'employee' => $employee,
             'year' => explode("-", $payrollDetail['year_month'])[0],
             'month' => explode("-", $payrollDetail['year_month'])[1],
-            'rekapLembur' => $this->formLemburModel->rekap($payrollDetail['employee_id'], $payrollDetail['year_month']),
+            'rekapLembur' => $this->formLemburModel->rekapLemburDateRange($payrollDetail['employee_id'], $payrollDetail['start_date'], $payrollDetail['end_date']),
             'totalLemburJamPertama' => $splitJamLembur['jamPertama'],
             'totalLemburJamKedua' => $splitJamLembur['jamKedua'],
             'perhitunganGaji' => $this->payrollGajiModel->getPerhitunganKomponenGajiPayroll($payrollID),

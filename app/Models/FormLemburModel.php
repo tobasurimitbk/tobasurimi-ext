@@ -135,6 +135,14 @@ class FormLemburModel extends Model
             ->findAll();
     }
 
+    public function rekapLemburDateRange($employeeID, $startDate, $endDate)
+    {
+        return $this->asArray()->where('employee_id', $employeeID)
+            ->where('periode >=', $startDate)
+            ->where('periode <=', $endDate)
+            ->findAll();
+    }
+
     public function getTotalLemburJamPertamaKedua($employeeID, $yearMonth)
     {
         $formLemburModel = new FormLemburModel();
@@ -159,6 +167,32 @@ class FormLemburModel extends Model
             'jamKedua' => number_format((($lemburJamKedua / 60) * 100), 2)
         ];
     }
+
+    public function getTotalLemburJamPertamaKeduaByDateRange($employeeID, $startDate, $endDate)
+    {
+        $formLemburModel = new FormLemburModel();
+        $lembur = $formLemburModel->rekapLemburDateRange($employeeID, $startDate, $endDate);
+        $totalLembur = count($lembur);
+        $totalJam = 0;
+        $lemburJamPertama = 0;
+        $lemburJamKedua = 0;
+
+        foreach ($lembur as $l) {
+            $totalJam += $l['total_jam_lembur'];
+        }
+
+        for ($i = 0; $i < $totalLembur; $i++) {
+            $totalJam--;
+            $lemburJamPertama++;
+            $lemburJamKedua = $totalJam;
+        }
+
+        return [
+            'jamPertama' => $lemburJamPertama,
+            'jamKedua' => number_format((($lemburJamKedua / 60) * 100), 2)
+        ];
+    }
+
 
     public function getFormLemburAmt(
         $employeeIds,

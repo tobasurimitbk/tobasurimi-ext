@@ -173,26 +173,26 @@
             <div class="row">
                 <div class="col-sm-3 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input readonly autocomplete="one-time-code" type="text" required name="totalUangLembur" id="totalUangLembur" class="form-control target input-picker" value="<?= " " . number_format($payrollDetail['nominal_uang_lembur'],  2, ',', '.') ?>">
+                        <input readonly autocomplete="one-time-code" type="text" required name="totalUangLembur" id="totalUangLembur" class="form-control target input-picker" value="<?= " " . number_format($payrollDetail['nominal_uang_lembur'],  2) ?>">
                         <label for="floatingInput">Total Uang Lembur Dalam Sebulan</label>
                     </div>
                 </div>
                 <div class="col-sm-3 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" onkeyup="this.value = greatFormatRupiah(this.value);" type="text" id="gajiPerHari" class="form-control target input-picker" value="<?= " " . number_format($payrollDetail['nominal_gaji_harian'], 2, ',', '.') ?>">
+                        <input disabled autocomplete="one-time-code" onkeyup="this.value = greatFormatRupiah(this.value);" type="text" id="gajiPerHari" class="form-control target input-picker" value="<?= " " . number_format($payrollDetail['nominal_gaji_harian'], 2) ?>">
                         <label for="floatingInput">Gaji (Per Hari)</label>
                     </div>
                 </div>
                 <div class="col-sm-3 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" onkeyup="this.value = greatFormatRupiah(this.value);" type="text" id="cadanganPerHari" class="form-control target input-picker" value="<?= " " . number_format($payrollDetail['nominal_cadangan'], 2, ',', '.') ?>">
+                        <input disabled autocomplete="one-time-code" onkeyup="this.value = greatFormatRupiah(this.value);" type="text" id="cadanganPerHari" class="form-control target input-picker" value="<?= " " . number_format($payrollDetail['nominal_cadangan'], 2) ?>">
                         <label for="floatingInput">Cadangan (Per Hari)</label>
                     </div>
                 </div>
                 <div class="col-sm-3 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input readonly autocomplete="one-time-code" type="text" id="hariKerja" class="form-control target input-picker" value="<?= $payrollDetail['hadir_final'] ?> Hari">
-                        <label for="floatingInput">Hari Kerja (Total Masuk + Perizinan Approved)</label>
+                        <label for="floatingInput">Hari Kerja (Tidak Termasuk Hari Minggu & Hari Libur)</label>
                     </div>
                 </div>
             </div>
@@ -234,12 +234,12 @@
                                         <tr style="cursor: pointer;" class="perhitunganGaji" data-id="<?= $p['id'] ?>" data-komponen_gaji="<?= $p['name'] ?>" data-nominal="<?= $p['nominal'] ?>" data-tipe="<?= $p['tipe'] == "PLUS" ? "+" : "-"  ?>">
                                             <td><?= $no++; ?></td>
                                             <td><b> <?= $p['name'] ?></b></td>
-                                            <td style="color: <?= $p['tipe'] == "PLUS" ? "green" : "red"  ?>; font-weight:bold;"><b> <?= $p['tipe'] == "PLUS" ? "(+)" : "(-)"  ?> <?= " " . number_format($p['nominal'],  2, ',', '.') ?></b></td>
+                                            <td style="color: <?= $p['tipe'] == "PLUS" ? "green" : "red"  ?>; font-weight:bold;"><b> <?= $p['tipe'] == "PLUS" ? "(+)" : "(-)"  ?> <?= " " . number_format($p['nominal'],  2) ?></b></td>
                                         </tr>
                                     <?php endforeach ?>
                                     <tr class="bg-secondary">
                                         <td colspan="2" align="right"><b>Tunjangan Diterima</b></td>
-                                        <td><b><?= " " . number_format($totalPerhitunganGaji,  2, ',', '.') ?></b></td>
+                                        <td><b><?= " " . number_format($totalPerhitunganGaji,  2) ?></b></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -267,12 +267,12 @@
                                             <td><?= date('d/m/Y', strtotime($r['periode'])) ?></td>
                                             <td><?= $r['checkin'] ?></td>
                                             <td><?= $r['total_jam_keterlambatan'] ?></td>
-                                            <td class="text-danger" style="font-weight:bold;"><b>(-) <?= " " . number_format($r['nominal_pengurangan'],  2, ',', '.') ?></b></td>
+                                            <td class="text-danger" style="font-weight:bold;"><b>(-) <?= " " . number_format($r['nominal_pengurangan'],  2) ?></b></td>
                                         </tr>
                                     <?php endforeach ?>
                                     <tr class="bg-secondary">
                                         <td colspan="4" align="right"><b>Denda Keterlambatan Presensi</b></td>
-                                        <td><b class="text-danger"> (-) <?= " " . number_format($totalNominalKeterlambatanPresensi,  2, ',', '.') ?></b></td>
+                                        <td><b class="text-danger"> (-) <?= " " . number_format($totalNominalKeterlambatanPresensi,  2) ?></b></td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
@@ -302,12 +302,12 @@
                                             <td><?= $r['total_jam_lembur'] ?> Jam</td>
                                             <td><?= $r['jam_mulai_lembur'] ?></td>
                                             <td><?= $r['jam_selesai_lembur'] ?></td>
-                                            <td style="font-weight:bold;" class="text-success"><b>(+) <?= " " . number_format($r['total_uang_lembur'],  2, ',', '.') ?></b></td>
+                                            <td style="font-weight:bold;" class="text-success"><b>(+) <?= " " . number_format($r['total_uang_lembur'],  2) ?></b></td>
                                         </tr>
                                     <?php endforeach ?>
                                     <tr class="bg-secondary">
                                         <td colspan="5" align="right"><b>Total Uang Lembur Selama Sebulan</b></td>
-                                        <td><b class="text-success">(+) <?= " " . number_format($payrollDetail['nominal_uang_lembur'],  2, ',', '.') ?></b></td>
+                                        <td><b class="text-success">(+) <?= " " . number_format($payrollDetail['nominal_uang_lembur'],  2) ?></b></td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
@@ -333,12 +333,12 @@
                                             <td><?= $no++; ?></td>
                                             <td><?= explode("_", $r['status'])[0] ?></td>
                                             <td><?= date('d/m/Y', strtotime($r['periode'])) ?></td>
-                                            <!-- <td style="font-weight:bold;" class="text-danger"><b>(-) <?= " " . number_format($r['nominal_pengurangan'],  2, ',', '.') ?></b></td> -->
+                                            <!-- <td style="font-weight:bold;" class="text-danger"><b>(-) <?= " " . number_format($r['nominal_pengurangan'],  2) ?></b></td> -->
                                         </tr>
                                     <?php endforeach ?>
                                     <!-- <tr class="bg-secondary">
                                         <td colspan="2" align="right"><b>Pengurangan Gaji Harian</b></td>
-                                        <td><b class="text-danger">(-) <?= " " . number_format($totalNominalRekapPerizinanNotApproved,  2, ',', '.') ?></b></td>
+                                        <td><b class="text-danger">(-) <?= " " . number_format($totalNominalRekapPerizinanNotApproved,  2) ?></b></td>
                                     </tr> -->
                                 <?php endif; ?>
                             </tbody>
@@ -363,11 +363,11 @@
                                     <tr>
                                         <td><?= $no++; ?></td>
                                         <td style="text-align: center;"><?= date('d/m/Y', strtotime($rekapPinjaman['tanggal_ambil'])) ?></td>
-                                        <td style="font-weight:bold;" class="text-danger"><b>(-) <?= " " . number_format($rekapPinjaman['nominal'],  2, ',', '.') ?></b></td>
+                                        <td style="font-weight:bold;" class="text-danger"><b>(-) <?= " " . number_format($rekapPinjaman['nominal'],  2) ?></b></td>
                                     </tr>
                                     <tr class="bg-secondary">
                                         <td colspan="2" align="right"><b>Total Pinjaman Karyawan</b></td>
-                                        <td><b class="text-danger">(-) <?= " " . number_format($totalPinjaman,  2, ',', '.') ?></b></td>
+                                        <td><b class="text-danger">(-) <?= " " . number_format($totalPinjaman,  2) ?></b></td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
@@ -425,23 +425,23 @@
                         <td style="width: 10px;">1</td>
                         <td>Total Gaji & Lembur</td>
                         <td>=</td>
-                        <td align="right"><b id="gajiLemburTabel"><?= " " . number_format($payrollDetail['nominal_uang_gaji'] + $payrollDetail['nominal_uang_lembur'], 2, ',', '.') ?></b></td>
+                        <td align="right"><b id="gajiLemburTabel"><?= " " . number_format($payrollDetail['nominal_uang_gaji'] + $payrollDetail['nominal_uang_lembur'], 2) ?></b></td>
                     </tr>
                     <tr>
                         <td style="width: 10px;">2</td>
                         <td>Penambahan Gaji</td>
                         <td>=</td>
-                        <td align="right"><b id="penambahanGajiTabel" class="text-success">(+) <?= " " . number_format($payrollDetail['nominal_penambahan_gaji'], 2, ',', '.') ?></b></td>
+                        <td align="right"><b id="penambahanGajiTabel" class="text-success">(+) <?= " " . number_format($payrollDetail['nominal_penambahan_gaji'], 2) ?></b></td>
                     </tr>
                     <tr>
                         <td style="width: 10px;">3</td>
                         <td>Pengurangan Gaji</td>
                         <td>=</td>
-                        <td align="right"><b id="penguranganGajiTabel" class="text-danger">(-) <?= " " . number_format($payrollDetail['nominal_pengurangan_gaji'], 2, ',', '.') ?></b></td>
+                        <td align="right"><b id="penguranganGajiTabel" class="text-danger">(-) <?= " " . number_format($payrollDetail['nominal_pengurangan_gaji'], 2) ?></b></td>
                     </tr>
                     <tr>
                         <td colspan="3" align="right"><b>Total Uang Diterima</b></td>
-                        <td align="right"><b id="gajiDiterimaTabel"><?= " " . number_format($payrollDetail['nominal_gaji_diterima'], 2, ',', '.') ?></b></td>
+                        <td align="right"><b id="gajiDiterimaTabel"><?= " " . number_format($payrollDetail['nominal_gaji_diterima'], 2) ?></b></td>
                     </tr>
                 </tbody>
             </table>

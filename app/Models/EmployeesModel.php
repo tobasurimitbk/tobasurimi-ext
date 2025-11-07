@@ -529,4 +529,10 @@ class EmployeesModel extends Model
         $queryResult = $this->asArray()->whereIn('id', $employeeIds)->where('deletedAt', null)->findAll();
         return $queryResult;
     }
+
+    public function getEmployeeByBagian($bagianId)
+    {
+        $dataResult = $this->db->table('employees')->where('bagian_id', $bagianId)->where('deletedAt', null)->get()->getResultArray();
+        return $dataResult;
+    }
 }
