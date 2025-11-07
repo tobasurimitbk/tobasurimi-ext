@@ -127,32 +127,6 @@
             page-break-inside: avoid;
         }
     </style>
-    <style>
-        .section-border {
-            width: 100%;
-            border: 1px solid #000;
-            font-size: 12px;
-            padding: 6px;
-            position: relative;
-            page-break-inside: auto;
-        }
-
-        /* Tambahkan border bawah manual setiap page break */
-        .section-border::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            border-bottom: 1px solid #000;
-        }
-
-        /* Trik buat munculin border atas di halaman baru */
-        .section-border>* {
-            page-break-inside: avoid;
-        }
-    </style>
-
 </head>
 
 <body>
@@ -556,7 +530,7 @@
 
 
                     <?php if ($displayPrice == "true" && $totalSalesKontrakdetail > 1 && $total_adjustments > 0): ?>
-                        <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;">
+                        <tr style="font-weight: bold; background-color: #e9ecef; font-size: 12px;">
                             <td style="padding: 6px; border: 1px solid #ddd;"></td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
                                 <span style="float: left;">TOTAL</span>
@@ -567,7 +541,7 @@
 
                     <!-- Royalty -->
                     <?php if ($dataSODetail['royaltyPriceFinal'] > 0): ?>
-                        <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;" class="price">
+                        <tr style="font-weight: bold; background-color: #e9ecef; font-size: 12px;" class="price">
                             <td style="padding: 6px; border: 1px solid #ddd;"></td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: right; color:red;">
                                 <span style="float: left;"><?= $dataSO->royalty ?></span>
@@ -578,7 +552,7 @@
 
                     <!-- Rebate -->
                     <?php if ($dataSODetail['rebatePriceFinal'] > 0): ?>
-                        <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;" class="price">
+                        <tr style="font-weight: bold; background-color: #e9ecef; font-size: 12px;" class="price">
                             <td style="padding: 6px; border: 1px solid #ddd;"></td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: right; color:red;">
                                 <span style="float: left;"><?= $dataSO->rebate ?></span>
@@ -589,7 +563,7 @@
 
                     <!-- Can Deduction -->
                     <?php if ($dataSODetail['canDeductionPriceFinal'] > 0): ?>
-                        <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;" class="price">
+                        <tr style="font-weight: bold; background-color: #e9ecef; font-size: 12px;" class="price">
                             <td style="padding: 6px; border: 1px solid #ddd;"></td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: right; color:red;">
                                 <span style="float: left;"><?= $dataSO->can_deduction ?></span>
@@ -600,7 +574,7 @@
 
                     <!-- Freight -->
                     <?php if ($dataSODetail['estimatedFreightPriceFinal'] > 0): ?>
-                        <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;" class="price">
+                        <tr style="font-weight: bold; background-color: #e9ecef; font-size: 12px;" class="price">
                             <td style="padding: 6px; border: 1px solid #ddd;"></td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
                                 <span style="float: left;"><?= $dataSO->estimated_freight ?></span>
@@ -611,7 +585,7 @@
 
                     <!-- Others (with +/- sign) -->
                     <?php if ($dataSODetail['othersPriceFinal'] > 0): ?>
-                        <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;" class="price">
+                        <tr style="font-weight: bold; background-color: #e9ecef; font-size: 12px;" class="price">
                             <td style="padding: 6px; border: 1px solid #ddd;"></td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
                                 <span style="float: left;"><?= $dataSO->others_type ?></span>
@@ -622,7 +596,7 @@
 
                     <!-- Palet & Fumigation -->
                     <?php if ($dataSO->palet_fumigation > 0): ?>
-                        <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;" class="price">
+                        <tr style="font-weight: bold; background-color: #e9ecef; font-size: 12px;" class="price">
                             <td style="padding: 6px; border: 1px solid #ddd;"></td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
                                 <span style="float: left;"><?= $dataSO->palet_fumigation ?></span>
@@ -633,7 +607,7 @@
 
                     <!-- Additional Details -->
                     <?php foreach ($dataSalesExportAdditional as $d): ?>
-                        <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;" class="price">
+                        <tr style="font-weight: bold; background-color: #e9ecef; font-size: 12px;" class="price">
                             <td style="padding: 6px; border: 1px solid #ddd;"></td>
                             <td style="<?= $d['additional_detail_type'] == "MINUS" ? 'padding: 6px; border: 1px solid #ddd; text-align: right; color:red;' : 'padding: 6px; border: 1px solid #ddd; text-align: right;' ?>">
                                 <span style="float: left;"><?= $d['additional_detail'] ?></span>
@@ -643,7 +617,7 @@
                     <?php endforeach; ?>
 
                     <!-- Final Amount Row -->
-                    <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;">
+                    <tr style="font-weight: bold; background-color: #e9ecef; font-size: 12px;">
                         <td style="padding: 6px; border: 1px solid #ddd;"></td>
                         <td style="padding: 6px; border: 1px solid #ddd;">
                             <table style="width: 100%; table-layout: fixed;">
@@ -732,240 +706,196 @@
                             </td>
                         </tr>
                     <?php endif; ?>
-
                 </tbody>
             </table>
-
-            <div border="1" style="width: 100%; border: 1px solid black; border-collapse: collapse; font-size:12px;">
-                <div class="" style="margin-bottom:-3px;">
-                    <b>
-                        DOCS & CERTIFICATE REQUIRED
-                    </b>
-                </div>
-
-                <hr>
-                <?php if ($dataSO->document_required != ""): ?>
-                    <b>
-                        - DOCUMENT REQUIRED
-                    </b>
-                    <?= $dataSO->document_required ?>
-                <?php endif; ?>
-                <?php if ($dataSO->payment_term != ""): ?>
-                    <b>
-                        - PAYMENT TERM
-                    </b>
-                    <br>
-                    <?= $dataSO->payment_term ?>
-                <?php endif; ?>
-
-                <?php if ($dataSO->shipment_an != ""): ?>
-                    <b>
-                        - SHIPMENT A/N
-                    </b>
-                    <br>
-                    <?= $dataSO->shipment_an ?>
-                <?php endif; ?>
-
-                <?php if ($dataSO->consigne_docs != ""): ?>
-                    <b>
-                        - CONSIGNEE
-                    </b>
-                    <br>
-                    <?= $dataSO->consigne_docs ?>
-                <?php endif; ?>
-
-                <?php if ($dataSO->notify_party != ""): ?>
-                    <b>
-                        - NOTIFY PARTY
-                    </b>
-                    <br>
-                    <?= $dataSO->notify_party ?>
-                <?php endif; ?>
-
-                <?php if ($dataSO->additional_detail_docs != ""): ?>
-                    <b>
-                        - ADDITIONAL DETAILS
-                    </b>
-                    <br>
-                    <?= $dataSO->additional_detail_docs ?>
-                <?php endif; ?>
-
-                <hr>
-                <div style="margin-top: -90px; margin-bottom:-3px;">
-                    <b>
-                        SPECIAL INSTRUCTIONS
-                    </b>
-                </div>
-                <hr>
-                <?php if ($dataSO->product_specs != ""): ?>
-                    <b>
-                        - PRODUCT SPECS
-                    </b>
-                    <br>
-                    <?= $dataSO->product_specs ?>
-
-                <?php endif; ?>
-
-                <?php if ($dataSO->processing_method != ""): ?>
-                    <b>
-                        - PROCESSING METHOD
-                    </b>
-                    <br>
-                    <?= $dataSO->processing_method ?>
-
-                <?php endif; ?>
-
-                <?php if ($dataSO->packaging != ""): ?>
-                    <b>
-                        - PACKAGING
-                    </b>
-                    <br>
-                    <?= $dataSO->packaging ?>
-                <?php endif; ?>
-
-                <?php if ($dataSO->code_stamping != ""): ?>
-                    <b>
-                        - CODE STAMPING
-                    </b>
-                    <br>
-                    <?= $dataSO->code_stamping ?>
-                <?php endif; ?>
-
-                <?php if ($dataSO->loading != ""): ?>
-                    <b>
-                        - LOADING
-                    </b>
-                    <br>
-                    <?= $dataSO->loading ?>
-                <?php endif; ?>
-
-
-                <?php if ($dataSO->foto_loading != ""): ?>
-                    <b>
-                        - FOTO LOADING
-                    </b>
-                    <br>
-                    <?= $dataSO->foto_loading ?>
-                <?php endif; ?>
-
-
-                <?php if ($dataSO->stuffing != ""): ?>
-                    <b>
-                        - STUFFING
-                    </b>
-                    <br>
-                    <?= $dataSO->stuffing ?>
-                <?php endif; ?>
-
-
-                <?php if ($dataSO->additional_detail != ""): ?>
-                    <b>
-                        - ADDITIONAL DETAIL
-                    </b>
-                    <br>
-                    <?= $dataSO->additional_detail ?>
-                <?php endif; ?>
-
-                <?php if (count($dataSalesOrderSpecs) != 0): ?>
-                    <div style="margin: 10px 0;">
-                        <b>
-                            - PRODUCT SPECS
-                        </b> <br>
-                        <table style="width:50%; border-collapse: collapse; margin-left:6px; margin-top:3px; font-size:11px;">
-                            <thead>
-                                <tr>
-                                    <th style="border: 1px solid #000; padding: 4px;"><b>GRADE</b></th>
-                                    <th style="border: 1px solid #000; padding: 4px;"><b>SPECIFICATIONS</b></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($dataSalesOrderSpecs as $d): ?>
-                                    <tr>
-                                        <td colspan="2" style="border: 1px solid #000; padding: 4px;">- <?= $d['size_packing'] ?></td>
-                                    </tr>
-                                    <?php foreach ($d['grade_specs'] as $g): ?>
-                                        <tr>
-                                            <td style="border: 1px solid #000; padding: 4px;"><?= $g['grade'] ?></td>
-                                            <td style="border: 1px solid #000; padding: 4px;"><?= $g['specification'] ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-
-
-                    </div>
-                <?php endif; ?>
-            </div>
-
-            <table border="1" style="width: 100.2%; border: 1px solid black; border-collapse: collapse;" class="label">
+            <table border="1" style="width: 100%; border: 1px solid black; border-collapse: collapse;" class="label">
                 <tbody>
-                    <tr class="keep-together">
+
+                    <!-- <tr>
+                        <td>
+
+                        </td>
+                    </tr> -->
+                    <tr>
                         <td>
                             <b>
-                                APPROVED BY
-                            </b>
+                                DOCS & CERTIFICATE REQUIRED
+                            </b><br>
+                            <hr>
+                            <?php if ($dataSO->document_required != ""): ?>
+                                <b>
+                                    - DOCUMENT REQUIRED
+                                </b>
+                                <?= $dataSO->document_required ?>
+                            <?php endif; ?>
+                            <?php if ($dataSO->payment_term != ""): ?>
+                                <b>
+                                    - PAYMENT TERM
+                                </b>
+                                <br>
+                                <?= $dataSO->payment_term ?>
+                            <?php endif; ?>
+
+                            <?php if ($dataSO->shipment_an != ""): ?>
+                                <b>
+                                    - SHIPMENT A/N
+                                </b>
+                                <br>
+                                <?= $dataSO->shipment_an ?>
+                            <?php endif; ?>
+
+                            <?php if ($dataSO->consigne_docs != ""): ?>
+                                <b>
+                                    - CONSIGNEE
+                                </b>
+                                <br>
+                                <?= $dataSO->consigne_docs ?>
+                            <?php endif; ?>
+
+                            <?php if ($dataSO->notify_party != ""): ?>
+                                <b>
+                                    - NOTIFY PARTY
+                                </b>
+                                <br>
+                                <?= $dataSO->notify_party ?>
+                            <?php endif; ?>
+
+                            <!-- <?php if ($dataSO->additional != ""): ?>
+                                <b>
+                                    - ADDITIONAL
+                                </b>
+                                <br>
+                                <?= $dataSO->additional ?> <br>
+                                <?php if ($dataSO->additional_2 != ""): ?>
+                                    <?= $dataSO->additional_2 ?> <br>
+                                <?php endif; ?>
+                            <?php endif; ?> -->
+
+                            <?php if ($dataSO->additional_detail_docs != ""): ?>
+                                <b>
+                                    - ADDITIONAL DETAILS
+                                </b>
+                                <br>
+                                <?= $dataSO->additional_detail_docs ?>
+                            <?php endif; ?>
                         </td>
                     </tr>
+                    <!-- <tr class="keep-together">
+                        <td>
 
+                        </td>
+                    </tr> -->
                     <tr>
-                        <td style=" padding: 0;">
-                            <table style="width: 100%; border-collapse: collapse;" class="label">
-                                <tr>
-                                    <td style="width: 16.66%; border: 1px solid black; border-left: none; border-top: none; border-bottom: none;">
-                                        M.DIRECTOR
-                                    </td>
-                                    <td style="width: 16.66%; border: 1px solid black; border-top: none; border-bottom: none;">
-                                        QC
-                                    </td>
-                                    <td style="width: 16.66%; border: 1px solid black; border-top: none; border-bottom: none;">
-                                        EXIM
-                                    </td>
-                                    <td style="width: 16.66%; border: 1px solid black; border-top: none; border-bottom: none;">
-                                        ACCOUNTING
-                                    </td>
-                                    <td style="width: 16.66%; border: 1px solid black; border-top: none; border-bottom: none;">
-                                        PRODUCTION
-                                    </td>
-                                    <td style="width: 16.66%; border: 1px solid black; border-right: none; border-top: none; border-bottom: none;">
-                                        MARKETING
-                                    </td>
-                                </tr>
-                            </table>
+                        <td>
+                            <b>
+                                SPECIAL INSTRUCTIONS
+                            </b> <br>
+                            <hr>
+                            <?php if ($dataSO->product_specs != ""): ?>
+                                <b>
+                                    - PRODUCT SPECS
+                                </b>
+                                <br>
+                                <?= $dataSO->product_specs ?>
+
+                            <?php endif; ?>
+
+                            <?php if ($dataSO->processing_method != ""): ?>
+                                <b>
+                                    - PROCESSING METHOD
+                                </b>
+                                <br>
+                                <?= $dataSO->processing_method ?>
+
+                            <?php endif; ?>
+
+                            <?php if ($dataSO->packaging != ""): ?>
+                                <b>
+                                    - PACKAGING
+                                </b>
+                                <br>
+                                <?= $dataSO->packaging ?>
+                            <?php endif; ?>
+
+                            <?php if ($dataSO->code_stamping != ""): ?>
+                                <b>
+                                    - CODE STAMPING
+                                </b>
+                                <br>
+                                <?= $dataSO->code_stamping ?>
+                            <?php endif; ?>
+
+                            <?php if ($dataSO->loading != ""): ?>
+                                <b>
+                                    - LOADING
+                                </b>
+                                <br>
+                                <?= $dataSO->loading ?>
+                            <?php endif; ?>
+
+
+                            <?php if ($dataSO->foto_loading != ""): ?>
+                                <b>
+                                    - FOTO LOADING
+                                </b>
+                                <br>
+                                <?= $dataSO->foto_loading ?>
+                            <?php endif; ?>
+
+
+                            <?php if ($dataSO->stuffing != ""): ?>
+                                <b>
+                                    - STUFFING
+                                </b>
+                                <br>
+                                <?= $dataSO->stuffing ?>
+                            <?php endif; ?>
+
+
+                            <?php if ($dataSO->additional_detail != ""): ?>
+                                <b>
+                                    - ADDITIONAL DETAIL
+                                </b>
+                                <br>
+                                <?= $dataSO->additional_detail ?>
+                            <?php endif; ?>
                         </td>
-
                     </tr>
-                    <tr>
-                        <td style="border: none; padding: 0;">
-                            <table style="width: 100%; border-collapse: collapse;" class="label">
-                                <tr>
-                                    <td style="width: 16.66%; border: 1px solid black; border-left: none; border-top: none; border-bottom: none;">
-                                        <br><br><br><br>
-                                    </td>
-                                    <td style="width: 16.66%; border: 1px solid black; border-top: none; border-bottom: none;">
-                                        <br><br><br><br>
 
-                                    </td>
-                                    <td style="width: 16.66%; border: 1px solid black; border-top: none; border-bottom: none;">
-                                        <br><br><br><br>
+                    <?php if (count($dataSalesOrderSpecs) != 0): ?>
+                        <div style="margin: 10px 0;">
+                            <b>
+                                PRODUCT SPECS
+                            </b> <br>
+                            <table style="width: 50%; border: 1px solid black; border-collapse: collapse; margin-left:6px; margin-top:3px;" class="label">
+                                <thead>
+                                    <tr>
+                                        <td><b>GRADE</b></td>
+                                        <td><b>SPECIFICATIONS</b></td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($dataSalesOrderSpecs as $d): ?>
+                                        <tr>
+                                            <td colspan="2">- <?= $d['size_packing'] ?></td>
+                                        </tr>
+                                        <?php foreach ($d['grade_specs'] as $g): ?>
+                                            <tr>
+                                                <td><?= $g['grade'] ?></td>
+                                                <td><?= $g['specification'] ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php endforeach; ?>
 
-                                    </td>
-                                    <td style="width: 16.66%; border: 1px solid black; border-top: none; border-bottom: none;">
-                                        <br><br><br><br>
-
-                                    </td>
-                                    <td style="width: 16.66%; border: 1px solid black; border-top: none; border-bottom: none;">
-                                        <br><br><br><br>
-
-                                    </td>
-                                    <td style="width: 16.66%; border: 1px solid black; border-right: none; border-top: none; border-bottom: none;">
-                                        <br><br><br><br>
-
-                                    </td>
-                                </tr>
+                                </tbody>
                             </table>
-                        </td>
-                    </tr>
+                            </td>
+
+                        </div>
+                    <?php endif; ?>
+
+
+
 
                 </tbody>
             </table>
