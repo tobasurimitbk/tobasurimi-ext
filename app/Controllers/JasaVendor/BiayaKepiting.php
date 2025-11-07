@@ -145,7 +145,10 @@ class BiayaKepiting extends BaseController
 
     public function create()
     {
-        return view('jasaVendor/biayaKepiting/form');
+        $data = [
+            'vendor' => $this->vendorModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', "ASC")->findAll(),
+        ];
+        return view('jasaVendor/biayaKepiting/form', $data);
     }
 
     public function detail($id)
@@ -167,101 +170,21 @@ class BiayaKepiting extends BaseController
     }
 
 
-    // public function createAction()
-    // {
+    public function getSuratJalan($vendorId)
+    {
+        $data = $this->jasaVendorInKepitingKukusModel
+            ->select('id, no_penerimaan_surat_jalan, tanggal')
+            ->where('vendor_id', $vendorId)
+            ->where('company_id', $this->this_company_id)
+            ->where('status_posting', '1')
+            ->where('deletedAt', null)
+            ->findAll();
 
-    //     $listBarang = json_decode($_POST['listBarang']);
-    //     $listPerolehanGaji = json_decode($_POST['listPerolehanGaji']);
-    //     $listBonus = json_decode($_POST['listBonus']);
-    //     $jasaVendorIn = $this->jasaVendorInModel->find($this->request->getVar('jasa_vendor_in_id'));
-    //     $biayaKepiting = $this->biayaKepitingModel->where('company_id', $this->this_company_id)->where('no_pembayaran', $this->request->getVar('no_pembayaran'))->first();
+        // FE expects: response (array langsung)
+        return $this->response->setJSON($data);
+    }
 
-    //     if ($biayaKepiting != null) {
-    //         return response()->setJSON([
-    //             'message' => "No pembayaran sudah ada !",
-    //             'status' => false,
-    //             'token' => csrf_hash()
-    //         ]);
-    //     }
 
-    //     if (count($listBarang) == 0) {
-    //         return response()->setJSON([
-    //             'message' => "Barang tidak boleh kosong",
-    //             'status' => false,
-    //             'token' => csrf_hash()
-    //         ]);
-    //     }
-
-    //     if (count($listBonus) == 0) {
-    //         return response()->setJSON([
-    //             'message' => "Bonus tidak boleh kosong",
-    //             'status' => false,
-    //             'token' => csrf_hash()
-    //         ]);
-    //     }
-
-    //     $id = $this->biayaKepitingModel->insert([
-    //         'company_id' => $this->this_company_id,
-    //         'divisi_id' => $jasaVendorIn['divisi_id'],
-    //         'jasa_vendor_in_id' => $jasaVendorIn['id'],
-    //         'vendor_id' => $jasaVendorIn['vendor_id'],
-    //         'warehouse_id' => $jasaVendorIn['warehouse_id'],
-    //         'no_pembayaran' => $this->request->getVar('no_pembayaran'),
-    //         "tanggal" => $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "",
-    //         'keterangan' => $this->request->getVar('keterangan'),
-    //         'status_posting' => '0'
-    //     ]);
-
-    //     foreach ($listBarang as $b) {
-    //         $this->biayaKepitingDetailModel->insert([
-    //             'biaya_kepiting_id' => $id,
-    //             'jasa_vendor_in_id' => $this->request->getVar('jasa_vendor_in_id'),
-    //             // 'barang_master_id' => $b->barang_master_id,
-    //             // 'barang_master_spesifikasi_id' => $b->barang_master_spesifikasi_id,
-    //             'jumbo' => $b->jumbo,
-    //             'ex_lump' => $b->ex_lump,
-    //             'lump' => $b->lump,
-    //             'special' => $b->special,
-    //             'claw' => $b->claw,
-    //             'mh' => $b->mh,
-    //             'cf' => $b->cf,
-    //         ]);
-    //     }
-
-    //     foreach ($listPerolehanGaji as $b) {
-    //         $this->biayaKepitingGajiModel->insert([
-    //             'biaya_kepiting_id' => $id,
-    //             'jumbo' => $b->jumbo,
-    //             'ex_lump' => $b->ex_lump,
-    //             'lump' => $b->lump,
-    //             'special' => $b->special,
-    //             'claw' => $b->claw,
-    //             'mh' => $b->mh,
-    //             'cf' => $b->cf,
-    //             'jenis' => $b->description
-    //         ]);
-    //     }
-
-    //     foreach ($listBonus as $b) {
-    //         if ($b->kg_bonus) {
-    //             $this->biayaKepitingBonusModel->insert([
-    //                 'biaya_kepiting_id' => $id,
-    //                 'jasa_vendor_in_id' => $this->request->getVar('jasa_vendor_in_id'),
-    //                 // 'barang_master_id' => $b->barang_master_id,
-    //                 // 'barang_master_spesifikasi_id' => $b->barang_master_spesifikasi_id,
-    //                 'kg_bonus' => $b->kg_bonus,
-    //                 'bonus_nominal' => $b->bonus_nominal
-    //             ]);
-    //         }
-    //     }
-
-    //     return response()->setJSON([
-    //         'message' => "Biaya kepiting berhasil disimpan",
-    //         'token' => csrf_token(),
-    //         'id' => encrypt($id),
-    //         'status' => true
-    //     ]);
-    // }
 
 
     public function createAction()
@@ -641,30 +564,37 @@ class BiayaKepiting extends BaseController
     {
         $jasaVendorInID = $this->request->getVar('jasa_vendor_in_id');
         $id = $this->request->getVar('id');
-
         // Pastikan $id bisa handle multiple atau single value
-        if (!empty($id)) {
-            $data = $this->biayaKepitingModel->dropdownBarangKepitingKukus($jasaVendorInID, $$id);
-            $dataPerolehanGaji = $this->biayaKepitingModel->dropdownPerolehanGaji($id);
-            $dataBonus = $this->biayaKepitingBonusModel->dropdownBarang($jasaVendorInID, $$id);
-        } else {
-            // Kalau belum ada ID dikirim
-            $data = $this->biayaKepitingModel->dropdownBarangKepitingKukus($jasaVendorInID);
-            $dataPerolehanGaji = $this->biayaKepitingModel->dropdownPerolehanGaji();
-            $dataBonus = $this->biayaKepitingBonusModel->dropdownBarang($jasaVendorInID);
+        if (!empty($jasaVendorInID)) {
+            if (!empty($id)) {
+                $data = $this->biayaKepitingModel->dropdownBarangKepitingKukus($jasaVendorInID, $id);
+                $dataPerolehanGaji = $this->biayaKepitingModel->dropdownPerolehanGaji($id);
+                $dataBonus = $this->biayaKepitingBonusModel->dropdownBarang($jasaVendorInID, $$id);
+            } else {
+                // Kalau belum ada ID dikirim
+                $data = $this->biayaKepitingModel->dropdownBarangKepitingKukus($jasaVendorInID);
+                $dataPerolehanGaji = $this->biayaKepitingModel->dropdownPerolehanGaji();
+                $dataBonus = $this->biayaKepitingBonusModel->dropdownBarang($jasaVendorInID);
+            }
+
+             // Ambil data vendor terkait
+            $dataVendorIn = $this->jasaVendorInModel->where('id', $jasaVendorInID)->findAll();
+            $dataVendor = $this->vendorModel->where('id', $dataVendorIn['vendor_id'])->first();
+
+            return response()->setJSON([
+                'data' => $data,
+                'dataPerolehanGaji' => $dataPerolehanGaji,
+                'dataBonus' => $dataBonus,
+                'dataVendor' => $dataVendor,
+                'token' => csrf_hash(),
+                'status' => true
+            ]);
         }
 
-        // Ambil data vendor terkait
-        $dataVendorIn = $this->jasaVendorInModel->where('id', $jasaVendorInID)->first();
-        $dataVendor = $this->vendorModel->where('id', $dataVendorIn['vendor_id'])->first();
-
         return response()->setJSON([
-            'data' => $data,
-            'dataPerolehanGaji' => $dataPerolehanGaji,
-            'dataBonus' => $dataBonus,
-            'dataVendor' => $dataVendor,
-            'token' => csrf_hash(),
-            'status' => true
+                'message' => "Jasa Vendor In ID kosong",
+                'token' => csrf_hash(),
+                'status' => false
         ]);
     }
 
