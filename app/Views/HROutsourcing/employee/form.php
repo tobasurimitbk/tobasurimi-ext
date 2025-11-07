@@ -104,21 +104,31 @@
 </section>
 
 
-    <div class="modal fade" id="qrModal" tabindex="-1" role="dialog" aria-labelledby="qrModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-sm" role="document">
-            <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">QR Code Karyawan</h5>
-                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+   <div class="modal fade" id="qrModal" tabindex="-1" role="dialog" aria-labelledby="qrModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document"> <!-- 🔹 ubah ke modal-lg dan center -->
+            <div class="modal-content" style="border-radius:16px; overflow:hidden;">
+            <div class="modal-header bg-white text-dark">
+                <h5 class="modal-title font-weight-bold" id="qrModalLabel">QR Code Karyawan</h5>
+                <button type="button" class="close text-dark" data-dismiss="modal">
+                <span>&times;</span>
+                </button>
             </div>
-            <div class="modal-body text-center" id="qrResult"></div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                <button type="button" class="btn btn-primary" id="btn-print">Print</button>
+
+            <div class="modal-body" id="qrResult" 
+                style="text-align:center; background-color:#f9f9f9; padding:30px 20px;">
+                <!-- Hasil HTML QR dari backend akan ditaruh di sini -->
+            </div>
+
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-secondary px-4" data-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary px-4" id="btn-print">
+                <i class="fa fa-print mr-1"></i> Print
+                </button>
             </div>
             </div>
         </div>
     </div>
+
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';

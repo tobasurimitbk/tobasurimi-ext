@@ -182,15 +182,13 @@ class Employee extends BaseController
 
     public function generateQrCode($employeeId)
     {
-        $html = "";
-
         try {
-            // Decrypt dulu biar dapat id asli
+            // 🔹 Decrypt id karyawan
             $empId = decrypt($employeeId);
 
-            // Ambil data employee
+            // 🔹 Ambil data karyawan + company
             $employee = $this->hrOutsourcingEmployeeModel
-                ->select('id, nama, badge')
+                ->select('id, nama, badge, company_id')
                 ->where('id', $empId)
                 ->first();
 
@@ -201,42 +199,45 @@ class Employee extends BaseController
                 ]);
             }
 
+            $company = $this->hrOutsourcingCompanyModel
+                ->select('name')
+                ->where('id', $employee['company_id'])
+                ->first();
+
             // === generate type dan encoded id ===
             $type = 'EMP';
             $encrypted = encrypt($empId);
 
-            // Encode ke Base64 URL-Safe (biar gak ada "-" "/" "=")
+            // Encode Base64 URL-Safe
             $safeValue = rtrim(strtr(base64_encode($encrypted), '+/', '-_'), '=');
 
-            // Format QR: TYPE-VALUE (dibaca langsung Golang)
+            // Format QR: TYPE-VALUE (dibaca oleh Golang)
             $qrText = "{$type}-{$safeValue}";
 
-            // Generate QR Code
+            // === Generate QR Code ===
             $qrCode = new QrCode($qrText);
             $qrCode->setSize(350);
             $qrCode->setMargin(10);
             $qrCode->setErrorCorrectionLevel(new ErrorCorrectionLevel(ErrorCorrectionLevel::HIGH));
 
-            // Convert QR ke Data URI (base64)
+            // Convert QR ke Data URI
             $dataUri = $qrCode->writeDataUri();
 
-            // HTML output
-            $html .= "
-                <div class='col-md-12 mb-4 text-center'>
-                    <a href='{$dataUri}' download='qr-employee-{$employee['id']}.png'>
-                        <img src='{$dataUri}' alt='QR Code' class='img-fluid'>
-                    </a><br>
-                    <small>
-                        <strong>{$employee['nama']}</strong><br>
-                        <strong>NO BADGE:</strong> {$employee['badge']}<br>
-                        <strong>SCAN VALUE:</strong> {$qrText}
-                    </small>
+            // === HTML tampilan clean dan center ===
+            $html = "
+            <div style='width:100%; text-align:center; margin-top:20px;'>
+                <div style='display:inline-block; border:1px solid #ddd; padding:20px; border-radius:12px; box-shadow:0 0 10px rgba(0,0,0,0.1);'>
+                    <h3 style='margin:0; font-weight:600;'>{$company['name']}</h3>
+                    <h4 style='margin:5px 0 15px 0;'>{$employee['nama']} ({$employee['badge']})</h4>
+                    <img src='{$dataUri}' alt='QR Code' style='width:250px; height:250px;'>
                 </div>
+            </div>
             ";
 
+            // balikan JSON respons
             return $this->response->setJSON([
                 'status' => 'ok',
-                'html'   => "<div class='row'>{$html}</div>"
+                'html'   => $html
             ]);
 
         } catch (Exception $e) {
@@ -246,6 +247,7 @@ class Employee extends BaseController
             ]);
         }
     }
+
 
     public function getEmployeeByIdQr($encryptedId)
     {
