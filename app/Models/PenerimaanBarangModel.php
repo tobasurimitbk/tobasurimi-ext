@@ -1205,6 +1205,95 @@ class PenerimaanBarangModel extends Model
         }
     }
 
+    public function autoOpenPO($penerimaanBarangID)
+    {
+        $amPurchaseOrderModel = new AMPurchaseOrderModel(); // bp lokal or import
+        $amPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel(); // bp lokal or import
+        $rmPurchaseOrderModel = new RMPurchaseOrderModel(); // bb lokal
+        $rmPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel(); // bb lokal
+        $rmImportPoModel = new RMImportPOModel(); // bb import
+        $rmImportPoDetailModel = new RMImportPODetailModel(); // bb import
+
+        // get type penerimaan dan tipe bahan
+        $penerimaanFirst = $this->asArray()->where('id', $penerimaanBarangID)->first();
+
+        if ($penerimaanFirst == null) {
+            return;
+        }
+
+        $poIDArr = json_decode(($penerimaanFirst['multiple_po_id']));
+
+        if ($penerimaanFirst['status_penerimaan'] == "LOKAL" && $penerimaanFirst['tipe_bahan'] == "PENOLONG") {
+            // PO LOKAL BAHAN PENOLONG
+            foreach ($poIDArr as $p) {
+                $poList = $amPurchaseOrderDetailModel->select('SUM(remaining_qty) AS remaining_qty_sum')
+                    ->where('deletedAt', null)
+                    ->where('am_purchase_order_id', $p)
+                    ->findAll();
+
+                if (count($poList) == 0) {
+                    return;
+                }
+                if ($poList[0]['remaining_qty_sum'] == 0) {
+                    $amPurchaseOrderModel->update($p, [
+                        'status_penerimaan' => 0
+                    ]);
+                }
+            }
+        } elseif ($penerimaanFirst['status_penerimaan'] == "LOKAL" && $penerimaanFirst['tipe_bahan'] == "BAKU") {
+            // PO LOKAL BAHAN BAKU
+            foreach ($poIDArr as $p) {
+                $poList = $rmPurchaseOrderDetailModel->select('SUM(remaining_qty) AS remaining_qty_sum')
+                    ->where('deletedAt', null)
+                    ->where('rm_purchase_order_id', $p)
+                    ->findAll();
+
+                if (count($poList) == 0) {
+                    return;
+                }
+                if ($poList[0]['remaining_qty_sum'] == 0) {
+                    $rmPurchaseOrderModel->update($p, [
+                        'status_penerimaan' => 0
+                    ]);
+                }
+            }
+        } elseif ($penerimaanFirst['status_penerimaan'] == "IMPORT" && $penerimaanFirst['tipe_bahan'] == "PENOLONG") {
+            // PO IMPORT BAHAN PENOLONG
+            foreach ($poIDArr as $p) {
+                $poList = $amPurchaseOrderDetailModel->select('SUM(remaining_qty) AS remaining_qty_sum')
+                    ->where('deletedAt', null)
+                    ->where('am_purchase_order_id', $p)
+                    ->findAll();
+
+                if (count($poList) == 0) {
+                    return;
+                }
+                if ($poList[0]['remaining_qty_sum'] == 0) {
+                    $amPurchaseOrderModel->update($p, [
+                        'status_penerimaan' => 0
+                    ]);
+                }
+            }
+        } elseif ($penerimaanFirst['status_penerimaan'] == "IMPORT" && $penerimaanFirst['tipe_bahan'] == "BAKU") {
+            // PO IMPORT BAHAN BAKU
+            foreach ($poIDArr as $p) {
+                $poList = $rmImportPoDetailModel->select('SUM(remaining_qty) AS remaining_qty_sum')
+                    ->where('deletedAt', null)
+                    ->where('rm_import_po_id', $p)
+                    ->findAll();
+
+                if (count($poList) == 0) {
+                    return;
+                }
+                if ($poList[0]['remaining_qty_sum'] == 0) {
+                    $rmImportPoModel->update($p, [
+                        'status_penerimaan' => 0
+                    ]);
+                }
+            }
+        }
+    }
+
     public function getListLaporanPenerimaanBarangBahanBakuLokal($condition = [], $addCondition = [], $limit = 10, $offset = 0)
     {
         $availableSort = [

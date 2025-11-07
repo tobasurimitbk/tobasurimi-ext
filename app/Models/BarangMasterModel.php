@@ -106,10 +106,12 @@ class BarangMasterModel extends Model
                 'parent_barang.parent_name AS kelompok_barang',
                 'suppliers.name as supplier_terakhir_name',
                 'barang_master_spesifikasi.harga_terakhir',
+                'satuans.kode_satuan AS kode_satuan_terakhir'
             ])
             ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
             ->join('suppliers', 'suppliers.id = barang_master_spesifikasi.supplier_terakhir', 'left')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.unit_terakhir', 'left')
             ->where($condition);
 
         if ($aksesSupplierLokalBP && !$aksesSupplierImportBP) {

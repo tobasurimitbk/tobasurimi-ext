@@ -1,3 +1,12 @@
+<style>
+    .form-add-spp .form-floating .form-floating-custom .select2 .selection .select2-selection {
+        height: 90px !important;
+    }
+
+    .form-add-spp .form-floating .form-floating-custom .select2 .selection .select2-selection__rendered {
+        height: 60px !important;
+    }
+</style>
 <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
     <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($dataPenerimaanBarang) ? encrypt($dataPenerimaanBarang['id']) : ""; ?>" />
     <?= csrf_field() ?>
@@ -45,19 +54,22 @@
     </div>
     <div class="row">
         <div class="col-md-4">
-            <div class="form-floating mb-3" style="height: 50px;">
-                <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select multiple_spp_id" id="multiple_spp_id[]" multiple name="multiple_spp_id[]" aria-label="Floating label select example">
-                    <option value=""></option>
-                    <?php if (!empty($dataPenerimaanBarang)) : ?>
-                        <?php foreach ($dataSPPSelected as $d) : ?>
-                            <option selected value="<?= $d["id"]; ?>"><?= strtoupper($d["spp_no"]); ?></option>
-                        <?php endforeach; ?>
+            <div class="form-floating mb-3" style="height: 90px;">
+                <div class="form-floating-custom">
+                    <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select multiple_spp_id" id="multiple_spp_id[]" multiple name="multiple_spp_id[]" aria-label="Floating label select example">
+                        <option value=""></option>
+                        <?php if (!empty($dataPenerimaanBarang)) : ?>
+                            <?php foreach ($dataSPPSelected as $d) : ?>
+                                <option selected value="<?= $d["id"]; ?>"><?= strtoupper($d["spp_no"]); ?></option>
+                            <?php endforeach; ?>
 
-                        <?php foreach ($dataSPP as $d) : ?>
-                            <option value="<?= $d["id"]; ?>"><?= strtoupper($d["spp_no"]); ?></option>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </select>
+                            <?php foreach ($dataSPP as $d) : ?>
+                                <option value="<?= $d["id"]; ?>"><?= strtoupper($d["spp_no"]); ?></option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
+                </div>
+
             </div>
         </div>
         <div class="col-md-4" style="display: none;">
@@ -632,68 +644,54 @@
                     confirmButtonColor: '#4e73df',
                 })
             } else {
-                Swal.fire({
-                    icon: 'question',
-                    title: 'Simpan Data?',
-                    confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Kembali',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const csrf = $(`[name="${csrfToken}"]`);
-                        var id = $('#id').val();
-                        var po_no = $('.multiple_po_id').select2('data').map(function(elem) {
-                            return elem.text;
-                        });
-                        var ongkosKirim = destroyFormatRupiah($('#ongkos_kirim').val() || 0);
-                        var url = id == '' ? '<?= base_url("penerimaan-barang-lokal-bp/insert"); ?>' : '<?= base_url("penerimaan-barang-lokal-bp/update"); ?>';
-                        var formData = new FormData(document.querySelector(".create-form"));
-                        formData.append("acceptance_type", po_no.length > 1 ? "MULTIPLE ORDER" : "SINGLE ORDER");
-                        formData.append("multiple_po_id", JSON.stringify($('.multiple_po_id').val()));
-                        formData.append("multiple_po_no", JSON.stringify(po_no));
-                        formData.append("barangs", JSON.stringify(listData.result));
-                        formData.set("ongkos_kirim", ongkosKirim);
-                        formData.append("id", id);
+                const csrf = $(`[name="${csrfToken}"]`);
+                var id = $('#id').val();
+                var po_no = $('.multiple_po_id').select2('data').map(function(elem) {
+                    return elem.text;
+                });
+                var ongkosKirim = destroyFormatRupiah($('#ongkos_kirim').val() || 0);
+                var url = id == '' ? '<?= base_url("penerimaan-barang-lokal-bp/insert"); ?>' : '<?= base_url("penerimaan-barang-lokal-bp/update"); ?>';
+                var formData = new FormData(document.querySelector(".create-form"));
+                formData.append("acceptance_type", po_no.length > 1 ? "MULTIPLE ORDER" : "SINGLE ORDER");
+                formData.append("multiple_po_id", JSON.stringify($('.multiple_po_id').val()));
+                formData.append("multiple_po_no", JSON.stringify(po_no));
+                formData.append("barangs", JSON.stringify(listData.result));
+                formData.set("ongkos_kirim", ongkosKirim);
+                formData.append("id", id);
 
-                        $.ajax({
-                            url: url,
-                            data: formData,
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            beforeSend: function(xhr) {
-                                setLoading();
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            },
-                            complete: function() {
-                                stopLoading();
-                            },
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    }).then(() => {
-                                        window.location.href = "<?= base_url("penerimaan-barang-lokal-bp"); ?>";
-                                    });
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                }
-                            }
-                        });
+                $.ajax({
+                    url: url,
+                    data: formData,
+                    method: "POST",
+                    dataType: "json",
+                    processData: false,
+                    contentType: false,
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            }).then(() => {
+                                window.location.href = "<?= base_url("penerimaan-barang-lokal-bp"); ?>";
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
                     }
-
-                })
+                });
             }
 
         }

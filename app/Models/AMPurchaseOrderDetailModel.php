@@ -376,6 +376,12 @@ class AMPurchaseOrderDetailModel extends Model
             }
         }
 
+        // urutkan by no spp
+        usort($res, function ($a, $b) {
+            return strcmp($a['spp_no'], $b['spp_no']);
+        });
+
+
         return [
             'result' => $res,
             'jml_order_total' => $jmlOrderTotal,
@@ -849,14 +855,16 @@ class AMPurchaseOrderDetailModel extends Model
 
     public function historiHargaPOBahanPenolongFirst(
         $spesifikasiId,
-        $companyId
+        $companyId,
+        $unitId
     ) {
         $dataLPB = $this->asArray()
             ->select('am_purchase_order_details.*,supplier_id')
             ->join('am_purchase_orders', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
             ->where('am_purchase_orders.company_id', $companyId)
             ->where('am_purchase_order_details.spesifikasi_id', $spesifikasiId)
-            ->orderBy('am_purchase_orders.po_date', "desc")
+            ->where('am_purchase_order_details.unit', $unitId)
+            ->orderBy('am_purchase_orders.po_no', "desc")
             ->first();
 
         return $dataLPB;

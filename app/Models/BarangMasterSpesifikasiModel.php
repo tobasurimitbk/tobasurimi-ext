@@ -28,6 +28,7 @@ class BarangMasterSpesifikasiModel extends Model
         'harga_jual',
         'supplier_terakhir',
         'harga_terakhir',
+        'unit_terakhir',
         'createdAt',
         'updatedAt',
         'deletedAt',
