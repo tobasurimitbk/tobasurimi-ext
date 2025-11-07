@@ -2169,6 +2169,7 @@ $routes->get('/payroll/print/division', 'HR\Payroll::exportPdfPayrollDivision', 
 $routes->get('/payroll/print/detail', 'HR\Payroll::exportPdfPayrollDivisionDetail', ['filter' => 'Auth']);
 $routes->get('/payroll/print/summary', 'HR\Payroll::exportPdfSummary', ['filter' => 'Auth']);
 $routes->get('/payroll/print/potongan', 'HR\Payroll::exportPdfPotongan', ['filter' => 'Auth']);
+$routes->post('/payroll/employees-by-bagian', 'HR\Payroll::getEmployeeByBagian', ['filter' => 'Auth']);
 
 // pinjaman karyawan
 $routes->get('/pinjaman-karyawan', 'HR\PinjamanKaryawan::index', ['filter' => 'Auth']);
@@ -3077,8 +3078,6 @@ $routes->get('/hr-outsourcing-scale', 'HROutsourcing\Scale::generateQrBarangView
 $routes->post('/hr-outsourcing-scale', 'HROutsourcing\Scale::generateQrBarang', ['filter' => 'Auth']);
 $routes->get('/hr-outsourcing-scale/id/(:segment)', 'HROutsourcing\Scale::getBarangByIdQr/$1');
 $routes->get('/hr-outsourcing-company/employee/detail/(:segment)', 'HROutsourcing\Employee::getEmployeeByIdQr/$1');
-$routes->get('/hr-outsourcing-company/search-barang',  'HROutsourcing\Scale::searchBarang', ['filter' => 'Auth']);
-$routes->get('/hr-outsourcing-company/search-master-barang',  'HROutsourcing\Scale::searchMasterBarang', ['filter' => 'Auth']);
 $routes->get('/get-spesifikasi-by-qr', 'Setting\Auth::login');
 
 /*

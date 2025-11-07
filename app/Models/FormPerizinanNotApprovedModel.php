@@ -186,9 +186,9 @@ class FormPerizinanNotApprovedModel extends Model
         }
 
         // Tambahkan total_perizinan_approved ke hadir_final
-        foreach ($employeeIds as $eid) {
-            $dataResultTotal[$eid]['hadir_final'] += $dataResultTotal[$eid]['total_perizinan_approved'];
-        }
+        // foreach ($employeeIds as $eid) {
+        //     $dataResultTotal[$eid]['hadir_final'] += $dataResultTotal[$eid]['total_perizinan_approved'];
+        // }
 
         return [
             'dataFormPerizinan' => $dataResult,                // insert batch

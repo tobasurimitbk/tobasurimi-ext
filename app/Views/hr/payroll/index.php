@@ -118,6 +118,16 @@
                                 </div>
                                 <div class="col-md-12">
                                     <div class="form-floating mb-2 mt-2">
+                                        <select class="form-select" id="bagianSingleID" name="bagianSingleID">
+                                            <option value="">
+                                                Cari Bagian
+                                            </option>
+                                        </select>
+                                        <label for="floatingInput">Cari Bagian</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-floating mb-2 mt-2">
                                         <select class="form-select" id="employeeID">
                                             <option value="">
                                                 Cari Berdasarkan Nama Karyawan
@@ -448,6 +458,16 @@
         $('#generateModal').modal('show');
     });
 
+    $('#divisionID').change(function(e) {
+        e.preventDefault();
+        dropdownBagianSingle();
+    });
+
+    $('#bagianSingleID').change(function(e) {
+        e.preventDefault();
+        dropdownKaryawanSinglePayroll();
+    });
+
     $("#month,#monthYearGlobal,#monthYearPersonal").datepicker({
         format: "yyyy-mm",
         startView: "months", // langsung tampilin bulan
@@ -471,6 +491,20 @@
     });
     $("#divisionID").select2({
         placeholder: "Cari Berdasarkan Departemen",
+        theme: "bootstrap-5",
+        allowClear: true,
+        dropdownParent: $('#generateModal')
+    });
+
+    $("#bagianGlobalID").select2({
+        placeholder: "Cari Bagian",
+        theme: "bootstrap-5",
+        allowClear: true,
+        dropdownParent: $('#generateModal')
+    });
+
+    $("#bagianSingleID").select2({
+        placeholder: "Cari Bagian",
         theme: "bootstrap-5",
         allowClear: true,
         dropdownParent: $('#generateModal')
@@ -723,16 +757,15 @@
 
     });
 
-    $("#divisionID").on('change', function(e) {
-        e.preventDefault();
+    function dropdownKaryawanSinglePayroll() {
         const csrf = $(`[name="${csrfToken}"]`);
-        var divisionID = $(this).val();
+        var bagianId = $('#bagianSingleID').val();
 
         var formData = new FormData();
-        formData.append('divisionID', divisionID);
+        formData.append('bagianId', bagianId);
 
         $.ajax({
-            url: "<?= base_url("payroll/employees"); ?>",
+            url: "<?= base_url("payroll/employees-by-bagian"); ?>",
             data: formData,
             beforeSend: function(xhr) {
                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -761,8 +794,7 @@
 
             }
         });
-
-    });
+    }
 
     $("#filterDivisiID").on('change', function(e) {
         e.preventDefault();
@@ -866,6 +898,59 @@
         autoclose: true
     });
 
+    function dropdownBagianGlobal() {
+        var divisiGlobalId = $('#divisionGlobalID').val();
+        let csrf = $(`[name="${csrfToken}"]`);
+        var formData = new FormData();
+        formData.append('divisionID', divisiGlobalId);
+        $.ajax({
+            url: `<?= base_url("list-attendance/get-bagian"); ?>`,
+            data: formData,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            method: "POST",
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success: function(result) {
+                csrf.val(result.token);
+                $("#bagianGlobalID").empty()
+                $("#bagianGlobalID").append(`<option value=""></option>`)
+                result.data.forEach(function(item) {
+                    $("#bagianGlobalID").append(`<option value="${item.id}">${item.kode_bagian.toUpperCase()} - ${item.nama_bagian.toUpperCase()}</option>`)
+                });
+            }
+        });
+
+    }
+
+    function dropdownBagianSingle() {
+        var divisionID = $('#divisionID').val();
+        let csrf = $(`[name="${csrfToken}"]`);
+        var formData = new FormData();
+        formData.append('divisionID', divisionID);
+        $.ajax({
+            url: `<?= base_url("list-attendance/get-bagian"); ?>`,
+            data: formData,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            method: "POST",
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success: function(result) {
+                csrf.val(result.token);
+                $("#bagianSingleID").empty()
+                $("#bagianSingleID").append(`<option value=""></option>`)
+                result.data.forEach(function(item) {
+                    $("#bagianSingleID").append(`<option value="${item.id}">${item.kode_bagian.toUpperCase()} - ${item.nama_bagian.toUpperCase()}</option>`)
+                });
+            }
+        });
+
+    }
 
     const printWithDivision = function(url) {
         var divisionID = $("#filterDivisiID").val();

@@ -7,9 +7,16 @@
     <title>Tanda Terima Upah Detail</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100%;
+            font-family: 'Times New Roman', Times, serif;
             letter-spacing: 2px;
             font-size: 10px;
+        }
+
+        @page {
+            size: 9.5in 11in landscape;
+            margin: 25px;
+            padding: 25px;
         }
 
         h4 {
@@ -21,12 +28,6 @@
         hr {
             border: none;
             border-top: 1px dashed #000;
-        }
-
-        @page {
-            size: 9.44in 10.00in landscape;
-            margin: 29px;
-            padding: 29px;
         }
 
         .page-break {

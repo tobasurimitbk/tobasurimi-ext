@@ -3,6 +3,9 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use DateInterval;
+use DatePeriod;
+use DateTime;
 use Exception;
 
 class AttendancesModel extends Model
@@ -138,6 +141,78 @@ class AttendancesModel extends Model
 
         return $query->findAll();
     }
+
+    public function getTotalHariLiburEmployeeHadir(
+        $startDate,
+        $endDate,
+        $companyId,
+        $employeeIds
+    ) {
+        // 1️⃣ Ambil semua hari libur dari tabel BigDays
+        $bigDaysModel = new BigDaysModel();
+        $bigDays = $bigDaysModel
+            ->where('company_id', $companyId)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        $mapBigDays = [];
+        foreach ($bigDays as $b) {
+            $mapBigDays[$b['date']] = true;
+        }
+
+        // 2️⃣ Buat map tanggal hari libur (Tambah Minggu)
+        $begin = new DateTime($startDate);
+        $end   = new DateTime($endDate);
+        $end->modify('+1 day');
+
+        $interval = new DateInterval('P1D');
+        $period   = new DatePeriod($begin, $interval, $end);
+
+        $mapHariLibur = [];
+        foreach ($period as $date) {
+            $current = $date->format('Y-m-d');
+            $dayOfWeek = $date->format('w'); // 0 = Minggu
+
+            if ($dayOfWeek == 0) {
+                $mapHariLibur[$current] = true;
+            }
+
+            if (isset($mapBigDays[$current])) {
+                $mapHariLibur[$current] = true;
+            }
+        }
+
+        // 3️⃣ Ambil data kehadiran dalam rentang tanggal
+        $attendanceList = $this->getAttendanceByDateRangeAmt(
+            $employeeIds,
+            $startDate,
+            $endDate
+        );
+
+        // 4️⃣ Buat map hasil: employee_id => total_hadir_hari_libur
+        $mapTotalLiburMasuk = [];
+        foreach ($employeeIds as $eid) {
+            $mapTotalLiburMasuk[$eid] = 0;
+        }
+
+        foreach ($attendanceList as $e) {
+            $eid = $e['employee_id'];
+            $tanggal = $e['periode'];
+
+            // Jika bukan hari libur → skip
+            if (!isset($mapHariLibur[$tanggal])) continue;
+
+            // Jika status bukan hadir → skip
+            if ($e['status'] == "ALPHA_A" || $e['status'] == "LIBUR_L") continue;
+
+            // ✅ Hitung hadir hari libur
+            $mapTotalLiburMasuk[$eid]++;
+        }
+
+        return $mapTotalLiburMasuk;
+    }
+
+
 
     // public function generate($employeeData, $startDate, $endDate, $year, $month, $companyID)
     // {
