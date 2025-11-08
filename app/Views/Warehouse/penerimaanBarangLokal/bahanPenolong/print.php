@@ -213,7 +213,7 @@
                 </th>
                 <th>
                     <div class="sign-row">
-                        <div>Diperiksa</div>
+                        <div></div>
                     </div>
                 </th>
             </tr>
