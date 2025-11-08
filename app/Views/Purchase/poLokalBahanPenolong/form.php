@@ -230,7 +230,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating" style="height: 50px;">
-                            <select class="form-select satuan_id" name="satuan_id" id="satuan_id">
+                            <select disabled class="form-select satuan_id" name="satuan_id" id="satuan_id">
                                 <option value=""></option>
                                 <?php foreach ($satuan as $s) : ?>
                                     <option
