@@ -162,7 +162,7 @@ class Scale extends BaseController
 
             // Format dan encrypt ID
             $type = 'BRG';
-            $encryptedId = encrypt("{$type}-{$spesifikasiId}");
+            $encryptedId = weakEncrypt("{$type}-{$spesifikasiId}");
 
             // QR text langsung isi type + value
             $qrText = "{$type}-{$encryptedId}";
