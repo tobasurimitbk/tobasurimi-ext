@@ -42,6 +42,8 @@ class SampleDetailModel extends Model
 
     public function getSampleDetail($sampleId)
     {
+        $sampleAdditionalModel = new SampleAdditionalModel();
+
         $selectQry = "
             sample_detail.*,
             barang_master_sales.barang_name AS barang,
@@ -59,6 +61,25 @@ class SampleDetailModel extends Model
         $resultArr = [];
 
         foreach ($sampleDetail as $s) {
+
+            $sampleAdditional = $sampleAdditionalModel
+                ->select('sample_additional.*,satuans.kode_satuan AS satuan_additional_kode')
+                ->join('satuans', 'satuans.id = sample_additional.satuan_additional', 'left')
+                ->where('sample_detail_id', $s['id'])
+                ->where('sample_additional.deletedAt', null)
+                ->findAll();
+
+            $listAdditional = [];
+            foreach ($sampleAdditional as $d) {
+                array_push($listAdditional, [
+                    'id_additional_item' => $d['id'],
+                    'additional_item' => $d['additional_item'],
+                    'qty_additional' => (float)$d['qty_additional'],
+                    'satuan_additional' => $d['satuan_additional'],
+                    'satuan_additional_kode' => $d['satuan_additional_kode']
+                ]);
+            }
+
             $resultArr[] = [
                 'id_barang' => $s['id'],
                 'barang_master_sales_id' => $s['barang_master_sales_id'],
@@ -72,7 +93,8 @@ class SampleDetailModel extends Model
                 'satuan_id' => $s['satuan_id'],
                 'berat_kotor' => (float)$s['berat_kotor'],
                 'berat_bersih' => (float)$s['berat_bersih'],
-                'note' => $s['note']
+                'note' => $s['note'],
+                'list_additional' => $listAdditional
             ];
         }
 

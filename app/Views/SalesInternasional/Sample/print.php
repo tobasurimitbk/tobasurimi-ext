@@ -160,6 +160,23 @@
                     </td>
                 </tr>
             <?php endif; ?>
+            <?php if (count($dataAdditionalItem) > 0): ?>
+                <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;" colspan="6">
+                    <td style="padding: 6px; border: 1px solid #8e8181ff;" colspan="8">
+                        <table style="width:20%; border-collapse: collapse; margin-left:6px; margin-top:3px; font-size:11px;">
+                            <tbody>
+                                <?php foreach ($dataAdditionalItem as $d): ?>
+                                    <tr>
+                                        <td style="border: 1px solid #000; padding: 4px;"><?= $d['additional_item'] ?></td>
+                                        <td style="border: 1px solid #000; padding: 4px; width:20px;"><?= number_format($d['total_qty_additional'], 2) ?></td>
+                                        <td style="border: 1px solid #000; padding: 4px; width:20px;"><?= $d['kode_satuan'] ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            <?php endif; ?>
         </tbody>
     </table>
     <table border="1" style="width: 100%; border: 1px solid black; border-collapse: collapse;" class="label">

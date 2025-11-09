@@ -102,6 +102,11 @@
             font-size: 25px;
             text-decoration: underline;
         }
+
+        .sign-name {
+            text-align: center;
+            font-style: bold;
+        }
     </style>
 </head>
 
@@ -188,7 +193,7 @@
                     </th>
                     <th>
                         <div class="sign-row">
-                            <div>Diperiksa</div>
+                            <div></div>
                         </div>
                     </th>
                 </tr>
@@ -199,7 +204,7 @@
                 <tr>
                     <td class="sign-name" style="border: none!important; margin-top:30px;">
                         <br><br>
-                        <div> </div>
+                        <div> <?= $dataUser != null ? $dataUser['name'] : "" ?> </div>
                     </td>
                     <td class="sign-name" style="border: none!important;margin-top:30px;">
                         <br><br>

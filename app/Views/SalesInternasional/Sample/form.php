@@ -196,7 +196,7 @@
 
 
 <div class="modal detail-modal" id="barangModal" tabindex="1">
-    <div class="modal-dialog" style="min-width: 900px;">
+    <div class="modal-dialog modal-lg" style="min-width: 1200px;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title title-secondary"><label id="label-barang"></label> Items</h5>
@@ -223,8 +223,8 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control grade" id="grade" name="grade" placeholder="Grade / Specification">
+                            <div class="form-floating mb-3">
+                                <textarea class="full-textarea form-control grade" id="grade" name="grade" placeholder="Grade / Specification"></textarea>
                                 <label for="floatingInput">Grade / Specification</label>
                             </div>
                         </div>
@@ -283,7 +283,52 @@
                         </div>
                     </div>
 
+                    <div class="col-subtitle-modal">
+                        <div class="row mt-3 justify-content-end">
+                            <div class="col-md-6">
+                                <label class="form-label font-weight-bold modal-sub-title"></label>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-success btn-block float-right" type="button" id="btnAddAditional">
+                                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i> Add Additional
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div style="max-height: 400px; overflow-y: auto;">
+                            <div class="table-responsive">
+                                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="additionalTable" width="100%" cellspacing="0">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th style="width: 10px;">No</th>
+                                            <th>Additional Item</th>
+                                            <th>Qty</th>
+                                            <th>Unit</th>
+                                            <th style="width: 100px;">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="body-additional" id="body-additional">
+                                        <!-- isi data -->
+                                    </tbody>
+                                    <tfoot class="tfoot-additional" id="tfoot-additional">
+                                        <tr>
+                                            <td colspan="1"></td>
+                                            <td><b style="float: right;">TOTAL</b></td>
+                                            <td><b>0.00</b></td>
+                                            <td colspan="2"><b></b></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
+
+
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-discard mr-2" id="btnHideBarang">Back</button>
                     <button type="button" class="btn btn-submit-form" id="btnSubmitBarang">Save</button>
@@ -293,9 +338,55 @@
     </div>
 </div>
 
+<div class="modal detail-modal" id="additionalItemModal" tabindex="1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary"><label id="label-additional-item"></label> Additional Item</h5>
+            </div>
+            <form class="create-form-additional-item" role="form" method="POST">
+                <input type="hidden" name="id_additional_item" id="id_additional_item">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control additional_item" id="additional_item" name="additional_item" placeholder="Additional Item">
+                                <label for="floatingInput">Additional Item (Example: Ice Gel Pack / Dry Ice)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input onkeyup="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control qty_additional" id="qty_additional" name="qty_additional" placeholder="Qty Additional">
+                                <label for="floatingInput">Qty Additional</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select satuan_additional" name="satuan_additional" id="satuan_additional">
+                                    <option value=""></option>
+                                    <?php foreach ($dataSatuan as $d) : ?>
+                                        <option value="<?= $d['id'] ?>"><?= $d['kode_satuan'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Select Unit</label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-discard mr-2" id="btnHideAdditionalItem">Back</button>
+                    <button type="button" class="btn btn-submit-form" id="btnSubmitAdditionalItem">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     var listBarang = [];
+    var listAdditional = [];
     var totalBeratBersih = 0;
     var totalBeratKotor = 0;
     var totalQty = 0;
@@ -342,15 +433,21 @@
             dropdownParent: $('#barangModal')
         }).change(function() {});
 
+        $('.satuan_additional').select2({
+            placeholder: "Select Unit",
+            theme: "bootstrap-5",
+            dropdownParent: $('#additionalItemModal')
+        }).change(function() {});
+
         //CSS SELECT2 FLOATING LABEL
-        $('.sales_contract_id, .divisi_id,.barang_master_sales_id,.satuan_id')
+        $('.sales_contract_id, .divisi_id,.barang_master_sales_id,.satuan_id,.satuan_additional')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.sales_contract_id, .divisi_id,.barang_master_sales_id,.satuan_id')
+        $('.sales_contract_id, .divisi_id,.barang_master_sales_id,.satuan_id,.satuan_additional')
             .parent('div')
             .children('span')
             .children('span')
@@ -358,7 +455,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.sales_contract_id, .divisi_id,.barang_master_sales_id,.satuan_id')
+        $('.sales_contract_id, .divisi_id,.barang_master_sales_id,.satuan_id,.satuan_additional')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -514,6 +611,51 @@
             },
         });
 
+        var validatorAdditionalItem = $(".create-form-additional-item").validate({
+            rules: {
+                additional_item: {
+                    required: true
+                },
+                qty_additional: {
+                    required: true
+                },
+                satuan_additional: {
+                    required: true
+                },
+            },
+            messages: {
+                additional_item: {
+                    required: "Additional item required"
+                },
+                qty_additional: {
+                    required: "Qty additional required"
+                },
+                satuan_additional: {
+                    required: "Unit additional required"
+                },
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');
+
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
+
         $('#btnSubmitBarang').click(function(e) {
             e.preventDefault();
             if ($('.create-form-barang').valid()) {
@@ -554,6 +696,7 @@
                     listBarang[index].satuan_id = satuanId;
                     listBarang[index].berat_kotor = beratKotor;
                     listBarang[index].berat_bersih = beratBersih;
+                    listBarang[index].list_additional = listAdditional;
 
                 } else {
                     // CREATE
@@ -571,7 +714,8 @@
                         satuan_id: satuanId,
                         berat_kotor: beratKotor,
                         berat_bersih: beratBersih,
-                        note: note
+                        note: note,
+                        list_additional: listAdditional,
                     });
                 }
 
@@ -673,7 +817,62 @@
         resetFormBarang();
         $('#label-barang').text('Create ');
         $('#barangModal').modal('show');
+        listAdditional = [];
+        drawTableAdditionalItem(listAdditional);
     });
+
+    $('#btnAddAditional').click(function(e) {
+        e.preventDefault();
+        resetFormAdditional();
+        $('.label-additional-item').text('Create ');
+        $('#additionalItemModal').modal('show');
+    });
+
+    $('#btnHideAdditionalItem').click(function(e) {
+        e.preventDefault();
+        $('#additionalItemModal').modal('hide');
+    });
+
+    $('#btnSubmitAdditionalItem').click(function(e) {
+        e.preventDefault();
+        if ($('.create-form-additional-item').valid()) {
+            var id_additional_item = $('#id_additional_item').val();
+            var additional_item = $('#additional_item').val();
+            var qty_additional = destroyFormatRupiah($('#qty_additional').val());
+            var satuan_additional = $('#satuan_additional option:selected').val();
+            var satuan_additional_kode = $('#satuan_additional option:selected').text();
+
+            if (id_additional_item) {
+                // edit
+                var index = null;
+                for (var i = 0; i < listAdditional.length; i++) {
+                    if (listAdditional[i].id_additional_item == id_additional_item) {
+                        index = i;
+                        break;
+                    }
+                }
+
+                listAdditional[index].id_additional_item = id_additional_item;
+                listAdditional[index].additional_item = additional_item;
+                listAdditional[index].qty_additional = qty_additional;
+                listAdditional[index].satuan_additional = satuan_additional;
+                listAdditional[index].satuan_additional_kode = satuan_additional_kode;
+            } else {
+                id_additional_item = getID();
+                listAdditional.push({
+                    id_additional_item: id_additional_item,
+                    additional_item: additional_item,
+                    qty_additional: qty_additional,
+                    satuan_additional: satuan_additional,
+                    satuan_additional_kode: satuan_additional_kode
+                });
+
+            }
+            $('#additionalItemModal').modal('hide');
+            drawTableAdditionalItem(listAdditional);
+
+        }
+    })
 
     function resetFormBarang() {
         $('#id_barang').val(null);
@@ -690,68 +889,178 @@
 
     }
 
+    function resetFormAdditional() {
+        $('#id_additional_item').val(null);
+        $('#additional_item').val(null);
+        $('#qty_additional').val(null);
+        $('#satuan_additional').val(null).change();
+    }
+
     function drawTableBarang(listBarang) {
-        $('#body-barang').empty();
-        $('#foot-barang').empty();
+        const table = $('#barangTable');
+        const tbody = table.find('#body-barang');
+        const tfoot = table.find('#foot-barang');
+
+        tbody.empty();
+        tfoot.empty();
+
+        if (!Array.isArray(listBarang) || listBarang.length === 0) {
+            tbody.html(`
+            <tr>
+                <td colspan="12" class="text-center text-muted">List Items Empty</td>
+            </tr>
+        `);
+            return;
+        }
+
+        let htmlRows = [];
+        let totalBeratBersih = 0;
+        let totalBeratKotor = 0;
+        totalQty = 0;
+        let kode_satuan = '';
+        let no = 1;
+
+        for (const item of listBarang) {
+            const id_barang = item.id_barang || '';
+            const barang = item.barang || '';
+            const grade = item.grade || '';
+            const note = item.note || '';
+            const an = item.an || '';
+            const pickup_date = item.pickup_date || '';
+            const via = item.via || '';
+            const qty = parseFloat(item.qty || 0);
+            const berat_kotor = parseFloat(item.berat_kotor || 0);
+            const berat_bersih = parseFloat(item.berat_bersih || 0);
+            kode_satuan = item.kode_satuan || '';
+
+            totalQty += qty;
+            totalBeratKotor += berat_kotor;
+            totalBeratBersih += berat_bersih;
+
+            // Row utama
+            htmlRows.push(`
+            <tr style="color:whitesmoke;">
+                <td style="text-align:center;">${no++}</td>
+                <td>${barang}</td>
+                <td>${grade}</td>
+                <td>${note}</td>
+                <td>${an}</td>
+                <td>${pickup_date}</td>
+                <td>${via}</td>
+                <td>${greatFormatRupiah(qty)}</td>
+                <td>${kode_satuan}</td>
+                <td>${greatFormatRupiah(berat_kotor)}</td>
+                <td>${greatFormatRupiah(berat_bersih)}</td>
+                <td>
+                    <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowBarang('${id_barang}')">
+                        <i class="fa fa-pencil fa-sm"></i>
+                    </button>
+                    <button type="button" class="btn btn-danger" onclick="deleteRowBarang('${id_barang}')">
+                        <i class="fa fa-trash fa-sm"></i>
+                    </button>
+                </td>
+            </tr>
+        `);
+
+            // Tambah inner table jika ada list_additional
+            if (Array.isArray(item.list_additional) && item.list_additional.length > 0) {
+                let additionalRows = item.list_additional.map(add => `
+                <tr>
+                    <td>${add.additional_item || ''}</td>
+                    <td>${greatFormatRupiah((add.qty_additional || 0).toFixed(2))}</td>
+                    <td>${add.satuan_additional_kode || ''}</td>
+                </tr>
+            `).join('');
+
+                htmlRows.push(`
+                <tr style="color:whitesmoke;">
+                    <td colspan="16">
+                        <b>ADDITIONAL ITEM</b><br>
+                        <table class="table table-sm table-bordered mb-2 w-100">
+                            <thead class="bg-warning text-dark">
+                                <tr>
+                                    <th>Additional Item</th>
+                                    <th>Qty</th>
+                                    <th>Unit</th>
+                                </tr>
+                            </thead>
+                            <tbody>${additionalRows}</tbody>
+                        </table>
+                    </td>
+                </tr>
+            `);
+            }
+        }
+
+        // Masukkan semua row sekaligus
+        tbody.html(htmlRows.join(''));
+
+        // Footer total
+        const totalRow = `
+        <tr>
+            <td colspan="6"></td>
+            <td><b>TOTAL</b></td>
+            <td><b>${greatFormatRupiah(totalQty)} (${kode_satuan})</b></td>
+            <td></td>
+            <td><b>${greatFormatRupiah(totalBeratKotor.toFixed(2))} (Gross Weight)</b></td>
+            <td><b>${greatFormatRupiah(totalBeratBersih.toFixed(2))} (Net Weight)</b></td>
+            <td></td>
+        </tr>
+    `;
+        tfoot.html(totalRow);
+    }
+
+
+
+    function drawTableAdditionalItem(listAdditional) {
+        const table = $('#additionalTable');
+        $('#body-additional').empty();
+        $('#tfoot-additional').empty();
         var row = '';
         var no = 1;
-        const table = $('#barangTable');
-        if (listBarang.length === 0) {
+        if (listAdditional.length === 0) {
             row += `
-                    <tr>
-                        <td colspan="12">List Items Empty</td>
-                    </tr>
+                <tr>
+                    <td colspan="1"></td>
+                    <td><b style="float: right;">TOTAL</b></td>
+                    <td><b>0.00</b></td>
+                    <td colspan="2"><b></b></td>
+                </tr>
                 `;
-            $('#foot-barang').append(row);
+            $('#tfoot-additional').append(row);
         } else {
-            totalBeratBersih = 0;
-            totalBeratKotor = 0;
-            totalQty = 0;
+            var totalQtyAdditional = 0;
 
-            listBarang.map(item => {
-                totalBeratBersih += parseFloat(item.berat_bersih);
-                totalBeratKotor += parseFloat(item.berat_kotor);
-                totalQty += parseFloat(item.qty);
+            listAdditional.map(item => {
+                totalQtyAdditional += parseFloat(item.qty_additional);
 
                 var newRow = $('<tr style="color:whitesmoke;">');
                 newRow.append($('<td style="text-align:center;">').text(no++));
-                newRow.append($('<td>').text(item.barang));
-                newRow.append($('<td>').text(item.grade));
-                newRow.append($('<td>').text(item.note));
-                newRow.append($('<td>').text(item.an));
-                newRow.append($('<td>').text(item.pickup_date));
-                newRow.append($('<td>').text(item.via));
-                newRow.append($('<td>').text(item.qty));
-                newRow.append($('<td>').text(item.kode_satuan));
-                newRow.append($('<td>').text(greatFormatRupiah(item.berat_kotor)));
-                newRow.append($('<td>').text(greatFormatRupiah(item.berat_bersih)));
-
+                newRow.append($('<td>').text(item.additional_item));
+                newRow.append($('<td>').text(greatFormatRupiah(item.qty_additional)));
+                newRow.append($('<td>').text(item.satuan_additional_kode));
                 newRow.append($('<td>').html(`
-                        <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowBarang('${item.id_barang}')">
+                        <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowAdditional('${item.id_additional_item}')">
                                 <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                            </button><button type="button" class="btn btn-danger" onclick="deleteRowBarang('${item.id_barang}')">
+                            </button><button type="button" class="btn btn-danger" onclick="deleteRowAdditional('${item.id_additional_item}')">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
                     `));
 
                 table.find('tbody').append(newRow);
+
             });
 
 
             table.find('tfoot').empty();
             var newRow = $('<tr>');
-            newRow.append($('<td colspan="6"></td>'));
-            newRow.append($('<td><b>TOTAL</b></td>'));
-            newRow.append($('<td><b>' + greatFormatRupiah(totalQty) + '</b></td>'));
             newRow.append($('<td></td>'));
-            newRow.append($('<td><b>' + greatFormatRupiah(totalBeratKotor.toFixed(2)) + '</b></td>'));
-            newRow.append($('<td><b>' + greatFormatRupiah(totalBeratBersih.toFixed(2)) + '</b></td>'));
-            newRow.append($('<td></td>'));
+            newRow.append($('<td><b style="float: right;">TOTAL</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalQtyAdditional) + '</b></td>'));
+            newRow.append($('<td colspan="2"><b></b></td>'));
             table.find('tfoot').append(newRow);
         }
     }
-
-
 
     function detailRowBarang(id_barang) {
         var item = null;
@@ -774,8 +1083,29 @@
         $('#berat_bersih').val(greatFormatRupiah(item.berat_bersih));
         $('#note').val(item.note);
 
+        listAdditional = item.list_additional;
+        drawTableAdditionalItem(listAdditional);
+
         $('#label-barang').text("Update ");
         $('#barangModal').modal('show');
+    }
+
+    function detailRowAdditional(id_additional_item) {
+        var item = null;
+        for (var i = 0; i < listAdditional.length; i++) {
+            if (listAdditional[i].id_additional_item == id_additional_item) {
+                item = listAdditional[i];
+                break;
+            }
+        }
+
+        $('#id_additional_item').val(item.id_additional_item);
+        $('#additional_item').val(item.additional_item);
+        $('#qty_additional').val(greatFormatRupiah(item.qty_additional));
+        $('#satuan_additional').val(item.satuan_additional).change();
+
+        $('#label-additional-item').text("Update ");
+        $('#additionalItemModal').modal('show');
     }
 
     function deleteRowBarang(id_barang) {
@@ -791,6 +1121,22 @@
         }
         drawTableBarang(listBarang);
     }
+
+    function deleteRowAdditional(id_additional_item) {
+        var indexToRemove = -1;
+        for (var i = 0; i < listAdditional.length; i++) {
+            if (listAdditional[i].id_additional_item == id_additional_item) {
+                indexToRemove = i;
+                break;
+            }
+        }
+        if (indexToRemove !== -1) {
+            listAdditional.splice(indexToRemove, 1);
+        }
+        drawTableAdditionalItem(listAdditional);
+    }
+
+
 
     function getID() {
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
