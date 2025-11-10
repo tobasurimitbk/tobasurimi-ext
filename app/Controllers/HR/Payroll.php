@@ -7,6 +7,7 @@ use App\Models\AttendanceKeterlambatanModel;
 use App\Models\AttendancesModel;
 use App\Models\BagianModel;
 use App\Models\CompaniesModel;
+use App\Models\DendaAbsenHarianModel;
 use App\Models\DivisisModel;
 use App\Models\EmployeesModel;
 use App\Models\FormLemburModel;
@@ -43,6 +44,7 @@ class Payroll extends BaseController
     protected $gajiDivisiModel;
     protected $uangMakanHarianModel;
     protected $tunjanganModel;
+    protected $dendaAbsenHarianModel;
 
     public function __construct()
     {
@@ -66,6 +68,7 @@ class Payroll extends BaseController
         $this->gajiDivisiModel = new GajiDivisiModel();
         $this->uangMakanHarianModel = new UangMakanHarianModel();
         $this->tunjanganModel = new TunjanganModel();
+        $this->dendaAbsenHarianModel = new DendaAbsenHarianModel();
     }
 
     public function index()
@@ -451,10 +454,17 @@ class Payroll extends BaseController
             }
 
             // Total Karyawan Masuk di Hari Libur
-            $mapTotalEmployeeMasukLibur = $this->attendanceModel->getTotalHariLiburEmployeeHadir(
+            // $mapTotalEmployeeMasukLibur = $this->attendanceModel->getTotalHariLiburEmployeeHadir(
+            //     $startDate,
+            //     $endDate,
+            //     $this->this_company_id,
+            //     $employeeIds,
+            // );
+
+            // get karyawan masuk tapi ga di approved
+            $mapTotalMasukNotApprove = $this->attendanceModel->getTotalEmployeeHadirNotApproved(
                 $startDate,
                 $endDate,
-                $this->this_company_id,
                 $employeeIds,
             );
 
@@ -498,7 +508,8 @@ class Payroll extends BaseController
             $dataPayroll = [];
             foreach ($employeeIds as $e) {
                 if (isset($mapStatusAttendance[$e])) {
-                    $mapStatusAttendance[$e]['HADIR_H'] = $mapStatusAttendance[$e]['HADIR_H'] - $mapTotalEmployeeMasukLibur[$e];
+                    //$mapStatusAttendance[$e]['HADIR_H'] = $mapStatusAttendance[$e]['HADIR_H'] - $mapTotalEmployeeMasukLibur[$e];
+                    $mapStatusAttendance[$e]['HADIR_H'] = $mapStatusAttendance[$e]['HADIR_H'] - $mapTotalMasukNotApprove[$e];
                 }
 
                 $att = $mapStatusAttendance[$e] ?? [];
@@ -583,9 +594,20 @@ class Payroll extends BaseController
                 $mapUangMakanHarian[$u['employee_id']] = $u['total_nominal'];
             }
 
+            $dendaAbsenHarian = $this->dendaAbsenHarianModel->generateDendaAmt(
+                $employeeIds,
+                $startDate,
+                $endDate
+            );
+            $mapDendaAbsenHarian = [];
+            foreach ($dendaAbsenHarian as $d) {
+                $mapDendaAbsenHarian[$d['employee_id']] = $d['total_nominal'];
+            }
+
             $dataPayrollGajiConjunction = $this->payrollGajiModel->generateAmt(
                 $mapEmployeePayroll,
                 $mapUangMakanHarian,
+                $mapDendaAbsenHarian,
                 $employeeIds,
                 $this->this_company_id,
                 $yearMonth
@@ -772,10 +794,16 @@ class Payroll extends BaseController
             }
 
             // Total Karyawan Masuk di Hari Libur
-            $mapTotalEmployeeMasukLibur = $this->attendanceModel->getTotalHariLiburEmployeeHadir(
+            // $mapTotalEmployeeMasukLibur = $this->attendanceModel->getTotalHariLiburEmployeeHadir(
+            //     $startDate,
+            //     $endDate,
+            //     $this->this_company_id,
+            //     $employeeIds,
+            // );
+
+            $mapTotalMasukNotApprove = $this->attendanceModel->getTotalEmployeeHadirNotApproved(
                 $startDate,
                 $endDate,
-                $this->this_company_id,
                 $employeeIds,
             );
 
@@ -819,7 +847,8 @@ class Payroll extends BaseController
             $dataPayroll = [];
             foreach ($employeeIds as $e) {
                 if (isset($mapStatusAttendance[$e])) {
-                    $mapStatusAttendance[$e]['HADIR_H'] = $mapStatusAttendance[$e]['HADIR_H'] - $mapTotalEmployeeMasukLibur[$e];
+                    //$mapStatusAttendance[$e]['HADIR_H'] = $mapStatusAttendance[$e]['HADIR_H'] - $mapTotalEmployeeMasukLibur[$e];
+                    $mapStatusAttendance[$e]['HADIR_H'] = $mapStatusAttendance[$e]['HADIR_H'] - $mapTotalMasukNotApprove[$e];
                 }
                 $att = $mapStatusAttendance[$e] ?? [];
 
@@ -901,14 +930,25 @@ class Payroll extends BaseController
                 $mapUangMakanHarian[$u['employee_id']] = $u['total_nominal'];
             }
 
+            $dendaAbsenHarian = $this->dendaAbsenHarianModel->generateDendaAmt(
+                $employeeIds,
+                $startDate,
+                $endDate
+            );
+            $mapDendaAbsenHarian = [];
+            foreach ($dendaAbsenHarian as $d) {
+                $mapDendaAbsenHarian[$d['employee_id']] = $d['total_nominal'];
+            }
+
+
             $dataPayrollGajiConjunction = $this->payrollGajiModel->generateAmt(
                 $mapEmployeePayroll,
                 $mapUangMakanHarian,
+                $mapDendaAbsenHarian,
                 $employeeIds,
                 $this->this_company_id,
                 $yearMonth
             );
-
             if (count($dataPayrollGajiConjunction) != 0) {
                 $this->payrollGajiModel->insertBatch($dataPayrollGajiConjunction);
             }

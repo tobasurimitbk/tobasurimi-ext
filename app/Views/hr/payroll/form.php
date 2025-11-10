@@ -385,7 +385,7 @@
                                     <!-- <th style="text-align: center;" class="sort">Selesai Istirahat</th> -->
                                     <th style="text-align: center;" class="sort">CheckOut</th>
                                     <th style="text-align: center;" class="sort">Total Jam</th>
-                                    <th style="text-align: center;" class="sort">Nominal ((GP + CADANGAN) / 7 * Total Jam)</th>
+                                    <th style="text-align: center;" class="sort">Nominal (GP + CADANGAN)</th>
                                 </tr>
                             </thead>
                             <tbody class="body-table" id="body-table">

@@ -54,4 +54,19 @@ class DendaAbsenHarianModel extends Model
 
         return $dendaHarianAll;
     }
+
+    public function generateDendaAmt(
+        $employeeIds,
+        $startDate,
+        $endDate
+    ) {
+        $dendaQry = $this->asArray()
+            ->select('SUM(nominal) AS total_nominal, employee_id')
+            ->where('tanggal >=', $startDate)
+            ->where('tanggal <=', $endDate)
+            ->whereIn('employee_id', $employeeIds)
+            ->groupBy('denda_absen_harian.employee_id')
+            ->findAll();
+        return $dendaQry;
+    }
 }

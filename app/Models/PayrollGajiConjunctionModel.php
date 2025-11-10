@@ -88,6 +88,7 @@ class PayrollGajiConjunctionModel extends Model
     public function generateAmt(
         $mapEmployeePayroll,
         $mapUangMakanHarian,
+        $mapDendaAbsenHarian,
         $employeeIds,
         $companyId,
         $yearMonth
@@ -112,6 +113,12 @@ class PayrollGajiConjunctionModel extends Model
                     $nominal = $g['nominal'];
                 } else {
                     $nominal = $mapUangMakanHarian[$g['employee_id']] ?? 0;
+                }
+            } elseif ($g['tunjangan_name'] == "DENDA") {
+                if (empty($mapDendaAbsenHarian[$g['employee_id']])) {
+                    $nominal = $g['nominal'];
+                } else {
+                    $nominal = $mapDendaAbsenHarian[$g['employee_id']] ?? 0;
                 }
             } else {
                 $nominal = $g['nominal'];

@@ -160,7 +160,7 @@ class AttendancesModel extends Model
             $mapBigDays[$b['date']] = true;
         }
 
-        // 2️⃣ Buat map tanggal hari libur (Tambah Minggu)
+        // 2️⃣ Buat daftar tanggal hari libur (termasuk Minggu)
         $begin = new DateTime($startDate);
         $end   = new DateTime($endDate);
         $end->modify('+1 day');
@@ -173,45 +173,81 @@ class AttendancesModel extends Model
             $current = $date->format('Y-m-d');
             $dayOfWeek = $date->format('w'); // 0 = Minggu
 
+            // Tambah Minggu sebagai hari libur
             if ($dayOfWeek == 0) {
                 $mapHariLibur[$current] = true;
             }
 
+            // Tambah dari BigDays
             if (isset($mapBigDays[$current])) {
                 $mapHariLibur[$current] = true;
             }
         }
 
-        // 3️⃣ Ambil data kehadiran dalam rentang tanggal
+        // 3️⃣ Ambil data kehadiran karyawan dalam rentang tanggal
         $attendanceList = $this->getAttendanceByDateRangeAmt(
             $employeeIds,
             $startDate,
             $endDate
         );
 
-        // 4️⃣ Buat map hasil: employee_id => total_hadir_hari_libur
+        // 4️⃣ Inisialisasi hasil
         $mapTotalLiburMasuk = [];
         foreach ($employeeIds as $eid) {
             $mapTotalLiburMasuk[$eid] = 0;
         }
 
+        // 5️⃣ Loop kehadiran
         foreach ($attendanceList as $e) {
             $eid = $e['employee_id'];
             $tanggal = $e['periode'];
 
-            // Jika bukan hari libur → skip
-            if (!isset($mapHariLibur[$tanggal])) continue;
+            // ✅ Cek apakah hari libur (Minggu atau BigDay)
+            $isHariLibur = isset($mapHariLibur[$tanggal]);
 
-            // Jika status bukan hadir → skip
-            if ($e['status'] == "ALPHA_A" || $e['status'] == "LIBUR_L") continue;
+            // ✅ Cek apakah karyawan hadir dan disetujui
+            $isHadir = !in_array($e['status'], ['ALPHA_A', 'LIBUR_L']);
+            $isApproved = !empty($e['isApproved']);
 
-            // ✅ Hitung hadir hari libur
-            $mapTotalLiburMasuk[$eid]++;
+            // Hitung hanya jika: hari libur + hadir + disetujui
+            if ($isHariLibur && $isHadir && $isApproved) {
+                $mapTotalLiburMasuk[$eid]++;
+            }
         }
 
         return $mapTotalLiburMasuk;
     }
 
+    public function getTotalEmployeeHadirNotApproved(
+        $startDate,
+        $endDate,
+        $employeeIds
+    ) {
+        $attendanceList = $this->getAttendanceByDateRangeAmt(
+            $employeeIds,
+            $startDate,
+            $endDate
+        );
+
+        $mapTotalMasukNotApproved = [];
+        foreach ($employeeIds as $eid) {
+            $mapTotalMasukNotApproved[$eid] = 0;
+        }
+
+        foreach ($attendanceList as $e) {
+            $eid = $e['employee_id'];
+
+            // ✅ Cek apakah karyawan hadir dan disetujui
+            $isHadir = !in_array($e['status'], ['ALPHA_A', 'LIBUR_L']);
+            $isApproved = !empty($e['isApproved']);
+
+            if ($isHadir && !$isApproved) {
+                $mapTotalMasukNotApproved[$eid]++;
+            }
+        }
+
+        return $mapTotalMasukNotApproved;
+    }
 
 
     // public function generate($employeeData, $startDate, $endDate, $year, $month, $companyID)
