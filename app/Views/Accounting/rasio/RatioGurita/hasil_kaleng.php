@@ -65,10 +65,6 @@
                     <th style="text-align: center;">Harga Satuan BJ</th>
                     <th style="text-align: center;">Total</th>
                     <th style="text-align: center;">Harga BB</th>
-                    <th style="text-align: center;">Valas</th>
-                    <th style="text-align: center;">Kurs</th>
-                    <th style="text-align: center;">Harga Satuan(Sesuai Kurs)</th>
-                    <th style="text-align: center;">Harga Total(Sesuai Kurs)</th>
                 </tr>
             </thead>
             <tbody class="body-table-rasio-akhir">
