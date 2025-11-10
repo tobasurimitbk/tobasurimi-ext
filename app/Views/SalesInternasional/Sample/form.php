@@ -79,7 +79,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <!-- <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select
                                 class="form-select divisi_id"
@@ -96,7 +96,7 @@
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Department</label>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="col-sm-4">
                         <div class="form-floating mb-3">
                             <input autocomplete="one-time-code" value="<?= !empty($dataSample) ? $dataSample['delivery'] : '' ?>" type="text" class="form-control delivery" id="delivery" name="delivery" placeholder="Delivery">
@@ -149,6 +149,7 @@
                             <thead class="thead-dark">
                                 <tr>
                                     <th style="width: 10px;">No</th>
+                                    <th>Dept</th>
                                     <th>Product</th>
                                     <th>Grade / Spesification</th>
                                     <th>Note</th>
@@ -167,7 +168,7 @@
                             </tbody>
                             <tfoot class="foot-barang" id="foot-barang">
                                 <tr>
-                                    <td colspan="12">List Items Empty</td>
+                                    <td colspan="13">List Items Empty</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -279,6 +280,24 @@
                             <div class="form-floating">
                                 <textarea class="full-textarea form-control note" id="note" name="note" placeholder="Note Items (Optional)"></textarea>
                                 <label for="floatingInput">Note (Optional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select
+                                    class="form-select divisi_barang_id"
+                                    aria-label="Floating label select example"
+                                    name="divisi_barang_id"
+                                    id="divisi_barang_id">
+                                    <option value=""></option>
+                                    <?php foreach ($dataDivisi as $d) : ?>
+                                        <option value="<?= $d['id'] ?>"
+                                            <?= !empty($dataSample['divisi_id']) && $dataSample['divisi_id'] == $d['id'] ? 'selected' : '' ?>>
+                                            <?= $d['divisi'] ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Select Department</label>
                             </div>
                         </div>
                     </div>
@@ -439,15 +458,21 @@
             dropdownParent: $('#additionalItemModal')
         }).change(function() {});
 
+        $('.divisi_barang_id').select2({
+            placeholder: "Select Department",
+            theme: "bootstrap-5",
+            dropdownParent: $('#barangModal')
+        }).change(function() {});
+
         //CSS SELECT2 FLOATING LABEL
-        $('.sales_contract_id, .divisi_id,.barang_master_sales_id,.satuan_id,.satuan_additional')
+        $('.sales_contract_id, .divisi_id,.barang_master_sales_id,.satuan_id,.satuan_additional,.divisi_barang_id')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.sales_contract_id, .divisi_id,.barang_master_sales_id,.satuan_id,.satuan_additional')
+        $('.sales_contract_id, .divisi_id,.barang_master_sales_id,.satuan_id,.satuan_additional,.divisi_barang_id')
             .parent('div')
             .children('span')
             .children('span')
@@ -455,7 +480,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.sales_contract_id, .divisi_id,.barang_master_sales_id,.satuan_id,.satuan_additional')
+        $('.sales_contract_id, .divisi_id,.barang_master_sales_id,.satuan_id,.satuan_additional,.divisi_barang_id')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -469,9 +494,9 @@
                 tanggal: {
                     required: true
                 },
-                divisi_id: {
-                    required: true
-                },
+                // divisi_id: {
+                //     required: true
+                // },
                 delivery: {
                     required: true
                 },
@@ -492,9 +517,9 @@
                 tanggal: {
                     required: "Tanggal required"
                 },
-                divisi_id: {
-                    required: "Departemen required"
-                },
+                // divisi_id: {
+                //     required: "Departemen required"
+                // },
                 delivery: {
                     required: "Delivery required"
                 },
@@ -553,9 +578,9 @@
                 qty: {
                     required: true
                 },
-                // berat_kotor: {
-                //     required: true
-                // },
+                divisi_barang_id: {
+                    required: true
+                },
                 // berat_bersih: {
                 //     required: true
                 // },
@@ -581,6 +606,9 @@
                 },
                 qty: {
                     required: "Qty required"
+                },
+                divisi_barang_id: {
+                    required: "Department required"
                 },
                 // berat_kotor: {
                 //     required: "Gross weight required"
@@ -672,6 +700,8 @@
                 var beratKotor = destroyFormatRupiah($('#berat_kotor').val());
                 var beratBersih = destroyFormatRupiah($('#berat_bersih').val());
                 var note = $('#note').val();
+                var divisiBarangId = $('#divisi_barang_id option:selected').val();
+                var divisiBarangText = $('#divisi_barang_id option:selected').text();
 
                 if (idBarang) {
                     // UPDATE
@@ -697,6 +727,9 @@
                     listBarang[index].berat_kotor = beratKotor;
                     listBarang[index].berat_bersih = beratBersih;
                     listBarang[index].list_additional = listAdditional;
+                    listBarang[index].divisi_barang_id = divisiBarangId;
+                    listBarang[index].divisi_barang_text = divisiBarangText;
+
 
                 } else {
                     // CREATE
@@ -716,6 +749,8 @@
                         berat_bersih: beratBersih,
                         note: note,
                         list_additional: listAdditional,
+                        divisi_barang_id: divisiBarangId,
+                        divisi_barang_text: divisiBarangText
                     });
                 }
 
@@ -886,7 +921,7 @@
         $('#berat_kotor').val(null);
         $('#berat_bersih').val(null);
         $('#note').val(null);
-
+        $('#divisi_barang_id').val(null).change();
     }
 
     function resetFormAdditional() {
@@ -907,7 +942,7 @@
         if (!Array.isArray(listBarang) || listBarang.length === 0) {
             tbody.html(`
             <tr>
-                <td colspan="12" class="text-center text-muted">List Items Empty</td>
+                <td colspan="13" class="text-center text-muted">List Items Empty</td>
             </tr>
         `);
             return;
@@ -931,6 +966,7 @@
             const qty = parseFloat(item.qty || 0);
             const berat_kotor = parseFloat(item.berat_kotor || 0);
             const berat_bersih = parseFloat(item.berat_bersih || 0);
+            const divisi_barang_text = item.divisi_barang_text;
             kode_satuan = item.kode_satuan || '';
 
             totalQty += qty;
@@ -941,6 +977,7 @@
             htmlRows.push(`
             <tr style="color:whitesmoke;">
                 <td style="text-align:center;">${no++}</td>
+                <td>${divisi_barang_text}</td>
                 <td>${barang}</td>
                 <td>${grade}</td>
                 <td>${note}</td>
@@ -974,7 +1011,7 @@
 
                 htmlRows.push(`
                 <tr style="color:whitesmoke;">
-                    <td colspan="16">
+                    <td colspan="17">
                         <b>ADDITIONAL ITEM</b><br>
                         <table class="table table-sm table-bordered mb-2 w-100">
                             <thead class="bg-warning text-dark">
@@ -998,7 +1035,7 @@
         // Footer total
         const totalRow = `
         <tr>
-            <td colspan="6"></td>
+            <td colspan="7"></td>
             <td><b>TOTAL</b></td>
             <td><b>${greatFormatRupiah(totalQty)} (${kode_satuan})</b></td>
             <td></td>
@@ -1082,6 +1119,7 @@
         $('#berat_kotor').val(greatFormatRupiah(item.berat_kotor));
         $('#berat_bersih').val(greatFormatRupiah(item.berat_bersih));
         $('#note').val(item.note);
+        $('#divisi_barang_id').val(item.divisi_barang_id).change();
 
         listAdditional = item.list_additional;
         drawTableAdditionalItem(listAdditional);
