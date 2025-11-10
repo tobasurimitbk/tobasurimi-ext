@@ -582,7 +582,7 @@
         },
     });
 
-    $('.btn-submit-parent').click(function(e) {
+    $('#btn-submit-parent').click(function(e) {
         e.preventDefault();
         if ($('.create-form').valid()) {
             if (listData.length === 0) {
