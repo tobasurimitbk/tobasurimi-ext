@@ -13,6 +13,7 @@ use App\Models\PenerimaanBarangModel;
 use App\Models\PengembalianBarangDetailModel;
 use App\Models\PengembalianBarangModel;
 use App\Models\SupplierModel;
+use App\Models\UserModel;
 use Dompdf\Dompdf;
 
 class ReturPembelianLokalBP extends BaseController
@@ -31,6 +32,7 @@ class ReturPembelianLokalBP extends BaseController
     protected $bc30Model;
     protected $dompdf;
     protected $companyModel;
+    protected $userModel;
 
     public function __construct()
     {
@@ -48,6 +50,7 @@ class ReturPembelianLokalBP extends BaseController
         $this->bc30Model = new BC30Model();
         $this->dompdf = new Dompdf();
         $this->companyModel = new CompaniesModel();
+        $this->userModel = new UserModel();
     }
 
     public function index()
@@ -197,7 +200,8 @@ class ReturPembelianLokalBP extends BaseController
             'dataPengembalianBarang' => $dataPengembalianBarang,
             'dataPengembalianBarangDetail' => $dataPengembalianBarangDetail,
             'title' => "Retur Pembelian",
-            'company' => $dataCompany
+            'company' => $dataCompany,
+            'dataUser' => $this->userModel->where('id', $this->this_user_id)->first()
         ];
         $this->dompdf->loadHtml(view('Warehouse/returnBarang/printLokalBP', $data));
         $this->dompdf->setPaper('A4', 'portrait');

@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\BarangMasterSalesModel;
 use App\Models\CompaniesModel;
 use App\Models\DivisisModel;
+use App\Models\SampleAdditionalModel;
 use App\Models\SampleDetailModel;
 use App\Models\SampleModel;
 use App\Models\SatuansModel;
@@ -23,6 +24,7 @@ class Sample extends BaseController
     protected $sampleModel;
     protected $sampleDetailModel;
     protected $companyModel;
+    protected $sampleAdditionalModel;
     protected $dompdf;
 
     public function __construct()
@@ -36,6 +38,7 @@ class Sample extends BaseController
         $this->sampleModel = new SampleModel();
         $this->sampleDetailModel = new SampleDetailModel();
         $this->companyModel = new CompaniesModel();
+        $this->sampleAdditionalModel = new SampleAdditionalModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -180,14 +183,28 @@ class Sample extends BaseController
             ->orderBy('barang_name', "asc")
             ->findAll();
         $dataBarangList = $this->sampleDetailModel->getSampleDetail($id);
+        $dataAdditionalItem = $this->sampleAdditionalModel
+            ->select('
+                sample_additional.additional_item, 
+                SUM(sample_additional.qty_additional) AS total_qty_additional, 
+                satuans.kode_satuan')
+            ->join('satuans', 'satuans.id = sample_additional.satuan_additional', 'left')
+            ->where('sample_additional.sample_id', $id)
+            ->where('sample_additional.deletedAt', null)
+            ->groupBy('sample_additional.additional_item')
+            ->findAll();
+
         $company = $this->companyModel->where('id', $this->this_company_id)->first();
+
+
 
         $data = [
             'dataSample' => $dataSample,
             'dataBarangList' => $dataBarangList,
             'dataSatuan' => $dataSatuan,
             'dataBarang' => $dataBarang,
-            "company" => $company
+            "company" => $company,
+            "dataAdditionalItem" => $dataAdditionalItem
         ];
 
         $this->dompdf->loadHtml(view('SalesInternasional/Sample/print', $data));
@@ -244,7 +261,7 @@ class Sample extends BaseController
             ]);
 
             foreach (json_decode($_POST['listBarang']) as $l) {
-                $this->sampleDetailModel->insert([
+                $sample_detail_id = $this->sampleDetailModel->insert([
                     'sample_id' => $id,
                     'barang_master_sales_id' => $l->barang_master_sales_id,
                     'satuan_id' => $l->satuan_id,
@@ -257,6 +274,16 @@ class Sample extends BaseController
                     'berat_bersih' => $l->berat_bersih,
                     'note' => trim($l->note)
                 ]);
+
+                foreach ($l->list_additional as $la) {
+                    $this->sampleAdditionalModel->insert([
+                        'sample_id' => $id,
+                        'sample_detail_id' => $sample_detail_id,
+                        'additional_item' => $la->additional_item,
+                        'qty_additional' => (float)$la->qty_additional,
+                        'satuan_additional' => $la->satuan_additional
+                    ]);
+                }
             }
 
             $db->transCommit();
@@ -312,8 +339,9 @@ class Sample extends BaseController
             ]);
 
             $this->sampleDetailModel->where('sample_id', $id)->delete(null, true);
+            $this->sampleAdditionalModel->where('sample_id', $id)->delete(null, true);
             foreach (json_decode($_POST['listBarang']) as $l) {
-                $this->sampleDetailModel->insert([
+                $sample_detail_id =  $this->sampleDetailModel->insert([
                     'sample_id' => $id,
                     'barang_master_sales_id' => $l->barang_master_sales_id,
                     'satuan_id' => $l->satuan_id,
@@ -326,6 +354,16 @@ class Sample extends BaseController
                     'berat_bersih' => $l->berat_bersih,
                     'note' => trim($l->note)
                 ]);
+
+                foreach ($l->list_additional as $la) {
+                    $this->sampleAdditionalModel->insert([
+                        'sample_id' => $id,
+                        'sample_detail_id' => $sample_detail_id,
+                        'additional_item' => $la->additional_item,
+                        'qty_additional' => (float)$la->qty_additional,
+                        'satuan_additional' => $la->satuan_additional
+                    ]);
+                }
             }
 
             $db->transCommit();
@@ -350,6 +388,7 @@ class Sample extends BaseController
         $id = decrypt($this->request->getVar('id'));
         $this->sampleModel->delete($id);
         $this->sampleDetailModel->where('sample_id', $id)->delete(null, false);
+        $this->sampleAdditionalModel->where('sample_id', $id)->delete(null, true);
 
         return response()->setJSON([
             'status' => true,

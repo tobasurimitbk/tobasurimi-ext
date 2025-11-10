@@ -864,7 +864,7 @@ class AMPurchaseOrderDetailModel extends Model
             ->where('am_purchase_orders.company_id', $companyId)
             ->where('am_purchase_order_details.spesifikasi_id', $spesifikasiId)
             ->where('am_purchase_order_details.unit', $unitId)
-            ->orderBy('am_purchase_orders.po_no', "desc")
+            ->orderBy('am_purchase_orders.po_date', "desc")
             ->first();
 
         return $dataLPB;
