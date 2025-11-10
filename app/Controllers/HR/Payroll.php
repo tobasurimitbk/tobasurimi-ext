@@ -1176,13 +1176,15 @@ class Payroll extends BaseController
             'perhitunganGaji' => $this->payrollGajiModel->getPerhitunganKomponenGajiPayroll($payrollID),
             'company' => $company,
             'totalNominalKeterlambatanPresensi' => $this->attendanceKeterlambatanModel->getTotalRekap($payrollID),
-            'totalNominalRekapPerizinanNotApproved' => $this->attendanceKeterlambatanModel->getTotalRekap($payrollID)
+            'totalNominalRekapPerizinanNotApproved' => $this->attendanceKeterlambatanModel->getTotalRekap($payrollID),
         ];
+
+        // dd($data);
 
         $dompdf->loadHtml(view('hr/payroll/payroll_single_print', $data));
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
-        $dompdf->stream("Tanda Terima Upah Karyawan ", array("Attachment" => false));
+        $dompdf->stream($data['payroll']['year_month'] . " " . $data['employee']['name'], array("Attachment" => false));
 
         exit(0);
     }

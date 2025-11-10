@@ -42,7 +42,7 @@
                             <tr>
                                 <th>No</th>
                                 <th onclick="changeSort('no_sample')" class="sort">No. Sample</th>
-                                <th onclick="changeSort('divisi_id')" class="sort">Department</th>
+                                <!-- <th onclick="changeSort('divisi_id')" class="sort">Department</th> -->
                                 <th onclick="changeSort('tanggal')" class="sort">Sample Date</th>
                                 <th onclick="changeSort('delivery')" class="sort">Delivery</th>
                                 <th onclick="changeSort('attn_no')" class="sort">Attn</th>
@@ -104,9 +104,6 @@
             }, {
                 data: "no_sample",
                 className: "text-left"
-            }, {
-                data: "divisi",
-                className: "text-left",
             }, {
                 data: "tanggal",
                 className: "text-left",

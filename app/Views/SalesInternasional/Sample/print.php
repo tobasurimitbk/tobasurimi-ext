@@ -36,7 +36,7 @@
                     <?= strtoupper(date('F d, Y', strtotime($dataSample['tanggal']))); ?>
                 </td>
             </tr>
-            <tr>
+            <!-- <tr>
                 <td>
                     DEPARTMENT
                 </td>
@@ -46,7 +46,7 @@
                 <td>
                     <?= strtoupper($dataSample['divisi']); ?>
                 </td>
-            </tr>
+            </tr> -->
         </table>
     </div>
 
@@ -54,6 +54,9 @@
         <thead>
             <tr style="background-color: #f8f9fa; border-bottom: 2px solid #dee2e6;">
                 <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd; width: 10px; height:2%;">NO</th>
+                <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd;">
+                    DEPT
+                </th>
                 <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd;">
                     PRODUCTS
                 </th>
@@ -88,7 +91,10 @@
                 ?>
                 <tr>
                     <td style="padding: 3px; border: 1px solid #ddd;"><?= $no++ ?></td>
-                    <td style="padding: 3px; border: 1px solid #ddd; width:7.5%; text-align: left;">
+                    <td style="padding: 3px; border: 1px solid #ddd; width: 1.5%;text-align: left;">
+                        <?= $d['divisi_barang_text'] ?>
+                    </td>
+                    <td style="padding: 3px; border: 1px solid #ddd; width:9.5%; text-align: left;">
                         <?= $d['barang'] ?> <br>
                         <?= $d['note'] ?>
                     </td>
@@ -130,7 +136,7 @@
                 </tr>
             <?php endforeach; ?>
             <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;">
-                <td style="padding: 6px; border: 1px solid #ddd;"></td>
+                <td colspan="2" style="padding: 6px; border: 1px solid #ddd;"></td>
                 <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
                     TOTAL QTY (<?= $kodeSatuan ?>)
                 </td>
@@ -140,7 +146,7 @@
             </tr>
             <?php if ($dataSample['total_berat_bersih'] != 0 && !empty($dataSample['total_berat_bersih'])): ?>
                 <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;" colspan="6">
-                    <td style="padding: 6px; border: 1px solid #ddd;"></td>
+                    <td colspan="2" style="padding: 6px; border: 1px solid #ddd;"></td>
                     <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
                         TOTAL NET WEIGHT (KG)
                     </td>
@@ -151,12 +157,29 @@
             <?php endif; ?>
             <?php if ($dataSample['total_berat_kotor'] != 0 && !empty($dataSample['total_berat_kotor'])): ?>
                 <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;" colspan="6">
-                    <td style="padding: 6px; border: 1px solid #ddd;"></td>
+                    <td colspan="2" style="padding: 6px; border: 1px solid #ddd;"></td>
                     <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
                         TOTAL GROSS WEIGHT (KG)
                     </td>
                     <td style="padding: 6px; border: 1px solid #ddd; " colspan="6">
                         <?= number_format($dataSample['total_berat_kotor'], 2) ?>
+                    </td>
+                </tr>
+            <?php endif; ?>
+            <?php if (count($dataAdditionalItem) > 0): ?>
+                <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;" colspan="6">
+                    <td style="padding: 6px; border: 1px solid #8e8181ff;" colspan="9">
+                        <table style="width:20%; border-collapse: collapse; margin-left:6px; margin-top:3px; font-size:11px;">
+                            <tbody>
+                                <?php foreach ($dataAdditionalItem as $d): ?>
+                                    <tr>
+                                        <td style="border: 1px solid #000; padding: 4px;"><?= $d['additional_item'] ?></td>
+                                        <td style="border: 1px solid #000; padding: 4px; width:20px;"><?= number_format($d['total_qty_additional'], 2) ?></td>
+                                        <td style="border: 1px solid #000; padding: 4px; width:20px;"><?= $d['kode_satuan'] ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
                     </td>
                 </tr>
             <?php endif; ?>

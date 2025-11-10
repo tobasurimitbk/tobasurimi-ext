@@ -1070,11 +1070,13 @@ class Attendance extends BaseController
             $checkIN = $this->request->getVar('checkIn');
             $checkOut = $this->request->getVar('checkOut');
             $statusKehadiran = $this->request->getVar('statusKehadiran');
-            $reason = $this->request->getVar('reason');
+            $reasonCheckin = $this->request->getVar('reason_checkin');
+            $reassonCheckout = $this->request->getVar('reason_checkout');
             $isApproved = $this->request->getVar('isApproved');
             $nominalUangMakan = $this->request->getVar('nominal_uang_makan');
             $nominalDendaKeterlambatan = $this->request->getVar('nominal_denda_keterlambatan');
             $abaikanSyncLog = $this->request->getVar('abaikan_sync_log');
+            $reason = $reasonCheckin . "-" . $reassonCheckout;
 
             if ($statusKehadiran != "HADIR_H") {
                 $checkIN = null;
