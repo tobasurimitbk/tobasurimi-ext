@@ -21,10 +21,8 @@
         }
 
         .info {
-            text-align: center;
             margin-bottom: 10px;
             font-weight: bold;
-            font-size: 12px;
         }
 
         table {
@@ -51,14 +49,10 @@
         }
 
         .group-title {
-            margin-top: 20px;
+            margin-top: 25px;
             margin-bottom: 3px;
-            font-size: 10px;
-        }
-
-        .sub-group-title {
             font-weight: bold;
-            font-size: 10px;
+            font-size: 11px;
         }
 
         .col-no {
@@ -100,104 +94,99 @@
 <body>
     <h2><?= $header; ?></h2>
     <div class="info">
-        <div>
-            Tanggal:
-            <?php if (!empty($tanggalAwal) && !empty($tanggalAkhir)) : ?>
-                <?= $tanggalAwal; ?> s/d <?= $tanggalAkhir; ?>
-            <?php else : ?>
-                ALL
-            <?php endif; ?>
-        </div>
+        Tanggal:
+        <?php if (!empty($tanggalAwal) && !empty($tanggalAkhir)) : ?>
+            <?= $tanggalAwal; ?> s/d <?= $tanggalAkhir; ?>
+        <?php else : ?>
+            ALL
+        <?php endif; ?>
     </div>
 
     <?php if (!empty($data)) : ?>
-        <?php
-        $nestedData = [];
-        foreach ($data as $row) {
-            $divisi = $row->divisiName ?? "LAINNYA";
-            $gudang = $row->warehouseName ?? "LAINNYA";
-            $barang = $row->barangName ?? "LAINNYA";
+        <?php foreach ($data as $barangName => $rows): ?>
+            <div class="group-title">Bahan Baku: <?= htmlspecialchars($barangName); ?></div>
 
-            $totalRow = floatval($row->nilai_total_umum ?? 0)
-                + floatval($row->nilai_total_harian ?? 0)
-                + floatval($row->nilai_total_bulanan ?? 0)
-                + floatval($row->nilai_total_tambahan ?? 0);
+            <table>
+                <thead>
+                    <tr>
+                        <th rowspan="2" class="col-no">No.</th>
+                        <th rowspan="2" class="col-supplier">Supplier</th>
+                        <th rowspan="2" class="col-nopo">No PO</th>
+                        <th rowspan="2" class="col-date">Tgl PO</th>
+                        <th rowspan="2" class="col-dept">Department</th>
+                        <th rowspan="2" class="col-gudang">Gudang</th>
+                        <th rowspan="2" class="col-qty">Qty</th>
+                        <th rowspan="2" class="col-satuan">Satuan</th>
+                        <th class="col-group">Tambahan Bulanan</th>
+                        <th rowspan="2" class="col-group">Total</th>
+                    </tr>
+                    <tr>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $no = 1;
+                    $subtotal = [
+                        'Qty' => 0,
+                        'DPP Umum' => 0,
+                        'PPh Umum' => 0,
+                        'Total Umum' => 0,
+                        'DPP Harian' => 0,
+                        'PPh Harian' => 0,
+                        'Total Harian' => 0,
+                        'DPP Bulanan' => 0,
+                        'PPh Bulanan' => 0,
+                        'Total Bulanan' => 0,
+                        'DPP Tambahan' => 0,
+                        'PPh Tambahan' => 0,
+                        'Total Tambahan' => 0,
+                        'Total' => 0,
+                    ];
 
-            $nestedData[$divisi][$gudang][$barang]['data'][] = [
-                'supplierName' => $row->supplierName,
-                'poNum' => $row->poNum,
-                'poDate' => $row->poDate,
-                'qtyPO' => $row->qtyPO,
-                'satuanName' => $row->satuanName,
+                    foreach ($rows as $row):
+                        $subtotal['Qty'] += $row['Qty'];
+                        $subtotal['DPP Umum'] += $row['DPP Umum'];
+                        $subtotal['PPh Umum'] += $row['PPh Umum'];
+                        $subtotal['Total Umum'] += $row['Total Umum'];
+                        $subtotal['DPP Harian'] += $row['DPP Harian'];
+                        $subtotal['PPh Harian'] += $row['PPh Harian'];
+                        $subtotal['Total Harian'] += $row['Total Harian'];
+                        $subtotal['DPP Bulanan'] += $row['DPP Bulanan'];
+                        $subtotal['PPh Bulanan'] += $row['PPh Bulanan'];
+                        $subtotal['Total Bulanan'] += $row['Total Bulanan'];
+                        $subtotal['DPP Tambahan'] += $row['DPP Tambahan'];
+                        $subtotal['PPh Tambahan'] += $row['PPh Tambahan'];
+                        $subtotal['Total Tambahan'] += $row['Total Tambahan'];
+                        $subtotal['Total'] += $row['Total'];
+                    ?>
+                        <tr>
+                            <td><?= $no++; ?></td>
+                            <td class="text-left"><?= htmlspecialchars($row['Supplier']); ?></td>
+                            <td><?= htmlspecialchars($row['poNum']); ?></td>
+                            <td><?= htmlspecialchars($row['poDate']); ?></td>
+                            <td class="text-left"><?= htmlspecialchars($row['Divisi']); ?></td>
+                            <td class="text-left"><?= htmlspecialchars($row['warehouseName']); ?></td>
+                            <td><?= number_format($row['Qty'], 2); ?></td>
+                            <td><?= htmlspecialchars($row['Satuan']); ?></td>
 
-                'nilai_total_bulanan' => $row->nilai_total_bulanan,
-                'totalRow' => $totalRow,
-            ];
+                            <td><?= number_format($row['Total Bulanan'], 2); ?></td>
 
-            // summary
-            if (!isset($nestedData[$divisi][$gudang][$barang]['summary'])) {
-                $nestedData[$divisi][$gudang][$barang]['summary'] = [
-                    'totalQtyPO' => 0,
-                    'totalBulanan' => 0,
-                    'totalRow' => 0,
-                ];
-            }
+                            <td><?= number_format($row['Total'], 2); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
 
-            $nestedData[$divisi][$gudang][$barang]['summary']['totalQtyPO'] += floatval($row->qtyPO);
-            $nestedData[$divisi][$gudang][$barang]['summary']['totalBulanan'] += floatval($row->nilai_total_bulanan);
-            $nestedData[$divisi][$gudang][$barang]['summary']['totalRow'] += $totalRow;
-        }
-        ?>
+                    <tr style="font-weight: bold; background-color: #eee;">
+                        <td colspan="6">SUBTOTAL <?= strtoupper($barangName); ?></td>
+                        <td><?= number_format($subtotal['Qty'], 2); ?></td>
+                        <td></td>
 
-        <?php foreach ($nestedData as $divisiName => $gudangList): ?>
-            <?php foreach ($gudangList as $warehouseName => $barangList): ?>
-                <?php foreach ($barangList as $barangName => $group): ?>
-                    <div class="sub-group-title" style="margin-top: 10px;">Department: <?= $divisiName; ?></div>
-                    <div class="sub-group-title">Gudang: <?= $warehouseName; ?></div>
-                    <div class="sub-group-title">Bahan Baku: <?= $barangName; ?></div>
+                        <td><?= number_format($subtotal['Total Bulanan'], 2); ?></td>
 
-                    <table>
-                        <thead>
-                            <tr>
-                                <th rowspan="2" class="col-no">No.</th>
-                                <th rowspan="2" class="col-supplier">Supplier</th>
-                                <th rowspan="2" class="col-nopo">No PO</th>
-                                <th rowspan="2" class="col-date">Tgl PO</th>
-                                <th rowspan="2" class="col-qty">Qty</th>
-                                <th rowspan="2" class="col-satuan">Satuan</th>
-                                <th class="col-group">Tambahan Bulanan</th>
-                                <th rowspan="2" class="col-group">Total</th>
-                            </tr>
-                            <tr>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php $no = 1;
-                            foreach ($group['data'] as $row): ?>
-                                <tr>
-                                    <td><?= $no++; ?></td>
-                                    <td class="text-left"><?= $row['supplierName']; ?></td>
-                                    <td><?= $row['poNum']; ?></td>
-                                    <td><?= $row['poDate']; ?></td>
-                                    <td style="text-align: right;"><?= number_format($row['qtyPO'], 2); ?></td>
-                                    <td><?= $row['satuanName']; ?></td>
-                                    <td style="text-align: right;"><?= number_format($row['nilai_total_bulanan'], 2); ?></td>
-                                    <td style="text-align: right;"><?= number_format($row['totalRow'], 2); ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-
-                            <tr style="font-weight: bold; background-color: #eee;">
-                                <td colspan="4">TOTAL <?= strtoupper($barangName); ?></td>
-                                <td style="text-align: right;"><?= number_format($group['summary']['totalQtyPO'], 2); ?></td>
-                                <td></td>
-                                <td style="text-align: right;"><?= number_format($group['summary']['totalBulanan'], 2); ?></td>
-                                <td style="text-align: right;"><?= number_format($group['summary']['totalRow'], 2); ?></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                <?php endforeach; ?>
-            <?php endforeach; ?>
+                        <td><?= number_format($subtotal['Total'], 2); ?></td>
+                    </tr>
+                </tbody>
+            </table>
         <?php endforeach; ?>
     <?php else: ?>
         <p>Tidak ada data yang tersedia.</p>
