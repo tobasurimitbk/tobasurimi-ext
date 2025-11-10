@@ -272,7 +272,8 @@ class Sample extends BaseController
                     'qty' => $l->qty,
                     'berat_kotor' => $l->berat_kotor,
                     'berat_bersih' => $l->berat_bersih,
-                    'note' => trim($l->note)
+                    'note' => trim($l->note),
+                    'divisi_barang_id' => $l->divisi_barang_id
                 ]);
 
                 foreach ($l->list_additional as $la) {
@@ -352,7 +353,8 @@ class Sample extends BaseController
                     'qty' => $l->qty,
                     'berat_kotor' => $l->berat_kotor,
                     'berat_bersih' => $l->berat_bersih,
-                    'note' => trim($l->note)
+                    'note' => trim($l->note),
+                    'divisi_barang_id' => $l->divisi_barang_id
                 ]);
 
                 foreach ($l->list_additional as $la) {

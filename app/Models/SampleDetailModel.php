@@ -47,13 +47,15 @@ class SampleDetailModel extends Model
         $selectQry = "
             sample_detail.*,
             barang_master_sales.barang_name AS barang,
-            satuans.kode_satuan
+            satuans.kode_satuan,
+            divisis.divisi AS divisi_barang
         ";
 
         $sampleDetail = $this->asArray()
             ->select($selectQry)
             ->join('barang_master_sales', 'barang_master_sales.id = sample_detail.barang_master_sales_id', 'left')
             ->join('satuans', 'satuans.id = sample_detail.satuan_id', 'left')
+            ->join('divisis', 'divisis.id = sample_detail.divisi_barang_id', 'left')
             ->where('sample_detail.sample_id', $sampleId)
             ->where('sample_detail.deletedAt', null)
             ->findAll();
@@ -94,7 +96,9 @@ class SampleDetailModel extends Model
                 'berat_kotor' => (float)$s['berat_kotor'],
                 'berat_bersih' => (float)$s['berat_bersih'],
                 'note' => $s['note'],
-                'list_additional' => $listAdditional
+                'list_additional' => $listAdditional,
+                'divisi_barang_id' => $s['divisi_barang_id'],
+                'divisi_barang_text' => $s['divisi_barang']
             ];
         }
 
