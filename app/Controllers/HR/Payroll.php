@@ -17,6 +17,7 @@ use App\Models\PayrollGajiConjunctionModel;
 use App\Models\PayrollGajiHarianModel;
 use App\Models\PayrollsModel;
 use App\Models\PinjamanKaryawanModel;
+use App\Models\TunjanganModel;
 use App\Models\UangMakanHarianModel;
 use Dompdf\Dompdf;
 use Exception;
@@ -41,6 +42,7 @@ class Payroll extends BaseController
     protected $companyModel;
     protected $gajiDivisiModel;
     protected $uangMakanHarianModel;
+    protected $tunjanganModel;
 
     public function __construct()
     {
@@ -63,6 +65,7 @@ class Payroll extends BaseController
         $this->companyModel = new CompaniesModel();
         $this->gajiDivisiModel = new GajiDivisiModel();
         $this->uangMakanHarianModel = new UangMakanHarianModel();
+        $this->tunjanganModel = new TunjanganModel();
     }
 
     public function index()
@@ -1154,16 +1157,20 @@ class Payroll extends BaseController
             $payrollID = decrypt($payrollID);
         }
 
-        // set payroll detail
         $payrollDetail = $this->payrollModel->where('id', $payrollID)->first();
-        // validation
         if ($payrollDetail == null) {
             return redirect()->to('payroll');
         }
-        // set variable
         $employee = $this->employeeModel->getSingleEmployee($payrollDetail['employee_id']);
-        $splitJamLembur = $this->formLemburModel->getTotalLemburJamPertamaKeduaByDateRange($payrollDetail['employee_id'], $payrollDetail['start_date'], $payrollDetail['end_date']);
+        $splitJamLembur = $this->formLemburModel->getTotalLemburJamPertamaKeduaByDateRange(
+            $payrollDetail['employee_id'],
+            $payrollDetail['start_date'],
+            $payrollDetail['end_date']
+        );
         $company =  $this->companyModel->where('id', $this->this_company_id)->first();
+        $tunjanganGajiPokok = $this->tunjanganModel->where('company_id', $this->this_company_id)->where('is_gaji_harian', 1)->where('deletedAt', null)->first();
+        $tunjanganCadangan = $this->tunjanganModel->where('company_id', $this->this_company_id)->where('is_cadangan', 1)->where('deletedAt', null)->first();
+        $payrollDetail['total_gaji_harian_plus_cadangan'] = $payrollDetail['nominal_gaji_harian'] + $payrollDetail['nominal_cadangan'];
 
         $data = [
             'payroll' => $payrollDetail,
@@ -1177,9 +1184,9 @@ class Payroll extends BaseController
             'company' => $company,
             'totalNominalKeterlambatanPresensi' => $this->attendanceKeterlambatanModel->getTotalRekap($payrollID),
             'totalNominalRekapPerizinanNotApproved' => $this->attendanceKeterlambatanModel->getTotalRekap($payrollID),
+            'tunjanganGajiPokok' => $tunjanganGajiPokok,
+            'tunjanganCadangan' => $tunjanganCadangan
         ];
-
-        // dd($data);
 
         $dompdf->loadHtml(view('hr/payroll/payroll_single_print', $data));
         $dompdf->setPaper('A4', 'portrait');
@@ -1235,9 +1242,19 @@ class Payroll extends BaseController
         $dompdf = new Dompdf();
         $yearMonth = $this->request->getVar('month');
         $divisionID = $this->request->getVar('divisi_id');
+        $bagianID = $this->request->getVar('bagian_id');
+        $tunjanganGajiPokok = $this->tunjanganModel->where('company_id', $this->this_company_id)->where('is_gaji_harian', 1)->where('deletedAt', null)->first();
+        $tunjanganCadangan = $this->tunjanganModel->where('company_id', $this->this_company_id)->where('is_cadangan', 1)->where('deletedAt', null)->first();
 
         $data = [
-            'payrollData' => $this->payrollModel->getPayrollDetail($yearMonth, $divisionID, $this->this_company_id)
+            'payrollData' => $this->payrollModel->getPayrollDetail(
+                $yearMonth,
+                $divisionID,
+                $this->this_company_id,
+                $bagianID
+            ),
+            'tunjanganGajiPokok' => $tunjanganGajiPokok,
+            'tunjanganCadangan' => $tunjanganCadangan
         ];
 
         $dompdf->loadHtml(view('hr/payroll/payroll_detail_division', $data));

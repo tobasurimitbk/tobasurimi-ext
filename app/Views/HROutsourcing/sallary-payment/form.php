@@ -80,6 +80,9 @@
                     <div class="card-header">
                         <h5>Header Pembayaran</h5>
                     </div>
+                    <button type="button" class="btn btn-info float-right mr-2" data-bs-toggle="modal" data-bs-target="#departmentIpModal">
+                        <i class="fas fa-cog"></i> Konfigurasi IP
+                    </button>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-4">
@@ -260,6 +263,101 @@
     </div>
 </div>
 
+<div class="modal fade" id="departmentIpModal" tabindex="-1" aria-labelledby="departmentIpModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="departmentIpModalLabel">Konfigurasi Department & IP</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Form Input Section -->
+        <div class="card mb-4">
+          <div class="card-header bg-primary text-white">
+            <h6 class="mb-0"><i class="fas fa-cog me-2"></i>Input Konfigurasi</h6>
+          </div>
+          <div class="card-body">
+            <form id="departmentIpForm">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="modalDepartment" class="form-label">Department <span class="text-danger">*</span></label>
+                    <select class="form-control" id="modalDepartment" name="modalDepartment" required>
+                      <option value="">Pilih Department</option>
+                      <?php foreach ($departement as $d): ?>
+                        <option value="<?= $d['id'] ?>"><?= $d['divisi'] ?></option>
+                      <?php endforeach; ?>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="ipAddress" class="form-label">IP Address <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="ipAddress" name="ipAddress" placeholder="Contoh: 192.168.1.100" required>
+                    <div class="form-text">Format: xxx.xxx.xxx.xxx</div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Data Hasil Konfigurasi Section -->
+        <div class="card">
+          <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+            <h6 class="mb-0"><i class="fas fa-list me-2"></i>Data Konfigurasi Department & IP</h6>
+            <button type="button" class="btn btn-sm btn-light" id="refreshIpData">
+              <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-bordered table-striped table-hover mb-0">
+                <thead class="table-dark">
+                  <tr>
+                    <th width="5%">No</th>
+                    <th width="45%">Department</th>
+                    <th width="35%">IP Address</th>
+                    <th width="15%">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="ipConfigTableBody">
+                  <!-- Data akan di-load via JavaScript -->
+                  <tr>
+                    <td colspan="4" class="text-center text-muted">
+                      <i class="fas fa-spinner fa-spin me-2"></i>Memuat data...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            
+            <!-- Summary Info -->
+            <div class="mt-3 p-3 bg-light rounded">
+              <div class="row text-center">
+                <div class="col-md-6">
+                  <small class="text-muted">Total Konfigurasi: <strong id="totalConfig">0</strong></small>
+                </div>
+                <div class="col-md-6">
+                  <small class="text-muted">Department Tersedia: <strong><?= count($departement) ?></strong></small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-1"></i> Tutup
+        </button>
+        <button type="button" class="btn btn-primary" id="saveDepartmentIp">
+          <i class="fas fa-save me-1"></i> Simpan Konfigurasi
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <script>
     var editMode = <?= !empty($data) ? 'true' : 'false' ?>;
@@ -277,6 +375,221 @@
 
     // Initialize on document ready
     $(document).ready(function() {
+
+
+        let currentEditId = null;
+
+        // Fungsi untuk memuat data konfigurasi
+        function loadDepartmentIpData() {
+            $('#ipConfigTableBody').html(`
+                <tr>
+                    <td colspan="4" class="text-center text-muted">
+                        <i class="fas fa-spinner fa-spin me-2"></i>Memuat data...
+                    </td>
+                </tr>
+            `);
+
+            $.ajax({
+                url: '<?= base_url("hr-outsourcing-sallary-payment/getDepartmentIpData") ?>',
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.length > 0) {
+                        let html = '';
+                        response.forEach((item, index) => {
+                            html += `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${item.department_name}</td>
+                                    <td>
+                                        <span class="badge bg-info">${item.ip_address}</span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-warning btn-edit" 
+                                                    data-id="${item.department_id}"
+                                                    data-name="${item.department_name}"
+                                                    data-ip="${item.ip_address}">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-danger btn-delete" 
+                                                    data-id="${item.department_id}"
+                                                    data-name="${item.department_name}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                        $('#ipConfigTableBody').html(html);
+                        $('#totalConfig').text(response.length);
+                    } else {
+                        $('#ipConfigTableBody').html(`
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">
+                                    <i class="fas fa-database me-2"></i>Belum ada data konfigurasi
+                                </td>
+                            </tr>
+                        `);
+                        $('#totalConfig').text('0');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $('#ipConfigTableBody').html(`
+                        <tr>
+                            <td colspan="4" class="text-center text-danger">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Gagal memuat data
+                            </td>
+                        </tr>
+                    `);
+                    console.error('Error loading department-IP data:', error);
+                }
+            });
+        }
+
+        // Fungsi untuk menyimpan data
+        $('#saveDepartmentIp').on('click', function() {
+            const departmentId = $('#modalDepartment').val();
+            const departmentName = $('#modalDepartment option:selected').text();
+            const ipAddress = $('#ipAddress').val();
+            
+            if (!departmentId || !ipAddress) {
+                showAlert('warning', 'Harap pilih department dan masukkan IP address!');
+                return;
+            }
+            
+            // Validasi format IP address
+            const ipPattern = /^(\d{1,3}\.){3}\d{1,3}$/;
+            if (!ipPattern.test(ipAddress)) {
+                showAlert('warning', 'Format IP address tidak valid! Contoh: 192.168.1.100');
+                return;
+            }
+            
+            const data = {
+                department_id: departmentId,
+                department_name: departmentName,
+                ip_address: ipAddress
+            };
+            
+            $.ajax({
+                url: '<?= base_url("hr-outsourcing-sallary-payment/saveDepartmentIp") ?>',
+                type: 'POST',
+                data: data,
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        showAlert('success', response.message);
+                        $('#departmentIpForm')[0].reset();
+                        currentEditId = null;
+                        loadDepartmentIpData();
+                        
+                        // Update tombol kembali ke mode simpan
+                        $('#saveDepartmentIp').html('<i class="fas fa-save me-1"></i> Simpan Konfigurasi');
+                    } else {
+                        showAlert('error', response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error saving department-IP data:', error);
+                    showAlert('error', 'Terjadi kesalahan saat menyimpan data.');
+                }
+            });
+        });
+
+        // Edit data
+        $(document).on('click', '.btn-edit', function() {
+            const departmentId = $(this).data('id');
+            const departmentName = $(this).data('name');
+            const ipAddress = $(this).data('ip');
+            
+            $('#modalDepartment').val(departmentId);
+            $('#ipAddress').val(ipAddress);
+            currentEditId = departmentId;
+            
+            // Ubah tombol ke mode update
+            $('#saveDepartmentIp').html('<i class="fas fa-sync-alt me-1"></i> Update Konfigurasi');
+            
+            // Scroll ke form input
+            $('.modal-body').animate({
+                scrollTop: 0
+            }, 500);
+        });
+
+        // Hapus data
+        $(document).on('click', '.btn-delete', function() {
+            const departmentId = $(this).data('id');
+            const departmentName = $(this).data('name');
+            
+            if (confirm(`Apakah Anda yakin ingin menghapus konfigurasi IP untuk department "${departmentName}"?`)) {
+                $.ajax({
+                    url: '<?= base_url("hr-outsourcing-sallary-payment/deleteDepartmentIp") ?>',
+                    type: 'POST',
+                    data: { department_id: departmentId },
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            showAlert('success', response.message);
+                            loadDepartmentIpData();
+                        } else {
+                            showAlert('error', response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error deleting department-IP data:', error);
+                        showAlert('error', 'Terjadi kesalahan saat menghapus data.');
+                    }
+                });
+            }
+        });
+
+        // Refresh data
+        $('#refreshIpData').on('click', function() {
+            $(this).find('i').addClass('fa-spin');
+            loadDepartmentIpData();
+            setTimeout(() => {
+                $(this).find('i').removeClass('fa-spin');
+            }, 1000);
+        });
+
+        // Reset form ketika modal ditutup
+        $('#departmentIpModal').on('hidden.bs.modal', function() {
+            $('#departmentIpForm')[0].reset();
+            currentEditId = null;
+            $('#saveDepartmentIp').html('<i class="fas fa-save me-1"></i> Simpan Konfigurasi');
+        });
+
+        // Load data pertama kali ketika modal dibuka
+        $('#departmentIpModal').on('show.bs.modal', function() {
+            loadDepartmentIpData();
+        });
+
+        // Fungsi untuk menampilkan alert
+        function showAlert(type, message) {
+            const alertClass = type === 'success' ? 'alert-success' : 
+                            type === 'warning' ? 'alert-warning' : 'alert-danger';
+            const icon = type === 'success' ? 'fa-check-circle' : 
+                        type === 'warning' ? 'fa-exclamation-triangle' : 'fa-exclamation-circle';
+            
+            const alertHtml = `
+                <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                    <i class="fas ${icon} me-2"></i>${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            // Tambahkan alert di atas form
+            $('#departmentIpForm').before(alertHtml);
+            
+            // Auto-hide alert setelah 5 detik
+            setTimeout(() => {
+                $('.alert').alert('close');
+            }, 5000);
+        }
+
+    
+
+
         // Initialize Select2
         $('.select2').select2({
             theme: "bootstrap-5",

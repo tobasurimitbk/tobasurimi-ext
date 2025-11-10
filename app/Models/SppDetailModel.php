@@ -80,6 +80,7 @@ class SppDetailModel extends Model
                 ->where('am_purchase_order_details.note', $d->note)
                 ->where('am_purchase_orders.purchase_request_id', $id)
                 ->where('am_purchase_order_details.deletedAt', null)
+                ->where('am_purchase_orders.is_posted', 1)
                 ->first();
             $sppDetailData[$i]->status_po = $poRes == null ? false : true;
         }

@@ -15,6 +15,7 @@ class SallaryPayment extends BaseController
     protected $hrOutsourcingCompanyModel;
     protected $hrOutsourcingEmployeeModel;
     protected $hrOutsourcingSallaryPaymentModel;
+    private $departmentIpFile = 'department_ip_data.json';
 
     public function __construct()
     {
@@ -25,9 +26,7 @@ class SallaryPayment extends BaseController
         $this->hrOutsourcingSallaryPaymentModel = new HROutsourcingSallaryPaymentModel();
     }
 
-
     public function index() {
-
          return view('HROutsourcing/sallary-payment/index');
     }
 
@@ -272,4 +271,141 @@ class SallaryPayment extends BaseController
         ]);
     }
 
+    // ============================
+    // DEPARTMENT IP CONFIGURATION
+    // ============================
+    
+    // Fungsi untuk mendapatkan path file JSON
+    private function getJsonFilePath() {
+        return WRITEPATH . 'uploads/' . $this->departmentIpFile;
+    }
+    
+    // Fungsi untuk menyimpan data department dan IP
+    public function saveDepartmentIp() {
+        $departmentId = $this->request->getPost('department_id');
+        $departmentName = $this->request->getPost('department_name');
+        $ipAddress = $this->request->getPost('ip_address');
+        
+        // Validasi input
+        if (empty($departmentId) || empty($ipAddress)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Department dan IP address harus diisi'
+            ]);
+        }
+        
+        // Validasi format IP address
+        if (!filter_var($ipAddress, FILTER_VALIDATE_IP)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Format IP address tidak valid'
+            ]);
+        }
+        
+        // Membaca data yang sudah ada
+        $existingData = $this->readDepartmentIpData();
+        
+        // Mengecek apakah department sudah ada
+        $found = false;
+        foreach ($existingData as &$item) {
+            if ($item['department_id'] == $departmentId) {
+                $item['ip_address'] = $ipAddress;
+                $found = true;
+                break;
+            }
+        }
+        
+        // Jika department belum ada, tambahkan data baru
+        if (!$found) {
+            $existingData[] = [
+                'department_id' => $departmentId,
+                'department_name' => $departmentName,
+                'ip_address' => $ipAddress
+            ];
+        }
+        
+        // Menyimpan data ke file JSON
+        if ($this->writeDepartmentIpData($existingData)) {
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'Data berhasil disimpan',
+                'data' => $existingData
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Gagal menyimpan data'
+            ]);
+        }
+    }
+    
+    // Fungsi untuk membaca data department dan IP
+    public function getDepartmentIpData() {
+        $data = $this->readDepartmentIpData();
+        return $this->response->setJSON($data);
+    }
+    
+    // Fungsi helper untuk membaca data dari file JSON
+    private function readDepartmentIpData() {
+        $filePath = $this->getJsonFilePath();
+        
+        if (!file_exists($filePath)) {
+            // Jika file tidak ada, buat file dengan array kosong
+            $this->writeDepartmentIpData([]);
+            return [];
+        }
+        
+        $jsonData = file_get_contents($filePath);
+        $data = json_decode($jsonData, true);
+        
+        return $data ?: [];
+    }
+    
+    // Fungsi helper untuk menulis data ke file JSON
+    private function writeDepartmentIpData($data) {
+        $filePath = $this->getJsonFilePath();
+        
+        // Memastikan directory ada
+        $dir = dirname($filePath);
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+        
+        $jsonData = json_encode($data, JSON_PRETTY_PRINT);
+        return file_put_contents($filePath, $jsonData) !== false;
+    }
+    
+    // Fungsi untuk mendapatkan IP berdasarkan department
+    public function getIpByDepartment($departmentId = null) {
+        if ($departmentId === null) {
+            $departmentId = $this->request->getGet('department_id');
+        }
+        
+        $data = $this->readDepartmentIpData();
+        
+        foreach ($data as $item) {
+            if ($item['department_id'] == $departmentId) {
+                return $this->response->setJSON([
+                    'success' => true,
+                    'ip_address' => $item['ip_address']
+                ]);
+            }
+        }
+        
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'IP address tidak ditemukan untuk department ini'
+        ]);
+    }
+
+    // Fungsi untuk halaman konfigurasi IP
+    public function ipConfig()
+    {
+        $data = [
+            'departement' => $this->divisiModel->where('company_id', $this->this_company_id)->select('id, divisi')->findAll(),
+            'ipData' => $this->readDepartmentIpData()
+        ];
+
+        return view('HROutsourcing/sallary-payment/ip-config', $data);
+    }
 }

@@ -416,19 +416,19 @@ class PenerimaanBarangLokalBP extends BaseController
                 );
             }
 
-            $first = $this->penerimaanBarangModel->where('company_id', $this->this_company_id)
-                ->where('no_penerimaan_barang', $this->request->getVar('no_penerimaan_barang'))
-                ->where('status_penerimaan', "LOKAL")
-                ->where('tipe_bahan', "PENOLONG")
-                ->first();
+            // $first = $this->penerimaanBarangModel->where('company_id', $this->this_company_id)
+            //     ->where('no_penerimaan_barang', $this->request->getVar('no_penerimaan_barang'))
+            //     ->where('status_penerimaan', "LOKAL")
+            //     ->where('tipe_bahan', "PENOLONG")
+            //     ->first();
 
-            if ($first != null) {
-                return response()->setJSON([
-                    'token' => csrf_hash(),
-                    'message' => "No Penerimaan Barang Sudah Ada",
-                    'status' => false
-                ]);
-            }
+            // if ($first != null) {
+            //     return response()->setJSON([
+            //         'token' => csrf_hash(),
+            //         'message' => "No Penerimaan Barang Sudah Ada",
+            //         'status' => false
+            //     ]);
+            // }
 
             $penerimaanBarangID = $this->penerimaanBarangModel->insert([
                 'company_id' => $this->this_company_id,

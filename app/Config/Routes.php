@@ -3073,6 +3073,11 @@ $routes->post('/hr-outsourcing-sallary-payment/getHrEmployeeOutSourcing', 'HROut
 $routes->post('/hr-outsourcing-sallary-payment/store', 'HROutsourcing\SallaryPayment::store', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-sallary-payment/update/(:segment)', 'HROutsourcing\SallaryPayment::update/$1', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-sallary-payment/delete/(:segment)', 'HROutsourcing\SallaryPayment::destroy/$1', ['filter' => 'Auth']);
+$routes->get('hr-outsourcing-sallary-payment/ip-config', 'HROutsourcing\SallaryPayment::ipConfig', ['filter' => 'Auth']);
+$routes->post('hr-outsourcing-sallary-payment/saveDepartmentIp', 'HROutsourcing\SallaryPayment::saveDepartmentIp', ['filter' => 'Auth']);
+$routes->get('hr-outsourcing-sallary-payment/getDepartmentIpData', 'HROutsourcing\SallaryPayment::getDepartmentIpData', ['filter' => 'Auth']);
+$routes->get('hr-outsourcing-sallary-payment/getIpByDepartment/(:num)', 'HROutsourcing\SallaryPayment::getIpByDepartment/$1', ['filter' => 'Auth']);
+$routes->get('hr-outsourcing-sallary-payment/getIpByDepartment', 'HROutsourcing\SallaryPayment::getIpByDepartment', ['filter' => 'Auth']);
 
 //HR Ousourcing Scale 
 $routes->get('/hr-outsourcing-scale', 'HROutsourcing\Scale::generateQrBarangView', ['filter' => 'Auth']);

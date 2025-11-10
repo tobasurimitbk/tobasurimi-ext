@@ -28,7 +28,7 @@
                         </button>
                     <?php endif; ?> -->
                     <?php if (can('Warehouse', 'P. Barang Lokal BP', 'u')) : ?>
-                        <button class="btn btn-show-form btn-save float-right btn-submit-parent">
+                        <button class="btn btn-show-form btn-save float-right btn-submit-parent" id="btn-submit-parent">
                             Simpan
                         </button>
                     <?php endif; ?>
@@ -37,7 +37,7 @@
                 <button class="btn btn-success float-right" onclick="cariBarang()">
                     <i class="fa-solid fa-magnifying-glass"></i> Cari Barang
                 </button>
-                <button class="btn btn-show-form btn-save float-right btn-submit-parent">
+                <button class="btn btn-show-form btn-save float-right btn-submit-parent" id="btn-submit-parent">
                     Simpan
                 </button>
             <?php endif; ?>
