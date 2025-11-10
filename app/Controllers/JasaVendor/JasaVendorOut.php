@@ -826,7 +826,7 @@ class JasaVendorOut extends BaseController
                         'supplier_name' => $item['supplier_name'],
                         'bc_type' => $item['type_bc'],
                         'stock_dokumen' => $stock_dokumen ?? '-',
-                        'stock_date' => $item['po_date'],
+                        'stock_date' => date('d-m-Y', strtotime($item['po_date'])),
                         'barang' => $item['barang'],
                         'reference_id' => $item['reference_id'],
                         'po_id' => $item['rm_purchase_order_id'],
