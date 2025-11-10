@@ -955,6 +955,7 @@
     const printWithDivision = function(url) {
         var divisionID = $("#filterDivisiID").val();
         var month = $('#month').val();
+        var bagianId = $('#filterBagianID').val();
         if (month == "") {
             Swal.fire({
                 icon: 'error',
@@ -970,7 +971,7 @@
             });
             return;
         } else {
-            var newUrl = url + '?divisi_id=' + divisionID + '&month=' + month;
+            var newUrl = url + '?divisi_id=' + divisionID + '&month=' + month + '&bagian_id=' + bagianId;
             window.open(newUrl, "_blank");
         }
     }

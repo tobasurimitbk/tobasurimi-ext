@@ -171,25 +171,27 @@ class FormLemburModel extends Model
     public function getTotalLemburJamPertamaKeduaByDateRange($employeeID, $startDate, $endDate)
     {
         $formLemburModel = new FormLemburModel();
-        $lembur = $formLemburModel->rekapLemburDateRange($employeeID, $startDate, $endDate);
-        $totalLembur = count($lembur);
-        $totalJam = 0;
+        $lemburList = $formLemburModel->rekapLemburDateRange($employeeID, $startDate, $endDate);
+
         $lemburJamPertama = 0;
         $lemburJamKedua = 0;
 
-        foreach ($lembur as $l) {
-            $totalJam += $l['total_jam_lembur'];
-        }
+        foreach ($lemburList as $lembur) {
+            $totalJamHariIni = (float) $lembur['total_jam_lembur'];
 
-        for ($i = 0; $i < $totalLembur; $i++) {
-            $totalJam--;
-            $lemburJamPertama++;
-            $lemburJamKedua = $totalJam;
+            if ($totalJamHariIni <= 1) {
+                // semua masuk ke jam pertama
+                $lemburJamPertama += $totalJamHariIni;
+            } else {
+                // 1 jam pertama, sisanya ke jam kedua
+                $lemburJamPertama += 1;
+                $lemburJamKedua += ($totalJamHariIni - 1);
+            }
         }
 
         return [
             'jamPertama' => $lemburJamPertama,
-            'jamKedua' => number_format((($lemburJamKedua / 60) * 100), 2)
+            'jamKedua' => $lemburJamKedua,
         ];
     }
 

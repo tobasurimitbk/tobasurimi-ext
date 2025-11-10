@@ -355,7 +355,7 @@ class PayrollsModel extends Model
                 'nominal_uang_lembur'      => $gajiLembur,
                 'nominal_pengurangan_gaji' => $totalMinus,
                 'nominal_penambahan_gaji'  => $totalPlus,
-                'nominal_gaji_diterima'    => ($totalGajiHarian + $totalPlus) - $totalMinus,
+                'nominal_gaji_diterima'    => ($totalGajiHarian + $totalPlus + $gajiLembur) - $totalMinus,
             ];
         }
 
@@ -557,8 +557,12 @@ class PayrollsModel extends Model
     }
 
 
-    public function getPayrollDetail($yearMonth, $divisionID, $companyID)
-    {
+    public function getPayrollDetail(
+        $yearMonth,
+        $divisionID,
+        $companyID,
+        $bagianID
+    ) {
 
         $payrollModel = new PayrollsModel();
         $employeeModel = new EmployeesModel();
@@ -574,6 +578,7 @@ class PayrollsModel extends Model
             ->where('payrolls.year_month', $yearMonth)
             ->where('employees.company_id', $companyID)
             ->where('employees.division_id', $divisionID)
+            ->where('employees.bagian_id', $bagianID)
             ->findAll();
 
         $data = [];
@@ -581,7 +586,12 @@ class PayrollsModel extends Model
         foreach ($employeePayroll as $ep) {
             $payrollDetail = $payrollModel->where('id', $ep['id'])->first();
             $employee = $employeeModel->getSingleEmployee($ep['employee_id']);
-            $splitJamLembur = $formLemburModel->getTotalLemburJamPertamaKedua($payrollDetail['employee_id'], $payrollDetail['year_month']);
+            $splitJamLembur = $formLemburModel->getTotalLemburJamPertamaKeduaByDateRange(
+                $payrollDetail['employee_id'],
+                $payrollDetail['start_date'],
+                $payrollDetail['end_date']
+            );
+            $payrollDetail['total_gaji_harian_plus_cadangan'] = $payrollDetail['nominal_gaji_harian'] + $payrollDetail['nominal_cadangan'];
 
             $data[] = [
                 'payroll' => $payrollDetail,

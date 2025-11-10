@@ -2273,7 +2273,6 @@ class Attendance extends BaseController
         $monthName = strtoupper(date('F Y', strtotime("$year-$month-01"))); // SEPTEMBER 2025
         $startDate = sprintf('%04d-%02d-01', $year, $month);
         $endDate   = sprintf('%04d-%02d-%02d', $year, $month, cal_days_in_month(CAL_GREGORIAN, $month, $year));
-        $employeeId = $this->request->getVar('employee_id');
 
         // ambil data employees
         $condition = [
@@ -2313,6 +2312,18 @@ class Attendance extends BaseController
         $mapDendaKeterlambatan = [];
         foreach ($dendaKeterlambatan as $d) {
             $mapDendaKeterlambatan[$d['employee_id']][$d['tanggal']] = ['nominal' => $d['nominal']];
+        }
+
+        $uangMakanData = !empty($employeeIds) ? $this->UangMakanHarianModel->getUangMakanHarianByDateRangeAmt(
+            $employeeIds,
+            $startDate,
+            $endDate
+        ) : [];
+        $mapUangMakanHarian = [];
+        foreach ($uangMakanData as $u) {
+            $mapUangMakanHarian[$u['employee_id']][$u['tanggal']] = [
+                'nominal' => $u['nominal']
+            ];
         }
 
         $spreadsheet = new Spreadsheet();
@@ -2389,7 +2400,7 @@ class Attendance extends BaseController
                     $lembur = (float)$selisih['jam'] . " Jam, " . $selisih['menit'] . " Menit";
                 }
 
-                $uangMakan = (float)($mapUangMakan[$e['id']][$tanggal] ?? 0);
+                $uangMakan = (float)($mapUangMakanHarian[$e['id']][$tanggal]['nominal'] ?? 0);
 
                 $col = 1;
                 $sheet->setCellValueByColumnAndRow($col++, $row, $d); // No
