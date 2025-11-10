@@ -706,7 +706,7 @@ class RasioGuritaController extends BaseController
             $dataBahanDigunakanPO = array_merge($dataBahanDigunakanPO, $poBBLokal, $poBBImport);
             $dataProduksiBahanDigunakan = $this->productionResultModel->getDataProductionResultBahanBakuWithDetail($conditionProduction);
             // var_dump($dataProduksiBahanDigunakan);
-            // var_dump($dataBahanDigunakanPO);
+            // var_dump($dataBahanDigunakanPO, $divisiID,  $tanggal_awal, $tanggal_akhir, $kategoriID, $this->this_company_id);
             // exit;
             // awal fungsi untuk bahan digunakan
             foreach ($dataBahanDigunakanPO as &$value) {

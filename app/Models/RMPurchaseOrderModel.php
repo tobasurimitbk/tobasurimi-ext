@@ -1584,7 +1584,7 @@ class RMPurchaseOrderModel extends Model
             ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
             ->join('barang_master', 'rm_purchase_order_details.barang1_id = barang_master.id', 'left')
             ->join('barang_master_spesifikasi', 'rm_purchase_order_details.barang2_id = barang_master_spesifikasi.id', 'left')
-            ->join('account_barang', 'rm_purchase_order_details.barang1_id = account_barang.barang_master_id', 'left')
+            ->join('account_barang', 'rm_purchase_order_details.barang1_id = account_barang.barang_master_id AND rm_purchase_order_details.barang2_id = account_barang.barang_master_spesifikasi_id', 'left')
             ->join('satuans', 'satuans.id = rm_purchase_order_details.satuan_id', 'left')
             ->where('rm_purchase_orders.divisi_id', $divisi_id)
             ->where('rm_purchase_orders.is_posted', '1')
