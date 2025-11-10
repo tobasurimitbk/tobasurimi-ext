@@ -48,10 +48,10 @@
             <?php if (empty($dataPenerimaanBarang)): ?>
                 <ul class="nav nav-tabs mb-3">
                     <li class="nav-item">
-                        <a class="nav-link active" id="nav_link_single" href="#" onclick="loadComponent('single')">Single Order</a>
+                        <a class="nav-link <?= @$_GET['type'] == 'single' || @$_GET['type'] == '' ? 'active' : '' ?>" id="nav_link_single" href="<?= base_url('penerimaan-barang-lokal-bp/create?type=single') ?>">Single Order</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="nav_link_multiple" href="#" onclick="loadComponent('multiple')">Multiple Order</a>
+                        <a class="nav-link <?= @$_GET['type'] == 'multiple' ? 'active' : '' ?>" id="nav_link_multiple" href="<?= base_url('penerimaan-barang-lokal-bp/create?type=multiple') ?>">Multiple Order</a>
                     </li>
                 </ul>
             <?php else: ?>
@@ -209,7 +209,7 @@
                     $('#content').show();
                 },
                 success: function(response) {
-                    $("#content").html(response);
+                    $('#content').empty().html(response);
                 },
                 error: function(xhr, status, error) {
                     console.error(xhr.responseText);
@@ -223,7 +223,11 @@
         const csrfToken = '<?= csrf_token() ?>';
 
         $('#spinner').hide();
-        loadComponent('single');
+        <?php if (@$_GET['type'] == 'single' || empty(@$_GET['type'])): ?>
+            loadComponent('single');
+        <?php else: ?>
+            loadComponent('multiple');
+        <?php endif; ?>
 
         function loadComponent(form) {
             if (form === 'single') {
