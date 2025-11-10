@@ -437,14 +437,9 @@
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-sm">
-                            <div class="form-floating mb-3" style="height: 50px;" id="reasonForm">
-                                <input type="text" name="reason" class="form-control" id="reason" placeholder="Reason">
-                                <label for="floatingInput">Keterangan Tambahan (Opsional)</label>
-                            </div>
-                        </div>
-                        <div class="col-sm">
+                    <div class="row mb-3">
+
+                        <div class="col-sm-12">
                             <label class="form-label font-weight-bold modal-sub-title" style="font-size: 14px;">Abaikan Dari Sync Log Absensi</label>
                             <div class="form-control border-0 custom-toggle-switch" style="margin-top: -15px;">
                                 <div class="form-check form-switch form-switch-lg">
@@ -465,20 +460,38 @@
                         <label for="jamTerlambat">Jam Terlambat</label>
                     </div>
 
-                    <div class="row mb-3" id="formInOut">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control" id="checkin" name="checkIn" maxlength="30" placeholder="CheckIn">
-                                <label for="checkin">CheckIN</label>
+                    <div id="formInOut">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input type="text" class="form-control" id="checkin" name="checkIn" maxlength="30" placeholder="CheckIn">
+                                    <label for="checkin">CheckIN</label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input type="text" class="form-control" id="checkout" name="checkOut" maxlength="30" placeholder="CheckOut">
+                                    <label for="checkout">CheckOut</label>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input type="text" class="form-control" id="checkout" name="checkOut" maxlength="30" placeholder="CheckOut">
-                                <label for="checkout">CheckOut</label>
+                        <div class="row">
+                            <div class="col-sm">
+                                <div class="form-floating mb-3 resonForm" style="height: 50px;">
+                                    <input type="text" name="reason_checkin" class="form-control" id="reason_checkin" placeholder="Reason Checkin">
+                                    <label for="floatingInput">Keterangan Tambahan Checkin (Opsional)</label>
+                                </div>
+                            </div>
+                            <div class="col-sm">
+                                <div class="form-floating mb-3 reasonForm" style="height: 50px;">
+                                    <input type="text" name="reason_checkout" class="form-control" id="reason_checkout" placeholder="Reason Checkout">
+                                    <label for="floatingInput">Keterangan Tambahan Checkout (Opsional)</label>
+                                </div>
                             </div>
                         </div>
                     </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-hide-form btn-discard btn-discard-update-absensi mr-3">Kembali</button>
@@ -912,8 +925,13 @@
                         var employee = response.data.employee;
                         var uangMakan = response.data.uangMakanHarian;
                         var dendaAbsenHarian = response.data.dendaAbsenHarian;
+                        var reason = response.data.attendance.reason || '';
+                        var parts = reason.split('-');
 
-                        $('#reason').val(null);
+                        var reason_checkin = parts[0] ? parts[0].trim() : '';
+                        var reason_checkout = parts[1] ? parts[1].trim() : '';
+
+                        $('#reason_checkin,#reason_checkout').val(null);
                         $('#attendenceID').val(attendance.id);
                         $('#employeeName').val(employee.name);
                         $('#tanggal').val(response.data.tanggal);
@@ -924,21 +942,23 @@
 
                         if (attendance.status == 'HADIR_H') {
                             // hadir
-                            $('#reasonForm').show();
+                            $('.reasonForm').show();
                             $('#formInOut').show();
                             $('#approvalForm').show();
                             // set form
                             $('#checkout').val(attendance.checkout);
                             $('#checkin').val(attendance.checkin);
-                            $('#reason').val(attendance.reason);
+                            $('#reason_checkin').val(reason_checkin);
+                            $('#reason_checkout').val(reason_checkout);
                         } else if (attendance.status == "ALPHA_A" || attendance.status == "LIBUR_L" || attendance.status == "RL_RL") {
                             $('#approvalForm').hide();
                         } else {
                             // ada perizinan
-                            $('#reasonForm').show();
+                            $('.reasonForm').show();
                             $('#formInOut').hide();
                             $('#approvalForm').show();
-                            $('#reason').val(attendance.reason);
+                            $('#reason_checkin').val(reason_checkin);
+                            $('#reason_checkout').val(reason_checkout);
                         }
 
                         $('#jamKerjaName').val(response.data.jamKerja.jenis);
@@ -1279,7 +1299,8 @@
             const csrf = $(`[name="${csrfToken}"]`);
             var attendenceID = $('#attendenceID').val();
             var statusKehadiran = $('#statusKehadiran').val();
-            var reason = $('#reason').val();
+            var reason_checkin = $('#reason_checkin').val();
+            var reason_checkout = $('#reason_checkout').val();
             var checkIn = $('#checkin').val();
             var checkOut = $('#checkout').val();
             var isApproved = $('#isApproved').val();
@@ -1291,7 +1312,8 @@
             var formData = new FormData();
             formData.append('attendenceID', attendenceID);
             formData.append('statusKehadiran', statusKehadiran);
-            formData.append("reason", reason);
+            formData.append("reason_checkin", reason_checkin);
+            formData.append("reason_checkout", reason_checkout);
             formData.append("checkIn", checkIn);
             formData.append("checkOut", checkOut);
             formData.append("isApproved", isApproved);
@@ -1328,7 +1350,7 @@
                     } else {
                         Swal.fire({
                             icon: 'error',
-                            title: 'Pilih bulan dahulu',
+                            title: response.message,
                             confirmButtonColor: '#4e73df',
                         });
                         return;
@@ -1611,7 +1633,7 @@
             // izin
             $("input[name='checkIn']").attr('required', false);
             $("input[name='checkOut']").attr('required', false);
-            $('#reasonForm').show();
+            $('.reasonForm').show();
             $('#approvalForm').show();
             $('#formInOut').hide();
         }
