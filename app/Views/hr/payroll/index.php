@@ -411,7 +411,7 @@
 
                     res += `
                         <?php if (can('Personalia', 'Payroll', 'u')): ?>
-                            <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                            <a href='<?= base_url("payroll/id") ?>/${id}' data-toggle="tooltip" title="Edit" class="btn btn-primary">
                                 <i class="fas fa-edit"></i>
                             </a>
                         <?php endif ?>
@@ -722,10 +722,6 @@
             });
         }
     });
-
-    function edit(id) {
-        location.replace(`<?= base_url("payroll/id"); ?>/${id}`);
-    }
 
     function print(url) {
         window.open(url, "_blank");

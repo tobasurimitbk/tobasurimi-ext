@@ -125,6 +125,7 @@ class PayrollGajiHarianModel extends Model
         // models
         $AttendancesModel = new AttendancesModel();
         $employeeJamKerjaModel = new EmployeeJamKerjaModel();
+        $bigDaysModel = new BigDaysModel();
 
         // Ambil semua jam kerja detail untuk semua employee dalam range SEKALI (anti N+1)
         // diasumsikan method ini mengembalikan struktur: [employee_id => [tanggal => jamKerjaDetail]]
@@ -179,7 +180,17 @@ class PayrollGajiHarianModel extends Model
             $nominalGajiCadangan = $mapGajiCadangan[$employeeID] ?? 0;
 
             // rumus yang kamu pakai: ((gajiHarian + gajiCadangan) / 7) * totalJamKerja
-            $nominalDiterima = (($nominalGajiHarian + $nominalGajiCadangan) / 7) * $totalJamKerja;
+            // $nominalDiterima = (($nominalGajiHarian + $nominalGajiCadangan) / 7) * $totalJamKerja;
+
+            if ($p['isApproved'] && !in_array($p['status'], ["LIBUR_L", "ALPHA_A"])) {
+                // Di Approved Wajib Dibayar
+                // gaji harian + tambahan
+                $nominalDiterima = $nominalGajiHarian + $nominalGajiCadangan;
+            } else {
+                // ga di approve 
+                $nominalDiterima = 0;
+            }
+
 
             $insertRows[] = [
                 'company_id' => $companyId,

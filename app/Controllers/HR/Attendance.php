@@ -227,7 +227,7 @@ class Attendance extends BaseController
                         'CUTI HAID_CHD' => 'bg-cuti-haid',
                         'CUTI HAMIL_CHL' => 'bg-cuti-hamil',
                         'CUTI MELAHIRKAN_CM' => 'bg-cuti-melahirkan',
-                        'IJIN_I' => 'bg-ijin',
+                        'POTONG GAJI_PG' => 'bg-ijin',
                         'SAKIT_S' => 'bg-sakit',
                         'RL_RL' => 'bg-rl',
                         'DINAS_D' => 'bg-dinas',
@@ -411,7 +411,7 @@ class Attendance extends BaseController
                     case 'CUTI MELAHIRKAN_CM':
                         $totalCutiMelahirkan++;
                         break;
-                    case 'IJIN_I':
+                    case 'POTONG GAJI_PG':
                         $totalIjin++;
                         break;
                     case 'SAKIT_S':
@@ -607,7 +607,7 @@ class Attendance extends BaseController
                         'CUTI HAID_CHD' => 'bg-cuti-haid',
                         'CUTI HAMIL_CHL' => 'bg-cuti-hamil',
                         'CUTI MELAHIRKAN_CM' => 'bg-cuti-melahirkan',
-                        'IJIN_I' => 'bg-ijin',
+                        'POTONG GAJI_PG' => 'bg-ijin',
                         'SAKIT_S' => 'bg-sakit',
                         'RL_RL' => 'bg-rl',
                         'ALPHA_A' => 'bg-alpha',
@@ -803,7 +803,7 @@ class Attendance extends BaseController
                     case 'CUTI MELAHIRKAN_CM':
                         $totalCutiMelahirkan++;
                         break;
-                    case 'IJIN_I':
+                    case 'POTONG GAJI_PG':
                         $totalIjin++;
                         break;
                     case 'SAKIT_S':
@@ -1495,7 +1495,7 @@ class Attendance extends BaseController
                     case 'CUTI MELAHIRKAN_CM':
                         $total['cm']++;
                         break;
-                    case 'IJIN_I':
+                    case 'POTONG GAJI_PG':
                         $total['ijin']++;
                         break;
                     case 'SAKIT_S':
@@ -2204,7 +2204,7 @@ class Attendance extends BaseController
                     case 'CUTI MELAHIRKAN_CM':
                         $total['cm']++;
                         break;
-                    case 'IJIN_I':
+                    case 'POTONG GAJI_PG':
                         $total['ijin']++;
                         break;
                     case 'SAKIT_S':

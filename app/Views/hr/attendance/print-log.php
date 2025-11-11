@@ -165,7 +165,7 @@
                                 <td style="background-color: #4B4453; color:white;">
                                     <b><?= $statusKode ?></b>
                                 </td>
-                            <?php elseif ($perizinanCheck['status'] == "IJIN_I") : ?>
+                            <?php elseif ($perizinanCheck['status'] == "POTONG GAJI_PG") : ?>
                                 <!-- Ada ijin -->
                                 <td style="background-color: #17a2b8; color:white;">
                                     <b><?= $statusKode ?></b>

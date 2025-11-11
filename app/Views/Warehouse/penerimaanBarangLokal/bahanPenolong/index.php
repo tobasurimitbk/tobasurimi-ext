@@ -15,9 +15,13 @@
             </ul>
         <?php endif; ?>
         <?php if (can('Warehouse', 'P. Barang Lokal BP', 'c')) : ?>
-            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("penerimaan-barang-lokal-bp/create"); ?>">
+            <a class="btn btn-show-form btn-add btn-dropdown-export dropdown-toggle float-right" href="#" id="dropdownMenuButtonExport2" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #4E8A00 !important; border-color:#4E8A00 !important;">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonExport2">
+                <li><a href="<?= base_url("penerimaan-barang-lokal-bp/create?type=single"); ?>" class="dropdown-item"><b>SINGLE ORDER</b></a></li>
+                <li><a href="<?= base_url("penerimaan-barang-lokal-bp/create?type=multiple"); ?>" class="dropdown-item"><b>MULTIPLE ORDER</b></a></li>
+            </ul>
         <?php endif; ?>
     </div>
     <div class="card">

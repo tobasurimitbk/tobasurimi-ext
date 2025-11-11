@@ -106,7 +106,7 @@
                 <div class="col-sm-2 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input readonly autocomplete="one-time-code" type="text" required name="totalIzin" id="totalIzin" class="form-control target input-picker" value="<?= $payrollDetail['izin'] ?? 0 ?> Kali">
-                        <label for="floatingInput">Izin</label>
+                        <label for="floatingInput">PG</label>
                     </div>
                 </div>
                 <div class="col-sm-2 mt-1">
@@ -385,7 +385,7 @@
                                     <!-- <th style="text-align: center;" class="sort">Selesai Istirahat</th> -->
                                     <th style="text-align: center;" class="sort">CheckOut</th>
                                     <th style="text-align: center;" class="sort">Total Jam</th>
-                                    <th style="text-align: center;" class="sort">Nominal ((GP + CADANGAN) / 7 * Total Jam)</th>
+                                    <th style="text-align: center;" class="sort">Nominal (GP + CADANGAN)</th>
                                 </tr>
                             </thead>
                             <tbody class="body-table" id="body-table">
