@@ -365,16 +365,16 @@
 </div>
 
 <div class="modal" id="updateModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><label class="title-name"></label> Update Absensi</h5>
             </div>
             <form id="updateAttendanceForm" role="form" method="POST">
                 <div class="modal-body">
-                    <div class="alert bg-info text-white" style="margin-top: -10px;">
+                    <div class="alert bg-primary text-white" style="margin-top: -10px;">
                         <div class="card-text">
-                            Status Perizinan yang tidak disetujui akan dimasukkan kedalam perhitungan potongan pada Payroll
+                            Status Perizinan yang tidak disetujui akan dimasukkan kedalam perhitungan potongan pada Payroll & tidak terhitung sebagai jam kerja
                         </div>
                     </div>
                     <input type="hidden" name="attendanceID" id="attendenceID" />
@@ -495,7 +495,12 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-hide-form btn-discard btn-discard-update-absensi mr-3">Kembali</button>
-                    <button type="button" class="btn btn-submit-form" id="updateAbsensi">Simpan</button>
+                    <button type="button" class="btn btn-submit-form" id="dataMesinFingerModal" style="background-color: #7FAB47 !important; border-color:#7FAB47 !important;">
+                        <i class="fa-solid fa-download"></i> Data Mesin Finger
+                    </button>
+                    <button type="button" class="btn btn-submit-form" id="updateAbsensi">
+                        <i class="fa-solid fa-floppy-disk"></i> Simpan
+                    </button>
                 </div>
             </form>
         </div>
@@ -543,6 +548,68 @@
                 <button type="button" class="btn btn-hide-form btn-discard mr-3" id="btn-discard-2">Kembali</button>
             </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="tarikDataFingerModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tarik Data Mesin Finger</h5>
+            </div>
+            <form id="tarik-data-finger-form">
+                <div class="modal-body">
+                    <input type="hidden" name="tanggal_tarik_data_finger" id="tanggal_tarik_data_finger">
+                    <input type="hidden" name="employee_id_tarik_data_finger" id="employee_id_tarik_data_finger">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input type="text" id="tanggalMesinFinger" class="form-control tanggalMesinFinger" placeholder="Tanggal Absen">
+                                    <label>Tanggal Absen</label>
+                                </div>
+                                <div class="input-group-append" style="height:50px;">
+                                    <button disabled class="btn btn-secondary" type="button">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select name="jamKerjaMesinFinger" class="form-select jamKerjaMesinFinger" id="jamKerjaMesinFinger">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Pilih Jam Kerja Dari Finger</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select name="targetJam" class="form-select targetJam" id="targetJam">
+                                    <option value=""></option>
+                                    <option value="checkin">JADIKAN JAM CHECKIN</option>
+                                    <option value="checkout">JADIKAN JAM CHECKOUT</option>
+
+                                </select>
+                                <label for="floatingInput">Pilih Target Jam</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" id="posisiKaryawanFinger" class="form-control posisiKaryawanFinger" readonly>
+                                <label>Posisi Karyawan Finger</label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-hide-form btn-discard mr-3" id="btnHideDataMesinFinger">Kembali</button>
+                    <button type="button" class="btn btn-submit-form" id="btnSubmitDataMesinFinger">Simpan</button>
+                </div>
+            </form>
+
         </div>
     </div>
 </div>
@@ -898,6 +965,10 @@
             formData.set('tanggal', tanggal);
             formData.set('employee_id', employeeId);
 
+            // append ke hidden element tarik data finger
+            $('#employee_id_tarik_data_finger').val(employeeId);
+            $('#tanggal_tarik_data_finger').val(tanggal);
+
             $.ajax({
                 url: "<?= base_url("list-attendance/get-attendance"); ?>",
                 data: formData,
@@ -1183,6 +1254,66 @@
         },
     });
 
+    var validatorTarikDataFinger = $("#tarik-data-finger-form").validate({
+        rules: {
+            tanggalMesinFinger: {
+                required: true
+            },
+            jamKerjaMesinFinger: {
+                required: true
+            },
+            targetJam: {
+                required: true
+            },
+        },
+        messages: {
+            tanggalMesinFinger: {
+                required: "tanggal wajib diisi"
+            },
+            jamKerjaMesinFinger: {
+                required: "jam kerja wajib diisi"
+            },
+            targetJam: {
+                required: "target jam wajib diisi"
+            },
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
+
+    $('#btnSubmitDataMesinFinger').click(function(e) {
+        e.preventDefault();
+        if ($('#tarik-data-finger-form').valid()) {
+            var targetJam = $('#targetJam').val();
+            var jamKerjaMesinFinger = $('#jamKerjaMesinFinger option:selected').text();
+
+            if (targetJam == 'checkin') {
+                $('#checkin').val(jamKerjaMesinFinger);
+            } else {
+                $('#checkout').val(jamKerjaMesinFinger);
+            }
+            $('#tarikDataFingerModal').modal('hide');
+        }
+    })
+
 
     $('#globalGenerateBtn').click(function(e) {
         e.preventDefault();
@@ -1452,6 +1583,20 @@
         dropdownParent: $('#updateModal')
     });
 
+    $('#jamKerjaMesinFinger').select2({
+        placeholder: "Pilih Jam Kerja Dari Finger",
+        theme: "bootstrap-5",
+        allowClear: false,
+        dropdownParent: $('#tarikDataFingerModal')
+    });
+
+    $('#targetJam').select2({
+        placeholder: "Pilih Target Jam",
+        theme: "bootstrap-5",
+        allowClear: false,
+        dropdownParent: $('#tarikDataFingerModal')
+    });
+
     $("#start_date").datepicker({
         placeholder: "Pilih Tanggal Mulai Absensi",
         todayHighlight: true,
@@ -1466,6 +1611,70 @@
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
         autoclose: true
+    });
+
+    $("#tanggalMesinFinger").datepicker({
+        placeholder: " Tanggal Mesin Finger",
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
+
+    $('#tanggalMesinFinger').change(function(e) {
+        e.preventDefault();
+        e.preventDefault();
+        let tanggal = $('#tanggalMesinFinger').val();
+        let employee_id = $('#employee_id_tarik_data_finger').val();
+        let formData = new FormData();
+        let csrf = $(`[name="${csrfToken}"]`);
+
+        tanggal = format_dmy_to_ymd(tanggal);
+        formData.append('tanggal', tanggal);
+        formData.append('employee_id', employee_id);
+
+        $.ajax({
+            url: "<?= base_url("list-attendance/get-all-data-finger"); ?>",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: formData,
+            method: "POST",
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                csrf.val(response.token);
+                if (response.status) {
+                    var data = response.data;
+                    $("#jamKerjaMesinFinger").empty()
+                    $("#jamKerjaMesinFinger").append(`<option value=""></option>`)
+                    data.dataResult.forEach(function(item) {
+                        $("#jamKerjaMesinFinger").append(`<option value="${item.id}" data-date_create="${item.date_create}" data-attendance_unit="${item.attendance_unit}">${item.date_create}</option>`)
+                    });
+                    var tanggal = format_ymd_to_dmy(data.tanggal);
+                    $('#targetJam').val(null).change();
+                    $("#jamKerjaMesinFinger").val(null).change();
+                    $('#tanggalMesinFinger').val(tanggal);
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: response.message,
+                        confirmButtonColor: '#4e73df',
+                    })
+                }
+            }
+        });
+    })
+
+    $('#jamKerjaMesinFinger').change(function(e) {
+        e.preventDefault();
+        var attendance_unit = $('#jamKerjaMesinFinger option:selected').data('attendance_unit');
+        $('#posisiKaryawanFinger').val(attendance_unit);
     });
 
     $('#employee_id_filter').select2({
@@ -1768,6 +1977,73 @@
 
         var url = "<?= base_url('list-attendance/export-bulanan') ?>?month=" + month + "&divisi_id=" + divisiId + "&tipe=" + tipe + "&bagian_id=" + bagianId;
         window.location.href = url;
+    }
+
+    $('#dataMesinFingerModal').click(function(e) {
+        e.preventDefault();
+        let tanggal = $('#tanggal_tarik_data_finger').val();
+        let employee_id = $('#employee_id_tarik_data_finger').val();
+        let formData = new FormData();
+        let csrf = $(`[name="${csrfToken}"]`);
+        formData.append('tanggal', tanggal);
+        formData.append('employee_id', employee_id);
+
+        $.ajax({
+            url: "<?= base_url("list-attendance/get-all-data-finger"); ?>",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: formData,
+            method: "POST",
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                csrf.val(response.token);
+                if (response.status) {
+                    var data = response.data;
+                    $("#jamKerjaMesinFinger").empty()
+                    $("#jamKerjaMesinFinger").append(`<option value=""></option>`)
+                    data.dataResult.forEach(function(item) {
+                        $("#jamKerjaMesinFinger").append(`<option value="${item.id}" data-date_create="${item.date_create}" data-attendance_unit="${item.attendance_unit}">${item.date_create}</option>`)
+                    });
+                    var tanggal = format_ymd_to_dmy(data.tanggal);
+                    $('#targetJam').val(null).change();
+                    $("#jamKerjaMesinFinger").val(null).change();
+                    $('#tanggalMesinFinger').val(tanggal);
+                    $('#tarikDataFingerModal').modal('show');
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: response.message,
+                        confirmButtonColor: '#4e73df',
+                    })
+                }
+            }
+        });
+    });
+
+    $('#btnHideDataMesinFinger').click(function(e) {
+        e.preventDefault();
+        $('#tarikDataFingerModal').modal('hide');
+    });
+
+    function format_ymd_to_dmy(tanggal) {
+        const dateStr = tanggal;
+        const [year, month, day] = dateStr.split("-");
+        const formatted = `${day}/${month}/${year}`;
+        return formatted;
+    }
+
+    function format_dmy_to_ymd(tanggal) {
+        if (!tanggal) return null;
+        const [day, month, year] = tanggal.split('/');
+        if (!day || !month || !year) return null;
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
     }
 </script>
 

@@ -204,4 +204,21 @@ class AttendancesLogModel extends Model
 
         return $this->db->query($sql, [$startDate, $endDate, $startDate, $endDate])->getResultArray();
     }
+
+    public function getAttencanceLogByDate($employeeId, $tanggal)
+    {
+        $selectQry = "
+            attendances_log.*,
+            attendances_unit.name AS attendance_unit
+        ";
+
+        $result = $this->asArray()
+            ->select($selectQry)
+            ->join('attendances_unit', 'attendances_unit.id = attendances_log.attendances_unit_id', 'left')
+            ->where('attendances_log.employees_id', $employeeId)
+            ->where('DATE(attendances_log.date_create)', $tanggal)
+            ->findAll();
+
+        return $result;
+    }
 }
