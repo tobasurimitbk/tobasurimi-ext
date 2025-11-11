@@ -1109,7 +1109,7 @@ class ProductionResult extends BaseController
                             }
                         }
                         if ($value['type'] == 'JADI') {
-                            if ($value['stock_detail_id']) {
+                            if ($value['stock_detail_id'] == '0') {
                                 $dataSpek = $this->barangMasterSpesifikasiModel->find($value["barang2_id"]);
                                 $dataIn = [
                                     "company_id"       => $this->this_company_id,
