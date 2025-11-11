@@ -1734,7 +1734,7 @@ class Supplier extends BaseController
                 ->setCellValue('C' . $column, $l['address'])
                 ->setCellValue('D' . $column, $l['postal_code'])
                 ->setCellValue('E' . $column, $l['npwp'])
-                ->setCellValue('F' . $column, $l['KTP'])
+                ->setCellValue('F' . $column, $l['ktp'])
                 ->setCellValue('G' . $column, $l['phone'])
                 ->setCellValue('H' . $column, $l['contact_person'])
                 ->setCellValue('I' . $column, $l['email']);
