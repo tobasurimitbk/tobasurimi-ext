@@ -374,7 +374,7 @@ class FormLembur extends BaseController
 
         $totalJamLembur = (float)$waktuSelisihPulangLembur['jam'] . "." . $waktuSelisihPulangLembur['menit'];
 
-        if ($totalJamLembur <= 0.9) {
+        if ($totalJamLembur <= 0.3) {
             return response()->setJSON([
                 'message' => "Minimal pegawai dapat mengambil lembur adalah satu jam. Tanggal " . date('d/m/Y', strtotime($tanggal)) . " hanya menghasilkan total jam lembur sebesar " . $waktuSelisihPulangLembur['menit'] . " Menit. Pegawai Checkout Jam " . $checkOutLog . " dan Waktu Pulang di Jam Kerja Adalah Jam " . $jamKerjaDetail['jam_pulang'] . ". Sehingga tidak memenuhi persyaratan :)",
                 'status' => \false,

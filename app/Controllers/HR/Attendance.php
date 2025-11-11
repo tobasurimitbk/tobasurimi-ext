@@ -3085,4 +3085,51 @@ class Attendance extends BaseController
             ]);
         }
     }
+
+    public function getListDataFingerAllByAttendance()
+    {
+        try {
+            $employeeId = $this->request->getVar('employee_id');
+            $tanggal = $this->request->getVar('tanggal');
+
+            if (empty($employeeId) || empty($tanggal)) {
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => 'Data karyawan atau tanggal kosong',
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            $attendanceLog = $this->AttendancesLogModel->getAttencanceLogByDate(
+                $employeeId,
+                $tanggal
+            );
+
+            $dataResult = array();
+            foreach ($attendanceLog as $a) {
+                array_push($dataResult, [
+                    'id' => $a['id'],
+                    'date_create' => date('H:i:s', strtotime($a['date_create'])),
+                    'attendance_unit' => $a['attendance_unit']
+                ]);
+            }
+
+            $data = [
+                'tanggal' => $tanggal,
+                'dataResult' => $dataResult
+            ];
+
+            return response()->setJSON([
+                'status' => true,
+                'token' => csrf_hash(),
+                'data' => $data
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => $e->getMessage(),
+                'token' => csrf_hash()
+            ]);
+        }
+    }
 }
