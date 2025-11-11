@@ -256,7 +256,7 @@
                                                     <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#4B4453; color:white;cursor:pointer;'>
                                                         <b><?= $statusKode  ?></b>
                                                     </td>
-                                                <?php elseif ($perizinanCheck['status'] == "IJIN_I") : ?>
+                                                <?php elseif ($perizinanCheck['status'] == "POTONG GAJI_PG") : ?>
                                                     <!-- Ada ijin -->
                                                     <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#17a2b8; color:white;cursor:pointer;'>
                                                         <b><?= $statusKode ?></b>
