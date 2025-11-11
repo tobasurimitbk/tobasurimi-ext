@@ -3109,7 +3109,7 @@ class Attendance extends BaseController
             foreach ($attendanceLog as $a) {
                 array_push($dataResult, [
                     'id' => $a['id'],
-                    'date_create' => date('H:m:s', strtotime($a['date_create'])),
+                    'date_create' => date('H:i:s', strtotime($a['date_create'])),
                     'attendance_unit' => $a['attendance_unit']
                 ]);
             }
