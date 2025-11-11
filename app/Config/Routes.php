@@ -43,7 +43,7 @@ $routes->get('/403', function () {
     return view('errors/html/error_403');
 });
 
-// $routes->get('/generate-bcpo', 'Warehouse\Penomoran_::generateNoAjuBcPurcaseOrder');
+$routes->get('/update-status-pg', 'Warehouse\Penomoran_::updateStatusAbsensiPg');
 // $routes->get('/generate-stock-revamp-nonpabean', 'Warehouse\Penomoran_::generateStokRevampNonPabean');
 // $routes->get('/generate-stock-revamp-pabean', 'Warehouse\Penomoran_::generateStokRevampPabean');
 // $routes->get('/generate-stock-detail-id-lpb-non-pabean', 'Warehouse\Penomoran_::generateStockDetailIdPenerimaanBarangDetailNonPabean');
@@ -2127,6 +2127,7 @@ $routes->get('/list-attendance/export-triwulan', 'HR\Attendance::exportTriwulanP
 $routes->get('/list-attendance/export-harian', 'HR\Attendance::exportExcelPresensiHarian', ['filter' => 'Auth']);
 $routes->post('/list-attendance/get-bagian', 'Master\Bagian::getBagianByDivisionNoEncrypt', ['filter' => 'Auth']);
 $routes->get('/list-attendance/export-bulanan-employee', 'HR\Attendance::exportExcelPresensiKaryawanBulanan', ['filter' => 'Auth']);
+$routes->post('/list-attendance/get-all-data-finger', 'HR\Attendance::getListDataFingerAllByAttendance', ['filter' => 'Auth']);
 
 // Big Day
 $routes->get('/big-days', 'Master\BigDays::ListBigDay', ['filter' => 'Auth']);
