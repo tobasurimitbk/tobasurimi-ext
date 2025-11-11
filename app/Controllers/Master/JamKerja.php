@@ -140,7 +140,8 @@ class JamKerja extends BaseController
                 "jenis" => $j->jenis,
                 "shift" => $j->shift,
                 "divisi" => $j->divisi,
-                "jam_terlambat" => $j->jam_terlambat
+                "jam_terlambat" => $j->jam_terlambat,
+                "lintas_hari" => $j->lintas_hari
             ]);
         }
 
@@ -180,6 +181,8 @@ class JamKerja extends BaseController
         $shift = $this->request->getVar('shift');
         $jamTerlambat = $this->request->getVar('jamTerlambat');
         $jenis = $this->request->getVar('jenis');
+        $jamKerjaLintasHari = $this->request->getVar('jam_kerja_lintas_hari');
+        $jamKerjaLintasHari = empty($jamKerjaLintasHari) ? "no" : "yes";
 
         $jamKerja = $this->jamKerjaModel->insert([
             'company_id' =>  $this->this_company_id,
@@ -187,6 +190,7 @@ class JamKerja extends BaseController
             'shift' => $shift,
             'jenis' => $jenis,
             'jam_terlambat' => $jamTerlambat,
+            'lintas_hari' => $jamKerjaLintasHari
         ]);
 
         foreach ($this->metadataModel->where('name', "hari")->findAll() as $h) {
@@ -196,7 +200,7 @@ class JamKerja extends BaseController
                 'jam_masuk' => $this->request->getVar($h['value'] . "_mulaiMasuk"),
                 'jam_istirahat_mulai' => $this->request->getVar($h['value'] . "_mulaiIstirahat"),
                 'jam_istirahat_selesai' => $this->request->getVar($h['value'] . "_selesaiIstirahat"),
-                'jam_pulang' => $this->request->getVar($h['value'] . "_mulaiPulang")
+                'jam_pulang' => $this->request->getVar($h['value'] . "_mulaiPulang"),
             ]);
         }
 
@@ -252,12 +256,15 @@ class JamKerja extends BaseController
         $shift = $this->request->getVar('shift');
         $jamTerlambat = $this->request->getVar('jamTerlambat');
         $jenis = $this->request->getVar('jenis');
+        $jamKerjaLintasHari = $this->request->getVar('jam_kerja_lintas_hari');
+        $jamKerjaLintasHari = empty($jamKerjaLintasHari) ? "no" : "yes";
 
         $this->jamKerjaModel->update($id, [
             'divisi_id' => $divisiId,
             'shift' => $shift,
             'jenis' => $jenis,
             'jam_terlambat' => $jamTerlambat,
+            'lintas_hari' => $jamKerjaLintasHari
         ]);
 
         // delete first

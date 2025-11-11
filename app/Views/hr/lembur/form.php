@@ -1,6 +1,11 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
-
+<style>
+    .form-switch-lg .form-check-input {
+        width: 4rem;
+        height: 1.5rem;
+    }
+</style>
 <section class="section">
     <div class="section-header">
         <h1 class="title-name"><?= (!empty($lemburDetail)) ? "Update" : "Tambah" ?> Lembur</h1>
@@ -311,6 +316,7 @@
         var kurangiJamIstirahat = $("select[name='kurangiJamIstirahat']").val();
         var jamSelesaiLembur = $("input[name='jamSelesaiLembur']").val();
         var gajiPokokPerHari = "<?= (!empty($lemburDetail)) ?  $lemburDetail['gaji_pokok_per_hari'] : "-" ?>";
+        var lemburLintasHari = "";
 
         // append to form
         var formData = new FormData();
@@ -422,6 +428,13 @@
                     $('input[name="jumlahJamKerjaBersih"]').val(null);
                     $('input[name="totalUangLembur"]').val(null);
                     $('input[name="gajiPokokPerHari"]').val(null);
+                } else {
+                    // response 500
+                    Swal.fire({
+                        icon: 'error',
+                        title: response.message,
+                        confirmButtonColor: '#4e73df',
+                    });
                 }
 
             },

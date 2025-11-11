@@ -79,6 +79,15 @@
                             <label for="floatingInput">Batas Jam Keterlambatan Absen Masuk</label>
                         </div>
                     </div>
+                    <div class="col-sm-3 mb-3">
+                        <label class="form-label font-weight-bold modal-sub-title" style="font-size: 14px;">Jam Kerja Lintas Hari (Shift 3)</label>
+                        <div class="form-control border-0 custom-toggle-switch" style="margin-top: -15px;">
+                            <div class="form-check form-switch form-switch-lg">
+                                <input class="form-check-input" <?= $jamKerja == null ? "" : ($jamKerja['lintas_hari'] == "yes" ? "checked" : "") ?> type="checkbox" name="jam_kerja_lintas_hari" id="jam_kerja_lintas_hari">
+                                <label class="form-check-label" for="jam_kerja_lintas_hari"></label>
+                            </div>
+                        </div>
+                    </div>
                     <!-- <div class="col-sm-12">
                         <div class="form">
                             <label class="mt-2 text-dark">

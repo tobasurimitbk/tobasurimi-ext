@@ -17,7 +17,8 @@ class JamKerjaModel extends Model
     protected $allowedFields    = [
         'jenis',
         'jam_terlambat',
-        'company_id'
+        'company_id',
+        'lintas_hari'
     ];
 
     // Dates
@@ -51,7 +52,8 @@ class JamKerjaModel extends Model
             'divisi_id' => 'jam_kerja.divisi_id',
             'jenis'    => 'jam_kerja.jenis',
             'shift' => 'jam_kerja.shift',
-            'jam_terlambat' => 'jam_kerja.jam_terlambat'
+            'jam_terlambat' => 'jam_kerja.jam_terlambat',
+            'lintas_hari' => 'jam_kerja.lintas_hari'
         ];
 
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];

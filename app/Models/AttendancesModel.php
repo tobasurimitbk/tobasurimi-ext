@@ -379,13 +379,16 @@ class AttendancesModel extends Model
         $FormPerijinanModel  = new FormPerijinanModel();
         $hariLiburModel      = new BigDaysModel();
         $AttendancesLogModel = new AttendancesLogModel();
+        $EmployeeJamKerjaModel = new EmployeeJamKerjaModel();
 
         try {
+            $employeeIds = array_column($employeeData, 'id');
+
             // Siapkan yang diabaikan dulu
             $attendanceAbaikan =  $AttendanceModel
                 ->where('periode >=', $startDate)
                 ->where('periode <=', $endDate)
-                ->where('company_id', $this->this_company_id)
+                ->whereIn('employee_id', $employeeIds)
                 ->where('abaikan_sync_log', "yes")
                 ->findAll();
 
@@ -403,8 +406,6 @@ class AttendancesModel extends Model
                 $allDates[] = date('Y-m-d', $startDateTimestamp);
                 $startDateTimestamp += 86400;
             }
-
-            $employeeIds = array_column($employeeData, 'id');
 
             // --- 2. load semua perizinan (sekali query)
             $formPerizinanAll = $FormPerijinanModel
@@ -429,28 +430,93 @@ class AttendancesModel extends Model
             $setHariLibur = array_flip($setHariLibur); // untuk cepat cek isset()
 
             // --- 4. load semua log attendance (sekali query)
-            $logs = $AttendancesLogModel
+            // === 1️⃣ Ambil semua log absensi untuk jam kerja normal (bukan lintas hari)
+            $logsNormal = $AttendancesLogModel
                 ->select("
-                employees_id,
-                DATE(date_create) as tgl,
-                DATE_FORMAT(MIN(date_create), '%H:%i:%s') AS checkin,
-                DATE_FORMAT(MAX(date_create), '%H:%i:%s') AS checkout
-            ")
+                    employees_id,
+                    DATE(date_create) as tgl,
+                    DATE_FORMAT(MIN(date_create), '%H:%i:%s') AS checkin,
+                    DATE_FORMAT(MAX(date_create), '%H:%i:%s') AS checkout
+                ")
                 ->whereIn('employees_id', $employeeIds)
                 ->where('date_create >=', $startDate . ' 00:00:00')
                 ->where('date_create <=', $endDate . ' 23:59:59')
                 ->groupBy('employees_id, DATE(date_create)')
                 ->findAll();
 
+
+            // === 2️⃣ Ambil daftar jam kerja lintas hari
+            $jamkerjaLintasHari = $EmployeeJamKerjaModel
+                ->select('employees_jam_kerja.employee_id, employees_jam_kerja.tanggal')
+                ->join('jam_kerja', 'jam_kerja.id = employees_jam_kerja.jam_kerja_id', 'left')
+                ->whereIn('employee_id', $employeeIds)
+                ->where('jam_kerja.lintas_hari', "yes")
+                ->where('employees_jam_kerja.deletedAt', null)
+                ->findAll();
+
+            // === 3️⃣ Buat mapping untuk tanggal kerja lintas hari per karyawan
+            $mapLintas = [];
+            foreach ($jamkerjaLintasHari as $j) {
+                $mapLintas[$j['employee_id']][] = $j['tanggal'];
+            }
+
+
+            // === 4️⃣ Ambil log untuk jam kerja lintas hari
+            $logsLintas = [];
+            foreach ($mapLintas as $empId => $tgls) {
+                foreach ($tgls as $tgl) {
+                    // definisikan batas waktu
+                    $startToday = $tgl . ' 00:00:00';
+                    $endToday   = $tgl . ' 23:59:59';
+                    $startNext  = date('Y-m-d 00:00:00', strtotime($tgl . ' +1 day'));
+                    $endNext    = date('Y-m-d 23:59:59', strtotime($tgl . ' +1 day'));
+
+                    // ambil checkin = MAX di hari pertama
+                    $checkin = $AttendancesLogModel
+                        ->select("DATE_FORMAT(MAX(date_create), '%H:%i:%s') AS checkin")
+                        ->where('employees_id', $empId)
+                        ->where('date_create >=', $startToday)
+                        ->where('date_create <=', $endToday)
+                        ->first();
+
+                    // ambil checkout = MIN di hari berikutnya
+                    $checkout = $AttendancesLogModel
+                        ->select("DATE_FORMAT(MIN(date_create), '%H:%i:%s') AS checkout")
+                        ->where('employees_id', $empId)
+                        ->where('date_create >=', $startNext)
+                        ->where('date_create <=', $endNext)
+                        ->first();
+
+                    if ($checkin || $checkout) {
+                        $logsLintas[] = [
+                            'employees_id' => $empId,
+                            'tgl_kerja'    => $tgl,
+                            'checkin'      => $checkin ? $checkin['checkin'] : null,
+                            'checkout'     => $checkout ? $checkout['checkout'] : null
+                        ];
+                    }
+                }
+            }
+
+
+            // === 5️⃣ Gabungkan hasil log normal dan lintas hari ke satu struktur
             $mapLog = [];
-            foreach ($logs as $l) {
+
+            // log normal
+            foreach ($logsNormal as $l) {
                 $mapLog[$l['employees_id']][$l['tgl']] = [
                     'checkin'  => $l['checkin'],
                     'checkout' => $l['checkout']
                 ];
             }
 
-
+            // log lintas hari
+            foreach ($logsLintas as $l) {
+                $mapLog[$l['employees_id']][$l['tgl_kerja']] = [
+                    'checkin'  => $l['checkin'],
+                    'checkout' => $l['checkout']
+                ];
+            }
 
             // --- 5. loop employee × tanggal (tanpa query)
             $batchInsert = [];

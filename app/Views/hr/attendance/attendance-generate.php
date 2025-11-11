@@ -1052,7 +1052,7 @@
                             $('#abaikan_sync_log').attr('checked', true).change();
                         } else {
                             // Gak
-                            $('#abaikan_sync_log').attr('checked', false).change();
+                            $('#abaikan_sync_log').removeAttr('checked').change();
                         }
                         // Assign Attr
                         $('#jamKerjaDetail').data('jam_kerja_id', response.data.jamKerja.id);
