@@ -1134,7 +1134,7 @@ class StockRevampDetailModel extends Model
                 stock_revamp_detail.qty_bersih as stok_total,
                 stock_revamp_detail.qty_diterima as stok_total_diterima,
                 jasa_vendor_in.no_penerimaan_surat_jalan,
-                UPPER(concat(vendors.name, ' / ', suppliers.name)) AS supplier_name,
+                UPPER(vendors.name) AS supplier_name,
                 bc_purchase_order.no_aju,
                 vendors.id AS vendor_id,
                 UPPER(vendors.name) AS vendor_name,
