@@ -146,7 +146,7 @@
                 <th class="txt-left" style="text-align:center; width: 100px;">Nama Barang</th>
                 <th class="txt-left" style="text-align:center; width: 40px;">Qty</th>
                 <th class="txt-left" style="text-align:center; width: 30px;">Satuan</th>
-                <th class="txt-left" style="text-align:center; width: 60px;">@ Rp</th>
+                <th class="txt-left" style="text-align:center; width: 60px;">Harga Satuan</th>
                 <th class="txt-left" style="text-align:center; width: 60px;">Jumlah</th>
                 <th class="txt-left" style=" text-align:center; width: 150px;">No PO</th>
                 <th class="txt-left" style="text-align:center; width: 60px;">Keterangan</th>
