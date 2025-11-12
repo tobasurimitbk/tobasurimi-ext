@@ -37,6 +37,7 @@ class Scale extends BaseController
             $data[] = [
                 'id' => $item->id,
                 'name' => $item->name,
+                'harga' => number_format($item->harga, 0, ',', '.'), // Format harga
                 'createdAt' => $item->createdAt,
             ];
         }
@@ -47,11 +48,11 @@ class Scale extends BaseController
         ]);
     }
 
-
     public function store()
     {
         if (!$this->validate([
             'name' => 'required',
+            'harga' => 'required|numeric'
         ])) {
             return $this->response->setJSON([
                 'status' => 'error',
@@ -62,6 +63,7 @@ class Scale extends BaseController
         try {
             $this->barangModel->save([
                 'name' => $this->request->getPost('name'),
+                'harga' => $this->request->getPost('harga'),
                 'company_id' => $this->this_company_id,
             ]);
 
@@ -88,17 +90,17 @@ class Scale extends BaseController
             ]);
         }
 
-        $data = [
-            'barang' => $barang,
-        ];
-
-        return view('hr_outsourcing/scale/modal_edit', $data);
+        return $this->response->setJSON([
+            'status' => 'success',
+            'data' => $barang
+        ]);
     }
 
     public function update($id)
     {
         if (!$this->validate([
             'name' => 'required',
+            'harga' => 'required|numeric'
         ])) {
             return $this->response->setJSON([
                 'status' => 'error',
@@ -109,6 +111,7 @@ class Scale extends BaseController
         try {
             $this->barangModel->update($id, [
                 'name' => $this->request->getPost('name'),
+                'harga' => $this->request->getPost('harga'),
                 'company_id' => $this->this_company_id,
             ]);
 
