@@ -614,7 +614,7 @@
                         <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;" class="price">
                             <td style="padding: 6px; border: 1px solid #ddd;"></td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
-                                <span style="float: left;"><?= $dataSO->others_type ?></span>
+                                <span style="float: left;"><?= $dataSODetail['salesContract']['others'] ?></span>
                                 <?= $dataSODetail['othersPriceFinal'] == "PLUS" ? "( " . number_format($dataSODetail['othersPriceFinal'], 2) . " )" : number_format($dataSODetail['othersPriceFinal'], 2) ?>
                             </td>
                         </tr>
