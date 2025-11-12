@@ -1078,6 +1078,10 @@ class Barang extends BaseController
             "barang_master.deletedAt"   => NULL,
         ];
 
+
+        $aksesSupplierLokalBP = can('Pembelian', 'PO Lokal BP', 'r');
+        $aksesSupplierImportBP = can('Pembelian', 'PO Import BP', 'r');
+
         $selectQry = "barang_master.*, 
         barang_master_spesifikasi.spesifikasi, 
         barang_master_spesifikasi.satuan_1, 
@@ -1100,6 +1104,14 @@ class Barang extends BaseController
             ->join('suppliers', 'suppliers.id = barang_master_spesifikasi.supplier_terakhir', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.unit_terakhir', 'left')
             ->orderBy($sort, $sortType);
+
+        if ($aksesSupplierLokalBP && !$aksesSupplierImportBP) {
+            // PO LOKAL BP — sembunyikan kode barang yang diawali 'BI-'
+            $barangDataQry->notLike('barang_master.kode_barang', 'BI-', 'after');
+        } elseif (!$aksesSupplierLokalBP && $aksesSupplierImportBP) {
+            // PO IMPORT BP — hanya tampilkan kode barang yang diawali 'BI-'
+            $barangDataQry->like('barang_master.kode_barang', 'BI-', 'after');
+        }
 
         if ($search || $filter_coa) {
             $barangDataQry->groupStart();
