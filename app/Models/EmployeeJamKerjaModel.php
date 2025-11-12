@@ -270,15 +270,17 @@ class EmployeeJamKerjaModel extends Model
 
     public function getJamKerjaKaryawan(
         $bagianId,
-        $tanggal
+        $tanggal_mulai,
+        $tanggal_selesai
     ) {
         $employeeModel = new EmployeesModel();
         $employeeData = $employeeModel->where('deletedAt', null)->where('bagian_id', $bagianId)->orderBy('name', "asc")->findAll();
 
         $dataResult = array();
         foreach ($employeeData as $e) {
+            // ambil tanggal mulai aja untuk preview
             $jamKerja = $this->getJamKerjaDetailByEmployeeId(
-                $tanggal,
+                $tanggal_mulai,
                 $e['id']
             );
 
@@ -286,6 +288,8 @@ class EmployeeJamKerjaModel extends Model
                 'id' => $e['id'],
                 'nip' => $e['nip'],
                 'name' => $e['name'],
+                'tanggal_mulai' => $tanggal_mulai,
+                'tanggal_selesai' => $tanggal_selesai,
                 'jenis' => trim($jamKerja['jenis']),
                 'shift' => trim($jamKerja['shift']),
             ]);

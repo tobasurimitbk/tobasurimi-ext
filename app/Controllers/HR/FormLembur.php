@@ -4,6 +4,7 @@ namespace App\Controllers\HR;
 
 use App\Controllers\BaseController;
 use App\Models\AttendancesLogModel;
+use App\Models\AttendancesModel;
 use App\Models\BagianModel;
 use App\Models\BigDaysModel;
 use App\Models\DivisisModel;
@@ -14,6 +15,7 @@ use App\Models\GajiConjunctionModel;
 use App\Models\GolonganModel;
 use App\Models\JamKerjaModel;
 use DateTime;
+use Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
@@ -33,6 +35,7 @@ class FormLembur extends BaseController
     protected $BigdaysModel;
     protected $EmployeeJamKerjaModel;
     protected $GolonganModel;
+    protected $AttendancesModel;
 
     public function __construct()
     {
@@ -47,6 +50,7 @@ class FormLembur extends BaseController
         $this->BigdaysModel = new BigDaysModel();
         $this->EmployeeJamKerjaModel = new EmployeeJamKerjaModel();
         $this->GolonganModel = new GolonganModel();
+        $this->AttendancesModel = new AttendancesModel();
     }
 
     public function index()
@@ -210,237 +214,245 @@ class FormLembur extends BaseController
 
     public function generateLemburPay()
     {
-        $employeeID = $this->request->getVar('employeeID');
-        $tanggal = $this->request->getVar('tanggalLembur');
-        $kurangiJamIstirahat = $this->request->getVar('kurangiJamIstirahat');
-        $jamSelesaiLembur = $this->request->getVar('jamSelesaiLembur');
-        $gajiPokokPerHari = $this->request->getVar('gajiPokokPerHari');
+        try {
+            $employeeID = $this->request->getVar('employeeID');
+            $tanggal = $this->request->getVar('tanggalLembur');
+            $jamSelesaiLembur = $this->request->getVar('jamSelesaiLembur');
+            $gajiPokokPerHari = $this->request->getVar('gajiPokokPerHari');
 
-        // $modelJamKerja = new JamKerjaModel();
-        // $modelGaji = new GajiConjunctionModel();
-        // $modelLogAttendance = new AttendancesLogModel();
-        // $modelBigDays = new BigDaysModel();
-        // $employeeJamKerjaModel = new EmployeeJamKerjaModel();
+            // declare Variable
+            $checkOutLog = ""; // di set sebagai selesai lembur
+            $jumlahJamIstirahat = 0;
+            $jumlahJamKerjaBersih = 0;
+            $gajiPokok = 0;
+            $totalJamLembur = 0;
+            $totalLemburJamPertama = 0;
+            $totalLemburJamBerikutnya = 0;
+            $bayaranLemburJamPertama = 0;
+            $bayaranLemburJamBerikutnya = 0;
 
-        // declare Variable
-        $checkOutLog = ""; // di set sebagai selesai lembur
-        $jumlahJamIstirahat = 0;
-        $jumlahJamKerjaBersih = 0;
-        $gajiPokok = 0;
-        $totalJamLembur = 0;
-        $totalLemburJamPertama = 0;
-        $totalLemburJamBerikutnya = 0;
-        $bayaranLemburJamPertama = 0;
-        $bayaranLemburJamBerikutnya = 0;
-
-        // Check
-        if (empty($employeeID) || empty($tanggal)) {
-            return response()->setJSON([
-                'message' => "Inputan Nama Karyawan dan Tanggal lembur wajib diisi !",
-                'status' => false,
-                'code' => 422
-            ]);
-        }
-
-        $tanggal = date('Y-m-d', strtotime(str_replace('/', '-', $tanggal)));
-
-        // Check data di fingerprint
-        $selectQry = "DATE_FORMAT(MIN(date_create), '%H:%i:%s') AS checkin,
-        DATE_FORMAT(MAX(date_create), '%H:%i:%s') AS checkout";
-
-        $logAttendance = $this->AttendancesLogModel
-            ->select($selectQry)
-            ->where('company_id', $this->this_company_id)
-            ->where('employees_id', $employeeID)
-            ->where("DATE_FORMAT(date_create, '%Y-%m-%d')",  $tanggal)
-            ->groupBy('DATE_FORMAT(date_create, \'%Y-%m-%d\')')
-            ->limit(2)
-            ->get()
-            ->getResult();
-
-        if (count($logAttendance) == 0) {
-            return response()->setJSON([
-                'message' => "Karyawan belum melakukan presensi fingerprint pada tanggal $tanggal",
-                'status' => false,
-                'code' => 400
-            ]);
-        }
-        // asign to max date create
-        if ($logAttendance[0]->checkout != $logAttendance[0]->checkin) {
-            // ada in and out
-            $checkOutLog = date('H:i', \strtotime($logAttendance[0]->checkout));
-        } else {
-            // in
-            $checkOutLog = date('H:i', \strtotime($logAttendance[0]->checkin));
-        }
-
-        // cek hari besar
-        $hariBesar = $this->BigdaysModel->where('date', $tanggal)->where('company_id', $this->this_company_id)->first();
-        // jika hari besar yha libur gak ada lembur
-        if ($hariBesar != null) {
-            return response()->setJSON([
-                'message' => "$tanggal adalah hari besar " . $hariBesar['name'] . ". jadi ga bisa ambil lembur di hari tersebut",
-                'status' => false,
-                'code' => 400
-            ]);
-        }
-
-        // check apakah sudah presensi pulang di log
-        if ($logAttendance[0]->checkout == $logAttendance[0]->checkin) {
-            // belum ada presensi pulang di log
-            return response()->setJSON([
-                'message' => "Karyawan belum melakukan presensi pulang pada tanggal $tanggal",
-                'status' => false,
-                'code' => 400
-            ]);
-        }
-
-        // update checkout (jika dia input manual)
-        if (!empty($jamSelesaiLembur)) {
-            $checkOutLog = $jamSelesaiLembur;
-        }
-
-        // get jam kerja
-        $hariInIndonesia = static::getDayIndonesia(date('l', strtotime($tanggal)));
-        // GET JAM KERJA USED
-        $jamKerja = $this->EmployeeJamKerjaModel->getJamKerjaUsedByEmployeeId($tanggal, $employeeID);
-
-        $jamKerjaDetail = $this->JamKerjaModel
-            ->select('jam_kerja_detail.*')
-            ->join('jam_kerja_detail', 'jam_kerja.id = jam_kerja_detail.jam_kerja_id')
-            ->where('jam_kerja.company_id', $this->this_company_id)
-            ->where('jam_kerja.id', $jamKerja['id'])
-            ->where('jam_kerja_detail.hari', $hariInIndonesia)
-            ->where('jam_kerja_detail.deletedAt', null)
-            ->first();
-
-        // cek jam kerja detail apakah kosong
-        if ($jamKerjaDetail == null) {
-            return response()->setJSON([
-                'message' => "Terjadi kesalahan, jam kerja belum diset untuk divisi ini",
-                'status' => false,
-                'code' => 400
-            ]);
-        }
-
-        // Default Jam Istirahat
-        if ($jamKerjaDetail['jam_istirahat_mulai'] == null) {
-            $jamKerjaDetail['jam_istirahat_mulai'] = "12:01";
-        }
-        if ($jamKerjaDetail['jam_istirahat_selesai'] == null) {
-            $jamKerjaDetail['jam_istirahat_selesai'] = "13:00";
-        }
-
-        // cari selisih waktu jam masuk dan checkout (bersih) => jam masuk -> checkout
-        $waktuSelisihMasukPulang = static::selisihWaktu($jamKerjaDetail['jam_masuk'], $checkOutLog);
-        // cari selisih waktu istirahat
-        $waktuSelisihIstirahat = static::selisihWaktu($jamKerjaDetail['jam_istirahat_mulai'], $jamKerjaDetail['jam_istirahat_selesai']);
-        // get selisih waktu istirahat
-        $jumlahJamIstirahat = $waktuSelisihIstirahat['jam'] . " Jam , " . $waktuSelisihIstirahat['menit'] . " Menit";
-
-        // jam istirahat
-        if ($kurangiJamIstirahat) {
-            // get selisih waktu jam masuk dan jam pulang
-            $waktuSelisihMasukPulangIstirahat = static::kurangiWaktus(
-                $waktuSelisihMasukPulang['jam'] . ":" . $waktuSelisihMasukPulang['menit'],
-                60
-            );
-            $jumlahJamKerjaBersih = $waktuSelisihMasukPulangIstirahat;
-        } else {
-            // jangan kurangi jam kerja bersih dengan jam istirahat
-            $jumlahJamKerjaBersih = \abs($waktuSelisihMasukPulang['jam']) . " Jam , " . \abs($waktuSelisihMasukPulang['menit']) . " Menit";
-        }
-
-        // gaji
-        $gaji = $this->GajiConjunctionModel->select("tunjangan.name, gaji_conjunction.nominal, tunjangan.is_gaji_harian")
-            ->join('tunjangan', 'tunjangan.id = gaji_conjunction.tunjangan_id')
-            ->where('gaji_conjunction.employee_id', $employeeID)
-            ->where('tunjangan.tipe', "PLUS")
-            ->where('tunjangan.is_gaji_harian', 1)
-            ->findAll();
-
-        // get gaji pokok
-        foreach ($gaji as $g) {
-            if ($g['is_gaji_harian'] == 1) {
-                $gajiPokok = $gajiPokokPerHari == "-" ? $g['nominal'] : $gajiPokokPerHari;
+            // Check
+            if (empty($employeeID) || empty($tanggal)) {
+                return response()->setJSON([
+                    'message' => "Inputan Nama Karyawan dan Tanggal lembur wajib diisi !",
+                    'status' => false,
+                    'code' => 422
+                ]);
             }
-        }
 
-        // hitung total jam lembur
-        $waktuSelisihPulangLembur = static::selisihWaktu(
-            $jamKerjaDetail['jam_pulang'],
-            $checkOutLog
-        );
+            // GET JAM KERJA USED
+            $tanggal = date('Y-m-d', strtotime(str_replace('/', '-', $tanggal)));
+            $jamKerja = $this->EmployeeJamKerjaModel->getJamKerjaUsedByEmployeeId($tanggal, $employeeID);
+            $lintas_hari = $jamKerja['lintas_hari'] == "yes" ? true : false;
 
-        $totalJamLembur = (float)$waktuSelisihPulangLembur['jam'] . "." . $waktuSelisihPulangLembur['menit'];
+            if ($jamKerja['lintas_hari'] == "yes") {
+                // jam kerja lintas hari
+                // Check data di data absensi
+                $selectQry = "attendances.checkin,attendances.checkout";
 
-        if ($totalJamLembur <= 0.3) {
-            return response()->setJSON([
-                'message' => "Minimal pegawai dapat mengambil lembur adalah satu jam. Tanggal " . date('d/m/Y', strtotime($tanggal)) . " hanya menghasilkan total jam lembur sebesar " . $waktuSelisihPulangLembur['menit'] . " Menit. Pegawai Checkout Jam " . $checkOutLog . " dan Waktu Pulang di Jam Kerja Adalah Jam " . $jamKerjaDetail['jam_pulang'] . ". Sehingga tidak memenuhi persyaratan :)",
-                'status' => \false,
-                'code' => 400
-            ]);
-        }
+                $logAttendance = $this->AttendancesModel
+                    ->select($selectQry)
+                    ->where('company_id', $this->this_company_id)
+                    ->where('employee_id', $employeeID)
+                    ->where("periode",  $tanggal)
+                    ->get()
+                    ->getResult();
+            } else {
+                // jam kerja normal
+                // Check data di fingerprint
+                $selectQry = "DATE_FORMAT(MIN(date_create), '%H:%i:%s') AS checkin,
+            DATE_FORMAT(MAX(date_create), '%H:%i:%s') AS checkout";
 
-        // chek apakah lembur lebih dari satu jam
-        if ($totalJamLembur >= 1) {
-            // jam pertama
-            $totalLemburJamPertama = 1;
-            $bayaranLemburJamPertama = ((1 / 173) * 25 * 1.5) * 1 * $gajiPokok;
-            // sisanya
-            $sisaWaktu = static::kurangiWaktu(
-                $waktuSelisihPulangLembur['jam'] . ":" . $waktuSelisihPulangLembur['menit'],
-                60.00 // satu jam
+                $logAttendance = $this->AttendancesLogModel
+                    ->select($selectQry)
+                    ->where('company_id', $this->this_company_id)
+                    ->where('employees_id', $employeeID)
+                    ->where("DATE_FORMAT(date_create, '%Y-%m-%d')",  $tanggal)
+                    ->groupBy('DATE_FORMAT(date_create, \'%Y-%m-%d\')')
+                    ->limit(2)
+                    ->get()
+                    ->getResult();
+            }
+
+
+            if (count($logAttendance) == 0) {
+                return response()->setJSON([
+                    'message' => "Karyawan belum melakukan presensi fingerprint pada tanggal $tanggal",
+                    'status' => false,
+                    'code' => 400
+                ]);
+            }
+            // asign to max date create
+            if ($logAttendance[0]->checkout != $logAttendance[0]->checkin) {
+                // ada in and out
+                $checkOutLog = date('H:i', \strtotime($logAttendance[0]->checkout));
+            } else {
+                // in
+                $checkOutLog = date('H:i', \strtotime($logAttendance[0]->checkin));
+            }
+
+            // cek hari besar
+            $hariBesar = $this->BigdaysModel->where('date', $tanggal)->where('company_id', $this->this_company_id)->first();
+            // jika hari besar yha libur gak ada lembur
+            if ($hariBesar != null) {
+                return response()->setJSON([
+                    'message' => "$tanggal adalah hari besar " . $hariBesar['name'] . ". jadi ga bisa ambil lembur di hari tersebut",
+                    'status' => false,
+                    'code' => 400
+                ]);
+            }
+
+            // check apakah sudah presensi pulang di log
+            if ($logAttendance[0]->checkout == $logAttendance[0]->checkin) {
+                // belum ada presensi pulang di log
+                return response()->setJSON([
+                    'message' => "Karyawan belum melakukan presensi pulang pada tanggal $tanggal",
+                    'status' => false,
+                    'code' => 400
+                ]);
+            }
+
+            // update checkout (jika dia input manual)
+            if (!empty($jamSelesaiLembur)) {
+                $checkOutLog = $jamSelesaiLembur;
+            }
+
+            // get jam kerja
+            $hariInIndonesia = static::getDayIndonesia(date('l', strtotime($tanggal)));
+
+            $jamKerjaDetail = $this->JamKerjaModel
+                ->select('jam_kerja_detail.*')
+                ->join('jam_kerja_detail', 'jam_kerja.id = jam_kerja_detail.jam_kerja_id')
+                ->where('jam_kerja.company_id', $this->this_company_id)
+                ->where('jam_kerja.id', $jamKerja['id'])
+                ->where('jam_kerja_detail.hari', $hariInIndonesia)
+                ->where('jam_kerja_detail.deletedAt', null)
+                ->first();
+
+            // cek jam kerja detail apakah kosong
+            if ($jamKerjaDetail == null) {
+                return response()->setJSON([
+                    'message' => "Terjadi kesalahan, jam kerja belum diset untuk divisi ini",
+                    'status' => false,
+                    'code' => 400
+                ]);
+            }
+
+            // Default Jam Istirahat
+            if ($jamKerjaDetail['jam_istirahat_mulai'] == null) {
+                $jamKerjaDetail['jam_istirahat_mulai'] = "12:01";
+            }
+            if ($jamKerjaDetail['jam_istirahat_selesai'] == null) {
+                $jamKerjaDetail['jam_istirahat_selesai'] = "13:00";
+            }
+
+
+            // cari selisih waktu jam masuk dan checkout (bersih) => jam masuk -> checkout
+            $waktuSelisihMasukPulang = static::selisihWaktu($jamKerjaDetail['jam_masuk'], $checkOutLog, $lintas_hari);
+            $jumlahJamKerjaBersih = \abs($waktuSelisihMasukPulang['jam']) . " Jam , " . \abs($waktuSelisihMasukPulang['menit']) . " Menit";
+
+            // gaji
+            $gaji = $this->GajiConjunctionModel->select("tunjangan.name, gaji_conjunction.nominal, tunjangan.is_gaji_harian")
+                ->join('tunjangan', 'tunjangan.id = gaji_conjunction.tunjangan_id')
+                ->where('gaji_conjunction.employee_id', $employeeID)
+                ->where('tunjangan.tipe', "PLUS")
+                ->where('tunjangan.is_gaji_harian', 1)
+                ->findAll();
+
+            // get gaji pokok
+            foreach ($gaji as $g) {
+                if ($g['is_gaji_harian'] == 1) {
+                    $gajiPokok = $gajiPokokPerHari == "-" ? $g['nominal'] : $gajiPokokPerHari;
+                }
+            }
+
+            // hitung total jam lembur
+            $waktuSelisihPulangLembur = static::selisihWaktu(
+                $jamKerjaDetail['jam_pulang'],
+                $checkOutLog,
+                $lintas_hari
             );
 
-            // lebih satu jam
-            $totalLemburJamBerikutnya = $sisaWaktu;
-            $bayaranLemburJamBerikutnya = ((1 / 173) * 25 * 2) * $sisaWaktu * $gajiPokok;
-        } else {
-            // cuma satu jam
-            $totalLemburJamPertama = $totalJamLembur;
-            $bayaranLemburJamPertama = ((1 / 173) * 25 * 1.5) * 1 * $gajiPokok;
-        }
 
-        if ($totalLemburJamPertama <= 0) {
+            $totalJamLembur = (float)$waktuSelisihPulangLembur['jam'] . "." . $waktuSelisihPulangLembur['menit'];
+
+            if ($totalJamLembur <= 0.29) {
+                return response()->setJSON([
+                    'message' => "Minimal pegawai dapat mengambil lembur adalah setengah jam. Tanggal " . date('d/m/Y', strtotime($tanggal)) . " hanya menghasilkan total jam lembur sebesar " . $waktuSelisihPulangLembur['menit'] . " Menit. Pegawai Checkout Jam " . $checkOutLog . " dan Waktu Pulang di Jam Kerja Adalah Jam " . $jamKerjaDetail['jam_pulang'] . ". Sehingga tidak memenuhi persyaratan :)",
+                    'status' => \false,
+                    'code' => 400
+                ]);
+            }
+
+            // chek apakah lembur lebih dari satu jam
+            if ($totalJamLembur >= 1) {
+                // jam pertama
+                $totalLemburJamPertama = 1;
+                $bayaranLemburJamPertama = ((1 / 173) * 25 * 1.5) * 1 * $gajiPokok;
+                // sisanya
+                $sisaWaktu = static::kurangiWaktu(
+                    $waktuSelisihPulangLembur['jam'] . ":" . $waktuSelisihPulangLembur['menit'],
+                    60.00 // satu jam
+                );
+
+                // lebih satu jam
+                $totalLemburJamBerikutnya = $sisaWaktu;
+                $bayaranLemburJamBerikutnya = ((1 / 173) * 25 * 2) * $sisaWaktu * $gajiPokok;
+            } else if ($totalJamLembur > 1 && $totalJamLembur < 2) {
+                // cuma satu jam
+                $totalLemburJamPertama = $totalJamLembur;
+                $bayaranLemburJamPertama = ((1 / 173) * 25 * 1.5) * 1 * $gajiPokok;
+            } else {
+                $totalLemburJamPertama = $totalJamLembur;
+                $bayaranLemburJamPertama = ((1 / 173) * 25 * 1.5) * 0.5 * $gajiPokok;
+            }
+
+            if ($totalLemburJamPertama <= 0) {
+                return response()->setJSON([
+                    'message' => "Tidak memenuhi syarat melakukan lembur karena pegawai checkout sebelum jam pulang, silahkan cek menu log absensi",
+                    'status' => \false,
+                    'code' => 400
+
+                ]);
+            }
+
+            $finalBayaranLemburJamPertama = \number_format($bayaranLemburJamPertama, 2, '.', '');
+            $finalBayaranLemburJamBerikutnya = \number_format($bayaranLemburJamBerikutnya, 2, '.', '');
+
+            $result = [
+                'jamKerja' => [
+                    'jamKerjaMasuk' => $jamKerjaDetail['jam_masuk'],
+                    'jamKerjaKeluar' => $jamKerjaDetail['jam_pulang'],
+                    'jamMulaiLembur' => $jamKerjaDetail['jam_pulang'],
+                    'jamSelesaiLembur' => $checkOutLog,
+                    'jumlahJamIstirahat' => $jumlahJamIstirahat,
+                    'jumlahJamKerjaBersih' => $jumlahJamKerjaBersih
+                ],
+                'komponenGaji' => $gaji,
+                'upah' => $gajiPokok,
+                'lembur' => [
+                    'lemburJamPertama' => [
+                        'totalLemburJamPertama' => \number_format(\abs($totalLemburJamPertama), 2, '.', ''),
+                        'bayaran' => $finalBayaranLemburJamPertama
+                    ],
+                    'lemburJamBerikutnya' => [
+                        'totalLemburJamKedua' => \number_format(\abs($totalLemburJamBerikutnya), 2, '.', ''),
+                        'bayaran' => $finalBayaranLemburJamBerikutnya
+                    ],
+                    'totalBayaran' => \number_format($finalBayaranLemburJamPertama + $finalBayaranLemburJamBerikutnya, 2, '.', ''),
+                    'totalJamLembur' => $totalJamLembur
+                ],
+                'status' => true,
+            ];
+
+            return response()->setJSON($result);
+        } catch (Exception $e) {
             return response()->setJSON([
-                'message' => "Tidak memenuhi syarat melakukan lembur karena pegawai checkout sebelum jam pulang, silahkan cek menu log absensi",
-                'status' => \false,
-                'code' => 400
-
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => $e->getMessage()
             ]);
         }
-
-        $finalBayaranLemburJamPertama = \number_format($bayaranLemburJamPertama, 2, '.', '');
-        $finalBayaranLemburJamBerikutnya = \number_format($bayaranLemburJamBerikutnya, 2, '.', '');
-
-        $result = [
-            'jamKerja' => [
-                'jamKerjaMasuk' => $jamKerjaDetail['jam_masuk'],
-                'jamKerjaKeluar' => $jamKerjaDetail['jam_pulang'],
-                'jamMulaiLembur' => $jamKerjaDetail['jam_pulang'],
-                'jamSelesaiLembur' => $checkOutLog,
-                'jumlahJamIstirahat' => $jumlahJamIstirahat,
-                'jumlahJamKerjaBersih' => $jumlahJamKerjaBersih
-            ],
-            'komponenGaji' => $gaji,
-            'upah' => $gajiPokok,
-            'lembur' => [
-                'lemburJamPertama' => [
-                    'totalLemburJamPertama' => \number_format(\abs($totalLemburJamPertama), 2, '.', ''),
-                    'bayaran' => $finalBayaranLemburJamPertama
-                ],
-                'lemburJamBerikutnya' => [
-                    'totalLemburJamKedua' => \number_format(\abs($totalLemburJamBerikutnya), 2, '.', ''),
-                    'bayaran' => $finalBayaranLemburJamBerikutnya
-                ],
-                'totalBayaran' => \number_format($finalBayaranLemburJamPertama + $finalBayaranLemburJamBerikutnya, 2, '.', ''),
-                'totalJamLembur' => $totalJamLembur
-            ],
-            'status' => true,
-        ];
-
-        return response()->setJSON($result);
     }
 
     public function create()
@@ -655,23 +667,62 @@ class FormLembur extends BaseController
         exit();
     }
 
-
-
-
     // helper
-    static function selisihWaktu($start, $finish)
+    static function selisihWaktu($start, $finish, $lintas_hari = false)
     {
-        list($jamMasuk, $menitMasuk) = explode(":", $start);
-        list($jamLain, $menitLain) = explode(":", $finish);
-        $selisihJam = $jamLain - $jamMasuk;
-        $selisihMenit = $menitLain - $menitMasuk;
-
-        if ($selisihMenit < 0) {
-            $selisihJam--;
-            $selisihMenit += 60;
+        // normalisasi lintas_hari (terima 'yes', '1', true, dll)
+        $isLintas = false;
+        if (is_string($lintas_hari)) {
+            $isLintas = strtolower($lintas_hari) === 'yes' || strtolower($lintas_hari) === 'true' || $lintas_hari === '1';
+        } else {
+            $isLintas = (bool) $lintas_hari;
         }
-        $selisihJamFormatted = str_pad($selisihJam, 2, '0', STR_PAD_LEFT);
-        $selisihMenitFormatted = str_pad($selisihMenit, 2, '0', STR_PAD_LEFT);
+
+        // helper: ambil jam dan menit dari string H:i atau H:i:s
+        $parse = function ($time) {
+            if ($time === null || $time === '') return false;
+            $parts = explode(':', $time);
+            if (count($parts) < 2) return false;
+            $h = (int) $parts[0];
+            $m = (int) $parts[1];
+            // normalisasi range
+            $h = max(0, min(23, $h));
+            $m = max(0, min(59, $m));
+            return [$h, $m];
+        };
+
+        $a = $parse($start);
+        $b = $parse($finish);
+
+        if ($a === false || $b === false) {
+            // kembalikan 00:00 jika parsing gagal
+            return ['jam' => '00', 'menit' => '00'];
+        }
+
+        list($jamMasuk, $menitMasuk) = $a;
+        list($jamLain, $menitLain) = $b;
+
+        // konversi ke total menit dari awal hari
+        $totalStart = $jamMasuk * 60 + $menitMasuk;
+        $totalFinish = $jamLain * 60 + $menitLain;
+
+        // jika lintas hari dan finish <= start, tambahkan 24 jam ke finish
+        if ($isLintas && $totalFinish <= $totalStart) {
+            $totalFinish += 24 * 60;
+        }
+
+        $diffMinutes = $totalFinish - $totalStart;
+
+        // jika hasil negatif (tidak lintas) set 0 agar tidak bikin kacau logika
+        if ($diffMinutes < 0) {
+            $diffMinutes = 0;
+        }
+
+        $diffHours = intdiv($diffMinutes, 60);
+        $diffRemainMinutes = $diffMinutes % 60;
+
+        $selisihJamFormatted = str_pad($diffHours, 2, '0', STR_PAD_LEFT);
+        $selisihMenitFormatted = str_pad($diffRemainMinutes, 2, '0', STR_PAD_LEFT);
 
         return [
             'jam' => $selisihJamFormatted,
@@ -679,25 +730,48 @@ class FormLembur extends BaseController
         ];
     }
 
-
-    // helper
     static function kurangiWaktu($waktu, $menitDikurangkan)
     {
+        if (empty($waktu)) {
+            throw new \Exception("Format waktu tidak valid atau kosong (kurangiWaktu)");
+        }
+
+        // pastikan formatnya H:i
+        if (strlen($waktu) == 8) { // misal 05:30:00
+            $waktu = substr($waktu, 0, 5); // jadi 05:30
+        }
+
         $waktuObj = DateTime::createFromFormat('H:i', $waktu);
-        $jam = $waktuObj->format('H');
-        $menit = $waktuObj->format('i');
-        $totalMenit = ($jam * 60) + $menit;
-        $totalMenit -= $menitDikurangkan;
+        if (!$waktuObj) {
+            throw new \Exception("Gagal parsing waktu: {$waktu}");
+        }
+
+        $jam = (int) $waktuObj->format('H');
+        $menit = (int) $waktuObj->format('i');
+
+        $totalMenit = ($jam * 60) + $menit - $menitDikurangkan;
         return ($totalMenit / 60);
     }
 
     static function kurangiWaktus($waktu, $menitDikurangkan)
     {
+        if (empty($waktu)) {
+            throw new \Exception("Format waktu tidak valid atau kosong (kurangiWaktus)");
+        }
+
+        if (strlen($waktu) == 8) { // misal 05:30:00
+            $waktu = substr($waktu, 0, 5);
+        }
+
         $waktuObj = DateTime::createFromFormat('H:i', $waktu);
-        $jam = $waktuObj->format('H');
-        $menit = $waktuObj->format('i');
-        $totalMenit = ($jam * 60) + $menit;
-        $totalMenit -= $menitDikurangkan;
+        if (!$waktuObj) {
+            throw new \Exception("Gagal parsing waktu: {$waktu}");
+        }
+
+        $jam = (int) $waktuObj->format('H');
+        $menit = (int) $waktuObj->format('i');
+
+        $totalMenit = ($jam * 60) + $menit - $menitDikurangkan;
 
         $jamBaru = floor($totalMenit / 60);
         $menitBaru = $totalMenit % 60;

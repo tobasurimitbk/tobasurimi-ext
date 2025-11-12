@@ -126,12 +126,14 @@ class EmployeeJamKerja extends BaseController
     public function getJamKerjaKaryawan()
     {
         try {
-            $tanggal = formatDMYtoYMD($this->request->getVar('tanggal'));
+            $tanggal_mulai = formatDMYtoYMD($this->request->getVar('tanggal_mulai'));
+            $tanggal_selesai = formatDMYtoYMD($this->request->getVar('tanggal_selesai'));
             $bagianId = $this->request->getVar('bagian_id');
 
             $data = $this->employeeJamKerjaModel->getJamKerjaKaryawan(
                 $bagianId,
-                $tanggal
+                $tanggal_mulai,
+                $tanggal_selesai
             );
 
             return response()->setJSON([
@@ -153,33 +155,59 @@ class EmployeeJamKerja extends BaseController
         $db = \Config\Database::connect();
         try {
             $db->transBegin();
-            $tanggal = formatDMYtoYMD($this->request->getVar('tanggal'));
+            $tanggalMulai = $this->request->getVar("tanggal_mulai")
+                ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_mulai")), "Y-m-d")
+                : "";
+            $tanggalSelesai = $this->request->getVar("tanggal_selesai")
+                ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_selesai")), "Y-m-d")
+                : "";
+
             $jamKerjaId = $this->request->getVar('jam_kerja_id');
             $divisiId = $this->request->getVar('divisi_id');
             $listData = json_decode($_POST['listData']);
 
-            foreach ($listData as $l) {
-                $first = $this->employeeJamKerjaModel->where('tanggal', $tanggal)
-                    ->where('employee_id', $l->id)
-                    ->where('deletedAt', null)
-                    ->first();
+            if (strtotime($tanggalMulai) > strtotime($tanggalSelesai)) {
+                return $this->response->setJSON([
+                    'token' => csrf_hash(),
+                    'status' => false,
+                    'message' => "Rentang tanggal tidak valid",
+                ]);
+            }
 
-                if ($first == null) {
-                    $this->employeeJamKerjaModel->insert([
-                        'company_id' => $this->this_company_id,
-                        'divisi_id' => $divisiId,
-                        'jam_kerja_id' => $jamKerjaId,
-                        'employee_id' => $l->id,
-                        'tanggal' => $tanggal
-                    ]);
-                } else {
-                    $this->employeeJamKerjaModel->update($first['id'], [
-                        'company_id' => $this->this_company_id,
-                        'divisi_id' => $divisiId,
-                        'jam_kerja_id' => $jamKerjaId,
-                        'employee_id' => $l->id,
-                        'tanggal' => $tanggal
-                    ]);
+            // 🔹 Generate daftar tanggal di antara rentang
+            $periode = [];
+            $current = strtotime($tanggalMulai);
+            $end     = strtotime($tanggalSelesai);
+
+            while ($current <= $end) {
+                $periode[] = date("Y-m-d", $current);
+                $current = strtotime("+1 day", $current);
+            }
+
+            foreach ($listData as $l) {
+                foreach ($periode as $tanggal) {
+                    $first = $this->employeeJamKerjaModel->where('tanggal', $tanggal)
+                        ->where('employee_id', $l->id)
+                        ->where('deletedAt', null)
+                        ->first();
+
+                    if ($first == null) {
+                        $this->employeeJamKerjaModel->insert([
+                            'company_id' => $this->this_company_id,
+                            'divisi_id' => $divisiId,
+                            'jam_kerja_id' => $jamKerjaId,
+                            'employee_id' => $l->id,
+                            'tanggal' => $tanggal
+                        ]);
+                    } else {
+                        $this->employeeJamKerjaModel->update($first['id'], [
+                            'company_id' => $this->this_company_id,
+                            'divisi_id' => $divisiId,
+                            'jam_kerja_id' => $jamKerjaId,
+                            'employee_id' => $l->id,
+                            'tanggal' => $tanggal
+                        ]);
+                    }
                 }
             }
 

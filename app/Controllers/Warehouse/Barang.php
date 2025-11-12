@@ -1064,62 +1064,72 @@ class Barang extends BaseController
 
     public function exportExcel()
     {
-
-        $search        = $this->request->getVar("search");
-        $sort        = $this->request->getVar("sort");
-        $sortType      = $this->request->getVar("sortType");
-        $parent_type      = $this->request->getVar("parent_type");
-        $filter_coa      = $this->request->getVar("filter_coa");
-
+        $search       = $this->request->getVar("search");
+        $sort         = $this->request->getVar("sort");
+        $sortType     = $this->request->getVar("sortType");
+        $parent_type  = $this->request->getVar("parent_type");
+        $filter_coa   = $this->request->getVar("filter_coa");
 
         $filename = "EXPORT_BARANG_" . strtoupper($parent_type);
 
         $condition = [
             "barang_master.company_id"  => $this->this_company_id,
             "barang_master.type_barang" => $parent_type,
-            "barang_master.deletedAt" => NULL,
+            "barang_master.deletedAt"   => NULL,
         ];
 
-        $selectQry = "barang_master.*, barang_master_spesifikasi.spesifikasi, barang_master_spesifikasi.satuan_1, barang_master_spesifikasi.satuan_2, barang_master_spesifikasi.konversi_satuan_2, barang_master_spesifikasi.satuan_3, barang_master_spesifikasi.konversi_satuan_3,
-        parent_barang.parent_name AS kelompok_barang";
+
+        $aksesSupplierLokalBP = can('Pembelian', 'PO Lokal BP', 'r');
+        $aksesSupplierImportBP = can('Pembelian', 'PO Import BP', 'r');
+
+        $selectQry = "barang_master.*, 
+        barang_master_spesifikasi.spesifikasi, 
+        barang_master_spesifikasi.satuan_1, 
+        barang_master_spesifikasi.satuan_2, 
+        barang_master_spesifikasi.konversi_satuan_2, 
+        barang_master_spesifikasi.satuan_3, 
+        barang_master_spesifikasi.konversi_satuan_3,
+        parent_barang.parent_name AS kelompok_barang,
+        barang_master_spesifikasi.harga_terakhir,
+        suppliers.name AS supplier_terakhir_name,
+        satuans.kode_satuan AS kode_satuan_terakhir";
 
         $barangMasterModel = new BarangMasterModel();
-
         $satuanModel = new SatuansModel();
-        $accountBarangModel = new AccountBarangModel();
 
         $barangDataQry = $barangMasterModel->select($selectQry)
             ->where($condition)
             ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
+            ->join('suppliers', 'suppliers.id = barang_master_spesifikasi.supplier_terakhir', 'left')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.unit_terakhir', 'left')
             ->orderBy($sort, $sortType);
+
+        if ($aksesSupplierLokalBP && !$aksesSupplierImportBP) {
+            // PO LOKAL BP — sembunyikan kode barang yang diawali 'BI-'
+            $barangDataQry->notLike('barang_master.kode_barang', 'BI-', 'after');
+        } elseif (!$aksesSupplierLokalBP && $aksesSupplierImportBP) {
+            // PO IMPORT BP — hanya tampilkan kode barang yang diawali 'BI-'
+            $barangDataQry->like('barang_master.kode_barang', 'BI-', 'after');
+        }
 
         if ($search || $filter_coa) {
             $barangDataQry->groupStart();
         }
 
         if ($search) {
-            $barangDataQry->like('barang_master.barang_name', $search);
-        }
-
-        if ($search) {
-            $barangDataQry->orLike('barang_master.kode_barang', $search);
-        }
-
-        if ($search) {
-            $barangDataQry->orLike('parent_barang.parent_name', $search);
+            $barangDataQry->like('barang_master.barang_name', $search)
+                ->orLike('barang_master.kode_barang', $search)
+                ->orLike('parent_barang.parent_name', $search);
         }
 
         if ($filter_coa) {
             $barangDataQry->join('account_barang', 'barang_master.id = account_barang.barang_master_id', 'left');
-        }
-
-        if ($filter_coa == "belum") {
-            $barangDataQry->where('account_barang.ap_id', NULL);
-        }
-
-        if ($filter_coa == "sudah") {
-            $barangDataQry->where('account_barang.ap_id !=', NULL);
+            if ($filter_coa == "belum") {
+                $barangDataQry->where('account_barang.ap_id', NULL);
+            } elseif ($filter_coa == "sudah") {
+                $barangDataQry->where('account_barang.ap_id !=', NULL);
+            }
         }
 
         if ($search || $filter_coa) {
@@ -1131,77 +1141,71 @@ class Barang extends BaseController
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
+        // Header
+        $headers = [
+            'A1' => 'NO',
+            'B1' => 'KATEGORI',
+            'C1' => 'KODE BARANG',
+            'D1' => 'BARANG',
+            'E1' => 'SPESIFIKASI',
+            'F1' => 'SATUAN 1',
+            'G1' => 'SATUAN 2',
+            'H1' => 'SATUAN 3',
+            'I1' => 'HARGA TERAKHIR',
+            'J1' => 'SUPPLIER TERAKHIR',
+        ];
 
+        foreach ($headers as $cell => $value) {
+            $sheet->setCellValue($cell, $value);
+        }
 
-        $sheet->getStyle('A1:G1')->applyFromArray([
-            'font' => [
-                'bold' => true,
-            ],
+        $sheet->getStyle('A1:J1')->applyFromArray([
+            'font' => ['bold' => true],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT],
         ]);
 
-
         if (empty($getAllBarangData)) {
-            $sheet->setCellValue('A1', 'Tidak Ada Data Barang');
+            $sheet->setCellValue('A2', 'Tidak Ada Data Barang');
         } else {
-            $sheet->setCellValue('A1', 'NO');
-            $sheet->setCellValue('B1', 'KATEGORI');
-            $sheet->setCellValue('C1', 'KODE BARANG');
-            $sheet->setCellValue('D1', 'NAMA BARANG');
-            $sheet->setCellValue('E1', 'SATUAN 1');
-            $sheet->setCellValue('F1', 'SATUAN 2');
-            $sheet->setCellValue('G1', 'SATUAN 3');
-            $sheet->setCellValue('H1', 'AKUN COA');
-            $sheet->getStyle('A1:H1')->applyFromArray([
-                'font' => [
-                    'bold' => true,
-                ],
-            ]);
-
             $no = 1;
             $numRow = 2;
 
-            foreach ($getAllBarangData as $row) :
-
-
+            foreach ($getAllBarangData as $row) {
                 $satuan1 = $satuanModel->asObject()->where('id', $row['satuan_1'])->where('deletedAt', null)->first();
                 $satuan2 = $satuanModel->asObject()->where('id', $row['satuan_2'])->where('deletedAt', null)->first();
                 $satuan3 = $satuanModel->asObject()->where('id', $row['satuan_3'])->where('deletedAt', null)->first();
 
-                $satuan1_kode = isset($satuan1) ? $satuan1->kode_satuan : "-";
+                $satuan1_kode = $satuan1->kode_satuan ?? "-";
                 $satuan2_kode = (isset($satuan2) && $row['satuan_2'] != 0) ? $satuan2->kode_satuan : "-";
                 $satuan3_kode = (isset($satuan3) && $row['satuan_3'] != 0) ? $satuan3->kode_satuan : "-";
-                $accountBarang = $accountBarangModel->where('barang_master_id', $row['id'])->where('deleted_at', null)->first();
-
 
                 $sheet->setCellValue('A' . $numRow, $no);
                 $sheet->setCellValue('B' . $numRow, $row['kelompok_barang']);
                 $sheet->setCellValue('C' . $numRow, $row['kode_barang']);
-                $sheet->setCellValue('D' . $numRow, $row['barang_name'] . " - " . $row['spesifikasi']);
-                $sheet->setCellValue('E' . $numRow, $satuan1_kode);
-                $sheet->setCellValue('F' . $numRow, $satuan2_kode == "-" ? "-" : $satuan2_kode . " (" . $row['konversi_satuan_2'] . " " . $satuan1_kode . ")");
-                $sheet->setCellValue('G' . $numRow, $satuan3_kode == "-" ? "-" : $satuan3_kode . " (" . $row['konversi_satuan_3'] . " " . $satuan1_kode . ")");
-                $sheet->setCellValue('H' . $numRow, $accountBarang == NULL ? "No" : "Yes");
-
-
-                // Auto size columns A, B, and C
-                $sheet->getColumnDimension('A')->setAutoSize(true);
-                $sheet->getColumnDimension('B')->setAutoSize(true);
-                $sheet->getColumnDimension('C')->setAutoSize(true);
-                $sheet->getColumnDimension('D')->setAutoSize(true);
-                $sheet->getColumnDimension('E')->setAutoSize(true);
-                $sheet->getColumnDimension('F')->setAutoSize(true);
-                $sheet->getColumnDimension('G')->setAutoSize(true);
-                $sheet->getColumnDimension('H')->setAutoSize(true);
+                $sheet->setCellValue('D' . $numRow, $row['barang_name']);
+                $sheet->setCellValue('E' . $numRow, $row['spesifikasi']);
+                $sheet->setCellValue('F' . $numRow, $satuan1_kode);
+                $sheet->setCellValue('G' . $numRow, $satuan2_kode == "-" ? "-" : $satuan2_kode . " (" . $row['konversi_satuan_2'] . " " . $satuan1_kode . ")");
+                $sheet->setCellValue('H' . $numRow, $satuan3_kode == "-" ? "-" : $satuan3_kode . " (" . $row['konversi_satuan_3'] . " " . $satuan1_kode . ")");
+                $sheet->setCellValue('I' . $numRow, $row['harga_terakhir'] == null ? "" : number_format($row['harga_terakhir'], 2) . " / " . $row['kode_satuan_terakhir']);
+                $sheet->setCellValue('J' . $numRow, $row['supplier_terakhir_name']);
 
                 $no++;
                 $numRow++;
-            endforeach;
+            }
 
+            // Rata kiri isi data
+            $sheet->getStyle('A2:J' . ($numRow - 1))
+                ->getAlignment()
+                ->setHorizontal(Alignment::HORIZONTAL_LEFT);
 
-            $sheet->getStyle('A1:' . $sheet->getHighestDataColumn() . $sheet->getHighestDataRow())
-                ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            // Auto-size semua kolom (A–J)
+            foreach (range('A', 'J') as $col) {
+                $sheet->getColumnDimension($col)->setAutoSize(true);
+            }
         }
 
+        // Output ke browser
         ob_start();
         $writer = new Xlsx($spreadsheet);
         $writer->save('php://output');
@@ -1215,6 +1219,7 @@ class Barang extends BaseController
         echo $excelOutput;
         exit();
     }
+
 
     public function exportExcelHistory()
     {

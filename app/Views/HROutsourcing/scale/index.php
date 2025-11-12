@@ -95,6 +95,7 @@
                         <tr>
                             <th>No</th>
                             <th>Nama Barang</th>
+                            <th>Harga</th>
                             <th>Tanggal Dibuat</th>
                             <th class="text-center">Aksi</th>
                         </tr>
@@ -120,8 +121,12 @@
                 <form id="createForm">
                     <?= csrf_field() ?>
                     <div class="mb-3">
-                        <label for="name" class="form-label">Name</label>
+                        <label for="name" class="form-label">Nama Barang</label>
                         <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="harga" class="form-label">Harga</label>
+                        <input type="number" class="form-control" id="harga" name="harga" required min="0">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
@@ -146,8 +151,12 @@
                     <?= csrf_field() ?>
                     <input type="hidden" id="edit_id" name="id">
                     <div class="mb-3">
-                        <label for="edit_spesifikasi" class="form-label">Spesifikasi</label>
-                        <input type="text" class="form-control" id="edit_spesifikasi" name="spesifikasi" required>
+                        <label for="edit_name" class="form-label">Nama Barang</label>
+                        <input type="text" class="form-control" id="edit_name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_harga" class="form-label">Harga</label>
+                        <input type="number" class="form-control" id="edit_harga" name="harga" required min="0">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
@@ -289,6 +298,7 @@
                             <tr>
                                 <td>${index + 1}</td>
                                 <td>${item.name}</td>
+                                <td>Rp ${item.harga}</td>
                                 <td>${item.createdAt}</td>
                                 <td class="table-actions text-center">
                                     <button class="btn btn-sm btn-warning btn-action" onclick="showEditModal(${item.id})" title="Edit">
@@ -325,10 +335,9 @@
             method: "GET",
             success: function(response) {
                 if (response.status === 'success') {
-                    // Load master barang untuk form edit
-                    // Isi form dengan data yang ada
                     $('#edit_id').val(response.data.id);
                     $('#edit_name').val(response.data.name);
+                    $('#edit_harga').val(response.data.harga);
                     $('#editModal').modal('show');
                 } else {
                     alert(response.message);

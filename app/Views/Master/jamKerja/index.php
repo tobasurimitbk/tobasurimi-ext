@@ -50,6 +50,8 @@
                                 <th onclick="changeSort('jenis')" class="sort">Jenis Jam Kerja</th>
                                 <th onclick="changeSort('shift')" class="sort">Shift</th>
                                 <th onclick="changeSort('jam_terlambat')" class="sort">Jam Keterlambatan Masuk</th>
+                                <th onclick="changeSort('lintas_hari')" style="width: 100px;" class="sort">Lintas Hari</th>
+
                                 <th style="width: 100px;">Action</th>
                             </tr>
                         </thead>
@@ -153,6 +155,28 @@
         }, {
             data: "jam_terlambat",
             className: "text-left"
+        }, {
+            data: "lintas_hari",
+            className: "text-center",
+            render: function(data, type, row) {
+                let lintas_hari = row.lintas_hari;
+                let htmlRes = '';
+
+                if (row.lintas_hari == "yes") {
+                    htmlRes += `
+                            <div class="text-success">
+                               <i class="fa-solid fa-check"></i>
+                            </div>`
+                } else {
+                    htmlRes += `
+                            <div class="text-danger">
+                               <i class="fa-solid fa-x"></i>
+                            </div>`
+                }
+
+                return htmlRes;
+
+            }
         }, {
             data: "id",
             className: "text-center actions",

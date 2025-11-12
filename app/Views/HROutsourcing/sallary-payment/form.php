@@ -54,7 +54,10 @@
 <section class="section">
     <div class="section-header">
         <h1>HR Outsourcing Salary Payment</h1>
-        <div class="section-header-breadcrumb">
+        <div class="col-button-tambah-spp">
+            <button class="btn btn-info float-right" data-bs-toggle="modal" data-bs-target="#departmentIpModal">
+                <i class="fas fa-cog"></i> Konfigurasi IP
+            </button>
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("hr-outsourcing-sallary-payment"); ?>">
                 Kembali
             </a>
@@ -80,9 +83,6 @@
                     <div class="card-header">
                         <h5>Header Pembayaran</h5>
                     </div>
-                    <button type="button" class="btn btn-info float-right mr-2" data-bs-toggle="modal" data-bs-target="#departmentIpModal">
-                        <i class="fas fa-cog"></i> Konfigurasi IP
-                    </button>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-4">
@@ -110,43 +110,11 @@
                                     <input type="date" class="form-control" id="tanggal_pembayaran" name="tanggal_pembayaran">
                                 </div>
                             </div>
+                            <button type="button" class="btn btn-success btn-get-data">
+                                <i class="fas fa-download"></i> Get Data
+                            </button>
                         </div>
                     </div>
-                </div>
-
-
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5>Detail Karyawan</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="employee">Karyawan</label>
-                                    <select class="form-control select2" id="employee" name="employee">
-                                        <option value="">Pilih Karyawan</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="tanggal_masuk_kerja">Tanggal Masuk Kerja</label>
-                                    <input type="date" class="form-control" id="tanggal_masuk_kerja" name="tanggal_masuk_kerja" required>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Form Actions -->
-                <div class="form-actions text-right">
-                    <button type="button" class="btn btn-secondary mr-2" onclick="resetForm()">
-                        <i class="fas fa-sync-alt"></i> Reset
-                    </button>
-                    <button type="button" class="btn btn-primary btn-submit">
-                        <i class="fas fa-plus"></i> Add Data
-                    </button>
                 </div>
             </form>
 
@@ -469,7 +437,8 @@
             const data = {
                 department_id: departmentId,
                 department_name: departmentName,
-                ip_address: ipAddress
+                ip_address: ipAddress,
+                <?= csrf_token() ?>: '<?= csrf_hash() ?>'
             };
             
             $.ajax({
@@ -493,6 +462,47 @@
                 error: function(xhr, status, error) {
                     console.error('Error saving department-IP data:', error);
                     showAlert('error', 'Terjadi kesalahan saat menyimpan data.');
+                }
+            });
+        });
+
+
+        $('.btn-get-data').on('click', function() {
+            const companyId = $('#company').val();
+            const tanggal = $('#tanggal_pembayaran').val();
+
+            if (!companyId) {
+                alert('Pilih perusahaan terlebih dahulu!');
+                return;
+            }
+            if (!tanggal) {
+                alert('Pilih tanggal pembayaran terlebih dahulu!');
+                return;
+            }
+
+            // Endpoint API lo
+            const apiUrl = `http://192.168.5.63:8001/api/local-data?company_id=${companyId}&tanggal=${tanggal}`;
+
+            // Loader optional
+            $('.btn-get-data').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Loading...');
+
+            $.ajax({
+                url: apiUrl,
+                method: 'GET',
+                dataType: 'json',
+                success: function(res) {
+                    if (res.status === 'success') {
+                
+                    } else {
+                        alert('Gagal mengambil data');
+                    }
+                },
+                error: function(xhr) {
+                    console.error(xhr.responseText);
+                    alert('Terjadi kesalahan saat memanggil API');
+                },
+                complete: function() {
+                    $('.btn-get-data').prop('disabled', false).html('<i class="fas fa-download"></i> Get Data');
                 }
             });
         });

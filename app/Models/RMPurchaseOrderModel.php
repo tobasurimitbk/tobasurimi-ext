@@ -2039,6 +2039,15 @@ class RMPurchaseOrderModel extends Model
                 $nilaiTotalBulananDetail = $dppBulananDetail - $pphBulananDetail;
             }
 
+            if ($pphMode == "None") {
+                $nilaiTotalUmumDetail = $dppUmumDetail;
+                $nilaiTotalHarianDetail = $dppHarianDetail;
+                $nilaiTotalBulananDetail = $dppBulananDetail;
+                $pphBulananDetail = 0;
+                $pphHarianDetail = 0;
+                $pphUmumDetail = 0;
+            }
+
             array_push($rmPurchaseOrderDetailNilai, [
                 'id' => $detailPo['id'],
                 'dpp_umum' => $dppUmumDetail,

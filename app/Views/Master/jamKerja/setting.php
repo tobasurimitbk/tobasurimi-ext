@@ -27,12 +27,30 @@
                         <div class="input-group mb-3">
                             <div class="form-floating" style="height: 50px;">
                                 <input type="text"
-                                    id="tanggal"
-                                    name="tanggal"
-                                    class="form-control tanggal"
-                                    placeholder="Tanggal"
+                                    id="tanggal_mulai"
+                                    name="tanggal_mulai"
+                                    class="form-control tanggal_mulai"
+                                    placeholder="Tanggal Mulai"
                                     value="">
-                                <label for="tanggal">Tanggal</label>
+                                <label for="tanggal">Tanggal Mulai</label>
+                            </div>
+                            <div class="input-group-append" style="height:50px;">
+                                <button disabled class="btn btn-secondary" type="button">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="input-group mb-3">
+                            <div class="form-floating" style="height: 50px;">
+                                <input type="text"
+                                    id="tanggal_selesai"
+                                    name="tanggal_selesai"
+                                    class="form-control tanggal_selesai"
+                                    placeholder="Tanggal Selesai"
+                                    value="">
+                                <label for="tanggal">Tanggal Selesai</label>
                             </div>
                             <div class="input-group-append" style="height:50px;">
                                 <button disabled class="btn btn-secondary" type="button">
@@ -79,7 +97,7 @@
                     </div>
                 </div>
 
-                <div class="col-subtitle-modal">
+                <div class="col-subtitle-modal mt-3">
                     <div class="row mt-1">
                         <div class="col-md-12">
                             <label class="form-label font-weight-bold modal-sub-title">List Karyawan & Jam Kerja</label>
@@ -134,8 +152,15 @@
     let listData = [];
     let listDataSelected = [];
 
-    $("#tanggal").datepicker({
-        placeholder: "Pilih Tanggal Mulai Log Absensi",
+    $("#tanggal_mulai").datepicker({
+        placeholder: "Pilih Tanggal Mulai",
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
+    $("#tanggal_selesai").datepicker({
+        placeholder: "Pilih Tanggal Selesai",
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
@@ -192,9 +217,6 @@
             v.jenis.toLowerCase().includes(keyword) ||
             v.shift.toLowerCase().includes(keyword)
         );
-
-        console.log(filtered);
-
         // redraw tabel dengan hasil filter
         drawTable(filtered);
     });
@@ -202,7 +224,10 @@
 
     var validator = $("#formPost").validate({
         rules: {
-            tanggal: {
+            tanggal_mulai: {
+                required: true
+            },
+            tanggal_selesai: {
                 required: true
             },
             divisi_id: {
@@ -216,8 +241,11 @@
             },
         },
         messages: {
-            tanggal: {
-                required: "pilih tanggal"
+            tanggal_mulai: {
+                required: "pilih tanggal mulai"
+            },
+            tanggal_selesai: {
+                required: "pilih tanggal selesai"
             },
             divisi_id: {
                 required: "pilih departemen"
@@ -286,11 +314,13 @@
                                 confirmButtonColor: '#4e73df',
                             }).then((res) => {
                                 if (res.isConfirmed) {
-                                    var tanggal = $('#tanggal').val();
+                                    var tanggal_mulai = $('#tanggal_mulai').val();
+                                    var tanggal_selesai = $('#tanggal_selesai').val();
                                     var bagianId = $('#bagian_id').val();
                                     getListData(
                                         bagianId,
-                                        tanggal
+                                        tanggal_mulai,
+                                        tanggal_selesai
                                     );
                                 }
                             });
@@ -331,15 +361,22 @@
 
     $('#cari_karyawan').click(function(e) {
         e.preventDefault();
-        var tanggal = $('#tanggal').val();
+        var tanggal_mulai = $('#tanggal_mulai').val();
+        var tanggal_selesai = $('#tanggal_selesai').val();
         var divisiId = $('#divisi_id').val();
         var bagianId = $('#bagian_id').val();
         $('#search').val(null);
 
-        if (tanggal == '') {
+        if (tanggal_mulai == '') {
             Swal.fire({
                 icon: 'error',
-                title: 'Pilih tanggal',
+                title: 'Pilih tanggal mulai',
+                confirmButtonColor: '#4e73df',
+            });
+        } else if (tanggal_selesai == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pilih tanggal selesai',
                 confirmButtonColor: '#4e73df',
             });
         } else if (divisiId == '') {
@@ -355,16 +392,17 @@
                 confirmButtonColor: '#4e73df',
             });
         } else {
-            getListData(bagianId, tanggal);
+            getListData(bagianId, tanggal_mulai, tanggal_selesai);
         }
     });
 
-    function getListData(bagianId, tanggal) {
+    function getListData(bagianId, tanggal_mulai, tanggal_selesai) {
         $.ajax({
             url: `<?= base_url("jam-kerja/get-jam-kerja-karyawan"); ?>`,
             data: {
                 bagian_id: bagianId,
-                tanggal: tanggal
+                tanggal_mulai: tanggal_mulai,
+                tanggal_selesai: tanggal_selesai
             },
             method: "GET",
             beforeSend: function() {
