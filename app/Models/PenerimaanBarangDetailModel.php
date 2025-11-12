@@ -336,6 +336,33 @@ class PenerimaanBarangDetailModel extends Model
             ->findAll();
     }
 
+    public function getPenerimaanBarangImportBakuDetailPrint($id)
+    {
+        $dd = $this->asArray()
+            ->select('
+            penerimaan_barang_detail.*,
+            barang_master.barang_name as nama_barang,
+            satuans.kode_satuan,
+            rm_import_pos.po_no,
+            rm_import_po_details.note as keterangan,
+            rm_import_po_details.total as total_po,
+            rm_import_pos.currency as currency,
+            barang_master_spesifikasi.spesifikasi,
+            metadata.value as currencyValue
+        ')
+            ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
+            ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'left')
+            ->join('rm_import_pos', 'rm_import_pos.id = penerimaan_barang_detail.purchase_order_id', 'left')
+            ->join('metadata', 'metadata.id = rm_import_pos.currency', 'left')
+            ->join('rm_import_po_details', 'rm_import_po_details.id = penerimaan_barang_detail.purchase_order_details_id', 'left')
+            ->where('penerimaan_barang_detail.penerimaan_barang_id', $id)
+            ->where('penerimaan_barang_detail.deletedAt', null)
+            ->findAll();
+
+        return $dd;
+    }
+
     public function getHargaTotalPenerimaan($penerimaan_barang_id)
     {
         return $this->asArray()->select('SUM(penerimaan_barang_detail.sub_total) AS harga')
