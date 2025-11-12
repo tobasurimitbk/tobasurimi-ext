@@ -398,10 +398,13 @@ class FormLembur extends BaseController
                 // lebih satu jam
                 $totalLemburJamBerikutnya = $sisaWaktu;
                 $bayaranLemburJamBerikutnya = ((1 / 173) * 25 * 2) * $sisaWaktu * $gajiPokok;
-            } else {
+            } else if ($totalJamLembur > 1 && $totalJamLembur < 2) {
                 // cuma satu jam
                 $totalLemburJamPertama = $totalJamLembur;
                 $bayaranLemburJamPertama = ((1 / 173) * 25 * 1.5) * 1 * $gajiPokok;
+            } else {
+                $totalLemburJamPertama = $totalJamLembur;
+                $bayaranLemburJamPertama = ((1 / 173) * 25 * 1.5) * 0.5 * $gajiPokok;
             }
 
             if ($totalLemburJamPertama <= 0) {
