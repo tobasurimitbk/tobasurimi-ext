@@ -260,16 +260,25 @@ class FormLembur extends BaseController
             } else {
                 // jam kerja normal
                 // Check data di fingerprint
-                $selectQry = "DATE_FORMAT(MIN(date_create), '%H:%i:%s') AS checkin,
-            DATE_FORMAT(MAX(date_create), '%H:%i:%s') AS checkout";
+                //     $selectQry = "DATE_FORMAT(MIN(date_create), '%H:%i:%s') AS checkin,
+                // DATE_FORMAT(MAX(date_create), '%H:%i:%s') AS checkout";
 
-                $logAttendance = $this->AttendancesLogModel
+                //     $logAttendance = $this->AttendancesLogModel
+                //         ->select($selectQry)
+                //         ->where('company_id', $this->this_company_id)
+                //         ->where('employees_id', $employeeID)
+                //         ->where("DATE_FORMAT(date_create, '%Y-%m-%d')",  $tanggal)
+                //         ->groupBy('DATE_FORMAT(date_create, \'%Y-%m-%d\')')
+                //         ->limit(2)
+                //         ->get()
+                //         ->getResult();
+                $selectQry = "attendances.checkin,attendances.checkout";
+
+                $logAttendance = $this->AttendancesModel
                     ->select($selectQry)
                     ->where('company_id', $this->this_company_id)
-                    ->where('employees_id', $employeeID)
-                    ->where("DATE_FORMAT(date_create, '%Y-%m-%d')",  $tanggal)
-                    ->groupBy('DATE_FORMAT(date_create, \'%Y-%m-%d\')')
-                    ->limit(2)
+                    ->where('employee_id', $employeeID)
+                    ->where("periode",  $tanggal)
                     ->get()
                     ->getResult();
             }
