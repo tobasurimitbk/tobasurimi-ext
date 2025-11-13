@@ -629,7 +629,7 @@ class AttendancesModel extends Model
 
             foreach ($yearMonth as $ym) {
                 $A = static::sumStatus($attendanceIndex, $ed['id'], $ym, ['ALPHA_A', 'LIBUR_L']);
-                $P = static::sumStatus($attendanceIndex, $ed['id'], $ym, ['CUTI TAHUNAN_CT', 'CUTI HAID_CHD', 'CUTI HAMIL_CHL', 'CUTI MELAHIRKAN_CM', 'POTONG GAJI_PG', 'SAKIT_S', 'DINAS_D']);
+                $P = static::sumStatus($attendanceIndex, $ed['id'], $ym, ['CUTI TAHUNAN_CT', 'CUTI HAID_CHD', 'CUTI HAMIL_CHL', 'CUTI MELAHIRKAN_CM', 'SAKIT_S', 'DINAS_D', 'IJIN_I']);
                 $H = static::sumStatus($attendanceIndex, $ed['id'], $ym, ['RL_RL', 'HADIR_H']);
 
                 $kehadiran[] = [

@@ -30,6 +30,8 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 
+use function PHPSTORM_META\map;
+
 class Attendance extends BaseController
 {
     protected $token;
@@ -227,11 +229,12 @@ class Attendance extends BaseController
                         'CUTI HAID_CHD' => 'bg-cuti-haid',
                         'CUTI HAMIL_CHL' => 'bg-cuti-hamil',
                         'CUTI MELAHIRKAN_CM' => 'bg-cuti-melahirkan',
-                        'POTONG GAJI_PG' => 'bg-ijin',
+                        'POTONG GAJI_PG' => 'bg-pg',
                         'SAKIT_S' => 'bg-sakit',
                         'RL_RL' => 'bg-rl',
                         'DINAS_D' => 'bg-dinas',
-                        'CUTI KEGUGURAN_CKG' => 'bg-cuti-keguguran'
+                        'CUTI KEGUGURAN_CKG' => 'bg-cuti-keguguran',
+                        'IJIN_I' => 'bg-ijin',
                     ];
 
                     $row['day_' . $d . '_in_class']  = $mapping[$statusIzin];
@@ -368,6 +371,7 @@ class Attendance extends BaseController
             $totalCutiHamil      = 0;
             $totalCutiMelahirkan = 0;
             $totalIjin           = 0;
+            $totalPg             = 0;
             $totalSakit          = 0;
             $totalRl             = 0;
             $totalHadir          = 0;
@@ -412,7 +416,7 @@ class Attendance extends BaseController
                         $totalCutiMelahirkan++;
                         break;
                     case 'POTONG GAJI_PG':
-                        $totalIjin++;
+                        $totalPg++;
                         break;
                     case 'SAKIT_S':
                         $totalSakit++;
@@ -425,6 +429,9 @@ class Attendance extends BaseController
                         break;
                     case 'CUTI KEGUGURAN_CKG':
                         $totalCutiKeguguran++;
+                        break;
+                    case 'IJIN_I':
+                        $totalIjin++;
                         break;
                 }
 
@@ -447,6 +454,7 @@ class Attendance extends BaseController
             $row['total_libur']           = $totalLibur;
             $row['total_dinas']           = $totalDinas;
             $row['total_cuti_keguguran']  = $totalCutiKeguguran;
+            $row['total_pg']              = $totalPg;
 
             $resultData[] = $row;
         }
@@ -607,13 +615,14 @@ class Attendance extends BaseController
                         'CUTI HAID_CHD' => 'bg-cuti-haid',
                         'CUTI HAMIL_CHL' => 'bg-cuti-hamil',
                         'CUTI MELAHIRKAN_CM' => 'bg-cuti-melahirkan',
-                        'POTONG GAJI_PG' => 'bg-ijin',
+                        'POTONG GAJI_PG' => 'bg-pg',
                         'SAKIT_S' => 'bg-sakit',
                         'RL_RL' => 'bg-rl',
                         'ALPHA_A' => 'bg-alpha',
                         'LIBUR_L' => 'bg-libur',
                         'DINAS_D' => 'bg-dinas',
-                        'CUTI KEGUGURAN_CKG' => 'bg-cuti-keguguran'
+                        'CUTI KEGUGURAN_CKG' => 'bg-cuti-keguguran',
+                        'IJIN_I' => 'bg-ijin',
                     ];
 
                     $row['day_' . $d . '_in_class']  = $mapping[$statusIzin];
@@ -760,6 +769,7 @@ class Attendance extends BaseController
             $totalCutiHamil      = 0;
             $totalCutiMelahirkan = 0;
             $totalIjin           = 0;
+            $totalPg             = 0;
             $totalSakit          = 0;
             $totalRl             = 0;
             $totalHadir          = 0;
@@ -804,7 +814,7 @@ class Attendance extends BaseController
                         $totalCutiMelahirkan++;
                         break;
                     case 'POTONG GAJI_PG':
-                        $totalIjin++;
+                        $totalPg++;
                         break;
                     case 'SAKIT_S':
                         $totalSakit++;
@@ -817,6 +827,9 @@ class Attendance extends BaseController
                         break;
                     case 'CUTI KEGUGURAN_CKG':
                         $totalCutiKeguguran++;
+                        break;
+                    case 'IJIN_I':
+                        $totalIjin++;
                         break;
                 }
 
@@ -839,6 +852,7 @@ class Attendance extends BaseController
             $row['total_libur']           = $totalLibur;
             $row['total_dinas']           = $totalDinas;
             $row['total_cuti_keguguran']  = $totalCutiKeguguran;
+            $row['total_pg']              = $totalPg;
 
             $resultData[] = $row;
         }
@@ -1438,7 +1452,8 @@ class Attendance extends BaseController
             'Alpha',
             'Libur',
             'Dinas',
-            'Cuti Keguguran'
+            'Cuti Keguguran',
+            'Potong Gaji'
         ];
         $colIndex = 1;
         $rowHeader2 = 3;
@@ -1466,7 +1481,7 @@ class Attendance extends BaseController
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $e['divisi']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $e['bagian']);
 
-            $total = ['ct' => 0, 'chd' => 0, 'chl' => 0, 'cm' => 0, 'ijin' => 0, 'sakit' => 0, 'rl' => 0, 'hadir' => 0, 'alpha' => 0, 'libur' => 0, 'dinas' => 0, 'ckg' => 0];
+            $total = ['ct' => 0, 'chd' => 0, 'chl' => 0, 'cm' => 0, 'ijin' => 0, 'sakit' => 0, 'rl' => 0, 'hadir' => 0, 'alpha' => 0, 'libur' => 0, 'dinas' => 0, 'ckg' => 0, 'pg' => 0];
 
             for ($d = 1; $d <= $totalDaysInMonth; $d++) {
                 $tanggal = sprintf("%04d-%02d-%02d", $year, $month, $d);
@@ -1496,7 +1511,7 @@ class Attendance extends BaseController
                         $total['cm']++;
                         break;
                     case 'POTONG GAJI_PG':
-                        $total['ijin']++;
+                        $total['pg']++;
                         break;
                     case 'SAKIT_S':
                         $total['sakit']++;
@@ -1509,6 +1524,9 @@ class Attendance extends BaseController
                         break;
                     case 'CUTI KEGUGURAN_CKG':
                         $total['ckg']++;
+                        break;
+                    case 'IJIN_I':
+                        $total['ijin']++;
                         break;
                 }
 
@@ -1529,6 +1547,7 @@ class Attendance extends BaseController
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['libur']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['dinas']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['ckg']);
+            $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['pg']);
 
             $rowIndex++;
         }
@@ -1775,7 +1794,8 @@ class Attendance extends BaseController
                         'sakit'          => 0,
                         'rl'             => 0,
                         'dinas'          => 0,
-                        'cuti_keguguran' => 0
+                        'cuti_keguguran' => 0,
+                        'potong_gaji' => 0
                     ];
                 }
 
@@ -1816,6 +1836,9 @@ class Attendance extends BaseController
                     case 'CKG':
                         $rekapKaryawan[$emp['id']]['cuti_keguguran']++;
                         break;
+                    case 'PG':
+                        $rekapKaryawan[$emp['id']]['potong_gaji']++;
+                        break;
                 }
             }
 
@@ -1834,7 +1857,7 @@ class Attendance extends BaseController
         $row++;
 
         // Header rekap
-        $rekapHeaders = ['No', 'Nip', 'Nama', 'Hadir', 'Alpa', 'Libur', 'Cuti Tahunan', 'Cuti Haid', 'Cuti Hamil', 'Cuti Melahirkan', 'Ijin', 'Sakit', 'RL', 'Dinas', 'Cuti Keguguran'];
+        $rekapHeaders = ['No', 'Nip', 'Nama', 'Hadir', 'Alpa', 'Libur', 'Cuti Tahunan', 'Cuti Haid', 'Cuti Hamil', 'Cuti Melahirkan', 'Ijin', 'Sakit', 'RL', 'Dinas', 'Cuti Keguguran', 'Potong Gaji'];
         $col = 'A';
         foreach ($rekapHeaders as $h) {
             $sheet->setCellValue("{$col}{$row}", $h);
@@ -1865,15 +1888,16 @@ class Attendance extends BaseController
             $sheet->setCellValue("M{$row}", $r['rl']);
             $sheet->setCellValue("N{$row}", $r['dinas']);
             $sheet->setCellValue("O{$row}", $r['cuti_keguguran']);
+            $sheet->setCellValue("P{$row}", $r['potong_gaji']);
 
-            $sheet->getStyle("A{$row}:O{$row}")->applyFromArray([
+            $sheet->getStyle("A{$row}:P{$row}")->applyFromArray([
                 'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
             ]);
             $row++;
         }
 
         // auto size kolom
-        foreach (range('A', 'O') as $col) {
+        foreach (range('A', 'P') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
@@ -2133,7 +2157,8 @@ class Attendance extends BaseController
             'Alpha',
             'Libur',
             'Dinas',
-            'Cuti Keguguran'
+            'Cuti Keguguran',
+            'Potong Gaji'
         ];
         $colIndex = 1;
         $rowHeader2 = 3;
@@ -2174,7 +2199,8 @@ class Attendance extends BaseController
                 'alpha' => 0,
                 'libur' => 0,
                 'dinas' => 0,
-                'ckg' => 0
+                'ckg' => 0,
+                'pg' => 0
             ];
 
             for ($d = 1; $d <= $totalDaysInMonth; $d++) {
@@ -2204,7 +2230,7 @@ class Attendance extends BaseController
                     case 'CUTI MELAHIRKAN_CM':
                         $total['cm']++;
                         break;
-                    case 'POTONG GAJI_PG':
+                    case 'IJIN_I':
                         $total['ijin']++;
                         break;
                     case 'SAKIT_S':
@@ -2218,6 +2244,9 @@ class Attendance extends BaseController
                         break;
                     case 'CUTI KEGUGURAN_CKG':
                         $total['ckg']++;
+                        break;
+                    case 'POTONG GAJI_PG':
+                        $total['pg']++;
                         break;
                 }
 
@@ -2238,6 +2267,7 @@ class Attendance extends BaseController
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['libur']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['dinas']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['ckg']);
+            $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['pg']);
 
             $rowIndex++;
         }
@@ -2827,6 +2857,7 @@ class Attendance extends BaseController
                         'rl'             => 0,
                         'dinas'          => 0,
                         'cuti_keguguran' => 0,
+                        'potong_gaji'   => 0
                     ];
                 }
 
@@ -2867,6 +2898,9 @@ class Attendance extends BaseController
                     case 'CKG':
                         $rekapKaryawan[$emp['id']]['cuti_keguguran']++;
                         break;
+                    case 'PG':
+                        $rekapKaryawan[$emp['id']]['potong_gaji']++;
+                        break;
                 }
             }
 
@@ -2885,7 +2919,7 @@ class Attendance extends BaseController
         $row++;
 
         // Header rekap
-        $rekapHeaders = ['No', 'Nip', 'Nama', 'Hadir', 'Alpa', 'Libur', 'Cuti Tahunan', 'Cuti Haid', 'Cuti Hamil', 'Cuti Melahirkan', 'Ijin', 'Sakit', 'RL', 'Dinas', 'Cuti Keguguran'];
+        $rekapHeaders = ['No', 'Nip', 'Nama', 'Hadir', 'Alpa', 'Libur', 'Cuti Tahunan', 'Cuti Haid', 'Cuti Hamil', 'Cuti Melahirkan', 'Ijin', 'Sakit', 'RL', 'Dinas', 'Cuti Keguguran', 'Potong Gaji'];
         $col = 'A';
         foreach ($rekapHeaders as $h) {
             $sheet->setCellValue("{$col}{$row}", $h);
@@ -2916,15 +2950,16 @@ class Attendance extends BaseController
             $sheet->setCellValue("M{$row}", $r['rl']);
             $sheet->setCellValue("N{$row}", $r['dinas']);
             $sheet->setCellValue("O{$row}", $r['cuti_keguguran']);
+            $sheet->setCellValue("P{$row}", $r['potong_gaji']);
 
-            $sheet->getStyle("A{$row}:O{$row}")->applyFromArray([
+            $sheet->getStyle("A{$row}:P{$row}")->applyFromArray([
                 'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
             ]);
             $row++;
         }
 
         // auto size kolom
-        foreach (range('A', 'O') as $col) {
+        foreach (range('A', 'P') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 

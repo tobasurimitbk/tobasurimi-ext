@@ -2792,6 +2792,7 @@ class LaporanSupplierLokalBB extends BaseController
         $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
 
+        // === HEADER 1 ===
         $headers = [
             'NO',
             'BARANG',
@@ -2799,31 +2800,96 @@ class LaporanSupplierLokalBB extends BaseController
             'DEPARTEMEN',
             'QTY',
             'SATUAN',
-            'DPP HARIAN',
-            'PPh HARIAN',
-            'TOTAL HARIAN',
-            'DPP TAMBAHAN HARIAN',
-            'PPh TAMBAHAN HARIAN',
-            'TOTAL TAMBAHAN HARIAN',
-            'DPP TAMBAHAN BULANAN',
-            'PPh TAMBAHAN BULANAN',
-            'TOTAL TAMBAHAN BULANAN',
-            'DPP TAMBAHAN LANGSUNG',
-            'PPh TAMBAHAN LANGSUNG',
-            'TOTAL TAMBAHAN LANGSUNG',
+            'HARIAN',
+            '',
+            '',
+            'TAMBAHAN HARIAN',
+            '',
+            '',
+            'TAMBAHAN BULANAN',
+            '',
+            '',
+            'TAMBAHAN LANGSUNG',
+            '',
+            '',
             'TOTAL'
         ];
 
+        // === HEADER 2 ===
+        $headers2 = [
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            'DPP',
+            'PPh',
+            'TOTAL',
+            'DPP',
+            'PPh',
+            'TOTAL',
+            'DPP',
+            'PPh',
+            'TOTAL',
+            'DPP',
+            'PPh',
+            'TOTAL',
+            'TOTAL'
+        ];
+
+        // Baris header
+        $headerRow1 = 3;
+        $headerRow2 = 4;
+
+        // Tulis baris pertama
         $col = 'A';
         foreach ($headers as $header) {
-            $sheet->setCellValue($col . '3', $header);
-            $sheet->getStyle($col . '3')->getFont()->setBold(true);
-            $sheet->getStyle($col . '3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->setCellValue($col . $headerRow1, $header);
+            $sheet->getStyle($col . $headerRow1)->getFont()->setBold(true);
+            $sheet->getStyle($col . $headerRow1)->getAlignment()
+                ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+                ->setVertical(Alignment::VERTICAL_CENTER);
+            $col++;
+        }
+
+        // Tulis baris kedua
+        $col = 'A';
+        foreach ($headers2 as $header2) {
+            $sheet->setCellValue($col . $headerRow2, $header2);
+            $sheet->getStyle($col . $headerRow2)->getFont()->setBold(true);
+            $sheet->getStyle($col . $headerRow2)->getAlignment()
+                ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+                ->setVertical(Alignment::VERTICAL_CENTER);
             $sheet->getColumnDimension($col)->setAutoSize(true);
             $col++;
         }
 
-        $rowNum = 4;
+        // === MERGE SESUAI KEINGINAN ===
+
+        // Merge kolom vertikal (NO–SATUAN & TOTAL)
+        $mergeVert = ['A', 'B', 'C', 'D', 'E', 'F', 'S'];
+        foreach ($mergeVert as $col) {
+            $sheet->mergeCells("{$col}{$headerRow1}:{$col}{$headerRow2}");
+        }
+
+        // Merge grup horizontal (kategori utama)
+        $sheet->mergeCells("G{$headerRow1}:I{$headerRow1}"); // HARIAN
+        $sheet->mergeCells("J{$headerRow1}:L{$headerRow1}"); // TAMBAHAN HARIAN
+        $sheet->mergeCells("M{$headerRow1}:O{$headerRow1}"); // TAMBAHAN BULANAN
+        $sheet->mergeCells("P{$headerRow1}:R{$headerRow1}"); // TAMBAHAN LANGSUNG
+
+        // Border dan alignment global
+        $sheet->getStyle("A{$headerRow1}:S{$headerRow2}")
+            ->getBorders()->getAllBorders()
+            ->setBorderStyle(Border::BORDER_THIN);
+
+        $sheet->getStyle("A{$headerRow1}:S{$headerRow2}")
+            ->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+            ->setVertical(Alignment::VERTICAL_CENTER);
+
+        $rowNum = $headerRow2 + 1; // baris awal data
         $no = 1;
 
         foreach ($groupedData as $barangName => $subGroups) {

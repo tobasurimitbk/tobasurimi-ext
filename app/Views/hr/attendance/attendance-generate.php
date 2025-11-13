@@ -782,7 +782,7 @@
                 className: "text-left",
                 sortable: false,
             }, {
-                data: "total_ijin",
+                data: "total_pg",
                 className: "text-left",
                 sortable: false,
             }, {
@@ -810,10 +810,16 @@
                 sortable: false,
             },
             {
+                data: "total_ijin",
+                className: "text-left",
+                sortable: false,
+            },
+            {
                 data: "total_libur",
                 className: "text-left",
                 sortable: false,
             },
+
 
         ],
     });
@@ -895,7 +901,11 @@
                             }
 
                             if (colClass.includes('bg-ijin')) {
-                                return renderCell(data, '#17a2b8');
+                                return renderCell(data, '#616030');
+                            }
+
+                            if (colClass.includes('bg-pg')) {
+                                return renderCell(data, '#17a2b8;');
                             }
 
                             if (colClass.includes('bg-sakit')) {

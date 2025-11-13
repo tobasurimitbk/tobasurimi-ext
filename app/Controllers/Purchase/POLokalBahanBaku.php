@@ -18,6 +18,7 @@ use App\Models\SatuansModel;
 use App\Models\MetadataModel;
 use App\Models\PenerimaanBarangDetailModel;
 use App\Models\PenerimaanBarangModel;
+use App\Models\RmPurchaseOrderDetailTambahanModel;
 use App\Models\SppDetailModel;
 use App\Models\SppModel;
 use App\Models\SupplierHargaModel;
@@ -52,6 +53,7 @@ class POLokalBahanBaku extends BaseController
     protected $accountBarangModel;
     protected $supplierHargaModel;
     protected $amPurchaseOrderDetailModel;
+    protected $rmPurchaseOrderDetailTambahanModel;
 
     protected $this_user_id;
     protected $is_admin;
@@ -86,6 +88,7 @@ class POLokalBahanBaku extends BaseController
         $this->kemasanModel = new KemasanModel();
         $this->accountBarangModel = new AccountBarangModel();
         $this->supplierHargaModel = new SupplierHargaModel();
+        $this->rmPurchaseOrderDetailTambahanModel = new RmPurchaseOrderDetailTambahanModel();
     }
 
     public function poLokalBahanBaku()
@@ -134,6 +137,7 @@ class POLokalBahanBaku extends BaseController
         $dataDivisi =  $this->divisiModel->getDivisiAccess();
         $dataKemasan = $this->kemasanModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', 'asc')->findAll();
         $dataSatuan = $this->SatuansModel->where('deletedAt', null)->findAll();
+        $dataPurchaseOrderDetailTambahan = $this->rmPurchaseOrderDetailTambahanModel->where('rm_purchase_order_id', $id)->where('deletedAt', null)->findAll();
 
         foreach (array_keys($dataSupplier) as $key) {
             $dataSupplier[$key] = (object)$dataSupplier[$key];
@@ -147,6 +151,7 @@ class POLokalBahanBaku extends BaseController
             "dataDivisi"    => $dataDivisi,
             "dataKemasan"   => $dataKemasan,
             "dataSatuan"    => $dataSatuan,
+            "dataPurchaseOrderDetailTambahan" => $dataPurchaseOrderDetailTambahan
         ];
 
 
@@ -312,6 +317,10 @@ class POLokalBahanBaku extends BaseController
 
     public function savePOLokalBahanBaku()
     {
+        // return response()->setJSON([
+        //     'list_tambahan_langsung' => json_decode($_POST['list_tambahan_langsung'])
+        // ]);
+
         $db = \Config\Database::connect();
         $db->transBegin();
 
@@ -424,6 +433,18 @@ class POLokalBahanBaku extends BaseController
                 'nilai_total_tambahan' => $totalFinal['nilai_total_tambahan'],
                 'nilai_total_qty' => $totalFinal['nilai_total_qty']
             ]);
+
+
+            // tambahan langsung detail
+            if ($this->request->getVar("subsidi_langsung") != 0 && !empty($this->request->getVar("subsidi_langsung"))) {
+                foreach (json_decode($_POST['list_tambahan_langsung']) as $l) {
+                    $this->rmPurchaseOrderDetailTambahanModel->insert([
+                        'rm_purchase_order_id' => $id,
+                        'nilai_tambahan_langsung' => $l->nilai_tambahan_langsung,
+                        'keterangan_tambahan_langsung' => $l->keterangan_tambahan_langsung
+                    ]);
+                }
+            }
 
             $db->transCommit();
 
@@ -590,6 +611,18 @@ class POLokalBahanBaku extends BaseController
                 'nilai_total_tambahan' => $totalFinal['nilai_total_tambahan'],
                 'nilai_total_qty' => $totalFinal['nilai_total_qty']
             ]);
+
+            // tambahan langsung detail
+            $this->rmPurchaseOrderDetailTambahanModel->where('rm_purchase_order_id', $id)->delete();
+            if ($this->request->getVar("subsidi_langsung") != 0 && !empty($this->request->getVar("subsidi_langsung"))) {
+                foreach (json_decode($_POST['list_tambahan_langsung']) as $l) {
+                    $this->rmPurchaseOrderDetailTambahanModel->insert([
+                        'rm_purchase_order_id' => $id,
+                        'nilai_tambahan_langsung' => $l->nilai_tambahan_langsung,
+                        'keterangan_tambahan_langsung' => $l->keterangan_tambahan_langsung
+                    ]);
+                }
+            }
 
             $db->transCommit();
             return response()->setJSON([
@@ -871,6 +904,7 @@ class POLokalBahanBaku extends BaseController
                 $lpb = $lpbDetail;
                 $lpbDetail = $dataPenerimaanBarangDetail;
             }
+            $dataPurchaseOrderDetailTambahan = $this->rmPurchaseOrderDetailTambahanModel->where('rm_purchase_order_id', $id)->where('deletedAt', null)->findAll();
 
 
             $data = [
@@ -879,7 +913,8 @@ class POLokalBahanBaku extends BaseController
                 'dataBarang' => $dataBarang,
                 'totalQty' => $totalQty,
                 'lpb' => $lpb,
-                'lpbDetail' => $lpbDetail
+                'lpbDetail' => $lpbDetail,
+                'dataPurchaseOrderDetailTambahan' => $dataPurchaseOrderDetailTambahan
             ];
 
             $this->dompdf->loadHtml(view('Purchase/poLokalBahanBaku/print', $data));
