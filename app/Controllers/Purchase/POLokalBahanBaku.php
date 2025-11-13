@@ -436,12 +436,14 @@ class POLokalBahanBaku extends BaseController
 
 
             // tambahan langsung detail
-            foreach (json_decode($_POST['list_tambahan_langsung']) as $l) {
-                $this->rmPurchaseOrderDetailTambahanModel->insert([
-                    'rm_purchase_order_id' => $id,
-                    'nilai_tambahan_langsung' => $l->nilai_tambahan_langsung,
-                    'keterangan_tambahan_langsung' => $l->keterangan_tambahan_langsung
-                ]);
+            if ($this->request->getVar("subsidi_langsung") != 0 && !empty($this->request->getVar("subsidi_langsung"))) {
+                foreach (json_decode($_POST['list_tambahan_langsung']) as $l) {
+                    $this->rmPurchaseOrderDetailTambahanModel->insert([
+                        'rm_purchase_order_id' => $id,
+                        'nilai_tambahan_langsung' => $l->nilai_tambahan_langsung,
+                        'keterangan_tambahan_langsung' => $l->keterangan_tambahan_langsung
+                    ]);
+                }
             }
 
             $db->transCommit();
@@ -612,12 +614,14 @@ class POLokalBahanBaku extends BaseController
 
             // tambahan langsung detail
             $this->rmPurchaseOrderDetailTambahanModel->where('rm_purchase_order_id', $id)->delete();
-            foreach (json_decode($_POST['list_tambahan_langsung']) as $l) {
-                $this->rmPurchaseOrderDetailTambahanModel->insert([
-                    'rm_purchase_order_id' => $id,
-                    'nilai_tambahan_langsung' => $l->nilai_tambahan_langsung,
-                    'keterangan_tambahan_langsung' => $l->keterangan_tambahan_langsung
-                ]);
+            if ($this->request->getVar("subsidi_langsung") != 0 && !empty($this->request->getVar("subsidi_langsung"))) {
+                foreach (json_decode($_POST['list_tambahan_langsung']) as $l) {
+                    $this->rmPurchaseOrderDetailTambahanModel->insert([
+                        'rm_purchase_order_id' => $id,
+                        'nilai_tambahan_langsung' => $l->nilai_tambahan_langsung,
+                        'keterangan_tambahan_langsung' => $l->keterangan_tambahan_langsung
+                    ]);
+                }
             }
 
             $db->transCommit();
@@ -900,6 +904,7 @@ class POLokalBahanBaku extends BaseController
                 $lpb = $lpbDetail;
                 $lpbDetail = $dataPenerimaanBarangDetail;
             }
+            $dataPurchaseOrderDetailTambahan = $this->rmPurchaseOrderDetailTambahanModel->where('rm_purchase_order_id', $id)->where('deletedAt', null)->findAll();
 
 
             $data = [
@@ -908,7 +913,8 @@ class POLokalBahanBaku extends BaseController
                 'dataBarang' => $dataBarang,
                 'totalQty' => $totalQty,
                 'lpb' => $lpb,
-                'lpbDetail' => $lpbDetail
+                'lpbDetail' => $lpbDetail,
+                'dataPurchaseOrderDetailTambahan' => $dataPurchaseOrderDetailTambahan
             ];
 
             $this->dompdf->loadHtml(view('Purchase/poLokalBahanBaku/print', $data));
