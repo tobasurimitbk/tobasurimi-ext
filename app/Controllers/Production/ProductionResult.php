@@ -416,6 +416,15 @@ class ProductionResult extends BaseController
         try {
             $workOrderIds = $this->request->getVar("kode_produksi");
 
+            if (json_encode($this->request->getPost("kode_request")) == "null") {
+                $data = [
+                    "status"    => false,
+                    "message"   => "Material Request belum dipilih",
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
+
             $datas = [
                 "company_id" => $this->this_company_id,
                 "pr_no" => $this->request->getVar("res_no") == "AUTO GENERATE" ? $this->generatePRNo() : $this->request->getVar("res_no"),
@@ -498,38 +507,38 @@ class ProductionResult extends BaseController
                 ];
                 $this->productionResultDetailModel->insert($datasbd);
 
-                if (!$barangFilling && $qty2 != 0) {
-                    $datasbr = [
-                        "production_result_id" => $productionResID,
-                        "material_request_detail_id" => $bd->material_request_detail_id,
-                        "material_request_id" => $bd->material_request_id,
-                        "barang1_id" => $bd->barang1_id,
-                        "barang2_id" => $bd->barang2_id,
-                        "warehouse_id" => $bd->warehouse_id,
-                        "divisi_id" => $bd->divisi_id,
-                        "bc_id" => $bd->bc_id ?? 0,
-                        "stock_dokumen" => $bd->stock_dokumen,
-                        "stock_date" => $bd->stock_date,
-                        "stock_id" => $bd->stock_id ?? 0,
-                        "stock_detail_id" => $bd->stock_detail_id ?? 0,
-                        "no_aju" => $bd->no_aju == "-" ? "-" : $bd->no_aju,
-                        "barang_type" => $bd->type_barang,
-                        "type" => "RETURN",
-                        "no_ref" => $bd->ref_no,
-                        "qty" => $qtySisa,
-                        "kondisi_barang" => "ditapak",
-                        "harga_umum" => (float) isset($bd->harga_umum) ? $bd->harga_umum :  0,
-                        "harga_harian" => (float) isset($bd->harga_harian) ? $bd->harga_harian : 0,
-                        "harga_bulanan" => (float) isset($bd->harga_bulanan) ? $bd->harga_bulanan : 0,
-                    ];
-                    $this->productionResultDetailModel->insert($datasbr);
-                    $this->accountBarangModel->insertAccountBarang(
-                        $this->this_company_id,
-                        $bd->divisi_id,
-                        $bd->barang1_id,
-                        $bd->barang2_id
-                    );
-                }
+                // if (!$barangFilling && $qty2 != 0) {
+                //     $datasbr = [
+                //         "production_result_id" => $productionResID,
+                //         "material_request_detail_id" => $bd->material_request_detail_id,
+                //         "material_request_id" => $bd->material_request_id,
+                //         "barang1_id" => $bd->barang1_id,
+                //         "barang2_id" => $bd->barang2_id,
+                //         "warehouse_id" => $bd->warehouse_id,
+                //         "divisi_id" => $bd->divisi_id,
+                //         "bc_id" => $bd->bc_id ?? 0,
+                //         "stock_dokumen" => $bd->stock_dokumen,
+                //         "stock_date" => $bd->stock_date,
+                //         "stock_id" => $bd->stock_id ?? 0,
+                //         "stock_detail_id" => $bd->stock_detail_id ?? 0,
+                //         "no_aju" => $bd->no_aju == "-" ? "-" : $bd->no_aju,
+                //         "barang_type" => $bd->type_barang,
+                //         "type" => "RETURN",
+                //         "no_ref" => $bd->ref_no,
+                //         "qty" => $qtySisa,
+                //         "kondisi_barang" => "ditapak",
+                //         "harga_umum" => (float) isset($bd->harga_umum) ? $bd->harga_umum :  0,
+                //         "harga_harian" => (float) isset($bd->harga_harian) ? $bd->harga_harian : 0,
+                //         "harga_bulanan" => (float) isset($bd->harga_bulanan) ? $bd->harga_bulanan : 0,
+                //     ];
+                //     $this->productionResultDetailModel->insert($datasbr);
+                //     $this->accountBarangModel->insertAccountBarang(
+                //         $this->this_company_id,
+                //         $bd->divisi_id,
+                //         $bd->barang1_id,
+                //         $bd->barang2_id
+                //     );
+                // }
             }
 
             foreach ($barangDigunakanPenolong as $bdp) {
@@ -601,22 +610,19 @@ class ProductionResult extends BaseController
             foreach ($barangFilling as $bf) {
                 $datasbf = [
                     "production_result_id" => $productionResID,
-                    "material_request_detail_id" => $bf->material_request_detail_id,
-                    "material_request_id" => $bf->material_request_id,
-                    "barang1_id" => $bf->barang1_id,
-                    "barang2_id" => $bf->barang2_id,
+                    "barang1_id" => decrypt($bf->barang1_id),
+                    "barang2_id" => decrypt($bf->barang2_id),
                     "warehouse_id" => $bf->warehouse_id,
                     "divisi_id" => $bf->divisi_id,
-                    "bc_id" => $bf->bc_id ?? 0,
-                    "stock_id" => $bf->stock_id,
-                    "stock_date" => $bf->stock_date,
-                    "stock_dokumen" => $bf->stock_dokumen,
-                    "no_aju" => $bf->no_aju,
-                    "barang_type" => $bf->type_barang,
+                    "bc_id" => 0,
+                    "stock_dokumen" => $productionResData['pr_no'],
+                    "stock_id" => 0,
+                    "stock_detail_id" => 0,
+                    "no_aju" => "-",
+                    "barang_type" => "bahan_setengah_jadi",
                     "type" => "RETURN",
-                    "no_ref" => $bf->ref_no,
+                    "no_ref" => "NON PABEAN",
                     "qty" => (float) $bf->qty,
-                    "kondisi_barang" => $bf->kondisi_barang,
                     "harga_umum" => (float) isset($bf->harga_umum) ? $bf->harga_umum :  0,
                     "harga_harian" => (float) isset($bf->harga_harian) ? $bf->harga_harian : 0,
                     "harga_bulanan" => (float) isset($bf->harga_bulanan) ? $bf->harga_bulanan : 0,
@@ -626,8 +632,8 @@ class ProductionResult extends BaseController
                 $this->accountBarangModel->insertAccountBarang(
                     $this->this_company_id,
                     $bf->divisi_id,
-                    $bf->barang1_id,
-                    $bf->barang2_id
+                    decrypt($bf->barang1_id),
+                    decrypt($bf->barang2_id)
                 );
             }
 
@@ -1051,47 +1057,48 @@ class ProductionResult extends BaseController
                         echo json_encode($data);
                         return;
                     } else {
-                        if ($value['type'] == 'RETURN') {
-                            $materialRequest = $this->materialRequestDetailModel
-                                ->where('material_request_id', $value['material_request_id'])
-                                ->where('id', $value['material_request_detail_id'])
-                                ->findAll();
-                            foreach ($materialRequest as $materialRequestData) {
-                                if ($value['kondisi_barang'] == "ditapak") {
-                                    $datas = [
-                                        'qty_now' => $value['qty'],
-                                        'kondisi_barang' => $value['kondisi_barang'],
-                                    ];
-                                    $this->materialRequestDetailModel->update($materialRequestData['id'], $datas);
-                                } else {
-                                    $dataMaterialDetail = [
-                                        'material_request_id' => $materialRequestData['material_request_id'],
-                                        'divisi_id' => $materialRequestData['divisi_id'],
-                                        'warehouse_id' => $materialRequestData['warehouse_id'],
-                                        'divisi_tujuan_id' => $materialRequestData['divisi_tujuan_id'],
-                                        'warehouse_tujuan_id' => $materialRequestData['warehouse_tujuan_id'],
-                                        'stock_tujuan_id' => $materialRequestData['stock_tujuan_id'],
-                                        'barang1_id' => $materialRequestData['barang1_id'],
-                                        'barang2_id' => $materialRequestData['barang2_id'],
-                                        'nama_barang' => $materialRequestData['nama_barang'],
-                                        'satuan' => $materialRequestData['satuan'],
-                                        'stock_id' => $materialRequestData['stock_id'],
-                                        'bc_id' => $materialRequestData['bc_id'],
-                                        'no_aju' => $materialRequestData['no_aju'],
-                                        'ref_no' => $materialRequestData['ref_no'],
-                                        'stock_date' => $materialRequestData['stock_date'],
-                                        'stock_dokumen' => $materialRequestData['stock_dokumen'],
-                                        'barang_type' => $materialRequestData['barang_type'],
-                                        'qty' => $materialRequestData['qty'],
-                                        'qty2' => $materialRequestData['qty2'],
-                                        'qty_isi' => $materialRequestData['qty_isi'],
-                                        'qty_now' => $value['qty'],
-                                        'kondisi_barang' => $value['kondisi_barang'],
-                                    ];
-                                    $this->materialRequestDetailModel->insert($dataMaterialDetail);
-                                }
-                            }
-                        } else if ($value['type'] == 'DIGUNAKAN') {
+                        // if ($value['type'] == 'RETURN') {
+                        //     $materialRequest = $this->materialRequestDetailModel
+                        //         ->where('material_request_id', $value['material_request_id'])
+                        //         ->where('id', $value['material_request_detail_id'])
+                        //         ->findAll();
+                        //     foreach ($materialRequest as $materialRequestData) {
+                        //         if ($value['kondisi_barang'] == "ditapak") {
+                        //             $datas = [
+                        //                 'qty_now' => $value['qty'],
+                        //                 'kondisi_barang' => $value['kondisi_barang'],
+                        //             ];
+                        //             $this->materialRequestDetailModel->update($materialRequestData['id'], $datas);
+                        //         } else {
+                        //             $dataMaterialDetail = [
+                        //                 'material_request_id' => $materialRequestData['material_request_id'],
+                        //                 'divisi_id' => $materialRequestData['divisi_id'],
+                        //                 'warehouse_id' => $materialRequestData['warehouse_id'],
+                        //                 'divisi_tujuan_id' => $materialRequestData['divisi_tujuan_id'],
+                        //                 'warehouse_tujuan_id' => $materialRequestData['warehouse_tujuan_id'],
+                        //                 'stock_tujuan_id' => $materialRequestData['stock_tujuan_id'],
+                        //                 'barang1_id' => $materialRequestData['barang1_id'],
+                        //                 'barang2_id' => $materialRequestData['barang2_id'],
+                        //                 'nama_barang' => $materialRequestData['nama_barang'],
+                        //                 'satuan' => $materialRequestData['satuan'],
+                        //                 'stock_id' => $materialRequestData['stock_id'],
+                        //                 'bc_id' => $materialRequestData['bc_id'],
+                        //                 'no_aju' => $materialRequestData['no_aju'],
+                        //                 'ref_no' => $materialRequestData['ref_no'],
+                        //                 'stock_date' => $materialRequestData['stock_date'],
+                        //                 'stock_dokumen' => $materialRequestData['stock_dokumen'],
+                        //                 'barang_type' => $materialRequestData['barang_type'],
+                        //                 'qty' => $materialRequestData['qty'],
+                        //                 'qty2' => $materialRequestData['qty2'],
+                        //                 'qty_isi' => $materialRequestData['qty_isi'],
+                        //                 'qty_now' => $value['qty'],
+                        //                 'kondisi_barang' => $value['kondisi_barang'],
+                        //             ];
+                        //             $this->materialRequestDetailModel->insert($dataMaterialDetail);
+                        //         }
+                        //     }
+                        // } else 
+                        if ($value['type'] == 'DIGUNAKAN') {
                             $materialRequest = $this->materialRequestDetailModel
                                 ->where('material_request_id', $value['material_request_id'])
                                 ->where('id', $value['material_request_detail_id'])
@@ -1108,7 +1115,7 @@ class ProductionResult extends BaseController
                                 }
                             }
                         }
-                        if ($value['type'] == 'JADI') {
+                        if ($value['type'] == 'JADI' || $value['type'] == 'RETURN' || $value['type'] == 'SCRAP') {
                             if ($value['stock_detail_id'] == '0') {
                                 $dataSpek = $this->barangMasterSpesifikasiModel->find($value["barang2_id"]);
                                 $dataIn = [
