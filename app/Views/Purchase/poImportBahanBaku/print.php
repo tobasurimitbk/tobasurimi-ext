@@ -229,7 +229,7 @@
     </table>
     <hr style="margin-top: -1px;">
 
-    <div class="content" style="margin-top: -15px;">
+    <div class="content" style="margin-top: -15px; font-size:12px;">
         <h2 style="text-align: center;">
             PURCHASE ORDER
         </h2>
