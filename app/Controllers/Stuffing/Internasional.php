@@ -262,24 +262,15 @@ class Internasional extends BaseController
         // get all id detail
         $id_detail_all = [];
         foreach ($barang as $b) {
-
-            $checkStock = $this->stockModel->where('id', $b->stock_id)->first();
             $this->stuffingInternasionalDetailModel->insert([
                 'divisi_id' => $b->divisi_id,
                 'warehouse_id' => $b->warehouse_id,
                 'stuffing_internasional_id' => $id,
                 'stock_id_warehouse' => $b->stock_id,
-                'stock_dokumen' => $b->stock_dokumen,
-                'no_dokumen_1' => $b->no_dokumen_1,
-                'no_dokumen_2' => $b->no_dokumen_2,
-                'bc_id_warehouse' => $b->bc_id,
-                'no_aju_warehouse' => $b->no_aju,
-                'barang1_id_warehouse' => $checkStock['barang1_id'],
-                'barang2_id_warehouse' => $checkStock['barang2_id'],
+                'stock_detail_id' => $b->id,
                 'barang_id_order' => $b->output->id_barang,
                 'qty' => $b->qty,
-                'stok_total' => $b->stok_total,
-
+                'stok_total' => $b->stok_total
             ]);
         }
 
