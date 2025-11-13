@@ -204,7 +204,7 @@
                                 <td style="width: 150px;"><?= $dataSO->sales_order_export_no ?></td>
                             </tr> -->
                             <tr style="text-align: right;">
-                                <td style="width: 140px;">ORDER</td>
+                                <td style="width: 210px;">ORDER</td>
                                 <td>:</td>
                                 <td><?= $dataSO->sales_order_export_no ?></td>
                             </tr>
@@ -336,7 +336,7 @@
                                     $columns_to_show = [];
                                     $all_columns = [
                                         'size' => ['label' => 'SIZE', 'width' => '8%'],
-                                        'grade' => ['label' => 'GRADE', 'width' => '8%'],
+                                        'grade' => ['label' => 'GRADE', 'width' => '10%'],
                                         'packing' => ['label' => 'PACKING', 'width' => '8%'],
                                         'can' => ['label' => 'QTY (CAN)', 'width' => '7%'],
                                         'cased' => ['label' => 'QTY (CASE)', 'width' => '7%'],
@@ -394,8 +394,8 @@
                                                     <?php endif; ?>
 
                                                     <th style=" border: 1px solid #ddd; width: 4.5%; text-align: center;">QTY (<?= $satuanQty ?>)</th>
-                                                    <th style=" border: 1px solid #ddd; width: 8%; text-align: center;" class="price">UNIT PRICE (<?= $dataSO->mata_uang . "/" . $satuanQty ?>)</th>
-                                                    <th style=" border: 1px solid #ddd; width: 8%; text-align: center;" class="price">TOTAL AMOUNT (<?= $dataSO->mata_uang ?>)</th>
+                                                    <th style=" border: 1px solid #ddd; width: 8%; text-align: center;" class="price">UNIT PRICE <br> (<?= $dataSO->mata_uang . "/" . $satuanQty ?>)</th>
+                                                    <th style=" border: 1px solid #ddd; width: 8%; text-align: center;" class="price">TOTAL AMOUNT <br> (<?= $dataSO->mata_uang ?>)</th>
                                                 </tr>
                                             </thead>
                                             <tbody>

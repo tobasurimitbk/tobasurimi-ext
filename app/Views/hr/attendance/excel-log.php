@@ -99,7 +99,7 @@ header("Content-Disposition: attachment; filename=LogAbsensi_" . $yearMonth . ".
                             </td>
                         <?php elseif ($perizinanCheck['status'] == "POTONG GAJI_PG") : ?>
                             <!-- Ada ijin -->
-                            <td style="background-color: #17a2b8; color:white;">
+                            <td style="background-color: #17a2b8;; color:white;">
                                 <b><?= $statusKode ?></b>
                             </td>
                         <?php elseif ($perizinanCheck['status'] == "SAKIT_S") : ?>
@@ -112,7 +112,13 @@ header("Content-Disposition: attachment; filename=LogAbsensi_" . $yearMonth . ".
                             <td style="background-color: #ff7b00; color:white;">
                                 <b><?= $statusKode ?></b>
                             </td>
+                        <?php elseif ($perizinanCheck['status'] == "IJIN_I") : ?>
+                            <!-- Ada Ijin -->
+                            <td style="background-color: #616030; color:white;">
+                                <b><?= $statusKode ?></b>
+                            </td>
                         <?php endif ?>
+
                     <?php else : ?>
                         <?php if ($check == 1) : ?>
                             <?php $hadir++; ?>

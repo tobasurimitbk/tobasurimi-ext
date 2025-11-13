@@ -25,6 +25,7 @@ class PayrollsModel extends Model
         'cuti_hamil',
         'cuti_melahirkan',
         'izin',
+        'pg',
         'sakit',
         'rl',
         'hadir',

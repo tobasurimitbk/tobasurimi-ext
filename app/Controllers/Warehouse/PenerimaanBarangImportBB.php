@@ -599,7 +599,7 @@ class PenerimaanBarangImportBB extends BaseController
 
             $data = [
                 'dataPenerimaanBarang' => $this->penerimaanBarangModel->getById($id),
-                'dataPenerimaanBarangDetail' => $this->penerimaanBarangDetailModel->getPenerimaanBarangImportBakuDetail($id)
+                'dataPenerimaanBarangDetail' => $this->penerimaanBarangDetailModel->getPenerimaanBarangImportBakuDetailPrint($id)
             ];
             $this->dompdf->loadHtml(view('Warehouse/penerimaanBarangImport/bahanBaku/print', $data));
             $this->dompdf->setPaper('A4', 'portrait');

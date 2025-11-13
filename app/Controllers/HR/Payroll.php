@@ -198,7 +198,8 @@ class Payroll extends BaseController
                     "cuti_haid" => $status['CUTI HAID_CHD'],
                     "cuti_hamil" => $status['CUTI HAMIL_CHL'],
                     "cuti_melahirkan" => $status['CUTI MELAHIRKAN_CM'],
-                    "izin" => $status['POTONG GAJI_PG'],
+                    "pg" => $status['POTONG GAJI_PG'], // kolom ijin hasil pg
+                    'izin' => $status['IJIN_I'], // kolom pg itu hasil ijin
                     "sakit" => $status['SAKIT_S'],
                     "rl" => $status['RL_RL'],
                     "hadir" => $status['HADIR_H'],
@@ -328,7 +329,8 @@ class Payroll extends BaseController
             "cuti_haid" => $status['CUTI HAID_CHD'],
             "cuti_hamil" => $status['CUTI HAMIL_CHL'],
             "cuti_melahirkan" => $status['CUTI MELAHIRKAN_CM'],
-            "izin" => $status['POTONG GAJI_PG'],
+            "pg" => $status['POTONG GAJI_PG'],
+            'izin' => $status['IJIN_I'],
             "sakit" => $status['SAKIT_S'],
             "rl" => $status['RL_RL'],
             "hadir" => $status['HADIR_H'],
@@ -462,11 +464,11 @@ class Payroll extends BaseController
             // );
 
             // get karyawan masuk tapi ga di approved
-            $mapTotalMasukNotApprove = $this->attendanceModel->getTotalEmployeeHadirNotApproved(
-                $startDate,
-                $endDate,
-                $employeeIds,
-            );
+            // $mapTotalMasukNotApprove = $this->attendanceModel->getTotalEmployeeHadirNotApproved(
+            //     $startDate,
+            //     $endDate,
+            //     $employeeIds,
+            // );
 
             // Mapping divisi
             $divisiList = $this->employeeModel->getDivisiByEmployeeAmt($employeeIds);
@@ -498,7 +500,8 @@ class Payroll extends BaseController
                         'LIBUR_L'           => 0,
                         'ALPHA_A'           => 0,
                         'DINAS_D'           => 0,
-                        'CUTI KEGUGURAN_CKG' => 0
+                        'CUTI KEGUGURAN_CKG' => 0,
+                        'IJIN_I' => 0
                     ];
                 }
                 $mapStatusAttendance[$empId][$s['status']] = $s['total'];
@@ -507,10 +510,10 @@ class Payroll extends BaseController
             // Insert payroll batch awal
             $dataPayroll = [];
             foreach ($employeeIds as $e) {
-                if (isset($mapStatusAttendance[$e])) {
-                    //$mapStatusAttendance[$e]['HADIR_H'] = $mapStatusAttendance[$e]['HADIR_H'] - $mapTotalEmployeeMasukLibur[$e];
-                    $mapStatusAttendance[$e]['HADIR_H'] = $mapStatusAttendance[$e]['HADIR_H'] - $mapTotalMasukNotApprove[$e];
-                }
+                // if (isset($mapStatusAttendance[$e])) {
+                //     //$mapStatusAttendance[$e]['HADIR_H'] = $mapStatusAttendance[$e]['HADIR_H'] - $mapTotalEmployeeMasukLibur[$e];
+                //     $mapStatusAttendance[$e]['HADIR_H'] = $mapStatusAttendance[$e]['HADIR_H'] - $mapTotalMasukNotApprove[$e];
+                // }
 
                 $att = $mapStatusAttendance[$e] ?? [];
 
@@ -523,7 +526,8 @@ class Payroll extends BaseController
                     "cuti_haid"                    => $att["CUTI HAID_CHD"] ?? 0,
                     "cuti_hamil"                   => $att["CUTI HAMIL_CHL"] ?? 0,
                     "cuti_melahirkan"              => $att["CUTI MELAHIRKAN_CM"] ?? 0,
-                    "izin"                         => $att["POTONG GAJI_PG"] ?? 0,
+                    "pg"                           => $att["POTONG GAJI_PG"] ?? 0,
+                    "izin"                         => $att["IJIN_I"] ?? 0,
                     "sakit"                        => $att["SAKIT_S"] ?? 0,
                     "rl"                           => $att["RL_RL"] ?? 0,
                     "hadir"                        => $att["HADIR_H"] ?? 0,
@@ -801,11 +805,11 @@ class Payroll extends BaseController
             //     $employeeIds,
             // );
 
-            $mapTotalMasukNotApprove = $this->attendanceModel->getTotalEmployeeHadirNotApproved(
-                $startDate,
-                $endDate,
-                $employeeIds,
-            );
+            // $mapTotalMasukNotApprove = $this->attendanceModel->getTotalEmployeeHadirNotApproved(
+            //     $startDate,
+            //     $endDate,
+            //     $employeeIds,
+            // );
 
             // Mapping divisi
             $divisiList = $this->employeeModel->getDivisiByEmployeeAmt($employeeIds);
@@ -837,7 +841,8 @@ class Payroll extends BaseController
                         'LIBUR_L'           => 0,
                         'ALPHA_A'           => 0,
                         'DINAS_D'           => 0,
-                        'CUTI KEGUGURAN_CKG' => 0
+                        'CUTI KEGUGURAN_CKG' => 0,
+                        'IJIN_I' => 0
                     ];
                 }
                 $mapStatusAttendance[$empId][$s['status']] = $s['total'];
@@ -846,10 +851,10 @@ class Payroll extends BaseController
             // Insert payroll batch awal
             $dataPayroll = [];
             foreach ($employeeIds as $e) {
-                if (isset($mapStatusAttendance[$e])) {
-                    //$mapStatusAttendance[$e]['HADIR_H'] = $mapStatusAttendance[$e]['HADIR_H'] - $mapTotalEmployeeMasukLibur[$e];
-                    $mapStatusAttendance[$e]['HADIR_H'] = $mapStatusAttendance[$e]['HADIR_H'] - $mapTotalMasukNotApprove[$e];
-                }
+                // if (isset($mapStatusAttendance[$e])) {
+                //     //$mapStatusAttendance[$e]['HADIR_H'] = $mapStatusAttendance[$e]['HADIR_H'] - $mapTotalEmployeeMasukLibur[$e];
+                //     $mapStatusAttendance[$e]['HADIR_H'] = $mapStatusAttendance[$e]['HADIR_H'] - $mapTotalMasukNotApprove[$e];
+                // }
                 $att = $mapStatusAttendance[$e] ?? [];
 
                 $dataPayroll[] = [
@@ -861,7 +866,8 @@ class Payroll extends BaseController
                     "cuti_haid"                    => $att["CUTI HAID_CHD"] ?? 0,
                     "cuti_hamil"                   => $att["CUTI HAMIL_CHL"] ?? 0,
                     "cuti_melahirkan"              => $att["CUTI MELAHIRKAN_CM"] ?? 0,
-                    "izin"                         => $att["POTONG GAJI_PG"] ?? 0,
+                    "pg"                         => $att["POTONG GAJI_PG"] ?? 0,
+                    "izin"                           => $att["IJIN_I"] ?? 0,
                     "sakit"                        => $att["SAKIT_S"] ?? 0,
                     "rl"                           => $att["RL_RL"] ?? 0,
                     "hadir"                        => $att["HADIR_H"] ?? 0,
