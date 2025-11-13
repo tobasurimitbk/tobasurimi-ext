@@ -229,8 +229,8 @@
     </table>
     <hr style="margin-top: -1px;">
 
-    <div class="content" style="margin-top: -15px; font-size:12px;">
-        <h2 style="text-align: center;">
+    <div class="content" style="margin-top: -70px !important; font-size:12px;">
+        <h2 style="text-align: center; margin-top:10px;">
             PURCHASE ORDER
         </h2>
 
@@ -384,11 +384,11 @@
                     <?php endforeach; ?>
 
                     <?php if ($index === count($chunkedDetails) - 1): ?>
-                        <tr>
+                        <tr style="line-height: 7px !important;">
                             <td colspan="4" style="text-align: center;">DISCOUNT</td>
                             <td style="text-align: center;"><?= number_format(formatter(($dataPO->potongan_harga), "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                         </tr>
-                        <tr>
+                        <tr style="line-height: 7px !important;">
                             <td colspan="4" style="text-align: center;">TOTAL</td>
                             <td style="text-align: center;"><?= number_format(formatter(($dataPO->total), "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                         </tr>
@@ -416,12 +416,12 @@
             </tr>
         </table>
 
-        <table style="margin-top: 50px;">
+        <table style="margin-top: 30px;">
             <tr>
                 <td>
                     YOUR FAITHFULLY, <br>
                     <?= strtoupper($dataPO->shipper) ?> <br>
-                    <br><br><br><br>
+                    <br><br><br>
 
                     <b><u><?= $dataPO->direktur == "-" ? "" : strtoupper($dataPO->direktur); ?></u></b><br>
                     DIRECTOR
