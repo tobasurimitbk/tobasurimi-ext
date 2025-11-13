@@ -647,12 +647,25 @@
 
 
             <table class="cong-table item-table txt-right" style="border: 1px solid black;">
+                <?php if ($dataPO->subsidi_langsung != 0): ?>
+                    <tr>
+                        <th class="column-table-normal" style="height: 5%;" colspan="4">Keterangan</th>
+                        <th class="column-table-normal">Total Tambahan</th>
+                    </tr>
+                    <?php foreach ($dataPurchaseOrderDetailTambahan as $d): ?>
+                        <tr>
+                            <td style="height: 5%;font-size:14px;" colspan="4"><?= $d['keterangan_tambahan_langsung'] ?></td>
+                            <td style="height: 5%;font-size:14px;"><?= number_format($d['nilai_tambahan_langsung'], 2) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+
                 <tr>
                     <th class="column-table-normal" style="height: 5%;">QTY</th>
                     <th class="column-table-normal">CONG SEBENARNYA</th>
                     <th class="column-table-normal">CONG BATASAN</th>
                     <th class="column-table-normal">SELISIH</th>
-                    <th class="column-table-normal">TOTAL TAMBAHAN</th>
+                    <th class="column-table-normal"><?= $dataPO->subsidi_langsung == 0 ? "TOTAL TAMBAHAN" : "" ?></th>
                 </tr>
                 <tr>
                     <td style="height: 5%;font-size:14px;"><?= number_format($totalQty ?? 0, 2) ?></td>
