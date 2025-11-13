@@ -183,9 +183,16 @@
                         </div>
                     </div>
                     <div class="col md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" value="<?= !empty($dataPOLokal) ? $dataPOLokal->subsidi_langsung : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control subsidi_langsung" name="subsidi_langsung" id="subsidi_langsung" placeholder="Subsidi Langsung (Opsional)">
-                            <label for="floatingInput">Tambahan Langsung (Opsional)</label>
+                        <div class="input-group input-group-password">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input readonly autocomplete="one-time-code" value="<?= !empty($dataPOLokal) ? $dataPOLokal->subsidi_langsung : ""; ?>" <?= !empty($dataPOLokal) ? ($dataPOLokal->is_posted === "1" ? 'disabled=true' : '') : ''; ?> type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control subsidi_langsung" name="subsidi_langsung" id="subsidi_langsung" placeholder="Subsidi Langsung (Opsional)">
+                                <label for="floatingInput">Tambahan Langsung (Opsional)</label>
+                            </div>
+                            <div class="input-group-append" style="height:50px;">
+                                <button class="btn btn-primary" data-toggle="modal" type="button" id="btnAddTambahanLangsung">
+                                    <i class="fa-solid fa-circle-plus"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -443,6 +450,76 @@
     </div>
 </section>
 
+<div class="modal detail-modal" id="detailTambahanLangsungModal" tabindex="1">
+    <div class="modal-dialog" style="min-width: 700px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary">Detail Tambahan Langsung</h5>
+            </div>
+            <form class="detail-tambahan-langsung" role="form" method="POST">
+                <div class="modal-body">
+                    <input type="hidden" name="id_detail_tambahan_langsung" id="id_detail_tambahan_langsung">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="input-group">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control nilai_tambahan_langsung" id="nilai_tambahan_langsung" name="nilai_tambahan_langsung" placeholder="Nilai Tambahan Langsung">
+                                    <label for="floatingInput">Nilai Tambahan Langsung</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3">
+                                <textarea class="full-textarea form-control keterangan_tambahan_langsung" id="keterangan_tambahan_langsung" name="keterangan_tambahan_langsung" placeholder="Keterangan Tambahan Langsung"></textarea>
+                                <label for="floatingInput">Keterangan Tambahan Langsung</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-subtitle-modal">
+                        <div class="row">
+                            <div class="col-md-6">
+                            </div>
+                            <div class="col-md-6">
+                                <button class="btn btn-show-detail btn-add btn-block float-right" id="btnAddDetailTambahanLangsung" type="button" style="width: 90% !important;">
+                                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="table-responsive">
+                            <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="tambahanLangsungTable" width="100%" cellspacing="0">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th style="width: 10px;">No</th>
+                                        <th>Nilai Tambahan Langsung</th>
+                                        <th>Keterangan</th>
+                                        <th style="width: 100px; text-align:center;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="body-tambahan-langsung" id="body-tambahan-langsung">
+
+                                </tbody>
+                                <tfoot class="foot-tambahan-langsung" id="foot-tambahan-langsung">
+                                    <tr>
+                                        <td colspan="4">List Tambahan Kosong</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-discard mr-2" id="btnHideTambahanLangsung">Kembali</button>
+                    <button type="button" class="btn btn-submit-form" id="btnSubmitTambahanLangsung">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <?php if (!empty($dataPOLokal)) : ?>
     <?php if ($dataPOLokal->warehouse_id == 0) : ?>
         <script>
@@ -489,7 +566,18 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let list_items = [];
+    let list_tambahan_langsung = [];
     let total = 0;
+
+    <?php if (!empty($dataPOLokal)): ?>
+        <?php foreach ($dataPurchaseOrderDetailTambahan as $d): ?>
+            list_tambahan_langsung.push({
+                id: "<?= $d['id'] ?>",
+                nilai_tambahan_langsung: <?= $d['nilai_tambahan_langsung'] ?>,
+                keterangan_tambahan_langsung: "<?= $d['keterangan_tambahan_langsung'] ?>"
+            });
+        <?php endforeach; ?>
+    <?php endif; ?>
 
     var validator_detail = $(".detail-form").validate({
         rules: {
@@ -1040,6 +1128,7 @@
                                 data.append("items", JSON.stringify(list_items))
                                 data.append("barang_id", $('.barang_id').val());
                                 data.append("total", total);
+                                data.append("list_tambahan_langsung", JSON.stringify(list_tambahan_langsung));
 
                                 let id = $(".id").val();
 
@@ -1488,6 +1577,198 @@
         }
     });
 
+    // VALIDATOR TAMBAHAN LANGSUNG
+    var validatorBarang = $(".detail-tambahan-langsung").validate({
+        rules: {
+            nilai_tambahan_langsung: {
+                required: true
+            },
+            keterangan_tambahan_langsung: {
+                required: true
+            },
+        },
+        messages: {
+            nilai_tambahan_langsung: {
+                required: "nilai tambahan wajib diisi"
+            },
+            keterangan_tambahan_langsung: {
+                required: "keterangan wajib diisi"
+            },
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
+
+    $('#btnAddTambahanLangsung').click(function(e) {
+        e.preventDefault();
+        resetFormDetailTambahanLangsung();
+        drawTableListTambahanLangsung(list_tambahan_langsung);
+        $('#detailTambahanLangsungModal').modal('show');
+    });
+
+    $('#btnHideTambahanLangsung').click(function(e) {
+        e.preventDefault();
+        $('#detailTambahanLangsungModal').modal('hide');
+    });
+
+    $('#btnAddDetailTambahanLangsung').click(function(e) {
+        e.preventDefault();
+        if ($('.detail-tambahan-langsung').valid()) {
+            var id_detail_tambahan_langsung = $('#id_detail_tambahan_langsung').val();
+            var nilai_tambahan_langsung = destroyFormatRupiah($('#nilai_tambahan_langsung').val());
+            var keterangan_tambahan_langsung = $('#keterangan_tambahan_langsung').val();
+
+            if (id_detail_tambahan_langsung) {
+                var index_selected = null;
+                for (let i = 0; i < list_tambahan_langsung.length; i++) {
+                    if (list_tambahan_langsung[i].id == id_detail_tambahan_langsung) {
+                        index_selected = i;
+                    }
+                }
+
+                list_tambahan_langsung[index_selected].nilai_tambahan_langsung = nilai_tambahan_langsung;
+                list_tambahan_langsung[index_selected].keterangan_tambahan_langsung = keterangan_tambahan_langsung;
+
+                // $('#id_detail_tambahan_langsung').val(item.)
+                // $('#nilai_tambahan_langsung').val(item.nilai_tambahan_langsung);
+                // $('#keterangan_tambahan_langsung').val(item.keterangan_tambahan_langsung);
+
+            } else {
+                list_tambahan_langsung.push({
+                    id: getID(),
+                    nilai_tambahan_langsung: nilai_tambahan_langsung,
+                    keterangan_tambahan_langsung: keterangan_tambahan_langsung
+                });
+            }
+            resetFormDetailTambahanLangsung();
+            drawTableListTambahanLangsung(list_tambahan_langsung);
+        }
+    });
+
+    $('#btnSubmitTambahanLangsung').click(function(e) {
+        e.preventDefault();
+        var total_tambahan_langsung = 0;
+        for (let i = 0; i < list_tambahan_langsung.length; i++) {
+            total_tambahan_langsung += list_tambahan_langsung[i].nilai_tambahan_langsung;
+        }
+        if (total_tambahan_langsung == 0) {
+            $('#subsidi_langsung').val(null);
+        } else {
+            $('#subsidi_langsung').val(greatFormatRupiah(total_tambahan_langsung));
+        }
+        $('#detailTambahanLangsungModal').modal('hide');
+    });
+
+    function drawTableListTambahanLangsung(list_tambahan_langsung) {
+        $('.body-tambahan-langsung').empty();
+        $('.foot-tambahan-langsung').empty();
+        var row = '';
+        var no = 1;
+        const table = $('#tambahanLangsungTable');
+        if (list_tambahan_langsung.length === 0) {
+            row += `
+                    <tr>
+                        <td><b>TOTAL</b></td>
+                        <td><b>0.00</b></td>
+                        <td><b></b></td>
+                        <td><b></b></td>
+                    </tr>
+                `;
+            $('.foot-tambahan-langsung').append(row);
+        } else {
+            var nilaiTambahanLangsungTotal = 0;
+            var no = 1;
+            list_tambahan_langsung.map(item => {
+                var newRow = $('<tr style="color:whitesmoke;">');
+                newRow.append($('<td style="text-align:center;">').text(no++));
+                newRow.append($('<td>').text(greatFormatRupiah(item.nilai_tambahan_langsung)));
+                newRow.append($('<td>').text(item.keterangan_tambahan_langsung));
+                newRow.append($('<td>').html(
+                    <?php if (!empty($dataPOLokal)) : ?> <?php if ($dataPOLokal->is_posted) : ?> `-`
+                        <?php else : ?> `
+                        <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowTambahanLangsung('${item.id}')">
+                                <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                            </button><button type="button" class="btn btn-danger" onclick="deleteRowTambahanLangsung('${item.id}')">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                    `
+                        <?php endif; ?>
+
+                    <?php else : ?> `
+                        <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowTambahanLangsung('${item.id}')">
+                                <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                            </button><button type="button" class="btn btn-danger" onclick="deleteRowTambahanLangsung('${item.id}')">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                    `
+                    <?php endif; ?>
+                ));
+
+                nilaiTambahanLangsungTotal += destroyFormatRupiah(item.nilai_tambahan_langsung);
+                table.find('tbody').append(newRow);
+            });
+            $('#body-tambahan-langsung').append(row);
+            table.find('tfoot').empty();
+            var newRow = $('<tr>');
+            newRow.append($('<td><b>TOTAL</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(nilaiTambahanLangsungTotal) + '</b></td>'));
+            newRow.append($('<td><b></b></td>'));
+            newRow.append($('<td><b></b></td>'));
+            table.find('tfoot').append(newRow);
+        }
+    }
+
+    function deleteRowTambahanLangsung(id) {
+        var indexToRemove = -1;
+        for (var i = 0; i < list_tambahan_langsung.length; i++) {
+            if (list_tambahan_langsung[i].id == id) {
+                indexToRemove = i;
+                break;
+            }
+        }
+        if (indexToRemove !== -1) {
+            list_tambahan_langsung.splice(indexToRemove, 1);
+        }
+        drawTableListTambahanLangsung(list_tambahan_langsung);
+    }
+
+    function detailRowTambahanLangsung(id) {
+        var item = null;
+        for (var i = 0; i < list_tambahan_langsung.length; i++) {
+            if (list_tambahan_langsung[i].id == id) {
+                item = list_tambahan_langsung[i];
+                break;
+            }
+        }
+
+        $('#id_detail_tambahan_langsung').val(item.id);
+        $('#nilai_tambahan_langsung').val(greatFormatRupiah(item.nilai_tambahan_langsung));
+        $('#keterangan_tambahan_langsung').val(item.keterangan_tambahan_langsung);
+    }
+
+    function resetFormDetailTambahanLangsung() {
+        $('#id_detail_tambahan_langsung').val(null);
+        $('#nilai_tambahan_langsung').val(null);
+        $('#keterangan_tambahan_langsung').val(null);
+    }
 
     const resetDetailForm = function() {
         $(".id_detail").val('');
