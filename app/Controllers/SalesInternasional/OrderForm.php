@@ -183,10 +183,8 @@ class OrderForm extends BaseController
         $salesOrderNo = $this->request->getVar('sales_order_export_no');
 
         if ($salesOrderNo == "AUTO GENERATE") {
-            // JIKA AUTO GENERATE MAKA GENERATE NOMOR BARU
-            $salesOrderNo = $this->generateNomorSalesOrderInternasional(
-                $this->request->getVar('sales_contract_id')
-            );
+            $salesContract = $this->salesKontrakModel->where('id', $this->request->getVar('sales_contract_id'))->first();
+            $salesOrderNo = $salesContract['sales_contract_no'];
         }
 
         $db = \Config\Database::connect();
@@ -335,7 +333,7 @@ class OrderForm extends BaseController
         } catch (Exception $e) {
             $db->transRollback();
             return response()->setJSON([
-                'message' => "Internal server error " . $e->getMessage(),
+                'message' => "Internal server error " . $e->getMessage() . " ar line " . $e->getLine() . " in file " . $e->getFile(),
                 'status' => false
             ]);
         }
@@ -568,19 +566,19 @@ class OrderForm extends BaseController
 
         $salesOrderNo = $this->request->getVar('sales_order_export_no');
 
-        $checkNoSalesOrder = $this->salesOrderExportModel
-            ->where('sales_order_export_no', $salesOrderNo)
-            ->where('company_id', $this->this_company_id)
-            ->where('sales_order_export_id !=', $id)
-            ->first();
+        // $checkNoSalesOrder = $this->salesOrderExportModel
+        //     ->where('sales_order_export_no', $salesOrderNo)
+        //     ->where('company_id', $this->this_company_id)
+        //     ->where('sales_order_export_id !=', $id)
+        //     ->first();
 
-        if ($checkNoSalesOrder != null) {
-            // NO Sales Order Already Exists
-            return response()->setJSON([
-                'message' => "Sales order no already exists",
-                'status' => false
-            ]);
-        }
+        // if ($checkNoSalesOrder != null) {
+        //     // NO Sales Order Already Exists
+        //     return response()->setJSON([
+        //         'message' => "Sales order no already exists",
+        //         'status' => false
+        //     ]);
+        // }
 
         $db = \Config\Database::connect();
         $db->transBegin();
