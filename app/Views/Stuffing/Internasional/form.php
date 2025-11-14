@@ -1063,8 +1063,6 @@
             var salesOrderExportDetailId = $(this).data("id");
             $('button[data-sales_order_export_detail_id="' + salesOrderExportDetailId + '"]').prop('disabled', true);
         });
-
-
     });
 
     function insertListPabean() {

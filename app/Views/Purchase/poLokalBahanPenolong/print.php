@@ -4,18 +4,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PO Lokal Bahan Penolong</title>
+    <title><?= $dataPOLokal->po_no ?></title>
     <style>
         body {
             height: 100%;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             font-size: 12px;
+            font-family: 'Times New Roman', Times, serif;
+            text-transform: uppercase;
+            /* font-weight: normal; */
         }
 
         @page {
-            size: 8.27in 5.50in landscape;
+            /* size: 8.27in 5.50in landscape; */
+            size: 8.27in 6in landscape;
             margin: 25px;
+            /* Margin diperkecil */
             padding: 25px;
+            /* Padding diperkecil */
         }
 
         .header {
@@ -265,30 +270,30 @@
                     <td style="text-align: center;"></td>
                 </tr>
                 <tr style="border: 0px;">
-                    <td style="height: 30px; border: 0px; text-align:center; ">Pemesan Order :</td>
+                    <!-- <td style="height: 30px; border: 0px; text-align:center; ">Pemesan Order :</td> -->
                     <td style="border: 0px;text-align:center">Pembuat Order</td>
                     <td style="border: 0px;text-align:center">Diketahui oleh</td>
                     <td style="border: 0px;text-align:center">Diperiksa oleh</td>
                     <td style="border: 0px;text-align:center">Disetujui oleh</td>
                 </tr>
                 <tr>
-                    <th style="font-weight: normal;">
+                    <!-- <th style="font-weight: normal;">
                         <br><br>
                         (Warehouse) <br><br>
-                    </th>
+                    </th> -->
                     <th style="font-weight: normal;">
-                        <br><br>
+                        <br><br><br>
                         (Pembelian)
                     </th>
                     <th style="font-weight: normal;">
-                        <br><br>
+                        <br><br><br>
                         (Kabag Pembelian)
                     </th>
                     <th style="font-weight: normal;">
-                        <br><br>
+                        <br><br><br>
                         (Audit)
                     <th style="font-weight: normal;">
-                        <br><br>
+                        <br><br><br>
                         (Direktur)
                     </th>
                 </tr>

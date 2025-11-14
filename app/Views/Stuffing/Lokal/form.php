@@ -129,7 +129,6 @@
                                     <th>Kode Barang</th>
                                     <th>Nama Barang</th>
                                     <th>Qty</th>
-                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
@@ -231,10 +230,10 @@
                             <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="dataTable" width="100%" cellspacing="0">
                                 <thead class="thead-dark">
                                     <tr>
-                                        <th style="text-align: center; width:10px;">#</th>
-                                        <th style="text-align: center;">Tipe Barang</th>
+                                        <th style="text-align: center; width:10px">#</th>
+                                        <!-- <th style="text-align: center;">Tipe Barang</th> -->
                                         <th style="text-align: center;">Dokumen Pabean</th>
-                                        <th style="text-align: center;">No Aju / No Daftar</th>
+                                        <!-- <th style="text-align: center;">No Aju / No Daftar</th> -->
                                         <th style="text-align: center;">Tanggal Penerimaan</th>
                                         <th style="text-align: center;">Barang - Spesifikasi</th>
                                         <th style="text-align: center;">Satuan</th>
@@ -259,10 +258,10 @@
                         <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="selectedItemTable" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th style="text-align: center; width:10px;">#</th>
+                                    <th style="text-align: center; width:10px">#</th>
                                     <th style="text-align: center;">Tipe Barang</th>
                                     <th style="text-align: center;">Dokumen Pabean</th>
-                                    <th style="text-align: center;">No Aju / No Daftar</th>
+                                    <!-- <th style="text-align: center;">No Aju / No Daftar</th> -->
                                     <th style="text-align: center;">Tanggal Penerimaan</th>
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
                                     <th style="text-align: center;">Satuan</th>
@@ -390,18 +389,7 @@
             {
                 data: "qty",
                 className: "text-center"
-            },
-            {
-                data: "id",
-                className: "text-center actions",
-                searchable: false,
-                sortable: false,
-                render: function(data, type, row) {
-                    let id = row.id;
-                    return id; // Return only the id value without any HTML tags
-                }
             }
-
         ],
         columnDefs: [{
             defaultContent: "-",
@@ -508,24 +496,18 @@
         // APPEND 
 
         <?php foreach ($stuffingLokalDetail as $m) : ?>
-
             listStockSelected.push({
                 id_stuffing_detail: "<?= $m['id_stuffing_detail'] ?>",
                 id: "<?= $m['id'] ?>",
                 bc_id: "<?= $m['bc_id'] ?>",
                 stock_detail_id: "<?= $m['stock_detail_id'] ?>",
                 no_aju: "<?= $m['no_aju'] ?>",
-                no_aju: "<?= $m['no_aju'] ?>",
                 stock_id: "<?= $m['stock_id'] ?>",
                 stok_total: "<?= $m['stok_total'] ?>",
-                stock_dokumen: "<?= $m['stock_dokumen'] ?>",
-                no_dokumen_1: "<?= $m['no_dokumen_1'] ?>",
-                no_dokumen_2: "<?= $m['no_dokumen_2'] ?>",
                 bc_type: "<?= $m['bc_type'] ?>",
                 satuan: "<?= $m['satuan'] ?>",
                 barang: "<?= $m['barang'] ?>",
                 type_barang: "<?= $m['type_barang'] ?>",
-                type_barang_text: "<?= $m['type_barang_text'] ?>",
                 stock_date: "<?= $m['stock_date'] ?>",
                 qty: "<?= $m['qty'] ?>",
                 divisi_id: "<?= $m['divisi_id'] ?>",
@@ -932,10 +914,9 @@
         }
         const table = $('#dataTable');
         var typePengambilanStok = $('#type_pengambilan_stock option:selected').val();
-
         $.each(data, function(i, v) {
             var newRow = $('<tr>');
-            if (typePengambilanStok == "FIFO" || parseFloat(v.stok_total) == 0) {
+            if (typePengambilanStok == "FIFO" || parseFloat(v.stok_total_diterima) == 0) {
                 newRow.append($('<td style="text-align: center;">').html(
                     `
                 `
@@ -944,20 +925,19 @@
                 newRow.append($('<td style="text-align: center;">').html(
                     `
                     <div class="form-check">
-                        <input data-id="${v.id}" data-stok_total="${v.stok_total}" autocomplete="one-time-code" class="form-check-input child" type="checkbox">
+                        <input data-id="${v.id}" data-stok_total="${v.stok_total_diterima}" autocomplete="one-time-code" class="form-check-input child" type="checkbox">
                     </div>
                 `
                 ));
             }
 
-            newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
+            // newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
             newRow.append($('<td style="text-align: center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align: center;">').text(v.no_aju));
-
+            // newRow.append($('<td style="text-align: center;">').text(v.no_aju));
             newRow.append($('<td style="text-align: center;">').text(v.stock_date));
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
-            newRow.append($('<td style="text-align: center;">').text(v.stok_total));
+            newRow.append($('<td style="text-align: center;">').text(v.stok_total_diterima));
             table.find('tbody').append(newRow);
         });
 
@@ -1237,15 +1217,15 @@
             newRow.append($('<td style="text-align: center;">').text(v.nama_barang));
             newRow.append($('<td style="text-align: center;">').text(v.qty));
 
-            if (v.tipe_input === 'stuffing') {
-                newRow.append($('<td style="text-align: center;">').html(`
-                    <button type="button" data-sales_order_detail_id = "${v.id}" onclick="handleDelete('${v.id}')" class="btn btn-discard delete-btn btn-trash <?= !empty($stuffingLokal) ? (($stuffingLokal['status_posting'] == "1") ? 'disabled' : '') : '' ?>">
-                        <i class="fa fa-trash"></i>
-                    </button>
-                `));
-            } else {
-                newRow.append($('<td style="text-align: center;">').html(''));
-            }
+            // if (v.tipe_input === 'stuffing') {
+            //     newRow.append($('<td style="text-align: center;">').html(`
+            //         <button type="button" data-sales_order_detail_id = "${v.id}" onclick="handleDelete('${v.id}')" class="btn btn-discard delete-btn btn-trash <?= !empty($stuffingLokal) ? (($stuffingLokal['status_posting'] == "1") ? 'disabled' : '') : '' ?>">
+            //             <i class="fa fa-trash"></i>
+            //         </button>
+            //     `));
+            // } else {
+            //     newRow.append($('<td style="text-align: center;">').html(''));
+            // }
 
 
             table.row.add(newRow).draw(false);
@@ -1253,6 +1233,7 @@
     }
 
     function drawTableSelectedItem(data) {
+        console.log(data)
         if ($.fn.DataTable.isDataTable('#selectedItemTable')) {
             $('#selectedItemTable').DataTable().clear().draw();
             selectedItemTable.destroy();
@@ -1261,23 +1242,30 @@
         var no = 1;
         $.each(data, function(i, v) {
             var newRow = $('<tr>');
-            newRow.append($('<td style="text-align: center;">').html(`${no++}`));
-            newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
+            newRow.append($('<td style="text-align: center;">').html(
+                `
+                   ${no++} 
+                `
+            ));
+            newRow.append($('<td style="text-align: center;">').text(v.type_barang));
             newRow.append($('<td style="text-align: center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align: center;">').text(v.no_aju));
-
+            // newRow.append($('<td style="text-align: center;">').text(v.no_aju));
             newRow.append($('<td style="text-align: center;">').text(v.stock_date));
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
-            newRow.append($('<td style="text-align: center;">').text(v.stok_total));
-            newRow.append($('<td style="text-align: center;">').html(`
-            <input onchange="definisiQtyInput()" <?= !empty($stuffingLokal) ? (($stuffingLokal['status_posting'] == "1") ? 'disabled' : '') : '' ?> class="form-control stok-out" oninput="preventNegativeInput(this);updateOrder($(this));" autocomplete="one-time-code" data-id="${v.id}" data-index="${i}"  data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
-        `));
+            newRow.append($('<td style="text-align: center;">').text(v.stok_total_diterima));
+            newRow.append($('<td style="text-align: center;">').html(
+                `
+                    <input onchange="definisiQtyInput()" <?= !empty($stuffingLokal) ? (($stuffingLokal['status_posting'] == "1") ? 'disabled' : '') : '' ?> class="form-control stok-out" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-index="${i}"  data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
+                `
+            ));
             newRow.append($('<td style="text-align: center;">').text(v.output.barang));
             newRow.append($('<td style="text-align: center;">').text(v.output.qty));
-            newRow.append($('<td style="text-align: center;">').html(`
-            <button <?= !empty($stuffingLokal) ? (($stuffingLokal['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
-        `));
+            newRow.append($('<td style="text-align: center;">').html(
+                `
+                    <button <?= !empty($stuffingLokal) ? (($stuffingLokal['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${v.id}, '${v.sales_order_export_detail_id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                `
+            ));
             table.find('tbody').append(newRow);
         });
 
@@ -1306,7 +1294,6 @@
         });
 
         selectedItemTable.draw();
-
     }
 
 
@@ -1328,15 +1315,15 @@
 
 
 
-    function updateOrder(input) {
-        var index = input.data('index');
-        var qtyInput = input.val() == "" ? 0.0 : parseFloat(input.val());
-        var item = listStockSelected[index];
-        var maxQty = parseFloat(item.stok_total);
-        var maxOutputQty = parseFloat(item.output.qty);
-        var qty = Math.min(maxQty, qtyInput, maxOutputQty);
-        input.val(qty);
-    }
+    // function updateOrder(input) {
+    //     var index = input.data('index');
+    //     var qtyInput = input.val() == "" ? 0.0 : parseFloat(input.val());
+    //     var item = listStockSelected[index];
+    //     var maxQty = parseFloat(item.stok_total);
+    //     var maxOutputQty = parseFloat(item.output.qty);
+    //     var qty = Math.min(maxQty, qtyInput, maxOutputQty);
+    //     input.val(qty);
+    // }
 
     function preventNegativeInput(inputElement) {
         var inputValue = inputElement.value;

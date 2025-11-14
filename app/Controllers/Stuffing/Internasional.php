@@ -167,16 +167,25 @@ class Internasional extends BaseController
     {
         $id = decrypt($id);
         $stuffingInternasionalModel = $this->stuffingInternasionalModel
-            ->select('stuffing_internasional.*, sales_order_export.bc_type, customers.name as customer_name')
+            ->select('stuffing_internasional.*, sales_order_export.bc_type, sales_order_export.sales_order_export_id, customers.name as customer_name')
             ->join('customers', 'customers.id = stuffing_internasional.customer_id')
             ->join('sales_order_export', 'sales_order_export.sales_order_export_id = stuffing_internasional.sales_order_export_id')
             ->find($id);
-        $salesOrder = $this->salesOrderDetailModel
-            ->select('sales_order_detail_export.*, barang_master_sales.id AS id_barang, barang_master_sales.barang_name AS nama_barang, barang_master_sales.kode_barang AS kode_barang')
-            ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail_export.barang_id')
-            ->where('sales_order_detail_export.sales_order_export_id', $stuffingInternasionalModel['sales_order_export_id'])
-            ->where('sales_order_detail_export.deletedAt', null)
-            ->findAll();
+        $dataSalesExport = $this->salesOrderModel
+            ->where('sales_order_export.sales_order_export_id', $stuffingInternasionalModel['sales_order_export_id'])
+            ->first();
+        $salesOrder =  $this->salesOrderModel
+            ->getDetailSalesKontrakInOrderForm(
+                $dataSalesExport['sales_contract_id'],
+                $stuffingInternasionalModel['sales_order_export_id']
+            );
+        // $salesOrder = $this->salesOrderDetailModel
+        //     ->select('sales_order_detail_export.*, barang_master_sales.id AS id_barang, barang_master_sales.barang_name AS nama_barang, barang_master_sales.kode_barang AS kode_barang')
+        //     ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail_export.barang_id')
+        //     ->where('sales_order_detail_export.sales_order_export_id', $stuffingInternasionalModel['sales_order_export_id'])
+        //     ->where('sales_order_detail_export.deletedAt', null)
+        //     ->findAll();
+      
         $dataAJU = $this->metaDataModel->getBCUsed('so_internasional');
 
         if ($stuffingInternasionalModel == null) {
@@ -253,24 +262,15 @@ class Internasional extends BaseController
         // get all id detail
         $id_detail_all = [];
         foreach ($barang as $b) {
-
-            $checkStock = $this->stockModel->where('id', $b->stock_id)->first();
             $this->stuffingInternasionalDetailModel->insert([
                 'divisi_id' => $b->divisi_id,
                 'warehouse_id' => $b->warehouse_id,
                 'stuffing_internasional_id' => $id,
                 'stock_id_warehouse' => $b->stock_id,
-                'stock_dokumen' => $b->stock_dokumen,
-                'no_dokumen_1' => $b->no_dokumen_1,
-                'no_dokumen_2' => $b->no_dokumen_2,
-                'bc_id_warehouse' => $b->bc_id,
-                'no_aju_warehouse' => $b->no_aju,
-                'barang1_id_warehouse' => $checkStock['barang1_id'],
-                'barang2_id_warehouse' => $checkStock['barang2_id'],
+                'stock_detail_id' => $b->id,
                 'barang_id_order' => $b->output->id_barang,
                 'qty' => $b->qty,
-                'stok_total' => $b->stok_total,
-
+                'stok_total' => $b->stok_total
             ]);
         }
 
