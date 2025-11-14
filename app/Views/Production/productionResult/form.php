@@ -331,6 +331,9 @@
                             </div>
 
                             <div class="tab-pane fade" id="nav-barang-material-request" role="tabpanel" aria-labelledby="nav-barang-material-request">
+                                <!-- <?php if (!isset($data) || (isset($data) && $data->is_posted != 1)) : ?>
+                                    <button type="button" class="btn btn-primary btn-add-barang-ditapak" style="float: right; margin-top: 35px;">Tambah Barang Ditapak</button>
+                                <?php endif; ?> -->
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-floating mb-3" style="height: 50px;">
@@ -470,6 +473,78 @@
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" oninput="preventNegativeInput(this)" readonly class="form-control qty_kg_barang_add" name="qty_kg_barang_add" id="qty_kg_barang_add" placeholder="Qty dalam KG">
+                                <label for="floatingInput">Qty dalam KG</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <button type="button" class="btn btn-show-form btn-add" id="btn-tambah-sementara">
+                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah ke List
+                        </button>
+                    </div>
+                </form>
+                <table class="table table-sm table-bordered mt-3" id="tbl-temp-barang">
+                    <thead>
+                        <tr>
+                            <th>Kode</th>
+                            <th>Nama</th>
+                            <th>Qty</th>
+                            <th>Berat Isi</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-form btn-discard btn-discard-add-barang mr-2">Kembali</button>
+                <button type="button" class="btn btn-submit-form btn-add-barang">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="add_barang_ditapak" tabindex="-1">
+    <div class="modal-dialog" style="min-width: 900px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tambah Barang Ditapak</h5>
+            </div>
+            <div class="modal-body">
+                <form class="form-excel" method="post">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="hidden" class="id_barang_hasil" name="id_barang_hasil" id="id_barang_hasil" />
+                                <select class="form-select kode_barang_add_ditapak" name="kode_barang_add_ditapak" id="kode_barang_add_ditapak" aria-label="Floating label select example">
+                                    <option data-barang_id="" data-nama="" data-satuan="" value=""></option>
+                                </select>
+                                <label for="floatingInput">Kode Barang</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" readonly class="form-control satuan_barang_add_ditapak" name="satuan_barang_add_ditapak" id="satuan_barang_add_ditapak" placeholder="Satuan">
+                                <label for="floatingInput">Satuan</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" oninput="preventNegativeInput(this)" class="form-control qty_barang_add_ditapak" name="qty_barang_add_ditapak" id="qty_barang_add_ditapak" placeholder="Qty Hasil">
+                                <label for="floatingInput">Qty Saat Ini</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" oninput="preventNegativeInput(this)" class="form-control kg_barang_add_ditapak" name="kg_barang_add_ditapak" id="kg_barang_add_ditapak" placeholder="Berat Isi">
+                                <label for="floatingInput">Berat Isi</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" oninput="preventNegativeInput(this)" readonly class="form-control qty_kg_barang_add_ditapak" name="qty_kg_barang_add_ditapak" id="qty_kg_barang_add_ditapak" placeholder="Qty dalam KG">
                                 <label for="floatingInput">Qty dalam KG</label>
                             </div>
                         </div>
@@ -794,15 +869,22 @@
             dropdownParent: $('#add_barang_produksi')
         })
 
+        $('.kode_barang_add_ditapak').select2({
+            placeholder: "Pilih Kode Barang",
+            theme: "bootstrap-5",
+            allowClear: true,
+            dropdownParent: $('#add_barang_ditapak')
+        })
+
         //CSS SELECT2 FLOATING LABEL
-        $('.kode_barang, .kode_barang_scrap, .kode_barang_filling, .kode_barang_add')
+        $('.kode_barang, .kode_barang_scrap, .kode_barang_filling, .kode_barang_add, .kode_barang_add_ditapak')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.kode_barang, .kode_barang_scrap, .kode_barang_filling, .kode_barang_add')
+        $('.kode_barang, .kode_barang_scrap, .kode_barang_filling, .kode_barang_add, .kode_barang_add_ditapak')
             .parent('div')
             .children('span')
             .children('span')
@@ -810,7 +892,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.kode_barang, .kode_barang_scrap, .kode_barang_filling, .kode_barang_add')
+        $('.kode_barang, .kode_barang_scrap, .kode_barang_filling, .kode_barang_add, .kode_barang_add_ditapak')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -976,6 +1058,10 @@
             $('#add_barang_produksi').modal('show');
         });
 
+        $(".btn-add-barang-ditapak").click(function() {
+            $('#add_barang_ditapak').modal('show');
+        });
+
         $(".btn-discard-add-barang").click(function() {
             $(".kode_barang_add").val("").change();
             $(".qty_barang_add").val();
@@ -1139,7 +1225,7 @@
                     confirmButtonText: 'Ok'
                 });
             }
-            console.log(list_items_barang_digunakan_penolong);
+            console.log(list_items_barang_digunakan);
 
             if (listMaterialCheck.length != 0) {
                 if ($(".create-form").valid()) {
@@ -1477,7 +1563,8 @@
                                     'satuan': item.satuan,
                                     'nama_barang': item.nama_barang,
                                     'note': item.note,
-                                    'qty': item.qty_now,
+                                    'qty': item.type_barang == "bahan_jadi" ? item.qty_isi : item.qty_now,
+                                    'qty_isi': item.qty_isi,
                                     'ref_no': new_ref_no,
                                     'no_aju': item.no_aju,
                                     'type_barang': item.type_barang,
@@ -1868,22 +1955,16 @@
         }
 
         // Menangani perubahan input Qty Hasil dan Berat Isi
-        $('.qty-barang-jadi, .berat-barang-jadi').on('input change', function() {
+        $('.qty-barang-jadi, .berat-barang-jadi, .qty-berat-barang-jadi').on('input change', function() {
             var index = $(this).data('index');
             var valueQtyBarangJadi = parseFloat($('input.qty-barang-jadi[data-index="' + index + '"]').val()) || 0;
             var valueBeratBarangJadi = parseFloat($('input.berat-barang-jadi[data-index="' + index + '"]').val()) || 0;
-
-            // Hitung total dan batasi 2 angka desimal
-            var jumlahQtyBeratJadi = valueQtyBarangJadi * valueBeratBarangJadi;
-            var fixedJumlah = jumlahQtyBeratJadi.toFixed(2); // misal 2 angka desimal
-
-            // Tampilkan hasil yang sudah dibulatkan
-            $('input.qty-berat-barang-jadi[data-index="' + index + '"]').val(fixedJumlah);
+            var valueQtyBeratBarangJadi = parseFloat($('input.qty-berat-barang-jadi[data-index="' + index + '"]').val()) || 0;
 
             // Simpan nilai baru ke array
             list_items_barang_jadi[index].qty = valueQtyBarangJadi;
             list_items_barang_jadi[index].qty2 = valueBeratBarangJadi;
-            list_items_barang_jadi[index].qty_isi = parseFloat(fixedJumlah); // simpan sebagai number, bukan string
+            list_items_barang_jadi[index].qty_isi = parseFloat(valueQtyBeratBarangJadi); // simpan sebagai number, bukan string
 
             // Render ulang tabel
             drawTableBarangJadi();
@@ -1908,8 +1989,9 @@
                 `;
             $('.body-table-barang-digunakan').append(row);
         } else {
+            console.log(list_items_barang_digunakan);
             list_items_barang_digunakan.map((item, index) => {
-                var qty = item.qty2 ? item.qty2 : item.qty;
+                var qty = item.qty2 ? item.qty2 : item.type_barang == "bahan_jadi" ? item.qty_isi ?? item.qty : item.qty_now ?? item.qty;
                 totalQtyDigunakan += parseFloat(qty || 0);
                 totalQtyRequest += parseFloat((item.qty_now ?? item.qty) || 0);
 
@@ -1922,8 +2004,8 @@
                 row += '<td>' + item.kode_barang + '</td>';
                 row += '<td>' + item.type_barang_text + '</td>';
                 row += '<td>' + item.nama_barang + '</td>';
-                row += '<td>' + item.satuan + '</td>';
-                row += '<td>' + greatFormatRupiah(item.qty_now ?? item.qty) + '</td>';
+                row += '<td>' + (item.type_barang == "bahan_jadi" ? "KG" : item.satuan) + '</td>';
+                row += '<td>' + greatFormatRupiah(item.type_barang == "bahan_jadi" ? item.qty_isi ?? item.qty : item.qty_now ?? item.qty) + '</td>';
                 row += '<td>' + `
                 <input class="form-control qty-barang-digunakan" <?= isset($data) ? ($data->is_posted ? 'readonly' : '') : '' ?>   style="height:40px" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" value="${qty}">` +
                     '</td>';

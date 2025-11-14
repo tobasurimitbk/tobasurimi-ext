@@ -946,7 +946,6 @@
         drawTableAsalBarang(listStockAsal);
     });
 
-
     // Mengaktifkan datepicker
     $('#date_production').datepicker({
         todayHighlight: true,
@@ -1116,12 +1115,15 @@
             if ($('.create-form').valid()) {
                 var isValid = true;
                 var dataError = null;
+                var qtyRequest = 0;
 
                 $.each(listStockSelectedBahanBaku, function(i, v) {
                     if (parseFloat(listStockSelectedBahanBaku[i].qty2) > parseFloat(listStockSelectedBahanBaku[i].stok_total) || isNaN(listStockSelectedBahanBaku[i].qty2) || listStockSelectedBahanBaku[i].qty2 == undefined || parseFloat(listStockSelectedBahanBaku[i].qty2) == 0) {
                         dataError = listStockSelectedBahanBaku[i];
                         // console.log("Kesini", listStockSelectedBahanBaku[i]);
                         isValid = false;
+                    } else {
+                        qtyRequest += parseFloat(listStockSelectedBahanBaku[i].qty2);
                     }
                 });
 
@@ -1131,6 +1133,8 @@
                         // console.log("Kesin2");
 
                         isValid = false;
+                    } else {
+                        qtyRequest += parseFloat(listStockSelectedBahan[i].qty2);
                     }
                 });
 
@@ -1140,20 +1144,21 @@
                         // console.log("Kesin3");
 
                         isValid = false;
+                    } else {
+                        qtyRequest += parseFloat(listStockSelectedBahanSetengahJadi[i].qty2);
                     }
                 });
 
                 $.each(listStockSelectedBahanJadi, function(i, v) {
-                    if (parseFloat(listStockSelectedBahanJadi[i].qty2) > parseFloat(listStockSelectedBahanJadi[i].stok_total) || isNaN(listStockSelectedBahanJadi[i].qty2) || listStockSelectedBahanJadi[i].qty2 == undefined || parseFloat(listStockSelectedBahanJadi[i].qty2) == 0 || isNaN(listStockSelectedBahanJadi[i].qty_isi) || listStockSelectedBahanJadi[i].qty_isi == undefined || parseFloat(listStockSelectedBahanJadi[i].qty_isi) == 0) {
+                    if (parseFloat(listStockSelectedBahanJadi[i].qty2) > parseFloat(listStockSelectedBahanJadi[i].stok_total) || isNaN(listStockSelectedBahanJadi[i].qty2) || listStockSelectedBahanJadi[i].qty2 == undefined || parseFloat(listStockSelectedBahanJadi[i].qty2) == 0 || isNaN(listStockSelectedBahanJadi[i].qty_isi) || listStockSelectedBahanJadi[i].qty_isi == undefined) {
                         dataError = listStockSelectedBahanJadi[i];
                         // console.log("Kesin4");
 
                         isValid = false;
+                    } else {
+                        qtyRequest += parseFloat(listStockSelectedBahanJadi[i].qty_isi == 0 ? listStockSelectedBahanJadi[i].qty2 : listStockSelectedBahanJadi[i].qty_isi);
                     }
                 });
-
-                // console.log(listStockSelectedBahanBaku, listStockSelectedBahan);
-
 
                 if (!isValid) {
                     Swal.fire({
@@ -1166,6 +1171,7 @@
                     Swal.fire({
                         icon: 'question',
                         title: 'Simpan Data ?',
+                        html: '<b>Total Qty Request: ' + qtyRequest + '</b>',
                         confirmButtonColor: '#4e73df',
                         cancelButtonColor: '#d33',
                         showCancelButton: true,
@@ -1756,6 +1762,8 @@
     function insertListFifo() {
         var typePengambilanStock = $('#type_pengambilan_stock option:selected').val();
         var typePengambilanStockBahanBaku = $('#type_pengambilan_stock_bahan_baku option:selected').val();
+        var qtyMutasiFifo = 0;
+        console.log('cek log', typePengambilanStock, typePengambilanStockBahanBaku, qtyMutasiFifo);
 
         if (typePengambilanStock != '') {
             // Bukan Bahan Baku
@@ -1768,7 +1776,7 @@
             var warehouseTujuanID = $("#warehouse_tujuan_id").val();
             // var keterangan = $("#keterangan").val();
             var warehouseTujuanText = $("#warehouse_tujuan_id option:selected").text();
-            var qtyMutasiFifo = parseFloat($('#qty_mutasi_fifo').val());
+            qtyMutasiFifo = parseFloat($('#qty_mutasi_fifo').val());
 
         } else if (typePengambilanStockBahanBaku != '') {
             // Bahan Baku
@@ -1781,7 +1789,7 @@
             var warehouseTujuanID = $("#warehouse_tujuan_bahan_baku_id").val();
             // var keterangan = $("#keterangan").val();
             var warehouseTujuanText = $("#warehouse_tujuan_bahan_baku_id option:selected").text();
-            var qtyMutasiFifo = parseFloat($('#qty_keluar_fifo').val());
+            qtyMutasiFifo = parseFloat($('#qty_keluar_fifo').val());
         }
 
         var dataIds = getIDListDataSelected();
@@ -2781,15 +2789,12 @@
     }
 
     function pindahTab(type) {
-        if (type == "BAHAN BAKU") {
-            // Clear Form Bahan Baku
-            $('#type_pengambilan_stock_bahan_baku').val(null).change();
-            $('#qty_keluar_fifo').val(null);
-        } else {
-            // Clear Form Bahan Lain
-            $('#type_pengambilan_stock').val(null).change();
-            $('#qty_mutasi_fifo').val(null);
-        }
+        // Clear Form Bahan Baku
+        $('#type_pengambilan_stock_bahan_baku').val(null).change();
+        $('#qty_keluar_fifo').val(null);
+        // Clear Form Bahan Lain
+        $('#type_pengambilan_stock').val(null).change();
+        $('#qty_mutasi_fifo').val(null);
 
         // Clear Stok Asal
         listStockAsal = [];

@@ -665,7 +665,7 @@ class MaterialRequest extends BaseController
                     'barang_type' => $item->type_barang,
                     'qty' => $item->qty2,
                     'qty2' => $item->qty2,
-                    'qty_isi' => 0,
+                    'qty_isi' => $item->qty_isi ?? 0,
                     'qty_now' => $item->qty2,
                     'harga_umum' => (float)$item->harga_umum,
                     'harga_harian' => (float)$item->harga_harian,

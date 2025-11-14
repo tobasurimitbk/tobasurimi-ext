@@ -423,6 +423,7 @@ class ProductionResult extends BaseController
                     'token'     => csrf_hash()
                 ];
                 echo json_encode($data);
+                return;
             }
 
             $datas = [
@@ -661,6 +662,16 @@ class ProductionResult extends BaseController
         try {
             $productionResID = $this->request->getVar("id");
             $workOrderIds = $this->request->getVar("kode_produksi");
+
+            if (json_encode($this->request->getPost("kode_request")) == "null") {
+                $data = [
+                    "status"    => false,
+                    "message"   => "Material Request belum dipilih",
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                return;
+            }
 
             $datas = [
                 "company_id" => $this->this_company_id,
@@ -956,7 +967,7 @@ class ProductionResult extends BaseController
     public function getListMaterialRequestByWOID()
     {
         $kodeProduksi = $this->request->getVar('kode_produksi');
-        $isEdit = $this->request->getVar('is_edit');
+        $isEdit = $this->request->getVar('is_edit') == "true" ? true : false;
 
         // Pastikan jadi array
         $woIds = is_array($kodeProduksi) ? $kodeProduksi : [$kodeProduksi];
