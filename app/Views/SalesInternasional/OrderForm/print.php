@@ -336,7 +336,7 @@
                                     $columns_to_show = [];
                                     $all_columns = [
                                         'size' => ['label' => 'SIZE', 'width' => '8%'],
-                                        'grade' => ['label' => 'GRADE', 'width' => '10%'],
+                                        'grade' => ['label' => 'GRADE', 'width' => '13%'],
                                         'packing' => ['label' => 'PACKING', 'width' => '8%'],
                                         'can' => ['label' => 'QTY (CAN)', 'width' => '7%'],
                                         'cased' => ['label' => 'QTY (CASE)', 'width' => '7%'],
