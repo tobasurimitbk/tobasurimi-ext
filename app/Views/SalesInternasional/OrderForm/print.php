@@ -171,7 +171,7 @@
             <table style="width: 100%; margin-top:-10px;line-height: 0.8 !important;">
                 <tr>
                     <td>
-                        <table class="label" style="width: 100%;">
+                        <table style="width: 100%; font-size:12px;">
                             <tr>
                                 <td>CONSIGNEE</td>
                                 <td>:</td>
