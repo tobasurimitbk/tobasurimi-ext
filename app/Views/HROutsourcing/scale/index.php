@@ -39,6 +39,14 @@
 <section class="section">
     <div class="section-header">
         <h1>Manajemen Barang</h1>
+        <div class="col-button-tambah-spp">
+            <button type="button" class="btn btn-success me-2" onclick="showNampanModal()">
+                <i class="fas fa-tray"></i> Kelola Nampan
+            </button>
+            <button type="button" class="btn btn-primary" onclick="showCreateModal()">
+                <i class="fas fa-plus"></i> Tambah Barang
+            </button>
+        </div>
     </div>
     
     <!-- Card untuk Generate QR Code -->
@@ -76,18 +84,7 @@
 
     <!-- Card untuk Table Data Barang -->
     <div class="card">
-        <div class="card-header">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5>Data Barang</h5>
-                </div>
-                <div class="col-md-6 text-end">
-                    <button type="button" class="btn btn-primary" onclick="showCreateModal()">
-                        <i class="fas fa-plus"></i> Tambah Barang
-                    </button>
-                </div>
-            </div>
-        </div>
+        <!-- Di card header Data Barang, tambahkan button -->
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-striped" id="tableBarang">
@@ -203,6 +200,84 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                 <button type="button" class="btn btn-danger" id="confirmDelete">Hapus</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Nampan -->
+<div class="modal fade" id="nampanModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Manajemen Nampan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Form Input -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h6>Tambah Nampan Baru</h6>
+                    </div>
+                    <div class="card-body">
+                        <form id="nampanForm">
+                            <?= csrf_field() ?>
+                            <input type="hidden" id="nampan_id" name="id">
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <div class="mb-3">
+                                        <label for="nampan_nama" class="form-label">Nama Nampan</label>
+                                        <input type="text" class="form-control" id="nampan_nama" name="nama" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="mb-3">
+                                        <label for="nampan_berat" class="form-label">Berat (kg)</label>
+                                        <input type="number" class="form-control" id="nampan_berat" name="berat" step="0.01" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="mb-3">
+                                        <label class="form-label">&nbsp;</label>
+                                        <div>
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-save"></i> Simpan
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Table Data -->
+                <div class="card">
+                    <div class="card-header">
+                        <h6>Data Nampan</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="tableNampan">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama Nampan</th>
+                                        <th>Berat</th>
+                                        <th>QR Code</th>
+                                        <th class="text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Data akan diisi via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
             </div>
         </div>
     </div>
@@ -477,6 +552,222 @@
                     currentEditId = null;
                 } else {
                     showValidationErrors(response.errors, 'editForm');
+                }
+            }
+        });
+    }
+
+    // Show nampan modal
+    function showNampanModal() {
+        loadNampanTable();
+        $('#nampanModal').modal('show');
+    }
+
+    // Load data nampan dari JSON
+    function loadNampanTable() {
+        $.ajax({
+            url: "<?= base_url('hr-outsourcing-scale/get-nampan') ?>",
+            method: "GET",
+            success: function(response) {
+                if (response.status === 'success') {
+                    let html = '';
+                    response.data.forEach((item, index) => {
+                        html += `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${item.nama}</td>
+                                <td>${item.berat} kg</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="printNampanQR(${item.id})" title="Print QR">
+                                        <i class="fas fa-print"></i> Print QR
+                                    </button>
+                                </td>
+                                <td class="table-actions text-center">
+                                    <button class="btn btn-sm btn-warning btn-action" onclick="editNampan(${item.id})" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger btn-action" onclick="deleteNampan(${item.id})" title="Hapus">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    $('#tableNampan tbody').html(html);
+                }
+            }
+        });
+    }
+
+    // Submit form nampan
+    $('#nampanForm').on('submit', function(e) {
+        e.preventDefault();
+        saveNampan();
+    });
+
+    // Save nampan
+    function saveNampan() {
+        const formData = new FormData(document.getElementById('nampanForm'));
+        const csrf = $(`[name="${csrfToken}"]`);
+        formData.append(csrfToken, csrf.val());
+
+        $.ajax({
+            url: "<?= base_url('hr-outsourcing-scale/save-nampan') ?>",
+            method: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    $('#nampanForm')[0].reset();
+                    $('#nampan_id').val('');
+                    loadNampanTable();
+                    showToast('success', response.message);
+                } else {
+                    showValidationErrors(response.errors, 'nampanForm');
+                }
+            }
+        });
+    }
+
+    // Edit nampan
+    function editNampan(id) {
+        $.ajax({
+            url: "<?= base_url('hr-outsourcing-scale/get-nampan/') ?>" + id,
+            method: "GET",
+            success: function(response) {
+                if (response.status === 'success') {
+                    $('#nampan_id').val(response.data.id);
+                    $('#nampan_nama').val(response.data.nama);
+                    $('#nampan_berat').val(response.data.berat);
+                    $('#nampan_nama').focus();
+                }
+            }
+        });
+    }
+
+    // Delete nampan
+    function deleteNampan(id) {
+        if (confirm('Apakah Anda yakin ingin menghapus nampan ini?')) {
+            const csrf = $(`[name="${csrfToken}"]`);
+            
+            $.ajax({
+                url: "<?= base_url('hr-outsourcing-scale/delete-nampan/') ?>" + id,
+                method: "POST",
+                data: { 
+                    [csrfToken]: csrf.val()
+                },
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                success: function(response) {
+                    if (response.status === 'success') {
+                        loadNampanTable();
+                        showToast('success', response.message);
+                    } else {
+                        showToast('error', response.message);
+                    }
+                }
+            });
+        }
+    }
+
+    // Print QR Code nampan (langsung print tanpa modal)
+    function printNampanQR(id) {
+        const csrf = $(`[name="${csrfToken}"]`);
+        
+        $.ajax({
+            url: "<?= base_url('hr-outsourcing-scale/generate-nampan-qr/') ?>" + id,
+            method: "POST",
+            data: { 
+                [csrfToken]: csrf.val()
+            },
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            success: function(response) {
+                if (response.status === "success") {
+                    // Langsung buka window print
+                    let printWindow = window.open('', '_blank');
+                    printWindow.document.write(`
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <title>Print QR Code Nampan</title>
+                            <style>
+                                body { 
+                                    margin: 0; 
+                                    padding: 20px; 
+                                    text-align: center; 
+                                    font-family: Arial, sans-serif;
+                                }
+                                .qr-container { 
+                                    margin: 20px auto; 
+                                    max-width: 400px;
+                                }
+                                .qr-title {
+                                    font-size: 24px;
+                                    font-weight: bold;
+                                    margin-bottom: 15px;
+                                    text-transform: uppercase;
+                                }
+                                .qr-info {
+                                    font-size: 16px;
+                                    margin-top: 10px;
+                                }
+                                img { 
+                                    max-width: 100%; 
+                                    height: auto;
+                                    border: 3px solid #000;
+                                    border-radius: 8px;
+                                }
+                                @media print {
+                                    body { margin: 0; padding: 10px; }
+                                    .no-print { display: none; }
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="qr-container">
+                                <div class="qr-title">${response.data.nama}</div>
+                                <img src="${response.data.qr_image}" alt="QR Code">
+                                <div class="qr-info">Berat: ${response.data.berat} kg</div>
+                            </div>
+                            <div class="no-print" style="margin-top: 20px;">
+                                <button onclick="window.print()" style="padding: 10px 20px; font-size: 16px;">
+                                    🖨️ Print QR Code
+                                </button>
+                                <button onclick="window.close()" style="padding: 10px 20px; font-size: 16px; margin-left: 10px;">
+                                    ❌ Tutup
+                                </button>
+                            </div>
+                            <script>
+                                // Auto print ketika window terbuka
+                                window.onload = function() {
+                                    window.print();
+                                };
+                            <\/script>
+                        </body>
+                        </html>
+                    `);
+                    printWindow.document.close();
+                } else {
+                    alert("Gagal generate QR Code");
                 }
             }
         });

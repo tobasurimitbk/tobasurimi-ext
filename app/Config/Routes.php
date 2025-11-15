@@ -3088,6 +3088,14 @@ $routes->post('/hr-outsourcing-scale/store', 'HROutsourcing\Scale::store', ['fil
 $routes->get('/hr-outsourcing-scale/edit/(:num)', 'HROutsourcing\Scale::edit/$1', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-scale/update/(:num)', 'HROutsourcing\Scale::update/$1', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-scale/delete/(:num)', 'HROutsourcing\Scale::delete/$1', ['filter' => 'Auth']);
+
+// Routes untuk Manajemen Nampan (JSON)
+$routes->get('hr-outsourcing-scale/get-nampan', 'HROutsourcing\Scale::getNampan', ['filter' => 'Auth']);
+$routes->get('hr-outsourcing-scale/get-nampan/(:num)', 'HROutsourcing\Scale::getNampanById/$1', ['filter' => 'Auth']);
+$routes->post('hr-outsourcing-scale/save-nampan', 'HROutsourcing\Scale::saveNampan', ['filter' => 'Auth']);
+$routes->post('hr-outsourcing-scale/delete-nampan/(:num)', 'HROutsourcing\Scale::deleteNampan/$1', ['filter' => 'Auth']);
+$routes->post('hr-outsourcing-scale/generate-nampan-qr/(:num)', 'HROutsourcing\Scale::generateNampanQr/$1', ['filter' => 'Auth']);
+
 $routes->get('/hr-outsourcing-scale/id/(:segment)', 'HROutsourcing\Scale::getBarangByIdQr/$1');
 $routes->get('/hr-outsourcing-company/employee/detail/(:segment)', 'HROutsourcing\Employee::getEmployeeByIdQr/$1');
 $routes->get('/get-spesifikasi-by-qr', 'Setting\Auth::login');

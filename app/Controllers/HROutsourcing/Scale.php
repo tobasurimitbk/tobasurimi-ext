@@ -13,11 +13,13 @@ class Scale extends BaseController
 {
     protected $this_company_id;
     protected $barangModel;
+    private $nampanFile;
 
     public function __construct()
     {
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->barangModel = new BarangMasterSortirModel();
+        $this->nampanFile = WRITEPATH . 'nampan.json';
     }
 
     public function generateQrBarangView()
@@ -362,5 +364,213 @@ class Scale extends BaseController
         ]);
     }
 
+
+    // Get all nampan data
+    public function getNampan()
+    {
+        try {
+            $data = [];
+            
+            if (file_exists($this->nampanFile)) {
+                $jsonContent = file_get_contents($this->nampanFile);
+                $data = json_decode($jsonContent, true) ?? [];
+            }
+
+            return $this->response->setJSON([
+                'status' => 'success',
+                'data' => $data
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Gagal memuat data: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    // Get single nampan by ID
+    public function getNampanById($id)
+    {
+        try {
+            $data = [];
+            
+            if (file_exists($this->nampanFile)) {
+                $jsonContent = file_get_contents($this->nampanFile);
+                $data = json_decode($jsonContent, true) ?? [];
+            }
+
+            $nampan = array_filter($data, function($item) use ($id) {
+                return $item['id'] == $id;
+            });
+
+            if (empty($nampan)) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Data nampan tidak ditemukan'
+                ]);
+            }
+
+            $nampan = array_values($nampan)[0];
+
+            return $this->response->setJSON([
+                'status' => 'success',
+                'data' => $nampan
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Gagal memuat data: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    // Save nampan (create/update)
+    public function saveNampan()
+    {
+        if (!$this->validate([
+            'nama' => 'required',
+            'berat' => 'required|numeric'
+        ])) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'errors' => $this->validator->getErrors()
+            ]);
+        }
+
+        try {
+            $id = $this->request->getPost('id');
+            $nama = $this->request->getPost('nama');
+            $berat = $this->request->getPost('berat');
+
+            // Load existing data
+            $data = [];
+            if (file_exists($this->nampanFile)) {
+                $jsonContent = file_get_contents($this->nampanFile);
+                $data = json_decode($jsonContent, true) ?? [];
+            }
+
+            if ($id) {
+                // Update existing
+                foreach ($data as &$item) {
+                    if ($item['id'] == $id) {
+                        $item['nama'] = $nama;
+                        $item['berat'] = $berat;
+                        $item['updated_at'] = date('Y-m-d H:i:s');
+                        break;
+                    }
+                }
+                $message = 'Nampan berhasil diupdate';
+            } else {
+                // Create new
+                $newId = empty($data) ? 1 : (max(array_column($data, 'id')) + 1);
+                $data[] = [
+                    'id' => $newId,
+                    'nama' => $nama,
+                    'berat' => $berat,
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s')
+                ];
+                $message = 'Nampan berhasil ditambahkan';
+            }
+
+            // Save to JSON file
+            file_put_contents($this->nampanFile, json_encode($data, JSON_PRETTY_PRINT));
+
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => $message
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Gagal menyimpan data: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    // Delete nampan
+    public function deleteNampan($id)
+    {
+        try {
+            $data = [];
+            
+            if (file_exists($this->nampanFile)) {
+                $jsonContent = file_get_contents($this->nampanFile);
+                $data = json_decode($jsonContent, true) ?? [];
+            }
+
+            // Filter out the item to delete
+            $data = array_filter($data, function($item) use ($id) {
+                return $item['id'] != $id;
+            });
+
+            // Reindex array
+            $data = array_values($data);
+
+            // Save back to JSON file
+            file_put_contents($this->nampanFile, json_encode($data, JSON_PRETTY_PRINT));
+
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Nampan berhasil dihapus'
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Gagal menghapus data: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    // Generate QR Code for nampan
+    public function generateNampanQr($id)
+    {
+        try {
+            // Load nampan data
+            $data = [];
+            if (file_exists($this->nampanFile)) {
+                $jsonContent = file_get_contents($this->nampanFile);
+                $data = json_decode($jsonContent, true) ?? [];
+            }
+
+            $nampan = array_filter($data, function($item) use ($id) {
+                return $item['id'] == $id;
+            });
+
+            if (empty($nampan)) {
+                throw new Exception("Data nampan tidak ditemukan.");
+            }
+
+            $nampan = array_values($nampan)[0];
+
+            // Generate QR Code
+            $type = 'NAMPAN';
+            $encryptedId = weakEncrypt("{$type}-{$id}");
+            $qrText = "{$type}-{$encryptedId}";
+
+            $qrCode = new QrCode($qrText);
+            $qrCode->setSize(350);
+            $qrCode->setMargin(10);
+            $qrCode->setErrorCorrectionLevel(new ErrorCorrectionLevel(ErrorCorrectionLevel::HIGH));
+
+            $dataUri = $qrCode->writeDataUri();
+
+            return $this->response->setJSON([
+                'status' => 'success',
+                'data' => [
+                    'id' => $id,
+                    'nama' => $nampan['nama'],
+                    'berat' => $nampan['berat'],
+                    'qr_image' => $dataUri
+                ]
+            ]);
+
+        } catch (Exception $e) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
 
 }
