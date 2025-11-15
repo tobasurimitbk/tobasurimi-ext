@@ -171,7 +171,7 @@
             <table style="width: 100%; margin-top:-10px;line-height: 0.8 !important;">
                 <tr>
                     <td>
-                        <table class="label">
+                        <table class="label" style="width: 100%;">
                             <tr>
                                 <td>CONSIGNEE</td>
                                 <td>:</td>
@@ -204,7 +204,7 @@
                                 <td style="width: 150px;"><?= $dataSO->sales_order_export_no ?></td>
                             </tr> -->
                             <tr style="text-align: right;">
-                                <td style="width: 210px;">ORDER</td>
+                                <td style="width: 150px;">ORDER</td>
                                 <td>:</td>
                                 <td><?= $dataSO->sales_order_export_no ?></td>
                             </tr>
