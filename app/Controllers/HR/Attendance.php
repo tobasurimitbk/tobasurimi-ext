@@ -235,6 +235,7 @@ class Attendance extends BaseController
                         'DINAS_D' => 'bg-dinas',
                         'CUTI KEGUGURAN_CKG' => 'bg-cuti-keguguran',
                         'IJIN_I' => 'bg-ijin',
+                        'HADIR_H' => 'bg-hadir'
                     ];
 
                     $row['day_' . $d . '_in_class']  = $mapping[$statusIzin];
@@ -623,6 +624,7 @@ class Attendance extends BaseController
                         'DINAS_D' => 'bg-dinas',
                         'CUTI KEGUGURAN_CKG' => 'bg-cuti-keguguran',
                         'IJIN_I' => 'bg-ijin',
+                        'HADIR_H' => 'bg-hadir'
                     ];
 
                     $row['day_' . $d . '_in_class']  = $mapping[$statusIzin];
