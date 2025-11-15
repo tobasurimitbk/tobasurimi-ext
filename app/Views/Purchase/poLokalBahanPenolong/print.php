@@ -9,7 +9,7 @@
         body {
             height: 100%;
             font-size: 12px;
-            font-family: 'Times New Roman', Times, serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             text-transform: uppercase;
             /* font-weight: normal; */
         }
