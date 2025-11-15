@@ -543,10 +543,10 @@ class Scale extends BaseController
 
             $nampan = array_values($nampan)[0];
 
-            // Generate QR Code
+            // Generate QR Code - YANG DIUBAH: Encrypt berat saja
             $type = 'NAMPAN';
-            $encryptedId = weakEncrypt("{$type}-{$id}");
-            $qrText = "{$type}-{$encryptedId}";
+            $encryptedBerat = weakEncrypt($nampan['berat']); // Encrypt berat saja
+            $qrText = "{$type}-{$encryptedBerat}"; // Format: NAMPAN-encrypted_berat
 
             $qrCode = new QrCode($qrText);
             $qrCode->setSize(350);
