@@ -197,39 +197,39 @@
                         </table>
                     </td>
                     <td>
-                        <table class="label" style="width: 100%;">
-                            <!-- <tr style="text-align: right;">
-                                <td>ORDER NO</td>
-                                <td>:</td>
-                                <td style="width: 150px;"><?= $dataSO->sales_order_export_no ?></td>
-                            </tr> -->
-                            <tr style="text-align: right;">
-                                <td style="width: 150px;">ORDER</td>
-                                <td>:</td>
+                        <table style="width: 100%; font-size:12px;">
+                            <tr>
+                                <td style="text-align: right;">ORDER</td>
+                                <td style="width: 10px; text-align: center;">:</td>
                                 <td><?= $dataSO->sales_order_export_no ?></td>
                             </tr>
+
                             <?php if (!empty($dataSO->po_no)): ?>
-                                <tr style="text-align: right;">
-                                    <td>PO NO</td>
-                                    <td>:</td>
+                                <tr>
+                                    <td style="white-space: nowrap; text-align: right;">PO NO</td>
+                                    <td style="text-align: center;">:</td>
                                     <td><?= $dataSO->po_no ?></td>
                                 </tr>
                             <?php endif; ?>
-                            <tr style="text-align: right;">
-                                <td>DATE</td>
-                                <td>:</td>
+
+                            <tr>
+                                <td style="white-space: nowrap; text-align: right;">DATE</td>
+                                <td style="text-align: center;">:</td>
                                 <td><?= date('d-M-Y', strtotime($dataSO->tanggal)) ?></td>
                             </tr>
-                            <?php $no = 1; ?>
-                            <?php foreach ($dataSalesOrderRevision as $d): ?>
-                                <tr style="text-align: right; background-color:#dee2e6">
-                                    <td>REVISED-<?= $no++ ?></td>
-                                    <td>:</td>
+
+                            <?php $no = 1;
+                            foreach ($dataSalesOrderRevision as $d): ?>
+                                <tr style="background-color:#dee2e6">
+                                    <td style="white-space: nowrap; text-align: right;">REVISED-<?= $no++ ?></td>
+                                    <td style="text-align: center;">:</td>
                                     <td><?= date('d-M-Y', strtotime($d['date_revision'])) ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         </table>
                     </td>
+
+
                 </tr>
             </table>
 
