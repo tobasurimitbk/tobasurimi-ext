@@ -4,6 +4,7 @@ namespace App\Controllers\HR;
 
 use App\Controllers\BaseController;
 use App\Models\AttendancesLogModel;
+use App\Models\BagianModel;
 use App\Models\BigDaysModel;
 use App\Models\DivisisModel;
 use App\Models\EmployeesModel;
@@ -25,6 +26,7 @@ class PinjamanKaryawan extends BaseController
     protected $employeeModel;
     protected $bigDaysModel;
     protected $attendancesLogModel;
+    protected $bagianModel;
 
     public function __construct()
     {
@@ -38,6 +40,7 @@ class PinjamanKaryawan extends BaseController
         $this->employeeModel = new EmployeesModel();
         $this->bigDaysModel = new BigDaysModel();
         $this->attendancesLogModel = new AttendancesLogModel();
+        $this->bagianModel = new BagianModel();
     }
 
     public function index()
@@ -401,6 +404,7 @@ class PinjamanKaryawan extends BaseController
             "divisi_id"          => $this->request->getGet("divisi_id"),
             "employee_id"        => $this->request->getGet("employee_id"),
             "employees.tipe"     => $this->request->getGet("tipe"),
+            "employees.bagian_id" => $this->request->getGet("bagian_id"),
             "sort" => $this->request->getGet('sort'),
             "sortType" => $this->request->getGet('sortType')
         ];
@@ -468,15 +472,18 @@ class PinjamanKaryawan extends BaseController
     {
         $yearMonth = $this->request->getVar('year_month');
         $divisiId = $this->request->getVar('divisi_id');
+        $bagianId = $this->request->getVar('bagian_id');
 
         $selectQry = "pinjaman_karyawan.*,employees.name";
 
         $data = [
             'divisi' => $this->divisiModel->where('id', $divisiId)->first(),
+            'bagian' => $this->bagianModel->where('id', $bagianId)->first(),
             'pinjaman' => $this->pinjamanKaryawanModel->select($selectQry)
                 ->join('employees', 'employees.id = pinjaman_karyawan.employee_id', 'left')
                 ->where('pinjaman_karyawan.month_year', $yearMonth)
                 ->where('pinjaman_karyawan.division_id', $divisiId)
+                ->where('employees.bagian_id', $bagianId)
                 ->where('pinjaman_karyawan.is_boleh_minjam', '1')
                 ->where('pinjaman_karyawan.is_ambil', '1')
                 ->findAll(),

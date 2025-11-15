@@ -72,6 +72,11 @@
             <td>:</td>
             <td><?= $divisi['divisi'] ?></td>
         </tr>
+        <tr>
+            <td>Bagian</td>
+            <td>:</td>
+            <td><?= $bagian['nama_bagian'] ?></td>
+        </tr>
     </table>
 
     <table width="100%" style="margin-top: 10px;" border="1" id="dashed-border-table">

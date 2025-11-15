@@ -20,7 +20,7 @@
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-start mb-3">
-                <div class="col-sm-3">
+                <div class="col-sm-2">
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
                             <input placeholder="" value="<?= date('Y-m') ?>" class="form-control month" id="month" name="month" />
@@ -33,7 +33,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-2">
                     <div class="form-floating">
                         <select class="form-select" name="filterDivisiID">
                             <option value="" selected></option>
@@ -44,6 +44,14 @@
                             <?php endforeach; ?>
                         </select>
                         <label for="floatingInput">Cari Departemen</label>
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    <div class="form-floating">
+                        <select class="form-select filterBagianID" name="filterBagianID" id="filterBagianID">
+                            <option value="" selected></option>
+                        </select>
+                        <label for="floatingInput">Cari Bagian</label>
                     </div>
                 </div>
                 <div class="col-sm-3">
@@ -361,6 +369,7 @@
                 data.divisi_id = $("select[name='filterDivisiID']").val();
                 data.employee_id = $("select[name='filterEmployeeID']").val();
                 data.tipe = $("select[name='filterGolongan']").val();
+                data.bagian_id = $("select[name='filterBagianID']").val();
                 data.month = $('#month').val();
                 data.sort = sort;
                 data.sortType = sortType;
@@ -540,6 +549,30 @@
         placeholder: "Cari Departemen",
         theme: "bootstrap-5",
         allowClear: true,
+    }).change(function(e) {
+        e.preventDefault();
+        let csrf = $(`[name="${csrfToken}"]`);
+        var formData = new FormData();
+        formData.append('divisionID', $(this).val());
+        $.ajax({
+            url: `<?= base_url("list-attendance/get-bagian"); ?>`,
+            data: formData,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            method: "POST",
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success: function(result) {
+                csrf.val(result.token);
+                $("#filterBagianID").empty()
+                $("#filterBagianID").append(`<option value=""></option>`)
+                result.data.forEach(function(item) {
+                    $("#filterBagianID").append(`<option value="${item.id}">${item.kode_bagian.toUpperCase()} - ${item.nama_bagian.toUpperCase()}</option>`)
+                });
+            }
+        });
     });
 
     $("select[name='filterEmployeeID']").select2({
@@ -573,6 +606,15 @@
         theme: "bootstrap-5",
         allowClear: true,
         dropdownParent: $('#generateModal')
+    });
+
+    $("#filterBagianID").select2({
+        placeholder: "Pilih Bagian",
+        theme: "bootstrap-5",
+        allowClear: true,
+    }).change(function(e) {
+        e.preventDefault();
+        table.ajax.reload();
     });
 
     $("#startDate,#finishDate,#tanggalAmbil_Global,#tanggalAmbil_Personal").datepicker({
@@ -970,6 +1012,7 @@
     function exportPinjaman() {
         var divisionID = $("select[name='filterDivisiID']").val();
         var yearMonth = $('#month').val();
+        var bagianID = $('#filterBagianID').val();
         if (divisionID == "") {
             Swal.fire({
                 icon: 'error',
@@ -984,8 +1027,15 @@
                 confirmButtonColor: '#4e73df',
             });
             return;
+        } else if (bagianID == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pilih bagian',
+                confirmButtonColor: '#4e73df',
+            });
+            return;
         } else {
-            var url = "<?= base_url('pinjaman-karyawan/print') ?>" + "?divisi_id=" + divisionID + '&year_month=' + yearMonth;
+            var url = "<?= base_url('pinjaman-karyawan/print') ?>" + "?divisi_id=" + divisionID + '&year_month=' + yearMonth + '&bagian_id=' + bagianID;
             window.open(url, "_blank");
         }
     }
