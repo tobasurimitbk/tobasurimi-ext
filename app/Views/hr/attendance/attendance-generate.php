@@ -716,7 +716,51 @@
         </div>
     </div>
 </div>
-
+<div class="modal" id="lapPerKaryawanModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Laporan Harian Per Karyawan</h5>
+            </div>
+            <form id="lapPerKaryawanForm" role="form" method="POST">
+                <div class="modal-body">
+                    <div class="row mb-2">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <div class="form-floating mb-2" style="height: 50px;">
+                                    <input type="text" id="start_date_lap_karyawan" name="start_date_lap_karyawan" class="form-control start_date_lap_karyawan" placeholder="Tanggal Mulai">
+                                    <label for="start_date">Tanggal Mulai Absensi</label>
+                                </div>
+                                <div class="input-group-append" style="height:50px;">
+                                    <button disabled class="btn btn-secondary" type="button">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <div class="form-floating mb-2" style="height: 50px;">
+                                    <input type="text" id="end_date_lap_karyawan" name="end_date_lap_karyawan" class="form-control end_date_lap_karyawan" placeholder="Tanggal Selesai">
+                                    <label for="end_date">Tanggal Selesai Absensi</label>
+                                </div>
+                                <div class="input-group-append" style="height:50px;">
+                                    <button disabled class="btn btn-secondary" type="button">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-hide-form btn-discard mr-3" id="btnHideLapPerKaryawan">Kembali</button>
+                    <button type="button" class="btn btn-submit-form" id="btnExportLapPerKaryawan">Export</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <script>
     let csrfToken = '<?= csrf_token() ?>';
@@ -1309,6 +1353,63 @@
         },
     });
 
+    var validatorLapPerKaryawan = $("#lapPerKaryawanForm").validate({
+        rules: {
+            start_date_lap_karyawan: {
+                required: true
+            },
+            end_date_lap_karyawan: {
+                required: true
+            },
+        },
+        messages: {
+            start_date_lap_karyawan: {
+                required: "tanggal mulai wajib diisi"
+            },
+            end_date_lap_karyawan: {
+                required: "tanggal selesai wajib diisi"
+            },
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
+
+    $('#btnHideLapPerKaryawan').click(function(e) {
+        e.preventDefault();
+        $('#lapPerKaryawanModal').modal('hide');
+    });
+
+    $('#btnExportLapPerKaryawan').click(function(e) {
+        e.preventDefault();
+        if ($('#lapPerKaryawanForm').valid()) {
+            var start_date = $('#start_date_lap_karyawan').val();
+            var end_date = $('#end_date_lap_karyawan').val();
+            var divisiId = $('#divisi_id').val();
+            var bagianId = $('#bagian_id').val();
+
+            var url = "<?= base_url('list-attendance/export-bulanan-employee') ?>?start_date=" + start_date + "&end_date=" + end_date + "&divisi_id=" + divisiId + '&bagian_id=' + bagianId;
+            window.location.href = url;
+        }
+    })
+
     $('#btnSubmitDataMesinFinger').click(function(e) {
         e.preventDefault();
         if ($('#tarik-data-finger-form').valid()) {
@@ -1731,7 +1832,7 @@
         orientation: "bottom auto"
     });
 
-    $("#start_date_global, #finish_date_global,#finish_date_personal,#start_date_personal").datepicker({
+    $("#start_date_global, #finish_date_global,#finish_date_personal,#start_date_personal,#start_date_lap_karyawan,#end_date_lap_karyawan").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
@@ -1784,38 +1885,12 @@
         }
     });
 
+
+
     $('#btnPerKaryawan').click(function(e) {
         e.preventDefault();
-        var month = $('#month').val();
-        var divisiId = $('#divisi_id').val();
-        var bagianId = $('#bagian_id').val();
-
-        if (month == '') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Pilih bulan dahulu',
-                confirmButtonColor: '#4e73df',
-            });
-            return;
-        } else if (divisiId == '') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Pilih departemen dahulu',
-                confirmButtonColor: '#4e73df',
-            });
-            return;
-        } else if (bagianId == '') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Pilih bagian dahulu',
-                confirmButtonColor: '#4e73df',
-            });
-            return;
-        } else {
-            var url = "<?= base_url('list-attendance/export-bulanan-employee') ?>?month=" + month + "&divisi_id=" + divisiId + '&bagian_id=' + bagianId + '&bagian_id=' + bagianId;
-            window.location.href = url;
-        }
-
+        $('#start_date_lap_karyawan,#start_date_lap_karyawan').val(null);
+        $('#lapPerKaryawanModal').modal('show');
     })
 
     // datepicker checkin dan checkout

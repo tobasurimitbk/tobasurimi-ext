@@ -97,6 +97,10 @@ class PinjamanKaryawanModel extends Model
             $pinjamanQry->like('pinjaman_karyawan.employee_id', $addCondition['employee_id']);
         }
 
+        if ($addCondition['employees.bagian_id']) {
+            $pinjamanQry->like('employees.bagian_id', $addCondition['employees.bagian_id']);
+        }
+
         if ($addCondition['divisi_id']) {
             $pinjamanQry->like('pinjaman_karyawan.division_id', $addCondition['divisi_id']);
         }
