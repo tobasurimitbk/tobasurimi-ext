@@ -2297,12 +2297,8 @@ class Attendance extends BaseController
 
     public function exportExcelPresensiKaryawanBulanan()
     {
-        $monthReq = $this->request->getVar('month') ?: date('Y-m');
-        [$year, $month] = explode('-', $monthReq);
-
-        $monthName = strtoupper(date('F Y', strtotime("$year-$month-01"))); // SEPTEMBER 2025
-        $startDate = sprintf('%04d-%02d-01', $year, $month);
-        $endDate   = sprintf('%04d-%02d-%02d', $year, $month, cal_days_in_month(CAL_GREGORIAN, $month, $year));
+        $startDate = formatDMYtoYMD($this->request->getVar('start_date'));
+        $endDate   = formatDMYtoYMD($this->request->getVar('end_date'));
 
         // ambil data employees
         $condition = [
@@ -2310,17 +2306,18 @@ class Attendance extends BaseController
             "employees.deletedAt"  => null,
         ];
         $addCondition = [
-            "divisi_id"   => $this->request->getVar('divisi_id'),
-            "tipe"        => $this->request->getVar('tipe'),
+            "divisi_id" => $this->request->getVar('divisi_id'),
+            "tipe"      => $this->request->getVar('tipe'),
             "bagian_id" => $this->request->getVar("bagian_id")
         ];
+
         $employees    = $this->EmployeesModel->getEmployeeListAttendances($condition, $addCondition, 0, 10000000);
         $employeeData = $employees['data'];
         $employeeIds  = array_column($employeeData, 'id');
 
         // log attendance
         $logData = !empty($employeeIds)
-            ? $this->AttendanceModel->getAttendanceAmt($employeeIds, $year, $month)
+            ? $this->AttendanceModel->getAttendanceByDateRangeAmt($employeeIds, $startDate, $endDate)
             : [];
 
         $mapLog = [];
@@ -2332,23 +2329,23 @@ class Attendance extends BaseController
             ];
         }
 
-        // mapping data denda keterlambatan
-        $dendaKeterlambatan = !empty($employeeIds) ? $this->DendaAbsenHarianModel->getDendaKeterlambatanByDateRangeAmt(
-            $employeeIds,
-            $startDate,
-            $endDate
-        ) : [];
+        // mapping denda keterlambatan
+        $dendaKeterlambatan = !empty($employeeIds)
+            ? $this->DendaAbsenHarianModel->getDendaKeterlambatanByDateRangeAmt($employeeIds, $startDate, $endDate)
+            : [];
 
         $mapDendaKeterlambatan = [];
         foreach ($dendaKeterlambatan as $d) {
-            $mapDendaKeterlambatan[$d['employee_id']][$d['tanggal']] = ['nominal' => $d['nominal']];
+            $mapDendaKeterlambatan[$d['employee_id']][$d['tanggal']] = [
+                'nominal' => $d['nominal']
+            ];
         }
 
-        $uangMakanData = !empty($employeeIds) ? $this->UangMakanHarianModel->getUangMakanHarianByDateRangeAmt(
-            $employeeIds,
-            $startDate,
-            $endDate
-        ) : [];
+        // uang makan
+        $uangMakanData = !empty($employeeIds)
+            ? $this->UangMakanHarianModel->getUangMakanHarianByDateRangeAmt($employeeIds, $startDate, $endDate)
+            : [];
+
         $mapUangMakanHarian = [];
         foreach ($uangMakanData as $u) {
             $mapUangMakanHarian[$u['employee_id']][$u['tanggal']] = [
@@ -2356,41 +2353,43 @@ class Attendance extends BaseController
             ];
         }
 
+        // Spreadsheet
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle("Presensi Bulanan");
 
         $row = 1;
 
-        // ========== Judul besar ==========
+        // Judul besar
         $sheet->mergeCells("A$row:G$row");
-        $sheet->setCellValue("A$row", "LAPORAN PRESENSI BULAN $monthName");
+        $sheet->setCellValue("A$row", "LAPORAN PRESENSI " . $startDate . " S.D " . $endDate);
         $sheet->getStyle("A$row")->applyFromArray([
             'font' => ['bold' => true, 'size' => 14],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
         ]);
         $row += 2;
 
+        // Loop per karyawan
         foreach ($employeeData as $e) {
-            // ======== Card Info Karyawan ========
+
+            // Card info karyawan
             $sheet->mergeCells("A$row:G$row");
             $sheet->setCellValue("A$row", "Nama: {$e['name']} | NIP: {$e['nip']} | Divisi: {$e['divisi']} | Bagian: {$e['bagian']}");
             $sheet->getStyle("A$row")->applyFromArray([
                 'font' => ['bold' => true],
-                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'FCE4D6']], // warna kartu
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'FCE4D6']],
                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT],
                 'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
             ]);
             $row += 2;
 
-            // ======== Header ========
+            // Header
             $headers = ['No', 'Tanggal', 'IN', 'OUT', 'DENDA', 'LEMBUR', 'UANG MAKAN'];
             $col = 1;
             foreach ($headers as $h) {
                 $sheet->setCellValueByColumnAndRow($col++, $row, $h);
             }
 
-            // Style header
             $sheet->getStyle("A$row:G$row")->applyFromArray([
                 'font' => ['bold' => true],
                 'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'D9E1F2']],
@@ -2400,27 +2399,32 @@ class Attendance extends BaseController
 
             $row++;
 
-            // ======== Isi data per tanggal ========
-            $totalDendaBulan = 0;
-            $totalDaysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
-            for ($d = 1; $d <= $totalDaysInMonth; $d++) {
-                $tanggal = sprintf("%04d-%02d-%02d", $year, $month, $d);
+            // ========== LOOP TANGGAL ==========  
+            $dateLoop = $startDate;
+            $no = 1;
+
+            while ($dateLoop <= $endDate) {
+
+                $tanggal = $dateLoop;
                 $dayLog  = $mapLog[$e['id']][$tanggal] ?? null;
+
                 $denda = (float)($mapDendaKeterlambatan[$e['id']][$tanggal]['nominal'] ?? 0);
-                $totalDendaBulan += $denda;
 
                 $in  = $dayLog['in'] ?? '';
                 $out = $dayLog['out'] ?? '';
                 $status = $dayLog['status'] ?? '';
+
                 if ($status != "HADIR_H" && !empty($status)) {
                     $val = explode("_", $status)[1];
                     $in = $out = $val;
                 }
 
+                // lembur
                 $formLembur = $this->formLemburModel->where('employee_id', $e['id'])
                     ->where('periode', $tanggal)
                     ->where('deletedAt', null)
                     ->first();
+
                 $lembur = '';
                 if ($formLembur != null) {
                     $selisih = $this->formLembur::selisihWaktu(
@@ -2430,30 +2434,33 @@ class Attendance extends BaseController
                     $lembur = (float)$selisih['jam'] . " Jam, " . $selisih['menit'] . " Menit";
                 }
 
+                // uang makan
                 $uangMakan = (float)($mapUangMakanHarian[$e['id']][$tanggal]['nominal'] ?? 0);
 
+                // isi row
                 $col = 1;
-                $sheet->setCellValueByColumnAndRow($col++, $row, $d); // No
-                $sheet->setCellValueByColumnAndRow($col++, $row, $tanggal); // YYYY-MM-DD
+                $sheet->setCellValueByColumnAndRow($col++, $row, $no++);
+                $sheet->setCellValueByColumnAndRow($col++, $row, $tanggal);
                 $sheet->setCellValueByColumnAndRow($col++, $row, $in);
                 $sheet->setCellValueByColumnAndRow($col++, $row, $out);
                 $sheet->setCellValueByColumnAndRow($col++, $row, $denda);
                 $sheet->setCellValueByColumnAndRow($col++, $row, $lembur);
                 $sheet->setCellValueByColumnAndRow($col++, $row, $uangMakan);
 
-                // Format angka & alignment
+                // format angka + style row
                 $sheet->getStyle("E$row:G$row")->getNumberFormat()->setFormatCode('#,##0');
                 $sheet->getStyle("E$row:G$row")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
-                // Border tiap baris
                 $sheet->getStyle("A$row:G$row")->applyFromArray([
                     'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
                 ]);
 
+                // increment tanggal
+                $dateLoop = date('Y-m-d', strtotime($dateLoop . ' +1 day'));
                 $row++;
             }
 
-            $row += 3; // spasi sebelum karyawan berikutnya
+            $row += 3; // spasi
         }
 
         // Auto width
@@ -2461,16 +2468,13 @@ class Attendance extends BaseController
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
-        // Output Excel
+        // Output file
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-        $fileName = "Presensi_Bulanan_{$monthName}.xlsx";
+        $fileName = "Presensi_Per_Karyawan.xlsx";
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment; filename=\"$fileName\"");
         $writer->save("php://output");
     }
-
-
-
 
     public function exportTriwulanPresensi()
     {
