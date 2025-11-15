@@ -22,6 +22,7 @@ use App\Models\SatuansModel;
 use App\Models\StockDetailModel;
 use Dompdf\Dompdf;
 use Exception;
+use IntlDateFormatter;
 
 class OrderForm extends BaseController
 {
@@ -901,6 +902,16 @@ class OrderForm extends BaseController
             ->where('sales_order_export_id', $id)
             ->findAll();
 
+        $formatter = new IntlDateFormatter(
+            'id_ID',
+            IntlDateFormatter::LONG,
+            IntlDateFormatter::NONE,
+            'Asia/Jakarta',
+            IntlDateFormatter::GREGORIAN,
+            'dd MMMM yyyy'
+        );
+
+        $tanggal_of = $formatter->format(strtotime($dataSO->tanggal));
         $data = [
             "displayPrice" => $displayPrice,
             "dataSO" => $dataSO,
@@ -909,7 +920,8 @@ class OrderForm extends BaseController
             "dataSalesOrderSpecs" => $dataSalesExportSpecs,
             "dataSalesExportAdditional" => $dataSalesExportAdditional,
             "company" => $this->companyModel->where('id', $dataSO->company_id)->first(),
-            "subCompany" => ""
+            "subCompany" => "",
+            "tanggal_of" => $tanggal_of
         ];
 
         if ($data['company']['id'] == 16) {
