@@ -90,7 +90,7 @@
                             <th onclick="changeSort('qty_diterima')">Qty</th>
                             <th onclick="changeSort('unit_id')">Unit</th>
                             <th onclick="changeSort('keterangan')">Note</th>
-
+                            <th>Tujuan Keluar</th>
                         </tr>
                     </thead>
                     <tbody class="body-table" id="body-table">
@@ -215,6 +215,11 @@
             {
                 data: "keterangan",
                 className: "text-left",
+            },
+            {
+                data: "tujuan_digunakan",
+                className: "text-left",
+                orderable: false
             },
         ],
         "drawCallback": function(settings) {

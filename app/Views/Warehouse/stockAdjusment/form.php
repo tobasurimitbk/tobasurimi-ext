@@ -2,7 +2,7 @@
 <?= $this->Section('content'); ?>
 <section class="section">
     <div class="section-header">
-        <h1><?= empty($adjusment) ? "Tambah Stok Adjusment" : "Update Stok Adjusment" ?></h1>
+        <h1>Adjusment Untuk Update Stok</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("stock-adjusment"); ?>">
                 Kembali
@@ -878,6 +878,7 @@
                 var url = id != '' ? "<?= base_url("stock-adjusment/update"); ?>" : "<?= base_url("stock-adjusment/save"); ?>";
                 var formData = new FormData(document.querySelector('.create-form'));
                 formData.append("listBarang", JSON.stringify(listStock));
+                formData.append("jenis_adjusment", "UPDATE");
                 // UPDATE
                 $.ajax({
                     url: url,

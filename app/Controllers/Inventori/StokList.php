@@ -24,6 +24,7 @@ use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
 use App\Models\StockModel;
 use App\Models\StockRevampDetailModel;
+use App\Models\StockRevampLogModel;
 use App\Models\StockRevampModel;
 use App\Models\SupplierModel;
 use App\Models\WarehousesModel;
@@ -62,6 +63,7 @@ class StokList extends BaseController
     protected $bc41Model;
     protected $stockRevampModel;
     protected $stockRevampDetailModel;
+    protected $stockRevampLogModel;
 
     public function __construct()
     {
@@ -93,6 +95,7 @@ class StokList extends BaseController
         $this->bc41Model = new BC41Model();
         $this->stockRevampModel = new StockRevampModel();
         $this->stockRevampDetailModel = new StockRevampDetailModel();
+        $this->stockRevampLogModel = new StockRevampLogModel();
     }
 
     public function index()
@@ -2266,4 +2269,254 @@ class StokList extends BaseController
         $writer->save('php://output');
         exit();
     }
+
+    public function kartuStokView()
+    {
+        $tipeBarang = $this->metaDataModel->where('deletedAt', null)
+            ->where('description !=', "kemasan")
+            ->where('name', "Kategori Barang")
+            ->findAll();
+
+        $data = [
+            'tipeBarang' => $tipeBarang,
+            'divisi' => $this->divisiModel->getDivisiAccess(),
+        ];
+
+        return view('Warehouse/stock/stock_card', $data);
+    }
+
+    public function getMasterBarang()
+    {
+        try {
+            $type_barang = $this->request->getVar('type_barang');
+            $dataList = $this->barangMasterModel->where('type_barang', $type_barang)
+                ->where('company_id', $this->this_company_id)
+                ->where('deletedAt', null)
+                ->findAll();
+
+            return response()->setJSON([
+                'status' => true,
+                'token' => csrf_hash(),
+                'data' => $dataList
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function allKartuStock()
+    {
+        $payload = [
+            "pageSize"      => $this->request->getVar("length"),
+            "currentPage"   => ($this->request->getVar("start") / $this->request->getVar("length")) + 1,
+            "search" => $this->request->getVar("search"),
+            "sort" => $this->request->getVar("sort"),
+            "sorttype" => $this->request->getVar("sortType"),
+        ];
+
+        $addCondition = [
+            "sort"   => $this->request->getVar("sort"),
+            "sortType"  => $this->request->getVar("sortType"),
+            "search" => $this->request->getVar("search"),
+            "start_date" => $this->request->getVar("start_date")
+                ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("start_date"))))
+                : null,
+            "end_date" => $this->request->getVar("end_date")
+                ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("end_date"))))
+                : null,
+            "divisi_id" => $this->request->getVar("divisi_id"),
+            "warehouse_id" => $this->request->getVar("warehouse_id"),
+        ];
+
+        $limit = $this->request->getVar("length");
+        $offset = $this->request->getVar("start");
+
+        $condition = [
+            'stock_revamp.deletedAt' => null,
+            'stock_revamp.company_id' => $this->this_company_id,
+            'stock_revamp.barang_master_id' => $this->request->getVar('barang_master_id')
+        ];
+
+        if (empty($condition['stock_revamp.barang_master_id']) || empty($addCondition['start_date']) || empty($addCondition['end_date'])) {
+            return response()->setJSON([
+                "draw"              => intval($this->request->getVar("draw")),
+                "recordsTotal"      => 0,
+                "recordsFiltered"   => 0,
+                "data"              => [],
+                "payload"           => $payload
+            ]);
+        }
+
+        $dataQry = $this->stockRevampModel->getListKartuStock(
+            $condition,
+            $addCondition,
+            $limit,
+            $offset
+        );
+
+        $dataTotalKartuStock = $this->getTotalKartuStockMasuk(
+            $addCondition['start_date'],
+            $addCondition['end_date']
+        );
+
+        $dataResult = [];
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($dataQry['data'] as $d) {
+            array_push($dataResult, [
+                'no' => $no++,
+                'id' => encrypt($d['id']),
+                'divisi' => $d['divisi'],
+                'warehouse_name' => $d['warehouse_name'],
+                'kode_barang' => $d['kode_barang'],
+                'barang_name' => $d['barang_name'],
+                'spesifikasi' => $d['spesifikasi'],
+                'qty_awal' => 0,
+                'qty_masuk' => isset($dataTotalKartuStock[$d['id']]) ? (float)$dataTotalKartuStock[$d['id']] ?? 0 : 0,
+                'qty_keluar' => 0,
+                'qty_akhir' => 0,
+                'kode_satuan' => $d['kode_satuan']
+            ]);
+        }
+
+        $data = [
+            "draw"              => intval($this->request->getVar("draw")),
+            "recordsTotal"      => $dataQry['totalData'],
+            "recordsFiltered"   => $dataQry['totalFilteredData'],
+            "data"              => $dataResult,
+            "payload"           => $payload
+        ];
+
+        return response()->setJSON($data);
+    }
+
+    public function getStockIdentity()
+    {
+        try {
+            $id = decrypt($this->request->getVar('id'));
+            $stock =  $this->stockRevampModel->getStockIdentity($id);
+            return response()->setJSON([
+                'status' => true,
+                'token' => csrf_hash(),
+                'data' => $stock
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    private function getTotalKartuStockMasuk($start_date, $end_date)
+    {
+        $condition = [
+            'company_id' => $this->this_company_id,
+            'dateStart'  => $start_date,
+            'dateEnd'    => $end_date,
+            'stock_id'   => "",
+        ];
+
+        $dataTotal =  $this->stockRevampLogModel->getKartuStockMasuk(
+            $condition,
+            0,
+            "desc",
+            100000000,
+            0
+        );
+
+        $dataMap = [];
+
+        foreach ($dataTotal['data'] as $d) {
+            $stockId = $d['stock_id'];
+            if (!isset($dataMap[$stockId])) {
+                $dataMap[$stockId] = 0;
+            }
+            $dataMap[$stockId] += floatval($d['qty_diterima']);
+        }
+
+        return $dataMap;
+    }
+
+
+    public function allMasukKartuStock()
+    {
+        $draw = $this->request->getGet('draw');
+        $start = (int)$this->request->getGet('start');
+        $length = (int)$this->request->getGet('length');
+        $orderDir = $this->request->getGet('order')[0]['dir'] ?? 'asc';
+        $orderColumnIndex = $this->request->getGet('order')[0]['column'] ?? null;
+
+        $dateStart = $this->request->getVar("start_date")
+            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("start_date"))))
+            : null;
+
+        $dateEnd = $this->request->getVar("end_date")
+            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("end_date"))))
+            : null;
+        $stockId = ($this->request->getGet('stock_id'));
+        $search = $this->request->getGet('search');
+
+        $condition = [
+            'company_id'        => $this->this_company_id,
+            'dateStart'         => $dateStart,
+            'dateEnd'           => $dateEnd,
+            'stock_id'         => $stockId,
+            'search'            => $search
+        ];
+
+        $dataTotal =  $this->stockRevampLogModel->getKartuStockMasuk(
+            $condition,
+            $orderColumnIndex,
+            $orderDir,
+            100000000,
+            0
+        );
+
+        $totalMasuk = 0;
+        foreach ($dataTotal['data'] as $d) {
+            $totalMasuk += (float)$d['qty_diterima'];
+        }
+
+        $data = $this->stockRevampLogModel->getKartuStockMasuk(
+            $condition,
+            $orderColumnIndex,
+            $orderDir,
+            $length,
+            $start
+        );
+
+        $dataResult = array();
+        $no = $start + 1;
+        foreach ($data['data'] as $d) {
+            array_push($dataResult, [
+                'no' => $no++,
+                'id' => $d['id'],
+                'reference_type' => $d['reference_type'],
+                'supplier_name' => $d['supplier_name'],
+                'po_no' => $d['po_no'],
+                'reference_no' => $d['reference_no'],
+                'po_date' => !empty($d['po_date']) && $d['po_date'] != null ? date('d/m/Y', strtotime($d['po_date'])) : "",
+                'lpb_date' => !empty($d['lpb_date']) && $d['lpb_date'] != null ? date('d/m/Y', strtotime($d['lpb_date'])) : "",
+                'keterangan' => $d['keterangan'],
+                'qty_diterima' => (float)$d['qty_diterima'],
+                'kode_satuan' => $d['kode_satuan'],
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'draw' => intval($draw),
+            'recordsTotal' => intval($data['totalData'] ?? 0),
+            'recordsFiltered' => intval($data['totalFilteredData'] ?? 0),
+            'data' => $dataResult,
+            'footerTotals' => $totalMasuk
+        ]);
+    }
+
+    public function allKeluarKartuStock() {}
 }

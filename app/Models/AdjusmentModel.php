@@ -67,7 +67,7 @@ class AdjusmentModel extends Model
             ->where($condition)
             ->join('divisis', 'adjusment.divisi_id = divisis.id', 'left')
             ->join('users', 'users.id = adjusment.createdBy', 'left')
-            ->join('metadata', 'metadata.id = adjusment.tipe_adjusment')
+            ->join('metadata', 'metadata.id = adjusment.tipe_adjusment', 'left')
             ->orderBy($sort, $sortType);
 
         $totalData = $dataQry->countAllResults(false);

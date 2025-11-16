@@ -6,6 +6,9 @@
         <h1>Stok List</h1>
 
         <div class="col-button-tambah-spp">
+            <a class="btn btn-hide-form btn-discard btn-primary float-right" style="background-color: #4E8A00 !important; border-color:#4E8A00; color:white !important;" href="<?= base_url("stock-list/stock-card"); ?>">
+                Kartu Stok
+            </a>
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("stock-list/create"); ?>">
                 Inisiasi Stok Awal
             </a>

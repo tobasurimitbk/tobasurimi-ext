@@ -155,6 +155,7 @@ class StokAdjusment extends BaseController
                 "created_by"            => $data['user_name'],
                 "status_posting"        => $data['status_posting'],
                 "divisi"                => $data['divisi'],
+                "jenis_adjusment"       => $data['jenis_adjusment']
             ]);
         }
 
@@ -328,6 +329,56 @@ class StokAdjusment extends BaseController
         }
     }
 
+    public function dropdownBarangStockList()
+    {
+        try {
+            $divisiId = $this->request->getVar('divisi_id');
+            $warehouseId = $this->request->getVar('warehouse_id');
+
+            if (empty($divisiId) || empty($warehouseId)) {
+                return response()->setJSON(['results' => []]);
+            }
+
+            $search = $this->request->getVar('q');
+            $data = $this->stockRevampModel->getStockListSearchBarang(
+                $this->this_company_id,
+                $divisiId,
+                $warehouseId,
+                $search
+            );
+
+            $dataList = array();
+            foreach ($data as $d) {
+                array_push($dataList, [
+                    'id' => $d['id'],
+                    'text' => "(" . $d['kode_barang'] . ") " . trim(
+                        str_replace(
+                            ["\"", "\t"],
+                            "'",
+                            $d['barang_name'] . '- ' . $d['spesifikasi']
+                        )
+                    ),
+                    'unit_id' => $d['unit_id'],
+                    'kode_barang' => $d['kode_barang'],
+                    'barang_name' => str_replace(["\"", "\t"], "'", $d['barang_name']),
+                    'spesifikasi' => str_replace(["\"", "\t"], "'", $d['spesifikasi']),
+                ]);
+            }
+
+            return response()->setJSON([
+                'results' => $dataList,
+                'status' => true,
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            return  response()->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
     public function getSatuanKonversi()
     {
         try {
@@ -424,6 +475,7 @@ class StokAdjusment extends BaseController
                 ->where('company_id', $this->this_company_id)
                 ->where('no_adjusment', $noAdjusment)
                 ->first();
+            $jenisAdjusment = $this->request->getVar('jenis_adjusment');
 
             if ($first != null) {
                 // sudah ada generate ulang
@@ -433,28 +485,39 @@ class StokAdjusment extends BaseController
             $id = $this->adjusmentModel->insert([
                 'company_id' => $this->this_company_id,
                 'divisi_id' => $this->request->getVar('divisi_id'),
+                'warehouse_id' => $jenisAdjusment == "UPDATE" ? null : $this->request->getVar('warehouse_id'),
                 'no_adjusment' => $this->request->getVar('no_adjusment'),
                 'tanggal' => $tanggal,
                 'tipe_adjusment' => $this->request->getVar('tipe_adjusment'),
                 'keterangan' => $this->request->getVar('keterangan') ?? null,
                 'status_posting' => 0,
-                'createdBy' => $this->this_user_id
+                'createdBy' => $this->this_user_id,
+                'jenis_adjusment' => $jenisAdjusment
             ]);
-
 
             foreach (json_decode($_POST['listBarang']) as $l) {
 
-                $this->adjusmentDetailModel->insert([
-                    'adjusment_id' => $id,
-                    'stock_detail_id' => $l->id,
-                    'qty_asal' => $l->qty_diterima,
-                    'operasi_adjusment_detail' => $l->adjusment->operasi_adjusment_detail,
-                    'qty_adjusment' => $l->adjusment->qty_adjusment,
-                    'unit_id_adjusment' => $l->adjusment->unit_id_adjusment,
-                    'qty_konversi' => $l->adjusment->qty_konversi,
-                    'unit_id_konversi' => $l->adjusment->unit_id_konversi,
-                    'hasil_adjusment' => $l->adjusment->hasil_adjusment
-                ]);
+                if ($jenisAdjusment == "UPDATE") {
+                    $this->adjusmentDetailModel->insert([
+                        'adjusment_id' => $id,
+                        'stock_detail_id' => $l->id,
+                        'qty_asal' => $l->qty_diterima,
+                        'operasi_adjusment_detail' => $l->adjusment->operasi_adjusment_detail,
+                        'qty_adjusment' => $l->adjusment->qty_adjusment,
+                        'unit_id_adjusment' => $l->adjusment->unit_id_adjusment,
+                        'qty_konversi' => $l->adjusment->qty_konversi,
+                        'unit_id_konversi' => $l->adjusment->unit_id_konversi,
+                        'hasil_adjusment' => $l->adjusment->hasil_adjusment
+                    ]);
+                } else {
+                    $this->adjusmentDetailModel->insert([
+                        'adjusment_id' => $id,
+                        'stock_id' => $l->stock_id,
+                        'operasi_adjusment_detail' => "PLUS",
+                        'unit_id_adjusment' => $l->satuan_id,
+                        'qty_adjusment' => $l->qty_adjusment,
+                    ]);
+                }
             }
 
             $db->transCommit();
@@ -486,6 +549,7 @@ class StokAdjusment extends BaseController
                 ->where('no_adjusment', $noAdjusment)
                 ->where('id !=', $id)
                 ->first();
+            $jenisAdjusment = $this->request->getVar('jenis_adjusment');
 
             if ($first != null) {
                 return response()->setJSON([
@@ -499,10 +563,12 @@ class StokAdjusment extends BaseController
                 'company_id' => $this->this_company_id,
                 'divisi_id' => $this->request->getVar('divisi_id'),
                 'no_adjusment' => $this->request->getVar('no_adjusment'),
+                'warehouse_id' => $jenisAdjusment == "UPDATE" ? null : $this->request->getVar('warehouse_id'),
                 'tanggal' => $tanggal,
                 'tipe_adjusment' => $this->request->getVar('tipe_adjusment'),
                 'keterangan' => $this->request->getVar('keterangan') ?? null,
                 'status_posting' => 0,
+                'jenis_adjusment' => $jenisAdjusment
             ]);
 
             $this->adjusmentDetailModel->where('adjusment_id', $id)->delete(null, false);
@@ -510,17 +576,27 @@ class StokAdjusment extends BaseController
             foreach (json_decode($_POST['listBarang']) as $l) {
                 // var_dump($l->adjusment);
                 // die;
-                $this->adjusmentDetailModel->insert([
-                    'adjusment_id' => $id,
-                    'stock_detail_id' => $l->id,
-                    'qty_asal' => $l->qty_diterima,
-                    'operasi_adjusment_detail' => $l->adjusment->operasi_adjusment_detail,
-                    'qty_adjusment' => $l->adjusment->qty_adjusment,
-                    'unit_id_adjusment' => $l->adjusment->unit_id_adjusment,
-                    'qty_konversi' => $l->adjusment->qty_konversi,
-                    'unit_id_konversi' => $l->adjusment->unit_id_konversi,
-                    'hasil_adjusment' => $l->adjusment->hasil_adjusment
-                ]);
+                if ($jenisAdjusment == "UPDATE") {
+                    $this->adjusmentDetailModel->insert([
+                        'adjusment_id' => $id,
+                        'stock_detail_id' => $l->id,
+                        'qty_asal' => $l->qty_diterima,
+                        'operasi_adjusment_detail' => $l->adjusment->operasi_adjusment_detail,
+                        'qty_adjusment' => $l->adjusment->qty_adjusment,
+                        'unit_id_adjusment' => $l->adjusment->unit_id_adjusment,
+                        'qty_konversi' => $l->adjusment->qty_konversi,
+                        'unit_id_konversi' => $l->adjusment->unit_id_konversi,
+                        'hasil_adjusment' => $l->adjusment->hasil_adjusment
+                    ]);
+                } else {
+                    $this->adjusmentDetailModel->insert([
+                        'adjusment_id' => $id,
+                        'stock_id' => $l->stock_id,
+                        'operasi_adjusment_detail' => "PLUS",
+                        'unit_id_adjusment' => $l->satuan_id,
+                        'qty_adjusment' => $l->qty_adjusment,
+                    ]);
+                }
             }
 
 
@@ -758,5 +834,252 @@ class StokAdjusment extends BaseController
         );
 
         return $no;
+    }
+
+    public function createAdjTambah()
+    {
+        $dataDivisi = $this->divisiModel->getDivisiAccess();
+        $dataSatuan = $this->satuanModel->where('deletedAt', null)->findAll();
+
+        $data = [
+            'divisi' => $dataDivisi,
+            'dataSatuan' => $dataSatuan,
+            'tanggal' => date('Y-m-d'),
+        ];
+
+        return view('Warehouse/stockAdjusment/form_tambah', $data);
+    }
+
+    public function detailAdjTambah($id)
+    {
+        $id = decrypt($id);
+        $adjusment = $this->adjusmentModel->where('id', $id)->first();
+
+        if ($adjusment == null) {
+            return redirect()->to('stock-adjusment');
+        }
+
+        $dataDivisi = $this->divisiModel->getDivisiAccess();
+        $dataSatuan = $this->satuanModel->where('deletedAt', null)->findAll();
+        $dataListBarang = $this->adjusmentDetailModel->getDetailAdjTambah($id);
+        $dataWarehouse = $this->warehouseModel->where('id', $adjusment['warehouse_id'])->findAll();
+
+        $data = [
+            'divisi' => $dataDivisi,
+            'dataSatuan' => $dataSatuan,
+            'dataListBarang' => $dataListBarang,
+            'adjusment' => $adjusment,
+            'warehouse' => $dataWarehouse
+        ];
+
+        return view('Warehouse/stockAdjusment/form_tambah', $data);
+    }
+
+    public function importPreview()
+    {
+        try {
+            // ========================
+            // 🔍 VALIDASI FILE
+            // ========================
+            $rules = [
+                "file" => [
+                    'rules' => 'uploaded[file]|ext_in[file,xlsx,xls]',
+                    'errors' => [
+                        'uploaded' => 'Tidak ada file yang di-upload.',
+                        'ext_in'   => 'File yang di-upload harus berupa file Excel (.xlsx atau .xls).',
+                    ],
+                ],
+            ];
+
+            if (!$this->validate($rules)) {
+                $errorList = $this->validator->getErrors();
+                return $this->response->setJSON([
+                    "status"  => false,
+                    "message" => $errorList[array_key_first($errorList)],
+                    'token'   => csrf_hash()
+                ]);
+            }
+
+            // ========================
+            // 📂 BACA FILE EXCEL
+            // ========================
+            $file = $this->request->getFile('file');
+            $divisiId = $this->request->getVar('divisi_id');
+            $warehouseId = $this->request->getVar('warehouse_id');
+
+            $divisi = $this->divisiModel->where('id', $divisiId)->first();
+            $warehouse = $this->warehouseModel->where('id', $warehouseId)->first();
+
+            if (!$file->isValid()) {
+                throw new \RuntimeException($file->getErrorString() . '(' . $file->getError() . ')');
+            }
+
+            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getTempName());
+            $worksheet   = $spreadsheet->getActiveSheet();
+
+            $data = [];
+            foreach ($worksheet->getRowIterator(2) as $row) {
+                $cellIterator = $row->getCellIterator();
+                $cellIterator->setIterateOnlyExistingCells(false);
+                $rowData = [];
+                foreach ($cellIterator as $cell) {
+                    $rowData[] = trim((string) $cell->getValue());
+                }
+                $data[] = $rowData;
+            }
+
+            // ========================
+            // 🔍 VALIDASI DATA
+            // ========================
+            $dataResult  = [];
+            $dataPreview = [];
+
+            foreach ($data as $index => $val) {
+                $status  = true;
+                $message = null;
+
+                $no         = trim($val[0] ?? '');
+                $kodeBarang = trim($val[1] ?? '');
+                $barangName = trim($val[2] ?? '');
+                $spesifikasi = trim($val[3] ?? '');
+                $qty        = (float) ($val[4] ?? 0);
+
+                // =========================
+                // 🔸 Validasi master barang
+                // =========================
+                $barangMasterFirst = $this->barangMasterModel
+                    ->where('company_id', $this->this_company_id)
+                    ->where('kode_barang', $kodeBarang)
+                    ->where('barang_name', $barangName)
+                    ->where('deletedAt', null)
+                    ->first();
+
+                $barangMasterSpesifikasi = null;
+                if ($barangMasterFirst) {
+                    $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel
+                        ->select('barang_master_spesifikasi.*, satuans.kode_satuan')
+                        ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+                        ->where('barang_master_id', $barangMasterFirst['id'])
+                        ->where('TRIM(spesifikasi)', $spesifikasi)
+                        ->where('barang_master_spesifikasi.deletedAt', null)
+                        ->first();
+
+                    if (!$barangMasterSpesifikasi) {
+                        $status = false;
+                        $message = "Spesifikasi tidak ditemukan di master barang.";
+                    }
+                } else {
+                    $status = false;
+                    $message = "Kode barang tidak ditemukan di master barang.";
+                }
+
+                // =========================
+                // 🔸 Validasi stok inisiasi
+                // =========================
+                if ($status && $barangMasterSpesifikasi) {
+                    $validasiStokInisiasi = $this->stockRevampModel->getBarangBelumDiinisiasi(
+                        $this->this_company_id,
+                        $divisiId,
+                        $warehouseId,
+                        $barangMasterSpesifikasi['id'],
+                        $barangMasterSpesifikasi['satuan_1']
+                    );
+
+                    if ($validasiStokInisiasi == null) {
+                        $status = false;
+                        $message = "Stok belum diinisiasi.";
+                    }
+                }
+
+                // =========================
+                // 💾 Simpan ke array result
+                // =========================
+                $dataResult[] = [
+                    'id' => $validasiStokInisiasi['id'] ?? null,
+                    'stock_id' => $validasiStokInisiasi['id'] ?? null,
+                    'kode_barang' => $kodeBarang,
+                    'barang_name' => $barangName,
+                    'spesifikasi' => $spesifikasi,
+                    'qty_adjusment' => $qty,
+                    'satuan_id' => $barangMasterSpesifikasi['satuan_1'] ?? null,
+                    'kode_satuan' => $barangMasterSpesifikasi['kode_satuan'] ?? null,
+                    'divisi' => $divisi['divisi'],
+                    'warehouse_name' => $warehouse['warehouse_name'],
+                    'status'        => $status,
+                    'message'       => $message,
+                ];
+            }
+
+            // =========================
+            // ✅ RETURN RESPONSE
+            // =========================
+            return $this->response->setJSON([
+                'data' => [
+                    'dataResult'  => $dataResult,
+                ],
+                'status' => true,
+                'token'  => csrf_hash()
+            ]);
+        } catch (\Throwable $e) {
+            return $this->response->setJSON([
+                'status'  => false,
+                'token'   => csrf_hash(),
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function postingAdjTambah()
+    {
+        $db = \Config\Database::connect();
+        $db->transBegin();
+        try {
+            $id = decrypt($this->request->getVar('id'));
+            $adjusment = $this->adjusmentModel->where('id', $id)->first();
+            $adjusmentList = $this->adjusmentDetailModel->where('adjusment_id', $id)->where('deletedAt', null)->findAll();
+
+            foreach ($adjusmentList as $a) {
+                $stock = $this->stockRevampModel->where('id', $a['stock_id'])->first();
+
+                $payload = [
+                    'company_id'        => $this->this_company_id,
+                    'barang_master_id'  => $stock['barang_master_id'],
+                    'spesifikasi_id'    => $stock['spesifikasi_id'],
+                    'unit_id'           => $stock['unit_id'],
+                    'divisi_id'         => $stock['divisi_id'],
+                    'warehouse_id'      => $stock['warehouse_id'],
+                    'qty_bersih'        => $a['qty_adjusment'],
+                    'qty_diterima'      => $a['qty_adjusment'],
+                    'bc_id'             => 0,
+                    'type_bc'           => 'NON PABEAN',
+                    'reference_id'      => $adjusment['id'],
+                    'po_type'           => null,
+                    'po_id'             => null,
+                    'reference_type'    => 'ADJUSMENT',
+                    'status'            => 'IN',
+                    'keterangan'        => $adjusment['no_adjusment']
+                ];
+
+                $this->stockRevampModel->insertStockRevamp(
+                    $db,
+                    $payload
+                );
+            }
+
+            $this->adjusmentModel->update($id, ['status_posting' => 1]);
+            $db->transCommit();
+            return response()->setJSON([
+                "status" => true,
+                "message" => "Adjusment berhasil diposting",
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            return response()->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 }

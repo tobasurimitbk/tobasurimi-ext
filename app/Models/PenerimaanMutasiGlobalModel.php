@@ -500,4 +500,47 @@ class PenerimaanMutasiGlobalModel extends Model
             ->like('multiple_no_mutasi', $noMutasi)
             ->first();
     }
+
+    public function posting($id, $db)
+    {
+        $stockRevampModel = new StockRevampModel();
+        $penerimaanMutasiGlobalModel = new PenerimaanMutasiGlobalDetailModel();
+        $barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
+
+        $penerimaanMutasi = $this->asArray()->where('id', $id)->first();
+        $penerimaanMutasiDetail = $penerimaanMutasiGlobalModel
+            ->where('penerimaan_mutasi_global_id', $id)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        foreach ($penerimaanMutasiDetail as $p) {
+            $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->where('id', $p['spesifikasi_hasil_id'])->first();
+
+            $payload = [
+                'company_id'        => $penerimaanMutasi['company_penerima_id'],
+                'barang_master_id'  => $barangMasterSpesifikasi['barang_master_id'],
+                'spesifikasi_id'    => $barangMasterSpesifikasi['id'],
+                'unit_id'           => $p['unit_hasil_id'],
+                'divisi_id'         => $penerimaanMutasi['divisi_penerima_id'],
+                'warehouse_id'      => $penerimaanMutasi['warehouse_penerima_id'],
+                'qty_bersih'        => $p['qty'],
+                'qty_diterima'      => $p['qty'],
+                'bc_id'             => 52,
+                'type_bc'           => "BC 2.7",
+                'reference_id'      => $penerimaanMutasi['id'],
+                'po_type'           => null,
+                'po_id'             => null,
+                'reference_type'    => 'PENERIMAAN MUTASI GLOBAL',
+                'status'            => 'IN',
+                'keterangan'        => $penerimaanMutasi['penerimaan_mutasi_no']
+            ];
+
+            $stockDetailId =  $stockRevampModel->insertStockRevamp(
+                $db,
+                $payload
+            );
+
+            $penerimaanMutasiGlobalModel->update($p['id'], ['stock_detail_id' => $stockDetailId]);
+        }
+    }
 }

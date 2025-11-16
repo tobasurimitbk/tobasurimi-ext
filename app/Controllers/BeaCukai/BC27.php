@@ -397,7 +397,8 @@ class BC27 extends BaseController
             $this->bc27Model->update($id, ['status_posting' => '1']);
             if ($bc27['penerimaan_otomatis'] == 1) {
                 $this->terimaOtomatis(
-                    $bc27['mutasi_global_id']
+                    $bc27['mutasi_global_id'],
+                    $db
                 );
             }
 
@@ -417,7 +418,7 @@ class BC27 extends BaseController
         }
     }
 
-    private function terimaOtomatis($mutasiGlobalId)
+    private function terimaOtomatis($mutasiGlobalId, $db)
     {
         $mutasiGlobal = $this->mutasiGlobalModel->where('id', $mutasiGlobalId)->first();
         $bc27 = $this->bc27Model->where('mutasi_global_id', $mutasiGlobalId)->first();
@@ -437,7 +438,8 @@ class BC27 extends BaseController
             'tanggal' => $mutasiGlobal['tanggal'],
             'keterangan' => null,
             'status_posting' => '1',
-            'createdBy' => $this->this_user_id
+            'createdBy' => $this->this_user_id,
+            'bc27_id' => $bc27['id']
         ]);
 
         foreach ($barang as $b) {
@@ -451,6 +453,8 @@ class BC27 extends BaseController
                 'qty' => $b['mutasi']['qty_konversi'],
             ]);
         }
+
+        $this->penerimaanMutasiGlobalModel->posting($id, $db);
 
         // Insert Stok
         return true;

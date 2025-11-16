@@ -813,4 +813,926 @@ class StockRevampLogModel extends Model
             'totalFilteredData' => $totalFilteredData,
         ];
     }
+
+    public function getListLogAdjusment($condition = [], $addCondition = [], $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'kode_barang'   => 'barang_master.kode_barang',
+            'barang_name'   => 'barang_master.barang_name',
+            'spesifikasi'   => 'barang_master_spesifikasi.spesifikasi',
+            'divisi_id'     => 'stock_revamp.divisi_id',
+            'warehouse_id'  => 'stock_revamp.warehouse_id',
+            'type_bc'       => 'stock_revamp_detail.type_bc',
+            'reference_id'  => 'stock_revamp_detail.reference_id',
+            'createdAt'     => 'stock_revamp_log.createdAt',
+            'qty_diterima'  => 'stock_revamp_log.qty_diterima',
+            'unit_id'       => 'stock_revamp.unit_id',
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'stock_revamp_log.createdAt';
+        $sortType = $availableSortType[strtolower($addCondition['sortType'] ?? 'desc')] ?? 'DESC';
+
+        // SELECT utama
+        $selectQry = "
+            stock_revamp_log.*,
+            barang_master.kode_barang,
+            barang_master.barang_name,
+            barang_master_spesifikasi.spesifikasi,
+            divisis.divisi,
+            warehouses.warehouse_name,
+            stock_revamp_detail.type_bc,
+            satuans.kode_satuan,
+            adjusment.no_adjusment AS ref_no,
+        ";
+
+        $builder = $this->asArray()
+            ->select($selectQry)
+            ->join('stock_revamp_detail', 'stock_revamp_detail.id = stock_revamp_log.stock_detail_id', 'left')
+            ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
+            ->join('barang_master', 'stock_revamp.barang_master_id = barang_master.id', 'left')
+            ->join('barang_master_spesifikasi', 'stock_revamp.spesifikasi_id = barang_master_spesifikasi.id', 'left')
+            ->join('divisis', 'divisis.id = stock_revamp.divisi_id', 'left')
+            ->join('satuans', 'satuans.id = stock_revamp.unit_id', 'left')
+            ->join('warehouses', 'warehouses.id = stock_revamp.warehouse_id', 'left')
+            ->join('adjusment', 'adjusment.id = stock_revamp_detail.reference_id', 'left')
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $builder->countAllResults(false);
+
+        if (!empty($addCondition['dateStart'])) {
+            $builder->where('DATE(stock_revamp_log.createdAt) >=', $addCondition['dateStart']);
+        }
+        if (!empty($addCondition['dateEnd'])) {
+            $builder->where('DATE(stock_revamp_log.createdAt) <=', $addCondition['dateEnd']);
+        }
+        if (!empty($addCondition['divisi_id'])) {
+            $builder->where('stock_revamp.divisi_id', $addCondition['divisi_id']);
+        }
+        if (!empty($addCondition['warehouse_id'])) {
+            $builder->where('stock_revamp.warehouse_id', $addCondition['warehouse_id']);
+        }
+        if (!empty($addCondition['search'])) {
+            $builder->groupStart()
+                ->like('divisis.divisi', $addCondition['search'])
+                ->orLike('barang_master.kode_barang', $addCondition['search'])
+                ->orLike('barang_master.barang_name', $addCondition['search'])
+                ->orLike('barang_master_spesifikasi.spesifikasi', $addCondition['search'])
+                ->groupEnd();
+        }
+
+        $countBuilder = clone $builder;
+        $totalFilteredData = $countBuilder->countAllResults(false);
+        $data = $builder->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+        ];
+    }
+
+    public function getListLogPenerimaanMutasi($condition = [], $addCondition = [], $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'kode_barang'   => 'barang_master.kode_barang',
+            'barang_name'   => 'barang_master.barang_name',
+            'spesifikasi'   => 'barang_master_spesifikasi.spesifikasi',
+            'divisi_id'     => 'stock_revamp.divisi_id',
+            'warehouse_id'  => 'stock_revamp.warehouse_id',
+            'type_bc'       => 'stock_revamp_detail.type_bc',
+            'reference_id'  => 'stock_revamp_detail.reference_id',
+            'createdAt'     => 'stock_revamp_log.createdAt',
+            'qty_diterima'  => 'stock_revamp_log.qty_diterima',
+            'unit_id'       => 'stock_revamp.unit_id',
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'stock_revamp_log.createdAt';
+        $sortType = $availableSortType[strtolower($addCondition['sortType'] ?? 'desc')] ?? 'DESC';
+
+        // SELECT utama
+        $selectQry = "
+            stock_revamp_log.*,
+            barang_master.kode_barang,
+            barang_master.barang_name,
+            barang_master_spesifikasi.spesifikasi,
+            divisis.divisi,
+            warehouses.warehouse_name,
+            stock_revamp_detail.type_bc,
+            satuans.kode_satuan,
+            penerimaan_mutasi.penerimaan_mutasi_no AS ref_no,
+        ";
+
+        $builder = $this->asArray()
+            ->select($selectQry)
+            ->join('stock_revamp_detail', 'stock_revamp_detail.id = stock_revamp_log.stock_detail_id', 'left')
+            ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
+            ->join('barang_master', 'stock_revamp.barang_master_id = barang_master.id', 'left')
+            ->join('barang_master_spesifikasi', 'stock_revamp.spesifikasi_id = barang_master_spesifikasi.id', 'left')
+            ->join('divisis', 'divisis.id = stock_revamp.divisi_id', 'left')
+            ->join('satuans', 'satuans.id = stock_revamp.unit_id', 'left')
+            ->join('warehouses', 'warehouses.id = stock_revamp.warehouse_id', 'left')
+            ->join('penerimaan_mutasi', 'penerimaan_mutasi.id = stock_revamp_detail.reference_id', 'left')
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $builder->countAllResults(false);
+
+        if (!empty($addCondition['dateStart'])) {
+            $builder->where('DATE(stock_revamp_log.createdAt) >=', $addCondition['dateStart']);
+        }
+        if (!empty($addCondition['dateEnd'])) {
+            $builder->where('DATE(stock_revamp_log.createdAt) <=', $addCondition['dateEnd']);
+        }
+        if (!empty($addCondition['divisi_id'])) {
+            $builder->where('stock_revamp.divisi_id', $addCondition['divisi_id']);
+        }
+        if (!empty($addCondition['warehouse_id'])) {
+            $builder->where('stock_revamp.warehouse_id', $addCondition['warehouse_id']);
+        }
+        if (!empty($addCondition['search'])) {
+            $builder->groupStart()
+                ->like('divisis.divisi', $addCondition['search'])
+                ->orLike('barang_master.kode_barang', $addCondition['search'])
+                ->orLike('barang_master.barang_name', $addCondition['search'])
+                ->orLike('barang_master_spesifikasi.spesifikasi', $addCondition['search'])
+                ->groupEnd();
+        }
+
+        $countBuilder = clone $builder;
+        $totalFilteredData = $countBuilder->countAllResults(false);
+        $data = $builder->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+        ];
+    }
+
+    public function getListLogPenerimaanMutasiGlobal($condition = [], $addCondition = [], $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'kode_barang'   => 'barang_master.kode_barang',
+            'barang_name'   => 'barang_master.barang_name',
+            'spesifikasi'   => 'barang_master_spesifikasi.spesifikasi',
+            'divisi_id'     => 'stock_revamp.divisi_id',
+            'warehouse_id'  => 'stock_revamp.warehouse_id',
+            'type_bc'       => 'stock_revamp_detail.type_bc',
+            'reference_id'  => 'stock_revamp_detail.reference_id',
+            'createdAt'     => 'stock_revamp_log.createdAt',
+            'qty_diterima'  => 'stock_revamp_log.qty_diterima',
+            'unit_id'       => 'stock_revamp.unit_id',
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'stock_revamp_log.createdAt';
+        $sortType = $availableSortType[strtolower($addCondition['sortType'] ?? 'desc')] ?? 'DESC';
+
+        // SELECT utama
+        $selectQry = "
+            stock_revamp_log.*,
+            barang_master.kode_barang,
+            barang_master.barang_name,
+            barang_master_spesifikasi.spesifikasi,
+            divisis.divisi,
+            warehouses.warehouse_name,
+            stock_revamp_detail.type_bc,
+            satuans.kode_satuan,
+            penerimaan_mutasi_global.penerimaan_mutasi_no AS ref_no,
+        ";
+
+        $builder = $this->asArray()
+            ->select($selectQry)
+            ->join('stock_revamp_detail', 'stock_revamp_detail.id = stock_revamp_log.stock_detail_id', 'left')
+            ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
+            ->join('barang_master', 'stock_revamp.barang_master_id = barang_master.id', 'left')
+            ->join('barang_master_spesifikasi', 'stock_revamp.spesifikasi_id = barang_master_spesifikasi.id', 'left')
+            ->join('divisis', 'divisis.id = stock_revamp.divisi_id', 'left')
+            ->join('satuans', 'satuans.id = stock_revamp.unit_id', 'left')
+            ->join('warehouses', 'warehouses.id = stock_revamp.warehouse_id', 'left')
+            ->join('penerimaan_mutasi_global', 'penerimaan_mutasi_global.id = stock_revamp_detail.reference_id', 'left')
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $builder->countAllResults(false);
+
+        if (!empty($addCondition['dateStart'])) {
+            $builder->where('DATE(stock_revamp_log.createdAt) >=', $addCondition['dateStart']);
+        }
+        if (!empty($addCondition['dateEnd'])) {
+            $builder->where('DATE(stock_revamp_log.createdAt) <=', $addCondition['dateEnd']);
+        }
+        if (!empty($addCondition['divisi_id'])) {
+            $builder->where('stock_revamp.divisi_id', $addCondition['divisi_id']);
+        }
+        if (!empty($addCondition['warehouse_id'])) {
+            $builder->where('stock_revamp.warehouse_id', $addCondition['warehouse_id']);
+        }
+        if (!empty($addCondition['search'])) {
+            $builder->groupStart()
+                ->like('divisis.divisi', $addCondition['search'])
+                ->orLike('barang_master.kode_barang', $addCondition['search'])
+                ->orLike('barang_master.barang_name', $addCondition['search'])
+                ->orLike('barang_master_spesifikasi.spesifikasi', $addCondition['search'])
+                ->groupEnd();
+        }
+
+        $countBuilder = clone $builder;
+        $totalFilteredData = $countBuilder->countAllResults(false);
+        $data = $builder->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+        ];
+    }
+
+    public function getKartuStockMasuk(
+        $condition,
+        $orderColumnIndex,
+        $orderDir,
+        $limit = 10,
+        $offset = 0
+    ) {
+
+        $db = \Config\Database::connect();
+
+        // ============================
+        // 🔍 FILTER KONDISI
+        // ============================
+
+        $where = [];
+        $whereDatePenerimaanBarang = "";
+        $whereDateProsesRebus = "";
+        $whereDateJasaVendor = "";
+        $whereDateHasilProduksi = "";
+        $whereDateInisiasi = "";
+
+        $searchPoLokalBb = "";
+        $searchPoBp = "";
+        $searchPoImportBb = "";
+        $searchProsesRebus = "";
+        $searchJasaVendor = "";
+        $searchHasilProduksi = "";
+
+        if (!empty($condition['id'])) {
+            $where[] = "stock_revamp_detail.id = '$condition[id]'";
+        }
+
+        if (!empty($condition['company_id'])) {
+            $where[] = "stock_revamp.company_id = '$condition[company_id]'";
+        }
+
+        if (!empty($condition['dateStart']) && !empty($condition['dateEnd'])) {
+            $whereDatePenerimaanBarang = "AND penerimaan_barang.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
+            $whereDateProsesRebus = "AND proses_rebus.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
+            $whereDateJasaVendor = "AND jasa_vendor_in.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
+            $whereDateHasilProduksi = "AND production_results.receive_date BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
+            $whereDateInisiasi = "AND DATE(stock_revamp_log.createdAt) BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
+        }
+
+        if (!empty($condition['stock_id'])) {
+            $where[] = "stock_revamp.id = '$condition[stock_id]'";
+        }
+        if (!empty($condition['search'])) {
+            $search = $db->escapeLikeString(trim($condition['search']));
+            $searchPoLokalBb = "
+                AND
+                    (
+                        suppliers.name LIKE '%{$search}%'
+                        OR stock_revamp_detail.reference_type LIKE '%{$search}%'
+                        OR penerimaan_barang.no_penerimaan_barang LIKE '%{$search}%'
+                        OR rm_purchase_orders.po_no LIKE '%{$search}%'
+                    )
+
+            ";
+            $searchPoBp = "
+                AND 
+                    (
+                        am_purchase_orders.po_no LIKE '%{$search}%'
+                        OR stock_revamp_detail.reference_type LIKE '%{$search}%'
+                        OR suppliers.name LIKE '%{$search}%'
+                        OR penerimaan_barang.no_penerimaan_barang LIKE '%{$search}%'
+                    )
+            ";
+            $searchPoImportBb = "
+                AND 
+                    (
+                        rm_import_pos.po_no LIKE '%{$search}%'
+                        OR suppliers.name LIKE '%{$search}%'
+                        OR stock_revamp_detail.reference_type LIKE '%{$search}%'
+                        OR penerimaan_barang.no_penerimaan_barang LIKE '%{$search}%'
+                    )
+            ";
+            $searchProsesRebus = "
+                AND 
+                    (
+                        proses_rebus.no_rebus LIKE '%{$search}%'
+                        OR stock_revamp_detail.reference_type LIKE '%{$search}%'
+                        OR rm_purchase_orders.po_no LIKE '%{$search}%'
+                    )
+            ";
+            $searchJasaVendor = "
+                AND
+                    ( 
+                        stock_revamp_detail.reference_type LIKE '%{$search}%'
+                        OR jasa_vendor_in.no_penerimaan_surat_jalan LIKE '%{$search}%'
+                    )
+            ";
+            $searchHasilProduksi = "
+                AND 
+                    (
+                        stock_revamp_detail.reference_type LIKE '%{$search}%'
+                        OR production_results.pr_no LIKE '%{$search}%'
+                    )
+            ";
+        }
+
+
+        $filterCondition = !empty($where) ? " AND " . implode(" AND ", $where) : "";
+
+        $columns = [
+            'id',
+            'reference_type',
+            'supplier_name',
+            'po_no',
+            'reference_no',
+            'po_date',
+            'lpb_date',
+            'kode_satuan',
+            'qty_diterima',
+            'keterangan'
+        ];
+
+        $orderBy = "";
+        if ($orderColumnIndex !== null && isset($columns[$orderColumnIndex])) {
+            $col = $columns[$orderColumnIndex];
+            $dir = strtoupper($orderDir) === 'DESC' ? 'DESC' : 'ASC';
+            $orderBy = " ORDER BY $col $dir ";
+        }
+
+        $baseQuery = "
+        (
+            -- STOK DARI PO LOKAL BAKU
+            SELECT
+                stock_revamp_detail.stock_id,
+                stock_revamp_log.id,
+                stock_revamp_detail.reference_type,
+                suppliers.name AS supplier_name,
+                rm_purchase_orders.po_no AS po_no,
+                penerimaan_barang.no_penerimaan_barang AS reference_no,
+                rm_purchase_orders.po_date,
+                penerimaan_barang.tanggal AS lpb_date,
+                stock_revamp_log.qty_diterima AS qty_diterima,
+                stock_revamp_log.keterangan,
+                satuans.kode_satuan
+            FROM stock_revamp_log
+            LEFT JOIN stock_revamp_detail ON stock_revamp_detail.id = stock_revamp_log.stock_detail_id
+            LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
+            LEFT JOIN satuans ON satuans.id = stock_revamp.unit_id
+            LEFT JOIN rm_purchase_orders ON rm_purchase_orders.id = stock_revamp_detail.po_id
+            LEFT JOIN penerimaan_barang ON penerimaan_barang.id = stock_revamp_detail.reference_id
+            LEFT JOIN suppliers ON suppliers.id = rm_purchase_orders.supplier_id
+            WHERE stock_revamp_log.deletedAt IS NULL
+            AND stock_revamp_detail.reference_type='LPB'
+            AND penerimaan_barang.tipe_bahan='BAKU'
+            AND penerimaan_barang.status_penerimaan='LOKAL'
+            AND stock_revamp_log.status='IN'
+            $filterCondition
+            $whereDatePenerimaanBarang
+            $searchPoLokalBb
+        )
+        UNION ALL
+        (
+            -- STOK DARI PO LOKAL BAHAN PENOLONG
+            SELECT
+                stock_revamp_detail.stock_id,
+                stock_revamp_log.id,
+                stock_revamp_detail.reference_type,
+                suppliers.name AS supplier_name,
+                am_purchase_orders.po_no AS po_no,
+                penerimaan_barang.no_penerimaan_barang AS reference_no,
+                am_purchase_orders.po_date,
+                penerimaan_barang.tanggal AS lpb_date,
+                stock_revamp_log.qty_diterima AS qty_diterima,
+                stock_revamp_log.keterangan,
+                satuans.kode_satuan
+            FROM stock_revamp_log
+            LEFT JOIN stock_revamp_detail ON stock_revamp_detail.id = stock_revamp_log.stock_detail_id
+            LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
+            LEFT JOIN satuans ON satuans.id = stock_revamp.unit_id
+            LEFT JOIN am_purchase_orders ON am_purchase_orders.id = stock_revamp_detail.po_id
+            LEFT JOIN penerimaan_barang ON penerimaan_barang.id = stock_revamp_detail.reference_id
+            LEFT JOIN suppliers ON suppliers.id = am_purchase_orders.supplier_id
+            WHERE stock_revamp_log.deletedAt IS NULL
+            AND stock_revamp_detail.reference_type='LPB'
+            AND penerimaan_barang.tipe_bahan='PENOLONG'
+            AND penerimaan_barang.status_penerimaan='LOKAL'
+            AND stock_revamp_log.status='IN'
+            $filterCondition
+            $whereDatePenerimaanBarang
+            $searchPoBp
+        )
+        UNION ALL
+        (
+            -- STOK DARI PO IMPORT BAHAN PENOLONG
+            SELECT
+                stock_revamp_detail.stock_id,
+                stock_revamp_log.id,
+                stock_revamp_detail.reference_type,
+                suppliers.name AS supplier_name,
+                am_purchase_orders.po_no AS po_no,
+                penerimaan_barang.no_penerimaan_barang AS reference_no,
+                am_purchase_orders.po_date,
+                penerimaan_barang.tanggal AS lpb_date,
+                stock_revamp_log.qty_diterima AS qty_diterima,
+                stock_revamp_log.keterangan,
+                satuans.kode_satuan
+            FROM stock_revamp_log
+            LEFT JOIN stock_revamp_detail ON stock_revamp_detail.id = stock_revamp_log.stock_detail_id
+            LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
+            LEFT JOIN satuans ON satuans.id = stock_revamp.unit_id
+            LEFT JOIN am_purchase_orders ON am_purchase_orders.id = stock_revamp_detail.po_id
+            LEFT JOIN penerimaan_barang ON penerimaan_barang.id = stock_revamp_detail.reference_id
+            LEFT JOIN suppliers ON suppliers.id = am_purchase_orders.supplier_id
+            WHERE stock_revamp_log.deletedAt IS NULL
+            AND stock_revamp_detail.reference_type='LPB'
+            AND penerimaan_barang.tipe_bahan='PENOLONG'
+            AND penerimaan_barang.status_penerimaan='IMPORT'
+            AND stock_revamp_log.status='IN'
+            $filterCondition
+            $whereDatePenerimaanBarang
+            $searchPoBp
+        )
+        UNION ALL
+        (
+            -- STOK DARI PO IMPORT BAHAN BAKU
+            SELECT
+                stock_revamp_detail.stock_id,
+                stock_revamp_log.id,
+                stock_revamp_detail.reference_type,
+                suppliers.name AS supplier_name,
+                rm_import_pos.po_no AS po_no,
+                penerimaan_barang.no_penerimaan_barang AS reference_no,
+                rm_import_pos.po_date,
+                penerimaan_barang.tanggal AS lpb_date,
+                stock_revamp_log.qty_diterima AS qty_diterima,
+                stock_revamp_log.keterangan,
+                satuans.kode_satuan
+            FROM stock_revamp_log
+            LEFT JOIN stock_revamp_detail ON stock_revamp_detail.id = stock_revamp_log.stock_detail_id
+            LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
+            LEFT JOIN satuans ON satuans.id = stock_revamp.unit_id
+            LEFT JOIN rm_import_pos ON rm_import_pos.id = stock_revamp_detail.po_id
+            LEFT JOIN penerimaan_barang ON penerimaan_barang.id = stock_revamp_detail.reference_id
+            LEFT JOIN suppliers ON suppliers.id = rm_import_pos.supplier_id
+            WHERE stock_revamp_log.deletedAt IS NULL
+            AND stock_revamp_detail.reference_type='LPB'
+            AND penerimaan_barang.tipe_bahan='BAKU'
+            AND penerimaan_barang.status_penerimaan='IMPORT'
+            AND stock_revamp_log.status='IN'
+            $filterCondition
+            $whereDatePenerimaanBarang
+            $searchPoImportBb
+        )
+        UNION ALL
+        (
+            -- STOK DARI PROSES REBUS
+            SELECT
+                stock_revamp_detail.stock_id,
+                stock_revamp_log.id,
+                stock_revamp_detail.reference_type,
+                suppliers.name AS supplier_name,
+                rm_purchase_orders.po_no AS po_no,
+                proses_rebus.no_rebus AS reference_no,
+                rm_purchase_orders.po_date,
+                proses_rebus.tanggal AS lpb_date,
+                stock_revamp_log.qty_diterima AS qty_diterima,
+                stock_revamp_log.keterangan,
+                satuans.kode_satuan
+            FROM stock_revamp_log
+            LEFT JOIN stock_revamp_detail ON stock_revamp_detail.id = stock_revamp_log.stock_detail_id
+            LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
+            LEFT JOIN satuans ON satuans.id = stock_revamp.unit_id
+            LEFT JOIN rm_purchase_orders ON rm_purchase_orders.id = stock_revamp_detail.po_id
+            LEFT JOIN proses_rebus ON proses_rebus.id = stock_revamp_detail.reference_id
+            LEFT JOIN suppliers ON suppliers.id = rm_purchase_orders.supplier_id
+            WHERE stock_revamp_log.deletedAt IS NULL
+            AND stock_revamp_detail.reference_type='PROSES REBUS'
+            AND stock_revamp_log.status='IN'
+            $filterCondition
+            $whereDateProsesRebus
+            $searchProsesRebus
+        )
+        UNION ALL
+        (
+            -- STOK DARI JASA VENDOR
+             SELECT
+                stock_revamp_detail.stock_id,
+                stock_revamp_log.id,
+                stock_revamp_detail.reference_type,
+                vendors.name AS supplier_name,
+                '' AS po_no,
+                jasa_vendor_in.no_penerimaan_surat_jalan AS reference_no,
+                '' AS po_date,
+                jasa_vendor_in.tanggal AS lpb_date,
+                stock_revamp_log.qty_diterima AS qty_diterima,
+                stock_revamp_log.keterangan,
+                satuans.kode_satuan
+            FROM stock_revamp_log
+            LEFT JOIN stock_revamp_detail ON stock_revamp_detail.id = stock_revamp_log.stock_detail_id
+            LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
+            LEFT JOIN satuans ON satuans.id = stock_revamp.unit_id
+            LEFT JOIN jasa_vendor_in ON jasa_vendor_in.id = stock_revamp_detail.reference_id
+            LEFT JOIN vendors ON vendors.id = jasa_vendor_in.vendor_id
+            WHERE stock_revamp_log.deletedAt IS NULL
+            AND stock_revamp_detail.reference_type='JASA VENDOR'
+            AND stock_revamp_log.status='IN'
+            $filterCondition
+            $whereDateJasaVendor
+            $searchJasaVendor
+        )
+        UNION ALL
+        (
+            -- STOK DARI HASIL PRODUKSI
+            SELECT
+                stock_revamp_detail.stock_id,
+                stock_revamp_log.id,
+                stock_revamp_detail.reference_type,
+                '' AS supplier_name,
+                '' AS po_no,
+                production_results.pr_no AS reference_no,
+                '' AS po_date,
+                production_results.receive_date AS lpb_date,
+                stock_revamp_log.qty_diterima AS qty_diterima,
+                stock_revamp_log.keterangan,
+                satuans.kode_satuan
+            FROM stock_revamp_log
+            LEFT JOIN stock_revamp_detail ON stock_revamp_detail.id = stock_revamp_log.stock_detail_id
+            LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
+            LEFT JOIN satuans ON satuans.id = stock_revamp.unit_id
+            LEFT JOIN production_results ON production_results.id = stock_revamp_detail.reference_id
+            WHERE stock_revamp_detail.deletedAt IS NULL
+            AND stock_revamp_detail.reference_type='HASIL PRODUKSI'
+            AND stock_revamp_log.status='IN'
+            $filterCondition
+            $whereDateHasilProduksi
+            $searchHasilProduksi
+        )
+        UNION ALL
+        (
+            -- STOK DARI INISIASI
+             SELECT
+                stock_revamp_detail.stock_id,
+                stock_revamp_log.id,
+                stock_revamp_detail.reference_type,
+                '' AS supplier_name,
+                '' AS po_no,
+                '' AS reference_no,
+                '' AS po_date,
+                DATE(stock_revamp_log.createdAt) AS lpb_date,
+                stock_revamp_log.qty_diterima AS qty_diterima,
+                stock_revamp_log.keterangan,
+                satuans.kode_satuan
+            FROM stock_revamp_log
+            LEFT JOIN stock_revamp_detail ON stock_revamp_detail.id = stock_revamp_log.stock_detail_id
+            LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
+            LEFT JOIN satuans ON satuans.id = stock_revamp.unit_id
+            WHERE stock_revamp_log.deletedAt IS NULL
+            AND stock_revamp_detail.reference_type='INISIASI'
+            AND stock_revamp_log.status='IN'
+            $whereDateInisiasi
+            $filterCondition
+        )
+        ";
+
+
+        // ============================
+        // 📊 COUNT + PAGINATION
+        // ============================
+
+        $countQuery = "SELECT COUNT(*) AS cnt FROM ($baseQuery) AS x";
+        $totalFiltered = (int) $db->query($countQuery)->getRow()->cnt;
+
+        $mainQuery = "
+            SELECT * FROM ($baseQuery) AS x
+            $orderBy
+            LIMIT $limit OFFSET $offset
+        ";
+
+
+
+        // var_dump($mainQuery);
+        // die;
+        $data = $db->query($mainQuery)->getResultArray();
+
+        // ============================
+        // 📦 RETURN RESULT
+        // ============================
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalFiltered,
+            'totalFilteredData' => $totalFiltered,
+            'sort'              => $orderColumnIndex,
+            'sortType'          => $orderDir,
+        ];
+    }
+
+    public function getKartuStockKeluar(
+        $condition,
+        $orderColumnIndex,
+        $orderDir,
+        $limit = 10,
+        $offset = 0
+    ) {
+
+        $db = \Config\Database::connect();
+
+        // ============================
+        // 🔍 FILTER KONDISI
+        // ============================
+
+        $where = [];
+        $whereDateProsesRebus = "";
+        $whereDateJasaVendor = "";
+        $whereDateMaterialRequest = "";
+        $whereDateMaterialRequestPenolong = "";
+
+        $searchProsesRebus = "";
+        $searchJasaVendor = "";
+        $searchMaterialRequest = "";
+        $searchMaterialRequestPenolong = "";
+
+        if (!empty($condition['id'])) {
+            $where[] = "stock_revamp_detail.id = '$condition[id]'";
+        }
+
+        if (!empty($condition['company_id'])) {
+            $where[] = "stock_revamp.company_id = '$condition[company_id]'";
+        }
+
+        if (!empty($condition['dateStart']) && !empty($condition['dateEnd'])) {
+            $whereDateProsesRebus = "AND proses_rebus.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
+            $whereDateJasaVendor = "AND jasa_vendor_in.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
+            $whereDateMaterialRequest = "AND material_requests.request_date BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
+            $whereDateMaterialRequestPenolong = "AND material_requests_penolong.request_date BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
+        }
+
+        if (!empty($condition['stock_id'])) {
+            $where[] = "stock_revamp.id = '$condition[stock_id]'";
+        }
+        if (!empty($condition['search'])) {
+            $search = $db->escapeLikeString(trim($condition['search']));
+            $searchProsesRebus = "
+                AND 
+                    (
+                        proses_rebus.no_rebus LIKE '%{$search}%'
+                        OR stock_revamp_detail.reference_type LIKE '%{$search}%'
+                        OR rm_purchase_orders.po_no LIKE '%{$search}%'
+                    )
+            ";
+            $searchJasaVendor = "
+                AND
+                    ( 
+                        stock_revamp_detail.reference_type LIKE '%{$search}%'
+                        OR jasa_vendor_in.no_penerimaan_surat_jalan LIKE '%{$search}%'
+                    )
+            ";
+            $searchMaterialRequest = "
+                AND 
+                    (
+                        stock_revamp_detail.reference_type LIKE '%{$search}%'
+                        OR production_results.pr_no LIKE '%{$search}%'
+                    )
+            ";
+
+            $searchMaterialRequest = "
+                AND 
+                    (
+                        stock_revamp_detail.reference_type LIKE '%{$search}%'
+                        OR production_results.pr_no LIKE '%{$search}%'
+                    )
+            ";
+        }
+
+
+        $filterCondition = !empty($where) ? " AND " . implode(" AND ", $where) : "";
+
+        $columns = [
+            'id',
+            'reference_tujuan_type',
+            'reference_no',
+            'tanggal_keluar',
+            'kode_satuan',
+            'qty_diterima',
+            'keterangan'
+        ];
+
+        $orderBy = "";
+        if ($orderColumnIndex !== null && isset($columns[$orderColumnIndex])) {
+            $col = $columns[$orderColumnIndex];
+            $dir = strtoupper($orderDir) === 'DESC' ? 'DESC' : 'ASC';
+            $orderBy = " ORDER BY $col $dir ";
+        }
+
+        $baseQuery = "
+        (
+            -- STOK KELUAR KE PROSES REBUS
+            SELECT
+                stock_revamp_detail.stock_id,
+                stock_revamp_log.id,
+                stock_revamp_log.reference_tujuan_type,
+                divisis.divisi AS divisi_tujuan,
+                warehouses.warehouse_name AS warehouse_name,
+                proses_rebus.no_rebus AS reference_no,
+                proses_rebus.tanggal AS tanggal_keluar,
+                stock_revamp_log.keterangan,
+                stock_revamp_log.qty_diterima AS qty_diterima,
+                satuans.kode_satuan
+            FROM stock_revamp_log
+            LEFT JOIN stock_revamp_detail ON stock_revamp_detail.id = stock_revamp_log.stock_detail_id
+            LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
+            LEFT JOIN satuans ON satuans.id = stock_revamp.unit_id
+            LEFT JOIN proses_rebus ON proses_rebus.id = stock_revamp_log.reference_id
+            LEFT JOIN divisis ON divisis.id = proses_rebus.divisi_id
+            LEFT JOIN warehouses ON warehouses.id = proses_rebus.warehouse_id
+            WHERE stock_revamp_log.deletedAt IS NULL
+            AND stock_revamp_log.reference_tujuan_type='PROSES REBUS'
+            AND stock_revamp_log.status='OUT'
+            $filterCondition
+            $whereDateProsesRebus
+            $searchProsesRebus
+        )
+        UNION ALL
+        (
+            -- STOK KELUAR TUJUAN JASA VENDOR
+             SELECT
+                stock_revamp_detail.stock_id,
+                stock_revamp_log.id,
+                stock_revamp_log.reference_tujuan_type,
+                divisis.divisi AS divisi_tujuan,
+                warehouses.warehouse_name AS warehouse_name,
+                jasa_vendor_out.no_surat_jalan AS reference_no,
+                jasa_vendor_out.tanggal AS tanggal_keluar,
+                stock_revamp_log.keterangan,
+                stock_revamp_log.qty_diterima AS qty_diterima,
+                satuans.kode_satuan
+            FROM stock_revamp_log
+            LEFT JOIN stock_revamp_detail ON stock_revamp_detail.id = stock_revamp_log.stock_detail_id
+            LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
+            LEFT JOIN satuans ON satuans.id = stock_revamp.unit_id
+            LEFT JOIN jasa_vendor_out ON jasa_vendor_out.id = stock_revamp_log.reference_tujuan_id
+            LEFT JOIN divisis ON divisis.id = jasa_vendor_out.divisi_id
+            LEFT JOIN warehouses ON warehouses.id = jasa_vendor_out.warehouse_id
+            WHERE stock_revamp_log.deletedAt IS NULL
+            AND stock_revamp_log.reference_tujuan_type='JASA VENDOR'
+            AND stock_revamp_log.status='OUT'
+            $filterCondition
+            $whereDateJasaVendor
+            $searchJasaVendor
+        )
+        UNION ALL
+        (
+            -- STOK KELUAR KE MATERIAL REQUEST BAHAN BAKU
+            SELECT
+                stock_revamp_detail.stock_id,
+                stock_revamp_log.id,
+                stock_revamp_log.reference_tujuan_type,
+                divisis.divisi AS divisi_tujuan,
+                warehouses.warehouse_name AS warehouse_name,
+                material_requests.req_no AS reference_no,
+                material_requests.request_date AS tanggal_keluar,
+                stock_revamp_log.keterangan,
+                stock_revamp_log.qty_diterima AS qty_diterima,
+                satuans.kode_satuan
+            FROM stock_revamp_log
+            LEFT JOIN stock_revamp_detail ON stock_revamp_detail.id = stock_revamp_log.stock_detail_id
+            LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
+            LEFT JOIN satuans ON satuans.id = stock_revamp.unit_id
+            LEFT JOIN material_requests ON material_requests.id = stock_revamp_log.reference_tujuan_id
+            WHERE stock_revamp_log.deletedAt IS NULL
+            AND stock_revamp_log.reference_tujuan_type='MATERIAL REQUEST BAKU'
+            AND stock_revamp_log.status='OUT'
+            $filterCondition
+            $whereDateMaterialRequest
+            $searchMaterialRequest
+        )
+        UNION ALL
+        (
+            -- STOK KELUAR MATERIAL REQUEST PENOLONG
+            SELECT
+                stock_revamp_detail.stock_id,
+                stock_revamp_log.id,
+                stock_revamp_log.reference_tujuan_type,
+                divisis.divisi AS divisi_tujuan,
+                warehouses.warehouse_name AS warehouse_name,
+                material_requests_penolong.req_no AS reference_no,
+                material_requests_penolong.request_date AS tanggal_keluar,
+                stock_revamp_log.keterangan,
+                stock_revamp_log.qty_diterima AS qty_diterima,
+                satuans.kode_satuan
+            FROM stock_revamp_log
+            LEFT JOIN stock_revamp_detail ON stock_revamp_detail.id = stock_revamp_log.stock_detail_id
+            LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
+            LEFT JOIN satuans ON satuans.id = stock_revamp.unit_id
+            LEFT JOIN material_requests_penolong ON material_requests_penolong.id = stock_revamp_log.reference_tujuan_id
+            WHERE stock_revamp_log.deletedAt IS NULL
+            AND stock_revamp_log.reference_tujuan_type='MATERIAL REQUEST PENOLONG'
+            AND stock_revamp_log.status='OUT'
+            $filterCondition
+            $whereDateMaterialRequestPenolong
+            $searchMaterialRequestPenolong
+        )
+        UNION ALL
+        (
+            -- STOK KELUAR MATERIAL REQUEST PENOLONG
+            SELECT
+                stock_revamp_detail.stock_id,
+                stock_revamp_log.id,
+                stock_revamp_log.reference_tujuan_type,
+                divisis.divisi AS divisi_tujuan,
+                warehouses.warehouse_name AS warehouse_name,
+                material_requests_penolong.req_no AS reference_no,
+                material_requests_penolong.request_date AS tanggal_keluar,
+                stock_revamp_log.keterangan,
+                stock_revamp_log.qty_diterima AS qty_diterima,
+                satuans.kode_satuan
+            FROM stock_revamp_log
+            LEFT JOIN stock_revamp_detail ON stock_revamp_detail.id = stock_revamp_log.stock_detail_id
+            LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
+            LEFT JOIN satuans ON satuans.id = stock_revamp.unit_id
+            LEFT JOIN material_requests_penolong ON material_requests_penolong.id = stock_revamp_log.reference_tujuan_id
+            WHERE stock_revamp_log.deletedAt IS NULL
+            AND stock_revamp_log.reference_tujuan_type='MATERIAL REQUEST PENOLONG'
+            AND stock_revamp_log.status='OUT'
+            $filterCondition
+            $whereDateMaterialRequestPenolong
+            $searchMaterialRequestPenolong
+        )
+        ";
+
+
+        // ============================
+        // 📊 COUNT + PAGINATION
+        // ============================
+
+        $countQuery = "SELECT COUNT(*) AS cnt FROM ($baseQuery) AS x";
+        $totalFiltered = (int) $db->query($countQuery)->getRow()->cnt;
+
+        $mainQuery = "
+            SELECT * FROM ($baseQuery) AS x
+            $orderBy
+            LIMIT $limit OFFSET $offset
+        ";
+
+
+
+        // var_dump($mainQuery);
+        // die;
+        $data = $db->query($mainQuery)->getResultArray();
+
+        // ============================
+        // 📦 RETURN RESULT
+        // ============================
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalFiltered,
+            'totalFilteredData' => $totalFiltered,
+            'sort'              => $orderColumnIndex,
+            'sortType'          => $orderDir,
+        ];
+    }
+
+
+
+    public function getKartuStockAwal(
+        $start_date,
+        $stock_id
+    ) {
+
+        $selectQry = '
+            (SUM(CASE WHEN stock_revamp_log.status = "IN" 
+            THEN stock_revamp_log.qty_diterima ELSE 0 END) - 
+            SUM(CASE WHEN stock_details.status = "OUT" 
+            THEN stock_revamp_log.qty_diterima ELSE 0 END)) 
+            AS stock_total,
+            stock_revamp_detail.stock_id
+       ';
+
+        $dataQry = $this->asArray()->select($selectQry)
+            ->join('stock_revamp_detail', 'stock_revamp_detail.id = stock_revamp_log.stock_detail_id', 'left')
+            ->where('stock_revamp_log.deletedAt', null)
+            ->where('stock_revamp_detail.deletedAt', null)
+            ->groupBy('stock_revamp_detail.stock_id')
+            ->findAll();
+    }
 }

@@ -247,6 +247,48 @@ class StokHistori extends BaseController
                 $limit,
                 $offset
             );
+        } elseif ($addCondition['sumber_barang'] == "ADJUSMENT") {
+            $condition = [
+                "stock_revamp.company_id" => $this->this_company_id,
+                "stock_revamp_detail.deletedAt" => null,
+                "stock_revamp_log.deletedAt" => null,
+                "stock_revamp_detail.reference_type" => "ADJUSMENT",
+            ];
+
+            $dataQry = $this->stockRevampLogModel->getListLogAdjusment(
+                $condition,
+                $addCondition,
+                $limit,
+                $offset
+            );
+        } elseif ($addCondition['sumber_barang'] == "PENERIMAAN MUTASI") {
+            $condition = [
+                "stock_revamp.company_id" => $this->this_company_id,
+                "stock_revamp_detail.deletedAt" => null,
+                "stock_revamp_log.deletedAt" => null,
+                "stock_revamp_detail.reference_type" => "PENERIMAAN MUTASI",
+            ];
+
+            $dataQry = $this->stockRevampLogModel->getListLogPenerimaanMutasi(
+                $condition,
+                $addCondition,
+                $limit,
+                $offset
+            );
+        } elseif ($addCondition['sumber_barang'] == "PENERIMAAN MUTASI GLOBAL") {
+            $condition = [
+                "stock_revamp.company_id" => $this->this_company_id,
+                "stock_revamp_detail.deletedAt" => null,
+                "stock_revamp_log.deletedAt" => null,
+                "stock_revamp_detail.reference_type" => "PENERIMAAN MUTASI GLOBAL",
+            ];
+
+            $dataQry = $this->stockRevampLogModel->getListLogPenerimaanMutasiGlobal(
+                $condition,
+                $addCondition,
+                $limit,
+                $offset
+            );
         }
 
         $dataResult = [];
@@ -269,7 +311,8 @@ class StokHistori extends BaseController
                 'qty' => (float)$d['qty_diterima'],
                 'status' => $d['status'],
                 'kode_satuan' => $d['kode_satuan'],
-                'keterangan' => $d['keterangan']
+                'keterangan' => $d['keterangan'],
+                'tujuan_digunakan' => $d['reference_tujuan_type']
             ]);
         }
 

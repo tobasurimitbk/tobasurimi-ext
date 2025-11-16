@@ -97,4 +97,35 @@ class AdjusmentDetailModel extends Model
 
         return $dataResult;
     }
+
+    public function getDetailAdjTambah($id)
+    {
+
+        $selectQry = "
+            adjusment_detail.id,
+            adjusment_detail.stock_id,
+            barang_master.kode_barang,
+            barang_master.barang_name,
+            barang_master_spesifikasi.spesifikasi,
+            adjusment_detail.qty_adjusment,
+            adjusment_detail.unit_id_adjusment AS satuan_id,
+            satuans.kode_satuan,
+            divisis.divisi,
+            warehouses.warehouse_name
+        ";
+
+        $dataResult = $this->asArray()->select($selectQry)
+            ->join('adjusment', 'adjusment_detail.adjusment_id = adjusment.id', 'left')
+            ->join('divisis', 'divisis.id = adjusment.divisi_id', 'left')
+            ->join('warehouses', 'warehouses.id = adjusment.warehouse_id', 'left')
+            ->join('stock_revamp', 'stock_revamp.id = adjusment_detail.stock_id', 'left')
+            ->join('barang_master', 'barang_master.id = stock_revamp.barang_master_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock_revamp.spesifikasi_id', 'left')
+            ->join('satuans', 'satuans.id = adjusment_detail.unit_id_adjusment', 'left')
+            ->where('adjusment_detail.adjusment_id', $id)
+            ->where('adjusment_detail.deletedAt', null)
+            ->findAll();
+
+        return $dataResult;
+    }
 }

@@ -577,4 +577,97 @@ class PenerimaanMutasiModel extends Model
             'sortType'  => $sortType
         ];
     }
+
+    public function posting($id, $db)
+    {
+        $stockRevampModel = new StockRevampModel();
+        $stockRevampDetailModel = new StockRevampDetailModel();
+        $penerimaanMutasiDetailModel = new PenerimaanMutasiDetailModel();
+
+        $penerimaanMutasi = $this->asArray()->where('id', $id)->first();
+        $penerimaanMutasiDetail = $penerimaanMutasiDetailModel
+            ->select('penerimaan_mutasi_detail.*,mutasi_detail.stock_detail_id')
+            ->join('mutasi_detail', 'mutasi_detail.id = penerimaan_mutasi_detail.mutasi_detail_id', 'left')
+            ->where('penerimaan_mutasi_detail.penerimaan_mutasi_id', $id)
+            ->where('penerimaan_mutasi_detail.deletedAt', null)
+            ->findAll();
+
+        foreach ($penerimaanMutasiDetail as $p) {
+            $stockDetail = $stockRevampDetailModel->where('id', $p['stock_detail_id'])->first();
+            $stock = $stockRevampModel->where('id', $stockDetail['stock_id'])->first();
+
+            $payload = [
+                'company_id'        => $penerimaanMutasi['company_id'],
+                'barang_master_id'  => $stock['barang_master_id'],
+                'spesifikasi_id'    => $stock['spesifikasi_id'],
+                'unit_id'           => $stock['unit_id'],
+                'divisi_id'         => $stock['divisi_id'],
+                'warehouse_id'      => $stock['warehouse_id'],
+                'qty_bersih'        => $p['qty'],
+                'qty_diterima'      => $p['qty'],
+                'bc_id'             => $penerimaanMutasi['tipe_mutasi'] == "LOKAL" ? 0 : 1426,
+                'type_bc'           => $penerimaanMutasi['tipe_mutasi'] == "LOKAL" ? "NON PABEAN" : "PPBKB",
+                'reference_id'      => $penerimaanMutasi['id'],
+                'po_type'           => null,
+                'po_id'             => null,
+                'reference_type'    => 'PENERIMAAN MUTASI',
+                'status'            => 'IN',
+                'keterangan'        => $penerimaanMutasi['penerimaan_mutasi_no']
+            ];
+
+            $stockDetailId =  $stockRevampModel->insertStockRevamp(
+                $db,
+                $payload
+            );
+
+            $penerimaanMutasiDetailModel->update($p['id'], ['stock_detail_id' => $stockDetailId]);
+        }
+    }
+
+    public function unposting($id)
+    {
+        $stockRevampDetailModel = new StockRevampDetailModel();
+        $penerimaanMutasiDetailModel = new PenerimaanMutasiDetailModel();
+        $stockRevampModel = new StockRevampModel();
+        $stockRevampLogModel = new StockRevampLogModel();
+
+        $penerimaanMutasiDetail = $penerimaanMutasiDetailModel
+            ->where('penerimaan_mutasi_id', $id)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        $isFailed = false;
+
+        foreach ($penerimaanMutasiDetail as $p) {
+            $stockDetail = $stockRevampDetailModel->where('id', $p['stock_detail_id'])->first();
+
+            if ($stockDetail['qty_diterima'] != $p['qty']) {
+                $isFailed = true;
+                break;
+            }
+        }
+
+        if ($isFailed) {
+            return false;
+        }
+
+        foreach ($penerimaanMutasiDetail as $p) {
+            $stockDetail = $stockRevampDetailModel->where('id', $p['stock_detail_id'])->first();
+
+            if ($stockDetail['qty_diterima'] != $p['qty']) {
+                $isFailed = true;
+                break;
+            }
+
+            $stock = $stockRevampModel->where('id', $stockDetail['stock_id'])->first();
+            if ($stock) {
+                $qtyNow = $stock['qty_bersih'] - $p['qty'];
+                $stockRevampModel->update($stock['id'], ['qty_bersih' => $qtyNow, 'qty_diterima' => $qtyNow]);
+            }
+
+            $stockRevampDetailModel->delete($stockDetail['id'], true);
+            $stockRevampLogModel->where('stock_detail_id', $stockDetail['id'])->delete(null, true);
+        }
+        return true;
+    }
 }

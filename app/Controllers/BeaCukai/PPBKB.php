@@ -353,7 +353,8 @@ class PPBKB extends BaseController
             if ($ppbkb['penerimaan_otomatis']) {
                 // OTOMATIS
                 $this->terimaOtomatis(
-                    $id
+                    $id,
+                    $db
                 );
             }
 
@@ -373,7 +374,7 @@ class PPBKB extends BaseController
         }
     }
 
-    private function terimaOtomatis($ppbkbId)
+    private function terimaOtomatis($ppbkbId, $db)
     {
         $ppbkb = $this->ppbkbModel->where('id', $ppbkbId)->first();
         $mutasi = $this->mutasiModel->where('id', $ppbkb['mutasi_id'])->where('deletedAt', null)->first();
@@ -393,7 +394,8 @@ class PPBKB extends BaseController
             'tanggal' =>  $ppbkb['tanggal'],
             'keterangan' => null,
             'status_posting' => '1',
-            'createdBy' => $this->this_user_id
+            'createdBy' => $this->this_user_id,
+            'ppbkb_id' => $ppbkb['id']
         ]);
 
         foreach ($mutasiDetail as $m) {
@@ -405,6 +407,8 @@ class PPBKB extends BaseController
                 'qty' => $m['qty_konversi']
             ]);
         }
+
+        $this->penerimaanMutasiModel->posting($id, $db);
 
         return true;
         // INSERT KEDALAM STOK TODO

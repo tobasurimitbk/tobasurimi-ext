@@ -13,6 +13,7 @@ use App\Models\PPBKBModel;
 use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
 use App\Models\StockModel;
+use App\Models\StockRevampDetailModel;
 use App\Models\StockRevampModel;
 use App\Models\WarehousesModel;
 use Dompdf\Dompdf;
@@ -35,6 +36,7 @@ class PenerimaanMutasi extends BaseController
     protected $dompdf;
     protected $this_user_id;
     protected $this_company_id;
+    protected $stockRevampDetailModel;
 
     public function __construct()
     {
@@ -53,6 +55,7 @@ class PenerimaanMutasi extends BaseController
         $this->ppbkbModel = new PPBKBModel();
         $this->stockRevampModel = new StockRevampModel();
         $this->dompdf = new Dompdf();
+        $this->stockRevampDetailModel = new StockRevampDetailModel();
     }
 
     public function index()
@@ -407,24 +410,58 @@ class PenerimaanMutasi extends BaseController
 
     public function posting()
     {
-        $id = decrypt($this->request->getVar('id'));
-        $this->penerimaanMutasiModel->update($id, ['status_posting' => '1']);
-        return response()->setJSON([
-            'message' => "Penerimaan Mutasi berhasil diposting",
-            'status' => true,
-            'token' => csrf_hash()
-        ]);
+        $db = \Config\Database::connect();
+        $db->transBegin();
+        try {
+            $id = decrypt($this->request->getVar('id'));
+            $this->penerimaanMutasiModel->posting($id, $db);
+            $this->penerimaanMutasiModel->update($id, ['status_posting' => '1']);
+            $db->transCommit();
+            return response()->setJSON([
+                'message' => "Penerimaan Mutasi berhasil diposting",
+                'status' => true,
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
     public function unposting()
     {
-        $id = decrypt($this->request->getVar('id'));
-        $this->penerimaanMutasiModel->update($id, ['status_posting' => '0']);
-        return response()->setJSON([
-            'message' => "Penerimaan Mutasi berhasil diunposting",
-            'status' => true,
-            'token' => csrf_hash()
-        ]);
+        $db = \Config\Database::connect();
+        $db->transBegin();
+        try {
+            $id = decrypt($this->request->getVar('id'));
+            $status = $this->penerimaanMutasiModel->unposting($id);
+            if (!$status) {
+                $db->transRollback();
+                return response()->setJSON([
+                    'message' => "Gagal unposting : stock sudah digunakan",
+                    'status' => true,
+                    'token' => csrf_hash()
+                ]);
+            }
+            $this->penerimaanMutasiModel->update($id, ['status_posting' => '0']);
+            $db->transCommit();
+            return response()->setJSON([
+                'message' => "Penerimaan Mutasi berhasil diunposting",
+                'status' => true,
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
     public function dropdownListDivisi()

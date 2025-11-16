@@ -11,6 +11,8 @@ use App\Models\MutasiGlobalDetailModel;
 use App\Models\MutasiGlobalModel;
 use App\Models\PenerimaanMutasiGlobalDetailModel;
 use App\Models\SatuansModel;
+use App\Models\StockRevampDetailModel;
+use App\Models\StockRevampLogModel;
 use App\Models\StockRevampModel;
 use App\Models\WarehousesModel;
 use Exception;
@@ -29,6 +31,8 @@ class MutasiGlobal extends BaseController
     protected $bc27Model;
     protected $stockRevampModel;
     protected $satuanModel;
+    protected $stockRevampDetailModel;
+    protected $stockRevampLogModel;
 
     public function __construct()
     {
@@ -44,6 +48,8 @@ class MutasiGlobal extends BaseController
         $this->bc27Model = new BC27Model();
         $this->satuanModel = new SatuansModel();
         $this->stockRevampModel = new StockRevampModel();
+        $this->stockRevampDetailModel = new StockRevampDetailModel();
+        $this->stockRevampLogModel = new StockRevampLogModel();
     }
 
     public function index()
@@ -353,24 +359,135 @@ class MutasiGlobal extends BaseController
 
     public function posting()
     {
-        $id = decrypt($this->request->getVar('id'));
-        $this->mutasiGlobalModel->update($id, ['status_posting' => 1]);
-        return response()->setJSON([
-            'message' => "Mutasi berhasil diposting",
-            'status' => true,
-            'token' => csrf_hash()
-        ]);
+
+        $db = \Config\Database::connect();
+        $db->transBegin();
+        try {
+            $id = decrypt($this->request->getVar('id'));
+            $mutasi = $this->mutasiGlobalModel->where('id', $id)->first();
+            $mutasiDetail = $this->mutasiGlobalDetailModel->where('mutasi_global_id', $id)->where('deletedAt', null)->findAll();
+
+            foreach ($mutasiDetail as $m) {
+                $data = [
+                    'stock_detail_id' => $m['stock_detail_id'],
+                    'qty_digunakan' => $m['qty_konversi'],
+                    'keterangan' => $mutasi['no_mutasi'],
+                    'reference_tujuan_id' => $mutasi['id'],
+                    'reference_tujuan_type' => "MUTASI GLOBAL"
+                ];
+
+                $this->stockRevampModel->outStockRevamp(
+                    $db,
+                    $data
+                );
+            }
+            $this->mutasiGlobalModel->update($id, ['status_posting' => 1]);
+            $db->transCommit();
+            return response()->setJSON([
+                'message' => "Mutasi berhasil diposting",
+                'status' => true,
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
     public function unPosting()
     {
-        $id = decrypt($this->request->getVar('id'));
-        $this->mutasiGlobalModel->update($id, ['status_posting' => 0]);
-        return response()->setJSON([
-            'message' => "Mutasi berhasil diunposting",
-            'status' => true,
-            'token' => csrf_hash()
-        ]);
+        $db = \Config\Database::connect();
+        $db->transBegin();
+        try {
+            $id = decrypt($this->request->getVar('id'));
+            // $mutasi = $this->mutasiModel->where('id', $id)->first();
+            // $mutasiDetail = $this->mutasiDetailModel->where('mutasi_id', $id)->where('deletedAt', null)->findAll();
+            $res = $this->unposting_mutasi_revamp(
+                $id
+            );
+            if (!$res) {
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "Gagal UnPosting : Stock Barang Sudah Digunakan",
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            $this->mutasiGlobalModel->update($id, ['status_posting' => 0]);
+            $db->transCommit();
+            return response()->setJSON([
+                'message' => "Mutasi berhasil diunposting",
+                'status' => true,
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function unposting_mutasi_revamp($mutasiId)
+    {
+        $db = \Config\Database::connect();
+        $db->transBegin();
+        try {
+            $mutasiDetail = $this->mutasiGlobalDetailModel
+                ->where('mutasi_global_id', $mutasiId)
+                ->where('deletedAt', null)->findAll();
+
+            $isFailed = false;
+            foreach ($mutasiDetail as $m) {
+                $stockDetail = $this->stockRevampDetailModel
+                    ->where('id', $m['stock_detail_id'])
+                    ->first();
+
+                if ($stockDetail['qty_diterima'] != $m['hasil_mutasi']) {
+                    // sudah ga sama dengan hasil mutasi gagal unpost
+                    $isFailed = true;
+                    break;
+                }
+            }
+
+            if ($isFailed) {
+                $db->transRollback();
+                return false;
+            }
+
+            // Aman Stock Belum Digunakan
+            foreach ($mutasiDetail as $m) {
+                $stockDetail = $this->stockRevampDetailModel
+                    ->where('id', $m['stock_detail_id'])
+                    ->first();
+
+                $stock = $this->stockRevampModel->where('id', $stockDetail['stock_id'])->first();
+
+                if ($stock) {
+                    $qtyNow = $stock['qty_diterima'] + $m['qty_konversi'];
+                    $this->stockRevampModel->update($stock['id'], ['qty_bersih' => $qtyNow, 'qty_diterima' => $qtyNow]);
+                }
+
+                $this->stockRevampLogModel
+                    ->where('stock_detail_id', $stockDetail['id'])
+                    ->where('reference_tujuan_id', $mutasiId)
+                    ->where('reference_tujuan_type', "MUTASI GLOBAL")
+                    ->delete(null, true);
+            }
+
+            $db->transCommit();
+            return true;
+        } catch (Exception $e) {
+            $db->transRollback();
+            log_message('error', 'Unposting Stock Failed: ' . $e->getMessage());
+            return false;
+        }
     }
 
     public function getMutasiNo()

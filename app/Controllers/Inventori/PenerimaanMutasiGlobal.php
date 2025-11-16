@@ -421,14 +421,25 @@ class PenerimaanMutasiGlobal extends BaseController
 
     public function posting()
     {
-        $id = decrypt($this->request->getVar('id'));
-
-        $this->penerimaanMutasiGlobalModel->update($id, ['status_posting' => '1']);
-        return response()->setJSON([
-            'message' => "Penerimaan Mutasi berhasil diposting",
-            'status' => true,
-            'token' => csrf_hash()
-        ]);
+        $db = \Config\Database::connect();
+        $db->transBegin();
+        try {
+            $id = decrypt($this->request->getVar('id'));
+            $this->penerimaanMutasiGlobalModel->posting($id, $db);
+            $this->penerimaanMutasiGlobalModel->update($id, ['status_posting' => '1']);
+            return response()->setJSON([
+                'message' => "Penerimaan Mutasi berhasil diposting",
+                'status' => true,
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
     public function dropdownListNomorMutasi()

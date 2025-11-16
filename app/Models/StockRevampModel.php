@@ -58,7 +58,8 @@ class StockRevampModel extends Model
     //     'po_id'             => 300,
     //     'reference_type'    => 'LPB',
     //     'status'            => 'IN',
-    //     'stock_detail_asal' => 100
+    //     'stock_detail_asal' => 100,
+    //     'keterangan'        => 'keterangan value'
     // ]);
     public function insertStockRevamp(BaseConnection $db, array $data)
     {
@@ -266,6 +267,13 @@ class StockRevampModel extends Model
         }
     }
 
+    //outStockRevamp($db, [
+    //     'stock_detail_id'   => 1,
+    //     'qty_digunakan'     => 10,
+    //     'keterangan'        => 5,
+    //     'reference_tujuan_id' => 2,
+    //     'reference_tujuan_type' => enum,
+    // ]);
     public function outStockRevamp(BaseConnection $db, array $data)
     {
         // HAPUS transBegin() dari model, karena sudah dihandle controller
@@ -336,13 +344,15 @@ class StockRevampModel extends Model
             // 5. Insert ke log
             // ==============================
             $db->table('stock_revamp_log')->insert([
-                'stock_detail_id' => $stockDetail['id'],
-                'status'          => 'OUT',
-                'qty_diterima'    => $data['qty_digunakan'],
-                'qty_bersih'      => $data['qty_digunakan'],
-                'keterangan'     => $data['keterangan'] ?? null,
-                'createdAt'       => date('Y-m-d H:i:s'),
-                'updatedAt'       => date('Y-m-d H:i:s'),
+                'stock_detail_id'     => $stockDetail['id'],
+                'status'              => 'OUT',
+                'qty_diterima'        => $data['qty_digunakan'],
+                'qty_bersih'          => $data['qty_digunakan'],
+                'keterangan'          => $data['keterangan'] ?? null,
+                'reference_tujuan_id' => $data['reference_tujuan_id'] ?? null,
+                'reference_tujuan_type' => $data['reference_tujuan_type'] ?? null,
+                'createdAt'           => date('Y-m-d H:i:s'),
+                'updatedAt'           => date('Y-m-d H:i:s'),
             ]);
 
             return $stockDetail['id'];
@@ -847,6 +857,9 @@ class StockRevampModel extends Model
         $whereDateHasilProduksi = "";
         $whereDateMaterialRequest = "";
         $whereDateMaterialRequestPenolong = "";
+        $whereDateAdjusment = "";
+        $whereDatePenerimaanMutasi = "";
+        $whereDatePenerimaanMutasiGlobal = "";
 
         $searchPoLokalBb = "";
         $searchPoBp = "";
@@ -856,6 +869,9 @@ class StockRevampModel extends Model
         $searchHasilProduksi = "";
         $searchMaterialRequest = "";
         $searchMaterialRequestPenolong = "";
+        $searchAdjusment = "";
+        $searchPenerimaanMutasi = "";
+        $searchPenerimaanMutasiGlobal = "";
 
         if (!empty($condition['id'])) {
             $where[] = "stock_revamp_detail.id = '$condition[id]'";
@@ -872,6 +888,9 @@ class StockRevampModel extends Model
             $whereDateHasilProduksi = "AND production_results.receive_date BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
             $whereDateMaterialRequest = "AND material_requests.request_date BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
             $whereDateMaterialRequestPenolong = "AND material_requests_penolong.request_date BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
+            $whereDateAdjusment = "AND adjusment.tanggal  BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
+            $whereDatePenerimaanMutasi = "AND penerimaan_mutasi.tanggal  BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
+            $whereDatePenerimaanMutasiGlobal = "AND penerimaan_mutasi_global.tanggal  BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
         }
 
         if (!empty($condition['type_barang'])) {
@@ -960,6 +979,33 @@ class StockRevampModel extends Model
                         CONCAT(barang_master.barang_name, ' ',barang_master_spesifikasi.spesifikasi) LIKE '%{$search}%'
                         OR barang_master.kode_barang LIKE '%{$search}%'
                         OR material_requests_penolong.req_no LIKE '%{$search}%'
+                    )
+            ";
+            $searchAdjusment = "
+                AND 
+                    (
+                        CONCAT(barang_master.barang_name, ' ',barang_master_spesifikasi.spesifikasi) LIKE '%{$search}%'
+                        OR barang_master.kode_barang LIKE '%{$search}%'
+                        OR adjusment.no_adjusment LIKE '%{$search}%'
+                    )
+            ";
+
+            $searchPenerimaanMutasi = "
+                AND 
+                    (
+                        CONCAT(barang_master.barang_name, ' ',barang_master_spesifikasi.spesifikasi) LIKE '%{$search}%'
+                        OR barang_master.kode_barang LIKE '%{$search}%'
+                        OR penerimaan_mutasi.penerimaan_mutasi_no LIKE '%{$search}%'
+                    )
+            ";
+
+
+            $searchPenerimaanMutasiGlobal = "
+                AND 
+                    (
+                        CONCAT(barang_master.barang_name, ' ',barang_master_spesifikasi.spesifikasi) LIKE '%{$search}%'
+                        OR barang_master.kode_barang LIKE '%{$search}%'
+                        OR penerimaan_mutasi_global.penerimaan_mutasi_no LIKE '%{$search}%'
                     )
             ";
         }
@@ -1313,9 +1359,9 @@ class StockRevampModel extends Model
                 barang_master.kode_barang,
                 barang_master.barang_name,
                 barang_master_spesifikasi.spesifikasi,
-                production_results.receive_date AS lpb_date,
                 '' AS po_no,
                 '' AS po_date,
+                production_results.receive_date AS lpb_date,
                 '' AS supplier_name,
                 production_results.pr_no AS reference_no,
                 satuans.kode_satuan,
@@ -1360,9 +1406,9 @@ class StockRevampModel extends Model
                 barang_master.kode_barang,
                 barang_master.barang_name,
                 barang_master_spesifikasi.spesifikasi,
-                material_requests.request_date AS lpb_date,
                 '' AS po_no,
                 '' AS po_date,
+                material_requests.request_date AS lpb_date,
                 '' AS supplier_name,
                 material_requests.req_no AS reference_no,
                 satuans.kode_satuan,
@@ -1407,9 +1453,9 @@ class StockRevampModel extends Model
                 barang_master.kode_barang,
                 barang_master.barang_name,
                 barang_master_spesifikasi.spesifikasi,
-                material_requests_penolong.request_date AS lpb_date,
                 '' AS po_no,
                 '' AS po_date,
+                material_requests_penolong.request_date AS lpb_date,
                 '' AS supplier_name,
                 material_requests_penolong.req_no AS reference_no,
                 satuans.kode_satuan,
@@ -1454,9 +1500,9 @@ class StockRevampModel extends Model
                 barang_master.kode_barang,
                 barang_master.barang_name,
                 barang_master_spesifikasi.spesifikasi,
-                '' AS lpb_date,
                 '' AS po_no,
                 '' AS po_date,
+                '' AS lpb_date,
                 '' AS supplier_name,
                 '' AS reference_no,
                 satuans.kode_satuan,
@@ -1487,6 +1533,149 @@ class StockRevampModel extends Model
             AND stock_revamp_detail.reference_type='INISIASI'
             $filterCondition
         )
+        UNION ALL
+        (
+            -- STOK DARI ADJUSMENT
+             SELECT
+                stock_revamp_detail.id,
+                stock_revamp_detail.reference_type,
+                stock_revamp_detail.qty_diterima,
+                stock_revamp_detail.type_bc,
+                barang_master.kode_barang,
+                barang_master.barang_name,
+                barang_master_spesifikasi.spesifikasi,
+                '' AS po_no,
+                '' AS po_date,
+                adjusment.tanggal AS lpb_date,
+                '' AS supplier_name,
+                adjusment.no_adjusment AS reference_no,
+                satuans.kode_satuan,
+                divisis.divisi,
+                warehouses.warehouse_name,
+                stock_revamp.unit_id,
+                '' AS no_aju,
+                '' AS no_daftar,
+                '' AS tanggal_dokumen,
+                -- HELPER UNTUK STOK
+                stock_revamp.barang_master_id,
+                stock_revamp.spesifikasi_id,
+                stock_revamp.divisi_id,
+                stock_revamp.warehouse_id,
+                stock_revamp_detail.bc_id,
+                stock_revamp_detail.reference_id,
+                stock_revamp_detail.po_type,
+                stock_revamp_detail.po_id
+            FROM
+                stock_revamp_detail
+            LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
+            LEFT JOIN barang_master ON stock_revamp.barang_master_id = barang_master.id
+            LEFT JOIN barang_master_spesifikasi ON stock_revamp.spesifikasi_id = barang_master_spesifikasi.id
+            LEFT JOIN satuans ON satuans.id = stock_revamp.unit_id
+            LEFT JOIN divisis ON divisis.id = stock_revamp.divisi_id
+            LEFT JOIN warehouses ON warehouses.id = stock_revamp.warehouse_id
+            LEFT JOIN adjusment ON adjusment.id = stock_revamp_detail.reference_id
+            WHERE stock_revamp_detail.deletedAt IS NULL
+            AND stock_revamp_detail.reference_type='ADJUSMENT'
+            $filterCondition
+            $whereDateAdjusment
+            $searchAdjusment
+        )
+        UNION ALL
+        (
+            -- STOK DARI PENERIMAAN MUTASI
+             SELECT
+                stock_revamp_detail.id,
+                stock_revamp_detail.reference_type,
+                stock_revamp_detail.qty_diterima,
+                stock_revamp_detail.type_bc,
+                barang_master.kode_barang,
+                barang_master.barang_name,
+                barang_master_spesifikasi.spesifikasi,
+                '' AS po_no,
+                '' AS po_date,
+                penerimaan_mutasi.tanggal AS lpb_date,
+                '' AS supplier_name,
+                penerimaan_mutasi.penerimaan_mutasi_no AS reference_no,
+                satuans.kode_satuan,
+                divisis.divisi,
+                warehouses.warehouse_name,
+                stock_revamp.unit_id,
+                ppbkb.no_ppbkb AS no_aju,
+                ppbkb.no_daftar AS no_daftar,
+                ppbkb.tanggal AS tanggal_dokumen,
+                -- HELPER UNTUK STOK
+                stock_revamp.barang_master_id,
+                stock_revamp.spesifikasi_id,
+                stock_revamp.divisi_id,
+                stock_revamp.warehouse_id,
+                stock_revamp_detail.bc_id,
+                stock_revamp_detail.reference_id,
+                stock_revamp_detail.po_type,
+                stock_revamp_detail.po_id
+            FROM
+                stock_revamp_detail
+            LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
+            LEFT JOIN barang_master ON stock_revamp.barang_master_id = barang_master.id
+            LEFT JOIN barang_master_spesifikasi ON stock_revamp.spesifikasi_id = barang_master_spesifikasi.id
+            LEFT JOIN satuans ON satuans.id = stock_revamp.unit_id
+            LEFT JOIN divisis ON divisis.id = stock_revamp.divisi_id
+            LEFT JOIN warehouses ON warehouses.id = stock_revamp.warehouse_id
+            LEFT JOIN penerimaan_mutasi ON penerimaan_mutasi.id = stock_revamp_detail.reference_id
+            LEFT JOIN ppbkb ON ppbkb.id = penerimaan_mutasi.ppbkb_id
+            WHERE stock_revamp_detail.deletedAt IS NULL
+            AND stock_revamp_detail.reference_type='PENERIMAAN MUTASI'
+            $filterCondition
+            $whereDatePenerimaanMutasi
+            $searchPenerimaanMutasi
+        )
+        UNION ALL
+        (
+            -- STOK DARI PENERIMAAN MUTASI GLOBAL
+             SELECT
+                stock_revamp_detail.id,
+                stock_revamp_detail.reference_type,
+                stock_revamp_detail.qty_diterima,
+                stock_revamp_detail.type_bc,
+                barang_master.kode_barang,
+                barang_master.barang_name,
+                barang_master_spesifikasi.spesifikasi,
+                '' AS po_no,
+                '' AS po_date,
+                penerimaan_mutasi_global.tanggal AS lpb_date,
+                '' AS supplier_name,
+                penerimaan_mutasi_global.penerimaan_mutasi_no AS reference_no,
+                satuans.kode_satuan,
+                divisis.divisi,
+                warehouses.warehouse_name,
+                stock_revamp.unit_id,
+                '' AS no_aju,
+                '' AS no_daftar,
+                '' AS tanggal_dokumen,
+                -- HELPER UNTUK STOK
+                stock_revamp.barang_master_id,
+                stock_revamp.spesifikasi_id,
+                stock_revamp.divisi_id,
+                stock_revamp.warehouse_id,
+                stock_revamp_detail.bc_id,
+                stock_revamp_detail.reference_id,
+                stock_revamp_detail.po_type,
+                stock_revamp_detail.po_id
+            FROM
+                stock_revamp_detail
+            LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
+            LEFT JOIN barang_master ON stock_revamp.barang_master_id = barang_master.id
+            LEFT JOIN barang_master_spesifikasi ON stock_revamp.spesifikasi_id = barang_master_spesifikasi.id
+            LEFT JOIN satuans ON satuans.id = stock_revamp.unit_id
+            LEFT JOIN divisis ON divisis.id = stock_revamp.divisi_id
+            LEFT JOIN warehouses ON warehouses.id = stock_revamp.warehouse_id
+            LEFT JOIN penerimaan_mutasi_global ON penerimaan_mutasi_global.id = stock_revamp_detail.reference_id
+            WHERE stock_revamp_detail.deletedAt IS NULL
+            AND stock_revamp_detail.reference_type='PENERIMAAN MUTASI GLOBAL'
+            $filterCondition
+            $whereDatePenerimaanMutasiGlobal
+            $searchPenerimaanMutasiGlobal
+        )
+        
         ";
 
 
@@ -1583,5 +1772,112 @@ class StockRevampModel extends Model
             ->where('stock_revamp.deletedAt', null)
             ->first();
         return $stockSudahInisiasi;
+    }
+
+    public function getListKartuStock($condition = [], $addCondition = [], $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'divisi_id'          => 'stock_revamp.divisi_id',
+            'warehouse_id'       => 'stock_revamp.warehouse_id',
+            'barang_master_id'   => 'stock_revamp.barang_master_id',
+            'spesifikasi_id'     => 'stock_revamp.spesifikasi_id',
+            'unit_id'            => 'stock_revamp.unit_id',
+            'kode_barang'       => 'barang_master.kode_barang'
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'barang_master_id'] ?? 'stock_revamp.barang_master_id';
+        $sortType = $availableSortType[strtolower($addCondition['sortType'] ?? 'desc')] ?? 'DESC';
+
+        $selectQry = "
+            stock_revamp.*,
+            divisis.divisi,
+            warehouses.warehouse_name,
+            satuans.kode_satuan,
+            barang_master.barang_name,
+            barang_master.kode_barang,
+            barang_master_spesifikasi.spesifikasi
+        ";
+
+        $builder = $this->asArray()
+            ->select($selectQry)
+            ->join('barang_master', 'stock_revamp.barang_master_id = barang_master.id', 'left')
+            ->join('barang_master_spesifikasi', 'stock_revamp.spesifikasi_id = barang_master_spesifikasi.id', 'left')
+            ->join('satuans', 'satuans.id = stock_revamp.unit_id', 'left')
+            ->join('divisis', 'divisis.id = stock_revamp.divisi_id', 'left')
+            ->join('warehouses', 'warehouses.id = stock_revamp.warehouse_id', 'left')
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $builder->countAllResults(false);
+
+        if (!empty($addCondition['barang_master_id'])) {
+            $builder->where('DATE(stock_revamp_log.createdAt) >=', $addCondition['dateStart']);
+        }
+        if (!empty($addCondition['divisi_id'])) {
+            $builder->where('stock_revamp.divisi_id', $addCondition['divisi_id']);
+        }
+        if (!empty($addCondition['warehouse_id'])) {
+            $builder->where('stock_revamp.warehouse_id', $addCondition['warehouse_id']);
+        }
+        if (!empty($addCondition['search'])) {
+            $builder->groupStart()
+                ->like("CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi)", $addCondition['search'])
+                ->orLike('divisis.divisi', $addCondition['search'])
+                ->orLike('warehouses.warehouse_name', $addCondition['search'])
+                ->orLike('barang_master.kode_barang', $addCondition['search'])
+                ->groupEnd();
+        }
+
+        $countBuilder = clone $builder;
+        $totalFilteredData = $countBuilder->countAllResults(false);
+        $data = $builder->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+        ];
+    }
+
+    public function getStockListSearchBarang(
+        $companyId,
+        $divisiId,
+        $warehouseId,
+        $search
+    ) {
+
+        $condition = [
+            'stock_revamp.company_id' => $companyId,
+            'stock_revamp.divisi_id' => $divisiId,
+            'stock_revamp.warehouse_id' => $warehouseId
+        ];
+
+        $selectQry = "
+            stock_revamp.id,
+            barang_master.kode_barang, 
+            barang_master.barang_name, 
+            barang_master_spesifikasi.spesifikasi,
+            stock_revamp.unit_id,
+            satuans.kode_satuan
+        ";
+
+        $dataQry = $this->asArray()->select($selectQry)
+            ->join('barang_master', 'barang_master.id = stock_revamp.barang_master_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock_revamp.spesifikasi_id', 'left')
+            ->join('satuans', 'satuans.id = stock_revamp.unit_id', 'left')
+            ->where('stock_revamp.deletedAt', null)
+            ->where($condition);
+
+        $dataQry
+            ->groupStart()
+            ->like('CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi)', $search)
+            ->orLike('barang_master.kode_barang', $search)
+            ->groupEnd();
+
+
+        $dataBarang = $dataQry->findAll(100);
+        return $dataBarang;
     }
 }

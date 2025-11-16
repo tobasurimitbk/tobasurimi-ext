@@ -5,9 +5,13 @@
     <div class="section-header">
         <h1>Stok Adjusment</h1>
         <?php if (can("Inventori", "Stok Adjusment", "c")) : ?>
-            <a href="<?= base_url('stock-adjusment/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
+            <a class="btn btn-show-form btn-add btn-dropdown-export dropdown-toggle float-right" href="#" id="dropdownMenuButtonExport2" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #4E8A00 !important; border-color:#4E8A00 !important;">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonExport2">
+                <li><a href="<?= base_url('stock-adjusment/create-tambah') ?>" class="dropdown-item"><b>ADJ TAMBAH</b></a></li>
+                <li><a href="<?= base_url("stock-adjusment/create"); ?>" class="dropdown-item"><b>ADJ UPDATE</b></a></li>
+            </ul>
         <?php endif; ?>
     </div>
     <div class="card">
@@ -183,15 +187,16 @@
                 render: function(data, type, row) {
                     let id = row.id;
                     let status_posting = row.status_posting;
+                    let jenis_adjusment = row.jenis_adjusment;
 
                     if (status_posting == 0) {
                         return `
                         <div class="mt-0">
-                             <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                             <a href="javascript:void(0)" onclick="edit('${id}','${jenis_adjusment}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
                                 <i class="fas fa-edit"></i>
                             </a>
                             <?php if (can('Inventori', 'Stok Adjusment', 'a')) : ?>
-                                <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
+                                <button data-toggle="tooltip" title="Posting" onclick="posting('${id}','${jenis_adjusment}')" class="btn btn-success posting-spp">
                                     <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
                                 </button>
                             <?php endif; ?>
@@ -204,7 +209,7 @@
                     `
                     } else {
                         return `
-                        <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                        <a href="javascript:void(0)" onclick="edit('${id}','${jenis_adjusment}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
                             <i class="fas fa-edit"></i>
                         </a>
                     `
@@ -267,15 +272,19 @@
         table.ajax.reload();
     });
 
-    function edit(id) {
-        window.location.href = "<?= base_url('stock-adjusment/id') ?>" + '/' + id
+    function edit(id, jenis_adjusment) {
+        if (jenis_adjusment == "UPDATE") {
+            window.location.href = "<?= base_url('stock-adjusment/id') ?>" + '/' + id
+        } else {
+            window.location.href = "<?= base_url('stock-adjusment/id-tambah') ?>" + '/' + id
+        }
     }
 
     $('#dateStart,#dateEnd').change(function() {
         table.ajax.reload();
     });
 
-    function posting(id) {
+    function posting(id, jenis_adjusment) {
         Swal.fire({
             icon: 'question',
             title: 'Posting Adjusment ?',
@@ -288,8 +297,9 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
+                const url = jenis_adjusment == "UPDATE" ? "<?= base_url("stock-adjusment/posting"); ?>" : "<?= base_url("stock-adjusment/posting-tambah"); ?>";
                 $.ajax({
-                    url: "<?= base_url("stock-adjusment/posting"); ?>",
+                    url: url,
                     data: {
                         id: id
                     },
