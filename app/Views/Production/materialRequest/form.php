@@ -408,8 +408,8 @@
                                     <!-- <th style="text-align: center;">No Aju / No Daftar</th> -->
                                     <th style="text-align: center;">Tgl PO / Tgl Vendor Masuk</th>
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
-                                    <th style="text-align: center;">Keterangan</th>
-                                    <th style="text-align: center;">Satuan</th>
+                                    <th style="text-align: center; width: 50px; padding: 10px;">Ket</th>
+                                    <th style="text-align: center; padding: 10px;">Satuan</th>
                                     <th style="text-align: center;">Qty</th>
                                 </tr>
                             </thead>
@@ -1167,7 +1167,7 @@
                     Swal.fire({
                         icon: 'question',
                         title: 'Simpan Data ?',
-                        html: '<b>Total Qty Request: ' + qtyRequest + '</b>',
+                        html: '<b>Total Qty Request: ' + qtyRequest.toFixed(2) + '</b>',
                         confirmButtonColor: '#4e73df',
                         cancelButtonColor: '#d33',
                         showCancelButton: true,
