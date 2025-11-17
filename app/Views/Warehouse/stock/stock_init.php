@@ -384,7 +384,7 @@
             var spesifikasi = $('#spesifikasi_id option:selected').data('spesifikasi');
             var satuan_id = $('#satuan_id option:selected').val();
             var kode_satuan = $('#satuan_id option:selected').text();
-            var qty_inisiasi = destroyFormatRupiah(parseFloat($('#qty_inisiasi').val()));
+            var qty_inisiasi = destroyFormatRupiah($('#qty_inisiasi').val());
 
             if (id_detail) {
                 // UPDATE

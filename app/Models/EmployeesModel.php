@@ -219,7 +219,7 @@ class EmployeesModel extends Model
             'employees.company_id' => $company_id,
             // 'divisis.deletedAt' => null,
             // 'bagian.deletedAt' => null,
-            // 'employees.status' => "Aktif"
+            'employees.status' => "Aktif"
         ];
 
         $builder = $this->db->table('employees')
@@ -248,6 +248,12 @@ class EmployeesModel extends Model
         if (isset($addCondition['divisi_id']) && $addCondition['divisi_id'] !== '') {
             $builder->groupStart();
             $builder->where('employees.division_id', $addCondition['divisi_id']);
+            $builder->groupEnd();
+        }
+
+        if (isset($addCondition['bagian_id']) && $addCondition['bagian_id'] !== '') {
+            $builder->groupStart();
+            $builder->where('employees.bagian_id', $addCondition['bagian_id']);
             $builder->groupEnd();
         }
 
@@ -308,7 +314,7 @@ class EmployeesModel extends Model
             'employees.deletedAt' => null,
             'employees.company_id' => $company_id,
             // 'divisis.deletedAt' => null,
-            // 'employees.status' => "Aktif"
+            'employees.status' => "Aktif"
         ];
 
         if ($golongan != null && !empty($golongan)) {

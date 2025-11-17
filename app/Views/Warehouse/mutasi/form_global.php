@@ -289,6 +289,7 @@
                                                 <th>Dept</th>
                                                 <th>Warehouse</th>
                                                 <th>Sumber</th>
+                                                <th>No Spp</th>
                                                 <th>Supplier / Vendor</th>
                                                 <th>Kode Barang</th>
                                                 <th>Barang</th>
@@ -497,6 +498,10 @@
             },
             {
                 data: "reference_type",
+                className: "text-left"
+            },
+            {
+                data: "spp_no",
                 className: "text-left"
             },
             {

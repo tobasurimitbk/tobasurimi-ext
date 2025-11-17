@@ -194,7 +194,7 @@
                     `
                     } else {
                         return `
-                        <?php if (can('Warehouse', 'Penerimaan Mutasi', 'u')): ?>
+                          <?php if (can('Inventori', 'Penerimaan Mutasi', 'u')): ?>
                             <a href="<?= base_url("penerimaan-mutasi/id-lokal"); ?>/${id}" data-toggle="tooltip" title="Edit" class="btn btn-primary">
                                 <i class="fas fa-edit"></i>
                             </a>

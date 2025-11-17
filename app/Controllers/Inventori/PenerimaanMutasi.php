@@ -165,7 +165,7 @@ class PenerimaanMutasi extends BaseController
     public function detail($id)
     {
         $id = decrypt($id);
-        $penerimaanMutasi = $this->penerimaanMutasiModel->find($id);
+        $penerimaanMutasi = $this->penerimaanMutasiModel->where('id', $id)->first();
 
         if ($penerimaanMutasi == null) {
             return redirect()->to('penerimaan-mutasi');
