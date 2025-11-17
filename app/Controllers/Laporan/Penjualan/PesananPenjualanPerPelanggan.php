@@ -259,7 +259,7 @@ class PesananPenjualanPerPelanggan extends BaseController
             "dateEnd" => $tglAkhir != "now" ? date("d/m/Y", strtotime($tglAkhir)) : "Now",
             "dateStartShip" => $addCondition['dateStartShip'] ? date("d/m/Y", strtotime($addCondition['dateStartShip'])) : "All",
             "dateEndShip" => $addCondition['dateEndShip'] ? date("d/m/Y", strtotime($addCondition['dateEndShip'])) : "Now",
-            "filter_customer" => $filter != "all" ? $this->customerModel->find($filter)->name : "All",
+            "filter_customer" => $filter != "all" ? $this->customerModel->find($filter)['name'] : "All",
             "filter_status" => $addCondition['filter_status'] ?: "All",
         ];
 

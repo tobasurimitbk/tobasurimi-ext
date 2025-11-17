@@ -137,7 +137,7 @@ class PenjualanPerPelanggan extends BaseController
             "totalAllInvoice" => number_format($totalAllInvoice),
             "dateStart" => $tglAwal != "all" ? date("d/m/Y", strtotime($tglAwal)) : "All",
             "dateEnd" => $tglAkhir != "now" ? date("d/m/Y", strtotime($tglAkhir)) : "Now",
-            "filter_customer" => $filter != "all" ? $this->customerModel->find($filter)->name : "All",
+            "filter_customer" => $filter != "all" ? $this->customerModel->find($filter)['name'] : "All",
             "search" => $search != "all" ? $search : "All"
         ];
 
