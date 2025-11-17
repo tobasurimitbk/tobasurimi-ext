@@ -4,6 +4,7 @@ namespace App\Controllers\HR;
 
 use App\Controllers\BaseController;
 use App\Models\AttendancesLogModel;
+use App\Models\AttendancesModel;
 use App\Models\BagianModel;
 use App\Models\BigDaysModel;
 use App\Models\DivisisModel;
@@ -27,6 +28,7 @@ class PinjamanKaryawan extends BaseController
     protected $bigDaysModel;
     protected $attendancesLogModel;
     protected $bagianModel;
+    protected $attendancesModel;
 
     public function __construct()
     {
@@ -41,6 +43,7 @@ class PinjamanKaryawan extends BaseController
         $this->bigDaysModel = new BigDaysModel();
         $this->attendancesLogModel = new AttendancesLogModel();
         $this->bagianModel = new BagianModel();
+        $this->attendancesModel = new AttendancesModel();
     }
 
     public function index()
@@ -68,6 +71,12 @@ class PinjamanKaryawan extends BaseController
             $tanggalAmbil    = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggalAmbil_Global'))));
 
             $addCondition = [
+                'divisi_id' => $divisiId,
+                'tipe' => $tipe,
+                'status' => "Aktif"
+            ];
+
+            $addConditionAll = [
                 'divisi_id' => $divisiId,
                 'tipe' => $tipe,
             ];
@@ -103,7 +112,14 @@ class PinjamanKaryawan extends BaseController
                 $addCondition,
                 $this->this_company_id
             );
+
+            $employeeDataAll = $this->employeeModel->getEmployeesPinjaman(
+                $addConditionAll,
+                $this->this_company_id
+            );
+
             $employeeIds  = array_column($employeeData, 'id');
+            $employeeIdsAll = array_column($employeeDataAll, 'id');
 
             if (count($employeeIds) == 0) {
                 return response()->setJSON([
@@ -117,7 +133,7 @@ class PinjamanKaryawan extends BaseController
             $this->pinjamanKaryawanModel
                 ->where('company_id', $this->this_company_id)
                 ->where('month_year', $yearMonth)
-                ->whereIn('employee_id', $employeeIds)
+                ->whereIn('employee_id', $employeeIdsAll)
                 ->delete();
 
             // ✅ preload izin sekali saja
@@ -135,19 +151,17 @@ class PinjamanKaryawan extends BaseController
             $liburMap = array_column($liburData, null, 'date'); // key = tanggal
 
             // ✅ preload attendance log
-            $logs = $this->attendancesLogModel
-                ->select("employees_id, DATE(date_create) as tgl,
-                  DATE_FORMAT(MIN(date_create), '%H:%i:%s') as checkin,
-                  DATE_FORMAT(MAX(date_create), '%H:%i:%s') as checkout")
-                ->whereIn('employees_id', $employeeIds)
-                ->where("DATE(date_create) >=", $startDate)
-                ->where("DATE(date_create) <=", $endDate)
-                ->groupBy("employees_id, DATE(date_create)")
+            $logs = $this->attendancesModel
+                ->select("employee_id, periode AS tgl, checkin, checkout")
+                ->whereIn('employee_id', $employeeIds)
+                ->where("periode >=", $startDate)
+                ->where("periode <=", $endDate)
+                ->groupBy("employee_id, periode")
                 ->findAll();
 
             $logMap = [];
             foreach ($logs as $l) {
-                $logMap[$l['employees_id'] . '_' . $l['tgl']] = $l;
+                $logMap[$l['employee_id'] . '_' . $l['tgl']] = $l;
             }
 
             // ✅ preload golongan
@@ -171,10 +185,12 @@ class PinjamanKaryawan extends BaseController
                     $libur   = $liburMap[$tgl] ?? null;
                     $logAbsen = $logMap[$e['id'] . '_' . $tgl] ?? null;
 
-                    if (($libur != null || date('l', strtotime($tgl)) == "Sunday") && $izin == null && $logAbsen == null) {
+                    // if (($libur != null || date('l', strtotime($tgl)) == "Sunday") && $izin == null && $logAbsen == null) {
+
+                    if ($libur != null || date('l', strtotime($tgl)) == "Sunday") {
                         $tidakHadir++;
                     } elseif ($izin != null) {
-                        if (in_array($izin['status'], ["ALPHA_A", "CUTI HAID_CHD", "CUTI HAMIL_CHL", "CUTI MELAHIRKAN_CM", "LIBUR_L", "DINAS_D"])) {
+                        if (in_array($izin['status'], ["ALPHA_A", "LIBUR_L", "IJIN_I", "PG_POTONG GAJI", "SAKIT_S"])) {
                             $tidakHadir++;
                         } else {
                             $hadir++;
@@ -301,13 +317,11 @@ class PinjamanKaryawan extends BaseController
                 ->findAll();
             $hariLiburMap = array_column($hariLiburList, null, 'date');
 
-            $attLogs = $this->attendancesLogModel
-                ->select("DATE(date_create) as tanggal,
-                  DATE_FORMAT(MIN(date_create), '%H:%i:%s') as checkin,
-                  DATE_FORMAT(MAX(date_create), '%H:%i:%s') as checkout")
-                ->where('employees_id', $employee['id'])
-                ->whereIn("DATE(date_create)", $dateList)
-                ->groupBy('DATE(date_create)')
+            $attLogs = $this->attendancesModel
+                ->select("periode as tanggal, checkin, checkout")
+                ->where('employee_id', $employee['id'])
+                ->whereIn("periode", $dateList)
+                ->groupBy('periode')
                 ->findAll();
             $logMap = [];
             foreach ($attLogs as $log) {
@@ -322,10 +336,12 @@ class PinjamanKaryawan extends BaseController
                 $hariLibur = $hariLiburMap[$dates] ?? null;
                 $log = $logMap[$dates] ?? null;
 
-                if ($hariLibur != null || (date('l', strtotime($dates)) == "Sunday" && !$izin && !$log)) {
+                // if ($hariLibur != null || (date('l', strtotime($dates)) == "Sunday" && !$izin && !$log)) {
+
+                if ($hariLibur != null || date('l', strtotime($dates)) == "Sunday") {
                     $tidakHadir++;
                 } elseif ($izin != null) {
-                    if (in_array($izin['status'], ["ALPHA_A", "CUTI HAID_CHD", "CUTI HAMIL_CHL", "CUTI MELAHIRKAN_CM", "LIBUR_L", "DINAS_D"])) {
+                    if (in_array($izin['status'], ["ALPHA_A", "LIBUR_L", "IJIN_I", "PG_POTONG GAJI", "SAKIT_S"])) {
                         $tidakHadir++;
                     } else {
                         $hadir++;
@@ -474,7 +490,7 @@ class PinjamanKaryawan extends BaseController
         $divisiId = $this->request->getVar('divisi_id');
         $bagianId = $this->request->getVar('bagian_id');
 
-        $selectQry = "pinjaman_karyawan.*,employees.name";
+        $selectQry = "pinjaman_karyawan.*,employees.name,employees.nip";
 
         $data = [
             'divisi' => $this->divisiModel->where('id', $divisiId)->first(),

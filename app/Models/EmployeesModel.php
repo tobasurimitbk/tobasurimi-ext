@@ -257,6 +257,12 @@ class EmployeesModel extends Model
             $builder->groupEnd();
         }
 
+        if (isset($addCondition['status']) && $addCondition['status'] !== '') {
+            $builder->groupStart();
+            $builder->where('employees.status', $addCondition['status']);
+            $builder->groupEnd();
+        }
+
         return $builder->get()->getResultArray();
     }
 

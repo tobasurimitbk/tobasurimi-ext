@@ -81,6 +81,7 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th style="width: 10px;">No</th>
+                                <th onclick="changeSort('employees.nip')" class="sort">Nip</th>
                                 <th onclick="changeSort('employees.name')" class="sort">Nama Karyawan</th>
                                 <th onclick="changeSort('employees.tipe')" class="sort">Tipe/Gol</th>
                                 <th onclick="changeSort('employees.division_id')" class="sort">Dept</th>
@@ -391,6 +392,10 @@
                 className: "text-left",
                 sortable: false,
                 width: "3%"
+            },
+            {
+                data: "nip",
+                className: "text-left"
             },
             {
                 data: "name",

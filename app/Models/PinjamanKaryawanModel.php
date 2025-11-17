@@ -58,6 +58,7 @@ class PinjamanKaryawanModel extends Model
     public function getList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
+            'employees.nip' => 'employees.nip',
             'employees.tipe' => 'employees.tipe',
             'employees.name' => 'employees.name',
             'employees.division_id' => 'employees.division_id',

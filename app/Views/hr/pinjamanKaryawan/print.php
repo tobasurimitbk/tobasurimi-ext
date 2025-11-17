@@ -82,8 +82,8 @@
     <table width="100%" style="margin-top: 10px;" border="1" id="dashed-border-table">
         <thead>
             <tr align="center">
-                <td>NO</td>
-                <td>Kode</td>
+                <td>No</td>
+                <td>Nip</td>
                 <td>Nama Karyawan</td>
                 <td>J.Hr.Krj</td>
                 <td>Jlh. Pinj</td>
@@ -104,7 +104,7 @@
                     <?php $total += $p['nominal'];  ?>
                     <tr align="center">
                         <td><?= $no++; ?></td>
-                        <td><?= $p['employee_id'] ?></td>
+                        <td><?= $p['nip'] ?></td>
                         <td><?= $p['name'] ?></td>
                         <td><?= $p['hadir'] ?></td>
                         <td><?= number_format($p['nominal'] == null ? 0 : $p['nominal'], 2) ?></td>

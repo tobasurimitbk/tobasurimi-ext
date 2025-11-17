@@ -318,135 +318,136 @@
         var gajiPokokPerHari = "<?= (!empty($lemburDetail)) ?  $lemburDetail['gaji_pokok_per_hari'] : "-" ?>";
         var lemburLintasHari = "";
 
-        // append to form
-        var formData = new FormData();
-        formData.append('employeeID', employeeID);
-        formData.append('tanggalLembur', tanggalLembur);
-        formData.append('kurangiJamIstirahat', kurangiJamIstirahat);
-        formData.append('jamSelesaiLembur', jamSelesaiLembur);
-        formData.append('gajiPokokPerHari', gajiPokokPerHari);
+        if (employeeID != '' && tanggalLembur != '') {
+            // append to form
+            var formData = new FormData();
+            formData.append('employeeID', employeeID);
+            formData.append('tanggalLembur', tanggalLembur);
+            formData.append('kurangiJamIstirahat', kurangiJamIstirahat);
+            formData.append('jamSelesaiLembur', jamSelesaiLembur);
+            formData.append('gajiPokokPerHari', gajiPokokPerHari);
 
-        // generate action
-        $.ajax({
-            url: "<?= base_url("lembur/generate-pay"); ?>",
-            data: formData,
-            method: "POST",
-            dataType: "json",
-            beforeSend: function(xhr) {
-                // setLoading();
-                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-            },
-            complete: function() {
-                // stopLoading();
-            },
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                if (response.status) {
-                    var table = $('#tabelGaji');
-                    table.find('tbody').empty();
+            // generate action
+            $.ajax({
+                url: "<?= base_url("lembur/generate-pay"); ?>",
+                data: formData,
+                method: "POST",
+                dataType: "json",
+                beforeSend: function(xhr) {
+                    // setLoading();
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                },
+                complete: function() {
+                    // stopLoading();
+                },
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.status) {
+                        var table = $('#tabelGaji');
+                        table.find('tbody').empty();
 
-                    var jamKerja = response.jamKerja;
-                    var lemburJamPertama = response.lembur.lemburJamPertama;
-                    var lemburJamBerikutnya = response.lembur.lemburJamBerikutnya;
+                        var jamKerja = response.jamKerja;
+                        var lemburJamPertama = response.lembur.lemburJamPertama;
+                        var lemburJamBerikutnya = response.lembur.lemburJamBerikutnya;
 
-                    $.each(response.komponenGaji, function(index, data) {
-                        var newRow = $('<tr style="color:whitesmoke; font-weight:bold;">');
-                        var indexNumber = index + 1;
-                        var nominal = "<?= !empty($lemburDetail) ? $lemburDetail['gaji_pokok_per_hari'] : "-" ?>"
-                        newRow.append($('<td>').text(indexNumber));
-                        newRow.append($('<td>').text(data.name));
-                        newRow.append($('<td>').text(data.nominal != null ? greatFormatRupiah(nominal == "-" ? data.nominal : nominal) : 0));
-                        table.append(newRow);
-                    });
+                        $.each(response.komponenGaji, function(index, data) {
+                            var newRow = $('<tr style="color:whitesmoke; font-weight:bold;">');
+                            var indexNumber = index + 1;
+                            var nominal = "<?= !empty($lemburDetail) ? $lemburDetail['gaji_pokok_per_hari'] : "-" ?>"
+                            newRow.append($('<td>').text(indexNumber));
+                            newRow.append($('<td>').text(data.name));
+                            newRow.append($('<td>').text(data.nominal != null ? greatFormatRupiah(nominal == "-" ? data.nominal : nominal) : 0));
+                            table.append(newRow);
+                        });
 
-                    $('input[name="jamKerjaMasuk"]').val(jamKerja.jamKerjaMasuk);
-                    $('input[name="jamKerjaKeluar"]').val(jamKerja.jamKerjaKeluar);
-                    $('input[name="jamMulaiLembur"]').val(jamKerja.jamMulaiLembur);
-                    $('input[name="jamSelesaiLembur"]').val(jamKerja.jamSelesaiLembur);
-                    $('input[name="jumlahJamIstirahat"]').val(jamKerja.jumlahJamIstirahat);
-                    $('input[name="jumlahJamKerjaBersih"]').val(jamKerja.jumlahJamKerjaBersih);
+                        $('input[name="jamKerjaMasuk"]').val(jamKerja.jamKerjaMasuk);
+                        $('input[name="jamKerjaKeluar"]').val(jamKerja.jamKerjaKeluar);
+                        $('input[name="jamMulaiLembur"]').val(jamKerja.jamMulaiLembur);
+                        $('input[name="jamSelesaiLembur"]').val(jamKerja.jamSelesaiLembur);
+                        $('input[name="jumlahJamIstirahat"]').val(jamKerja.jumlahJamIstirahat);
+                        $('input[name="jumlahJamKerjaBersih"]').val(jamKerja.jumlahJamKerjaBersih);
 
-                    var tbody = $("#rincanBiayaLembur");
-                    tbody.empty();
+                        var tbody = $("#rincanBiayaLembur");
+                        tbody.empty();
 
-                    var dataToAdd = [{
-                            column1: "1.",
-                            column2: "1/173 x 25 x 1.5",
-                            column3: "x",
-                            column4: lemburJamPertama.totalLemburJamPertama + " x " + greatFormatRupiah(response.upah),
-                            column5: greatFormatRupiah(lemburJamPertama.bayaran),
-                        },
-                        {
-                            column1: "2.",
-                            column2: "1/173 x 25 x 2",
-                            column3: "x",
-                            column4: lemburJamBerikutnya.totalLemburJamKedua + " x " + greatFormatRupiah(response.upah),
-                            column5: greatFormatRupiah(lemburJamBerikutnya.bayaran),
-                        },
-                        {
-                            column1: "",
-                            column2: "",
-                            column3: "",
-                            column4: "",
-                            column5: greatFormatRupiah(response.lembur.totalBayaran)
-                        }
-                    ];
+                        var dataToAdd = [{
+                                column1: "1.",
+                                column2: "1/173 x 25 x 1.5",
+                                column3: "x",
+                                column4: lemburJamPertama.totalLemburJamPertama + " x " + greatFormatRupiah(response.upah),
+                                column5: greatFormatRupiah(lemburJamPertama.bayaran),
+                            },
+                            {
+                                column1: "2.",
+                                column2: "1/173 x 25 x 2",
+                                column3: "x",
+                                column4: lemburJamBerikutnya.totalLemburJamKedua + " x " + greatFormatRupiah(response.upah),
+                                column5: greatFormatRupiah(lemburJamBerikutnya.bayaran),
+                            },
+                            {
+                                column1: "",
+                                column2: "",
+                                column3: "",
+                                column4: "",
+                                column5: greatFormatRupiah(response.lembur.totalBayaran)
+                            }
+                        ];
 
-                    $('input[name="totalUangLembur"]').val(response.lembur.totalBayaran);
-                    $('input[name="totalJamLembur"]').val(response.lembur.totalJamLembur);
-                    $('input[name="gajiPokokPerHari"]').val(response.upah);
+                        $('input[name="totalUangLembur"]').val(response.lembur.totalBayaran);
+                        $('input[name="totalJamLembur"]').val(response.lembur.totalJamLembur);
+                        $('input[name="gajiPokokPerHari"]').val(response.upah);
 
-                    $.each(dataToAdd, function(index, data) {
-                        var newRow = $("<tr class='text-dark font-weight-bold' style='color:whitesmoke;'>");
-                        newRow.append($("<td style='width: 10px;'>").text(data.column1));
-                        newRow.append($("<td>").text(data.column2));
-                        newRow.append($("<td>").text(data.column3));
-                        newRow.append($("<td>").text(data.column4));
-                        newRow.append($("<td>").text(data.column5));
-                        tbody.append(newRow);
-                    });
+                        $.each(dataToAdd, function(index, data) {
+                            var newRow = $("<tr class='text-dark font-weight-bold' style='color:whitesmoke;'>");
+                            newRow.append($("<td style='width: 10px;'>").text(data.column1));
+                            newRow.append($("<td>").text(data.column2));
+                            newRow.append($("<td>").text(data.column3));
+                            newRow.append($("<td>").text(data.column4));
+                            newRow.append($("<td>").text(data.column5));
+                            tbody.append(newRow);
+                        });
 
-                    showRincianUangLembur();
+                        showRincianUangLembur();
 
 
-                } else if (!response.status && response.code == 400) {
+                    } else if (!response.status && response.code == 400) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                        });
+                        var table = $('#tabelGaji');
+                        table.find('tbody').empty();
+                        hideRincianUangLembur();
+
+                        $('input[name="jamKerjaMasuk"]').val(null);
+                        $('input[name="jamKerjaKeluar"]').val(null);
+                        $('input[name="jamMulaiLembur"]').val(null);
+                        $('input[name="jamSelesaiLembur"]').val(null);
+                        $('input[name="jumlahJamIstirahat"]').val(null);
+                        $('input[name="jumlahJamKerjaBersih"]').val(null);
+                        $('input[name="totalUangLembur"]').val(null);
+                        $('input[name="gajiPokokPerHari"]').val(null);
+                    } else {
+                        // response 500
+                        Swal.fire({
+                            icon: 'error',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                        });
+                    }
+
+                },
+                onError: function(response) {
                     Swal.fire({
                         icon: 'error',
-                        title: response.message,
-                        confirmButtonColor: '#4e73df',
-                    });
-                    var table = $('#tabelGaji');
-                    table.find('tbody').empty();
-                    hideRincianUangLembur();
-
-                    $('input[name="jamKerjaMasuk"]').val(null);
-                    $('input[name="jamKerjaKeluar"]').val(null);
-                    $('input[name="jamMulaiLembur"]').val(null);
-                    $('input[name="jamSelesaiLembur"]').val(null);
-                    $('input[name="jumlahJamIstirahat"]').val(null);
-                    $('input[name="jumlahJamKerjaBersih"]').val(null);
-                    $('input[name="totalUangLembur"]').val(null);
-                    $('input[name="gajiPokokPerHari"]').val(null);
-                } else {
-                    // response 500
-                    Swal.fire({
-                        icon: 'error',
-                        title: response.message,
+                        title: 'Terjadi kesalahan pada sistem',
                         confirmButtonColor: '#4e73df',
                     });
                 }
-
-            },
-            onError: function(response) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Terjadi kesalahan pada sistem',
-                    confirmButtonColor: '#4e73df',
-                });
-            }
-        });
-
+            });
+        }
     }
 
     var validator = $("#formLembur").validate({
