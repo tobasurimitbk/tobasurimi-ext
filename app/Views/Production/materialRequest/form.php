@@ -402,9 +402,7 @@
                                 <tr>
                                     <th style="text-align: center;">#</th>
                                     <!-- <th style="text-align: center;">Asal Barang</th> -->
-                                    <?php if (session()->get("login")->this_company_id == 16) : ?>
-                                        <th style="text-align: center;">No PO / No VBM</th>
-                                    <?php endif; ?>
+                                    <th style="text-align: center;">No PO / No VBM</th>
                                     <th style="text-align: center;">Supplier / Vendor</th>
                                     <!-- <th style="text-align: center;">Dokumen Pabean</th> -->
                                     <!-- <th style="text-align: center;">No Aju / No Daftar</th> -->
@@ -461,9 +459,7 @@
                                         <th style="text-align: center;">Departemen / Warehouse Asal</th>
                                         <th style="text-align: center;">Departemen / Warehouse Tujuan</th>
                                         <th style="text-align: center;">Supplier / Vendor</th>
-                                        <?php if (session()->get("login")->this_company_id == 16) : ?>
-                                            <th style="text-align: center;">No PO / No VBM</th>
-                                        <?php endif; ?>
+                                        <th style="text-align: center;">No PO / No VBM</th>
                                         <th style="text-align: center;">Tgl PO / Tgl Vendor Masuk</th>
                                         <th style="text-align: center;">Barang - Spesifikasi</th>
                                         <th style="text-align: center;">Keterangan</th>
@@ -1527,9 +1523,7 @@
 
             // newRow.append($('<td style="text-align:center;">').text(v.sumber));
 
-            <?php if (session()->get("login")->this_company_id == 16) : ?>
-                newRow.append($('<td style="text-align:center;">').text(v.stock_dokumen));
-            <?php endif; ?>
+            newRow.append($('<td style="text-align:center;">').text(v.stock_dokumen));
             newRow.append($('<td style="text-align:center;">').text(v.supplier_name));
             // newRow.append($('<td style="text-align:center;">').text(v.bc_type));
             // newRow.append($('<td style="text-align: center;">').text(`${v.no_aju ? v.no_aju : '-'} / ${v.no_daftar ? v.no_daftar : '-'}`));
@@ -1962,9 +1956,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.departmentText + ' / ' + v.warehouseText));
             newRow.append($('<td style="text-align: center;">').text(v.departmentTujuanText + ' / ' + v.warehouseTujuanText));
             newRow.append($('<td style="text-align: center;">').text(v.supplier_name));
-            <?php if (session()->get("login")->this_company_id == 16) : ?>
-                newRow.append($('<td style="text-align: center;">').text(v.stock_dokumen));
-            <?php endif; ?>
+            newRow.append($('<td style="text-align: center;">').text(v.stock_dokumen));
             newRow.append($('<td style="text-align: center;">').text(v.stock_date));
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align:center;">').text(v.keterangan));

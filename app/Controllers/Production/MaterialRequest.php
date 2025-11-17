@@ -1728,7 +1728,7 @@ class MaterialRequest extends BaseController
                 if (!empty($vendorId)) {
                     $condition["jasa_vendor_in.vendor_id "] = $vendorId;
                 }
-                $condition["stock_revamp_detail.reference_type "] = "JASA VENDOR";
+                $condition["stock_revamp_detail.reference_type "] = ["JASA VENDOR", "PROSES REBUS"];
                 $dataResult = $this->stockRevampDetailModel->getStockListVendorWithCondition($condition);
             }
 
