@@ -3086,6 +3086,7 @@ $routes->get('/hr-outsourcing-sallary-payment/create', 'HROutsourcing\SallaryPay
 $routes->post('/hr-outsourcing-sallary-payment/getHrCompanyOutSourcing', 'HROutsourcing\SallaryPayment::getHrCompanyOutSourcing', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-sallary-payment/getHrEmployeeOutSourcing', 'HROutsourcing\SallaryPayment::getHrEmployeeOutSourcing', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-sallary-payment/store', 'HROutsourcing\SallaryPayment::store', ['filter' => 'Auth']);
+$routes->post('/hr-outsourcing-sallary-payment/push', 'HROutsourcing\SallaryPayment::push', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-sallary-payment/update/(:segment)', 'HROutsourcing\SallaryPayment::update/$1', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-sallary-payment/delete/(:segment)', 'HROutsourcing\SallaryPayment::destroy/$1', ['filter' => 'Auth']);
 $routes->get('hr-outsourcing-sallary-payment/ip-config', 'HROutsourcing\SallaryPayment::ipConfig', ['filter' => 'Auth']);
