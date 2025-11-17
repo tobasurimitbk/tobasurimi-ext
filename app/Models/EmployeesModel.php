@@ -496,7 +496,8 @@ class EmployeesModel extends Model
             ->select($selectQry)
             ->join('divisis', 'divisis.id = employees.division_id', 'left')
             ->join('bagian', 'bagian.id = employees.bagian_id', 'left')
-            ->where($condition);
+            ->where($condition)
+            ->where('employees.status', "Aktif");
 
         $totalData = $dataQry->countAllResults(false);
 
