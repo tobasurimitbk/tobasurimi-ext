@@ -190,7 +190,7 @@ class PinjamanKaryawan extends BaseController
                     if ($libur != null || date('l', strtotime($tgl)) == "Sunday") {
                         $tidakHadir++;
                     } elseif ($izin != null) {
-                        if (in_array($izin['status'], ["ALPHA_A", "LIBUR_L", "IJIN_I", "PG_POTONG GAJI", "SAKIT_S"])) {
+                        if (in_array($izin['status'], ["ALPHA_A", "POTONG GAJI_PG"])) {
                             $tidakHadir++;
                         } else {
                             $hadir++;
@@ -341,7 +341,7 @@ class PinjamanKaryawan extends BaseController
                 if ($hariLibur != null || date('l', strtotime($dates)) == "Sunday") {
                     $tidakHadir++;
                 } elseif ($izin != null) {
-                    if (in_array($izin['status'], ["ALPHA_A", "LIBUR_L", "IJIN_I", "PG_POTONG GAJI", "SAKIT_S"])) {
+                    if (in_array($izin['status'], ["ALPHA_A", "POTONG GAJI_PG"])) {
                         $tidakHadir++;
                     } else {
                         $hadir++;

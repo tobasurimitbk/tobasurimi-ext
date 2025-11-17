@@ -167,8 +167,8 @@
                         <div class="col-md-6 mb-3">
                             <div class="input-group">
                                 <div class="form-floating">
-                                    <input name="startDate" id="startDate" type="text" required class="form-control target input-picker" placeholder="Tanggal Mulai Log Absensi">
-                                    <label for="floatingInput">Tanggal Mulai Log Absensi</label>
+                                    <input name="startDate" id="startDate" type="text" required class="form-control target input-picker" placeholder="Tanggal Mulai Absensi">
+                                    <label for="floatingInput">Tanggal Mulai Absensi</label>
                                 </div>
                                 <div class="input-group-append" style="height:50px;">
                                     <button disabled class="btn btn-secondary" type="button">
@@ -180,8 +180,8 @@
                         <div class="col-md-6 mb-3">
                             <div class="input-group">
                                 <div class="form-floating">
-                                    <input name="finishDate" id="finishDate" type="text" required class="form-control target input-picker" placeholder="Tanggal Selesai Log Absensi">
-                                    <label for="floatingInput">Tanggal Selesai Log Absensi</label>
+                                    <input name="finishDate" id="finishDate" type="text" required class="form-control target input-picker" placeholder="Tanggal Selesai Absensi">
+                                    <label for="floatingInput">Tanggal Selesai Absensi</label>
                                 </div>
                                 <div class="input-group-append" style="height:50px;">
                                     <button disabled class="btn btn-secondary" type="button">
