@@ -110,7 +110,7 @@ class LaporanSupplierLokalBB extends BaseController
         // var_dump($condition, $addCondition, $availableSort);
 
         // Ambil semua data untuk total footer
-        $allData = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierPerPO(
+        $allData = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierNew(
             $availableSort,
             $condition,
             $addCondition,
@@ -119,7 +119,7 @@ class LaporanSupplierLokalBB extends BaseController
         )['data'];
 
         // Ambil data dengan pagination
-        $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierPerPO(
+        $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierNew(
             $availableSort,
             $condition,
             $addCondition,
@@ -147,51 +147,88 @@ class LaporanSupplierLokalBB extends BaseController
             'totalRow' => 0
         ];
 
-        foreach ($allData as $row) {
-            $qtyAll       = floatval($row->qtyPO ?? 0);
+        foreach ($allData as $i => &$row) {
 
-            $dppUmum       = floatval($row->dpp_umum ?? 0);
-            $pphUmum       = floatval($row->pph_umum ?? 0);
-            $totalUmum     = floatval($row->nilai_total_umum ?? 0);
+            $qtyAll     = floatval($row->qtyPO ?? 0);
 
-            $dppHarian     = floatval($row->dpp_harian ?? 0);
-            $pphHarian     = floatval($row->pph_harian ?? 0);
-            $totalHarian   = floatval($row->nilai_total_harian ?? 0);
+            $dppUmum    = floatval($row->dpp_umum ?? 0);
+            $pphUmum    = floatval($row->pph_umum ?? 0);
+            $totalUmum  = floatval($row->nilai_total_umum ?? 0);
 
-            $dppBulanan    = floatval($row->dpp_bulanan ?? 0);
-            $pphBulanan    = floatval($row->pph_bulanan ?? 0);
-            $totalBulanan  = floatval($row->nilai_total_bulanan ?? 0);
+            $dppHarian    = floatval($row->dpp_harian ?? 0);
+            $pphHarian    = floatval($row->pph_harian ?? 0);
+            $totalHarian  = floatval($row->nilai_total_harian ?? 0);
 
-            $dppTambahan   = floatval($row->dpp_tambahan ?? 0);
-            $pphTambahan   = floatval($row->pph_tambahan ?? 0);
-            $totalTambahan = floatval($row->nilai_total_tambahan ?? 0);
+            $dppBulanan   = floatval($row->dpp_bulanan ?? 0);
+            $pphBulanan   = floatval($row->pph_bulanan ?? 0);
+            $totalBulanan = floatval($row->nilai_total_bulanan ?? 0);
+
+            $qtyDetail = floatval($row->qtyPO ?? 0);
+            $qtyTotalPO = floatval($row->sum_qtyPO ?? 0);
+            $proporsi = ($qtyTotalPO > 0) ? ($qtyDetail / $qtyTotalPO) : 0;
+
+            $dppTambahan   = floatval($row->sum_dpp_tambahan ?? 0) * $proporsi;
+            $pphTambahan   = floatval($row->sum_pph_tambahan ?? 0) * $proporsi;
+            $totalTambahan = floatval($row->sum_nilai_total_tambahan ?? 0) * $proporsi;
+
+            // ✔ MASUKKAN KEMBALI KE ARRAY UTAMA
+            $row->dpp_tambahan = $dppTambahan;
+            $row->pph_tambahan = $pphTambahan;
+            $row->nilai_total_tambahan = $totalTambahan;
 
             $totalRow = $totalUmum + $totalHarian + $totalBulanan + $totalTambahan;
 
+            // total ALL (tetap sama)
             $totalsRaw['qtyAll']       += $qtyAll;
-            $totalsRaw['dppUmum']       += $dppUmum;
-            $totalsRaw['pphUmum']       += $pphUmum;
-            $totalsRaw['totalUmum']     += $totalUmum;
-            $totalsRaw['dppHarian']     += $dppHarian;
-            $totalsRaw['pphHarian']     += $pphHarian;
-            $totalsRaw['totalHarian']   += $totalHarian;
-            $totalsRaw['dppBulanan']    += $dppBulanan;
-            $totalsRaw['pphBulanan']    += $pphBulanan;
-            $totalsRaw['totalBulanan']  += $totalBulanan;
-            $totalsRaw['dppTambahan']   += $dppTambahan;
-            $totalsRaw['pphTambahan']   += $pphTambahan;
+            $totalsRaw['dppUmum']      += $dppUmum;
+            $totalsRaw['pphUmum']      += $pphUmum;
+            $totalsRaw['totalUmum']    += $totalUmum;
+            $totalsRaw['dppHarian']    += $dppHarian;
+            $totalsRaw['pphHarian']    += $pphHarian;
+            $totalsRaw['totalHarian']  += $totalHarian;
+            $totalsRaw['dppBulanan']   += $dppBulanan;
+            $totalsRaw['pphBulanan']   += $pphBulanan;
+            $totalsRaw['totalBulanan'] += $totalBulanan;
+            $totalsRaw['dppTambahan']  += $dppTambahan;
+            $totalsRaw['pphTambahan']  += $pphTambahan;
             $totalsRaw['totalTambahan'] += $totalTambahan;
-            $totalsRaw['totalRow']      += $totalRow;
+            $totalsRaw['totalRow']     += $totalRow;
         }
 
         // --- Format row (pagination) ---
         foreach ($paginatedData as $i => &$row) {
+
             $row->no = $start + $i + 1;
-            $totalRow = floatval($row->nilai_total_umum ?? 0)
+
+            // ===============================
+            //  HITUNG PROPOSI TAMBAHAN (SAMA DENGAN allData)
+            // ===============================
+            $qtyDetail   = floatval($row->qtyPO ?? 0);
+            $qtyTotalPO  = floatval($row->sum_qtyPO ?? 0);
+            $proporsi    = ($qtyTotalPO > 0) ? ($qtyDetail / $qtyTotalPO) : 0;
+
+            // Tambahan (hasil proporsional)
+            $row->dpp_tambahan =
+                floatval($row->sum_dpp_tambahan ?? 0) * $proporsi;
+
+            $row->pph_tambahan =
+                floatval($row->sum_pph_tambahan ?? 0) * $proporsi;
+
+            $row->nilai_total_tambahan =
+                floatval($row->sum_nilai_total_tambahan ?? 0) * $proporsi;
+
+            // ===============================
+            //  TOTAL ROW (setelah ada tambahan)
+            // ===============================
+            $totalRow =
+                floatval($row->nilai_total_umum ?? 0)
                 + floatval($row->nilai_total_harian ?? 0)
                 + floatval($row->nilai_total_bulanan ?? 0)
                 + floatval($row->nilai_total_tambahan ?? 0);
 
+            // ===============================
+            //  FORMAT NUMBER (TETAP)
+            // ===============================
             foreach (
                 [
                     'dpp_umum',
@@ -210,6 +247,7 @@ class LaporanSupplierLokalBB extends BaseController
             ) {
                 $row->$key = number_format(floatval($row->$key ?? 0), 2, '.', ',');
             }
+
             $row->totalRow = number_format($totalRow, 2, '.', ',');
         }
 
@@ -1152,7 +1190,7 @@ class LaporanSupplierLokalBB extends BaseController
             'warehouseName' => 'warehouses.warehouse_name',
         ];
 
-        $allData = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierPerPO(
+        $allData = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierNew(
             $availableSort,
             $condition,
             $addCondition,
@@ -1161,10 +1199,24 @@ class LaporanSupplierLokalBB extends BaseController
         )['data'];
 
         $grouped = [];
-        foreach ($allData as $row) {
+        foreach ($allData as &$row) {
             $supplier = $row->supplierName ?? '-';
             $barang   = $row->barangName ?? '-';
             $key = $supplier . '||' . $barang;
+
+            $qtyDetail   = floatval($row->qtyPO ?? 0);
+            $qtyTotalPO  = floatval($row->sum_qtyPO ?? 0);
+            $proporsi    = ($qtyTotalPO > 0) ? ($qtyDetail / $qtyTotalPO) : 0;
+
+            // Tambahan (hasil proporsional)
+            $row->dpp_tambahan =
+                floatval($row->sum_dpp_tambahan ?? 0) * $proporsi;
+
+            $row->pph_tambahan =
+                floatval($row->sum_pph_tambahan ?? 0) * $proporsi;
+
+            $row->nilai_total_tambahan =
+                floatval($row->sum_nilai_total_tambahan ?? 0) * $proporsi;
 
             if (!isset($grouped[$key])) {
                 $grouped[$key] = [
@@ -1307,7 +1359,7 @@ class LaporanSupplierLokalBB extends BaseController
             'warehouseName' => 'warehouses.warehouse_name',
         ];
 
-        $allData = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierPerPO(
+        $allData = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierNew(
             $availableSort,
             $condition,
             $addCondition,
@@ -1321,6 +1373,20 @@ class LaporanSupplierLokalBB extends BaseController
         foreach ($allData as $row) {
             $barang   = trim($row->barangName ?? '-');
             $supplier = trim($row->supplierName ?? '-');
+
+            $qtyDetail   = floatval($row->qtyPO ?? 0);
+            $qtyTotalPO  = floatval($row->sum_qtyPO ?? 0);
+            $proporsi    = ($qtyTotalPO > 0) ? ($qtyDetail / $qtyTotalPO) : 0;
+
+            // Tambahan (hasil proporsional)
+            $row->dpp_tambahan =
+                floatval($row->sum_dpp_tambahan ?? 0) * $proporsi;
+
+            $row->pph_tambahan =
+                floatval($row->sum_pph_tambahan ?? 0) * $proporsi;
+
+            $row->nilai_total_tambahan =
+                floatval($row->sum_nilai_total_tambahan ?? 0) * $proporsi;
 
             if (!isset($grouped[$barang])) {
                 $grouped[$barang] = [];
@@ -1421,7 +1487,7 @@ class LaporanSupplierLokalBB extends BaseController
             'warehouseName' => 'warehouses.warehouse_name',
         ];
 
-        $allData = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierPerPO(
+        $allData = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierNew(
             $availableSort,
             $condition,
             $addCondition,
@@ -1442,6 +1508,20 @@ class LaporanSupplierLokalBB extends BaseController
 
             $barangKey   = preg_replace('/\s+/', ' ', $barang);
             $supplierKey = preg_replace('/\s+/', ' ', $supplier);
+
+            $qtyDetail   = floatval($row->qtyPO ?? 0);
+            $qtyTotalPO  = floatval($row->sum_qtyPO ?? 0);
+            $proporsi    = ($qtyTotalPO > 0) ? ($qtyDetail / $qtyTotalPO) : 0;
+
+            // Tambahan (hasil proporsional)
+            $row->dpp_tambahan =
+                floatval($row->sum_dpp_tambahan ?? 0) * $proporsi;
+
+            $row->pph_tambahan =
+                floatval($row->sum_pph_tambahan ?? 0) * $proporsi;
+
+            $row->nilai_total_tambahan =
+                floatval($row->sum_nilai_total_tambahan ?? 0) * $proporsi;
 
             if (!isset($grouped[$barangKey])) {
                 $grouped[$barangKey] = [];
@@ -1523,7 +1603,7 @@ class LaporanSupplierLokalBB extends BaseController
         foreach ($grouped as $barangName => $rows) {
             // Judul bahan baku
             $sheet->setCellValue("A{$row}", "Bahan Baku: " . strtoupper($barangName));
-            $sheet->mergeCells("A{$row}:T{$row}");
+            $sheet->mergeCells("A{$row}:S{$row}");
             $sheet->getStyle("A{$row}")->getFont()->setBold(true)->getColor()->setARGB('FFFFFFFF');
             $sheet->getStyle("A{$row}")->getFill()->setFillType('solid')->getStartColor()->setARGB('FF666666');
             $row++;
@@ -1545,7 +1625,6 @@ class LaporanSupplierLokalBB extends BaseController
             $sheet->setCellValue("P{$row}", "Tambahan Langsung");
             $sheet->mergeCells("P{$row}:R{$row}");
             $sheet->setCellValue("S{$row}", "TOTAL");
-            $sheet->mergeCells("S{$row}:U" . ($row + 1));
 
             // Subheader
             $row2 = $row + 1;
@@ -2099,7 +2178,7 @@ class LaporanSupplierLokalBB extends BaseController
             'warehouseName' => 'warehouses.warehouse_name',
         ];
 
-        $allData = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierPerPO(
+        $allData = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierNew(
             $availableSort,
             $condition,
             $addCondition,
@@ -2114,6 +2193,20 @@ class LaporanSupplierLokalBB extends BaseController
             $barang   = $row->barangName ?? '-';
             $supplier = $row->supplierName ?? '-';
             $spek     = $row->spekName ?? '-';
+
+            $qtyDetail   = floatval($row->qtyPO ?? 0);
+            $qtyTotalPO  = floatval($row->sum_qtyPO ?? 0);
+            $proporsi    = ($qtyTotalPO > 0) ? ($qtyDetail / $qtyTotalPO) : 0;
+
+            // Tambahan (hasil proporsional)
+            $row->dpp_tambahan =
+                floatval($row->sum_dpp_tambahan ?? 0) * $proporsi;
+
+            $row->pph_tambahan =
+                floatval($row->sum_pph_tambahan ?? 0) * $proporsi;
+
+            $row->nilai_total_tambahan =
+                floatval($row->sum_nilai_total_tambahan ?? 0) * $proporsi;
 
             if (!isset($grouped[$barang])) {
                 $grouped[$barang] = [];
@@ -2245,6 +2338,20 @@ class LaporanSupplierLokalBB extends BaseController
             $divisi   = $row->divisiName ?? '-';
             $spek     = $row->spekName ?? '-';
             $satuan   = $row->satuanName ?? '-';
+
+            $qtyDetail   = floatval($row->qtyPO ?? 0);
+            $qtyTotalPO  = floatval($row->sum_qtyPO ?? 0);
+            $proporsi    = ($qtyTotalPO > 0) ? ($qtyDetail / $qtyTotalPO) : 0;
+
+            // Tambahan (hasil proporsional)
+            $row->dpp_tambahan =
+                floatval($row->sum_dpp_tambahan ?? 0) * $proporsi;
+
+            $row->pph_tambahan =
+                floatval($row->sum_pph_tambahan ?? 0) * $proporsi;
+
+            $row->nilai_total_tambahan =
+                floatval($row->sum_nilai_total_tambahan ?? 0) * $proporsi;
 
             if (!isset($grouped[$barang])) {
                 $grouped[$barang] = [];
