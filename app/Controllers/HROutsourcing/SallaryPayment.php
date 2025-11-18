@@ -3,6 +3,7 @@
 namespace App\Controllers\HROutsourcing;
 
 use App\Controllers\BaseController;
+use App\Models\BarangMasterSortirModel;
 use App\Models\DivisisModel;
 use App\Models\HROutsourcingCompanyModel;
 use App\Models\HROutsourcingEmployeeModel;
@@ -408,4 +409,63 @@ class SallaryPayment extends BaseController
 
         return view('HROutsourcing/sallary-payment/ip-config', $data);
     }
+
+
+    public function push()
+    {
+        $ipAddress = $this->request->getPost('ip');
+        if (!$ipAddress) {
+            return $this->response->setJSON([
+                "status" => false,
+                "message" => "IP address tidak ditemukan"
+            ]);
+        }
+
+        $employeeModel = new HrOutsourcingEmployeeModel();
+        $barangModel   = new BarangMasterSortirModel();
+        $companyModel  = new HrOutsourcingCompanyModel();
+
+        // Ambil data dari database
+        $employees = $employeeModel->findAll();
+        $barang = $barangModel->findAll();
+        $companies = $companyModel->findAll();
+
+        // LOG DATA UNTUK DEBUG
+        log_message('info', 'Data to sync - Employees: ' . count($employees) . ', Barang: ' . count($barang) . ', Companies: ' . count($companies));
+
+        // Format data sesuai dengan struct Go
+        $payload = [
+            "employees" => $employees,
+            "barang"    => $barang,
+            "companies" => $companies,
+        ];
+
+        $golangUrl = "http://{$ipAddress}:8001/api/migrate-to-db";
+        $client = \Config\Services::curlrequest();
+
+        try {
+            $response = $client->post($golangUrl, [
+                "json" => $payload,
+                "timeout" => 3000, // TIMEOUT 5 MENIT
+                "connect_timeout" => 30,
+                "headers" => [
+                    "Content-Type" => "application/json",
+                ]
+            ]);
+
+            return $this->response->setJSON([
+                "status" => true,
+                "message" => "Data berhasil dikirim",
+                "go_response" => json_decode($response->getBody(), true)
+            ]);
+
+        } catch (\Exception $e) {
+            log_message('error', 'Push data failed: ' . $e->getMessage());
+            return $this->response->setJSON([
+                "status" => false,
+                "message" => "Gagal push: " . $e->getMessage()
+            ]);
+        }
+    }
+
 }

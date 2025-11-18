@@ -385,6 +385,10 @@
                                                     data-name="${item.department_name}">
                                                 <i class="fas fa-trash"></i>
                                             </button>
+                                            <button class="btn btn-primary btn-push"
+                                                    data-ip="${item.ip_address}">
+                                                <i class="fas fa-paper-plane"></i>
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -415,6 +419,46 @@
                 }
             });
         }
+
+
+        $(document).on('click', '.btn-push', function() {
+            let ip = $(this).data('ip');
+
+            Swal.fire({
+                title: 'Kirim Data?',
+                text: `Data akan dikirim ke server Golang: ${ip}`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Kirim Sekarang',
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                    $.ajax({
+                        url: '<?= base_url("hr-outsourcing-sallary-payment/push") ?>',
+                        type: 'POST',
+                        data: { ip: ip, <?= csrf_token() ?>: '<?= csrf_hash() ?>' },
+                        dataType: 'json',
+                        success: function(res) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil',
+                                text: res.message
+                            });
+                            console.log(res.go_response);
+                        },
+                        error: function(xhr, status, err) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal',
+                                text: err
+                            });
+                        }
+                    });
+
+                }
+            });
+        });
+
 
         // Fungsi untuk menyimpan data
         $('#saveDepartmentIp').on('click', function() {
