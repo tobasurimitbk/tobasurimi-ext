@@ -298,48 +298,95 @@
 
         if (!validateGetData(companyId, tanggal)) return;
 
-        const apiUrl = getApiUrl(companyId, tanggal);
         toggleLoadingState(true);
 
+        const departmentId = $('#departemen').val();
+        
+        // Step 1: Get IP address
         $.ajax({
-            url: apiUrl,
-            method: 'GET',
+            url: `<?= base_url("hr-outsourcing-sallary-payment/getIpByDepartment/") ?>${departmentId}`,
+            type: 'GET',
             dataType: 'json',
-            success: (res) => handleGetDataSuccess(res),
-            error: (xhr) => handleGetDataError(xhr),
-            complete: () => toggleLoadingState(false)
+            success: function(ipResponse) {
+                if (ipResponse.success && ipResponse.ip_address) {
+                    // Step 2: Get data dari scale system
+                    const apiUrl = `http://${ipResponse.ip_address}:8001/api/local-data?company_id=${companyId}&tanggal=${tanggal}`;
+                    
+                    $.ajax({
+                        url: apiUrl,
+                        method: 'GET',
+                        dataType: 'json',
+                        timeout: 10000,
+                        success: function(res) {
+                            handleGetDataSuccess(res);
+                        },
+                        error: function(xhr, status, error) {
+                            handleGetDataError(xhr, status, error);
+                        },
+                        complete: function() {
+                            toggleLoadingState(false);
+                        }
+                    });
+                } else {
+                    showError(ipResponse.message || 'IP address tidak ditemukan untuk department ini');
+                    toggleLoadingState(false);
+                }
+            },
+            error: function(error) {
+                showError('Gagal mengambil konfigurasi IP: ' + error.statusText);
+                toggleLoadingState(false);
+            }
         });
     }
 
     function validateGetData(companyId, tanggal) {
         if (!companyId) {
-            alert('Pilih perusahaan terlebih dahulu!');
+            showWarning('Pilih perusahaan terlebih dahulu!');
             return false;
         }
         if (!tanggal) {
-            alert('Pilih tanggal pembayaran terlebih dahulu!');
+            showWarning('Pilih tanggal pembayaran terlebih dahulu!');
             return false;
         }
         return true;
     }
 
-    function getApiUrl(companyId, tanggal) {
-        const baseUrl = 'http://10.107.75.156:8001/api/local-data';
-        return `${baseUrl}?company_id=${companyId}&tanggal=${tanggal}`;
-    }
+    // function getApiUrl(companyId, tanggal, callback) {
+    //     const departmentId = $('#departemen').val();
+        
+    //     $.ajax({
+    //         url: `<?= base_url("hr-outsourcing-sallary-payment/getIpByDepartment/") ?>${departmentId}`,
+    //         type: 'GET',
+    //         dataType: 'json',
+    //         success: function(ipResponse) {
+    //             if (ipResponse.success && ipResponse.ip_address) {
+    //                 const baseUrl = `http://${ipResponse.ip_address}:8001/api/local-data`;
+    //                 const apiUrl = `${baseUrl}?company_id=${companyId}&tanggal=${tanggal}`;
+    //                 callback(apiUrl);
+    //             } else {
+    //                 showError(ipResponse.message || 'IP address tidak ditemukan untuk department ini');
+    //                 callback(null);
+    //             }
+    //         },
+    //         error: function(error) {
+    //             showError('Gagal mengambil konfigurasi IP: ' + error.statusText);
+    //             callback(null);
+    //         }
+    //     });
+    // }
 
     function handleGetDataSuccess(res) {
         if (res.status === 'success' && res.data && res.data.length > 0) {
             processScaleDataToTable(res.data);
         } else {
-            alert('Tidak ada data untuk kriteria yang dipilih');
+            showAlert('warning', 'Tidak Ada Data Untuk Kriteria Yang Di Pilih');
             clearTable();
         }
     }
 
     function handleGetDataError(xhr) {
         console.error(xhr.responseText);
-        alert('Terjadi kesalahan saat memanggil API');
+        showAlert('warning', 'Terjadi Kesalahan Bro');
     }
 
     function toggleLoadingState(loading) {
