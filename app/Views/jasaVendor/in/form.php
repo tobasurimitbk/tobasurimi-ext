@@ -547,6 +547,7 @@
                 var isValidBarang = true;
                 var barangError = null;
 
+                // Cek apakah semua barang di group sudah ada output
                 $.each(listBarangGroup, function(i, v) {
                     if (v.list_barang_masuk.length == 0) {
                         isValidBarang = false;
@@ -562,57 +563,9 @@
                         confirmButtonText: 'Ok'
                     });
                 } else {
-
-                    // APPEND LIST BARANG GROUP KE LIST BARANG
-                    // LOOP LIST BARANG GROUP
-                    $.each(listBarangGroup, function(i, v) {
-                        var totalDetailBarangKeluar = 0;
-                        var qtyKotorRes = 0;
-                        var qtyBersihRes = 0;
-
-                        // LOOP LIST BARANG
-                        $.each(listBarang, function(j, k) {
-
-                            if (v.barang1_id == k.barang1_id) {
-                                totalDetailBarangKeluar++;
-                            }
-                        });
-
-                        $.each(listBarang, function(j, k) {
-
-                            if (v.barang1_id == k.barang1_id) {
-
-                                listBarang[j].list_barang_masuk = [];
-
-                                $.each(v.list_barang_masuk, function(y, z) {
-
-                                    qtyKotorRes = z.qty_kotor / totalDetailBarangKeluar;
-                                    qtyBersihRes = z.qty_bersih / totalDetailBarangKeluar;
-                                    qtyKotorRes = qtyKotorRes.toFixed(2);
-                                    qtyBersihRes = qtyBersihRes.toFixed(2);
-
-                                    listBarang[j].list_barang_masuk = listBarang[j].list_barang_masuk.filter(item => item.spesifikasi_in_id !== z.spesifikasi_in_id);
-
-                                    listBarang[j].list_barang_masuk.push({
-                                        jasa_vendor_out_detail_id: k.jasa_vendor_out_detail_id,
-                                        barang1_id: z.barang1_id,
-                                        spesifikasi_in_id: z.spesifikasi_in_id,
-                                        kode_barang_in: z.kode_barang_in,
-                                        barang_name_in: z.barang_name_in,
-                                        kode_satuan_in: z.kode_satuan_in,
-                                        qty_kotor: qtyKotorRes,
-                                        qty_bersih: qtyBersihRes
-
-                                    });
-
-                                })
-
-                            }
-
-                        });
-
-                    });
-
+                    // HAPUS SEMUA LOGIC DISTRIBUSI YANG RUMIT
+                    // LANGSUNG PAKAI listBarangGroup SAJA
+                    
                     Swal.fire({
                         icon: 'question',
                         title: 'Simpan Data ?',
@@ -626,8 +579,10 @@
                         if (result.isConfirmed) {
                             let id = $('#id').val();
                             let data = new FormData(document.querySelector(".create-form"));
-                            data.append('listBarang', JSON.stringify(listBarang));
-
+                            
+                            // KIRIM listBarangGroup BUKAN listBarang
+                            data.append('listBarangGroup', JSON.stringify(listBarangGroup));
+                            
                             if (id) {
                                 // UPDATE
                                 $.ajax({
@@ -710,7 +665,6 @@
                         }
                     });
                 }
-
             }
         }
     });
@@ -1011,7 +965,7 @@
                         autocomplete="one-time-code" 
                         data-spesifikasi_in_id="${v.spesifikasi_in_id}" 
                         type="text" 
-                        value="${v.qty_kotor == '' || v.qty_kotor == 0 ? '' : v.qty_kotor.toFixed(2)}">
+                        value="${v.qty_kotor == '' || v.qty_kotor == 0 ? '' : parseFloat(v.qty_kotor).toFixed(2)}">
                     `
                 ));
 
@@ -1024,7 +978,7 @@
                         autocomplete="one-time-code" 
                         data-spesifikasi_in_id="${v.spesifikasi_in_id}" 
                         type="text" 
-                        value="${v.qty_bersih == '' || v.qty_bersih == 0 ? '' : v.qty_bersih.toFixed(2)}">
+                        value="${v.qty_bersih == '' || v.qty_bersih == 0 ? '' : parseFloat(v.qty_bersih).toFixed(2)}">
                     `
                 ));
 

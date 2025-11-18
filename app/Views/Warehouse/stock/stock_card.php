@@ -8,13 +8,9 @@
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("stock-list"); ?>">
                 Kembali
             </a>
-            <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #FFA426 !important;color: white !important;border: 0px solid !important;">
+            <button class="btn btn-discard float-right" type="button" id="btnExportKartuStock" style="background-color: #FFA426 !important;color: white !important;border: 0px solid !important;">
                 Export
             </button>
-            <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-                <li><button class="dropdown-item btn-upload-excel">Export Pdf</button></li>
-                <li><button class="dropdown-item" onclick="exportExcel()">Export Excel</button></li>
-            </ul>
         </div>
     </div>
     <div class="card">
@@ -163,7 +159,13 @@
                                         <td>:</td>
                                         <td id="txt_date_range_masuk"></td>
                                     </tr>
-
+                                    <tr>
+                                        <td colspan="7">
+                                            <button class="btn btn-discard float-right" type="button" id="btnExportPemasukkan" style="background-color: #FFA426 !important;color: white !important;border: 0px solid !important;">
+                                                Export Pemasukkan
+                                            </button>
+                                        </td>
+                                    </tr>
                                 </table>
                             </div>
                         </div>
@@ -184,6 +186,7 @@
                                                 <th>No</th>
                                                 <th>Sumber</th>
                                                 <th>Supplier / Vendor</th>
+                                                <th>No Spp</th>
                                                 <th>No Po</th>
                                                 <th>Ref No</th>
                                                 <th>Tgl Po</th>
@@ -198,7 +201,7 @@
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <th colspan="8" class="text-right">GRAND TOTAL</th>
+                                                <th colspan="9" class="text-right">GRAND TOTAL</th>
                                                 <th class="text-left total_masuk_detail" id="total_masuk_detail"></th>
                                                 <th></th>
                                             </tr>
@@ -246,6 +249,13 @@
                                         <td>Rentang Tanggal</td>
                                         <td>:</td>
                                         <td id="txt_date_range_keluar"></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="7">
+                                            <button class="btn btn-discard float-right" type="button" id="btnExportPengeluaran" style="background-color: #FFA426 !important;color: white !important;border: 0px solid !important;">
+                                                Export Pengeluaran
+                                            </button>
+                                        </td>
                                     </tr>
 
                                 </table>
@@ -373,8 +383,9 @@
             {
                 data: "qty_awal",
                 className: "text-left",
-                render: function(data) {
-                    return `<b>${greatFormatRupiah(data)}</b>`;
+                render: function(data, type, row) {
+                    let qty_awal = parseFloat(row.qty_awal).toFixed(2);
+                    return `<b>${greatFormatRupiah(qty_awal)}</b>`;
                 }
             },
             {
@@ -398,8 +409,9 @@
             {
                 data: "qty_akhir",
                 className: "text-left",
-                render: function(data) {
-                    return `<b>${greatFormatRupiah(data)}</b>`;
+                render: function(data, type, row) {
+                    let qty_akhir = parseFloat(row.qty_akhir).toFixed(2);
+                    return `<b>${greatFormatRupiah(qty_akhir)}</b>`;
                 }
             },
             {
@@ -476,6 +488,10 @@
                 className: "text-left"
             },
             {
+                data: "spp_no",
+                className: "text-left",
+            },
+            {
                 data: "po_no",
                 className: "text-left"
             },
@@ -538,9 +554,119 @@
         },
     });
 
+    const tableKeluar = $('#dataTableKeluar').DataTable({
+        processing: true,
+        serverSide: true,
+        ordering: true,
+        order: [
+            [6, 'desc']
+        ],
+        fixedHeader: true,
+        lengthMenu: [
+            [25],
+            [25],
+        ],
+        pageLength: 25,
+        ajax: {
+            url: "<?= base_url("stock-list/all-keluar-kartu-stock"); ?>",
+            dataSrc: "data",
+            data: function(data) {
+                data.search = $(".search_keluar").val();
+                data.start_date = $("#start_date").val();
+                data.end_date = $("#end_date").val();
+                data.stock_id = stock_id;
+                data.sort = sort;
+                data.sortType = sortType;
+            },
+
+        },
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+        },
+        display: "stripe",
+        searching: false,
+        columns: [{
+                data: "no",
+                className: "text-left",
+                orderable: false
+            },
+            {
+                data: "reference_tujuan_type",
+                className: "text-left"
+            },
+            {
+                data: "divisi_tujuan",
+                className: "text-left"
+            },
+            {
+                data: "warehouse_tujuan",
+                className: "text-left",
+            },
+            {
+                data: "reference_no",
+                className: "text-left"
+            },
+            {
+                data: "tanggal_keluar",
+                className: "text-left"
+            },
+            {
+                data: "keterangan",
+                className: "text-left",
+            },
+            {
+                data: "qty_diterima",
+                className: "text-left",
+                render: function(data) {
+                    return `<b>${greatFormatRupiah(data)}</b>`;
+                }
+            },
+            {
+                data: "kode_satuan",
+                className: "text-left"
+            },
+        ],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
+        language: {
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        },
+        footerCallback: function(row, data, start, end, display) {
+            const api = this.api();
+            const total = api.ajax.json().footerTotals || 0;
+
+            if (total) {
+                $('.total_keluar_detail').html(greatFormatRupiah(total.toFixed(2)));
+            } else {
+                $('.total_keluar_detail').html(greatFormatRupiah(0));
+
+            }
+        },
+    });
+
     $('#search_masuk').keyup((e) => {
         e.preventDefault();
         tableMasuk.ajax.reload()
+    });
+
+    $('#search_keluar').keyup((e) => {
+        e.preventDefault();
+        tableKeluar.ajax.reload()
     });
 
     $('#type_barang').select2({
@@ -610,6 +736,117 @@
         $('#detailPengeluaranModal').modal('hide');
     });
 
+    $('#btnExportKartuStock').click(function(e) {
+        e.preventDefault();
+        var barangMasterId = $('#barang_master_id option:selected').val();
+        var start_date = $('#start_date').val();
+        var end_date = $('#end_date').val();
+
+        if (barangMasterId == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pilih master barang',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Oke',
+            });
+            return;
+        } else if (start_date == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pilih tanggal mulai',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Oke',
+            });
+            return;
+        } else if (end_date == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pilih tanggal selesai',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Oke',
+            });
+            return;
+        } else {
+            var url = "<?= base_url('stock-list/export-kartu-stock') ?>" + "?barang_master_id=" + barangMasterId + "&start_date=" + start_date + "&end_date=" + end_date;
+            window.location.href = url;
+        }
+
+    });
+
+    $('#btnExportPemasukkan').click(function(e) {
+        e.preventDefault();
+        var stockId = stock_id;
+        var start_date = $('#start_date').val();
+        var end_date = $('#end_date').val();
+
+        if (stockId == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pilih barang dulu',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Oke',
+            });
+            return;
+        } else if (start_date == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pilih tanggal mulai',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Oke',
+            });
+            return;
+        } else if (end_date == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pilih tanggal selesai',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Oke',
+            });
+            return;
+        } else {
+            var url = "<?= base_url('stock-list/export-kartu-stock-masuk') ?>" + "?stock_id=" + stockId + "&start_date=" + start_date + "&end_date=" + end_date;
+            window.location.href = url;
+        }
+
+    });
+
+    $('#btnExportPengeluaran').click(function(e) {
+        e.preventDefault();
+        var stockId = stock_id;
+        var start_date = $('#start_date').val();
+        var end_date = $('#end_date').val();
+
+        if (stockId == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pilih barang dulu',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Oke',
+            });
+            return;
+        } else if (start_date == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pilih tanggal mulai',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Oke',
+            });
+            return;
+        } else if (end_date == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pilih tanggal selesai',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Oke',
+            });
+            return;
+        } else {
+            var url = "<?= base_url('stock-list/export-kartu-stock-keluar') ?>" + "?stock_id=" + stockId + "&start_date=" + start_date + "&end_date=" + end_date;
+            window.location.href = url;
+        }
+
+    });
+
     function detailMasuk(id) {
         $.ajax({
             url: `<?= base_url('stock-list/stock-identity-detail'); ?>`,
@@ -662,6 +899,7 @@
                     $('#txt_dept_keluar').text(`${data.divisi} ${data.warehouse_name}`);
 
                     stock_id = data.id;
+                    tableKeluar.ajax.reload();
                     $('#detailPengeluaranModal').modal('show');
                 } else {
                     Swal.fire({

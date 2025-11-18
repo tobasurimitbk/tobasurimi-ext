@@ -64,6 +64,7 @@ class PinjamanKaryawan extends BaseController
             $db->transBegin();
 
             $divisiId = $this->request->getVar('divisiId_generate');
+            $bagianId = $this->request->getVar('bagianId_generate');
             $tipe = $this->request->getVar('golongan_generate');
             $yearMonth  = $this->request->getVar('monthYear');
             $startDate  = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('startDate'))));
@@ -72,12 +73,14 @@ class PinjamanKaryawan extends BaseController
 
             $addCondition = [
                 'divisi_id' => $divisiId,
+                'bagian_id' => $bagianId,
                 'tipe' => $tipe,
                 'status' => "Aktif"
             ];
 
             $addConditionAll = [
                 'divisi_id' => $divisiId,
+                'bagian_id' => $bagianId,
                 'tipe' => $tipe,
             ];
 

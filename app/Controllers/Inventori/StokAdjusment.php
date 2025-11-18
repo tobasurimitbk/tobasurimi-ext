@@ -260,6 +260,7 @@ class StokAdjusment extends BaseController
                 'id' => $d['id'],
                 'divisi' => $d['divisi'],
                 'warehouse_name' => $d['warehouse_name'],
+                'spp_no' => $d['spp_no'],
                 'reference_type' => $d['reference_type'],
                 'supplier_name' => $d['supplier_name'],
                 'kode_barang' => $d['kode_barang'],

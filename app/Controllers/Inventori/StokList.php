@@ -939,8 +939,31 @@ class StokList extends BaseController
                 "stock_revamp_detail.reference_type" => "INISIASI",
             ];
             $dataQry = $this->stockRevampDetailModel->getListStockDetailByInisiasi($condition, $addCondition, $limit, $offset);
+        } elseif ($addCondition['sumber_barang'] == "ADJUSMENT") {
+            $condition = [
+                "stock_revamp_detail.stock_id" => $id,
+                "stock_revamp_detail.deletedAt" => null,
+                "stock_revamp.deletedAt" => null,
+                "stock_revamp_detail.reference_type" => "ADJUSMENT",
+            ];
+            $dataQry = $this->stockRevampDetailModel->getListStockDetailByAdjusment($condition, $addCondition, $limit, $offset);
+        } elseif ($addCondition['sumber_barang'] == "PENERIMAAN MUTASI") {
+            $condition = [
+                "stock_revamp_detail.stock_id" => $id,
+                "stock_revamp_detail.deletedAt" => null,
+                "stock_revamp.deletedAt" => null,
+                "stock_revamp_detail.reference_type" => "PENERIMAAN MUTASI",
+            ];
+            $dataQry = $this->stockRevampDetailModel->getListStockDetailByPenerimaanMutasi($condition, $addCondition, $limit, $offset);
+        } elseif ($addCondition['sumber_barang'] == "PENERIMAAN MUTASI GLOBAL") {
+            $condition = [
+                "stock_revamp_detail.stock_id" => $id,
+                "stock_revamp_detail.deletedAt" => null,
+                "stock_revamp.deletedAt" => null,
+                "stock_revamp_detail.reference_type" => "PENERIMAAN MUTASI GLOBAL",
+            ];
+            $dataQry = $this->stockRevampDetailModel->getListStockDetailByPenerimaanMutasiGlobal($condition, $addCondition, $limit, $offset);
         }
-
 
         $dataResult = [];
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
@@ -2358,15 +2381,49 @@ class StokList extends BaseController
             $offset
         );
 
-        $dataTotalKartuStock = $this->getTotalKartuStockMasuk(
+        $masuk = $this->getTotalKartuStockMasuk(
             $addCondition['start_date'],
             $addCondition['end_date']
+        );
+
+        $keluar = $this->getTotalKartuStockKeluar(
+            $addCondition['start_date'],
+            $addCondition['end_date']
+        );
+
+        // get stok awal
+        $stockMasukAwal = $this->getTotalKartuStockMasuk(
+            "2025-09-01",
+            $addCondition['start_date']
+        );
+
+        $stockKeluarAwal = $this->getTotalKartuStockKeluar(
+            "2025-09-01",
+            $addCondition['start_date']
         );
 
         $dataResult = [];
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($dataQry['data'] as $d) {
+
+            $stock_out_awal = 0;
+            $stock_in_awal = 0;
+
+            if (isset($stockMasukAwal[$d['id']])) {
+                $stock_in_awal = $stockMasukAwal[$d['id']];
+            }
+
+            if (isset($stockKeluarAwal[$d['id']])) {
+                $stock_out_awal = $stockKeluarAwal[$d['id']];
+            }
+
+            $qty_masuk = isset($masuk[$d['id']]) ? (float)$masuk[$d['id']] ?? 0 : 0;
+            $qty_keluar = isset($keluar[$d['id']]) ? (float)$keluar[$d['id']] ?? 0 : 0;
+
+            $qty_awal =  $stock_in_awal - $stock_out_awal;
+            $qty_akhir = $qty_awal + $qty_masuk - $qty_keluar;
+
             array_push($dataResult, [
                 'no' => $no++,
                 'id' => encrypt($d['id']),
@@ -2375,10 +2432,10 @@ class StokList extends BaseController
                 'kode_barang' => $d['kode_barang'],
                 'barang_name' => $d['barang_name'],
                 'spesifikasi' => $d['spesifikasi'],
-                'qty_awal' => 0,
-                'qty_masuk' => isset($dataTotalKartuStock[$d['id']]) ? (float)$dataTotalKartuStock[$d['id']] ?? 0 : 0,
-                'qty_keluar' => 0,
-                'qty_akhir' => 0,
+                'qty_awal' => $qty_awal,
+                'qty_masuk' => $qty_masuk,
+                'qty_keluar' => $qty_keluar,
+                'qty_akhir' => $qty_akhir,
                 'kode_satuan' => $d['kode_satuan']
             ]);
         }
@@ -2423,6 +2480,36 @@ class StokList extends BaseController
         ];
 
         $dataTotal =  $this->stockRevampLogModel->getKartuStockMasuk(
+            $condition,
+            0,
+            "desc",
+            100000000,
+            0
+        );
+
+        $dataMap = [];
+
+        foreach ($dataTotal['data'] as $d) {
+            $stockId = $d['stock_id'];
+            if (!isset($dataMap[$stockId])) {
+                $dataMap[$stockId] = 0;
+            }
+            $dataMap[$stockId] += floatval($d['qty_diterima']);
+        }
+
+        return $dataMap;
+    }
+
+    private function getTotalKartuStockKeluar($start_date, $end_date)
+    {
+        $condition = [
+            'company_id' => $this->this_company_id,
+            'dateStart'  => $start_date,
+            'dateEnd'    => $end_date,
+            'stock_id'   => "",
+        ];
+
+        $dataTotal =  $this->stockRevampLogModel->getKartuStockKeluar(
             $condition,
             0,
             "desc",
@@ -2499,6 +2586,7 @@ class StokList extends BaseController
                 'id' => $d['id'],
                 'reference_type' => $d['reference_type'],
                 'supplier_name' => $d['supplier_name'],
+                'spp_no' => $d['spp_no'],
                 'po_no' => $d['po_no'],
                 'reference_no' => $d['reference_no'],
                 'po_date' => !empty($d['po_date']) && $d['po_date'] != null ? date('d/m/Y', strtotime($d['po_date'])) : "",
@@ -2518,5 +2606,454 @@ class StokList extends BaseController
         ]);
     }
 
-    public function allKeluarKartuStock() {}
+    public function allKeluarKartuStock()
+    {
+        $draw = $this->request->getGet('draw');
+        $start = (int)$this->request->getGet('start');
+        $length = (int)$this->request->getGet('length');
+        $orderDir = $this->request->getGet('order')[0]['dir'] ?? 'asc';
+        $orderColumnIndex = $this->request->getGet('order')[0]['column'] ?? null;
+
+        $dateStart = $this->request->getVar("start_date")
+            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("start_date"))))
+            : null;
+
+        $dateEnd = $this->request->getVar("end_date")
+            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("end_date"))))
+            : null;
+        $stockId = ($this->request->getGet('stock_id'));
+        $search = $this->request->getGet('search');
+
+        $condition = [
+            'company_id'        => $this->this_company_id,
+            'dateStart'         => $dateStart,
+            'dateEnd'           => $dateEnd,
+            'stock_id'         => $stockId,
+            'search'            => $search
+        ];
+
+        $dataTotal =  $this->stockRevampLogModel->getKartuStockKeluar(
+            $condition,
+            $orderColumnIndex,
+            $orderDir,
+            100000000,
+            0
+        );
+
+        $totalKeluar = 0;
+        foreach ($dataTotal['data'] as $d) {
+            $totalKeluar += (float)$d['qty_diterima'];
+        }
+
+        $data = $this->stockRevampLogModel->getKartuStockKeluar(
+            $condition,
+            $orderColumnIndex,
+            $orderDir,
+            $length,
+            $start
+        );
+
+        $dataResult = array();
+        $no = $start + 1;
+        foreach ($data['data'] as $d) {
+            array_push($dataResult, [
+                'no' => $no++,
+                'id' => $d['id'],
+                'reference_tujuan_type' => $d['reference_tujuan_type'],
+                'divisi_tujuan' => $d['divisi_tujuan'],
+                'warehouse_tujuan' => $d['warehouse_tujuan'],
+                'reference_no' => $d['reference_no'],
+                'tanggal_keluar' => !empty($d['tanggal_keluar']) && $d['tanggal_keluar'] != null ? date('d/m/Y', strtotime($d['tanggal_keluar'])) : "",
+                'keterangan' => $d['keterangan'],
+                'qty_diterima' => (float)$d['qty_diterima'],
+                'kode_satuan' => $d['kode_satuan'],
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'draw' => intval($draw),
+            'recordsTotal' => intval($data['totalData'] ?? 0),
+            'recordsFiltered' => intval($data['totalFilteredData'] ?? 0),
+            'data' => $dataResult,
+            'footerTotals' => $totalKeluar
+        ]);
+    }
+
+    public function exportKartuStock()
+    {
+        $barangId = $this->request->getVar('barang_master_id');
+        $start_date = $this->request->getVar('start_date');
+        $end_date   = $this->request->getVar('end_date');
+
+        if (!$barangId || !$start_date || !$end_date) {
+            return redirect()->back()->with('error', 'Parameter tidak lengkap');
+        }
+
+        // Normalisasi tanggal
+        $start_date = date('Y-m-d', strtotime(str_replace('/', '-', $start_date)));
+        $end_date   = date('Y-m-d', strtotime(str_replace('/', '-', $end_date)));
+
+        // Ambil data barang
+        $barang = $this->barangMasterModel
+            ->select("barang_name, kode_barang")
+            ->find($barangId);
+
+        if (!$barang) {
+            return redirect()->back()->with('error', 'Barang tidak ditemukan');
+        }
+
+
+        // Kondisi
+        $condition = [
+            'stock_revamp.deletedAt'      => null,
+            'stock_revamp.company_id'     => $this->this_company_id,
+            'stock_revamp.barang_master_id' => $barangId
+        ];
+
+        $addCondition = [
+            'start_date' => $start_date,
+            'end_date'   => $end_date,
+            'sort'       => 'form_perijinan.updatedAt',
+            'sortType'   => 'DESC'
+        ];
+
+        // Ambil data kartu stok
+        $dataQry = $this->stockRevampModel->getListKartuStock(
+            $condition,
+            $addCondition,
+            999999,
+            0
+        );
+
+        // Ambil total masuk/keluar
+        $masuk = $this->getTotalKartuStockMasuk($start_date, $end_date);
+        $keluar = $this->getTotalKartuStockKeluar($start_date, $end_date);
+
+        // Stok awal
+        $stockMasukAwal = $this->getTotalKartuStockMasuk("2025-09-01", $start_date);
+        $stockKeluarAwal = $this->getTotalKartuStockKeluar("2025-09-01", $start_date);
+
+        // ================================
+        //  PHPSPREADSHEET
+        // ================================
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle("Kartu Stok");
+
+        // === STYLE =====
+        $headerStyle = [
+            'font' => ['bold' => true, 'size' => 12],
+            'alignment' => ['horizontal' => 'center']
+        ];
+
+        $tableHeaderStyle = [
+            'font' => ['bold' => true],
+            'alignment' => ['horizontal' => 'center'],
+            'borders' => ['allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN]]
+        ];
+
+        $tableBodyStyle = [
+            'borders' => ['allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN]]
+        ];
+
+        // ======================================
+        // HEADER LAPORAN
+        // ======================================
+        $sheet->mergeCells('A1:H1');
+        $sheet->setCellValue('A1', 'LAPORAN KARTU STOK');
+        $sheet->getStyle('A1')->applyFromArray($headerStyle);
+
+        $sheet->mergeCells('A2:H2');
+        $sheet->setCellValue('A2', 'Periode: ' . date('d/m/Y', strtotime($start_date)) . ' s.d ' . date('d/m/Y', strtotime($end_date)));
+
+        $sheet->mergeCells('A3:H3');
+        $sheet->setCellValue('A3', "Nama Barang: {$barang['barang_name']} ({$barang['kode_barang']})");
+
+        $sheet->getStyle('A2:A3')->getAlignment()->setHorizontal('center');
+
+        // ======================================
+        // TABLE HEADER
+        // ======================================
+        $row = 5;
+
+        $headers = [
+            'No',
+            'Dept',
+            'Warehouse',
+            'Kode Barang',
+            'Nama Barang',
+            'Spesifikasi',
+            'Qty Awal',
+            'Qty Masuk',
+            'Qty Keluar',
+            'Qty Akhir',
+            'Satuan'
+        ];
+
+        $col = 'A';
+        foreach ($headers as $h) {
+            $sheet->setCellValue($col . $row, $h);
+            $col++;
+        }
+
+        $sheet->getStyle("A{$row}:K{$row}")->applyFromArray($tableHeaderStyle);
+
+
+        // ======================================
+        // TABLE BODY
+        // ======================================
+        $row++;
+        $no = 1;
+
+        foreach ($dataQry['data'] as $d) {
+
+            $inAwal = $stockMasukAwal[$d['id']] ?? 0;
+            $outAwal = $stockKeluarAwal[$d['id']] ?? 0;
+            $qty_awal = $inAwal - $outAwal;
+
+            $qty_masuk  = $masuk[$d['id']] ?? 0;
+            $qty_keluar = $keluar[$d['id']] ?? 0;
+
+            $qty_akhir = $qty_awal + $qty_masuk - $qty_keluar;
+
+            $sheet->setCellValue("A{$row}", $no++);
+            $sheet->setCellValue("B{$row}", $d['divisi']);
+            $sheet->setCellValue("C{$row}", $d['warehouse_name']);
+            $sheet->setCellValue("D{$row}", $d['kode_barang']);
+            $sheet->setCellValue("E{$row}", $d['barang_name']);
+            $sheet->setCellValue("F{$row}", $d['spesifikasi']);
+            $sheet->setCellValue("G{$row}", $qty_awal);
+            $sheet->setCellValue("H{$row}", $qty_masuk);
+            $sheet->setCellValue("I{$row}", $qty_keluar);
+            $sheet->setCellValue("J{$row}", $qty_akhir);
+            $sheet->setCellValue("K{$row}", $d['kode_satuan']);
+
+            $sheet->getStyle("A{$row}:K{$row}")->applyFromArray($tableBodyStyle);
+
+            $row++;
+        }
+
+        // Auto size
+        foreach (range('A', 'K') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // FOOTER
+        // $sheet->setCellValue("A{$row}", 'Dicetak pada: ' . date('d-m-Y H:i:s'));
+
+        // ================================
+        // OUTPUT EXCEL
+        // ================================
+        $fileName = "Kartu_Stock_{$barang['kode_barang']}_{$start_date}_sd_{$end_date}.xlsx";
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment;filename=\"{$fileName}\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save('php://output');
+        exit();
+    }
+
+    public function exportKartuStockMasuk()
+    {
+        $dateStart = $this->request->getVar("start_date")
+            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("start_date"))))
+            : null;
+
+        $dateEnd = $this->request->getVar("end_date")
+            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("end_date"))))
+            : null;
+
+        $stockId = $this->request->getVar("stock_id");
+        $search  = $this->request->getVar("search");
+
+        $condition = [
+            'company_id' => $this->this_company_id,
+            'dateStart'  => $dateStart,
+            'dateEnd'    => $dateEnd,
+            'stock_id'   => $stockId,
+            'search'     => $search
+        ];
+
+        // Ambil semua data
+        $data = $this->stockRevampLogModel->getKartuStockMasuk(
+            $condition,
+            null,
+            'asc',
+            100000000,
+            0
+        );
+
+        $rows = $data['data'];
+
+        // Mulai Excel
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle("Kartu Stock Masuk");
+
+        // Header
+        $headers = [
+            'A' => 'NO',
+            'B' => 'SUMBER BARANG',
+            'C' => 'SUPPLIER',
+            'D' => 'NO SPP',
+            'E' => 'NO PO',
+            'F' => 'REFERENCE NO',
+            'G' => 'TGL PO',
+            'H' => 'TGL MASUK',
+            'I' => 'KETERANGAN',
+            'J' => 'QTY MASUK',
+            'K' => 'SATUAN',
+        ];
+
+        foreach ($headers as $col => $title) {
+            $sheet->setCellValue($col . "1", $title);
+        }
+
+        // Style Header
+        $sheet->getStyle("A1:K1")->applyFromArray([
+            'font' => ['bold' => true],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'color' => ['rgb' => 'DDDDDD']
+            ],
+            'alignment' => ['horizontal' => 'center'],
+            'borders' => ['allBorders' => ['borderStyle' => 'thin']]
+        ]);
+
+        // Data
+        $rowNum = 2;
+        $no = 1;
+
+        foreach ($rows as $r) {
+            $sheet->setCellValue("A$rowNum", $no++);
+            $sheet->setCellValue("B$rowNum", $r['reference_type']);
+            $sheet->setCellValue("C$rowNum", $r['supplier_name']);
+            $sheet->setCellValue("D$rowNum", $r['spp_no']);
+            $sheet->setCellValue("E$rowNum", $r['po_no']);
+            $sheet->setCellValue("F$rowNum", $r['reference_no']);
+            $sheet->setCellValue("G$rowNum", $r['po_date'] ? date('d/m/Y', strtotime($r['po_date'])) : '');
+            $sheet->setCellValue("H$rowNum", $r['lpb_date'] ? date('d/m/Y', strtotime($r['lpb_date'])) : '');
+            $sheet->setCellValue("I$rowNum", $r['keterangan']);
+            $sheet->setCellValue("J$rowNum", (float)$r['qty_diterima']);
+            $sheet->setCellValue("K$rowNum", $r['kode_satuan']);
+            $rowNum++;
+        }
+
+        // Border semua
+        $sheet->getStyle("A1:K" . ($rowNum - 1))->applyFromArray([
+            'borders' => ['allBorders' => ['borderStyle' => 'thin']]
+        ]);
+
+        // Auto size kolom
+        foreach (range('A', 'K') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Download file
+        $filename = "kartu_stock_masuk_" . date('Ymd_His') . ".xlsx";
+        header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        header("Content-Disposition: attachment;filename=\"$filename\"");
+        header("Cache-Control: max-age=0");
+
+        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save("php://output");
+        exit;
+    }
+
+    public function exportKartuStockKeluar()
+    {
+        $dateStart = $this->request->getVar("start_date")
+            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("start_date"))))
+            : null;
+
+        $dateEnd = $this->request->getVar("end_date")
+            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("end_date"))))
+            : null;
+
+        $stockId = $this->request->getVar("stock_id");
+        $search  = $this->request->getVar("search");
+
+        $condition = [
+            'company_id' => $this->this_company_id,
+            'dateStart'  => $dateStart,
+            'dateEnd'    => $dateEnd,
+            'stock_id'   => $stockId,
+            'search'     => $search
+        ];
+
+        $data = $this->stockRevampLogModel->getKartuStockKeluar(
+            $condition,
+            null,
+            'asc',
+            100000000,
+            0
+        );
+
+        $rows = $data['data'];
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle("Kartu Stock Keluar");
+
+        $headers = [
+            'A' => 'NO',
+            'B' => 'TUJUAN',
+            'C' => 'DEPT TUJUAN',
+            'D' => 'WAREHOUSE TUJUAN',
+            'E' => 'REF NO',
+            'F' => 'TGL KELUAR',
+            'G' => 'KETERANGAN',
+            'H' => 'QTY KELUAR',
+            'I' => 'SATUAN',
+        ];
+
+        foreach ($headers as $col => $title) {
+            $sheet->setCellValue($col . "1", $title);
+        }
+
+        $sheet->getStyle("A1:I1")->applyFromArray([
+            'font' => ['bold' => true],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'color' => ['rgb' => 'DDDDDD']
+            ],
+            'alignment' => ['horizontal' => 'center'],
+            'borders' => ['allBorders' => ['borderStyle' => 'thin']]
+        ]);
+
+        $rowNum = 2;
+        $no = 1;
+
+        foreach ($rows as $r) {
+            $sheet->setCellValue("A$rowNum", $no++);
+            $sheet->setCellValue("B$rowNum", $r['reference_tujuan_type']);
+            $sheet->setCellValue("C$rowNum", $r['divisi_tujuan']);
+            $sheet->setCellValue("D$rowNum", $r['warehouse_tujuan']);
+            $sheet->setCellValue("E$rowNum", $r['reference_no']);
+            $sheet->setCellValue("F$rowNum", $r['tanggal_keluar'] ? date('d/m/Y', strtotime($r['tanggal_keluar'])) : '');
+            $sheet->setCellValue("G$rowNum", $r['keterangan']);
+            $sheet->setCellValue("H$rowNum", (float)$r['qty_diterima']);
+            $sheet->setCellValue("I$rowNum", $r['kode_satuan']);
+            $rowNum++;
+        }
+
+        $sheet->getStyle("A1:I" . ($rowNum - 1))->applyFromArray([
+            'borders' => ['allBorders' => ['borderStyle' => 'thin']]
+        ]);
+
+        foreach (range('A', 'I') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $filename = "kartu_stock_keluar_" . date('Ymd_His') . ".xlsx";
+        header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        header("Content-Disposition: attachment;filename=\"$filename\"");
+        header("Cache-Control: max-age=0");
+
+        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save("php://output");
+        exit;
+    }
 }

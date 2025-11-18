@@ -929,6 +929,7 @@ class StockRevampModel extends Model
                         OR am_purchase_orders.po_no LIKE '%{$search}%'
                         OR suppliers.name LIKE '%{$search}%'
                         OR penerimaan_barang.no_penerimaan_barang LIKE '%{$search}%'
+                        OR purchase_requests.spp_no LIKE '%{$search}%'
                     )
             ";
             $searchPoImportBb = "
@@ -1018,6 +1019,7 @@ class StockRevampModel extends Model
             'id',
             'divisi',
             'warehouse_name',
+            'spp_no',
             'reference_type',
             'supplier_name',
             'kode_barang',
@@ -1044,6 +1046,7 @@ class StockRevampModel extends Model
             -- STOK DARI PO LOKAL BAKU
             SELECT
                 stock_revamp_detail.id,
+                '' AS spp_no,
                 stock_revamp_detail.reference_type,
                 stock_revamp_detail.qty_diterima,
                 stock_revamp_detail.type_bc,
@@ -1097,6 +1100,7 @@ class StockRevampModel extends Model
             -- STOK DARI PO LOKAL BAHAN PENOLONG
             SELECT
                 stock_revamp_detail.id,
+                purchase_requests.spp_no AS spp_no,
                 stock_revamp_detail.reference_type,
                 stock_revamp_detail.qty_diterima,
                 stock_revamp_detail.type_bc,
@@ -1137,6 +1141,7 @@ class StockRevampModel extends Model
             LEFT JOIN warehouses ON warehouses.id = stock_revamp.warehouse_id
             LEFT JOIN bc_purchase_order_lpb ON bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id
             LEFT JOIN bc_purchase_order ON bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id
+            LEFT JOIN purchase_requests ON purchase_requests.id = am_purchase_orders.purchase_request_id
             WHERE stock_revamp_detail.deletedAt IS NULL
             AND stock_revamp_detail.reference_type='LPB'
             AND penerimaan_barang.tipe_bahan='PENOLONG'
@@ -1150,6 +1155,7 @@ class StockRevampModel extends Model
             -- STOK DARI PO IMPORT BAHAN PENOLONG
             SELECT
                 stock_revamp_detail.id,
+                '' AS spp_no,
                 stock_revamp_detail.reference_type,
                 stock_revamp_detail.qty_diterima,
                 stock_revamp_detail.type_bc,
@@ -1190,6 +1196,7 @@ class StockRevampModel extends Model
             LEFT JOIN warehouses ON warehouses.id = stock_revamp.warehouse_id
             LEFT JOIN bc_purchase_order_lpb ON bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id
             LEFT JOIN bc_purchase_order ON bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id
+            LEFT JOIN purchase_requests ON purchase_requests.id = am_purchase_orders.purchase_request_id
             WHERE stock_revamp_detail.deletedAt IS NULL
             AND stock_revamp_detail.reference_type='LPB'
             AND penerimaan_barang.tipe_bahan='PENOLONG'
@@ -1203,6 +1210,7 @@ class StockRevampModel extends Model
             -- STOK DARI PO IMPORT BAHAN BAKU
             SELECT
                 stock_revamp_detail.id,
+                '' AS spp_no,
                 stock_revamp_detail.reference_type,
                 stock_revamp_detail.qty_diterima,
                 stock_revamp_detail.type_bc,
@@ -1256,6 +1264,7 @@ class StockRevampModel extends Model
             -- STOK DARI PROSES REBUS
             SELECT
                 stock_revamp_detail.id,
+                '' AS spp_no,
                 stock_revamp_detail.reference_type,
                 stock_revamp_detail.qty_diterima,
                 stock_revamp_detail.type_bc,
@@ -1305,6 +1314,7 @@ class StockRevampModel extends Model
             -- STOK DARI JASA VENDOR
              SELECT
                 stock_revamp_detail.id,
+                '' AS spp_no,
                 stock_revamp_detail.reference_type,
                 stock_revamp_detail.qty_diterima,
                 stock_revamp_detail.type_bc,
@@ -1353,6 +1363,7 @@ class StockRevampModel extends Model
             -- STOK DARI HASIL PRODUKSI
              SELECT
                 stock_revamp_detail.id,
+                '' AS spp_no,
                 stock_revamp_detail.reference_type,
                 stock_revamp_detail.qty_diterima,
                 stock_revamp_detail.type_bc,
@@ -1400,6 +1411,7 @@ class StockRevampModel extends Model
             -- STOK DARI MATERIAL REQUEST BAKU
              SELECT
                 stock_revamp_detail.id,
+                '' AS spp_no,
                 stock_revamp_detail.reference_type,
                 stock_revamp_detail.qty_diterima,
                 stock_revamp_detail.type_bc,
@@ -1447,6 +1459,7 @@ class StockRevampModel extends Model
             -- STOK DARI MATERIAL REQUEST PENOLONG
              SELECT
                 stock_revamp_detail.id,
+                '' AS spp_no,
                 stock_revamp_detail.reference_type,
                 stock_revamp_detail.qty_diterima,
                 stock_revamp_detail.type_bc,
@@ -1494,6 +1507,7 @@ class StockRevampModel extends Model
             -- STOK DARI INISIASI
              SELECT
                 stock_revamp_detail.id,
+                '' AS spp_no,
                 stock_revamp_detail.reference_type,
                 stock_revamp_detail.qty_diterima,
                 stock_revamp_detail.type_bc,
@@ -1538,6 +1552,7 @@ class StockRevampModel extends Model
             -- STOK DARI ADJUSMENT
              SELECT
                 stock_revamp_detail.id,
+                '' AS spp_no,
                 stock_revamp_detail.reference_type,
                 stock_revamp_detail.qty_diterima,
                 stock_revamp_detail.type_bc,
@@ -1585,6 +1600,7 @@ class StockRevampModel extends Model
             -- STOK DARI PENERIMAAN MUTASI
              SELECT
                 stock_revamp_detail.id,
+                '' AS spp_no,
                 stock_revamp_detail.reference_type,
                 stock_revamp_detail.qty_diterima,
                 stock_revamp_detail.type_bc,
@@ -1633,6 +1649,7 @@ class StockRevampModel extends Model
             -- STOK DARI PENERIMAAN MUTASI GLOBAL
              SELECT
                 stock_revamp_detail.id,
+                '' AS spp_no,
                 stock_revamp_detail.reference_type,
                 stock_revamp_detail.qty_diterima,
                 stock_revamp_detail.type_bc,

@@ -148,7 +148,15 @@
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
-                                <label for="floatingInput">Pilih Departemen (Opsional)</label>
+                                <label for="floatingInput">Pilih Departemen</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <div class="form-floating">
+                                <select class="form-select bagianId_generate" name="bagianId_generate" id="bagianId_generate">
+                                    <option value="" selected></option>
+                                </select>
+                                <label for="floatingInput">Pilih Bagian</label>
                             </div>
                         </div>
                         <div class="col-sm-6 mb-3">
@@ -600,7 +608,39 @@
     });
 
     $("#divisiId_generate").select2({
-        placeholder: "Pilih Departemen (Opsional)",
+        placeholder: "Pilih Departemen",
+        theme: "bootstrap-5",
+        allowClear: true,
+        dropdownParent: $('#generateModal')
+    }).change(function(e) {
+        e.preventDefault();
+        let csrf = $(`[name="${csrfToken}"]`);
+        var formData = new FormData();
+        formData.append('divisionID', $(this).val());
+        $.ajax({
+            url: `<?= base_url("list-attendance/get-bagian"); ?>`,
+            data: formData,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            method: "POST",
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success: function(result) {
+                csrf.val(result.token);
+                $("#bagianId_generate").empty()
+                $("#bagianId_generate").append(`<option value=""></option>`)
+                result.data.forEach(function(item) {
+                    $("#bagianId_generate").append(`<option value="${item.id}">${item.kode_bagian.toUpperCase()} - ${item.nama_bagian.toUpperCase()}</option>`)
+                });
+            }
+        });
+
+    });
+
+    $("#bagianId_generate").select2({
+        placeholder: "Pilih Bagian",
         theme: "bootstrap-5",
         allowClear: true,
         dropdownParent: $('#generateModal')
@@ -734,7 +774,13 @@
                 },
                 tanggalAmbil_Global: {
                     required: true
-                }
+                },
+                divisiId_generate: {
+                    required: true
+                },
+                bagianId_generate: {
+                    required: true
+                },
             },
             messages: {
                 monthYear: {
@@ -748,7 +794,13 @@
                 },
                 tanggalAmbil_Global: {
                     required: "Tanggal Ambil Wajib Diisi"
-                }
+                },
+                divisiId_generate: {
+                    required: "Departemen Wajib Diisi"
+                },
+                bagianId_generate: {
+                    required: "Bagian Wajib Diisi"
+                },
             },
             errorElement: 'span',
             errorClass: 'text-danger',
@@ -864,6 +916,7 @@
             e.preventDefault();
             $('#divisiId_generate').val(null).change();
             $('#golongan_generate').val(null).change();
+            $('#bagianId_generate').val(null).change();
         })
 
         // generate pinjaman action

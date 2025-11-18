@@ -1392,6 +1392,10 @@ $routes->get('/stock-list/list-barang-master', 'Inventori\StokList::getMasterBar
 $routes->get('/stock-list/list-barang-master', 'Inventori\StokList::getMasterBarang', ['filter' => 'Auth']);
 $routes->get('/stock-list/stock-identity-detail', 'Inventori\StokList::getStockIdentity', ['filter' => 'Auth']);
 $routes->get('/stock-list/all-masuk-kartu-stock', 'Inventori\StokList::allMasukKartuStock', ['filter' => 'Auth']);
+$routes->get('/stock-list/all-keluar-kartu-stock', 'Inventori\StokList::allKeluarKartuStock', ['filter' => 'Auth']);
+$routes->get('/stock-list/export-kartu-stock', 'Inventori\StokList::exportKartuStock', ['filter' => 'Auth']);
+$routes->get('/stock-list/export-kartu-stock-masuk', 'Inventori\StokList::exportKartuStockMasuk', ['filter' => 'Auth']);
+$routes->get('/stock-list/export-kartu-stock-keluar', 'Inventori\StokList::exportKartuStockKeluar', ['filter' => 'Auth']);
 
 // STOK ADJUSMENT
 $routes->get('/stock-adjusment', 'Inventori\StokAdjusment::index', ['filter' => 'Auth']);
@@ -3086,6 +3090,7 @@ $routes->get('/hr-outsourcing-sallary-payment/create', 'HROutsourcing\SallaryPay
 $routes->post('/hr-outsourcing-sallary-payment/getHrCompanyOutSourcing', 'HROutsourcing\SallaryPayment::getHrCompanyOutSourcing', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-sallary-payment/getHrEmployeeOutSourcing', 'HROutsourcing\SallaryPayment::getHrEmployeeOutSourcing', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-sallary-payment/store', 'HROutsourcing\SallaryPayment::store', ['filter' => 'Auth']);
+$routes->post('/hr-outsourcing-sallary-payment/push', 'HROutsourcing\SallaryPayment::push', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-sallary-payment/update/(:segment)', 'HROutsourcing\SallaryPayment::update/$1', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-sallary-payment/delete/(:segment)', 'HROutsourcing\SallaryPayment::destroy/$1', ['filter' => 'Auth']);
 $routes->get('hr-outsourcing-sallary-payment/ip-config', 'HROutsourcing\SallaryPayment::ipConfig', ['filter' => 'Auth']);

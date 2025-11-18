@@ -734,12 +734,12 @@ class JasaVendorIn extends BaseController
 
     public function createActionNew()
     {
-        $barangs = json_decode($_POST['listBarang']);
+        $barangGroups = json_decode($_POST['listBarangGroup']);
         $jasaVendorOutNo = $this->jasaVendorInModel->getJasaVendorOutNo(
             $this->request->getVar('multiple_jasa_vendor_out_id')
         );
 
-        if (count($barangs) == 0) {
+        if (count($barangGroups) == 0) {
             return response()->setJSON([
                 'status' => false,
                 'message' => "Barang tidak boleh kosong",
@@ -787,48 +787,18 @@ class JasaVendorIn extends BaseController
             ]);
         }
 
-        // Step 1: Gabungkan semua list_barang_masuk (global grouping)
-        $groupedBarang = [];
-
-        foreach ($barangs as $b) {
-            foreach ($b->list_barang_masuk as $c) {
-               
-                    // Group berdasarkan spesifikasi + dokumen
-                    $key = $c->spesifikasi_in_id . '_' . $b->stock_dokumen;
-
-                    if (!isset($groupedBarang[$key])) {
-                        $groupedBarang[$key] = [
-                            'jasa_vendor_out_id' => $b->jasa_vendor_out_id,
-                            'jasa_vendor_out_detail_id' => $b->jasa_vendor_out_detail_id, // ambil dari data pertama yang ketemu
-                            'spesifikasi_in_id' => $c->spesifikasi_in_id,
-                            'bc_in_id' => $b->bc_id,
-                            'no_aju_in' => $b->no_aju,
-                            'stock_dokumen' => $b->stock_dokumen,
-                            'qty_kotor' => 0,
-                            'qty_bersih' => 0
-                        ];
-                    }
-
-                    $groupedBarang[$key]['qty_kotor'] += $c->qty_kotor;
-                    $groupedBarang[$key]['qty_bersih'] += $c->qty_bersih;
-
+        // AMBIL DATA DETAIL ASLI UNTUK MENDAPATKAN jasa_vendor_out_detail_id YANG BENAR
+        // INSERT data dari group
+        foreach ($barangGroups as $group) {
+            // Untuk setiap barang masuk di group, insert ke detail
+            foreach ($group->list_barang_masuk as $barangMasuk) {
+                $this->jasaVendorInDetailModel->insert([
+                    'jasa_vendor_in_id' => $id,
+                    'spesifikasi_in_id' => $barangMasuk->spesifikasi_in_id,
+                    'qty_kotor' => $barangMasuk->qty_kotor,
+                    'qty_bersih' => $barangMasuk->qty_bersih
+                ]);
             }
-        }
-
-        // Step 2: Insert hasil grouping
-        foreach ($groupedBarang as $gb) {
-
-            $this->jasaVendorInDetailModel->insert([
-                'jasa_vendor_in_id' => $id,
-                'jasa_vendor_out_id' => $gb['jasa_vendor_out_id'],
-                'jasa_vendor_out_detail_id' => $gb['jasa_vendor_out_detail_id'],
-                'spesifikasi_in_id' => $gb['spesifikasi_in_id'],
-                'bc_in_id' => $gb['bc_in_id'],
-                'no_aju_in' => $gb['no_aju_in'],
-                'stock_dokumen' => $gb['stock_dokumen'],
-                'qty_kotor' => $gb['qty_kotor'],
-                'qty_bersih' => $gb['qty_bersih']
-            ]);
         }
 
         return response()->setJSON([
