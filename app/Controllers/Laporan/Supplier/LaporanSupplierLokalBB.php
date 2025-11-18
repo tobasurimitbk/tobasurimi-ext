@@ -124,7 +124,8 @@ class LaporanSupplierLokalBB extends BaseController
             $condition,
             $addCondition,
             $pageSize,
-            $start
+            $start,
+            "PO"
         );
 
         $paginatedData = $dataBBLokal['data'];
