@@ -676,7 +676,9 @@ class StokAdjusment extends BaseController
                         'status'            => 'IN',
                         'qty_bersih'        => $stockDetail['qty_bersih'],
                         'qty_diterima'      => $a['qty_konversi'],
-                        'keterangan'        => $adjusment['no_adjusment'],
+                        'keterangan'     => $adjusment['keterangan'],
+                        'reference_tujuan_id' => $adjusment['id'],
+                        'reference_tujuan_type' => "ADJUSMENT"
                     ]);
 
                     $this->stockRevampHistoryModel->insert([
@@ -703,7 +705,9 @@ class StokAdjusment extends BaseController
                         'status'         => 'OUT',
                         'qty_bersih'     => $stockDetail['qty_bersih'],
                         'qty_diterima'      => $a['qty_konversi'],
-                        'keterangan'     => $adjusment['no_adjusment'],
+                        'keterangan'     => $adjusment['keterangan'],
+                        'reference_tujuan_id' => $adjusment['id'],
+                        'reference_tujuan_type' => "ADJUSMENT"
                     ]);
 
                     $this->stockRevampHistoryModel->insert([
