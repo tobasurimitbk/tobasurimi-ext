@@ -414,40 +414,33 @@ class SallaryPayment extends BaseController
     public function push()
     {
         $ipAddress = $this->request->getPost('ip');
-        if (!$ipAddress) {
-            return $this->response->setJSON([
-                "status" => false,
-                "message" => "IP address tidak ditemukan"
-            ]);
-        }
-
+        
         $employeeModel = new HrOutsourcingEmployeeModel();
         $barangModel   = new BarangMasterSortirModel();
         $companyModel  = new HrOutsourcingCompanyModel();
 
-        // Ambil data dari database
-        $employees = $employeeModel->findAll();
-        $barang = $barangModel->findAll();
-        $companies = $companyModel->findAll();
+        // TEST: Ambil hanya 2 record masing-masing
+        $employees = $employeeModel->limit(2)->findAll();
+        $barang = $barangModel->limit(2)->findAll();
+        $companies = $companyModel->limit(2)->findAll();
 
-        // LOG DATA UNTUK DEBUG
-        log_message('info', 'Data to sync - Employees: ' . count($employees) . ', Barang: ' . count($barang) . ', Companies: ' . count($companies));
+        // Debug data
+        log_message('debug', 'Sample Employee: ' . json_encode($employees[0] ?? []));
+        log_message('debug', 'Sample Barang: ' . json_encode($barang[0] ?? []));
+        log_message('debug', 'Sample Company: ' . json_encode($companies[0] ?? []));
 
-        // Format data sesuai dengan struct Go
         $payload = [
             "employees" => $employees,
             "barang"    => $barang,
             "companies" => $companies,
         ];
 
-        $golangUrl = "http://{$ipAddress}:8001/api/migrate-to-db";
         $client = \Config\Services::curlrequest();
-
+        
         try {
-            $response = $client->post($golangUrl, [
+            $response = $client->post("http://{$ipAddress}:8001/api/migrate-to-db", [
                 "json" => $payload,
-                "timeout" => 3000, // TIMEOUT 5 MENIT
-                "connect_timeout" => 30,
+                "timeout" => 30,
                 "headers" => [
                     "Content-Type" => "application/json",
                 ]
@@ -460,7 +453,6 @@ class SallaryPayment extends BaseController
             ]);
 
         } catch (\Exception $e) {
-            log_message('error', 'Push data failed: ' . $e->getMessage());
             return $this->response->setJSON([
                 "status" => false,
                 "message" => "Gagal push: " . $e->getMessage()
