@@ -1664,6 +1664,7 @@ class StockRevampLogModel extends Model
         $whereDateMutasiGlobal = "";
         $whereDateStuffingLokal = "";
         $whereDateStuffingEkspor = "";
+        $whereDateAdjusment = "";
 
         $searchProsesRebus = "";
         $searchJasaVendor = "";
@@ -1673,6 +1674,7 @@ class StockRevampLogModel extends Model
         $searchMutasiGlobal = "";
         $searchStuffingLokal = "";
         $searchStuffingEkspor = "";
+        $searchAdjusment = "";
 
         if (!empty($condition['id'])) {
             $where[] = "stock_revamp_detail.id = '$condition[id]'";
@@ -1691,6 +1693,7 @@ class StockRevampLogModel extends Model
             $whereDateMutasiGlobal = "AND mutasi_global.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
             $whereDateStuffingLokal = "AND stuffing_lokal.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
             $whereDateStuffingEkspor = "AND stuffing_internasional.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
+            $whereDateAdjusment = "AND adjusment.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
         }
 
         if (!empty($condition['stock_id'])) {
@@ -1754,6 +1757,13 @@ class StockRevampLogModel extends Model
             $searchStuffingEkspor = "
         AND (
             stuffing_internasional.no_stuffing LIKE '%{$search}%'
+        )
+    ";
+
+            $searchAdjusment = "
+        AND (
+            adjusment.no_adjusment LIKE '%{$search}%'
+            OR adjusment.keterangan LIKE '%{$search}%'
         )
     ";
         }
@@ -1997,6 +2007,33 @@ class StockRevampLogModel extends Model
             $filterCondition
             $whereDateStuffingEkspor
             $searchStuffingEkspor
+        )
+        UNION ALL
+        (
+            -- STOK KELUAR ADJUSMENT
+            SELECT
+                stock_revamp_detail.stock_id,
+                stock_revamp_log.id,
+                stock_revamp_log.reference_tujuan_type,
+                divisis.divisi AS divisi_tujuan,
+                '' AS warehouse_name,
+                adjusment.no_adjusment AS reference_no,
+                adjusment.tanggal AS tanggal_keluar,
+                stock_revamp_log.keterangan,
+                stock_revamp_log.qty_diterima AS qty_diterima,
+                satuans.kode_satuan
+            FROM stock_revamp_log
+            LEFT JOIN stock_revamp_detail ON stock_revamp_detail.id = stock_revamp_log.stock_detail_id
+            LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
+            LEFT JOIN satuans ON satuans.id = stock_revamp.unit_id
+            LEFT JOIN adjusment ON adjusment.id = stock_revamp_log.reference_tujuan_id
+            LEFT JOIN divisis ON divisis.id = adjusment.divisi_id
+            WHERE stock_revamp_log.deletedAt IS NULL
+            AND stock_revamp_log.reference_tujuan_type='ADJUSMENT'
+            AND stock_revamp_log.status='OUT'
+            $filterCondition
+            $whereDateAdjusment
+            $searchAdjusment
         )
         UNION ALL
         (
