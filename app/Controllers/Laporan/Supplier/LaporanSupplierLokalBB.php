@@ -201,22 +201,33 @@ class LaporanSupplierLokalBB extends BaseController
 
             $row->no = $start + $i + 1;
 
-            // ===============================
-            //  HITUNG PROPOSI TAMBAHAN (SAMA DENGAN allData)
-            // ===============================
-            $qtyDetail   = floatval($row->qtyPO ?? 0);
-            $qtyTotalPO  = floatval($row->sum_qtyPO ?? 0);
-            $proporsi    = ($qtyTotalPO > 0) ? ($qtyDetail / $qtyTotalPO) : 0;
-
-            // Tambahan (hasil proporsional)
+            $row->qtyPO = $row->sum_qtyPO;
+            $row->dpp_umum =
+                floatval($row->sum_dpp_umum ?? 0);
+            $row->pph_umum =
+                floatval($row->sum_pph_umum ?? 0);
+            $row->nilai_total_umum =
+                floatval($row->sum_nilai_total_umum ?? 0);
+            $row->dpp_harian =
+                floatval($row->sum_dpp_harian ?? 0);
+            $row->pph_harian =
+                floatval($row->sum_pph_harian ?? 0);
+            $row->nilai_total_harian =
+                floatval($row->sum_nilai_total_harian ?? 0);
+            $row->dpp_bulanan =
+                floatval($row->sum_dpp_bulanan ?? 0);
+            $row->pph_bulanan =
+                floatval($row->sum_pph_bulanan ?? 0);
+            $row->nilai_total_bulanan =
+                floatval($row->sum_nilai_total_bulanan ?? 0);
             $row->dpp_tambahan =
-                floatval($row->sum_dpp_tambahan ?? 0) * $proporsi;
+                floatval($row->sum_dpp_tambahan ?? 0);
 
             $row->pph_tambahan =
-                floatval($row->sum_pph_tambahan ?? 0) * $proporsi;
+                floatval($row->sum_pph_tambahan ?? 0);
 
             $row->nilai_total_tambahan =
-                floatval($row->sum_nilai_total_tambahan ?? 0) * $proporsi;
+                floatval($row->sum_nilai_total_tambahan ?? 0);
 
             // ===============================
             //  TOTAL ROW (setelah ada tambahan)
