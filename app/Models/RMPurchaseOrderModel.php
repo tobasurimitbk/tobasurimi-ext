@@ -997,7 +997,7 @@ class RMPurchaseOrderModel extends Model
         ];
     }
 
-    public function getPoBBLokalForSupplierNew($availableSort, $condition, $addCondition, $limit = 10, $offset = 0)
+    public function getPoBBLokalForSupplierNew($availableSort, $condition, $addCondition, $limit = 10, $offset = 0, $isGroupBy = null)
     {
 
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
@@ -1079,9 +1079,13 @@ class RMPurchaseOrderModel extends Model
             ->join('warehouses', 'penerimaan_barang.warehouse_id = warehouses.id', 'left')
             ->join('supplier_harga', 'supplier_harga.id = rm_purchase_order_details.supplier_harga_id', 'left')
             ->join('divisis', 'divisis.id = rm_purchase_orders.divisi_id', 'left')
-            ->where($condition)
-            // ->groupBy('supplier_harga.spesifikasi_id, rm_purchase_orders.id')
-            ->orderBy($sort, $sortType);
+            ->where($condition);
+
+        if ($isGroupBy == "PO") {
+            $poBBLokalData->groupBy('rm_purchase_orders.id');
+        }
+
+        $poBBLokalData->orderBy($sort, $sortType);
 
 
         $totalData = $poBBLokalData->countAllResults(false);
