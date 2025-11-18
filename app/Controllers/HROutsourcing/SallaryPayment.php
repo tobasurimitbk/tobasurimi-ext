@@ -3,6 +3,7 @@
 namespace App\Controllers\HROutsourcing;
 
 use App\Controllers\BaseController;
+use App\Models\BarangMasterSortirModel;
 use App\Models\DivisisModel;
 use App\Models\HROutsourcingCompanyModel;
 use App\Models\HROutsourcingEmployeeModel;
@@ -408,4 +409,55 @@ class SallaryPayment extends BaseController
 
         return view('HROutsourcing/sallary-payment/ip-config', $data);
     }
+
+
+    public function push()
+    {
+        $ipAddress = $this->request->getPost('ip');
+        
+        $employeeModel = new HrOutsourcingEmployeeModel();
+        $barangModel   = new BarangMasterSortirModel();
+        $companyModel  = new HrOutsourcingCompanyModel();
+
+        // TEST: Ambil hanya 2 record masing-masing
+        $employees = $employeeModel->limit(2)->findAll();
+        $barang = $barangModel->limit(2)->findAll();
+        $companies = $companyModel->limit(2)->findAll();
+
+        // Debug data
+        log_message('debug', 'Sample Employee: ' . json_encode($employees[0] ?? []));
+        log_message('debug', 'Sample Barang: ' . json_encode($barang[0] ?? []));
+        log_message('debug', 'Sample Company: ' . json_encode($companies[0] ?? []));
+
+        $payload = [
+            "employees" => $employees,
+            "barang"    => $barang,
+            "companies" => $companies,
+        ];
+
+        $client = \Config\Services::curlrequest();
+        
+        try {
+            $response = $client->post("http://{$ipAddress}:8001/api/migrate-to-db", [
+                "json" => $payload,
+                "timeout" => 30,
+                "headers" => [
+                    "Content-Type" => "application/json",
+                ]
+            ]);
+
+            return $this->response->setJSON([
+                "status" => true,
+                "message" => "Data berhasil dikirim",
+                "go_response" => json_decode($response->getBody(), true)
+            ]);
+
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                "status" => false,
+                "message" => "Gagal push: " . $e->getMessage()
+            ]);
+        }
+    }
+
 }
