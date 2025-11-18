@@ -1196,6 +1196,7 @@ class StockRevampModel extends Model
             LEFT JOIN warehouses ON warehouses.id = stock_revamp.warehouse_id
             LEFT JOIN bc_purchase_order_lpb ON bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id
             LEFT JOIN bc_purchase_order ON bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id
+            LEFT JOIN purchase_requests ON purchase_requests.id = am_purchase_orders.purchase_request_id
             WHERE stock_revamp_detail.deletedAt IS NULL
             AND stock_revamp_detail.reference_type='LPB'
             AND penerimaan_barang.tipe_bahan='PENOLONG'
