@@ -1723,6 +1723,7 @@ class MaterialRequest extends BaseController
                     $condition["rm_purchase_orders.supplier_id"] = $supplierId;
                 }
                 $condition["stock_revamp_detail.reference_type"] = ["LPB", "PROSES REBUS"];
+                $condition["stock_revamp_detail.po_id"] = "IS NOT NULL";
                 $dataResult = $this->stockRevampDetailModel->getStockListPOWithCondition($condition);
             } else {
                 if (!empty($vendorId)) {
@@ -1784,7 +1785,7 @@ class MaterialRequest extends BaseController
                     $dataResult[$i]['id'] = encrypt($dataResult[$i]['stock_id']) . '-' . encrypt($dataResult[$i]['id']);
                     $dataResult[$i]['bc_id'] =  $dataResult[$i]['bc_id'] == "-" ? "-" : $dataResult[$i]['bc_id'];
                     $dataResult[$i]['no_aju'] =  empty($dataResult[$i]['no_aju']) ? "-" : $dataResult[$i]['no_aju'];
-                    $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? ($dataResult[$i]['no_penerimaan_barang'] == null ? "-" : $dataResult[$i]['no_penerimaan_barang']) : $dataResult[$i]['stock_dokumen'];
+                    $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
                     $dataResult[$i]['no_dokumen_2'] = $dataResult[$i]['no_penerimaan_barang'] == null ? "-" : $dataResult[$i]['no_penerimaan_barang'];
                     $dataResult[$i]['supplier_id'] = $vendorId;
                     $dataResult[$i]['harga_umum'] = $dataResult[$i]['harga_umum'] == null ? "0" : $dataResult[$i]['harga_umum'];

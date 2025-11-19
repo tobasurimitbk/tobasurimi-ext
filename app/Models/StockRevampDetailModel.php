@@ -1248,12 +1248,16 @@ class StockRevampDetailModel extends Model
                 bc_purchase_order.no_daftar
             ")
             ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
+
             ->join('rm_purchase_orders', 'rm_purchase_orders.id = stock_revamp_detail.po_id', 'left')
             ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
             ->join('penerimaan_barang', 'penerimaan_barang.id = stock_revamp_detail.reference_id', 'left')
             ->join('bc_purchase_order_lpb', 'bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id', 'left')
             ->join('bc_purchase_order', 'bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id', 'left')
-            ->join('proses_rebus', 'proses_rebus.id = stock_revamp_detail.reference_id', 'left')
+
+            ->join('proses_rebus_detail', "proses_rebus_detail.stock_detail_hasil_rebus_id = stock_revamp_detail.id AND stock_revamp_detail.reference_type = 'PROSES REBUS' AND proses_rebus_detail.po_id IS NOT NULL", 'left')
+            ->join('proses_rebus', 'proses_rebus.id = proses_rebus_detail.proses_rebus_id', 'left')
+
             ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
             ->join('barang_master', 'barang_master.id = stock_revamp.barang_master_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock_revamp.spesifikasi_id', 'left')
@@ -1263,6 +1267,9 @@ class StockRevampDetailModel extends Model
         foreach ($condition as $field => $value) {
             if (is_array($value)) {
                 $builder->whereIn($field, $value);
+            } elseif ($value === 'IS NOT NULL') {
+                // kondisi is not null
+                $builder->where("$field IS NOT NULL", null, false);
             } else {
                 $builder->where($field, $value);
             }
@@ -1301,17 +1308,30 @@ class StockRevampDetailModel extends Model
                 stock_revamp_detail.qty_bersih as stok_total,
                 stock_revamp_detail.qty_diterima as stok_total_diterima,
                 jasa_vendor_in.no_penerimaan_surat_jalan,
-                UPPER(vendors.name) AS supplier_name,
                 bc_purchase_order.no_aju,
+                CASE 
+                    WHEN stock_revamp_detail.reference_type = 'PROSES REBUS' AND proses_rebus_detail.po_id IS NULL THEN UPPER(vendors_rebus.name)
+                    WHEN stock_revamp_detail.reference_type = 'JASA VENDOR' THEN UPPER(vendors.name)
+                    ELSE UPPER(vendors.name)
+                END AS vendor_name,
+                CASE 
+                    WHEN stock_revamp_detail.reference_type = 'PROSES REBUS' AND proses_rebus_detail.po_id IS NULL THEN UPPER(vendors_rebus.name)
+                    WHEN stock_revamp_detail.reference_type = 'JASA VENDOR' THEN UPPER(vendors.name)
+                    ELSE UPPER(vendors.name)
+                END AS supplier_name,
+                CASE 
+                    WHEN stock_revamp_detail.reference_type = 'PROSES REBUS' AND proses_rebus_detail.po_id IS NULL THEN vendors.id
+                    WHEN stock_revamp_detail.reference_type = 'JASA VENDOR' THEN vendors.id
+                    ELSE UPPER(vendors.name)
+                END AS vendor_id,
                 vendors.id AS vendor_id,
-                UPPER(vendors.name) AS vendor_name,
                 rm_purchase_order_details.general_price as harga_umum,
                 rm_purchase_order_details.daily_price as harga_harian,
                 rm_purchase_order_details.monthly_price as harga_bulanan,
                 CASE 
-                    WHEN stock_revamp_detail.reference_type = 'PROSES REBUS' THEN concat(jasa_vendor_in.no_penerimaan_surat_jalan, ' (', rm_purchase_orders.po_no, ')')
-                    WHEN stock_revamp_detail.reference_type = 'JASA VENDOR' THEN concat(jasa_vendor_in.no_penerimaan_surat_jalan, ' (', COALESCE (rm_purchase_orders.po_no, proses_rebus.no_rebus), ')')
-                    ELSE penerimaan_barang.tanggal
+                    WHEN stock_revamp_detail.reference_type = 'PROSES REBUS' AND proses_rebus_detail.jasa_vendor_id IS NOT NULL THEN concat(proses_rebus.no_rebus, ' (', jasa_vendor_in_rebus.no_penerimaan_surat_jalan, ')')
+                    WHEN stock_revamp_detail.reference_type = 'JASA VENDOR' THEN jasa_vendor_in.no_penerimaan_surat_jalan
+                    ELSE 'test'
                 END AS stock_dokumen,
                 CASE 
                     WHEN stock_revamp_detail.reference_type = 'PROSES REBUS' THEN proses_rebus.tanggal
@@ -1321,11 +1341,20 @@ class StockRevampDetailModel extends Model
                 stock_revamp_detail.type_bc as type_bc,
                 bc_purchase_order.no_daftar
             ")
-            ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
+
+            // from Proses Rebus
+            ->join('proses_rebus_detail', "proses_rebus_detail.stock_detail_hasil_rebus_id = stock_revamp_detail.id AND stock_revamp_detail.reference_type = 'PROSES REBUS'", 'left')
+            ->join('proses_rebus', "proses_rebus.id = proses_rebus_detail.proses_rebus_id", 'left')
+            // from Proses Rebus -> JasVen
+            ->join('jasa_vendor_in as jasa_vendor_in_rebus', "jasa_vendor_in_rebus.id = proses_rebus_detail.jasa_vendor_id  AND stock_revamp_detail.reference_type = 'PROSES REBUS'", 'left')
+            ->join('vendors as vendors_rebus', 'vendors_rebus.id = jasa_vendor_in_rebus.vendor_id', 'left')
+
+            // from Jasa Vendor
             ->join('jasa_vendor_in', "jasa_vendor_in.id = stock_revamp_detail.reference_id AND stock_revamp_detail.reference_type = 'JASA VENDOR'", 'left')
-            ->join('proses_rebus', "proses_rebus.id = stock_revamp_detail.reference_id AND stock_revamp_detail.reference_type = 'PROSES REBUS'", 'left')
             ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
-            ->join('stock_revamp_history', 'stock_revamp_history.stock_detail_akhir = stock_revamp_detail.id', 'left')
+
+            ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
+            ->join('stock_revamp_history', "stock_revamp_history.stock_detail_akhir = stock_revamp_detail.id AND stock_revamp_detail.reference_type = 'JASA VENDOR'", 'left')
 
             //get asal po stock
             ->join('stock_revamp_detail as stock_revamp_detail2', 'stock_revamp_detail2.id = stock_revamp_history.stock_detail_asal', 'left')
