@@ -1324,10 +1324,13 @@
 
                 item.size_breakdown.forEach(size => {
 
-                    if (size.cased == "0") {
-                        carton = size.qty
+                    let cased = size?.cased ?? 0; 
+                    let qty   = size?.qty_input ?? 0;
+
+                    if (cased === "" || cased === "0" || cased === 0 || cased === null || cased === undefined) {
+                        carton = qty || 0;
                     } else {
-                        carton = size.cased
+                        carton = cased;
                     }
 
                     const newRow = $('<tr style="color:whitesmoke;">');
@@ -1343,7 +1346,7 @@
                     newRow.append(`<td>${size.cased}</td>`);
                     newRow.append(`<td>${item.brand}</td>`);
                     newRow.append(`<td>${item.packing}</td>`);
-                    newRow.append(`<td>${size.qty}</td>`);
+                    newRow.append(`<td>${size.qty_input}</td>`);
                     newRow.append(`<td>${size.satuan_size_code}</td>`);
                     newRow.append(`
                         <td>

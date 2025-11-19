@@ -405,9 +405,10 @@ class Internasional extends BaseController
 
         $dataSalesExport = $this->salesOrderModel
             ->where('sales_order_export.sales_order_export_id', $this->request->getVar('sales_order_id'))
+            ->where('sales_order_export.deletedAt', NULL)
             ->first();
         $dataSalesExportDetail =  $this->salesOrderModel
-            ->getDetailSalesKontrakInOrderForm(
+            ->getDetailSalesKontrakInOrderFormForStuffing(
                 $dataSalesExport['sales_contract_id'],
                 $this->request->getVar('sales_order_id')
             );
