@@ -758,7 +758,7 @@ class JasaVendorOut extends BaseController
                 for ($i = 0; $i < count($dataResult); $i++) {
                                 $bcType = $metaDataModel->find($dataResult[$i]['bc_id']);
                                 $dataResult[$i]['no_penerimaan_surat_jalan'] = $dataResult[$i]['no_penerimaan_surat_jalan'];
-                                $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
+                                $dataResult[$i]['bc_type'] = (!empty($bcType) && isset($bcType['value'])) ? $bcType['value'] : "NON PABEAN";
                                 $dataResult[$i]['satuan'] = $dataResult[$i]['kode_satuan'];
                                 $dataResult[$i]['barang'] = strtoupper($dataResult[$i]['barang']);
                                 $dataResult[$i]['stock_date'] = $dataResult == null ? "-" : date('d/m/Y', strtotime($dataResult[$i]['tanggal']));
