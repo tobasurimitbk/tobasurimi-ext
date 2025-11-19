@@ -309,6 +309,7 @@
                 company_id: companyId,
                 tanggal: tanggal,
                 department_id: departmentId,
+                <?= csrf_token() ?>: '<?= csrf_hash() ?>'
             },
             success: function(res) {
                 if (res.success) {
