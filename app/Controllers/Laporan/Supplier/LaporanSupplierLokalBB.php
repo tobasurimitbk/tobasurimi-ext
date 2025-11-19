@@ -2332,7 +2332,7 @@ class LaporanSupplierLokalBB extends BaseController
             'warehouseName' => 'warehouses.warehouse_name',
         ];
 
-        $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierPerPO(
+        $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierNew(
             $availableSort,
             $condition,
             $addCondition,

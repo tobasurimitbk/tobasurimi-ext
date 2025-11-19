@@ -653,18 +653,18 @@ class StokAdjusment extends BaseController
 
             foreach ($adjusmentList as $a) {
                 // Update
-                $stock = $this->stockRevampDetailModel
-                    ->select('stock_revamp.*')
-                    ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
+                $stockDetail = $this->stockRevampDetailModel
+                    ->select('stock_revamp_detail.*')
                     ->where('stock_revamp_detail.id', $a['stock_detail_id'])
                     ->first();
 
-                $stockDetail = $this->stockRevampDetailModel->where('id', $a['stock_detail_id'])->first();
+                $stock = $this->stockRevampModel->where('id', $stockDetail['stock_id'])->first();
+                $qtyTotal = $this->getTotalStockParent($stockDetail['stock_id']);
 
                 if ($a['operasi_adjusment_detail'] == "PLUS") {
                     // PLUS
                     $this->stockRevampModel->update($stock['id'], [
-                        'qty_diterima' => $stock['qty_diterima'] + $a['hasil_adjusment']
+                        'qty_diterima' => $qtyTotal + $a['qty_konversi']
                     ]);
 
                     $this->stockRevampDetailModel->update($a['stock_detail_id'], [
@@ -681,19 +681,19 @@ class StokAdjusment extends BaseController
                         'reference_tujuan_type' => "ADJUSMENT"
                     ]);
 
-                    $this->stockRevampHistoryModel->insert([
-                        'stock_detail_asal' => $a['stock_detail_id'],
-                        'stock_detail_akhir' => null,
-                        'status' => "IN",
-                        'qty_bersih_asal' => $stockDetail['qty_bersih'],
-                        'qty_bersih_akhir' => $stockDetail['qty_bersih'],
-                        'qty_diterima_asal' => $a['qty_asal'],
-                        'qty_diterima_akhir' => $a['hasil_adjusment']
-                    ]);
+                    // $this->stockRevampHistoryModel->insert([
+                    //     'stock_detail_asal' => $a['stock_detail_id'],
+                    //     'stock_detail_akhir' => null,
+                    //     'status' => "IN",
+                    //     'qty_bersih_asal' => $stockDetail['qty_bersih'],
+                    //     'qty_bersih_akhir' => $stockDetail['qty_bersih'],
+                    //     'qty_diterima_asal' => $a['qty_asal'],
+                    //     'qty_diterima_akhir' => $a['hasil_adjusment']
+                    // ]);
                 } else {
                     // MINUS
                     $this->stockRevampModel->update($stock['id'], [
-                        'qty_diterima' => $stock['qty_diterima'] - $a['hasil_adjusment']
+                        'qty_diterima' => $qtyTotal - $a['qty_konversi']
                     ]);
 
                     $this->stockRevampDetailModel->update($a['stock_detail_id'], [
@@ -710,15 +710,15 @@ class StokAdjusment extends BaseController
                         'reference_tujuan_type' => "ADJUSMENT"
                     ]);
 
-                    $this->stockRevampHistoryModel->insert([
-                        'stock_detail_asal' => $a['stock_detail_id'],
-                        'stock_detail_akhir' => null,
-                        'status' => "OUT",
-                        'qty_bersih_asal' => $stockDetail['qty_bersih'],
-                        'qty_bersih_akhir' => $stockDetail['qty_bersih'],
-                        'qty_diterima_asal' => $a['qty_asal'],
-                        'qty_diterima_akhir' => $a['hasil_adjusment']
-                    ]);
+                    // $this->stockRevampHistoryModel->insert([
+                    //     'stock_detail_asal' => $a['stock_detail_id'],
+                    //     'stock_detail_akhir' => null,
+                    //     'status' => "OUT",
+                    //     'qty_bersih_asal' => $stockDetail['qty_bersih'],
+                    //     'qty_bersih_akhir' => $stockDetail['qty_bersih'],
+                    //     'qty_diterima_asal' => $a['qty_asal'],
+                    //     'qty_diterima_akhir' => $a['hasil_adjusment']
+                    // ]);
                 }
             }
 
@@ -1086,5 +1086,16 @@ class StokAdjusment extends BaseController
                 'message' => $e->getMessage()
             ]);
         }
+    }
+
+    private function getTotalStockParent($stockId)
+    {
+        $total = 0;
+        $listStock = $this->stockRevampDetailModel->where('stock_id', $stockId)->where('deletedAt', null)->findAll();
+        foreach ($listStock as $l) {
+            $total += $l['qty_diterima'];
+        }
+
+        return $total;
     }
 }
