@@ -460,4 +460,62 @@ class SallaryPayment extends BaseController
         }
     }
 
+
+    public function getData()
+    {
+        $companyId = $this->request->getPost('company_id');
+        $tanggal = $this->request->getPost('tanggal');
+        $departmentId = $this->request->getPost('department_id');
+
+        // Validasi dasar
+        if (!$companyId || !$tanggal || !$departmentId) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Data tidak lengkap'
+            ]);
+        }
+
+        // ==== STEP 1: Ambil IP berdasarkan department ====
+        $ipData = $this->readDepartmentIpData();
+        $deptIp = null;
+
+        foreach ($ipData as $item) {
+            if ($item['department_id'] == $departmentId) {
+                $deptIp = $item['ip_address'];
+                break;
+            }
+        }
+
+        if (!$deptIp) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'IP Address tidak ditemukan untuk departemen ini'
+            ]);
+        }
+
+        // ==== STEP 2: Request ke scale system ====
+        $url = "http://{$deptIp}:8001/api/local-data?company_id={$companyId}&tanggal={$tanggal}";
+
+        try {
+            $client = \Config\Services::curlrequest([
+                'timeout' => 10,
+            ]);
+
+            $response = $client->get($url);
+            $json = json_decode($response->getBody(), true);
+
+            return $this->response->setJSON([
+                'success' => true,
+                'data' => $json
+            ]);
+
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Gagal mengambil data dari scale system: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+
 }

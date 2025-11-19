@@ -3098,6 +3098,7 @@ $routes->post('hr-outsourcing-sallary-payment/saveDepartmentIp', 'HROutsourcing\
 $routes->get('hr-outsourcing-sallary-payment/getDepartmentIpData', 'HROutsourcing\SallaryPayment::getDepartmentIpData', ['filter' => 'Auth']);
 $routes->get('hr-outsourcing-sallary-payment/getIpByDepartment/(:num)', 'HROutsourcing\SallaryPayment::getIpByDepartment/$1', ['filter' => 'Auth']);
 $routes->get('hr-outsourcing-sallary-payment/getIpByDepartment', 'HROutsourcing\SallaryPayment::getIpByDepartment', ['filter' => 'Auth']);
+$routes->post('/hr-outsourcing-sallary-payment/getData', 'HROutsourcing\SallaryPayment::getData', ['filter' => 'Auth']);
 
 //HR Ousourcing Scale 
 $routes->get('/hr-outsourcing-scale', 'HROutsourcing\Scale::generateQrBarangView', ['filter' => 'Auth']);

@@ -295,49 +295,37 @@
     function handleGetData() {
         const companyId = $('#company').val();
         const tanggal = $('#tanggal_pembayaran').val();
+        const departmentId = $('#departemen').val();
 
         if (!validateGetData(companyId, tanggal)) return;
 
         toggleLoadingState(true);
 
-        const departmentId = $('#departemen').val();
-        
-        // Step 1: Get IP address
         $.ajax({
-            url: `<?= base_url("hr-outsourcing-sallary-payment/getIpByDepartment/") ?>${departmentId}`,
-            type: 'GET',
+            url: `<?= base_url("hr-outsourcing-sallary-payment/getData") ?>`,
+            type: 'POST',
             dataType: 'json',
-            success: function(ipResponse) {
-                if (ipResponse.success && ipResponse.ip_address) {
-                    // Step 2: Get data dari scale system
-                    const apiUrl = `http://${ipResponse.ip_address}:8001/api/local-data?company_id=${companyId}&tanggal=${tanggal}`;
-                    
-                    $.ajax({
-                        url: apiUrl,
-                        method: 'GET',
-                        dataType: 'json',
-                        timeout: 10000,
-                        success: function(res) {
-                            handleGetDataSuccess(res);
-                        },
-                        error: function(xhr, status, error) {
-                            handleGetDataError(xhr, status, error);
-                        },
-                        complete: function() {
-                            toggleLoadingState(false);
-                        }
-                    });
+            data: {
+                company_id: companyId,
+                tanggal: tanggal,
+                department_id: departmentId,
+            },
+            success: function(res) {
+                if (res.success) {
+                    handleGetDataSuccess(res.data);
                 } else {
-                    showError(ipResponse.message || 'IP address tidak ditemukan untuk department ini');
-                    toggleLoadingState(false);
+                    showError(res.message);
                 }
             },
-            error: function(error) {
-                showError('Gagal mengambil konfigurasi IP: ' + error.statusText);
+            error: function(xhr) {
+                showError('Terjadi kesalahan saat mengambil data.');
+            },
+            complete: function() {
                 toggleLoadingState(false);
             }
         });
     }
+
 
     function validateGetData(companyId, tanggal) {
         if (!companyId) {
