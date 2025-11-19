@@ -1425,7 +1425,7 @@ class PenerimaanBarangLokalBP extends BaseController
         }
     }
 
-    public function dropdownSupplierBySPP()
+    public function dropdownSupplierBySPPBackup()
     {
         $sppId = $this->request->getVar('spp_id');
         $poList = $this->amPurchaseOrderModel->where('po_type', "Lokal")->where('purchase_request_id', $sppId)->where('is_posted', 1)->where('status_penerimaan', 0)->where('deletedAt', null)->findAll();
@@ -1433,6 +1433,45 @@ class PenerimaanBarangLokalBP extends BaseController
 
         foreach ($poList as $p) {
             array_push($supplierId, $p['supplier_id']);
+        }
+
+        if (count($supplierId) == 0) {
+            return response()->setJSON([
+                'status' => true,
+                'data' => []
+            ]);
+        }
+
+        $suplierData = $this->supplierModel->whereIn('id', $supplierId)->where('deletedAt', null)->findAll();
+        return response()->setJSON([
+            'status' => true,
+            'data' => $suplierData
+        ]);
+    }
+
+    public function dropdownSupplierBySPP()
+    {
+        $sppId = $this->request->getVar('spp_id');
+        $poList = $this->amPurchaseOrderModel->where('po_type', "Lokal")
+            ->where('purchase_request_id', $sppId)
+            ->where('is_posted', 1)
+            ->where('status_penerimaan', 0)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        $supplierId = [];
+
+        foreach ($poList as $p) {
+            $poDetail = $this->amPurchaseOrderDetailModel
+                ->where('am_purchase_order_id', $p['id'])
+                ->where('deletedAt', null)
+                ->findAll();
+
+            foreach ($poDetail as $d) {
+                if ($d['remaining_qty'] != 0) {
+                    array_push($supplierId, $p['supplier_id']);
+                }
+            }
         }
 
         if (count($supplierId) == 0) {

@@ -1480,7 +1480,7 @@ class StockRevampLogModel extends Model
                 '' AS po_date,
                 adjusment.tanggal AS lpb_date,
                 stock_revamp_log.qty_diterima AS qty_diterima,
-                stock_revamp_log.keterangan,
+                adjusment.keterangan,
                 satuans.kode_satuan
             FROM stock_revamp_log
             LEFT JOIN stock_revamp_detail ON stock_revamp_detail.id = stock_revamp_log.stock_detail_id

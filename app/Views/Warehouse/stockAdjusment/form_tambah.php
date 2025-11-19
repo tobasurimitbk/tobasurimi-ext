@@ -81,9 +81,15 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($adjusment) ? ($adjusment['status_posting'] ? 'disabled' : '') : '' ?> placeholder="Keterangan" value="<?= !empty($adjusment) ? $adjusment['keterangan'] : '' ?>" class="form-control keterangan" id="keterangan" name="keterangan" />
-                            <label for="floatingInput" style="z-index: 1;">Keterangan (Opsional)</label>
+                        <div class="form-floating mb-3">
+                            <textarea
+                                <?= !empty($adjusment) ? ($adjusment['status_posting'] ? 'disabled' : '') : '' ?>
+                                class="form-control keterangan"
+                                placeholder="Keterangan"
+                                id="keterangan"
+                                name="keterangan"
+                                style="height: 180px; resize: vertical;"><?= !empty($adjusment) ? $adjusment['keterangan'] : '' ?></textarea>
+                            <label for="keterangan" style="z-index: 1;">Keterangan (Opsional)</label>
                         </div>
                     </div>
                 </div>

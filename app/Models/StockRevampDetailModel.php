@@ -309,6 +309,7 @@ class StockRevampDetailModel extends Model
             ->groupBy('
                 stock_revamp_detail.id,
             ')
+            ->where('stock_revamp_detail.qty_bersih >', 0)
             ->where('stock_revamp_detail.reference_type !=', "PROSES REBUS")
             ->where('stock_revamp.spesifikasi_id', $spesifikasiId)
             ->orderBy('stock_revamp_detail.createdAt', 'ASC')

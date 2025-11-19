@@ -854,6 +854,12 @@
             data: {
                 id: id,
             },
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
             dataType: "json",
             success: function(res) {
                 if (res.status) {
@@ -886,6 +892,12 @@
             method: "GET",
             data: {
                 id: id,
+            },
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
             },
             dataType: "json",
             success: function(res) {

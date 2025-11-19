@@ -184,7 +184,9 @@ class ProsesRebusDetailModel extends Model
 
             // === Susun hasil ===
             $bcType = $metaDataModel->find($stockList['bc_id']);
-            $stockList['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
+            $dataResult['bc_type'] = (!empty($bcType) && isset($bcType['value']))
+            ? $bcType['value']
+            : "NON PABEAN";
             $stockList['satuan'] = $satuanIn['kode_satuan'];
             $stockList['satuan_id'] = $satuanIn['id'];
             $stockList['barang'] = $dataBarangIn['barang_name'] . ' - ' . strtoupper($barangMasterSpesifikasiIn['spesifikasi']);
