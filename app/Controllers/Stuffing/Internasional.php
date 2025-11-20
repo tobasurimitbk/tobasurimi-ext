@@ -320,7 +320,7 @@ class Internasional extends BaseController
                 ];
 
                 // Panggil model - jika gagal akan throw exception
-                $result = $stockRevampModel->outStockRevamp($db, $data);
+                $result = $stockRevampModel->outStockRevampWithoutQtyBersih($db, $data);
                 
                 if (!$result) {
                     throw new \Exception("Gagal memproses stock untuk detail ID: {$j['stock_out_detail_id']}");
@@ -405,9 +405,10 @@ class Internasional extends BaseController
 
         $dataSalesExport = $this->salesOrderModel
             ->where('sales_order_export.sales_order_export_id', $this->request->getVar('sales_order_id'))
+            ->where('sales_order_export.deletedAt', NULL)
             ->first();
         $dataSalesExportDetail =  $this->salesOrderModel
-            ->getDetailSalesKontrakInOrderForm(
+            ->getDetailSalesKontrakInOrderFormForStuffing(
                 $dataSalesExport['sales_contract_id'],
                 $this->request->getVar('sales_order_id')
             );
