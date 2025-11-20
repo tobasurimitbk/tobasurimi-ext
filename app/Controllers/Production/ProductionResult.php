@@ -1110,19 +1110,55 @@ class ProductionResult extends BaseController
                         //     }
                         // } else 
                         if ($value['type'] == 'DIGUNAKAN') {
-                            $materialRequest = $this->materialRequestDetailModel
-                                ->where('material_request_id', $value['material_request_id'])
-                                ->where('id', $value['material_request_detail_id'])
-                                ->findAll();
-                            foreach ($materialRequest as $materialRequestData) {
-                                $qtyNow = (float) $materialRequestData['qty_now'];
-                                $qtyProduksi = (float) $value['qty'];
-                                $qtyHasil = $qtyNow - $qtyProduksi;
-                                if ($qtyHasil == 0) {
+                            if ($value['barang_type'] == "bahan_baku") {
+                                $materialRequest = $this->materialRequestDetailModel
+                                    ->where('material_request_id', $value['material_request_id'])
+                                    ->where('id', $value['material_request_detail_id'])
+                                    ->findAll();
+                                foreach ($materialRequest as $materialRequestData) {
+                                    $qtyNow = (float) $materialRequestData['qty_now'];
+                                    $qtyProduksi = (float) $value['qty'];
+                                    $qtyHasil = $qtyNow - $qtyProduksi;
+                                    // if ($qtyHasil == 0) {
                                     $datas = [
                                         'qty_now' => $qtyHasil,
                                     ];
                                     $this->materialRequestDetailModel->update($materialRequestData['id'], $datas);
+                                    // }
+
+                                    $dataOut = [
+                                        "stock_detail_id" => $materialRequestData['stock_detail_tujuan_id'],
+                                        "qty_digunakan" => $materialRequestData['qty2'],
+                                        "no_dokumen" => $resultData['pr_no'],
+                                        "reference_tujuan_id" => $id,
+                                        "reference_tujuan_type" => "HASIL PRODUKSI",
+                                    ];
+                                    $stockRevampModel->outStockRevamp($db, $dataOut);
+                                }
+                            } else {
+                                $materialRequestPenolong = $this->materialRequestPenolongDetailsModel
+                                    ->where('material_request_id', $value['material_request_id'])
+                                    ->where('id', $value['material_request_detail_id'])
+                                    ->findAll();
+                                foreach ($materialRequestPenolong as $materialRequestDataPenolong) {
+                                    $qtyNow = (float) $materialRequestDataPenolong['qty_now'];
+                                    $qtyProduksi = (float) $value['qty'];
+                                    $qtyHasil = $qtyNow - $qtyProduksi;
+                                    // if ($qtyHasil == 0) {
+                                    $datas = [
+                                        'qty_now' => $qtyHasil,
+                                    ];
+                                    $this->materialRequestPenolongDetailsModel->update($materialRequestDataPenolong['id'], $datas);
+                                    // }
+
+                                    $dataOut = [
+                                        "stock_detail_id" => $materialRequestDataPenolong['stock_detail_tujuan_id'],
+                                        "qty_digunakan" => $materialRequestDataPenolong['qty2'],
+                                        "no_dokumen" => $resultData['pr_no'],
+                                        "reference_tujuan_id" => $id,
+                                        "reference_tujuan_type" => "HASIL PRODUKSI",
+                                    ];
+                                    $stockRevampModel->outStockRevamp($db, $dataOut);
                                 }
                             }
                         }

@@ -1104,7 +1104,11 @@
             }
 
             // Check if the item with the same barang1_id and barang2_id already exists
-            let exists = tempBarangList.some(item => item.barang1_id === barang1_id && item.barang2_id === barang2_id);
+            let exists = tempBarangList.some(item =>
+                item.barang1_id === barang1_id &&
+                item.barang2_id === barang2_id &&
+                item.qty_isi === qty_isi_jadi
+            );
 
             if (exists) {
                 Swal.fire({
@@ -1169,7 +1173,8 @@
                 // cek apakah sudah ada item dengan barang1_id & barang2_id yang sama
                 const sudahAda = list_items_barang_jadi.some(item =>
                     item.barang1_id == t.barang1_id &&
-                    item.barang2_id == t.barang2_id
+                    item.barang2_id == t.barang2_id &&
+                    item.qty_isi == t.qty_isi
                 );
 
                 if (!sudahAda) {
@@ -1181,7 +1186,7 @@
                 } else {
                     Swal.fire({
                         icon: 'error',
-                        title: `Baran ${t.barang_name} sudah ada`,
+                        title: `Barang ${t.barang_name} sudah ada`,
                         confirmButtonColor: '#4e73df',
                         confirmButtonText: 'Ok'
                     });

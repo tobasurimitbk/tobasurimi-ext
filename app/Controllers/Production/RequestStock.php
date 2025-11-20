@@ -520,7 +520,9 @@ class RequestStock extends BaseController
                         $dataOut = [
                             "stock_detail_id" => $value['stock_detail_id'],
                             "qty_digunakan" => $value['qty'],
-                            "no_dokumen" => $materialRequestData['req_no']
+                            "no_dokumen" => $materialRequestData['req_no'],
+                            "reference_tujuan_id" => $id,
+                            "reference_tujuan_type" => "MATERIAL REQUEST BAKU",
                         ];
                         $getStockIdOld = $stockRevampDetailModel->find($value['stock_detail_id']);
 
@@ -778,7 +780,9 @@ class RequestStock extends BaseController
                         $dataOut = [
                             "stock_detail_id" => $value['stock_detail_id'],
                             "qty_digunakan" => $value['qty'],
-                            "no_dokumen" => $materialRequestData['req_no']
+                            "no_dokumen" => $materialRequestData['req_no'],
+                            "reference_tujuan_id" => $id,
+                            "reference_tujuan_type" => "MATERIAL REQUEST PENOLONG",
                         ];
                         $getStockIdOld = $stockRevampDetailModel->find($value['stock_detail_id']);
 
