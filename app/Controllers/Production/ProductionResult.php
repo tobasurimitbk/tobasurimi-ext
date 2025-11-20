@@ -704,12 +704,14 @@ class ProductionResult extends BaseController
                         ];
                         $this->productionResultDetailModel->update($bj->production_result_detail_id, $datasbj);
 
-                        $this->accountBarangModel->insertAccountBarang(
-                            $this->this_company_id,
-                            $bj->divisi_id,
-                            $bj->barang1_id,
-                            $bj->barang2_id
-                        );
+                        if (isset($bj->divisi_id) && isset($bj->barang1_id) && isset($bj->barang2_id)) {
+                            $this->accountBarangModel->insertAccountBarang(
+                                $this->this_company_id,
+                                $bj->divisi_id,
+                                $bj->barang1_id,
+                                $bj->barang2_id
+                            );
+                        }
                     }
                 } else {
                     $datasbj = [
@@ -750,12 +752,14 @@ class ProductionResult extends BaseController
                 ];
                 $this->productionResultDetailModel->update($bd->production_result_detail_id, $datasbd);
 
-                $this->accountBarangModel->insertAccountBarang(
-                    $this->this_company_id,
-                    $bd->divisi_id,
-                    $bd->barang1_id,
-                    $bd->barang2_id
-                );
+                if (isset($bd->divisi_id) && isset($bd->barang1_id) && isset($bd->barang2_id)) {
+                    $this->accountBarangModel->insertAccountBarang(
+                        $this->this_company_id,
+                        $bd->divisi_id,
+                        $bd->barang1_id,
+                        $bd->barang2_id
+                    );
+                }
             }
 
             foreach ($barangDigunakanPenolong as $bdp) {
@@ -781,12 +785,14 @@ class ProductionResult extends BaseController
                 ];
                 $this->productionResultDetailModel->update($bs->production_result_detail_id, $datasbs);
 
-                $this->accountBarangModel->insertAccountBarang(
-                    $this->this_company_id,
-                    $bs->divisi_id,
-                    $bs->barang1_id,
-                    $bs->barang2_id
-                );
+                if (isset($bs->divisi_id) && isset($bs->barang1_id) && isset($bs->barang2_id)) {
+                    $this->accountBarangModel->insertAccountBarang(
+                        $this->this_company_id,
+                        $bs->divisi_id,
+                        $bs->barang1_id,
+                        $bs->barang2_id
+                    );
+                }
             }
 
             foreach ($barangFilling as $bf) {
@@ -795,12 +801,14 @@ class ProductionResult extends BaseController
                 ];
                 $this->productionResultDetailModel->update($bf->production_result_detail_id, $datasbf);
 
-                $this->accountBarangModel->insertAccountBarang(
-                    $this->this_company_id,
-                    $bf->divisi_id,
-                    $bf->barang1_id,
-                    $bf->barang2_id
-                );
+                if (isset($bf->divisi_id) && isset($bf->barang1_id) && isset($bf->barang2_id)) {
+                    $this->accountBarangModel->insertAccountBarang(
+                        $this->this_company_id,
+                        $bf->divisi_id,
+                        $bf->barang1_id,
+                        $bf->barang2_id
+                    );
+                }
             }
 
             $data = [
