@@ -2452,7 +2452,7 @@ class Attendance extends BaseController
                 $uangMakan = (float)($mapUangMakanHarian[$e['id']][$tanggal]['nominal'] ?? 0);
                 if (in_array($e['divisi'], ["BULANAN", "KANTOR"])) {
                     // khusus departemen kantor & bulanan aja
-                    if ($reason == '' || $reason == '-') {
+                    if ($reason == '' || $reason == '-' && $this->is_format_waktu($in)) {
                         $isTerlambat =  $this->is_terlambat($jamKerjaTerlambat, $in);
                     } else {
                         $isTerlambat = false;
@@ -3217,5 +3217,10 @@ class Attendance extends BaseController
         $jamKerja = strtotime($jamKerjaTerlambat);
         $jamMasuk = strtotime($in);
         return $jamMasuk > $jamKerja;
+    }
+
+    private function is_format_waktu($str)
+    {
+        return preg_match('/^(2[0-3]|[01][0-9]):[0-5][0-9](:[0-5][0-9])?$/', $str);
     }
 }
