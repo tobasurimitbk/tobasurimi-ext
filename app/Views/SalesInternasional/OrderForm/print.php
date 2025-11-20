@@ -197,11 +197,23 @@
                         </table>
                     </td>
                     <td>
-                        <table style="width: 100%; font-size:12px;" border="0">
+                        <?php
+                        $panjangKolom = 0;
+                        $panjangKolomOrder = 0;
+
+                        if (strlen($dataSO->sales_order_export_no) >= 34) {
+                            $panjangKolom = 100;
+                            $panjangKolomOrder = 190;
+                        } else {
+                            $panjangKolom = 80;
+                            $panjangKolomOrder = 0;
+                        }
+                        ?>
+                        <table style="width: <?= $panjangKolom ?>%; font-size:12px; float:right;" border="0">
                             <tr>
                                 <td style="text-align: left; width:3px;">ORDER</td>
                                 <td style="width: 5px; text-align: right;">:</td>
-                                <td style="text-align: left; width:190px;"><?= $dataSO->sales_order_export_no ?></td>
+                                <td style="text-align: left; width:<?= $panjangKolomOrder ?>px;"><?= $dataSO->sales_order_export_no ?></td>
                             </tr>
 
                             <?php if (!empty($dataSO->po_no)): ?>
