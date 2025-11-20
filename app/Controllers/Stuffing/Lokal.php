@@ -318,7 +318,7 @@ class Lokal extends BaseController
                 ];
 
                 // Panggil model - jika gagal akan throw exception
-                $result = $stockRevampModel->outStockRevamp($db, $data);
+                $result = $stockRevampModel->outStockRevampWithoutQtyBersih($db, $data);
                 
                 if (!$result) {
                     throw new \Exception("Gagal memproses stock untuk detail ID: {$j['stock_out_detail_id']}");

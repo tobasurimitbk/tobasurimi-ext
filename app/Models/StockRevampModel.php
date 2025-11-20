@@ -274,6 +274,7 @@ class StockRevampModel extends Model
     //     'reference_tujuan_id' => 2,
     //     'reference_tujuan_type' => enum,
     // ]);
+
     public function outStockRevamp(BaseConnection $db, array $data)
     {
         // HAPUS transBegin() dari model, karena sudah dihandle controller
@@ -360,6 +361,83 @@ class StockRevampModel extends Model
             // HAPUS transRollback() dari model
             log_message('error', 'Out Stock Failed: ' . $e->getMessage());
             throw $e; // Lempar exception ke controller
+        }
+    }
+
+    public function outStockRevampWithoutQtyBersih(BaseConnection $db, array $data)
+    {
+        try {
+            // ==============================
+            // 1. Ambil data detail
+            // ==============================
+            $stockDetail = $db->table('stock_revamp_detail')
+                ->where('id', $data['stock_detail_id'])
+                ->get()
+                ->getRowArray();
+
+            if (!$stockDetail) {
+                throw new \Exception("Stock detail tidak ditemukan");
+            }
+
+            // ==============================
+            // 2. Hitung qty_diterima baru (ONLY THIS)
+            // ==============================
+            $newQtyDetail = $stockDetail['qty_diterima'] - $data['qty_digunakan'];
+
+            // Tidak menyentuh qty_bersih
+
+            $db->table('stock_revamp_detail')
+                ->where('id', $data['stock_detail_id'])
+                ->update([
+                    'qty_diterima' => $newQtyDetail,
+                    // 'qty_bersih' tidak di-update!
+                ]);
+
+            // ==============================
+            // 3. Ambil data parent stock_revamp
+            // ==============================
+            $stock = $db->table('stock_revamp')
+                ->where('id', $stockDetail['stock_id'])
+                ->get()
+                ->getRowArray();
+
+            if (!$stock) {
+                throw new \Exception("Stock parent tidak ditemukan");
+            }
+
+            // ==============================
+            // 4. Hitung qty_diterima parent baru
+            // ==============================
+            $newQtyParent = $stock['qty_diterima'] - $data['qty_digunakan'];
+
+            // Tidak menyentuh qty_bersih
+
+            $db->table('stock_revamp')
+                ->where('id', $stockDetail['stock_id'])
+                ->update([
+                    'qty_diterima' => $newQtyParent,
+                    // 'qty_bersih' tidak di-update!
+                ]);
+
+            // ==============================
+            // 5. Insert LOG
+            // ==============================
+            $db->table('stock_revamp_log')->insert([
+                'stock_detail_id'       => $stockDetail['id'],
+                'status'                => 'OUT',
+                'qty_diterima'          => $data['qty_digunakan'],
+                'qty_bersih'            => $data['qty_digunakan'], // log boleh isi tapi tidak memengaruhi stock
+                'keterangan'            => $data['keterangan'] ?? null,
+                'reference_tujuan_id'   => $data['reference_tujuan_id'] ?? null,
+                'reference_tujuan_type' => $data['reference_tujuan_type'] ?? null,
+                'createdAt'             => date('Y-m-d H:i:s'),
+                'updatedAt'             => date('Y-m-d H:i:s'),
+            ]);
+
+            return $stockDetail['id'];
+        } catch (\Throwable $e) {
+            log_message('error', 'Out Stock Failed: ' . $e->getMessage());
+            throw $e;
         }
     }
 
