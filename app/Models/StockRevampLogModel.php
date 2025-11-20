@@ -1865,8 +1865,9 @@ class StockRevampLogModel extends Model
             LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
             LEFT JOIN satuans ON satuans.id = stock_revamp.unit_id
             LEFT JOIN material_requests ON material_requests.id = stock_revamp_log.reference_tujuan_id
-            LEFT JOIN divisis ON divisis.id = material_requests.divisi_id
-            LEFT JOIN warehouses ON warehouses.id = material_requests.warehouse_id
+            LEFT JOIN material_request_details ON material_request_details.material_request_id = stock_revamp_log.reference_tujuan_id AND material_request_details.stock_detail_id=stock_revamp_detail.id
+            LEFT JOIN divisis ON divisis.id = material_request_details.divisi_tujuan_id
+            LEFT JOIN warehouses ON warehouses.id = material_request_details.warehouse_tujuan_id
             WHERE stock_revamp_log.deletedAt IS NULL
             AND stock_revamp_log.reference_tujuan_type='MATERIAL REQUEST BAKU'
             AND stock_revamp_log.status='OUT'
@@ -1893,8 +1894,9 @@ class StockRevampLogModel extends Model
             LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
             LEFT JOIN satuans ON satuans.id = stock_revamp.unit_id
             LEFT JOIN material_requests_penolong ON material_requests_penolong.id = stock_revamp_log.reference_tujuan_id
-            LEFT JOIN divisis ON divisis.id = material_requests_penolong.divisi_id
-            LEFT JOIN warehouses ON warehouses.id = material_requests_penolong.warehouse_id
+            LEFT JOIN material_request_penolong_details ON material_requests_penolong.id = stock_revamp_log.reference_tujuan_id AND material_request_penolong_details.stock_detail_id=stock_revamp_detail.id
+            LEFT JOIN divisis ON divisis.id = material_request_penolong_details.divisi_id
+            LEFT JOIN warehouses ON warehouses.id = material_request_penolong_details.warehouse_id
             WHERE stock_revamp_log.deletedAt IS NULL
             AND stock_revamp_log.reference_tujuan_type='MATERIAL REQUEST PENOLONG'
             AND stock_revamp_log.status='OUT'
