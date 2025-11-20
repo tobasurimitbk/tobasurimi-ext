@@ -16,6 +16,7 @@ use App\Models\EmployeesModel;
 use App\Models\FormLemburModel;
 use App\Models\FormPerijinanModel;
 use App\Models\GolonganModel;
+use App\Models\JamKerjaModel;
 use App\Models\MetadataModel;
 use App\Models\UangMakanHarianModel;
 use CodeIgniter\I18n\Time;
@@ -52,6 +53,7 @@ class Attendance extends BaseController
     protected $AttendanceUnitModel;
     protected $AttendancesApi;
     protected $DendaAbsenHarianModel;
+    protected $jamKerjaModel;
 
     public function __construct()
     {
@@ -73,6 +75,7 @@ class Attendance extends BaseController
         $this->AttendanceUnitModel = new AttendancesUnitModel();
         $this->AttendancesApi = new Attendances();
         $this->DendaAbsenHarianModel = new DendaAbsenHarianModel();
+        $this->jamKerjaModel = new JamKerjaModel();
     }
 
     public function indexLog()
@@ -2313,6 +2316,13 @@ class Attendance extends BaseController
             "bagian_id" => $this->request->getVar("bagian_id")
         ];
 
+        // ambil data jam kerja kantor & bulanan
+        // default jam segini
+        $jamKerja = $this->jamKerjaModel->where('jenis', "JAM KERJA KANTOR")
+            ->where('company_id', $this->this_company_id)
+            ->first();
+        $jamKerjaTerlambat = $jamKerja != null ? $jamKerja['jam_terlambat'] . ":00" : "08:15:00";
+
         $employees    = $this->EmployeesModel->getEmployeeListAttendances($condition, $addCondition, 0, 10000000);
         $employeeData = $employees['data'];
         $employeeIds  = array_column($employeeData, 'id');
@@ -2328,6 +2338,7 @@ class Attendance extends BaseController
                 'in'     => $l['checkin'],
                 'out'    => $l['checkout'],
                 'status' => $l['status'],
+                'reason' => $l['reason']
             ];
         }
 
@@ -2415,6 +2426,7 @@ class Attendance extends BaseController
                 $in  = $dayLog['in'] ?? '';
                 $out = $dayLog['out'] ?? '';
                 $status = $dayLog['status'] ?? '';
+                $reason = $dayLog['reason'] ?? '';
 
                 if ($status != "HADIR_H" && !empty($status)) {
                     $val = explode("_", $status)[1];
@@ -2438,6 +2450,16 @@ class Attendance extends BaseController
 
                 // uang makan
                 $uangMakan = (float)($mapUangMakanHarian[$e['id']][$tanggal]['nominal'] ?? 0);
+                if (in_array($e['divisi'], ["BULANAN", "KANTOR"])) {
+                    // khusus departemen kantor & bulanan aja
+                    if (($reason == '' || $reason == '-') && $this->is_format_waktu($in) && $status == "HADIR_H") {
+                        $isTerlambat =  $this->is_terlambat($jamKerjaTerlambat, $in);
+                    } else {
+                        $isTerlambat = false;
+                    }
+                } else {
+                    $isTerlambat =  false;
+                }
 
                 // isi row
                 $col = 1;
@@ -2456,6 +2478,22 @@ class Attendance extends BaseController
                 $sheet->getStyle("A$row:G$row")->applyFromArray([
                     'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
                 ]);
+
+                if ($isTerlambat) {
+                    $sheet->getStyleByColumnAndRow(3, $row)->applyFromArray([
+                        'font' => [
+                            'color' => ['rgb' => 'FF0000'], // merah
+                            'bold'  => true
+                        ]
+                    ]);
+                    $sheet->getStyleByColumnAndRow(4, $row)->applyFromArray([
+                        'font' => [
+                            'color' => ['rgb' => 'FF0000'], // merah
+                            'bold'  => true
+                        ]
+                    ]);
+                }
+
 
                 // increment tanggal
                 $dateLoop = date('Y-m-d', strtotime($dateLoop . ' +1 day'));
@@ -3172,5 +3210,17 @@ class Attendance extends BaseController
                 'token' => csrf_hash()
             ]);
         }
+    }
+
+    private function is_terlambat($jamKerjaTerlambat, $in)
+    {
+        $jamKerja = strtotime($jamKerjaTerlambat);
+        $jamMasuk = strtotime($in);
+        return $jamMasuk > $jamKerja;
+    }
+
+    private function is_format_waktu($str)
+    {
+        return preg_match('/^(2[0-3]|[01][0-9]):[0-5][0-9](:[0-5][0-9])?$/', $str);
     }
 }
