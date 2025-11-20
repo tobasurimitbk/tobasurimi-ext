@@ -2452,7 +2452,7 @@ class Attendance extends BaseController
                 $uangMakan = (float)($mapUangMakanHarian[$e['id']][$tanggal]['nominal'] ?? 0);
                 if (in_array($e['divisi'], ["BULANAN", "KANTOR"])) {
                     // khusus departemen kantor & bulanan aja
-                    if ($reason == '' || $reason == '-' && $this->is_format_waktu($in)) {
+                    if (($reason == '' || $reason == '-') && $this->is_format_waktu($in) && $status == "HADIR_H") {
                         $isTerlambat =  $this->is_terlambat($jamKerjaTerlambat, $in);
                     } else {
                         $isTerlambat = false;
