@@ -1201,7 +1201,7 @@ class PenerimaanBarangImportBP extends BaseController
         $selectQry = "divisis.*";
         $result = $this->divisiModel->select($selectQry)
             ->join('am_purchase_orders', 'am_purchase_orders.division_id = divisis.id', 'left')
-            ->whereIn('divisis.id', session()->get('login')->this_access_divisi_id)
+            // ->whereIn('divisis.id', session()->get('login')->this_access_divisi_id)
             ->where($condition)
             ->groupBy('divisis.id')
             ->findAll();
