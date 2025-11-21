@@ -2901,8 +2901,10 @@ class BC23 extends BaseController
 
         $formatted = [];
         $no = 1;
+        $totalSubTotal = 0;
 
         foreach ($data as $row) {
+            $totalSubTotal += floatval($row['sub_total']); // Kumpulkan total as angka
 
             $formatted[] = [
                 'no' => $no++,
@@ -2987,6 +2989,12 @@ class BC23 extends BaseController
             $rowNum++;
         }
 
+
+        // Grand Total row
+        $sheet->setCellValue('R' . $rowNum, 'GRAND TOTAL');
+        $sheet->setCellValue('S' . $rowNum, $totalSubTotal);
+
+
         // Border untuk semua
         $lastRow = $rowNum;
         $sheet->getStyle("A1:S$lastRow")->applyFromArray([
@@ -3014,6 +3022,10 @@ class BC23 extends BaseController
             ],
         ]);
 
+        // Format angka di kolom Sub Total (kolom R), tanpa simbol Rp
+        $sheet->getStyle("R2:R$lastRow")
+            ->getNumberFormat()
+            ->setFormatCode('#,##0.00');
 
         // Export
         $writer = new Xlsx($spreadsheet);

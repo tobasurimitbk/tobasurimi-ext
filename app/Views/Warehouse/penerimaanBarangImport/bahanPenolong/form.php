@@ -1,6 +1,14 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
+<style>
+    .form-add-spp .form-floating .form-floating-custom .select2 .selection .select2-selection {
+        height: 90px !important;
+    }
 
+    .form-add-spp .form-floating .form-floating-custom .select2 .selection .select2-selection__rendered {
+        height: 60px !important;
+    }
+</style>
 <section class="section">
     <div class="section-header">
         <h1 class="title-name"><?= !empty($dataPenerimaanBarang) ? "Update Penerimaan Barang Import Bahan Penolong" : "Tambah Penerimaan Barang Import Bahan Penolong" ?></h1>
@@ -92,15 +100,18 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> multiple class="form-select multiple_po_id" name="multiple_po_id[]" id="multiple_po_id[]">
-                                <option value=""></option>
-                                <?php if (!empty($dataPenerimaanBarang)) : ?>
-                                    <?php foreach (json_decode(($dataPenerimaanBarang['multiple_po_id'])) as $i => $id) : ?>
-                                        <option selected value="<?= $id ?>"><?= json_decode(($dataPenerimaanBarang['multiple_po_no']))[$i] ?></option>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
-                            </select>
+                        <div class="form-floating mb-3" style="height: 90px;">
+                            <div class="form-floating-custom">
+                                <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> multiple class="form-select multiple_po_id" name="multiple_po_id[]" id="multiple_po_id[]">
+                                    <option value=""></option>
+                                    <?php if (!empty($dataPenerimaanBarang)) : ?>
+                                        <?php foreach (json_decode(($dataPenerimaanBarang['multiple_po_id'])) as $i => $id) : ?>
+                                            <option selected value="<?= $id ?>"><?= json_decode(($dataPenerimaanBarang['multiple_po_no']))[$i] ?></option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </select>
+                            </div>
+
                         </div>
                     </div>
                     <div class="col-md-4">

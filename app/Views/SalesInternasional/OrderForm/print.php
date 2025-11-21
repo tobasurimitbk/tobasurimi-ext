@@ -246,7 +246,7 @@
             </table>
 
 
-            <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 12px;">
+            <table style="width: 100%; border-collapse: collapse; margin-top: <?= count($dataSalesOrderRevision) != 0 ? (count($dataSalesOrderRevision) * 20) . "px" : "4px" ?>; font-size: 12px;">
                 <thead>
                     <tr style="background-color: #f8f9fa; border-bottom: 2px solid #dee2e6;">
                         <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd; width: 4%;">NO</th>
