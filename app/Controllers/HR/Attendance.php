@@ -4,6 +4,7 @@ namespace App\Controllers\HR;
 
 use App\Controllers\API\Attendances;
 use App\Controllers\BaseController;
+use App\Models\AttendanceKeteranganModel;
 use App\Models\AttendancesLogModel;
 use App\Models\AttendancesModel;
 use App\Models\AttendancesUnitModel;
@@ -54,6 +55,7 @@ class Attendance extends BaseController
     protected $AttendancesApi;
     protected $DendaAbsenHarianModel;
     protected $jamKerjaModel;
+    protected $AttendanceKeteranganModel;
 
     public function __construct()
     {
@@ -76,6 +78,7 @@ class Attendance extends BaseController
         $this->AttendancesApi = new Attendances();
         $this->DendaAbsenHarianModel = new DendaAbsenHarianModel();
         $this->jamKerjaModel = new JamKerjaModel();
+        $this->AttendanceKeteranganModel = new AttendanceKeteranganModel();
     }
 
     public function indexLog()
@@ -1065,6 +1068,17 @@ class Attendance extends BaseController
             }
         }
 
+        $attendanceKeterangan = $this->AttendanceKeteranganModel
+            ->where('tanggal', $attendanceDetail['periode'])
+            ->where('employee_id', $attendanceDetail['employee_id'])
+            ->first();
+
+        if ($attendanceKeterangan) {
+            $attendanceDetail['reason'] = $attendanceKeterangan['reason'];
+        }
+
+        $resultData['attendance'] = $attendanceDetail;
+
         // GET JAM KERJA USED
         $jamKerja = $this->EmployeeJamKerjaModel->getJamKerjaUsedByEmployeeId($tanggal, $employeeID);
         $uangMakanHarian = $this->UangMakanHarianModel->where('tanggal', $tanggal)->where('employee_id', $employeeID)->first();
@@ -1149,6 +1163,31 @@ class Attendance extends BaseController
                 $this->DendaAbsenHarianModel->update($dendaAbsenHarian['id'], [
                     'nominal' => $nominalDendaKeterlambatan,
                 ]);
+            }
+
+            $keterangan = $this->AttendanceKeteranganModel
+                ->where('employee_id', $attendance['employee_id'])
+                ->where('tanggal', $attendance['periode'])
+                ->first();
+
+            if ($keterangan == null) {
+                if ($reason != '' && $reason != null && $reason != '-') {
+                    $this->AttendanceKeteranganModel->insert([
+                        'employee_id' => $attendance['employee_id'],
+                        'tanggal' => $attendance['periode'],
+                        'reason' => $reason
+                    ]);
+                }
+            } else {
+                if ($reason != '' && $reason != null && $reason != '-') {
+                    $this->AttendanceKeteranganModel->update($keterangan['id'], [
+                        'employee_id' => $attendance['employee_id'],
+                        'tanggal' => $attendance['periode'],
+                        'reason' => $reason
+                    ]);
+                } else {
+                    $this->AttendanceKeteranganModel->delete($keterangan['id']);
+                }
             }
 
             return $this->response->setJSON([
@@ -2723,6 +2762,20 @@ class Attendance extends BaseController
             ];
         }
 
+        // mapping keterangan 
+        $attendanceKeterangan = !empty($employeeIds) ? $this->AttendanceKeteranganModel->getKeteranganByDateRangeAmt(
+            $employeeIds,
+            $startDate,
+            $endDate
+        ) : [];
+
+        $mapAttendanceKeterangan = [];
+        foreach ($attendanceKeterangan as $d) {
+            $mapAttendanceKeterangan[$d['employee_id']][$d['tanggal']] = [
+                'reason' => $d['reason']
+            ];
+        }
+
         // ambil big days
         $bigDays = $this->BigDaysModel
             ->where('company_id', $this->this_company_id)
@@ -2805,6 +2858,10 @@ class Attendance extends BaseController
                         $formLembur['jam_selesai_lembur']
                     );
                     $totalJamLembur = (float)$waktuSelisihPulangLembur['jam'] . " Jam, " . $waktuSelisihPulangLembur['menit'] . " Menit";
+                }
+
+                if ($reason == '') {
+                    $reason = $mapAttendanceKeterangan[$emp['id']][$tgl]['reason'] ?? '';
                 }
 
                 // cek jika tanggal masuk big day
