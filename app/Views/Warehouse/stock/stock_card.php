@@ -180,7 +180,7 @@
                         <div class="row">
                             <div class="col-md-12 col-table-button-tts" style="margin-top: 5px;">
                                 <div class="table-responsive">
-                                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-pemasukkan" id="dataTableMasuk" width="100%" cellspacing="0">
+                                    <table class="table table-responsive table-bordered nowrap table-hover-tobasurimi dataTable table-pemasukkan" id="dataTableMasuk" width="100%" cellspacing="0">
                                         <thead class="thead-dark">
                                             <tr>
                                                 <th>No</th>
