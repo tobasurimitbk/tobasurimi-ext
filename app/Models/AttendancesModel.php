@@ -380,6 +380,7 @@ class AttendancesModel extends Model
         $hariLiburModel      = new BigDaysModel();
         $AttendancesLogModel = new AttendancesLogModel();
         $EmployeeJamKerjaModel = new EmployeeJamKerjaModel();
+        $AttendanceKeteranganModel = new AttendanceKeteranganModel();
 
         try {
             $employeeIds = array_column($employeeData, 'id');
@@ -520,6 +521,7 @@ class AttendancesModel extends Model
 
             // --- 5. loop employee × tanggal (tanpa query)
             $batchInsert = [];
+            $batchKeterangan = [];
 
             foreach ($employeeData as $e) {
                 foreach ($allDates as $dates) {
@@ -541,7 +543,11 @@ class AttendancesModel extends Model
                         $reason = "";
                         $checkin = $checkout = null;
                     } else {
-                        $status  = "HADIR_H";
+                        if ($log['checkin'] == null && $log['checkout'] == null) {
+                            $status  = "ALPHA_A";
+                        } else {
+                            $status  = "HADIR_H";
+                        }
                         $reason  = "";
                         $checkin = $log['checkin'];
                         $checkout = $log['checkout'];
@@ -561,6 +567,14 @@ class AttendancesModel extends Model
                             'year_month'  => $year . "-" . $month,
                             'isApproved'  => $izin['is_approval'] ?? 1
                         ];
+
+                        if ($reason != '' && $reason != null && $reason != '-') {
+                            $batchKeterangan[] =  [
+                                'employee_id' => $e['id'],
+                                'tanggal' => $dates,
+                                'reason' => $reason
+                            ];
+                        }
                     }
                 }
             }
@@ -568,6 +582,11 @@ class AttendancesModel extends Model
             // --- 6. insert batch biar cepat
             if ($batchInsert) {
                 $AttendanceModel->insertBatch($batchInsert, 500);
+            }
+
+            // insert batch keterangan
+            if ($batchKeterangan) {
+                $AttendanceKeteranganModel->insertKeteranganBatch($batchKeterangan, 500);
             }
 
             return ['status' => true, 'message' => ''];
