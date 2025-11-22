@@ -957,7 +957,7 @@ class JasaVendorOut extends BaseController
                         'stok_total' => floatval($item['stok_total_diterima'])
                     ];
                 }
-            } {
+            } else {
                 // Untuk Dari Jasa Vendor
                 $condition = [
                     'stock_revamp.barang_master_id' => $barangMasterId,
