@@ -53,7 +53,7 @@ class AttendanceKeteranganModel extends Model
                     'reason' => $b['reason']
                 ]);
             } else {
-                $this->insert($dataKeterangan);
+                $this->insert($b);
             }
         }
     }
