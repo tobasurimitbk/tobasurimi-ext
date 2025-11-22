@@ -431,7 +431,7 @@ class MaterialRequestDetailsModel extends Model
                     material_request_details.id AS id_material_request_detail, 
                     material_request_details.stock_id, 
                     material_request_details.stock_detail_id, 
-                    suppliers.name as supplier_name,
+                    COALESCE(suppliers.name, vendors.name) as supplier_name,
                     material_request_details.bc_id, 
                     material_request_details.no_aju, 
                     material_request_details.stock_dokumen, 
@@ -466,9 +466,16 @@ class MaterialRequestDetailsModel extends Model
             ->join('warehouses as warehouse_asal', 'warehouse_asal.id = material_request_details.warehouse_id', 'left')
             ->join('warehouses as warehouse_tujuan', 'warehouse_tujuan.id = material_request_details.warehouse_tujuan_id', 'left')
             ->join('stock_revamp_detail', 'stock_revamp_detail.id = material_request_details.stock_detail_id', 'left')
+
+            // get from lpb and po
             ->join('penerimaan_barang', "penerimaan_barang.id = stock_revamp_detail.reference_id AND stock_revamp_detail.reference_type = 'LPB'", 'left')
             ->join('suppliers', "suppliers.id = penerimaan_barang.supplier_id AND stock_revamp_detail.reference_type = 'LPB'", 'left')
             ->join('rm_purchase_orders', "rm_purchase_orders.id = stock_revamp_detail.po_id AND stock_revamp_detail.reference_type = 'LPB'", 'left')
+
+            // get from lpb and po
+            ->join('jasa_vendor_in', "jasa_vendor_in.id = stock_revamp_detail.reference_id AND stock_revamp_detail.reference_type = 'JASA VENDOR'", 'left')
+            ->join('vendors', "vendors.id = jasa_vendor_in.vendor_id AND stock_revamp_detail.reference_type = 'JASA VENDOR'", 'left')
+
             ->where('barang_type', "bahan_baku")
             ->where('material_request_id', $materialRequestId)
             ->findAll();

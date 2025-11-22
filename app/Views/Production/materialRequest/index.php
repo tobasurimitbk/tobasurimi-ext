@@ -14,6 +14,22 @@
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
+                <div class="col-md-4">
+                    <div class="input-group input-group-password">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateStartRequest" id="dateStartRequest" name="dateStartRequest" placeholder="Tanggal Awal Request">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="input-group input-group-password">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateEndRequest" id="dateEndRequest" name="dateEndRequest" placeholder="Tanggal Akhir Request">
+                        <div class="input-group-prepend group-prepend-password align-items-center">
+                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
+                        </div>
+                    </div>
+                </div>
                 <div class="col-md-4 mb-3">
                     <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik Kode Request / Nama Barang" value="" />
                 </div>

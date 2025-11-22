@@ -9,12 +9,12 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             letter-spacing: 2px;
-            font-size: 12px;
+            font-size: 10px;
         }
 
         h5 {
             font-weight: normal;
-            font-size: 18px;
+            font-size: 12px;
             margin-bottom: 10px;
             text-align: center;
             font-weight: bold;
@@ -23,7 +23,7 @@
 
         h6 {
             font-weight: normal;
-            font-size: 13px;
+            font-size: 11px;
             text-align: left;
             font-weight: bold;
             margin-top: 10px;
@@ -46,76 +46,102 @@
 
         #dashed-border-table th,
         #dashed-border-table td {
-            border: 1px dashed #000;
+            border: 1px solid #000;
             padding: 5px;
             text-align: center;
         }
     </style>
 </head>
 
-
-
 <body>
-
     <h5>
         Data Material Request
     </h5>
 
-
     <table width="100%" border="1" id="dashed-border-table" style="">
         <thead>
             <tr>
-                <th style="text-align: center;">No</th>
-                <th style="text-align: center;">Department</th>
-                <th style="text-align: center;">Warehouse</th>
-                <th style="text-align: center;">Tipe Barang</th>
-                <th style="text-align: center;">Dokumen Pabean</th>
-                <th style="text-align: center;">No Aju / No Daftar</th>
-                <th style="text-align: center;">Tanggal Penerimaan</th>
-                <th style="text-align: center;">Barang - Spesifikasi</th>
-                <th style="text-align: center;">Satuan</th>
-                <th style="text-align: center;">Qty Awal</th>
-                <th style="text-align: center;">Qty Direquest</th>
-
+                <th rowspan="2">No</th>
+                <th rowspan="2">Supplier</th>
+                <th colspan="<?= $banyakHeader ?>">Spesifikasi</th>
+                <th rowspan="2">Total</th>
+            </tr>
+            <tr>
+                <?php foreach ($dataHeader as $h): ?>
+                    <th><?= $h->spesifikasi ?></th>
+                <?php endforeach; ?>
             </tr>
         </thead>
+
         <tbody>
-            <?php $no = 1; ?>
-            <?php foreach ($data as $d) : ?>
+            <?php
+            $no = 1;
+            $counterPivotSupplier = count($pivotSupplier);
+            ?>
+            <?php foreach ($pivotSupplier as $supplier): ?>
                 <tr>
-                    <td><?= $no++; ?></td>
-                    <td><?= $d->divisi_text ?></td>
-                    <td><?= $d->warehouse_text++; ?></td>
-                    <td><?= $d->barang_type_text; ?></td>
-                    <td><?= $d->ref_no;  ?></td>
-                    <td><?= $d->no_aju;  ?></td>
-                    <td><?= date('d/m/Y', strtotime($d->stock_date)); ?></td>
-                    <td><?= $d->nama_barang; ?></td>
-                    <td><?= $d->satuan; ?></td>
-                    <td><?= $d->qty; ?></td>
-                    <td><?= $d->qty2; ?></td>
+                    <td><?= $no++ ?></td>
+                    <td style="text-align:left"><?= $supplier['supplier_name'] ?></td>
 
+                    <?php foreach ($dataHeader as $h): ?>
+                        <td style="text-align:center">
+                            <?= $supplier['specs'][$h->barang2_id] ?? 0 ?>
+                        </td>
+                    <?php endforeach; ?>
+
+                    <td style="text-align:center"><?= $supplier['total'] ?></td>
                 </tr>
-
             <?php endforeach; ?>
-            <tr>
-                <td colspan="9" style="text-align: right;">
-                    Total Qty
-                </td>
-                <td>
-                    <?= $totalQty ?>
-                </td>
-                <td>
-                    <?= $totalQty2 ?>
-                </td>
+            <?php if ($counterPivotSupplier > 0): ?>
+                <tr>
+                    <td></td>
+                    <td style="text-align:right; font-weight:bold;">TOTAL</td>
 
+                    <?php foreach ($dataHeader as $h): ?>
+                        <td style="text-align:center; font-weight:bold;">
+                            <?= $footerTotalSupplier[$h->barang2_id] ?? 0 ?>
+                        </td>
+                    <?php endforeach; ?>
 
+                    <td style="text-align:center; font-weight:bold;"><?= $footerGrandTotalSupplier; ?></td>
+                </tr>
+            <?php endif; ?>
 
-            </tr>
+            <?php
+            $noVendor = 1;
+            $counterPivotJasaVendor = count($pivotJasaVendor);
+            ?>
+            <?php foreach ($pivotJasaVendor as $jasavendor): ?>
+                <tr>
+                    <td><?= $noVendor++ ?></td>
+                    <td style="text-align:left"><?= $jasavendor['keterangan_full'] ?? $jasavendor['vendor_name'] ?></td>
+
+                    <?php foreach ($dataHeader as $h): ?>
+                        <td style="text-align:center">
+                            <?= $jasavendor['specs'][$h->barang2_id] ?? 0 ?>
+                        </td>
+                    <?php endforeach; ?>
+
+                    <td style="text-align:center"><?= $jasavendor['total'] ?></td>
+                </tr>
+            <?php endforeach; ?>
+            <?php if ($counterPivotJasaVendor > 0): ?>
+                <tr>
+                    <td></td>
+                    <td style="text-align:right; font-weight:bold;">TOTAL</td>
+
+                    <?php foreach ($dataHeader as $h): ?>
+                        <td style="text-align:center; font-weight:bold;">
+                            <?= $footerTotalJasaVendor[$h->barang2_id] ?? 0 ?>
+                        </td>
+                    <?php endforeach; ?>
+
+                    <td style="text-align:center; font-weight:bold;"><?= $footerGrandTotalJasaVendor; ?></td>
+                </tr>
+            <?php endif; ?>
+
         </tbody>
     </table>
-
-
 </body>
 
 </html>

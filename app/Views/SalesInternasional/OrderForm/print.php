@@ -197,11 +197,23 @@
                         </table>
                     </td>
                     <td>
-                        <table style="width: 100%; font-size:12px;" border="0">
+                        <?php
+                        $panjangKolom = 0;
+                        $panjangKolomOrder = 0;
+
+                        if (strlen($dataSO->sales_order_export_no) >= 34) {
+                            $panjangKolom = 100;
+                            $panjangKolomOrder = 190;
+                        } else {
+                            $panjangKolom = 80;
+                            $panjangKolomOrder = 0;
+                        }
+                        ?>
+                        <table style="width: <?= $panjangKolom ?>%; font-size:12px; float:right;" border="0">
                             <tr>
                                 <td style="text-align: left; width:3px;">ORDER</td>
                                 <td style="width: 5px; text-align: right;">:</td>
-                                <td style="text-align: left; width:190px;"><?= $dataSO->sales_order_export_no ?></td>
+                                <td style="text-align: left; width:<?= $panjangKolomOrder ?>px;"><?= $dataSO->sales_order_export_no ?></td>
                             </tr>
 
                             <?php if (!empty($dataSO->po_no)): ?>
@@ -234,7 +246,7 @@
             </table>
 
 
-            <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 12px;">
+            <table style="width: 100%; border-collapse: collapse; margin-top: <?= count($dataSalesOrderRevision) != 0 ? (count($dataSalesOrderRevision) * 20) . "px" : "4px" ?>; font-size: 12px;">
                 <thead>
                     <tr style="background-color: #f8f9fa; border-bottom: 2px solid #dee2e6;">
                         <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd; width: 4%;">NO</th>

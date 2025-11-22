@@ -472,7 +472,7 @@
                                 <tbody class="body-table">
                                 </tbody>
                                 <tfoot class="footer-table">
-                                    <td style="text-align: center; font-weight: bold;" colspan="8">Total</td>
+                                    <td style="text-align: center; font-weight: bold;" colspan="9">Total</td>
                                     <td style="text-align: right; font-weight: bold;"><span class="nilai-total-bahan-baku-awal">0</span></td>
                                     <td style="text-align: right; font-weight: bold;"><span class="nilai-total-bahan-baku-request">0</span></td>
                                     <td style="text-align: right; font-weight: bold;"></td>
