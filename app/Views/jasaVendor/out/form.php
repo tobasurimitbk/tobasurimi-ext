@@ -207,13 +207,8 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select type_barang" id="type_barang" name="type_barang">
                                     <option value=""></option>
-                                    <?php foreach ($tipeBarang as $t) : ?>
-                                        <?php if ($t['description'] == "bahan_baku") : ?>
-                                            <option selected value="<?= $t['description'] ?>">
-                                                <?= strtoupper($t['value']); ?>
-                                            </option>
-                                        <?php endif; ?>
-                                    <?php endforeach; ?>
+                                    <option value="BAHAN_BAKU">BAHAN BAKU</option>
+                                    <option value="BAHAN_SETENGAH_JADI">BAHAN SETENGAH JADI</option>
                                 </select>
                                 <label for="floatingInput" style="z-index: 1;">Tipe Barang</label>
                             </div>
@@ -883,7 +878,7 @@
                                         if (response.status == false) {
                                             Swal.fire({
                                                 icon: 'error',
-                                                title: res.message,
+                                                title: response.message,
                                                 confirmButtonColor: '#4e73df',
                                             })
                                         } else {

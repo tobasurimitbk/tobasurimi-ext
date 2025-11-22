@@ -13,9 +13,8 @@ use App\Models\ProsesRebusDetailModel;
 use App\Models\ProsesRebusModel;
 use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
-use App\Models\StockModel;
-use App\Models\StockRevampDetailModel;
 use App\Models\StockRevampModel;
+use App\Models\StockRevampDetailModel;
 use App\Models\SupplierModel;
 use App\Models\WarehousesModel;
 use App\Models\VendorModel;
@@ -26,7 +25,6 @@ class ProsesRebus extends BaseController
     protected $this_company_id;
     protected $vendorModel;
     protected $divisiModel;
-    protected $stockModel;
     protected $stockDetailModel;
     protected $stockDetail2Model;
     protected $metaDataModel;
@@ -44,7 +42,6 @@ class ProsesRebus extends BaseController
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->divisiModel = new DivisisModel();
         $this->metaDataModel = new MetadataModel();
-        $this->stockModel = new StockModel();
         $this->stockDetailModel = new StockDetailModel();
         $this->stockDetail2Model = new StockDetail2Model();
         $this->prosesRebusModel = new ProsesRebusModel();
@@ -627,8 +624,8 @@ class ProsesRebus extends BaseController
 
         foreach ($prosesRebusDetail as $p) {
             // BARANG OUT DARI INVENTORI
-            $stockRebus = $this->stockModel->find($p['stock_rebus_id']);
-            $stockHasilRebus = $this->stockModel->find($p['stock_hasil_rebus_id']);
+            $stockRebus = $this->stockRevampModel->find($p['stock_rebus_id']);
+            $stockHasilRebus = $this->stockRevampModel->find($p['stock_hasil_rebus_id']);
 
             // BARANG LAMA
             $stockRebusDetail = $this->stockDetail2Model->getStockListDetail(
@@ -653,7 +650,7 @@ class ProsesRebus extends BaseController
 
             // Proses stok keluar (hanya untuk qty yang ada di sistem)
             if ($qty_rebus_input > 0) {
-                $stok = $this->stockModel->insertStok(
+                $stok = $this->stockRevampModel->insertStok(
                     $prosesRebus['company_id'],
                     $prosesRebus['warehouse_id'],
                     $prosesRebus['divisi_id'],
@@ -694,7 +691,7 @@ class ProsesRebus extends BaseController
 
             // -----
             // BARANG IN KE INVENTORI (proses seperti biasa)
-            $stok = $this->stockModel->insertStok(
+            $stok = $this->stockRevampModel->insertStok(
                 $prosesRebus['company_id'],
                 $prosesRebus['warehouse_id'],
                 $prosesRebus['divisi_id'],
@@ -751,8 +748,8 @@ class ProsesRebus extends BaseController
 
         foreach ($prosesRebusDetail as $p) {
             // BARANG OUT DARI INVENTORI
-            $stockRebus = $this->stockModel->find($p['stock_rebus_id']);
-            $stockHasilRebus = $this->stockModel->find($p['stock_hasil_rebus_id']);
+            $stockRebus = $this->stockRevampModel->find($p['stock_rebus_id']);
+            $stockHasilRebus = $this->stockRevampModel->find($p['stock_hasil_rebus_id']);
 
             // BARANG LAMA
             $stockRebusDetail = $this->stockDetail2Model->getStockListDetail(
@@ -772,7 +769,7 @@ class ProsesRebus extends BaseController
 
             // BARANG IN YANG DIREBUS (kembalikan stok)
             if ($qty_to_return > 0) {
-                $stok = $this->stockModel->insertStok(
+                $stok = $this->stockRevampModel->insertStok(
                     $prosesRebus['company_id'],
                     $prosesRebus['warehouse_id'],
                     $prosesRebus['divisi_id'],
@@ -813,7 +810,7 @@ class ProsesRebus extends BaseController
 
             // -----
             // BARANG OUT HASIL REBUS (proses seperti biasa)
-            $stok = $this->stockModel->insertStok(
+            $stok = $this->stockRevampModel->insertStok(
                 $prosesRebus['company_id'],
                 $prosesRebus['warehouse_id'],
                 $prosesRebus['divisi_id'],
@@ -916,7 +913,7 @@ class ProsesRebus extends BaseController
 
         $response = array();
         if (!empty($stockID)) {
-            $data = $this->stockModel->getBarangRebusAndStock(
+            $data = $this->stockRevampModel->getBarangRebusAndStock(
                 $this->request->getVar('type_barang'),
                 $this->request->getVar('divisi_id'),
                 $this->request->getVar('warehouse_id')

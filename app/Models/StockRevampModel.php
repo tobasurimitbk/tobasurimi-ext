@@ -739,6 +739,36 @@ class StockRevampModel extends Model
     }
 
 
+    public function getBarangAndStock($type_barang, $divisi_id, $warehouse_id)
+    {
+        // var_dump($type_barang, $divisi_id, $warehouse_id);
+        // die;
+        $selectQry = "
+        stock_revamp.id AS stock_id,
+        stock_revamp.spesifikasi_id AS spesifikasi_id,
+        CONCAT(UPPER(barang_master.barang_name), '-', UPPER(barang_master_spesifikasi.spesifikasi)) AS barang,
+        barang_master.kode_barang,
+        barang_master.id,
+        satuans.kode_satuan
+    ";
+
+        $dataResult1 = $this->asArray()->select($selectQry)
+            ->join('barang_master', 'barang_master.id = stock_revamp.barang_master_id')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock_revamp.spesifikasi_id')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+            ->where('stock_revamp.deletedAt', null)
+            ->where('barang_master_spesifikasi.deletedAt', null)
+            ->where('barang_master.deletedAt', null)
+            ->where('barang_master.type_barang', $type_barang)
+            ->where('stock_revamp.divisi_id', $divisi_id)
+            ->where('stock_revamp.warehouse_id', $warehouse_id)
+            // ->like('barang_master.barang_name', '%' . "UDANG" . '%')
+            ->orderBy('barang_master.kode_barang', "ASC")
+            ->findAll();
+        return $dataResult1;
+    }
+
+
     public function getListMasterBarang($company_id, $type_barang)
     {
         $kemasanModel = new KemasanModel();
