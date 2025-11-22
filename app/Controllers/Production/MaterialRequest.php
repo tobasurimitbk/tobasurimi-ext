@@ -1293,52 +1293,222 @@ class MaterialRequest extends BaseController
         $id = decrypt($id);
         $dompdf = new Dompdf();
 
-        $dataMaterialRequestDetails = $this->materialRequestDetailsModel->asObject()->select('material_request_details.*, barang_master.kode_barang, satuans.kode_satuan, warehouses.warehouse_name as warehouse_text, divisis.divisi as divisi_text')
+        /*
+            |--------------------------------------------------------------------------
+            | Ambil Header (Spesifikasi)
+            |--------------------------------------------------------------------------
+        */
+        $dataHeader = $this->materialRequestDetailsModel
+            ->asObject()
+            ->select('
+            material_request_details.barang1_id, 
+            material_request_details.barang2_id, 
+            barang_master.kode_barang, 
+            barang_master_spesifikasi.spesifikasi
+        ')
             ->join('barang_master', 'barang_master.id = material_request_details.barang1_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = material_request_details.barang2_id', 'left')
-            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
-            ->join('warehouses', 'warehouses.id = material_request_details.warehouse_id', 'left')
-            ->join('divisis', 'divisis.id = material_request_details.divisi_id', 'left')
-            ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id')
             ->where('material_request_id', $id)
-            ->where('parent_barang.parent_name !=', "KIMIA")
             ->where('material_request_details.deletedAt', null)
-            // ->groupBy('material_request_details.barang1_id, material_request_details.barang2_id, material_request_details.stock_tujuan_id')
-            ->get()->getResult();
-        foreach ($dataMaterialRequestDetails as $key => &$value) {
-            if ($value->barang_type == "bahan_baku") {
-                $value->barang_type_text = "Bahan Baku";
-            } elseif ($value->barang_type == "bahan_penolong") {
-                $value->barang_type_text = "Bahan Penolong";
-            } elseif ($value->barang_type == "bahan_jadi") {
-                $value->barang_type_text = "Bahan Jadi";
-            } elseif ($value->barang_type == "bahan_scrap") {
-                $value->barang_type_text = "Bahan Scrap";
-            } elseif ($value->barang_type == "bahan_modal") {
-                $value->barang_type_text = "Bahan Modal";
-            } elseif ($value->barang_type == "bahan_setengah_jadi") {
-                $value->barang_type_text = "Bahan Setengah Jadi";
+            ->groupBy('material_request_details.barang2_id')
+            ->orderBy('barang_master_spesifikasi.spesifikasi', 'ASC')
+            ->get()
+            ->getResult();
+
+
+        /*
+            |--------------------------------------------------------------------------
+            | Ambil Data Supplier + qty per barang + spesifikasi
+            |--------------------------------------------------------------------------
+        */
+        $dataSupplierDetail = $this->materialRequestDetailsModel
+            ->asObject()
+            ->select('
+            material_request_details.id, 
+            material_request_details.stock_detail_id, 
+            material_request_details.barang1_id, 
+            material_request_details.barang2_id,
+            material_request_details.qty2,
+            suppliers.id as supplier_id,
+            suppliers.name as supplier_name
+        ')
+            ->join('barang_master', 'barang_master.id = material_request_details.barang1_id')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = material_request_details.barang2_id')
+            ->join('stock_revamp_detail', 'stock_revamp_detail.id = material_request_details.stock_detail_id AND stock_revamp_detail.po_id IS NOT NULL')
+            ->join('rm_purchase_orders', 'rm_purchase_orders.id = stock_revamp_detail.po_id')
+            ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id')
+            ->where('material_request_details.material_request_id', $id)
+            ->whereIn('stock_revamp_detail.reference_type', ['LPB', 'PROSES REBUS'])
+            ->where('material_request_details.deletedAt', null)
+            ->get()
+            ->getResult();
+
+
+        /*
+            |--------------------------------------------------------------------------
+            | PIVOT – Group supplier by supplier_id, lalu qty2 per spesifikasi
+            |--------------------------------------------------------------------------
+        */
+        $pivotSupplier = [];
+
+        foreach ($dataSupplierDetail as $row) {
+
+            $supplierId = $row->supplier_id;
+            $specId     = $row->barang2_id;
+
+            if (!isset($pivotSupplier[$supplierId])) {
+                $pivotSupplier[$supplierId] = [
+                    'supplier_name' => $row->supplier_name,
+                    'specs' => [],
+                    'total' => 0
+                ];
+            }
+
+            // Qty per spesifikasi
+            $pivotSupplier[$supplierId]['specs'][$specId] =
+                ($pivotSupplier[$supplierId]['specs'][$specId] ?? 0) + $row->qty2;
+
+            // Total semua qty2
+            $pivotSupplier[$supplierId]['total'] += $row->qty2;
+        }
+
+        // Hitung total per spesifikasi (footer)
+        $footerTotalSupplier = [];
+        $footerGrandTotalSupplier = 0;
+
+        foreach ($pivotSupplier as $supplier) {
+            foreach ($dataHeader as $h) {
+                $specId = $h->barang2_id;
+
+                $qty = $supplier['specs'][$specId] ?? 0;
+
+                if (!isset($footerTotalSupplier[$specId])) {
+                    $footerTotalSupplier[$specId] = 0;
+                }
+
+                $footerTotalSupplier[$specId] += $qty;
+                $footerGrandTotalSupplier += $qty;
             }
         }
-        $totalQty = 0;
-        $totalQty2 = 0;
 
-        foreach ($dataMaterialRequestDetails as $d) {
-            $totalQty += $d->qty;
-            $totalQty2 += $d->qty2;
+
+        /*
+            |--------------------------------------------------------------------------
+            | Ambil Data Jasa Vendor + qty per barang + spesifikasi
+            |--------------------------------------------------------------------------
+        */
+        $dataJasaVendorDetail = $this->materialRequestDetailsModel
+            ->asObject()
+            ->select('
+                material_request_details.id, 
+                material_request_details.stock_detail_id, 
+                material_request_details.barang1_id, 
+                material_request_details.barang2_id,
+                material_request_details.qty2,
+                vendors.id as vendor_id,
+                vendors.name as vendor_name,
+                material_request_details.keterangan,
+                material_request_details.stock_date,
+                CONCAT(TRIM(material_request_details.keterangan), " ", DAY(material_request_details.stock_date), " ", TRIM(vendors.name)) as keterangan_full
+            ')
+            ->join('barang_master', 'barang_master.id = material_request_details.barang1_id')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = material_request_details.barang2_id')
+            ->join('stock_revamp_detail', 'stock_revamp_detail.id = material_request_details.stock_detail_id')
+
+            // JOIN untuk reference_type = JASA VENDOR
+            ->join('jasa_vendor_in jvi1', "jvi1.id = stock_revamp_detail.reference_id AND stock_revamp_detail.reference_type = 'JASA VENDOR'", 'left')
+
+            // JOIN untuk reference_type = PROSES REBUS
+            ->join('proses_rebus_detail', "proses_rebus_detail.stock_detail_hasil_rebus_id = stock_revamp_detail.id AND stock_revamp_detail.reference_type = 'PROSES REBUS' AND proses_rebus_detail.jasa_vendor_id IS NOT NULL", 'left')
+            ->join('jasa_vendor_in jvi2', "jvi2.id = proses_rebus_detail.jasa_vendor_id", 'left')
+
+            // vendor bisa berasal dari jvi1 atau jvi2
+            ->join('vendors', 'vendors.id = COALESCE(jvi1.vendor_id, jvi2.vendor_id)', 'left')
+            ->where('material_request_details.material_request_id', $id)
+            ->whereIn('stock_revamp_detail.reference_type', ['JASA VENDOR', 'PROSES REBUS'])
+            ->where('material_request_details.deletedAt', null)
+            ->orderBy('keterangan_full', 'ASC')
+            ->get()
+            ->getResult();
+
+        /*
+            |--------------------------------------------------------------------------
+            | PIVOT – Group supplier by supplier_id, lalu qty2 per spesifikasi
+            |--------------------------------------------------------------------------
+        */
+        $pivotJasaVendor = [];
+
+        foreach ($dataJasaVendorDetail as $row) {
+
+            $groupKey   = $row->keterangan_full ?? $row->vendor_id;
+            $specId     = $row->barang2_id;
+
+            if (!isset($pivotJasaVendor[$groupKey])) {
+                $pivotJasaVendor[$groupKey] = [
+                    'vendor_name' => $row->vendor_name,
+                    'keterangan_full' => $row->keterangan_full,
+                    'specs' => [],
+                    'total' => 0
+                ];
+            }
+
+            // Qty per spesifikasi
+            $pivotJasaVendor[$groupKey]['specs'][$specId] =
+                ($pivotJasaVendor[$groupKey]['specs'][$specId] ?? 0) + $row->qty2;
+
+            // Total semua qty2
+            $pivotJasaVendor[$groupKey]['total'] += $row->qty2;
+        }
+
+        // var_dump($pivotJasaVendor, $dataJasaVendorDetail);
+        // exit;
+
+        // Hitung total per spesifikasi (footer)
+        $footerTotalJasaVendor = [];
+        $footerGrandTotalJasaVendor = 0;
+
+        foreach ($pivotJasaVendor as $jasavendor) {
+            foreach ($dataHeader as $h) {
+                $specId = $h->barang2_id;
+
+                $qty = $jasavendor['specs'][$specId] ?? 0;
+
+                if (!isset($footerTotalJasaVendor[$specId])) {
+                    $footerTotalJasaVendor[$specId] = 0;
+                }
+
+                $footerTotalJasaVendor[$specId] += $qty;
+                $footerGrandTotalJasaVendor += $qty;
+            }
         }
 
 
-        $data  = [
-            'data' => $dataMaterialRequestDetails,
-            'totalQty' => number_format($totalQty, 2),
-            'totalQty2' => number_format($totalQty2, 2)
+        /*
+            |--------------------------------------------------------------------------
+            | Kirim data ke View
+            |--------------------------------------------------------------------------
+        */
+        $data = [
+            'dataHeader'   => $dataHeader,
+            'banyakHeader' => count($dataHeader),
+            'pivotSupplier'        => $pivotSupplier,
+            'footerTotalSupplier'  => $footerTotalSupplier,
+            'footerGrandTotalSupplier'  => $footerGrandTotalSupplier,
+            'pivotJasaVendor'        => $pivotJasaVendor,
+            'footerTotalJasaVendor'  => $footerTotalJasaVendor,
+            'footerGrandTotalJasaVendor'  => $footerGrandTotalJasaVendor,
         ];
 
+
+        /*
+            |--------------------------------------------------------------------------
+            | Render PDF
+            |--------------------------------------------------------------------------
+        */
         $dompdf->loadHtml(view('Production/materialRequest/printMaterialRequest', $data));
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
-        $dompdf->stream("Print Material Request", array("Attachment" => false));
+        $dompdf->stream("Print Material Request", ["Attachment" => false]);
 
         exit(0);
     }
