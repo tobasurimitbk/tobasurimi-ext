@@ -2353,6 +2353,7 @@ class StokList extends BaseController
                 : null,
             "divisi_id" => $this->request->getVar("divisi_id"),
             "warehouse_id" => $this->request->getVar("warehouse_id"),
+            'barang_master_id' => $this->request->getVar('barang_master_id'),
         ];
 
         $limit = $this->request->getVar("length");
@@ -2361,10 +2362,10 @@ class StokList extends BaseController
         $condition = [
             'stock_revamp.deletedAt' => null,
             'stock_revamp.company_id' => $this->this_company_id,
-            'stock_revamp.barang_master_id' => $this->request->getVar('barang_master_id')
+            'barang_master.type_barang' => $this->request->getVar('type_barang')
         ];
 
-        if (empty($condition['stock_revamp.barang_master_id']) || empty($addCondition['start_date']) || empty($addCondition['end_date'])) {
+        if (empty($addCondition['start_date']) || empty($addCondition['end_date'])) {
             return response()->setJSON([
                 "draw"              => intval($this->request->getVar("draw")),
                 "recordsTotal"      => 0,
@@ -2383,7 +2384,7 @@ class StokList extends BaseController
 
         $masuk = $this->getTotalKartuStockMasuk(
             $addCondition['start_date'],
-            $addCondition['end_date']
+            $addCondition['end_date'],
         );
 
         $keluar = $this->getTotalKartuStockKeluar(

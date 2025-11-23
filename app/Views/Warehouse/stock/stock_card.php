@@ -343,6 +343,7 @@
                 data.divisi_id = $("#divisi_id option:selected").val();
                 data.warehouse_id = $("#warehouse_id option:selected").val();
                 data.barang_master_id = $('#barang_master_id option:selected').val();
+                data.type_barang = $('#type_barang option:selected').val();
                 data.sort = sort;
                 data.sortType = sortType;
             },
@@ -659,12 +660,12 @@
         },
     });
 
-    $('#search_masuk').keyup((e) => {
+    $('#search_masuk').change((e) => {
         e.preventDefault();
         tableMasuk.ajax.reload()
     });
 
-    $('#search_keluar').keyup((e) => {
+    $('#search_keluar').change((e) => {
         e.preventDefault();
         tableKeluar.ajax.reload()
     });
@@ -676,6 +677,7 @@
     }).change(function(e) {
         e.preventDefault();
         dropdownMasterBarang();
+        table.ajax.reload();
     });
 
     $('#divisi_id').select2({
@@ -711,7 +713,7 @@
         table.ajax.reload();
     });
 
-    $('#search_kartu').keyup(function(e) {
+    $('#search_kartu').change(function(e) {
         e.preventDefault();
         table.ajax.reload();
     });

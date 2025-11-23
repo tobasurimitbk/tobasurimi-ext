@@ -114,6 +114,8 @@ class MutasiDetailModel extends Model
                         'no_daftar' => $d['no_daftar'],
                         'tanggal_dokumen' => $d['tanggal_dokumen']
                     ],
+                    "keterangan_mutasi" => $a['keterangan'],
+                    "spp_no" => $d['spp_no']
                 ]);
             }
         }

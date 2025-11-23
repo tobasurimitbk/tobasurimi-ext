@@ -1937,14 +1937,14 @@ class StockRevampModel extends Model
 
         $totalData = $builder->countAllResults(false);
 
-        if (!empty($addCondition['barang_master_id'])) {
-            $builder->where('DATE(stock_revamp_log.createdAt) >=', $addCondition['dateStart']);
-        }
         if (!empty($addCondition['divisi_id'])) {
             $builder->where('stock_revamp.divisi_id', $addCondition['divisi_id']);
         }
         if (!empty($addCondition['warehouse_id'])) {
             $builder->where('stock_revamp.warehouse_id', $addCondition['warehouse_id']);
+        }
+        if (!empty($addCondition['barang_master_id'])) {
+            $builder->where('stock_revamp.barang_master_id', $addCondition['barang_master_id']);
         }
         if (!empty($addCondition['search'])) {
             $builder->groupStart()

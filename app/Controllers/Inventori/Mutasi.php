@@ -218,7 +218,8 @@ class Mutasi extends BaseController
                     'unit_id_mutasi' => $l->mutasi->unit_id_mutasi,
                     'qty_konversi' => $l->mutasi->qty_konversi,
                     'unit_id_konversi' => $l->mutasi->unit_id_konversi,
-                    'hasil_mutasi' => $l->mutasi->hasil_mutasi
+                    'hasil_mutasi' => $l->mutasi->hasil_mutasi,
+                    'keterangan' => isset($l->keterangan_mutasi) ? $l->keterangan_mutasi : null
                 ]);
             }
 
@@ -295,7 +296,8 @@ class Mutasi extends BaseController
                         'unit_id_mutasi' => $l->mutasi->unit_id_mutasi,
                         'qty_konversi' => $l->mutasi->qty_konversi,
                         'unit_id_konversi' => $l->mutasi->unit_id_konversi,
-                        'hasil_mutasi' => $l->mutasi->hasil_mutasi
+                        'hasil_mutasi' => $l->mutasi->hasil_mutasi,
+                        'keterangan' => isset($l->keterangan_mutasi) ? $l->keterangan_mutasi : null
                     ]);
 
                     array_push($id_detail_all, $check['id']);
@@ -315,7 +317,8 @@ class Mutasi extends BaseController
                         'unit_id_mutasi' => $l->mutasi->unit_id_mutasi,
                         'qty_konversi' => $l->mutasi->qty_konversi,
                         'unit_id_konversi' => $l->mutasi->unit_id_konversi,
-                        'hasil_mutasi' => $l->mutasi->hasil_mutasi
+                        'hasil_mutasi' => $l->mutasi->hasil_mutasi,
+                        'keterangan' => isset($l->keterangan_mutasi) ? $l->keterangan_mutasi : null
                     ]);
 
                     array_push($id_detail_all,  $id_detail_new);

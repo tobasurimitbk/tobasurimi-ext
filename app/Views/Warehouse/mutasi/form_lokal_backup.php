@@ -175,24 +175,20 @@
                             <thead class="thead-dark">
                                 <tr>
                                     <th>No</th>
-                                    <th>Sumber</th>
                                     <th>Kode</th>
                                     <th>Barang</th>
                                     <th>Spesifikasi</th>
-                                    <th>No Spp</th>
-                                    <th>Tgl Masuk</th>
-                                    <th>Ref No</th>
-                                    <th>Qty Keluar</th>
-                                    <th>Satuan Keluar</th>
+                                    <th>Qty Mutasi</th>
+                                    <th>Satuan Mutasi</th>
                                     <th>Keterangan</th>
-                                    <th>Action</th>
+                                    <th style="width: 100px;">Action</th>
                                 </tr>
                             </thead>
                             <tbody class="body-table">
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <td colspan="12">Tidak Ada Data</td>
+                                    <td colspan="8">Tidak Ada Data</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -239,8 +235,6 @@
                                     <label for="floatingInput" style="z-index: 1;">Keterangan</label>
                                 </div>
                             </div>
-
-
                         </div>
 
                         <label class="form-label font-weight-bold lable-title">Pilih Inventori Barang Yang Akan Anda Mutasikan</label>
@@ -355,93 +349,48 @@
                 <input type="hidden" name="id_stock_detail" id="id_stock_detail" class="id_stock_detail">
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-md-4">
-                            <div class="input-group">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly autocomplete="one-time-code" type="text" class="form-control kode_barang" id="kode_barang" name="kode_barang" placeholder="Kode Barang">
-                                    <label for="floatingInput">Kode Barang</label>
-                                </div>
+                        <div class="col-md-6">
+                            <div class="form-floating" style="height: 50px;">
+                                <input placeholder="Qty Mutasi Detail" oninput="this.value = greatFormatRupiah(this.value)" class="form-control qty_mutasi_detail" id="qty_mutasi_detail" name="qty_mutasi_detail" />
+                                <label for="floatingInput" style="z-index: 1;">Qty Mutasi</label>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="input-group">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly autocomplete="one-time-code" type="text" class="form-control barang_name" id="barang_name" name="barang_name" placeholder="Barang">
-                                    <label for="floatingInput">Nama Barang</label>
-                                </div>
+                        <div class="col-md-6">
+                            <div class="form-floating" style="height: 50px;">
+                                <input placeholder="Keterangan Detail" class="form-control keterangan_detail" id="keterangan_detail" name="keterangan_detail" />
+                                <label for="floatingInput" style="z-index: 1;">Keterangan</label>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="input-group">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly autocomplete="one-time-code" type="text" class="form-control spesifikasi" id="spesifikasi" name="spesifikasi" placeholder="Spesifikasi">
-                                    <label for="floatingInput">Spesifikasi</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="input-group">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input oninput="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control qty_mutasi" id="qty_mutasi" name="qty_mutasi" placeholder="Qty mutasi">
-                                    <label for="floatingInput">Qty Mutasi</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select unit_id_mutasi" name="unit_id_mutasi" id="unit_id_mutasi">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Satuan Mutasi</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="input-group">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly oninput="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control qty_asal" id="qty_asal" name="qty_asal" placeholder="Qty Asal">
-                                    <label for="floatingInput">Stok Asal</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="input-group">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly oninput="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control qty_konversi" id="qty_konversi" name="qty_konversi" placeholder="Qty Konversi">
-                                    <label for="floatingInput">Qty Konversi</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select unit_id_konversi" name="unit_id_konversi" id="unit_id_konversi" disabled>
-                                    <option value=""></option>
-                                    <?php foreach ($dataSatuan as $d): ?>
-                                        <option value="<?= $d['id'] ?>"><?= $d['kode_satuan'] ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Satuan Konversi</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="input-group">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly oninput="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control qty_hasil_mutasi" id="qty_hasil_mutasi" name="qty_hasil_mutasi" placeholder="Qty Hasil mutasi">
-                                    <label for="floatingInput">Hasil mutasi</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-8">
-                            <div class="form-floating">
-                                <textarea
-                                    class="form-control keterangan_mutasi"
-                                    placeholder="Keterangan"
-                                    id="keterangan_mutasi"
-                                    name="keterangan_mutasi"
-                                    style="height: 100px;"></textarea>
-                                <label for="keterangan_mutasi" style="z-index: 1;">Keterangan</label>
-                            </div>
-                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 col-table-button-tts" style="margin-top: 10px;">
+                            <div class="table-responsive">
+                                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-inventori-detail" id="dataTableDetail" width="100%" cellspacing="0">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>No</th>
+                                            <th>#</th>
+                                            <th>Dept</th>
+                                            <th>Warehouse</th>
+                                            <th>No Spp</th>
+                                            <th>Sumber</th>
+                                            <th>Supplier / Vendor</th>
+                                            <th>Kode Barang</th>
+                                            <th>Barang</th>
+                                            <th>Spesifikasi</th>
+                                            <th>Tgl Masuk</th>
+                                            <th>Ref No</th>
+                                            <th>Qty</th>
+                                            <th>Satuan</th>
+                                            <th>Keterangan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="body-table">
 
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
 
                 </div>
@@ -457,6 +406,8 @@
 <script>
     var listStockInventori = [];
     var listStockSelected = [];
+    var listFormGroupped = [];
+
     $('.form-fifo').hide();
     <?php if (!empty($mutasiDetail)) : ?>
         listStockSelected = <?= json_encode($mutasiDetail) ?>;
@@ -820,7 +771,6 @@
         var dataIds = checkedCheckboxes.map(function() {
             return parseFloat($(this).val());
         }).get();
-
         if (dataIds.length == 0) {
             Swal.fire({
                 icon: 'error',
@@ -847,13 +797,13 @@
                             unit_id_konversi: v.unit_id,
                             unit_name_konversi: v.kode_satuan,
                         }
-                        listStockInventori[i].keterangan_mutasi = "";
                         listStockSelected.push(listStockInventori[i]);
                     }
                 }
             });
         }
-        drawTableSelectedItem(listStockSelected);
+        grouppedArr(listStockSelected);
+        // drawTableSelectedItem(listStockSelected);
         // Tutup Modal Stok
         $('#detailStockModal').modal('hide');
     }
@@ -921,7 +871,6 @@
                         var isIDSelected = $.grep(listStockSelected, function(item) {
                             return item.id == Number(currentID);
                         }).length > 0;
-
                         if (!isIDSelected && qtyMutasiFifo != 0 && parseFloat(listStockInventori[i].qty_diterima) != 0) {
                             var mutasiQty = Math.min(qtyMutasiFifo, parseFloat(listStockInventori[i].qty_diterima));
                             var hasilMutasi = v.qty_diterima - mutasiQty;
@@ -933,10 +882,9 @@
                                 qty_konversi: parseFloat(mutasiQty).toFixed(2),
                                 unit_id_konversi: v.unit_id,
                                 unit_name_konversi: v.kode_satuan,
-                                hasil_mutasi: parseFloat(hasilMutasi).toFixed(2)
+                                hasil_mutasi: parseFloat(hasilMutasi).toFixed(2),
                             }
                             listStockInventori[i].keterangan_mutasi = keteranganFifo;
-
                             listStockSelected.push(listStockInventori[i]);
                             qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
                         }
@@ -944,7 +892,8 @@
                 });
             }
         }
-        drawTableSelectedItem(listStockSelected);
+        grouppedArr(listStockSelected);
+        // drawTableSelectedItem(listStockSelected);
         // Tutup Modal Stok
         $('#detailStockModal').modal('hide');
     }
@@ -1033,9 +982,6 @@
             qty_hasil_mutasi: {
                 required: true
             },
-            keterangan_mutasi: {
-                required: true
-            },
         },
         messages: {
             qty_mutasi: {
@@ -1049,9 +995,6 @@
             },
             qty_hasil_mutasi: {
                 required: "Qty hasil mutasi wajib diisi"
-            },
-            keterangan_mutasi: {
-                required: "Keterangan mutasi wajib diisi"
             },
         },
         errorElement: 'span',
@@ -1155,7 +1098,6 @@
                 var unit_name_mutasi = $('#unit_id_mutasi option:selected').text().trim();
                 var qty_konversi = parseFloat(destroyFormatRupiah($('#qty_konversi').val()));
                 var hasil_mutasi = parseFloat(destroyFormatRupiah($('#qty_hasil_mutasi').val()));
-                var keterangan_mutasi = $('#keterangan_mutasi').val();
 
                 var index = null;
                 for (let i = 0; i < listStockSelected.length; i++) {
@@ -1163,7 +1105,8 @@
                         index = i;
                     }
                 }
-                listStockSelected[index].keterangan_mutasi = keterangan_mutasi;
+
+                listStockSelected[index].keterangan = "";
                 listStockSelected[index].mutasi.qty_mutasi = qty_mutasi;
                 listStockSelected[index].mutasi.unit_id_mutasi = unit_id_mutasi;
                 listStockSelected[index].mutasi.unit_name_mutasi = unit_name_mutasi;
@@ -1225,46 +1168,8 @@
             });
             return;
         } else {
-            $.ajax({
-                url: "<?= base_url("mutasi/list-satuan-konversi"); ?>",
-                data: {
-                    id: id
-                },
-                method: "GET",
-                success: function(response) {
-                    if (response.status) {
-                        var satuanmutasiArr = response.data;
-                        $('#id_stock_detail').val(item.id);
-                        $('#kode_barang').val(item.kode_barang);
-                        $('#barang_name').val(item.barang_name);
-                        $('#spesifikasi').val(item.spesifikasi);
-                        $('#qty_mutasi').val(greatFormatRupiah(item.mutasi.qty_mutasi));
-                        $('#unit_id_mutasi').val(item.mutasi.unit_id_mutasi).change();
-                        $('#qty_konversi').val(greatFormatRupiah(item.mutasi.qty_konversi));
-                        $('#unit_id_konversi').val(item.mutasi.unit_id_konversi).change();
-                        $('#qty_hasil_mutasi').val(greatFormatRupiah(item.mutasi.hasil_mutasi));
-                        $('#operasi_mutasi_detail').val(item.mutasi.operasi_mutasi_detail).change();
-                        $('#qty_asal').val(greatFormatRupiah(item.qty_diterima));
-                        $('#keterangan_mutasi').val(item.keterangan_mutasi);
 
-                        // append select
-                        dropdownUnitMutasi(satuanmutasiArr);
-                        $('#unit_id_mutasi').val(item.mutasi.unit_id_konversi).change();
-
-                        $('#detailMutasiModal').modal('show');
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: response.message,
-                            confirmButtonColor: '#4e73df',
-                            cancelButtonColor: '#d33',
-                            reverseButtons: true,
-                            confirmButtonText: 'Oke',
-                        });
-                        return;
-                    }
-                },
-            });
+            $('#detailMutasiModal').modal('show');
         }
     }
 
@@ -1279,7 +1184,6 @@
         $('#unit_id_konversi').val(null).change();
         $('#qty_hasil_mutasi').val(null);
         $('#operasi_mutasi_detail').val(null).change();
-        $('#keterangan_mutasi').val(null).change();
         $('#qty_asal').val(null);
     }
 
@@ -1372,7 +1276,7 @@
         var no = 1;
         if (data.length == 0) {
             var newRow = $('<tr>');
-            newRow.append($('<td  colspan="17" >').text("Tidak Ada Data"));
+            newRow.append($('<td  colspan="8" >').text("Tidak Ada Data"));
             table.find('tfoot').append(newRow);
         } else {
             $.each(data, function(i, v) {
@@ -1382,22 +1286,18 @@
                    ${no++} 
                 `
                 ));
-                newRow.append($('<td>').text(v.reference_type));
                 newRow.append($('<td>').text(v.kode_barang));
                 newRow.append($('<td>').text(v.barang_name));
                 newRow.append($('<td>').text(v.spesifikasi));
-                newRow.append($('<td>').text(v.spp_no));
-                newRow.append($('<td>').text(v.lpb_date));
-                newRow.append($('<td>').text(v.reference_no));
-                newRow.append($('<td>').text(greatFormatRupiah(v.mutasi.qty_konversi)));
-                newRow.append($('<td>').text(v.mutasi.unit_name_konversi));
-                newRow.append($('<td>').text(v.keterangan_mutasi));
+                newRow.append($('<td>').text(greatFormatRupiah(v.total_qty_mutasi)));
+                newRow.append($('<td>').text(v.unit));
+                newRow.append($('<td>').text(v.keterangan));
                 newRow.append($('<td >').html(
                     `
-                    <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detail('${v.id}')">
+                    <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detail('${v.spesifikasi_id}')">
                         <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                     </button>
-                    <button type="button" class="btn btn-danger" onclick="remove('${v.id}')">
+                    <button type="button" class="btn btn-danger" onclick="remove('${v.spesifikasi_id}')">
                         <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                     </button>
                 `
@@ -1508,6 +1408,36 @@
             }
         })
     });
+
+    function grouppedArr(data) {
+        const grouped = Object.values(
+            data.reduce((acc, item) => {
+                const key = item.spesifikasi_id;
+
+                if (!acc[key]) {
+                    acc[key] = {
+                        spesifikasi_id: item.spesifikasi_id,
+                        spesifikasi: item.spesifikasi,
+                        barang_name: item.barang_name,
+                        kode_barang: item.kode_barang,
+                        unit: item.unit_name_mutasi || item.kode_satuan,
+                        total_qty_mutasi: 0,
+                        keterangan: item.keterangan,
+                        items: []
+                    };
+                }
+
+
+                acc[key].total_qty_mutasi += Number(item.mutasi.qty_mutasi);
+                acc[key].items.push(item);
+
+                return acc;
+            }, {})
+        );
+
+        listFormGroupped = grouped;
+        drawTableSelectedItem(listFormGroupped);
+    }
 </script>
 
 
