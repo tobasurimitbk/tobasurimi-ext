@@ -2365,7 +2365,7 @@ class StokList extends BaseController
             'barang_master.type_barang' => $this->request->getVar('type_barang')
         ];
 
-        if (empty($addCondition['start_date']) || empty($addCondition['end_date'])) {
+        if (empty($addCondition['start_date']) || empty($addCondition['end_date']) || empty($condition['barang_master.type_barang'])) {
             return response()->setJSON([
                 "draw"              => intval($this->request->getVar("draw")),
                 "recordsTotal"      => 0,
