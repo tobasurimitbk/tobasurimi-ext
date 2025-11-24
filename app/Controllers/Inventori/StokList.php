@@ -2558,12 +2558,24 @@ class StokList extends BaseController
             'search'            => $search
         ];
 
+
+        if (empty($stockId) || $stockId == '') {
+            return $this->response->setJSON([
+                'draw' => intval($draw),
+                'recordsTotal' => 0,
+                'recordsFiltered' => 0,
+                'data' => [],
+                'footerTotals' => 0
+            ]);
+        }
+
+
         $dataTotal =  $this->stockRevampLogModel->getKartuStockMasuk(
             $condition,
             $orderColumnIndex,
             $orderDir,
-            100000000,
-            0
+            $length,
+            $start
         );
 
         $totalMasuk = 0;
@@ -2633,12 +2645,22 @@ class StokList extends BaseController
             'search'            => $search
         ];
 
+        if (empty($stockId) || $stockId == '') {
+            return $this->response->setJSON([
+                'draw' => intval($draw),
+                'recordsTotal' => 0,
+                'recordsFiltered' => 0,
+                'data' => [],
+                'footerTotals' => 0
+            ]);
+        }
+
         $dataTotal =  $this->stockRevampLogModel->getKartuStockKeluar(
             $condition,
             $orderColumnIndex,
             $orderDir,
-            100000000,
-            0
+            $length,
+            $start
         );
 
         $totalKeluar = 0;
