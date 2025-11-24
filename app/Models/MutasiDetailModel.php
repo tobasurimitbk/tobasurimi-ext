@@ -80,6 +80,7 @@ class MutasiDetailModel extends Model
                 // Stock
                 array_push($dataResult, [
                     'no' => $no++,
+                    'id_detail' => $a['id'],
                     'id' => $d['id'],
                     'divisi' => $d['divisi'],
                     'warehouse_name' => $d['warehouse_name'],

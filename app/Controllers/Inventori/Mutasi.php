@@ -219,7 +219,7 @@ class Mutasi extends BaseController
                     'qty_konversi' => $l->mutasi->qty_konversi,
                     'unit_id_konversi' => $l->mutasi->unit_id_konversi,
                     'hasil_mutasi' => $l->mutasi->hasil_mutasi,
-                    'keterangan' => isset($l->keterangan_mutasi) ? $l->keterangan_mutasi : null
+                    'keterangan' => isset($l->keterangan_mutasi) ? trim($l->keterangan_mutasi) : null
                 ]);
             }
 
@@ -282,11 +282,24 @@ class Mutasi extends BaseController
 
             foreach (json_decode($_POST['listMutasi']) as $l) {
                 // CHECK
-                $check = $this->mutasiDetailModel
-                    ->where('mutasi_id', $id)
-                    ->where('stock_detail_id', $l->id)
-                    ->where('deletedAt', null)
-                    ->first();
+
+                if ($first['tipe_mutasi'] == "LOKAL") {
+                    // LOKAL
+                    $check = $this->mutasiDetailModel
+                        ->where('mutasi_id', $id)
+                        ->where('stock_detail_id', $l->id)
+                        ->where('deletedAt', null)
+                        ->where('keterangan', trim($l->keterangan_mutasi))
+                        ->first();
+                } else {
+                    // PPBKB
+                    $check = $this->mutasiDetailModel
+                        ->where('mutasi_id', $id)
+                        ->where('stock_detail_id', $l->id)
+                        ->where('deletedAt', null)
+                        ->first();
+                }
+
 
                 if ($check != null) {
                     $this->mutasiDetailModel->update($check['id'], [
@@ -297,17 +310,25 @@ class Mutasi extends BaseController
                         'qty_konversi' => $l->mutasi->qty_konversi,
                         'unit_id_konversi' => $l->mutasi->unit_id_konversi,
                         'hasil_mutasi' => $l->mutasi->hasil_mutasi,
-                        'keterangan' => isset($l->keterangan_mutasi) ? $l->keterangan_mutasi : null
+                        'keterangan' => isset($l->keterangan_mutasi) ? trim($l->keterangan_mutasi) : null
                     ]);
 
                     array_push($id_detail_all, $check['id']);
                 } else {
                     // NEW
                     // DELETE
-                    $this->mutasiDetailModel
-                        ->where('mutasi_id', $id)
-                        ->where('stock_detail_id', $l->id)
-                        ->delete();
+                    if ($first['tipe_mutasi'] == "LOKAL") {
+                        $this->mutasiDetailModel
+                            ->where('mutasi_id', $id)
+                            ->where('stock_detail_id', $l->id)
+                            ->where('keterangan', trim($l->keterangan_mutasi))
+                            ->delete();
+                    } else {
+                        $this->mutasiDetailModel
+                            ->where('mutasi_id', $id)
+                            ->where('stock_detail_id', $l->id)
+                            ->delete();
+                    }
 
                     // INSERT
                     $id_detail_new = $this->mutasiDetailModel->insert([
@@ -318,7 +339,7 @@ class Mutasi extends BaseController
                         'qty_konversi' => $l->mutasi->qty_konversi,
                         'unit_id_konversi' => $l->mutasi->unit_id_konversi,
                         'hasil_mutasi' => $l->mutasi->hasil_mutasi,
-                        'keterangan' => isset($l->keterangan_mutasi) ? $l->keterangan_mutasi : null
+                        'keterangan' => isset($l->keterangan_mutasi) ? trim($l->keterangan_mutasi) : null
                     ]);
 
                     array_push($id_detail_all,  $id_detail_new);
@@ -368,7 +389,7 @@ class Mutasi extends BaseController
                 $data = [
                     'stock_detail_id' => $m['stock_detail_id'],
                     'qty_digunakan' => $m['qty_konversi'],
-                    'keterangan' => $mutasi['no_mutasi'],
+                    'keterangan' => $m['keterangan'],
                     'reference_tujuan_id' => $mutasi['id'],
                     'reference_tujuan_type' => "MUTASI"
                 ];
@@ -436,7 +457,20 @@ class Mutasi extends BaseController
         $db = \Config\Database::connect();
         $db->transBegin();
         try {
-            $mutasiDetail = $this->mutasiDetailModel->where('mutasi_id', $mutasiId)->where('deletedAt', null)->findAll();
+            $subQuery = $db->table('mutasi_detail')
+                ->select('stock_detail_id, MAX(id) AS min_id')
+                ->where('mutasi_id', $mutasiId)
+                ->where('deletedAt', null)
+                ->groupBy('stock_detail_id');
+
+            $mutasiDetail = $db->table('mutasi_detail')
+                ->select('mutasi_detail.stock_detail_id, mutasi_detail.hasil_mutasi')
+                ->join("({$subQuery->getCompiledSelect()}) md2", 'mutasi_detail.id = md2.min_id')
+                ->orderBy('mutasi_detail.id', 'ASC')
+                ->get()
+                ->getResultArray();
+
+
             $isFailed = false;
             foreach ($mutasiDetail as $m) {
                 $stockDetail = $this->stockRevampDetailModel
@@ -454,6 +488,13 @@ class Mutasi extends BaseController
                 $db->transRollback();
                 return false;
             }
+
+            $mutasiDetail = $this->mutasiDetailModel
+                ->select('mutasi_detail.stock_detail_id,SUM(qty_konversi) AS qty_konversi')
+                ->where('mutasi_id', $mutasiId)
+                ->where('deletedAt', null)
+                ->groupBy('mutasi_detail.stock_detail_id')
+                ->findAll();
 
             // Aman Stock Belum Digunakan
             foreach ($mutasiDetail as $m) {
