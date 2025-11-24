@@ -352,7 +352,7 @@
                 <h5 class="modal-title title-secondary">Input Qty Mutasi</h5>
             </div>
             <form class="update-form-mutasi" role="form" method="POST">
-                <input type="hidden" name="id_stock_detail" id="id_stock_detail" class="id_stock_detail">
+                <input type="hidden" name="id_detail" id="id_detail" class="id_detail">
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-4">
@@ -393,6 +393,14 @@
                                     <option value=""></option>
                                 </select>
                                 <label for="floatingInput" style="z-index: 1;">Satuan Mutasi</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input readonly oninput="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control qty_konversi_total" id="qty_konversi_total" name="qty_konversi_total" placeholder="Qty Diambil Total">
+                                    <label for="floatingInput">Qty Diambil Total</label>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -494,11 +502,42 @@
                 data.search = $("#search").val();
             },
             dataSrc: function(json) {
-                // simpan data hasil request ke variabel global
+
+                const selected = window.listStockSelected || [];
+
+                json.data = json.data.map(row => {
+                    // cari apakah row ini sudah dipilih di FIFO
+                    const used = selected.filter(s => s.id === row.id);
+
+                    if (used.length > 0) {
+                        // hitung berapa qty yang sudah terpakai
+                        let totalUsed = 0;
+                        used.forEach(u => {
+                            totalUsed += parseFloat(u.mutasi.qty_mutasi);
+                        });
+
+                        // kurangi stok saat ini
+                        row.qty_diterima = parseFloat(row.qty_diterima) - totalUsed;
+
+                        // kalau habis jadikan 0
+                        if (row.qty_diterima < 0) row.qty_diterima = 0;
+                    }
+
+                    return row;
+                });
+
+                // simpan untuk FIFO pemanggilan berikutnya
                 window.listStockInventori = json.data;
-                // kembalikan array data agar DataTables bisa menampilkannya
+
                 return json.data;
             }
+
+            // dataSrc: function(json) {
+            //     // simpan data hasil request ke variabel global
+            //     window.listStockInventori = json.data;
+            //     // kembalikan array data agar DataTables bisa menampilkannya
+            //     return json.data;
+            // }
         },
         "initComplete": function(settings, json) {
             $('.dataTables_length').empty();
@@ -835,7 +874,7 @@
                 var currentID = Number(v.id);
                 if ($.inArray(currentID, dataIds) !== -1) {
                     var isIDSelected = $.grep(listStockSelected, function(item) {
-                        return item.id == Number(currentID);
+                        return item.id == Number(currentID) && v.keterangan_mutasi == "";
                     }).length > 0;
 
                     if (!isIDSelected) {
@@ -847,6 +886,7 @@
                             unit_id_konversi: v.unit_id,
                             unit_name_konversi: v.kode_satuan,
                         }
+                        listStockInventori[i].id_detail = getID();
                         listStockInventori[i].keterangan_mutasi = "";
                         listStockSelected.push(listStockInventori[i]);
                     }
@@ -867,87 +907,171 @@
         if (listStockInventori.length === 0) {
             Swal.fire({
                 icon: 'error',
-                title: 'Stok Inventori Kosong',
-                confirmButtonColor: '#4e73df',
-                confirmButtonText: 'Oke',
+                title: 'Stok Inventori Kosong'
             });
             return;
-        } else if (isNaN(qtyMutasiFifo)) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Terjadi Kesalahan : Qty Mutasi Keluar Wajib Diisi',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                reverseButtons: true,
-                confirmButtonText: 'Oke',
-            });
-            return;
-        } else if (spesifikasiId == '') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Kode & Nama Barang Wajib Diisi',
-                confirmButtonColor: '#4e73df',
-                confirmButtonText: 'Oke',
-            });
-            return;
-        } else if (keteranganFifo == '') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Keterangan Wajib Diisi',
-                confirmButtonColor: '#4e73df',
-                confirmButtonText: 'Oke',
-            });
-            return;
-        } else {
-            var totalStokTotal = 0;
-            $.each(listStockInventori, function(i, v) {
-                totalStokTotal += parseFloat(v.qty_diterima);
-            });
-
-            if (qtyMutasiFifo > totalStokTotal) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Terjadi Kesalahan : Stok barang tidak cukup !',
-                    confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    reverseButtons: true,
-                    confirmButtonText: 'Oke',
-                });
-                return;
-            } else {
-                $.each(listStockInventori, function(i, v) {
-                    var currentID = Number(v.id);
-                    if ($.inArray(currentID, dataIds) == -1) {
-                        var isIDSelected = $.grep(listStockSelected, function(item) {
-                            return item.id == Number(currentID);
-                        }).length > 0;
-
-                        if (!isIDSelected && qtyMutasiFifo != 0 && parseFloat(listStockInventori[i].qty_diterima) != 0) {
-                            var mutasiQty = Math.min(qtyMutasiFifo, parseFloat(listStockInventori[i].qty_diterima));
-                            var hasilMutasi = v.qty_diterima - mutasiQty;
-
-                            listStockInventori[i].mutasi = {
-                                qty_mutasi: parseFloat(mutasiQty),
-                                unit_id_mutasi: v.unit_id,
-                                unit_name_mutasi: v.kode_satuan,
-                                qty_konversi: parseFloat(mutasiQty).toFixed(2),
-                                unit_id_konversi: v.unit_id,
-                                unit_name_konversi: v.kode_satuan,
-                                hasil_mutasi: parseFloat(hasilMutasi).toFixed(2)
-                            }
-                            listStockInventori[i].keterangan_mutasi = keteranganFifo;
-
-                            listStockSelected.push(listStockInventori[i]);
-                            qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
-                        }
-                    }
-                });
-            }
         }
+        if (isNaN(qtyMutasiFifo)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Qty Mutasi Keluar Wajib Diisi'
+            });
+            return;
+        }
+        if (spesifikasiId == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Kode & Nama Barang Wajib Diisi'
+            });
+            return;
+        }
+        if (keteranganFifo == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Keterangan Wajib Diisi'
+            });
+            return;
+        }
+
+        var totalStok = listStockInventori.reduce((a, b) => a + parseFloat(b.qty_diterima), 0);
+
+        if (qtyMutasiFifo > totalStok) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Stok barang tidak cukup!'
+            });
+            return;
+        }
+
+        // Sort FIFO
+        listStockInventori.sort((a, b) => new Date(a.lpb_date) - new Date(b.lpb_date));
+
+        // FIFO per row
+        $.each(listStockInventori, function(i, v) {
+            if (qtyMutasiFifo <= 0) return false;
+
+            var stokRow = parseFloat(v.qty_diterima);
+            if (stokRow <= 0) return;
+
+            var mutasiQty = Math.min(qtyMutasiFifo, stokRow);
+
+            // SIMPAN MUTASI BARU
+            let mutasiData = JSON.parse(JSON.stringify(v));
+            mutasiData.id_detail = getID();
+
+            mutasiData.mutasi = {
+                qty_mutasi: mutasiQty,
+                unit_id_mutasi: v.unit_id,
+                unit_name_mutasi: v.kode_satuan,
+                qty_konversi: mutasiQty.toFixed(2),
+                unit_id_konversi: v.unit_id,
+                unit_name_konversi: v.kode_satuan,
+                hasil_mutasi: (stokRow - mutasiQty).toFixed(2)
+            };
+            mutasiData.keterangan_mutasi = keteranganFifo;
+
+            listStockSelected.push(mutasiData);
+
+            qtyMutasiFifo -= mutasiQty;
+        });
+
         drawTableSelectedItem(listStockSelected);
-        // Tutup Modal Stok
         $('#detailStockModal').modal('hide');
     }
+
+    // function insertListFifo() {
+    //     var dataIds = getIDListDataSelected();
+    //     var qtyMutasiFifo = parseFloat(destroyFormatRupiah($('#qty_mutasi_fifo').val()));
+    //     var spesifikasiId = $(".spesifikasi_id option:selected").val();
+    //     var keteranganFifo = $(".keterangan_fifo").val();
+
+    //     console.log("STOK INVENTORI", listStockInventori);
+    //     console.log("STOK SELECTED", listStockSelected);
+
+    //     if (listStockInventori.length === 0) {
+    //         Swal.fire({
+    //             icon: 'error',
+    //             title: 'Stok Inventori Kosong',
+    //             confirmButtonColor: '#4e73df',
+    //             confirmButtonText: 'Oke',
+    //         });
+    //         return;
+    //     } else if (isNaN(qtyMutasiFifo)) {
+    //         Swal.fire({
+    //             icon: 'error',
+    //             title: 'Terjadi Kesalahan : Qty Mutasi Keluar Wajib Diisi',
+    //             confirmButtonColor: '#4e73df',
+    //             cancelButtonColor: '#d33',
+    //             reverseButtons: true,
+    //             confirmButtonText: 'Oke',
+    //         });
+    //         return;
+    //     } else if (spesifikasiId == '') {
+    //         Swal.fire({
+    //             icon: 'error',
+    //             title: 'Kode & Nama Barang Wajib Diisi',
+    //             confirmButtonColor: '#4e73df',
+    //             confirmButtonText: 'Oke',
+    //         });
+    //         return;
+    //     } else if (keteranganFifo == '') {
+    //         Swal.fire({
+    //             icon: 'error',
+    //             title: 'Keterangan Wajib Diisi',
+    //             confirmButtonColor: '#4e73df',
+    //             confirmButtonText: 'Oke',
+    //         });
+    //         return;
+    //     } else {
+    //         var totalStokTotal = 0;
+    //         $.each(listStockInventori, function(i, v) {
+    //             totalStokTotal += parseFloat(v.qty_diterima);
+    //         });
+
+    //         if (qtyMutasiFifo > totalStokTotal) {
+    //             Swal.fire({
+    //                 icon: 'error',
+    //                 title: 'Terjadi Kesalahan : Stok barang tidak cukup !',
+    //                 confirmButtonColor: '#4e73df',
+    //                 cancelButtonColor: '#d33',
+    //                 reverseButtons: true,
+    //                 confirmButtonText: 'Oke',
+    //             });
+    //             return;
+    //         } else {
+    //             $.each(listStockInventori, function(i, v) {
+    //                 var currentID = Number(v.id);
+    //                 if ($.inArray(currentID, dataIds) == -1) {
+    //                     var isIDSelected = $.grep(listStockSelected, function(item) {
+    //                         return item.id == Number(currentID) && item.keterangan_mutasi == keteranganFifo;
+    //                     }).length > 0;
+
+    //                     if (!isIDSelected && qtyMutasiFifo != 0 && parseFloat(listStockInventori[i].qty_diterima) != 0) {
+    //                         var mutasiQty = Math.min(qtyMutasiFifo, parseFloat(listStockInventori[i].qty_diterima));
+    //                         var hasilMutasi = v.qty_diterima - mutasiQty;
+
+    //                         listStockInventori[i].mutasi = {
+    //                             qty_mutasi: parseFloat(mutasiQty),
+    //                             unit_id_mutasi: v.unit_id,
+    //                             unit_name_mutasi: v.kode_satuan,
+    //                             qty_konversi: parseFloat(mutasiQty).toFixed(2),
+    //                             unit_id_konversi: v.unit_id,
+    //                             unit_name_konversi: v.kode_satuan,
+    //                             hasil_mutasi: parseFloat(hasilMutasi).toFixed(2)
+    //                         }
+    //                         listStockInventori[i].keterangan_mutasi = keteranganFifo;
+
+    //                         listStockSelected.push(listStockInventori[i]);
+    //                         qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
+    //                     }
+    //                 }
+    //             });
+    //         }
+    //     }
+    //     drawTableSelectedItem(listStockSelected);
+    //     // Tutup Modal Stok
+    //     $('#detailStockModal').modal('hide');
+    // }
 
     // VALIDATOR
     var validator = $(".create-form").validate({
@@ -1149,7 +1273,7 @@
                 });
                 return;
             } else {
-                var id_stock_detail = $('#id_stock_detail').val();
+                var id_detail = $('#id_detail').val();
                 var qty_mutasi = parseFloat(destroyFormatRupiah($('#qty_mutasi').val()));
                 var unit_id_mutasi = $('#unit_id_mutasi option:selected').val();
                 var unit_name_mutasi = $('#unit_id_mutasi option:selected').text().trim();
@@ -1159,7 +1283,7 @@
 
                 var index = null;
                 for (let i = 0; i < listStockSelected.length; i++) {
-                    if (listStockSelected[i].id == id_stock_detail) {
+                    if (listStockSelected[i].id_detail == id_detail) {
                         index = i;
                     }
                 }
@@ -1176,10 +1300,10 @@
     })
 
 
-    function remove(id) {
+    function remove(id_detail) {
         var indexToRemove = -1;
         for (var i = 0; i < listStockSelected.length; i++) {
-            if (listStockSelected[i].id == id) {
+            if (listStockSelected[i].id_detail == id_detail) {
                 indexToRemove = i;
                 break;
             }
@@ -1209,14 +1333,19 @@
         $('#qty_konversi').val(greatFormatRupiah(qty_konversi));
     }
 
-    function detail(id) {
+    function detail(id, id_detail) {
         resetFormDetail();
         var item = null;
+        var qty_konversi_total = 0;
         for (let i = 0; i < listStockSelected.length; i++) {
-            if (listStockSelected[i].id == id) {
+            if (listStockSelected[i].id_detail == id_detail) {
                 item = listStockSelected[i];
             }
+            if (listStockSelected[i].id == id) {
+                qty_konversi_total = qty_konversi_total + parseFloat(listStockSelected[i].mutasi.qty_konversi);
+            }
         }
+
         if (item == '') {
             Swal.fire({
                 icon: 'error',
@@ -1234,7 +1363,7 @@
                 success: function(response) {
                     if (response.status) {
                         var satuanmutasiArr = response.data;
-                        $('#id_stock_detail').val(item.id);
+                        $('#id_detail').val(item.id_detail);
                         $('#kode_barang').val(item.kode_barang);
                         $('#barang_name').val(item.barang_name);
                         $('#spesifikasi').val(item.spesifikasi);
@@ -1246,6 +1375,7 @@
                         $('#operasi_mutasi_detail').val(item.mutasi.operasi_mutasi_detail).change();
                         $('#qty_asal').val(greatFormatRupiah(item.qty_diterima));
                         $('#keterangan_mutasi').val(item.keterangan_mutasi);
+                        $('#qty_konversi_total').val(greatFormatRupiah(qty_konversi_total));
 
                         // append select
                         dropdownUnitMutasi(satuanmutasiArr);
@@ -1269,7 +1399,7 @@
     }
 
     function resetFormDetail() {
-        $('#id_stock_detail').val(null);
+        $('#id_detail').val(null);
         $('#kode_barang').val(null);
         $('#barang_name').val(null);
         $('#spesifikasi').val(null);
@@ -1394,10 +1524,10 @@
                 newRow.append($('<td>').text(v.keterangan_mutasi));
                 newRow.append($('<td >').html(
                     `
-                    <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detail('${v.id}')">
+                    <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detail('${v.id}','${v.id_detail}')">
                         <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                     </button>
-                    <button type="button" class="btn btn-danger" onclick="remove('${v.id}')">
+                    <button type="button" class="btn btn-danger" onclick="remove('${v.id_detail}')">
                         <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                     </button>
                 `
@@ -1451,7 +1581,7 @@
                                 title: response.message,
                                 confirmButtonColor: '#4e73df',
                             }).then((result) => {
-                                window.location.href = "<?= base_url("mutasi"); ?>";
+                                window.location.href = "<?= base_url("mutasi/lokal"); ?>";
                             });
                         } else {
                             Swal.fire({
@@ -1508,6 +1638,17 @@
             }
         })
     });
+
+    function getID() {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let randomString = '';
+
+        for (let i = 0; i < 10; i++) {
+            randomString += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+
+        return randomString;
+    };
 </script>
 
 
