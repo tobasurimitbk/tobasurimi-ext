@@ -3,13 +3,14 @@
 
 <section class="section">
     <div class="section-header">
-        <h1><?= empty($mutasi) ? "Tambah Mutasi Lokal" : "Update Mutasi Lokal" ?></h1>
+        <h1><?= empty($mutasi) ? "Tambah Mutasi Lokal (Pengeluaran Barang)" : "Update Mutasi Lokal (Pengeluaran Barang)" ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("mutasi/lokal"); ?>">
                 Kembali
             </a>
             <?php if (!empty($mutasi)) : ?>
                 <?php if ($mutasi['status_posting'] == "0") : ?>
+
                     <?php if (can('Inventori', 'Mutasi', 'd')) : ?>
                         <button class="btn btn-hapus delete-parent float-right">
                             Hapus
@@ -20,12 +21,16 @@
                             Posting
                         </button>
                     <?php endif; ?>
+                    <a class="btn btn-warning btn-print float-right" target="_blank" href="<?= base_url('mutasi/print-lokal/' . encrypt($mutasi['id'])) ?>">
+                        Print
+                    </a>
                     <?php if (can('Inventori', 'Mutasi', 'u')) : ?>
                         <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                             Simpan
                         </button>
                     <?php endif; ?>
                 <?php endif; ?>
+
             <?php else : ?>
                 <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                     Simpan

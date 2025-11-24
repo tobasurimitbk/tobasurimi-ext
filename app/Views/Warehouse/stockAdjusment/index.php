@@ -10,7 +10,7 @@
             </a>
             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonExport2">
                 <li><a href="<?= base_url('stock-adjusment/create-tambah') ?>" class="dropdown-item"><b>ADJ TAMBAH</b></a></li>
-                <li><a href="<?= base_url("stock-adjusment/create"); ?>" class="dropdown-item"><b>ADJ UPDATE</b></a></li>
+                <li><a href="<?= base_url("stock-adjusment/create"); ?>" class="dropdown-item"><b>ADJ KURANG</b></a></li>
             </ul>
         <?php endif; ?>
     </div>

@@ -2806,10 +2806,10 @@ class StokList extends BaseController
             'Kode Barang',
             'Nama Barang',
             'Spesifikasi',
-            'Qty Awal',
-            'Qty Masuk',
-            'Qty Keluar',
-            'Qty Akhir',
+            'Saldo Awal',
+            'Masuk',
+            'Keluar',
+            'Saldo Akhir',
             'Satuan'
         ];
 

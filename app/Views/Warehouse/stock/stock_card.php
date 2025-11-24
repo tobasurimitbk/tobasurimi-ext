@@ -112,10 +112,10 @@
                                 <th onclick="changeSort('kode_barang')">Kode Barang</th>
                                 <th onclick="changeSort('barang_master_id')">Barang</th>
                                 <th onclick="changeSort('spesifikasi_id')">Spesifikasi</th>
-                                <th>Qty Awal</th>
-                                <th>Qty Masuk</th>
-                                <th>Qty Keluar</th>
-                                <th>Qty Akhir</th>
+                                <th>Saldo Awal</th>
+                                <th>Masuk</th>
+                                <th>Keluar</th>
+                                <th>Saldo Akhir</th>
                                 <th onclick="changeSort('unit_id')">Satuan</th>
                             </tr>
                         </thead>

@@ -3,7 +3,7 @@
 
 <section class="section">
     <div class="section-header">
-        <h1>Mutasi Lokal</h1>
+        <h1>Mutasi Lokal (Pengeluaran Barang)</h1>
         <?php if (can("Inventori", "Mutasi", "c")) : ?>
             <a href="<?= base_url('mutasi/create-lokal') ?>" type="button" class="btn btn-show-form btn-add float-right">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
@@ -14,7 +14,7 @@
         <div class="card-body">
             <ul class="nav nav-tabs">
                 <li class="nav-item">
-                    <a class="nav-link active" href="#">Mutasi Lokal</a>
+                    <a class="nav-link active" href="#">Mutasi Lokal (Pengeluaran Barang)</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="<?= base_url('mutasi') ?>">Mutasi PPBKB</a>
@@ -190,6 +190,11 @@
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
                         <?php endif; ?>
+                           <?php if (can('Inventori', 'Mutasi', 'p')) : ?>
+                                <a data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" href="<?= base_url("mutasi/print-lokal/"); ?>${id}" style="box-shadow: none !important;">
+                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                </a>
+                            <?php endif; ?>
                         </div>
                     `
                     } else {
@@ -203,12 +208,22 @@
                                         <i class="fa-solid fa-ban"></i>    
                                     </button>
                                 <?php endif; ?>
+                                   <?php if (can('Inventori', 'Mutasi', 'p')) : ?>
+                                <a data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" href="<?= base_url("mutasi/print-lokal/"); ?>${id}" style="box-shadow: none !important;">
+                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                </a>
+                            <?php endif; ?>
                             `;
                         } else {
                             return `
                               <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
                                     <i class="fas fa-edit"></i>
                                 </a>
+                            <?php if (can('Inventori', 'Mutasi', 'p')) : ?>
+                                <a data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" href="<?= base_url("mutasi/print-lokal/"); ?>${id}" style="box-shadow: none !important;">
+                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                </a>
+                            <?php endif; ?>
                             `;
                         }
                     }
