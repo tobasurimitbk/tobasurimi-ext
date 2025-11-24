@@ -1297,7 +1297,7 @@ $routes->get('/biaya-udang/id/(:segment)',  'JasaVendor\BiayaUdang::detail/$1', 
 $routes->get('/biaya-udang/print/(:segment)',  'JasaVendor\BiayaUdang::print/$1', ['filter' => 'Auth']);
 $routes->get('/biaya-udang/all', 'JasaVendor\BiayaUdang::all', ['filter' => 'Auth']);
 $routes->get('/biaya-udang/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
-$routes->get('/biaya-udang/list-divisi', 'JasaVendor\BiayaUdang::dropdownDivisi', ['filter' => 'Auth']);
+$routes->get('/biaya-udang/list-divisi', 'Master\Divisi::dropdownDivisi', ['filter' => 'Auth']);
 $routes->get('/biaya-udang/list-jasa-vendor-in', 'JasaVendor\BiayaUdang::dropdownJasaVendorIn', ['filter' => 'Auth']);
 $routes->post('/biaya-udang/autocomplete', 'JasaVendor\BiayaUdang::autoComplete', ['filter' => 'Auth']);
 // BIAYA KEPITING
