@@ -110,8 +110,10 @@ class BiayaUdangModel extends Model
     }
 
 
-    public function dropdownJasaVendorIn($divisiID)
+    public function dropdownJasaVendorIn($divisiID, $vendorID)
     {
+
+
         $jasaVendorInModel = new JasaVendorInModel();
         $biayaKepitingModel = new BiayaKepitingModel();
         $result = array();
@@ -122,6 +124,7 @@ class BiayaUdangModel extends Model
             ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
             ->where('jasa_vendor_in.status_posting', '1')
             ->where('jasa_vendor_in.divisi_id', $divisiID)
+            ->where('jasa_vendor_in.vendor_id', $vendorID)
             ->findAll();
 
         return $resultBiayaUdang;

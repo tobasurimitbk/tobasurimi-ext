@@ -807,6 +807,7 @@ function updateGrandTotal() {
             },
             data: {
                 divisi_id: $('.divisi_id option:selected').val(),
+                vendor_id: $('.vendor_id option:selected').val(),
             },
             dataType: "json",
             success: function(res) {
