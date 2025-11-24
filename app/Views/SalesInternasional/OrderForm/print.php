@@ -205,7 +205,7 @@
                             $panjangKolom = 100;
                             $panjangKolomOrder = 190;
                         } else {
-                            $panjangKolom = 80;
+                            $panjangKolom = 85;
                             $panjangKolomOrder = 0;
                         }
                         ?>
