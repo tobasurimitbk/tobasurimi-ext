@@ -1123,9 +1123,11 @@
                 row.append($('<td style="text-align: center;">').html(
                     `<div class="form-check">
                         <input data-id="${v.id}" data-stok_total="${v.stok_total}" 
-                            class="form-check-input child" type="checkbox">
+                            class="form-check-input child" type="checkbox"
+                            style="transform: scale(2); margin: 8px;">
                     </div>`
                 ));
+
             }
 
             row.append($('<td style="text-align:center;">').text(v.sumber || '-'));

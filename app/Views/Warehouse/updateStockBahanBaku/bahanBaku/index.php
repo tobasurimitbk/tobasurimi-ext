@@ -162,6 +162,12 @@
                                     </button>
                                 </div>
                             `
+                    } else {
+                        return `
+                                <button data-toggle="tooltip" title="Un Posting" onclick="unposting('${id}')" class="btn btn-danger posting-spp">
+                                    <i class="fa-solid fa-ban"></i>    
+                                </button>
+                            `
                     }
                 }
             }
