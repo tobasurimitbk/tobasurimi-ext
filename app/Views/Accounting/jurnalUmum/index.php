@@ -120,6 +120,24 @@
     let sort = "created_at";
     let sortType = "desc";
 
+    // Set default tanggal: awal bulan - hari ini
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    function formatDate(date) {
+        // Format dd/mm/yyyy
+        let dd = String(date.getDate()).padStart(2, '0');
+        let mm = String(date.getMonth() + 1).padStart(2, '0'); // Januari = 0
+        let yyyy = date.getFullYear();
+        return dd + '/' + mm + '/' + yyyy;
+    }
+
+    $(".start_date").val(formatDate(firstDay));
+    $(".end_date").val(formatDate(today));
+
+    console.log(formatDate(firstDay), formatDate(today));
+
+
     const table = $('.dataTable').DataTable({
 
         processing: true,
