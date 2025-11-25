@@ -8,6 +8,7 @@ use App\Models\BarangMasterModel;
 use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\DivisisModel;
 use App\Models\JasaVendorInModel;
+use App\Models\JasaVendorOutDetailModel;
 use App\Models\KemasanModel;
 use App\Models\MaterialRequestDetailsModel;
 use App\Models\MaterialRequestsModel;
@@ -57,6 +58,7 @@ class MaterialRequest extends BaseController
     protected $vendorModel;
     protected $rmPurchaseOrderModel;
     protected $jasaVendorInModel;
+    protected $jasaVendorOutDetailModel;
 
     protected $jurnalUmumController;
 
@@ -90,6 +92,7 @@ class MaterialRequest extends BaseController
         $this->vendorModel = new VendorModel();
         $this->rmPurchaseOrderModel = new RMPurchaseOrderModel();
         $this->jasaVendorInModel = new JasaVendorInModel();
+        $this->jasaVendorOutDetailModel = new JasaVendorOutDetailModel();
 
         $this->jurnalUmumController = new JurnalUmum();
     }
@@ -1409,6 +1412,7 @@ class MaterialRequest extends BaseController
                 vendors.name as vendor_name,
                 material_request_details.keterangan,
                 material_request_details.stock_date,
+                COALESCE(jvi1.multiple_jasa_vendor_out_id, jvi2.multiple_jasa_vendor_out_id) as jasa_vendor_out_id,
                 CONCAT(TRIM(material_request_details.keterangan), " ", DAY(material_request_details.stock_date), " ", TRIM(vendors.name)) as keterangan_full
             ')
             ->join('barang_master', 'barang_master.id = material_request_details.barang1_id')
@@ -1438,25 +1442,66 @@ class MaterialRequest extends BaseController
         */
         $pivotJasaVendor = [];
 
-        foreach ($dataJasaVendorDetail as $row) {
+        // var_dump($dataJasaVendorDetail);
+        foreach ($dataJasaVendorDetail as &$row) {
 
+            $supplierNames = [];
+            $supplierPoDays = [];
+            $supplierPoNos = [];
+
+            if (!empty($row->jasa_vendor_out_id)) {
+
+                foreach (json_decode($row->jasa_vendor_out_id) as $outId) {
+
+                    $dataJasaVendorOutDetail = $this->jasaVendorOutDetailModel
+                        ->asObject()
+                        ->select('
+                    jasa_vendor_out_detail.id, 
+                    jasa_vendor_out_detail.po_id,
+                    suppliers.name as supplier_name,
+                    rm_purchase_orders.po_no,
+                    DAY(rm_purchase_orders.po_date) as po_day
+                ')
+                        ->join('rm_purchase_orders', 'rm_purchase_orders.id = jasa_vendor_out_detail.po_id')
+                        ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id')
+                        ->where('jasa_vendor_out_detail.jasa_vendor_out_id', $outId)
+                        ->where('jasa_vendor_out_detail.deletedAt', null)
+                        ->first();
+
+                    if ($dataJasaVendorOutDetail) {
+
+                        // Tampung semua
+                        $supplierNames[] = $dataJasaVendorOutDetail->supplier_name;
+                        $supplierPoDays[] = $dataJasaVendorOutDetail->po_day;
+                        $supplierPoNos[] = $dataJasaVendorOutDetail->po_no;
+                    }
+                }
+            }
+
+            // Gabungkan pakai koma
+            $row->supplier_name = implode(', ', $supplierNames);
+            $row->supplier_po_day = implode(', ', $supplierPoDays);
+            $row->supplier_po_no = implode(', ', $supplierPoNos);
+
+            // ---- lanjut pivot ----
             $groupKey   = $row->keterangan_full ?? $row->vendor_id;
             $specId     = $row->barang2_id;
 
             if (!isset($pivotJasaVendor[$groupKey])) {
                 $pivotJasaVendor[$groupKey] = [
-                    'vendor_name' => $row->vendor_name,
+                    'vendor_name'     => $row->vendor_name,
+                    'supplier_name'   => $row->supplier_name,      // sudah gabungan
+                    'supplier_po_day' => $row->supplier_po_day,    // sudah gabungan
+                    'supplier_po_no'  => $row->supplier_po_no,     // sudah gabungan
                     'keterangan_full' => $row->keterangan_full,
-                    'specs' => [],
-                    'total' => 0
+                    'specs'           => [],
+                    'total'           => 0
                 ];
             }
 
-            // Qty per spesifikasi
             $pivotJasaVendor[$groupKey]['specs'][$specId] =
                 ($pivotJasaVendor[$groupKey]['specs'][$specId] ?? 0) + $row->qty2;
 
-            // Total semua qty2
             $pivotJasaVendor[$groupKey]['total'] += $row->qty2;
         }
 
@@ -1485,6 +1530,150 @@ class MaterialRequest extends BaseController
 
         /*
             |--------------------------------------------------------------------------
+            | Ambil Data Barang Jadi/Proses Ulang + qty per barang + spesifikasi
+            |--------------------------------------------------------------------------
+        */
+        $dataProsesUlangDetail = $this->materialRequestDetailsModel
+            ->asObject()
+            ->select('
+            material_request_details.id, 
+            material_request_details.stock_detail_id, 
+            material_request_details.barang1_id, 
+            material_request_details.barang2_id,
+            material_request_details.qty2,
+            material_request_details.qty_isi,
+        ')
+            ->join('barang_master', 'barang_master.id = material_request_details.barang1_id')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = material_request_details.barang2_id')
+            ->join('stock_revamp_detail', 'stock_revamp_detail.id = material_request_details.stock_detail_id')
+            ->where('material_request_details.material_request_id', $id)
+            ->where('material_request_details.barang_type', 'bahan_jadi')
+            ->whereIn('stock_revamp_detail.reference_type', ['HASIL PRODUKSI'])
+            ->where('material_request_details.deletedAt', null)
+            ->get()
+            ->getResult();
+
+        /*
+            |--------------------------------------------------------------------------
+            | PIVOT – Group supplier by supplier_id, lalu qty2 per spesifikasi
+            |--------------------------------------------------------------------------
+        */
+        $pivotProsesUlang = [];
+
+        foreach ($dataProsesUlangDetail as $row) {
+
+            $prosesUlang = 0;
+            $specId     = $row->barang2_id;
+
+            if (!isset($pivotProsesUlang[$prosesUlang])) {
+                $pivotProsesUlang[$prosesUlang] = [
+                    'supplier_name' => "Proses Ulang",
+                    'specs' => [],
+                    'total' => 0
+                ];
+            }
+
+            // Qty per spesifikasi
+            $pivotProsesUlang[$prosesUlang]['specs'][$specId] =
+                ($pivotProsesUlang[$prosesUlang]['specs'][$specId] ?? 0) + $row->qty_isi;
+
+            // Total semua qty2
+            $pivotProsesUlang[$prosesUlang]['total'] += $row->qty_isi;
+        }
+
+        // Hitung total per spesifikasi (footer)
+        $footerTotalProsesUlang = [];
+        $footerGrandTotalProsesUlang = 0;
+
+        foreach ($pivotProsesUlang as $prosesUlang) {
+            foreach ($dataHeader as $h) {
+                $specId = $h->barang2_id;
+
+                $qty = $prosesUlang['specs'][$specId] ?? 0;
+
+                if (!isset($footerTotalProsesUlang[$specId])) {
+                    $footerTotalProsesUlang[$specId] = 0;
+                }
+
+                $footerTotalProsesUlang[$specId] += $qty;
+                $footerGrandTotalProsesUlang += $qty;
+            }
+        }
+
+        /*
+            |--------------------------------------------------------------------------
+            | Ambil Data Barang Setengah Jadi/Ditapak + qty per barang + spesifikasi
+            |--------------------------------------------------------------------------
+        */
+        $dataDitapakDetail = $this->materialRequestDetailsModel
+            ->asObject()
+            ->select('
+                material_request_details.id, 
+                material_request_details.stock_detail_id, 
+                material_request_details.barang1_id, 
+                material_request_details.barang2_id,
+                material_request_details.qty2,
+                material_request_details.qty_isi,
+            ')
+            ->join('barang_master', 'barang_master.id = material_request_details.barang1_id')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = material_request_details.barang2_id')
+            ->join('stock_revamp_detail', 'stock_revamp_detail.id = material_request_details.stock_detail_id')
+            ->where('material_request_details.material_request_id', $id)
+            ->whereIn('material_request_details.kondisi_barang', ['ditapak', 'filling'])
+            ->whereIn('stock_revamp_detail.reference_type', ['HASIL PRODUKSI'])
+            ->where('material_request_details.deletedAt', null)
+            ->get()
+            ->getResult();
+
+        /*
+            |--------------------------------------------------------------------------
+            | PIVOT – Group supplier by supplier_id, lalu qty2 per spesifikasi
+            |--------------------------------------------------------------------------
+        */
+        $pivotDitapak = [];
+
+        foreach ($dataDitapakDetail as $row) {
+
+            $ditapak = 0;
+            $specId     = $row->barang2_id;
+
+            if (!isset($pivotDitapak[$ditapak])) {
+                $pivotDitapak[$ditapak] = [
+                    'supplier_name' => "Filling / Ditapak",
+                    'specs' => [],
+                    'total' => 0
+                ];
+            }
+
+            // Qty per spesifikasi
+            $pivotDitapak[$ditapak]['specs'][$specId] =
+                ($pivotDitapak[$ditapak]['specs'][$specId] ?? 0) + $row->qty2;
+
+            // Total semua qty2
+            $pivotDitapak[$ditapak]['total'] += $row->qty2;
+        }
+
+        // Hitung total per spesifikasi (footer)
+        $footerTotalDitapak = [];
+        $footerGrandTotalDitapak = 0;
+
+        foreach ($pivotDitapak as $ditapak) {
+            foreach ($dataHeader as $h) {
+                $specId = $h->barang2_id;
+
+                $qty = $ditapak['specs'][$specId] ?? 0;
+
+                if (!isset($footerTotalDitapak[$specId])) {
+                    $footerTotalDitapak[$specId] = 0;
+                }
+
+                $footerTotalDitapak[$specId] += $qty;
+                $footerGrandTotalDitapak += $qty;
+            }
+        }
+
+        /*
+            |--------------------------------------------------------------------------
             | Kirim data ke View
             |--------------------------------------------------------------------------
         */
@@ -1497,6 +1686,12 @@ class MaterialRequest extends BaseController
             'pivotJasaVendor'        => $pivotJasaVendor,
             'footerTotalJasaVendor'  => $footerTotalJasaVendor,
             'footerGrandTotalJasaVendor'  => $footerGrandTotalJasaVendor,
+            'pivotProsesUlang'        => $pivotProsesUlang,
+            'footerTotalProsesUlang'  => $footerTotalProsesUlang,
+            'footerGrandTotalProsesUlang'  => $footerGrandTotalProsesUlang,
+            'pivotDitapak'        => $pivotDitapak,
+            'footerTotalDitapak'  => $footerTotalDitapak,
+            'footerGrandTotalDitapak'  => $footerGrandTotalDitapak,
         ];
 
 
