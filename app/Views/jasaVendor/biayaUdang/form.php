@@ -165,13 +165,13 @@
                             </thead>
                             <tbody class="body-table">
                             </tbody>
-                            <tfoot class="foot-detail-table" id="foot-detail-table">
+                            <!-- <tfoot class="foot-detail-table" id="foot-detail-table">
                                 <tr>
                                     <td colspan="12" style="text-align: center;">
                                         Tidak Ada Barang
                                     </td>
                                 </tr>
-                            </tfoot>
+                            </tfoot> -->
                         </table>
                     </div>
                 </div>
@@ -320,224 +320,121 @@
     });
 
     $('.btn-submit-parent').click(function() {
-        if (listBarang.length == 0) {
+        if (!listBarang || Object.keys(listBarang).length === 0) {
             Swal.fire({
                 icon: 'error',
                 title: 'Barang yang akan dibayar tidak boleh kosong !',
                 confirmButtonColor: '#4e73df',
                 confirmButtonText: 'Ok'
             });
-        } else {
-            if ($('.create-form').valid()) {
-                var isValidTbHarga = true;
-                var dataErrorTbHarga = null;
+            return;
+        }
+        if ($('.create-form').valid()) {
+            let isValid = true;
+            let errorMessage = '';
+            let errorData = null;
 
-                var isValidDagingFauzy = true;
-                var dataErrorDagingFauzy = null;
+            Object.values(listBarang).forEach(parentBlock => {
+                const p = parentBlock.parent;
 
-                var isValidDagingCn = true;
-                var dataErrorDagingCn = null;
+                // Tanggal PO
+                const tanggalPO = $(`.tanggal_po[data-parent_id="${p.id}"]`);
 
-                var isValidKgDaging = true;
-                var dataErrorKgDaging = null;
+                // KG Daging
+                const kgDaging = $(`.kg_daging[data-parent_id="${p.id}"]`);
 
-                var isValidTanggalPO = true;
-                var dataErrorTanggalPO = null;
+                // Harga per kilo
+                const hargaPerKilo = $(`.harga_per_kilo[data-parent_id="${p.id}"]`);
 
-                $.each(listBarang, function(i, v) {
-                    var tbHargaElement = $('input[data-barang_master_id="' + v.barang_master_id + '"].tb_harga');
-                    var kgFauzyElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].kg_fauzy');
-                    var kgCnElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].kg_cn');
-                    var kgDagingElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].kg_daging');
-                    var tanggalPOElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].tanggal_po');
+                // Assign ke listBarang (pakai jQuery semuanya)
+                p.tanggal_po = tanggalPO.val();
+                p.kg_daging = parseFloat(kgDaging.val());
+                p.harga_per_kilo = parseFloat(hargaPerKilo.val()) || 0;
 
-                    // asign value tb harga
-                    if (tbHargaElement.val() == undefined || tbHargaElement.val() == '') {
-                        dataErrorTbHarga = listBarang[i];
-                        isValidTbHarga = false;
-                    } else {
-                        // assign
-                        listBarang[i].tb_harga = tbHargaElement.val();
-                    }
+                // Hitung total harga berdasarkan harga_per_kilo dan sum_bersih
+                p.total_harga = p.harga_per_kilo * (p.sum_bersih || 0);
+            });
 
-                    // asign value kg fauzy
-                    if (kgFauzyElement.val() == undefined || kgFauzyElement.val() == '') {
-                        dataErrorDagingFauzy = listBarang[i];
-                        isValidDagingFauzy = false;
-                    } else {
-                        listBarang[i].kg_fauzy = kgFauzyElement.val();
-                    }
-
-                    // asign value cn
-                    if (kgCnElement.val() == undefined || kgCnElement.val() == '') {
-                        dataErrorDagingCn = listBarang[i];
-                        isValidDagingCn = false;
-                    } else {
-                        listBarang[i].kg_cn = kgCnElement.val();
-                    }
-
-                    // asign value daging
-                    if (kgDagingElement.val() == undefined || kgDagingElement.val() == '') {
-                        dataErrorDagingCn = listBarang[i];
-                        isValidKgDaging = false;
-                    } else {
-                        listBarang[i].kg_daging = kgDagingElement.val();
-                    }
-
-                    // asign value tanggal po
-                    if (tanggalPOElement.val() == undefined || tanggalPOElement.val() == "") {
-                        dataErrorTanggalPO = listBarang[i];
-                        isValidTanggalPO = false;
-                    } else {
-                        listBarang[i].tanggal_po = tanggalPOElement.val();
-                    }
-
+            if (!isValid) {
+                Swal.fire({
+                    icon: 'error',
+                    title: errorMessage,
+                    confirmButtonColor: '#4e73df',
+                    confirmButtonText: 'Ok'
                 });
+                return;
+            }
 
-                if (!isValidDagingFauzy) {
+            // Konfirmasi Simpan
+            Swal.fire({
+                icon: 'question',
+                title: 'Simpan Data ?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Kembali',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    submitData();
+                }
+            });
+        }
+    });
+
+    function submitData() {
+        let id = $('#id').val();
+        let data = new FormData(document.querySelector(".create-form"));
+        data.append('listBarang', JSON.stringify(listBarang));
+
+        const url = id ? "<?= base_url("biaya-udang/update"); ?>" : "<?= base_url("biaya-udang/save"); ?>";
+
+        $.ajax({
+            url: url,
+            data: data,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                setLoading();
+            },
+            complete: function() {
+                stopLoading()
+            },
+            method: "POST",
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                if (response.status) {
                     Swal.fire({
-                        icon: 'error',
-                        title: 'Qty Kg daging fauzy untuk barang ' + dataErrorDagingFauzy.barang_name + ', spesifikasi ' + dataErrorDagingFauzy.spesifikasi + ' tidak valid',
+                        icon: 'success',
+                        title: response.message,
                         confirmButtonColor: '#4e73df',
                         confirmButtonText: 'Ok'
-                    });
-                } else if (!isValidDagingCn) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Qty Kg daging CN untuk barang ' + dataErrorDagingCn.barang_name + ', spesifikasi ' + dataErrorDagingCn.spesifikasi + ' tidak valid',
-                        confirmButtonColor: '#4e73df',
-                        confirmButtonText: 'Ok'
-                    });
-                } else if (!isValidKgDaging) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Qty Kg daging untuk barang ' + dataErrorKgDaging.barang_name + ', spesifikasi ' + dataErrorKgDaging.spesifikasi + ' tidak valid',
-                        confirmButtonColor: '#4e73df',
-                        confirmButtonText: 'Ok'
-                    });
-                } else if (!isValidTbHarga) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Tb harga untuk barang ' + dataErrorTbHarga.barang_name + ' tidak valid',
-                        confirmButtonColor: '#4e73df',
-                        confirmButtonText: 'Ok'
-                    });
-                } else if (!isValidTanggalPO) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Tb harga untuk barang ' + dataErrorTbHarga.barang_name + ' tidak valid',
-                        confirmButtonColor: '#4e73df',
-                        confirmButtonText: 'Ok'
-                    });
-                } else if (!isValidTanggalPO) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Tanggal Purchase Order untuk barang ' + dataErrorTanggalPO.barang_name + ', spesifikasi ' + dataErrorTanggalPO.spesifikasi + ' tidak valid',
-                        confirmButtonColor: '#4e73df',
-                        confirmButtonText: 'Ok'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = "<?= base_url("biaya-udang") ?>";
+                        }
                     });
                 } else {
                     Swal.fire({
-                        icon: 'question',
-                        title: 'Simpan Data ?',
+                        icon: 'error',
+                        title: response.message,
                         confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        showCancelButton: true,
-                        reverseButtons: true,
-                        confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Kembali',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            let id = $('#id').val();
-                            let data = new FormData(document.querySelector(".create-form"));
-                            data.append('listBarang', JSON.stringify(listBarang));
-
-                            if (id) {
-                                // UPDATE
-                                $.ajax({
-                                    url: "<?= base_url("biaya-udang/update"); ?>",
-                                    data: data,
-                                    beforeSend: function(xhr) {
-                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                        setLoading();
-                                    },
-                                    complete: function() {
-                                        stopLoading()
-                                    },
-                                    method: "POST",
-                                    dataType: "json",
-                                    processData: false,
-                                    contentType: false,
-                                    success: function(response) {
-                                        if (response.status) {
-                                            Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                                confirmButtonText: 'Ok'
-                                            }).then((result) => {
-                                                if (result.isConfirmed) {
-                                                    window.location.href = "<?= base_url("biaya-udang") ?>";
-                                                }
-                                            });
-                                        } else {
-                                            Swal.fire({
-                                                icon: 'error',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                                confirmButtonText: 'Ok'
-                                            });
-                                        }
-
-                                    },
-                                });
-                            } else {
-                                // INSERT
-                                $.ajax({
-                                    url: "<?= base_url("biaya-udang/save"); ?>",
-                                    data: data,
-                                    beforeSend: function(xhr) {
-                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                        setLoading();
-                                    },
-                                    complete: function() {
-                                        stopLoading()
-                                    },
-                                    method: "POST",
-                                    dataType: "json",
-                                    processData: false,
-                                    contentType: false,
-                                    success: function(response) {
-                                        if (response.status) {
-                                            Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                                confirmButtonText: 'Ok'
-                                            }).then((result) => {
-                                                if (result.isConfirmed) {
-                                                    window.location.href = "<?= base_url("biaya-udang") ?>";
-                                                }
-                                            });
-                                        } else {
-                                            Swal.fire({
-                                                icon: 'error',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                                confirmButtonText: 'Ok'
-                                            });
-                                        }
-
-                                    },
-                                });
-                            }
-                        }
+                        confirmButtonText: 'Ok'
                     });
                 }
-
+            },
+            error: function(xhr, status, error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Terjadi kesalahan saat menyimpan data',
+                    confirmButtonColor: '#4e73df',
+                    confirmButtonText: 'Ok'
+                });
             }
-        }
-    });
+        });
+    }
 
     function listDataBarang() {
         let arr = $('.multiple_jasa_vendor_in_id').val();
@@ -564,209 +461,204 @@
     }
 
 
-        function drawTable() {
-            const tbody = document.querySelector('#dataTable tbody');
-            tbody.innerHTML = '';
+    function drawTable() {
+        const tbody = document.querySelector('#dataTable tbody');
+        tbody.innerHTML = '';
 
-            if (!listBarang || Object.keys(listBarang).length === 0) {
-                tbody.innerHTML = '<tr><td colspan="11" class="no-data">Tidak Ada Barang</td></tr>';
-                return;
-            }
-
-            let grand_total = 0;
-            let no = 1;
-
-            Object.values(listBarang).forEach(parentBlock => {
-    const p = parentBlock.parent;
-    const detail = parentBlock.detail;
-    const rowspan = detail.length > 0 ? detail.length : 1;
-
-    // Hitung total harga
-    const total_harga = (p.sum_bersih || 0) * (p.tb_harga || 0);
-    grand_total += total_harga;
-
-    // =========================
-    // PARENT ROW
-    // =========================
-    const mainRow = document.createElement('tr');
-    mainRow.style.color = 'black';
-    mainRow.style.background = "#fafafa";
-
-    // Kolom No
-    const noCell = document.createElement('td');
-    noCell.rowSpan = rowspan;
-    noCell.textContent = no++;
-    noCell.style = "vertical-align:middle; text-align:center;";
-    mainRow.appendChild(noCell);
-
-    // PO
-    const poCell = document.createElement('td');
-    poCell.rowSpan = rowspan;
-    poCell.innerHTML = `
-        <input type="date" class="tanggal_po" data-parent_id="${p.id}"
-        value="${p.tanggal_masuk}"
-        style="height:38px; width:130px; border-radius:6px; padding:4px; border:1px solid #ccc;">
-    `;
-    poCell.style = "vertical-align:middle; text-align:center;";
-    mainRow.appendChild(poCell);
-
-    // Jenis
-    const jenisCell = document.createElement('td');
-    jenisCell.rowSpan = rowspan;
-    jenisCell.textContent = p.barang_name;
-    jenisCell.style = "vertical-align:middle;";
-    mainRow.appendChild(jenisCell);
-
-    // Mentch
-    const mentchCell = document.createElement('td');
-    mentchCell.rowSpan = rowspan;
-    mentchCell.textContent = p.spesifikasi;
-    mentchCell.style = "vertical-align:middle;";
-    mainRow.appendChild(mentchCell);
-
-    // KG Keluar dari detail[0]
-    const kgKeluarCell = document.createElement('td');
-    kgKeluarCell.textContent = detail[0]?.qty_keluar?.toFixed(2) ?? "0.00";
-    kgKeluarCell.style = "text-align:right;";
-    mainRow.appendChild(kgKeluarCell);
-
-    // Kotor
-    const kgKotorCell = document.createElement('td');
-    kgKotorCell.rowSpan = rowspan;
-    kgKotorCell.textContent = p.sum_kotor?.toFixed(2) ?? "0.00";
-    kgKotorCell.style = "vertical-align:middle; text-align:right;";
-    mainRow.appendChild(kgKotorCell);
-
-    // Canning
-    const kgCanningCell = document.createElement('td');
-    kgCanningCell.rowSpan = rowspan;
-    kgCanningCell.textContent = p.sum_bersih?.toFixed(2) ?? "0.00";
-    kgCanningCell.style = "vertical-align:middle; text-align:right;";
-    mainRow.appendChild(kgCanningCell);
-
-    // KG Daging
-    const kgDagingCell = document.createElement('td');
-    kgDagingCell.rowSpan = rowspan;
-    kgDagingCell.textContent = p.sum_bersih?.toFixed(2) ?? "0.00";
-    kgDagingCell.style = "vertical-align:middle; text-align:right;";
-    mainRow.appendChild(kgDagingCell);
-
-    // Ratio
-    const ratioCell = document.createElement('td');
-    ratioCell.rowSpan = rowspan;
-    ratioCell.textContent = (p.ratio?.toFixed(2) ?? "0.00") + "%";
-    ratioCell.style = "vertical-align:middle; text-align:center;";
-    mainRow.appendChild(ratioCell);
-
-    // Harga per kilo
-    const tbHargaCell = document.createElement('td');
-    tbHargaCell.rowSpan = rowspan;
-    tbHargaCell.innerHTML = `
-        <input class="harga_per_kilo" 
-               data-parent_id="${p.id}" 
-               data-per_kilo="${p.sum_bersih}" 
-               value="${p.harga_per_kilo ?? ''}"
-               style="height:38px; width:120px; border-radius:6px; padding:4px; border:1px solid #ccc;">
-    `;
-    tbHargaCell.style = "vertical-align:middle;";
-    mainRow.appendChild(tbHargaCell);
-
-    // Total harga
-    const totalHargaCell = document.createElement('td');
-    totalHargaCell.rowSpan = rowspan;
-    totalHargaCell.innerHTML = `
-        <input class="tb_harga_parent" data-parent_id="${p.id}"
-               value="${p.tb_harga ?? 0}"
-               style="height:38px; width:150px; text-align:right; border-radius:6px; padding:4px; border:1px solid #ccc;">
-    `;
-    totalHargaCell.style = "vertical-align:middle;";
-    mainRow.appendChild(totalHargaCell);
-
-    tbody.appendChild(mainRow);
-
-    // =========================
-    // DETAIL ROWS
-    // =========================
-    for (let i = 1; i < detail.length; i++) {
-        const d = detail[i];
-
-        const detRow = document.createElement('tr');
-        detRow.style.background = "#fff";
-
-        const kgKeluarDetail = document.createElement('td');
-        kgKeluarDetail.textContent = d.qty_keluar?.toFixed(2) ?? "0.00";
-        kgKeluarDetail.style = "text-align:right;";
-        detRow.appendChild(kgKeluarDetail);
-
-        tbody.appendChild(detRow);
-    }
-});
-
-
-            // Baris grand total
-            const grandTotalRow = document.createElement('tr');
-            grandTotalRow.className = 'grand-total-row';
-            grandTotalRow.style.color = 'black';
-            grandTotalRow.innerHTML = `
-                <td colspan="10"><b>GRAND TOTAL</b></td>
-                <td id="grand_total">${grand_total.toLocaleString()}</td>
-            `;
-            tbody.appendChild(grandTotalRow);
-
-            // Tambahkan event listener untuk input harga
-            document.querySelectorAll('.harga_per_kilo').forEach(input => {
-                input.addEventListener('keyup', function() {
-                    const parentId = this.getAttribute('data-parent_id');
-                    const harga = parseFloat(this.value) || 0;
-                    const sumBersih = parseFloat(this.getAttribute('data-per_kilo')) || 0;
-                    const total = harga * sumBersih;
-
-                    // Update input tb_harga_parent
-                    document.querySelector(`.tb_harga_parent[data-parent_id="${parentId}"]`).value = total.toLocaleString();
-                    
-                    updateGrandTotal();
-                });
-            });
+        if (!listBarang || Object.keys(listBarang).length === 0) {
+            tbody.innerHTML = '<tr><td colspan="11" class="no-data">Tidak Ada Barang</td></tr>';
+            return;
         }
-    
-// ======================================================
-// KEYUP HANDLER — AUTO HITUNG TOTAL
-// ======================================================
-$(document).on("keyup", ".harga_per_kilo", function () {
-    const parentId = $(this).data("parent_id");
 
-    // harga per kilo yang diinput user
-    const harga = parseFloat($(this).val()) || 0;
+        let grand_total = 0;
+        let no = 1;
 
-    // ambil nilai bersih dari attribute data-per_kilo
-    const sumBersih = parseFloat($(this).data("per_kilo")) || 0;
+        Object.values(listBarang).forEach(parentBlock => {
+            const p = parentBlock.parent;
+            const detail = parentBlock.detail;
+            const rowspan = detail.length > 0 ? detail.length : 1;
 
-    // hitung total
-    const total = harga * sumBersih;
+            // Hitung total harga berdasarkan harga_per_kilo dan sum_bersih
+            const total_harga = (p.sum_bersih || 0) * (p.harga_per_kilo || 0);
+            grand_total += total_harga;
 
-    console.log("Harga:", harga, "Sum Bersih:", sumBersih, "Total:", total);
+            // =========================
+            // PARENT ROW
+            // =========================
+            const mainRow = document.createElement('tr');
+            mainRow.style.color = 'black';
+            mainRow.style.background = "#fafafa";
 
-    // update input tb_harga_parent (total harga)
-    $(`.tb_harga_parent[data-parent_id="${parentId}"]`).val(total.toLocaleString());
+            // Kolom No
+            const noCell = document.createElement('td');
+            noCell.rowSpan = rowspan;
+            noCell.textContent = no++;
+            noCell.style = "vertical-align:middle; text-align:center;";
+            mainRow.appendChild(noCell);
 
-    updateGrandTotal();
-});
+            // PO
+            const poCell = document.createElement('td');
+            poCell.rowSpan = rowspan;
+            poCell.innerHTML = `
+                <input type="date" class="tanggal_po" data-parent_id="${p.id}"
+                value="${p.tanggal_masuk}"
+                style="height:38px; width:130px; border-radius:6px; padding:4px; border:1px solid #ccc;">
+            `;
+            poCell.style = "vertical-align:middle; text-align:center;";
+            mainRow.appendChild(poCell);
 
+            // Jenis
+            const jenisCell = document.createElement('td');
+            jenisCell.rowSpan = rowspan;
+            jenisCell.textContent = p.barang_name;
+            jenisCell.style = "vertical-align:middle;";
+            mainRow.appendChild(jenisCell);
 
+            // Mentch
+            const mentchCell = document.createElement('td');
+            mentchCell.rowSpan = rowspan;
+            mentchCell.textContent = p.spesifikasi;
+            mentchCell.style = "vertical-align:middle;";
+            mainRow.appendChild(mentchCell);
 
-// ======================================================
-// UPDATE GRAND TOTAL
-// ======================================================
-function updateGrandTotal() {
-    let sum = 0;
+            // KG Keluar dari detail[0]
+            const kgKeluarCell = document.createElement('td');
+            kgKeluarCell.textContent = detail[0]?.qty_keluar?.toFixed(2) ?? "0.00";
+            kgKeluarCell.style = "text-align:right;";
+            mainRow.appendChild(kgKeluarCell);
 
-    $(".total_harga_parent").each(function () {
-        const v = parseFloat($(this).text().replace(/,/g, "")) || 0;
-        sum += v;
+            // Kotor
+            const kgKotorCell = document.createElement('td');
+            kgKotorCell.rowSpan = rowspan;
+            kgKotorCell.textContent = p.sum_kotor?.toFixed(2) ?? "0.00";
+            kgKotorCell.style = "vertical-align:middle; text-align:right;";
+            mainRow.appendChild(kgKotorCell);
+
+            // Canning
+            const kgCanningCell = document.createElement('td');
+            kgCanningCell.rowSpan = rowspan;
+            kgCanningCell.textContent = p.sum_bersih?.toFixed(2) ?? "0.00";
+            kgCanningCell.style = "vertical-align:middle; text-align:right;";
+            mainRow.appendChild(kgCanningCell);
+
+            // KG Daging
+            const kgDagingCell = document.createElement('td');
+            kgDagingCell.rowSpan = rowspan;
+            kgDagingCell.textContent = p.sum_bersih?.toFixed(2) ?? "0.00";
+            kgDagingCell.style = "vertical-align:middle; text-align:right;";
+            mainRow.appendChild(kgDagingCell);
+
+            // Ratio
+            const ratioCell = document.createElement('td');
+            ratioCell.rowSpan = rowspan;
+            ratioCell.textContent = (p.ratio?.toFixed(2) ?? "0.00") + "%";
+            ratioCell.style = "vertical-align:middle; text-align:center;";
+            mainRow.appendChild(ratioCell);
+
+            // Harga per kilo
+            const tbHargaCell = document.createElement('td');
+            tbHargaCell.rowSpan = rowspan;
+            tbHargaCell.innerHTML = `
+                <input class="harga_per_kilo" 
+                    data-parent_id="${p.id}" 
+                    data-per_kilo="${p.sum_bersih}" 
+                    value="${p.harga_per_kilo ?? ''}"
+                    style="height:38px; width:120px; border-radius:6px; padding:4px; border:1px solid #ccc;">
+            `;
+            tbHargaCell.style = "vertical-align:middle;";
+            mainRow.appendChild(tbHargaCell);
+
+            // Total harga (READONLY)
+            const totalHargaCell = document.createElement('td');
+            totalHargaCell.rowSpan = rowspan;
+            totalHargaCell.innerHTML = `
+                <input class="total_harga_parent" data-parent_id="${p.id}"
+                    value="${total_harga.toLocaleString()}"
+                    readonly
+                    style="height:38px; width:150px; text-align:right; border-radius:6px; padding:4px; border:1px solid #ccc; background-color:#f8f9fa;">
+            `;
+            totalHargaCell.style = "vertical-align:middle;";
+            mainRow.appendChild(totalHargaCell);
+
+            tbody.appendChild(mainRow);
+
+            // =========================
+            // DETAIL ROWS
+            // =========================
+            for (let i = 1; i < detail.length; i++) {
+                const d = detail[i];
+
+                const detRow = document.createElement('tr');
+                detRow.style.background = "#fff";
+
+                const kgKeluarDetail = document.createElement('td');
+                kgKeluarDetail.textContent = d.qty_keluar?.toFixed(2) ?? "0.00";
+                kgKeluarDetail.style = "text-align:right;";
+                detRow.appendChild(kgKeluarDetail);
+
+                tbody.appendChild(detRow);
+            }
+        });
+
+        // Baris grand total
+        const grandTotalRow = document.createElement('tr');
+        grandTotalRow.className = 'grand-total-row';
+        grandTotalRow.style.color = 'black';
+        grandTotalRow.innerHTML = `
+            <td colspan="10"><b>GRAND TOTAL</b></td>
+            <td id="grand_total">${grand_total.toLocaleString()}</td>
+        `;
+        tbody.appendChild(grandTotalRow);
+
+        // Tambahkan event listener untuk input harga
+        document.querySelectorAll('.harga_per_kilo').forEach(input => {
+            input.addEventListener('keyup', function() {
+                const parentId = this.getAttribute('data-parent_id');
+                const harga = parseFloat(this.value) || 0;
+                const sumBersih = parseFloat(this.getAttribute('data-per_kilo')) || 0;
+                const total = harga * sumBersih;
+
+                // Update input total_harga_parent (readonly)
+                document.querySelector(`.total_harga_parent[data-parent_id="${parentId}"]`).value = total.toLocaleString();
+                
+                updateGrandTotal();
+            });
+        });
+    }
+
+    // ======================================================
+    // KEYUP HANDLER — AUTO HITUNG TOTAL
+    // ======================================================
+    $(document).on("keyup", ".harga_per_kilo", function () {
+        const parentId = $(this).data("parent_id");
+
+        // harga per kilo yang diinput user
+        const harga = parseFloat($(this).val()) || 0;
+
+        // ambil nilai bersih dari attribute data-per_kilo
+        const sumBersih = parseFloat($(this).data("per_kilo")) || 0;
+
+        // hitung total
+        const total = harga * sumBersih;
+
+        console.log("Harga:", harga, "Sum Bersih:", sumBersih, "Total:", total);
+
+        // update input total_harga_parent (readonly)
+        $(`.total_harga_parent[data-parent_id="${parentId}"]`).val(total.toLocaleString());
+
+        updateGrandTotal();
     });
 
-    $("#grand_total").text(sum.toLocaleString());
-}
+    function updateGrandTotal() {
+        let grand_total = 0;
+        
+        document.querySelectorAll('.total_harga_parent').forEach(input => {
+            const value = input.value.replace(/[^0-9.-]+/g, '');
+            grand_total += parseFloat(value) || 0;
+        });
+        
+        document.getElementById('grand_total').textContent = grand_total.toLocaleString();
+    }
 
 
     function getListDivisi() {

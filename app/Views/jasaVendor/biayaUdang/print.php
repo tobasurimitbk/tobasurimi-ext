@@ -11,12 +11,6 @@
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
         }
 
-        /* @page {
-            size: 8.27in 5.50in landscape;
-            margin: 25px;
-            padding: 25px;
-        } */
-
         .body {
             margin-left: 30px;
             margin-right: 30px;
@@ -63,6 +57,10 @@
             vertical-align: bottom;
             border-bottom: 2px solid black;
         }
+
+        .bg-gray {
+            background-color: #fafafa;
+        }
     </style>
 </head>
 
@@ -74,7 +72,7 @@
                     <td style="text-align: center;">
                         <h2>
                             <u>
-                                Rincan Pembayaran Biaya Gaji Kopek Udang / Cumi Kulit Rebus
+                                Rincian Pembayaran Biaya Gaji Kopek Udang / Cumi Kulit Rebus
                             </u>
                             <br>
                         </h2>
@@ -82,7 +80,6 @@
                             NO : <?= $biayaUdang['no_pembayaran'] ?>
                         </h4>
                     </td>
-
                 </tr>
             </table>
 
@@ -107,149 +104,121 @@
             <table class="table" style="margin-top: 15px;">
                 <thead style="text-align: center; font-weight:bold;">
                     <tr>
-                        <th style="text-align: center;" colspan="4"></th>
-                        <th style="text-align: center;" colspan="1">Size</th>
-                        <th style="text-align: center;" colspan="3"></th>
-                        <th style="text-align: center;" colspan="4">Upah Kopek Yang Dibayar</th>
+                        <th rowspan="2" style="text-align: center;">No</th>
+                        <th rowspan="2" style="text-align: center;">Tanggal PO</th>
+                        <th rowspan="2" style="text-align: center;">Jenis</th>
+                        <th rowspan="2" style="text-align: center;">Mentah</th>
+                        <th style="text-align: center;">KG Keluar</th>
+                        <th rowspan="2" style="text-align: center;">Kotor</th>
+                        <th rowspan="2" style="text-align: center;">Canning</th>
+                        <th rowspan="2" style="text-align: center;">KG Daging</th>
+                        <th rowspan="2" style="text-align: center;">Ratio</th>
+                        <th rowspan="2" style="text-align: center;">Harga Per Kilo</th>
+                        <th rowspan="2" style="text-align: center;">Total Harga</th>
                     </tr>
                     <tr>
-                        <th style="text-align: center;">No</th>
-                        <th style="text-align: center;">Tanggal Masuk</th>
                         <th style="text-align: center;">Tanggal Keluar</th>
-                        <th style="text-align: center;">Jenis</th>
-
-
-                        <th style="text-align: center;">Mentah</th>
-
-                        <th style="text-align: center;">KG REBUS</th>
-                        <th style="text-align: center;">KG DAGING <?= strtoupper($vendor != null ? $vendor['name'] : '') ?></th>
-                        <th style="text-align: center;">KG DAGING <?= strtoupper($divisi != null ? $divisi['divisi'] : '') ?></th>
-
-                        <th style="text-align: center;">Kg Daging</th>
-                        <th style="text-align: center; width:50px">Ratio</th>
-                        <th style="text-align: center;">TB Harga</th>
-                        <th style="text-align: center;">Total Harga</th>
                     </tr>
                 </thead>
 
                 <tbody>
                     <?php
-                    $tb_harga_sum = 0;
-                    $kg_rebus_sum = 0;
-                    $kg_fauzy_sum = 0;
-                    $kg_cn_sum = 0;
-                    $kg_daging_sum = 0;
-                    $total_harga = 0;
-                    $i = 0;
+                    $grand_total = 0;
+                    $no = 1;
                     ?>
 
-                    <?php foreach ($biayaUdangDetail as $index => $b) : ?>
+                    <?php foreach ($biayaUdangDetail as $parentBlock) : ?>
                         <?php
-                        $barang_master_id_last = 0;
-                        $tb_harga_last = 0;
+                        $p = $parentBlock['parent'];
+                        $detail = $parentBlock['detail'];
+                        $rowspan = count($detail) > 0 ? count($detail) : 1;
 
-                        if ($index == 0) {
-                            $barang_master_id_last = $b['barang_master_id'];
-                            $tb_harga_last = $b['tb_harga'];
-                        } else {
-                            $barang_master_id_last = $biayaUdangDetail[$index - 1]['barang_master_id'];
-                            $tb_harga_last = $biayaUdangDetail[$index - 1]['tb_harga'];
-                        }
-
-                        if ($tb_harga_last != $b['tb_harga']) {
-                            $tb_harga_sum += floatval($b['tb_harga']);
-                        }
-
-                        // SUM
-                        $kg_rebus_sum += floatval($b['qty_rebus']);
-                        $kg_fauzy_sum += floatval($b['kg_fauzy']);
-                        $kg_cn_sum += floatval($b['kg_cn']);
-                        $kg_daging_sum += floatval($b['kg_daging']);
+                        // Hitung total harga
+                        $total_harga = ($p['sum_bersih'] ?? 0) * ($p['harga_per_kilo'] ?? 0);
+                        $grand_total += $total_harga;
                         ?>
 
-                        <?php if ($barang_master_id_last != $b['barang_master_id']) : ?>
-                            <?php
-                            $totalFirst = null;
-                            foreach ($biayaUdangTotal as $t) :
-                                if ($barang_master_id_last == $t['barang_master_id']) {
-                                    $totalFirst = $t;
-                                }
-                            endforeach;
-                            $total_harga += $totalFirst['total_harga'];
+                        <!-- PARENT ROW -->
+                        <tr class="bg-gray">
+                            <!-- No -->
+                            <td rowspan="<?= $rowspan ?>" style="text-align: center; vertical-align: middle;">
+                                <?= $no++ ?>
+                            </td>
 
-                            ?>
-                            <tr style="text-align: center;">
-                                <td style="text-align: center;" colspan="5">
-                                    <b>SUB TOTAL</b>
-                                </td>
-                                <td><?= $totalFirst['kg_rebus_total'] ?></td>
-                                <td><?= $totalFirst['kg_fauzy_total'] ?></td>
-                                <td><?= $totalFirst['kg_cn_total'] ?></td>
-                                <td><?= $totalFirst['kg_daging_total'] ?></td>
-                                <td><?= number_format($totalFirst['ratio'], 2) . ' %' ?></td>
-                                <td><?= number_format($tb_harga_last, 2) ?></td>
-                                <td><?= number_format($totalFirst['total_harga'], 2) ?></td>
-                            </tr>
-                        <?php endif; ?>
+                            <!-- Tanggal PO -->
+                            <td rowspan="<?= $rowspan ?>" style="text-align: center; vertical-align: middle;">
+                                <?= !empty($p['tanggal_po']) ? date('d/m/Y', strtotime($p['tanggal_po'])) : 
+                                    (!empty($p['tanggal_masuk']) ? date('d/m/Y', strtotime($p['tanggal_masuk'])) : '-') ?>
+                            </td>
 
-                        <tr style="text-align: center;">
-                            <td><?= ++$i ?></td>
-                            <td><?= $b['tanggal_masuk'] ?></td>
-                            <td><?= $b['tanggal_keluar'] ?></td>
-                            <td><?= $b['barang_name'] ?></td>
-                            <td><?= $b['spesifikasi'] ?></td>
-                            <td><?= $b['qty_rebus'] ?></td>
-                            <td><?= $b['kg_fauzy'] ?></td>
-                            <td><?= $b['kg_cn'] ?></td>
-                            <td><?= $b['kg_daging'] ?></td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
+                            <!-- Jenis -->
+                            <td rowspan="<?= $rowspan ?>" style="vertical-align: middle;">
+                                <?= $p['barang_name'] ?>
+                            </td>
+
+                            <!-- Mentah -->
+                            <td rowspan="<?= $rowspan ?>" style="vertical-align: middle;">
+                                <?= $p['spesifikasi'] ?>
+                            </td>
+
+                            <!-- KG Keluar - Baris pertama detail -->
+                            <td style="text-align: right;">
+                                <?= isset($detail[0]) ? number_format($detail[0]['qty_keluar'] ?? 0, 2) : '0.00' ?>
+                            </td>
+
+                            <!-- Kotor -->
+                            <td rowspan="<?= $rowspan ?>" style="text-align: right; vertical-align: middle;">
+                                <?= number_format($p['sum_kotor'] ?? 0, 2) ?>
+                            </td>
+
+                            <!-- Canning -->
+                            <td rowspan="<?= $rowspan ?>" style="text-align: right; vertical-align: middle;">
+                                <?= number_format($p['sum_bersih'] ?? 0, 2) ?>
+                            </td>
+
+                            <!-- KG Daging -->
+                            <td rowspan="<?= $rowspan ?>" style="text-align: right; vertical-align: middle;">
+                                <?= number_format($p['sum_bersih'] ?? 0, 2) ?>
+                            </td>
+
+                            <!-- Ratio -->
+                            <td rowspan="<?= $rowspan ?>" style="text-align: center; vertical-align: middle;">
+                                <?= number_format($p['ratio'] ?? 0, 2) ?>%
+                            </td>
+
+                            <!-- Harga Per Kilo -->
+                            <td rowspan="<?= $rowspan ?>" style="text-align: right; vertical-align: middle;">
+                                <?= number_format($p['harga_per_kilo'] ?? 0, 2) ?>
+                            </td>
+
+                            <!-- Total Harga -->
+                            <td rowspan="<?= $rowspan ?>" style="text-align: right; vertical-align: middle;">
+                                <?= number_format($total_harga, 2) ?>
+                            </td>
                         </tr>
 
-                        <?php if ($index == count($biayaUdangDetail) - 1) : ?>
-                            <?php
-                            $totalFirst = null;
-                            foreach ($biayaUdangTotal as $t) :
-                                if ($b['barang_master_id'] == $t['barang_master_id']) {
-                                    $totalFirst = $t;
-                                }
-                            endforeach;
-                            $total_harga += $totalFirst['total_harga'];
-
-                            ?>
-                            <tr style="text-align: center;">
-                                <td style="text-align: center;" colspan="5">
-                                    <b>SUB TOTAL</b>
+                        <!-- DETAIL ROWS (jika ada lebih dari 1 detail) -->
+                        <?php for ($i = 1; $i < count($detail); $i++) : ?>
+                            <?php $d = $detail[$i]; ?>
+                            <tr>
+                                <!-- KG Keluar untuk detail rows -->
+                                <td style="text-align: right;">
+                                    <?= number_format($d['qty_keluar'] ?? 0, 2) ?>
                                 </td>
-                                <td><?= $totalFirst['kg_rebus_total'] ?></td>
-                                <td><?= $totalFirst['kg_fauzy_total'] ?></td>
-                                <td><?= $totalFirst['kg_cn_total'] ?></td>
-                                <td><?= $totalFirst['kg_daging_total'] ?></td>
-                                <td><?= number_format($totalFirst['ratio'], 2) . ' %' ?></td>
-                                <td><?= number_format($tb_harga_last, 2) ?></td>
-                                <td><?= number_format($totalFirst['total_harga'], 2) ?></td>
                             </tr>
-                        <?php endif; ?>
+                        <?php endfor; ?>
+
                     <?php endforeach; ?>
 
-                    <tr style="text-align: center;">
-                        <td style="text-align: center;" colspan="5"><b>GRAND TOTAL</b></td>
-                        <td><?= $kg_rebus_sum ?></td>
-                        <td><?= $kg_fauzy_sum ?></td>
-                        <td><?= $kg_cn_sum ?></td>
-                        <td><?= $kg_daging_sum ?></td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td><?= number_format($total_harga, 2) ?></td>
+                    <!-- GRAND TOTAL ROW -->
+                    <tr style="font-weight: bold;">
+                        <td colspan="10" style="text-align: center;"><b>GRAND TOTAL</b></td>
+                        <td style="text-align: right;"><?= number_format($grand_total, 2) ?></td>
                     </tr>
                 </tbody>
-
             </table>
 
         </div>
-
     <?php endif; ?>
 </body>
-
 </html>

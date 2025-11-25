@@ -11,6 +11,7 @@ use App\Models\JasaVendorInModel;
 use App\Models\VendorModel;
 use App\Models\WarehousesModel;
 use Dompdf\Dompdf;
+use Exception;
 
 class BiayaUdang extends BaseController
 {
@@ -147,63 +148,85 @@ class BiayaUdang extends BaseController
 
     public function createAction()
     {
-        $listBarang = json_decode($_POST['listBarang']);
+        $listBarang = json_decode($this->request->getPost('listBarang'), true);
+        
         $jasaVendorInNo = $this->biayaUdangModel->getJasaVendorInNo(
-            $this->request->getVar('multiple_jasa_vendor_in_id')
+            $this->request->getPost('multiple_jasa_vendor_in_id')
         );
 
-        if (count($listBarang) == 0) {
-            return response()->setJSON([
+        if (empty($listBarang)) {
+            return $this->response->setJSON([
                 'message' => "Barang tidak boleh kosong",
                 'status' => false,
                 'token' => csrf_hash()
             ]);
         }
 
-        $check = $this->biayaUdangModel->where('company_id', $this->this_company_id)->where('no_pembayaran', $this->request->getVar('no_pembayaran'))->first();
+        $check = $this->biayaUdangModel
+            ->where('company_id', $this->this_company_id)
+            ->where('no_pembayaran', $this->request->getPost('no_pembayaran'))
+            ->first();
 
         if ($check != null) {
-            return response()->setJSON([
+            return $this->response->setJSON([
                 'status' => false,
                 'message' => "Nomor pembayaran sudah ada",
                 'token' => csrf_hash()
             ]);
         }
 
-        $id = $this->biayaUdangModel->insert([
-            'company_id' => $this->this_company_id,
-            'divisi_id' => $this->request->getVar('divisi_id'),
-            'multiple_jasa_vendor_in_id' =>  str_replace(['\\"', '\\', '"'], '', json_encode($this->request->getVar('multiple_jasa_vendor_in_id'))),
-            'multiple_jasa_vendor_in_no' =>  str_replace(['\\"', '\\'], '', json_encode($jasaVendorInNo)),
-            'vendor_id' => $this->request->getVar('vendor_id'),
-            'no_pembayaran' => $this->request->getVar('no_pembayaran'),
-            "tanggal" => $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "",
-            'keterangan' => $this->request->getVar('keterangan'),
-            'status_posting' => '0'
-        ]);
+        try {
+            $id = $this->biayaUdangModel->insert([
+                'company_id' => $this->this_company_id,
+                'divisi_id' => $this->request->getPost('divisi_id'),
+                'multiple_jasa_vendor_in_id' => json_encode($this->request->getPost('multiple_jasa_vendor_in_id')),
+                'multiple_jasa_vendor_in_no' => json_encode($jasaVendorInNo),
+                'vendor_id' => $this->request->getPost('vendor_id'),
+                'no_pembayaran' => $this->request->getPost('no_pembayaran'),
+                "tanggal" => $this->request->getPost("tanggal") ? 
+                    date("Y-m-d", strtotime(str_replace('/', '-', $this->request->getPost("tanggal")))) : 
+                    date("Y-m-d"),
+                'keterangan' => $this->request->getPost('keterangan'),
+                'status_posting' => '0'
+            ]);
 
-        foreach ($listBarang as $b) {
-            $this->biayaUdangDetailModel->insert([
-                'biaya_udang_id' => $id,
-                'jasa_vendor_in_id' => $b->jasa_vendor_in_id,
-                'barang_master_id' => $b->barang_master_id,
-                'barang_master_spesifikasi_id' => $b->barang_master_spesifikasi_id,
-                'tanggal_po' => $b->tanggal_po,
-                'kg_fauzy' => $b->kg_fauzy,
-                'kg_cn' => $b->kg_cn,
-                'kg_daging' => $b->kg_daging,
-                'tb_harga' => $b->tb_harga
+            if (!$id) {
+                throw new Exception('Gagal menyimpan data biaya udang');
+            }
+
+            foreach ($listBarang as $b) {
+                $parentData = $b['parent'];
+                
+                // Hitung total harga berdasarkan harga_per_kilo dan sum_bersih
+                $total_harga = ($parentData['sum_bersih'] ?? 0) * ($parentData['harga_per_kilo'] ?? 0);
+                
+                $this->biayaUdangDetailModel->insert([
+                    'biaya_udang_id' => $id,
+                    'jasa_vendor_in_id' => $parentData['id'],
+                    'tanggal_po' => $parentData['tanggal_po'],
+                    'kg_cn' => $parentData['sum_bersih'] ?? 0,
+                    'kg_daging' => $parentData['sum_bersih'] ?? 0,
+                    'harga_per_kilo' => $parentData['harga_per_kilo'] ?? 0, // Simpan harga_per_kilo
+                    'total_harga' => $total_harga // Simpan total_harga yang dihitung
+                ]);
+            }
+
+            return $this->response->setJSON([
+                'message' => "Biaya udang berhasil disimpan",
+                'token' => csrf_hash(),
+                'id' => encrypt($id),
+                'status' => true
+            ]);
+
+        } catch (Exception $e) {
+            return $this->response->setJSON([
+                'message' => $e->getMessage(),
+                'status' => false,
+                'token' => csrf_hash()
             ]);
         }
-
-        return response()->setJSON([
-            'message' => "Biaya udang berhasil disimpan",
-            'token' => csrf_token(),
-            'id' => encrypt($id),
-            'status' => true
-        ]);
     }
-
+    
     public function updateAction()
     {
         $id = decrypt($this->request->getVar('id'));
@@ -308,15 +331,28 @@ class BiayaUdang extends BaseController
             return redirect()->to('biaya-udang');
         }
 
+        // Get data untuk print
+        $biayaUdangDetail = $this->biayaUdangModel->dropdownBarang(json_decode($biayaUdang['multiple_jasa_vendor_in_id']), $id);
+        $biayaUdangTotal = $this->biayaUdangModel->getBarangDetail(json_decode($biayaUdang['multiple_jasa_vendor_in_id']), $id);
+
+        // Update parent data dengan data dari biayaUdangTotal
+        foreach ($biayaUdangDetail as &$parentBlock) {
+            $parentId = $parentBlock['parent']['jasa_vendor_in_id'];
+            if (isset($biayaUdangTotal[$parentId])) {
+                $parentBlock['parent']['harga_per_kilo'] = $biayaUdangTotal[$parentId]['harga_per_kilo'];
+                $parentBlock['parent']['total_harga'] = $biayaUdangTotal[$parentId]['total_harga'];
+                $parentBlock['parent']['tanggal_po'] = $biayaUdangTotal[$parentId]['tanggal_po'];
+            }
+        }
+
         $data = [
             'tanggal' => date('Y-m-d'),
-            'biayaUdang' => $this->biayaUdangModel->find($id),
-            'biayaUdangDetail' => $this->biayaUdangModel->dropdownBarang(json_decode($biayaUdang['multiple_jasa_vendor_in_id']), $id)
+            'biayaUdang' => $biayaUdang,
+            'biayaUdangDetail' => $biayaUdangDetail,
+            'divisi' => $this->divisiModel->find($biayaUdang['divisi_id']),
+            'vendor' => $this->vendorModel->find($biayaUdang['vendor_id']),
+            'biayaUdangTotal' => $biayaUdangTotal
         ];
-
-        $data['divisi'] = $this->divisiModel->find($biayaUdang['divisi_id']);
-        $data['vendor'] = $this->vendorModel->find($biayaUdang['vendor_id']);
-        $data['biayaUdangTotal'] = $this->biayaUdangModel->getBarangDetail(json_decode($biayaUdang['multiple_jasa_vendor_in_id']), $id);
 
         $this->dompdf->loadHtml(view('jasaVendor/biayaUdang/print', $data));
         $this->dompdf->setPaper('A4', 'landscape');
@@ -344,16 +380,46 @@ class BiayaUdang extends BaseController
 
     public function dropdownBarang()
     {
-        $jasaVendorInArrID = json_decode($this->request->getVar('multiple_jasa_vendor_in_id'));
+        $jasaVendorInArrID = $this->request->getVar('multiple_jasa_vendor_in_id');
         $id = $this->request->getVar('id');
+        
+        // Decode JSON jika diperlukan
+        if (is_string($jasaVendorInArrID)) {
+            $jasaVendorInArrID = json_decode($jasaVendorInArrID, true);
+        }
+        
+        if (empty($jasaVendorInArrID)) {
+            return response()->setJSON([
+                'data' => [],
+                'dataTotal' => [],
+                'token' => csrf_hash(),
+                'status' => false,
+                'message' => 'Jasa Vendor ID tidak boleh kosong'
+            ]);
+        }
+
         if (empty($id)) {
             $data = $this->biayaUdangModel->dropdownBarang($jasaVendorInArrID);
             $dataTotal = [];
         } else {
-            $id = decrypt($id);
-            $data = $this->biayaUdangModel->dropdownBarang($jasaVendorInArrID, $id);
-            $dataTotal = $this->biayaUdangModel->getBarangDetail($jasaVendorInArrID, $id);
+            $decryptedId = decrypt($id);
+            $data = $this->biayaUdangModel->dropdownBarang($jasaVendorInArrID, $decryptedId);
+            $dataTotal = $this->biayaUdangModel->getBarangDetail($jasaVendorInArrID, $decryptedId);
+            
+            // Update data dengan nilai dari dataTotal jika ada
+            if (!empty($dataTotal)) {
+                foreach ($data as $key => $item) {
+                    $jasaVendorInId = $item['parent']['jasa_vendor_in_id'];
+                    if (isset($dataTotal[$jasaVendorInId])) {
+                        // Hanya update harga_per_kilo dan total_harga (tanpa tb_harga)
+                        $data[$key]['parent']['harga_per_kilo'] = $dataTotal[$jasaVendorInId]['harga_per_kilo'];
+                        $data[$key]['parent']['total_harga'] = $dataTotal[$jasaVendorInId]['total_harga'];
+                        $data[$key]['parent']['tanggal_po'] = $dataTotal[$jasaVendorInId]['tanggal_po'];
+                    }
+                }
+            }
         }
+        
         return response()->setJSON([
             'data' => $data,
             'dataTotal' => $dataTotal,
