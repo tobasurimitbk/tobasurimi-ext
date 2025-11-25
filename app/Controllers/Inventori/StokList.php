@@ -2353,6 +2353,7 @@ class StokList extends BaseController
                 : null,
             "divisi_id" => $this->request->getVar("divisi_id"),
             "warehouse_id" => $this->request->getVar("warehouse_id"),
+            'barang_master_id' => $this->request->getVar('barang_master_id'),
         ];
 
         $limit = $this->request->getVar("length");
@@ -2361,10 +2362,10 @@ class StokList extends BaseController
         $condition = [
             'stock_revamp.deletedAt' => null,
             'stock_revamp.company_id' => $this->this_company_id,
-            'stock_revamp.barang_master_id' => $this->request->getVar('barang_master_id')
+            'barang_master.type_barang' => $this->request->getVar('type_barang')
         ];
 
-        if (empty($condition['stock_revamp.barang_master_id']) || empty($addCondition['start_date']) || empty($addCondition['end_date'])) {
+        if (empty($addCondition['start_date']) || empty($addCondition['end_date']) || empty($condition['barang_master.type_barang'])) {
             return response()->setJSON([
                 "draw"              => intval($this->request->getVar("draw")),
                 "recordsTotal"      => 0,
@@ -2383,7 +2384,7 @@ class StokList extends BaseController
 
         $masuk = $this->getTotalKartuStockMasuk(
             $addCondition['start_date'],
-            $addCondition['end_date']
+            $addCondition['end_date'],
         );
 
         $keluar = $this->getTotalKartuStockKeluar(
@@ -2557,12 +2558,24 @@ class StokList extends BaseController
             'search'            => $search
         ];
 
+
+        if (empty($stockId) || $stockId == '') {
+            return $this->response->setJSON([
+                'draw' => intval($draw),
+                'recordsTotal' => 0,
+                'recordsFiltered' => 0,
+                'data' => [],
+                'footerTotals' => 0
+            ]);
+        }
+
+
         $dataTotal =  $this->stockRevampLogModel->getKartuStockMasuk(
             $condition,
             $orderColumnIndex,
             $orderDir,
-            100000000,
-            0
+            $length,
+            $start
         );
 
         $totalMasuk = 0;
@@ -2632,12 +2645,22 @@ class StokList extends BaseController
             'search'            => $search
         ];
 
+        if (empty($stockId) || $stockId == '') {
+            return $this->response->setJSON([
+                'draw' => intval($draw),
+                'recordsTotal' => 0,
+                'recordsFiltered' => 0,
+                'data' => [],
+                'footerTotals' => 0
+            ]);
+        }
+
         $dataTotal =  $this->stockRevampLogModel->getKartuStockKeluar(
             $condition,
             $orderColumnIndex,
             $orderDir,
-            100000000,
-            0
+            $length,
+            $start
         );
 
         $totalKeluar = 0;
@@ -2681,11 +2704,12 @@ class StokList extends BaseController
 
     public function exportKartuStock()
     {
-        $barangId = $this->request->getVar('barang_master_id');
+        $divisi_id = $this->request->getVar('divisi_id');
+        $warehouse_id = $this->request->getVar('warehouse_id');
         $start_date = $this->request->getVar('start_date');
         $end_date   = $this->request->getVar('end_date');
 
-        if (!$barangId || !$start_date || !$end_date) {
+        if (!$divisi_id || !$warehouse_id || !$start_date || !$end_date) {
             return redirect()->back()->with('error', 'Parameter tidak lengkap');
         }
 
@@ -2693,28 +2717,22 @@ class StokList extends BaseController
         $start_date = date('Y-m-d', strtotime(str_replace('/', '-', $start_date)));
         $end_date   = date('Y-m-d', strtotime(str_replace('/', '-', $end_date)));
 
-        // Ambil data barang
-        $barang = $this->barangMasterModel
-            ->select("barang_name, kode_barang")
-            ->find($barangId);
-
-        if (!$barang) {
-            return redirect()->back()->with('error', 'Barang tidak ditemukan');
-        }
-
+        $divisi = $this->divisiModel->where('id', $divisi_id)->first();
+        $warehouse = $this->warehouseModel->where('id', $warehouse_id)->first();
 
         // Kondisi
         $condition = [
             'stock_revamp.deletedAt'      => null,
             'stock_revamp.company_id'     => $this->this_company_id,
-            'stock_revamp.barang_master_id' => $barangId
         ];
 
         $addCondition = [
             'start_date' => $start_date,
             'end_date'   => $end_date,
-            'sort'       => 'form_perijinan.updatedAt',
-            'sortType'   => 'DESC'
+            'sort'       => 'barang_master_id',
+            'sortType'   => 'ASC',
+            'divisi_id' => $divisi_id,
+            'warehouse_id' => $warehouse_id
         ];
 
         // Ambil data kartu stok
@@ -2767,7 +2785,7 @@ class StokList extends BaseController
         $sheet->setCellValue('A2', 'Periode: ' . date('d/m/Y', strtotime($start_date)) . ' s.d ' . date('d/m/Y', strtotime($end_date)));
 
         $sheet->mergeCells('A3:H3');
-        $sheet->setCellValue('A3', "Nama Barang: {$barang['barang_name']} ({$barang['kode_barang']})");
+        $sheet->setCellValue('A3', "Stok Departemen $divisi[divisi], Warehouse $warehouse[warehouse_name]");
 
         $sheet->getStyle('A2:A3')->getAlignment()->setHorizontal('center');
 
@@ -2783,10 +2801,10 @@ class StokList extends BaseController
             'Kode Barang',
             'Nama Barang',
             'Spesifikasi',
-            'Qty Awal',
-            'Qty Masuk',
-            'Qty Keluar',
-            'Qty Akhir',
+            'Saldo Awal',
+            'Masuk',
+            'Keluar',
+            'Saldo Akhir',
             'Satuan'
         ];
 
@@ -2844,7 +2862,7 @@ class StokList extends BaseController
         // ================================
         // OUTPUT EXCEL
         // ================================
-        $fileName = "Kartu_Stock_{$barang['kode_barang']}_{$start_date}_sd_{$end_date}.xlsx";
+        $fileName = "Kartu_Stock_{$divisi['divisi']}_{$start_date}_sd_{$end_date}.xlsx";
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment;filename=\"{$fileName}\"");

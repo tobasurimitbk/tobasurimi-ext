@@ -1297,7 +1297,7 @@ $routes->get('/biaya-udang/id/(:segment)',  'JasaVendor\BiayaUdang::detail/$1', 
 $routes->get('/biaya-udang/print/(:segment)',  'JasaVendor\BiayaUdang::print/$1', ['filter' => 'Auth']);
 $routes->get('/biaya-udang/all', 'JasaVendor\BiayaUdang::all', ['filter' => 'Auth']);
 $routes->get('/biaya-udang/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
-$routes->get('/biaya-udang/list-divisi', 'JasaVendor\BiayaUdang::dropdownDivisi', ['filter' => 'Auth']);
+$routes->get('/biaya-udang/list-divisi', 'Master\Divisi::dropdownDivisi', ['filter' => 'Auth']);
 $routes->get('/biaya-udang/list-jasa-vendor-in', 'JasaVendor\BiayaUdang::dropdownJasaVendorIn', ['filter' => 'Auth']);
 $routes->post('/biaya-udang/autocomplete', 'JasaVendor\BiayaUdang::autoComplete', ['filter' => 'Auth']);
 // BIAYA KEPITING
@@ -1486,7 +1486,7 @@ $routes->post('/mutasi/un-posting-global', 'Inventori\MutasiGlobal::unposting', 
 $routes->get('/mutasi/lokal', 'Inventori\MutasiLokal::index', ['filter' => 'Auth']);
 $routes->get('/mutasi/create-lokal', 'Inventori\MutasiLokal::create', ['filter' => 'Auth']);
 $routes->get('/mutasi/id-lokal/(:segment)', 'Inventori\MutasiLokal::detail/$1', ['filter' => 'Auth']);
-
+$routes->get('/mutasi/print-lokal/(:segment)', 'Inventori\MutasiLokal::print/$1', ['filter' => 'Auth']);
 // PENERIMAAN BARANG LOKAL BP
 $routes->get('/penerimaan-barang-lokal-bp', 'Warehouse\PenerimaanBarangLokalBP::index', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal-bp/all', 'Warehouse\PenerimaanBarangLokalBP::all', ['filter' => 'Auth']);
@@ -1620,6 +1620,7 @@ $routes->get('/update-stock-bahan-baku/print/(:segment)', 'Warehouse\UpdateStock
 $routes->post('/update-stock-bahan-baku/save', 'Warehouse\UpdateStockBahanBaku::saveStockBahanBakuAction', ['filter' => 'Auth']);
 $routes->post('/update-stock-bahan-baku/update', 'Warehouse\UpdateStockBahanBaku::updateStockBahanBakuAction', ['filter' => 'Auth']);
 $routes->post('/update-stock-bahan-baku/posting', 'Warehouse\UpdateStockBahanBaku::posting', ['filter' => 'Auth']);
+$routes->post('/update-stock-bahan-baku/unposting', 'Warehouse\UpdateStockBahanBaku::unposting', ['filter' => 'Auth']);
 $routes->post('/update-stock-bahan-baku/delete', 'Warehouse\UpdateStockBahanBaku::deleteupdateStockBahanBaku', ['filter' => 'Auth']);
 
 
@@ -1990,17 +1991,10 @@ $routes->group('bea-cukai-bc-25', ['filter' => 'Auth'], function ($routes) {
     $routes->get('/', 'BeaCukai\BC25::index');
     $routes->get('create', 'BeaCukai\BC25::create');
     $routes->get('all', 'BeaCukai\BC25::all');
-    $routes->get('online', 'BeaCukai\BC25::online');
     $routes->get('download-response', 'BeaCukai\BC40::downloadResponPdf');
-    $routes->get('all-online', 'BeaCukai\BC25::allOnline');
-    $routes->get('id/(:segment)', 'BeaCukai\BC25::detail/$1');
     $routes->post('save', 'BeaCukai\BC25::createAction');
-    $routes->post('update', 'BeaCukai\BC25::updateAction');
-    $routes->post('delete', 'BeaCukai\BC25::delete');
-    $routes->post('posting', 'BeaCukai\BC25::posting');
-    $routes->get('check-no-aju', 'BeaCukai\BC25::checkNoAju');
-    $routes->get('list-reference', 'BeaCukai\BC25::getReference');
-    $routes->get('list-reference-detail', 'BeaCukai\BC25::getDetailReference');
+    $routes->get('id/(:segment)', 'BeaCukai\BC25::detail/$1');
+    $routes->get('get-referensi', 'BeaCukai\BC25::getReferensiPengeluaran');
     // HEADER
     $routes->get('id/header/(:segment)', 'BeaCukai\BC25::header/$1');
     $routes->post('id/header', 'BeaCukai\BC25::updateHeader');
@@ -2049,8 +2043,13 @@ $routes->group('bea-cukai-bc-25', ['filter' => 'Auth'], function ($routes) {
     // OUTSTANDING
     $routes->get('bc-25-outstanding-all', 'BeaCukai\BC25::allOutstanding');
     $routes->get('bc-25-outstanding', 'BeaCukai\BC25::viewOutstanding');
-    $routes->get('bc-25-outstanding-export', 'BeaCukai\BC25::OutstandingSheet');
+    $routes->get('bc-25-outstanding-export', 'BeaCukai\BC25::OutstandingExcel');
+    // DEBUG PAYLOAD
+    $routes->get('debug-payload/(:segment)', 'BeaCukai\BC25::debug_payload/$1');
 });
+
+
+
 
 // BC 4.1
 $routes->group('bea-cukai-bc-41', ['filter' => 'Auth'], function ($routes) {

@@ -150,13 +150,10 @@
                                 <tr>
                                     <th style="text-align: center;">No</th>
                                     <th style="text-align: center;">Tanggal Keluar</th>
-                                    <th style="text-align: center;">Tanggal Purchase Order</th>
-                                    <th style="text-align: center;">Jenis</th>
+                                    <th style="text-align: center;">Barang</th>
+                                    <th style="text-align: center;">Spesifikasi</th>
 
-
-                                    <th style="text-align: center;">Mentah</th>
-
-                                    <th style="text-align: center;">KG REBUS</th>
+                                    <th style="text-align: center;">KG KELUAR</th>
                                     <th style="text-align: center;" class="kg-daging-vendor">KG DAGING VENDOR</th>
                                     <th style="text-align: center;" class="kg-daging-divisi">KG DAGING DEPARTEMEN</th>
 
@@ -187,6 +184,7 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
+    const disabledStatus = <?= !empty($biayaUdang) && $biayaUdang['status_posting'] == "1" ? "'disabled'" : "''" ?>;
 
     var request;
     var listBarang = [];
@@ -565,172 +563,211 @@
         });
     }
 
-    function drawTable() {
-        const table = $('#dataTable');
-        $('.foot-detail-table').empty();
-        $('.body-table').empty();
-        var no = 1;
 
-        if (listBarang.length == 0) {
-            row += `
-                    <tr>
-                        <td colspan="12" style="text-align: center;">
-                            Tidak Ada Barang
-                        </td>
-                    </tr>
-                `;
-            $('.foot-detail-table').append(row);
-        } else {
-            var tb_harga_sum = 0;
-            var kg_rebus_sum = 0;
-            var kg_fauzy_sum = 0;
-            var kg_cn_sum = 0;
-            var kg_daging_sum = 0;
-            var total_harga = 0;
+        function drawTable() {
+            const tbody = document.querySelector('#dataTable tbody');
+            tbody.innerHTML = '';
 
-            $.each(listBarang, function(i, v) {
-                var barang_master_id_last = 0;
-                var tb_harga_last = 0;
+            if (!listBarang || Object.keys(listBarang).length === 0) {
+                tbody.innerHTML = '<tr><td colspan="11" class="no-data">Tidak Ada Barang</td></tr>';
+                return;
+            }
 
-                if (i == 0) {
-                    barang_master_id_last = v.barang_master_id;
-                    tb_harga_last = v.tb_harga;
-                } else {
-                    barang_master_id_last = listBarang[i - 1].barang_master_id;
-                    tb_harga_last = listBarang[i - 1].tb_harga;
-                }
+            let grand_total = 0;
+            let no = 1;
 
-                if (tb_harga_last != v.tb_harga) {
-                    tb_harga_sum += parseFloat(v.tb_harga);
-                }
+            Object.values(listBarang).forEach(parentBlock => {
+    const p = parentBlock.parent;
+    const detail = parentBlock.detail;
+    const rowspan = detail.length > 0 ? detail.length : 1;
 
-                // SUM
-                kg_rebus_sum += parseFloat(v.qty_rebus);
-                kg_fauzy_sum += parseFloat(v.kg_fauzy);
-                kg_cn_sum += parseFloat(v.kg_cn);
-                kg_daging_sum += parseFloat(v.kg_daging);
+    // Hitung total harga
+    const total_harga = (p.sum_bersih || 0) * (p.tb_harga || 0);
+    grand_total += total_harga;
 
+    // =========================
+    // PARENT ROW
+    // =========================
+    const mainRow = document.createElement('tr');
+    mainRow.style.color = 'black';
+    mainRow.style.background = "#fafafa";
 
-                // SUB TOTAL ATAS
-                if (barang_master_id_last != v.barang_master_id) {
-                    var totalFirst = {
-                        'kg_rebus_total': 0,
-                        'kg_fauzy_total': 0,
-                        'kg_cn_total': 0,
-                        'kg_daging_total': 0,
-                        'total_harga': 0,
-                        'ratio': 0
-                    };
-                    $.each(listTotal, function(j, l) {
-                        if (barang_master_id_last == l.barang_master_id) {
-                            totalFirst = l;
-                        }
-                    });
+    // Kolom No
+    const noCell = document.createElement('td');
+    noCell.rowSpan = rowspan;
+    noCell.textContent = no++;
+    noCell.style = "vertical-align:middle; text-align:center;";
+    mainRow.appendChild(noCell);
 
-                    total_harga += totalFirst.total_harga;
+    // PO
+    const poCell = document.createElement('td');
+    poCell.rowSpan = rowspan;
+    poCell.innerHTML = `
+        <input type="date" class="tanggal_po" data-parent_id="${p.id}"
+        value="${p.tanggal_masuk}"
+        style="height:38px; width:130px; border-radius:6px; padding:4px; border:1px solid #ccc;">
+    `;
+    poCell.style = "vertical-align:middle; text-align:center;";
+    mainRow.appendChild(poCell);
 
-                    var newRow = $('<tr  style="color:whitesmoke; background-color:#fadfbe">');
-                    newRow.append($('<td style="text-align: center;" colspan="5">').html("<b>SUB TOTAL</b>"));
-                    newRow.append($('<td>').text(totalFirst.kg_rebus_total.toFixed(2)));
-                    newRow.append($('<td >').text(totalFirst.kg_fauzy_total.toFixed(3)));
-                    newRow.append($('<td>').text(totalFirst.kg_cn_total.toFixed(3)));
-                    newRow.append($('<td>').text(totalFirst.kg_daging_total.toFixed(3)));
-                    newRow.append($('<td>').text(totalFirst.ratio.toFixed(2) + ' %'));
-                    newRow.append($('<td style="text-align: center;">').html(
-                        `
-                            <input id="${i+'_0'}" <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control tb_harga" oninput="preventNegativeInput(this)" data-barang_master_id="${barang_master_id_last}" autocomplete="one-time-code" class="form-control kg_rebus" onkeyup="autoComplete()" type="text" value="${tb_harga_last}">
-                        `
-                    ));
-                    newRow.append($('<td >').text(formatRupiah(totalFirst.total_harga)));
-                    table.find('tbody').append(newRow);
-                }
+    // Jenis
+    const jenisCell = document.createElement('td');
+    jenisCell.rowSpan = rowspan;
+    jenisCell.textContent = p.barang_name;
+    jenisCell.style = "vertical-align:middle;";
+    mainRow.appendChild(jenisCell);
 
-                // KONTEN
-                var newRow = $('<tr  style="color:whitesmoke;">');
-                newRow.append($('<td style="text-align: center;">').html(
-                    `
-                            ${no++} 
-                        `
-                ));
-                newRow.append($('<td style="text-align: center;">').text(v.tanggal_keluar));
-                newRow.append($('<td style="text-align: center;">').html(
-                    `
-                        <input id="${i+'_kg_dg_1'}" <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control tanggal_po" data-spesifikasi_id="${v.barang_master_spesifikasi_id}"  autocomplete="one-time-code" class="form-control tanggal_po" type="date" value="${v.tanggal_po}">
-                    `
-                ));
-                newRow.append($('<td style="text-align: center;">').text(v.barang_name));
-                newRow.append($('<td style="text-align: center;">').text(v.spesifikasi));
-                newRow.append($('<td>').text(v.qty_rebus));
-                newRow.append($('<td style="text-align: center;">').html(
-                    `
-                            <input id="${i+'_kg_dg_2'}" <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control kg_fauzy" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}"  autocomplete="one-time-code" class="form-control kg_fauzy" onkeyup="autoComplete()" type="text" value="${v.kg_fauzy}">
-                        `
-                ));
-                newRow.append($('<td style="text-align: center;">').html(
-                    `
-                            <input id="${i+'_kg_dg_3'}" <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control kg_cn" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control kg_cn" onkeyup="autoComplete()" type="text" value="${v.kg_cn}">
-                        `
-                ));
-                newRow.append($('<td style="text-align: center;">').html(
-                    `
-                            <input id="${i+'_kg_dg_4'}" <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control kg_daging" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control kg_daging" onkeyup="autoComplete()" type="text" value="${v.kg_daging}">
-                        `
-                ));
-                newRow.append($('<td>').text('-'));
-                newRow.append($('<td>').text('-'));
-                newRow.append($('<td>').text('-'));
-                table.find('tbody').append(newRow);
+    // Mentch
+    const mentchCell = document.createElement('td');
+    mentchCell.rowSpan = rowspan;
+    mentchCell.textContent = p.spesifikasi;
+    mentchCell.style = "vertical-align:middle;";
+    mainRow.appendChild(mentchCell);
 
-                // SUB TOTAL BAWAH
-                if ((listBarang.length - 1) == i) {
-                    var totalFirst = {
-                        'kg_rebus_total': 0,
-                        'kg_fauzy_total': 0,
-                        'kg_cn_total': 0,
-                        'kg_daging_total': 0,
-                        'total_harga': 0,
-                        'ratio': 0
-                    };
-                    $.each(listTotal, function(j, l) {
-                        if (v.barang_master_id == l.barang_master_id) {
-                            totalFirst = l;
-                        }
-                    });
+    // KG Keluar dari detail[0]
+    const kgKeluarCell = document.createElement('td');
+    kgKeluarCell.textContent = detail[0]?.qty_keluar?.toFixed(2) ?? "0.00";
+    kgKeluarCell.style = "text-align:right;";
+    mainRow.appendChild(kgKeluarCell);
 
-                    total_harga += totalFirst.total_harga;
+    // Kotor
+    const kgKotorCell = document.createElement('td');
+    kgKotorCell.rowSpan = rowspan;
+    kgKotorCell.textContent = p.sum_kotor?.toFixed(2) ?? "0.00";
+    kgKotorCell.style = "vertical-align:middle; text-align:right;";
+    mainRow.appendChild(kgKotorCell);
 
-                    var newRow = $('<tr  style="color:whitesmoke; background-color:#fadfbe">');
-                    newRow.append($('<td style="text-align: center;" colspan="5">').html("<b>SUB TOTAL</b>"));
-                    newRow.append($('<td>').text(totalFirst.kg_rebus_total.toFixed(2)));
-                    newRow.append($('<td >').text(totalFirst.kg_fauzy_total.toFixed(3)));
-                    newRow.append($('<td>').text(totalFirst.kg_cn_total.toFixed(3)));
-                    newRow.append($('<td>').text(totalFirst.kg_daging_total.toFixed(3)));
-                    newRow.append($('<td>').text(totalFirst.ratio.toFixed(2) + ' %'));
-                    newRow.append($('<td style="text-align: center;">').html(
-                        `
-                                <input id="${i+'_6'}" <?= !empty($biayaUdang) ? (($biayaUdang['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control tb_harga" data-barang_master_id="${v.barang_master_id}" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control tb_harga" type="text" onkeyup="autoComplete()" value="${v.tb_harga}">
-                        `
-                    ));
-                    newRow.append($('<td >').text(formatRupiah(totalFirst.total_harga)));
-                    table.find('tbody').append(newRow);
-                }
+    // Canning
+    const kgCanningCell = document.createElement('td');
+    kgCanningCell.rowSpan = rowspan;
+    kgCanningCell.textContent = p.sum_bersih?.toFixed(2) ?? "0.00";
+    kgCanningCell.style = "vertical-align:middle; text-align:right;";
+    mainRow.appendChild(kgCanningCell);
 
-            });
+    // KG Daging
+    const kgDagingCell = document.createElement('td');
+    kgDagingCell.rowSpan = rowspan;
+    kgDagingCell.textContent = p.sum_bersih?.toFixed(2) ?? "0.00";
+    kgDagingCell.style = "vertical-align:middle; text-align:right;";
+    mainRow.appendChild(kgDagingCell);
 
-            // GRAND TOTAL
-            var newRow = $('<tr style="color:whitesmoke; background-color:#f2c996">');
-            newRow.append($('<td style="text-align: center;" colspan="5">').html("<b>GRAND TOTAL</b>"));
-            newRow.append($('<td>').text(kg_rebus_sum.toFixed(2)));
-            newRow.append($('<td >').text(kg_fauzy_sum.toFixed(3)));
-            newRow.append($('<td>').text(kg_cn_sum.toFixed(3)));
-            newRow.append($('<td>').text(kg_daging_sum.toFixed(3)));
-            newRow.append($('<td>').text("-"));
-            newRow.append($('<td >').text('-'));
-            newRow.append($('<td >').text(formatRupiah(total_harga)));
-            table.find('tbody').append(newRow);
-        }
+    // Ratio
+    const ratioCell = document.createElement('td');
+    ratioCell.rowSpan = rowspan;
+    ratioCell.textContent = (p.ratio?.toFixed(2) ?? "0.00") + "%";
+    ratioCell.style = "vertical-align:middle; text-align:center;";
+    mainRow.appendChild(ratioCell);
 
+    // Harga per kilo
+    const tbHargaCell = document.createElement('td');
+    tbHargaCell.rowSpan = rowspan;
+    tbHargaCell.innerHTML = `
+        <input class="harga_per_kilo" 
+               data-parent_id="${p.id}" 
+               data-per_kilo="${p.sum_bersih}" 
+               value="${p.harga_per_kilo ?? ''}"
+               style="height:38px; width:120px; border-radius:6px; padding:4px; border:1px solid #ccc;">
+    `;
+    tbHargaCell.style = "vertical-align:middle;";
+    mainRow.appendChild(tbHargaCell);
+
+    // Total harga
+    const totalHargaCell = document.createElement('td');
+    totalHargaCell.rowSpan = rowspan;
+    totalHargaCell.innerHTML = `
+        <input class="tb_harga_parent" data-parent_id="${p.id}"
+               value="${p.tb_harga ?? 0}"
+               style="height:38px; width:150px; text-align:right; border-radius:6px; padding:4px; border:1px solid #ccc;">
+    `;
+    totalHargaCell.style = "vertical-align:middle;";
+    mainRow.appendChild(totalHargaCell);
+
+    tbody.appendChild(mainRow);
+
+    // =========================
+    // DETAIL ROWS
+    // =========================
+    for (let i = 1; i < detail.length; i++) {
+        const d = detail[i];
+
+        const detRow = document.createElement('tr');
+        detRow.style.background = "#fff";
+
+        const kgKeluarDetail = document.createElement('td');
+        kgKeluarDetail.textContent = d.qty_keluar?.toFixed(2) ?? "0.00";
+        kgKeluarDetail.style = "text-align:right;";
+        detRow.appendChild(kgKeluarDetail);
+
+        tbody.appendChild(detRow);
     }
+});
+
+
+            // Baris grand total
+            const grandTotalRow = document.createElement('tr');
+            grandTotalRow.className = 'grand-total-row';
+            grandTotalRow.style.color = 'black';
+            grandTotalRow.innerHTML = `
+                <td colspan="10"><b>GRAND TOTAL</b></td>
+                <td id="grand_total">${grand_total.toLocaleString()}</td>
+            `;
+            tbody.appendChild(grandTotalRow);
+
+            // Tambahkan event listener untuk input harga
+            document.querySelectorAll('.harga_per_kilo').forEach(input => {
+                input.addEventListener('keyup', function() {
+                    const parentId = this.getAttribute('data-parent_id');
+                    const harga = parseFloat(this.value) || 0;
+                    const sumBersih = parseFloat(this.getAttribute('data-per_kilo')) || 0;
+                    const total = harga * sumBersih;
+
+                    // Update input tb_harga_parent
+                    document.querySelector(`.tb_harga_parent[data-parent_id="${parentId}"]`).value = total.toLocaleString();
+                    
+                    updateGrandTotal();
+                });
+            });
+        }
+    
+// ======================================================
+// KEYUP HANDLER — AUTO HITUNG TOTAL
+// ======================================================
+$(document).on("keyup", ".harga_per_kilo", function () {
+    const parentId = $(this).data("parent_id");
+
+    // harga per kilo yang diinput user
+    const harga = parseFloat($(this).val()) || 0;
+
+    // ambil nilai bersih dari attribute data-per_kilo
+    const sumBersih = parseFloat($(this).data("per_kilo")) || 0;
+
+    // hitung total
+    const total = harga * sumBersih;
+
+    console.log("Harga:", harga, "Sum Bersih:", sumBersih, "Total:", total);
+
+    // update input tb_harga_parent (total harga)
+    $(`.tb_harga_parent[data-parent_id="${parentId}"]`).val(total.toLocaleString());
+
+    updateGrandTotal();
+});
+
+
+
+// ======================================================
+// UPDATE GRAND TOTAL
+// ======================================================
+function updateGrandTotal() {
+    let sum = 0;
+
+    $(".total_harga_parent").each(function () {
+        const v = parseFloat($(this).text().replace(/,/g, "")) || 0;
+        sum += v;
+    });
+
+    $("#grand_total").text(sum.toLocaleString());
+}
+
 
     function getListDivisi() {
         // GET LIST DIVISI
@@ -770,6 +807,7 @@
             },
             data: {
                 divisi_id: $('.divisi_id option:selected').val(),
+                vendor_id: $('.vendor_id option:selected').val(),
             },
             dataType: "json",
             success: function(res) {

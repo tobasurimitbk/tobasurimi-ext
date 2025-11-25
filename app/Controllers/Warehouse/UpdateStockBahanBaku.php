@@ -503,9 +503,113 @@ class UpdateStockBahanBaku extends BaseController
         }
     }
 
+    public function unposting()
+    {
+        $id = decrypt($this->request->getVar('id'));
 
+        // 🔹 Cek data utama
+        $purchase = $this->updateStockPurchase->find($id);
+        if (!$purchase) {
+            return $this->response->setJSON([
+                'message' => "Data tidak ditemukan",
+                'status'  => false,
+                'token'   => csrf_hash()
+            ]);
+        }
 
-    
+        // 🔹 Cegah double unpost
+        if ($purchase['status_posting'] != "1") {
+            return $this->response->setJSON([
+                'message' => "Data belum diposting",
+                'status'  => false,
+                'token'   => csrf_hash()
+            ]);
+        }
+
+        try {
+            // 🔹 Ambil detail
+            $stockDetail = $this->updateStockPurchaseDetail
+                ->where('deletedAt', null)
+                ->where('update_stock_purchase_id', $id)
+                ->findAll();
+
+            if (empty($stockDetail)) {
+                return $this->response->setJSON([
+                    'message' => "Detail tidak ditemukan",
+                    'status'  => false,
+                    'token'   => csrf_hash()
+                ]);
+            }
+
+            foreach ($stockDetail as $p) {
+                $stockDetailId = $p['stock_detail_id'];
+                $parentId      = $p['stock_id'] ?? null;
+
+                // NEW: CEK LOG OUT — JIKA ADA, TOLAK UNPOST
+                $hasOutLog = $this->stockRevampLogModel
+                    ->where('stock_detail_id', $stockDetailId)
+                    ->where('status', 'OUT')
+                    ->first();
+
+                if ($hasOutLog) {
+                    return $this->response->setJSON([
+                        'message' => "Tidak bisa unposting. Stock sudah digunakan (ada log OUT).",
+                        'status'  => false,
+                        'token'   => csrf_hash()
+                    ]);
+                }
+
+                // 🔹 Ambil qty lama (yang sudah diposting)
+                $oldDetail = $this->stockRevampDetailModel
+                    ->select('qty_diterima')
+                    ->where('id', $stockDetailId)
+                    ->first();
+
+                $postedQty = $oldDetail ? (float)$oldDetail['qty_diterima'] : 0;
+                $originalQty = (float)$p['qty_diterima']; // qty sebelum posting
+                $selisih = $postedQty - $originalQty;
+
+                // 🔹 Balik qty detail ke original
+                $this->stockRevampDetailModel
+                    ->where('id', $stockDetailId)
+                    ->set(['qty_diterima' => $originalQty])
+                    ->update();
+
+                // 🔹 Insert log (OUT)
+                if ($selisih != 0) {
+                    $this->stockRevampLogModel->insert([
+                        'stock_detail_id' => $stockDetailId,
+                        'status'          => 'OUT',
+                        'qty_diterima'    => $selisih * -1,
+                    ]);
+                }
+
+                // 🔹 Update parent (kurangi qty_diterima)
+                if ($parentId) {
+                    $this->stockRevampModel
+                        ->where('id', $parentId)
+                        ->set('qty_diterima', 'qty_diterima - ' . $selisih, false)
+                        ->update();
+                }
+            }
+
+            // 🔹 Update status posting
+            $this->updateStockPurchase->update($id, ['status_posting' => "0"]);
+
+            return $this->response->setJSON([
+                'message' => "Unposting Stock Kotor berhasil",
+                'status'  => true,
+                'token'   => csrf_hash()
+            ]);
+
+        } catch (\Throwable $th) {
+            return $this->response->setJSON([
+                'message' => "Gagal unposting: " . $th->getMessage(),
+                'status'  => false,
+                'token'   => csrf_hash()
+            ]);
+        }
+    }
 
     public function print($id = null)
     {

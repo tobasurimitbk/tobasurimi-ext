@@ -10,6 +10,7 @@ use App\Models\MutasiModel;
 use App\Models\SatuansModel;
 use App\Models\StockRevampModel;
 use App\Models\WarehousesModel;
+use Dompdf\Dompdf;
 
 class MutasiLokal extends BaseController
 {
@@ -22,6 +23,7 @@ class MutasiLokal extends BaseController
     protected $mutasiModel;
     protected $mutasiDetailModel;
     protected $warehouseModel;
+    protected $dompdf;
 
     public function __construct()
     {
@@ -34,6 +36,7 @@ class MutasiLokal extends BaseController
         $this->mutasiModel = new MutasiModel();
         $this->mutasiDetailModel = new MutasiDetailModel();
         $this->warehouseModel = new WarehousesModel();
+        $this->dompdf = new Dompdf();
     }
 
     public function index()
@@ -91,5 +94,31 @@ class MutasiLokal extends BaseController
         ];
 
         return view('Warehouse/mutasi/form_lokal', $data);
+    }
+
+    public function print($id)
+    {
+        $id = decrypt($id);
+        $mutasi = $this->mutasiModel
+            ->select('mutasi.*,divisis.divisi')
+            ->join('divisis', 'divisis.id = mutasi.divisi_asal_id', 'left')
+            ->where('mutasi.id', $id)
+            ->first();
+
+        if ($mutasi == null) {
+            return redirect()->to('mutasi/lokal');
+        }
+        $dataMutasiDetail = $this->mutasiDetailModel->getDetail($id);
+
+        $data = [
+            'mutasi' => $mutasi,
+            'mutasiDetail' => $dataMutasiDetail,
+        ];
+
+        $this->dompdf->loadHtml(view('Warehouse/mutasi/print', $data));
+        $this->dompdf->setPaper('A4', '');
+        $this->dompdf->render();
+        $this->dompdf->stream($mutasi['no_mutasi'], array("Attachment" => false));
+        exit(0);
     }
 }

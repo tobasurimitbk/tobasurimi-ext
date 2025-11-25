@@ -112,10 +112,10 @@
                                 <th onclick="changeSort('kode_barang')">Kode Barang</th>
                                 <th onclick="changeSort('barang_master_id')">Barang</th>
                                 <th onclick="changeSort('spesifikasi_id')">Spesifikasi</th>
-                                <th>Qty Awal</th>
-                                <th>Qty Masuk</th>
-                                <th>Qty Keluar</th>
-                                <th>Qty Akhir</th>
+                                <th>Saldo Awal</th>
+                                <th>Masuk</th>
+                                <th>Keluar</th>
+                                <th>Saldo Akhir</th>
                                 <th onclick="changeSort('unit_id')">Satuan</th>
                             </tr>
                         </thead>
@@ -343,6 +343,7 @@
                 data.divisi_id = $("#divisi_id option:selected").val();
                 data.warehouse_id = $("#warehouse_id option:selected").val();
                 data.barang_master_id = $('#barang_master_id option:selected').val();
+                data.type_barang = $('#type_barang option:selected').val();
                 data.sort = sort;
                 data.sortType = sortType;
             },
@@ -659,12 +660,12 @@
         },
     });
 
-    $('#search_masuk').keyup((e) => {
+    $('#search_masuk').change((e) => {
         e.preventDefault();
         tableMasuk.ajax.reload()
     });
 
-    $('#search_keluar').keyup((e) => {
+    $('#search_keluar').change((e) => {
         e.preventDefault();
         tableKeluar.ajax.reload()
     });
@@ -676,6 +677,7 @@
     }).change(function(e) {
         e.preventDefault();
         dropdownMasterBarang();
+        table.ajax.reload();
     });
 
     $('#divisi_id').select2({
@@ -711,7 +713,7 @@
         table.ajax.reload();
     });
 
-    $('#search_kartu').keyup(function(e) {
+    $('#search_kartu').change(function(e) {
         e.preventDefault();
         table.ajax.reload();
     });
@@ -738,19 +740,12 @@
 
     $('#btnExportKartuStock').click(function(e) {
         e.preventDefault();
-        var barangMasterId = $('#barang_master_id option:selected').val();
         var start_date = $('#start_date').val();
         var end_date = $('#end_date').val();
+        var divisi_id = $('#divisi_id').val();
+        var warehouse_id = $('#warehouse_id').val();
 
-        if (barangMasterId == '') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Pilih master barang',
-                confirmButtonColor: '#4e73df',
-                confirmButtonText: 'Oke',
-            });
-            return;
-        } else if (start_date == '') {
+        if (start_date == '') {
             Swal.fire({
                 icon: 'error',
                 title: 'Pilih tanggal mulai',
@@ -766,8 +761,24 @@
                 confirmButtonText: 'Oke',
             });
             return;
+        } else if (divisi_id == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Departemen wajib diisi',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Oke',
+            });
+            return;
+        } else if (warehouse_id == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Warehouse wajib diisi',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Oke',
+            });
+            return;
         } else {
-            var url = "<?= base_url('stock-list/export-kartu-stock') ?>" + "?barang_master_id=" + barangMasterId + "&start_date=" + start_date + "&end_date=" + end_date;
+            var url = "<?= base_url('stock-list/export-kartu-stock') ?>" + "?start_date=" + start_date + "&end_date=" + end_date + "&warehouse_id=" + warehouse_id + "&divisi_id=" + divisi_id;
             window.location.href = url;
         }
 

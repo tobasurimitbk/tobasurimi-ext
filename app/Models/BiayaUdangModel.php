@@ -110,8 +110,10 @@ class BiayaUdangModel extends Model
     }
 
 
-    public function dropdownJasaVendorIn($divisiID)
+    public function dropdownJasaVendorIn($divisiID, $vendorID)
     {
+
+
         $jasaVendorInModel = new JasaVendorInModel();
         $biayaKepitingModel = new BiayaKepitingModel();
         $result = array();
@@ -122,17 +124,10 @@ class BiayaUdangModel extends Model
             ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
             ->where('jasa_vendor_in.status_posting', '1')
             ->where('jasa_vendor_in.divisi_id', $divisiID)
+            ->where('jasa_vendor_in.vendor_id', $vendorID)
             ->findAll();
 
-        foreach ($resultBiayaUdang as $r) {
-            $checkBiayaKepiting = $biayaKepitingModel->where('jasa_vendor_in_id', $r['id'])->first();
-            $checkBiayaUdang = $this->like('multiple_jasa_vendor_in_id', $r['id'])->first();
-            if ($checkBiayaKepiting == null && $checkBiayaUdang == null) {
-                array_push($result, $r);
-            }
-        }
-
-        return $result;
+        return $resultBiayaUdang;
     }
 
     public function getJasaVendorInNo($jasaVendorInArrID)
@@ -152,100 +147,211 @@ class BiayaUdangModel extends Model
     {
         $divisiModel = new DivisisModel();
         $biayaKepitingModel = new BiayaKepitingModel();
+        $biayaUdangModel = new BiayaUdangModel(); // <-- ini harus model yg bener
         $jasaVendorInModel = new JasaVendorInModel();
 
-        $divisiArr = array();
-        $result = array();
+        // 🔹 Ambil divisi yang boleh diakses
+        $divisiArr = array_column($divisiModel->getDivisiAccess(), 'id');
 
-        foreach ($divisiModel->getDivisiAccess() as $d) {
-            array_push($divisiArr, $d['id']);
-        }
-
-        $resultBiayaUdang = $jasaVendorInModel
-            ->select('DISTINCT(divisis.id), divisis.divisi, jasa_vendor_in.id AS jasa_vendor_in_id')
+        // 🔹 Ambil jasa_vendor_in valid
+        $result = $jasaVendorInModel
+            ->select('divisis.id, divisis.divisi, jasa_vendor_in.id AS jasa_vendor_in_id')
             ->join('divisis', 'divisis.id = jasa_vendor_in.divisi_id', 'left')
-            ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
             ->where('jasa_vendor_in.status_posting', '1')
             ->where('jasa_vendor_in.vendor_id', $vendorID)
             ->whereIn('jasa_vendor_in.divisi_id', $divisiArr)
             ->findAll();
 
-        foreach ($resultBiayaUdang as $r) {
-            $checkBiayaKepiting = $biayaKepitingModel->where('jasa_vendor_in_id', $r['jasa_vendor_in_id'])->first();
-            $checkBiayaUdang = $this->like('multiple_jasa_vendor_in_id', $r['jasa_vendor_in_id'])->first();
-            if ($checkBiayaKepiting == null && $checkBiayaUdang == null) {
-                array_push($result, $r);
+        $final = [];
+
+        foreach ($result as $r) {
+
+            // 🔹 cek biaya kepiting
+            $kepitingExists = $biayaKepitingModel
+                ->where('jasa_vendor_in_id', $r['jasa_vendor_in_id'])
+                ->first();
+
+            // 🔹 cek biaya udang (multiple)
+            $udangExists = $biayaUdangModel
+                ->like('multiple_jasa_vendor_in_id', $r['jasa_vendor_in_id'])
+                ->first();
+
+            // 🔥 skip jika ada salah satu
+            if ($kepitingExists || $udangExists) {
+                continue;
             }
+
+            // 🔹 push hanya yang valid
+            $final[$r['id']] = $r; // unique by divisi id
         }
 
-        if (count($result) != 0) {
-            $idArr = array_column($result, 'id');
-            $uniqueID = array_unique($idArr);
-            $uniqueArr =  array_intersect_key($result, $uniqueID);
-            $result = $uniqueArr;
-        }
-
-        return $result;
+        return array_values($final);
     }
-
 
     public function dropdownBarang($jasaVendorInArrID, $id = null)
     {
-        $jasaVendorInDetailModel = new JasaVendorInDetailModel();
-        $biayaUdangDetailModel = new BiayaUdangDetailModel();
+        $db = \Config\Database::connect();
 
-        // CREATE
-        $selectQryJasaVendorDetail = "
-            barang_master.id AS barang_master_id,
-            barang_master_spesifikasi.id AS barang_master_spesifikasi_id,
-            jasa_vendor_in.tanggal AS tanggal_masuk,
-            jasa_vendor_out.tanggal AS tanggal_keluar,
-            SUM(jasa_vendor_in_detail.qty_bersih) as qty_bersih,
-            SUM(jasa_vendor_out_detail.qty) as qty_rebus,
-            barang_master.barang_name,
-            barang_master_spesifikasi.spesifikasi,
-            jasa_vendor_in.id AS jasa_vendor_in_id
-        ";
+        // ==================================================================
+        // 1. SANITIZE INPUT IDS
+        // ==================================================================
+        $ids = [];
 
-        $jasaVendorInDetail = $jasaVendorInDetailModel
-            ->select($selectQryJasaVendorDetail)
-            ->join('jasa_vendor_out_detail', 'jasa_vendor_out_detail.id = jasa_vendor_in_detail.jasa_vendor_out_detail_id')
-            ->join('jasa_vendor_in', 'jasa_vendor_in.id = jasa_vendor_in_detail.jasa_vendor_in_id')
-            ->join('jasa_vendor_out', 'jasa_vendor_out.id = jasa_vendor_out_detail.jasa_vendor_out_id')
-            ->join('stock', 'stock.id = jasa_vendor_in_detail.stock_in_id')
-            ->join('barang_master', 'barang_master.id = stock.barang1_id')
-            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id')
-            ->whereIn('jasa_vendor_in_id', $jasaVendorInArrID)
-            ->groupBy('jasa_vendor_in_detail.stock_in_id')
-            ->findAll();
+        if (is_array($jasaVendorInArrID)) {
+            $raw = $jasaVendorInArrID;
+        } else {
+            $s = trim((string)$jasaVendorInArrID);
 
-        for ($i = 0; $i < count($jasaVendorInDetail); $i++) {
-            $jasaVendorInDetail[$i]['tanggal_masuk'] = date('Y-m-d', strtotime($jasaVendorInDetail[$i]['tanggal_masuk']));
-            $jasaVendorInDetail[$i]['tanggal_keluar'] = date('d/m/Y', strtotime($jasaVendorInDetail[$i]['tanggal_keluar']));
-
-            if ($id != null) {
-                $biayaUdangDetail = $biayaUdangDetailModel
-                    ->where('biaya_udang_id', $id)
-                    ->where('jasa_vendor_in_id', $jasaVendorInDetail[$i]['jasa_vendor_in_id'])
-                    ->where('barang_master_id', $jasaVendorInDetail[$i]['barang_master_id'])
-                    ->where('barang_master_spesifikasi_id', $jasaVendorInDetail[$i]['barang_master_spesifikasi_id'])
-                    ->first();
-
-                $jasaVendorInDetail[$i]['tanggal_po'] = $biayaUdangDetail['tanggal_po'];
-                $jasaVendorInDetail[$i]['kg_fauzy'] = $biayaUdangDetail['kg_fauzy'];
-                $jasaVendorInDetail[$i]['kg_cn'] = $biayaUdangDetail['kg_cn'];
-                $jasaVendorInDetail[$i]['kg_daging'] = $biayaUdangDetail['kg_daging'];
-                $jasaVendorInDetail[$i]['tb_harga'] = $biayaUdangDetail['tb_harga'];
-            } else {
-                $jasaVendorInDetail[$i]['tanggal_po'] = $jasaVendorInDetail[$i]['tanggal_masuk'];
-                $jasaVendorInDetail[$i]['kg_fauzy'] = 0;
-                $jasaVendorInDetail[$i]['kg_cn'] = 0;
-                $jasaVendorInDetail[$i]['kg_daging'] = 0;
-                $jasaVendorInDetail[$i]['tb_harga'] = 0;
+            // format JSON-like: "[730]" atau ["730"]
+            if ((str_starts_with($s, '[') && str_ends_with($s, ']')) || strpos($s, '[') !== false) {
+                preg_match_all('/\d+/', $s, $m);
+                $raw = $m[0] ?? [];
+            }
+            // "1,2,3"
+            elseif (strpos($s, ',') !== false) {
+                $raw = explode(',', $s);
+            }
+            // single id "730"
+            else {
+                $raw = $s !== '' ? [$s] : [];
             }
         }
 
-        return $jasaVendorInDetail;
+        // convert semua ke int
+        foreach ($raw as $r) {
+            $digits = preg_replace('/\D+/', '', (string)$r);
+            if ($digits !== '') {
+                $ids[] = (int)$digits;
+            }
+        }
+
+        if (empty($ids)) {
+            return $this->respond([]);
+        }
+
+        // ==================================================================
+        // 2. AMBIL PARENT
+        // ==================================================================
+        $parents = $db->table('jasa_vendor_in')
+            ->select('id, tanggal, multiple_jasa_vendor_out_id')
+            ->whereIn('id', $ids)
+            ->get()
+            ->getResultArray();
+
+        $final = [];
+
+        // ==================================================================
+        // 3. LOOP PER-PARENT → ambil detail
+        // ==================================================================
+        foreach ($parents as $p) {
+            $parentId = (int)$p['id'];
+
+            // DETAIL IN (bersih / kotor) + barang & spek
+            $detailRows = $db->table('jasa_vendor_in_detail jvid')
+                ->select('jvid.qty_bersih, jvid.qty_kotor, jvid.stock_detail_in_id,
+                        bm.barang_name, bms.spesifikasi')
+                ->join('stock_revamp_detail srd', 'srd.id = jvid.stock_detail_in_id', 'left')
+                ->join('stock_revamp s', 's.id = srd.stock_id', 'left')
+                ->join('barang_master bm', 'bm.id = s.barang_master_id', 'left')
+                ->join('barang_master_spesifikasi bms', 'bms.id = s.spesifikasi_id', 'left')
+                ->where('jvid.jasa_vendor_in_id', $parentId)
+                ->get()
+                ->getResultArray();
+
+            $sum_bersih = 0;
+            $sum_kotor = 0;
+            $barang_name = null;
+            $spesifikasi = null;
+
+            foreach ($detailRows as $d) {
+                $sum_bersih += floatval($d['qty_bersih'] ?? 0);
+                $sum_kotor += floatval($d['qty_kotor'] ?? 0);
+
+                if ($barang_name === null && !empty($d['barang_name'])) {
+                    $barang_name = $d['barang_name'];
+                }
+                if ($spesifikasi === null && !empty($d['spesifikasi'])) {
+                    $spesifikasi = $d['spesifikasi'];
+                }
+            }
+
+            // ==================================================================
+            // 4. AMBIL OUT (TANPA BARANG – CUMA qty & tanggal)
+            // ==================================================================
+            $outRows = [];
+            $multiple = trim((string)$p['multiple_jasa_vendor_out_id']);
+
+            if ($multiple !== '') {
+                preg_match_all('/\d+/', $multiple, $mout);
+                $outIds = array_map('intval', $mout[0] ?? []);
+
+                if (!empty($outIds)) {
+                    $outRows = $db->table('jasa_vendor_out_detail jvod')
+                        ->select('jvod.qty AS qty_keluar, jvo.tanggal AS tanggal_keluar')
+                        ->join('jasa_vendor_out jvo', 'jvo.id = jvod.jasa_vendor_out_id', 'left')
+                        ->whereIn('jvod.jasa_vendor_out_id', $outIds)
+                        ->get()
+                        ->getResultArray();
+                }
+            }
+
+            $sum_keluar = 0;
+            foreach ($outRows as $o) {
+                $sum_keluar += floatval($o['qty_keluar'] ?? 0);
+            }
+
+            // ==================================================================
+            if ($sum_keluar > 0) {
+                // ratio = IN / OUT dalam persen
+                $ratio = round(($sum_kotor / $sum_keluar) * 100, 2);
+            } else {
+                $ratio = 0;
+            }
+
+            // ==================================================================
+            // 6. BUILD PARENT OUTPUT
+            // ==================================================================
+            $final[$parentId] = [
+                'parent' => [
+                    'id' => $parentId,
+                    'tanggal_masuk' => $p['tanggal'],
+                    'sum_bersih' => round($sum_bersih, 3),
+                    'sum_kotor' => round($sum_kotor, 3),
+                    'sum_keluar' => round($sum_keluar, 3),
+                    'ratio' => $ratio,
+                    'barang_name' => $barang_name,
+                    'spesifikasi' => $spesifikasi,
+                    'tb_harga' => 0,
+                    'total_harga' => 0
+                ],
+                'detail' => []
+            ];
+
+            // ==================================================================
+            // 7. DETAIL OUT — HANYA qty & tanggal
+            // ==================================================================
+            if (!empty($outRows)) {
+                foreach ($outRows as $o) {
+                    $final[$parentId]['detail'][] = [
+                        'tanggal_keluar' => $o['tanggal_keluar']
+                            ? date('d/m/Y', strtotime($o['tanggal_keluar']))
+                            : null,
+                        'qty_keluar' => floatval($o['qty_keluar'])
+                    ];
+                }
+            } else {
+                // minimal 1 baris kosong
+                $final[$parentId]['detail'][] = [
+                    'tanggal_keluar' => null,
+                    'qty_keluar' => 0
+                ];
+            }
+        }
+
+        // ==================================================================
+        // 8. RETURN JSON
+        // ==================================================================
+        return $final;
     }
 
     public function getBarangDetail($jasaVendorInArrID, $id)

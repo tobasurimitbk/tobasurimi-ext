@@ -161,6 +161,10 @@ class JasaVendorOut extends BaseController
             'divisi' => $this->divisiModel->getDivisiAccess(),
             'supplier' => $this->supplierModel->getSupplierJasVend()
         ];
+
+        // var_dump($data['tipeBarang']);
+        // die;
+
         return view('jasaVendor/out/form', $data);
     }
 
@@ -187,7 +191,11 @@ class JasaVendorOut extends BaseController
 
     public function createAction()
     {
-        $check = $this->jasaVendorOutModel->where('no_surat_jalan', $this->request->getVar('no_surat_jalan'))->first();
+        // var_dump($this->request->getVar());
+        // die;
+        $check = $this->jasaVendorOutModel->where('no_surat_jalan', $this->request->getVar('no_surat_jalan'))
+                                        ->where('deletedAt', null)
+                                        ->first();
 
         if ($check != null) {
             return response()->setJSON([
@@ -206,7 +214,7 @@ class JasaVendorOut extends BaseController
             'warehouse_id' => $this->request->getVar('warehouse_id'),
             'no_surat_jalan' => $this->request->getVar('no_surat_jalan'),
             "tanggal" => $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "",
-            'tipe_barang' => "bahan_baku",
+            'tipe_barang' => $this->request->getVar('type_barang'),
             'no_kontainer' => $this->request->getVar('no_kontainer'),
             'tipe_pengambilan_stock' => $this->request->getVar('type_pengambilan_stock'),
             'keterangan' => $this->request->getVar('keterangan'),
@@ -305,6 +313,7 @@ class JasaVendorOut extends BaseController
             'divisi_id'             => $this->request->getVar('divisi_id'),
             'warehouse_id'          => $this->request->getVar('warehouse_id'),
             'no_surat_jalan'        => $this->request->getVar('no_surat_jalan'),
+            'tipe_barang'           => $this->request->getVar('type_barang'),
             "tanggal"               => $this->request->getVar("tanggal")
                 ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d")
                 : "",
@@ -464,19 +473,25 @@ class JasaVendorOut extends BaseController
 
         try {
             $stockRevampModel = new StockRevampModel();
+            $stockRevampDetailModel = new StockRevampDetailModel();
+
             $id = decrypt($this->request->getVar('id'));
 
-            // Validasi data exists
-            $jasaVendorOut = $this->jasaVendorOutModel->where('id', $id)->where('deletedAt', NULL)->first();
+            // Validasi header
+            $jasaVendorOut = $this->jasaVendorOutModel
+                ->where('id', $id)
+                ->where('deletedAt', NULL)
+                ->first();
+
             if (!$jasaVendorOut) {
                 throw new \Exception("Data jasa vendor tidak ditemukan");
             }
 
-            // Cek jika sudah diposting
             if ($jasaVendorOut['status_posting'] == '1') {
                 throw new \Exception("Data sudah diposting sebelumnya");
             }
 
+            // Ambil detail JV Out
             $jasaVendorOutDetail = $this->jasaVendorOutDetailModel
                 ->where('jasa_vendor_out_id', $id)
                 ->where('deletedAt', null)
@@ -486,16 +501,43 @@ class JasaVendorOut extends BaseController
                 throw new \Exception("Detail jasa vendor tidak ditemukan");
             }
 
+            // Ambil 1 data stock untuk cek tipe_barang
+            $firstDetail = $jasaVendorOutDetail[0];
+            $stockDetail = $stockRevampDetailModel->find($firstDetail['stock_out_detail_id']);
+            $stockHeader = $stockRevampModel->find($stockDetail['stock_id']);
+
+            $tipeBarang = strtoupper($stockHeader['tipe_barang'] ?? '');
+
+            // ====================================================
+            // CASE 1 : BARANG SETENGAH JADI -> Tidak kurangi stok
+            // ====================================================
+            if ($tipeBarang === "bahan_setengah_jadi") {
+
+                // langsung update posting tanpa proses stok
+                $this->jasaVendorOutModel->update($id, ['status_posting' => '1']);
+
+                $db->transCommit();
+
+                return $this->response->setJSON([
+                    'status' => true,
+                    'message' => "Jasa vendor (BAHAN SETENGAH JADI) berhasil diposting tanpa pengurangan stok",
+                    'token' => csrf_hash(),
+                ]);
+            }
+
+            // ====================================================
+            // CASE 2 : Barang normal -> jalankan outStockRevamp
+            // ====================================================
             foreach ($jasaVendorOutDetail as $j) {
+
                 $data = [
                     "stock_detail_id" => $j['stock_out_detail_id'],
                     "qty_digunakan" => $j['qty'],
                     "no_dokumen" => $jasaVendorOut['no_surat_jalan']
                 ];
 
-                // Panggil model - jika gagal akan throw exception
                 $result = $stockRevampModel->outStockRevamp($db, $data);
-                
+
                 if (!$result) {
                     throw new \Exception("Gagal memproses stock untuk detail ID: {$j['stock_out_detail_id']}");
                 }
@@ -504,7 +546,6 @@ class JasaVendorOut extends BaseController
             // Update status posting
             $this->jasaVendorOutModel->update($id, ['status_posting' => '1']);
 
-            // Commit transaksi
             $db->transCommit();
 
             return $this->response->setJSON([
@@ -515,16 +556,16 @@ class JasaVendorOut extends BaseController
 
         } catch (\Exception $e) {
             $db->transRollback();
-            
+
             return $this->response->setJSON([
                 'status' => false,
                 'message' => "Gagal posting jasa vendor: " . $e->getMessage(),
                 'token' => csrf_hash(),
             ]);
-            
+
         } catch (\Throwable $th) {
             $db->transRollback();
-            
+
             return $this->response->setJSON([
                 'status' => false,
                 'message' => "Terjadi kesalahan sistem: " . $th->getMessage(),
@@ -533,23 +574,26 @@ class JasaVendorOut extends BaseController
         }
     }
 
+    
     public function unposting()
     {
         $db = \Config\Database::connect();
         $db->transBegin();
+
         $stockRevampModel = new StockRevampModel();
+        $stockRevampDetailModel = new StockRevampDetailModel();
 
         try {
             $id = decrypt($this->request->getVar('id'));
-            
-            // Validasi apakah data exists
+
+            // Validasi header
             $jasaVendorOut = $this->jasaVendorOutModel
                 ->where('id', $id)
                 ->first();
+
             if (!$jasaVendorOut) {
                 throw new \Exception("Data Jasa Vendor Out tidak ditemukan");
             }
-
 
             $jasaVendorOutDetail = $this->jasaVendorOutDetailModel
                 ->where('jasa_vendor_out_id', $id)
@@ -559,48 +603,76 @@ class JasaVendorOut extends BaseController
                 throw new \Exception("Detail Jasa Vendor Out tidak ditemukan");
             }
 
+            // Ambil 1 detail untuk cek tipe_barang
+            $firstDetail = $jasaVendorOutDetail[0];
+            $stockDetail = $stockRevampDetailModel->find($firstDetail["stock_out_detail_id"]);
+            $stockHeader = $stockRevampModel->find($stockDetail["stock_id"]);
+
+            $tipeBarang = strtoupper($stockHeader["tipe_barang"] ?? "");
+
+            // =============================================================
+            // CASE 1: BAHAN SETENGAH JADI → Tidak perlu restore stok
+            // =============================================================
+            if ($tipeBarang === "bahan_setengah_jadi") {
+
+                // Hanya balikkan status posting
+                $this->jasaVendorOutModel->update($id, [
+                    "status_posting" => '0'
+                ]);
+
+                $db->transCommit();
+
+                return $this->response->setJSON([
+                    "message" => "Unpost berhasil (BAHAN SETENGAH JADI — tidak restore stok)",
+                    "status"  => true,
+                    "token"   => csrf_hash()
+                ]);
+            }
+
+            // =============================================================
+            // CASE 2: Normal → Jalankan restore stok seperti biasa
+            // =============================================================
             foreach ($jasaVendorOutDetail as $j) {
+
                 $data = [
-                    "stock_detail_asal"     => $j["stock_out_detail_id"],    
+                    "stock_detail_asal"     => $j["stock_out_detail_id"],
                     "qty_diterima_asal"     => $j["qty"],
                     "no_dokumen"            => $jasaVendorOut["no_surat_jalan"],
                     "keterangan"            => "UNPOST JASA VENDOR KELUAR",
                 ];
 
-                // Panggil model - jika gagal akan throw exception
                 $stockRevampModel->unpostStockKeluar($db, $data);
             }
 
-            // update status Jasa Vendor Out
+            // Update status posting
             $this->jasaVendorOutModel->update($id, [
-                'status_posting' => '0'
+                "status_posting" => '0'
             ]);
 
-            // commit transaksi
             $db->transCommit();
 
             return $this->response->setJSON([
-                'message' => "Jasa Vendor Out berhasil di-unpost",
-                'status'  => true,
-                'token'   => csrf_hash()
+                "message" => "Jasa Vendor Out berhasil di-unpost",
+                "status"  => true,
+                "token"   => csrf_hash()
             ]);
 
         } catch (\Exception $e) {
             $db->transRollback();
 
             return $this->response->setJSON([
-                'message' => "Gagal unpost Jasa Vendor Out: " . $e->getMessage(),
-                'status'  => false,
-                'token'   => csrf_hash()
+                "message" => "Gagal unpost Jasa Vendor Out: " . $e->getMessage(),
+                "status"  => false,
+                "token"   => csrf_hash()
             ]);
-            
+
         } catch (\Throwable $th) {
             $db->transRollback();
 
             return $this->response->setJSON([
-                'message' => "Terjadi kesalahan sistem: " . $th->getMessage(),
-                'status'  => false,
-                'token'   => csrf_hash()
+                "message" => "Terjadi kesalahan sistem: " . $th->getMessage(),
+                "status"  => false,
+                "token"   => csrf_hash()
             ]);
         }
     }
@@ -676,7 +748,7 @@ class JasaVendorOut extends BaseController
             );
         } else {
             // Stok Dengan Master Barang & Spesifikasi
-            $data = $stockRevampModel->getBarangRebusAndStock(
+            $data = $stockRevampModel->getBarangAndStock(
                 $this->request->getVar('type_barang'),
                 $this->request->getVar('divisi_id'),
                 $this->request->getVar('warehouse_id')
@@ -836,7 +908,7 @@ class JasaVendorOut extends BaseController
                         'stok_total' => floatval($item['stok_total_diterima'])
                     ];
                 }
-            } else {
+            } elseif (!empty($vendorId)) {
                 // Untuk Dari Jasa Vendor
                 $condition = [
                     'stock_revamp_detail.reference_type' => "JASA VENDOR",
@@ -879,6 +951,36 @@ class JasaVendorOut extends BaseController
                         'barang' => $item['barang'],
                         'reference_id' => $item['reference_id'],
                         'po_id' => $item['rm_purchase_order_id'],
+                        'reference_type' => $item['reference_type'],
+                        'satuan' => $item['kode_satuan'],
+                        'satuan_id' => $item['satuan_id'],
+                        'stok_total' => floatval($item['stok_total_diterima'])
+                    ];
+                }
+            } else {
+                // Untuk Dari Jasa Vendor
+                $condition = [
+                    'stock_revamp.barang_master_id' => $barangMasterId,
+                    'stock_revamp_detail.qty_diterima >' => 0,
+                ];
+
+                $dataResult = $stockRevampDetailModel->getStockListWithAddConditionForJasaVendorOutTapak($condition);
+
+                $resultArr = [];
+                foreach ($dataResult as $item) {
+                    if (floatval($item['stok_total_diterima']) <= 0) continue;
+
+                    $resultArr[] = [
+                        'id' => $item['id'],
+                        'sumber' => $item['reference_type'],
+                        'bc_id' => $item['bc_id'],
+                        'supplier_name' => "HASIL PRODUKSI",
+                        'bc_type' => $item['type_bc'],
+                        'stock_dokumen' => $item['pr_no'] ?? '-',
+                        'stock_date' => $item['receive_date'],
+                        'barang' => $item['barang'],
+                        'reference_id' => $item['reference_id'],
+                        'po_id' => null,
                         'reference_type' => $item['reference_type'],
                         'satuan' => $item['kode_satuan'],
                         'satuan_id' => $item['satuan_id'],

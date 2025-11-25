@@ -343,9 +343,10 @@ class JasaVendorIn extends BaseController
         ";
 
         $jasaVendorInDetail = $this->jasaVendorInDetailModel->select($selectQryJasaVendorDetail)
-            ->join('stock', 'stock.id = jasa_vendor_in_detail.stock_in_id')
-            ->join('barang_master', 'barang_master.id = stock.barang1_id')
-            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id')
+            ->join('stock_revamp_detail', 'stock_revamp_detail.id = jasa_vendor_in_detail.stock_detail_in_id')
+            ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id')
+            ->join('barang_master', 'barang_master.id = stock_revamp.barang_master_id')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock_revamp.spesifikasi_id')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1')
             ->where('jasa_vendor_in_id', $id)
             ->groupBy('jasa_vendor_in_detail.stock_in_id')

@@ -3,14 +3,13 @@
 
 <section class="section">
     <div class="section-header">
-        <h1><?= empty($mutasi) ? "Tambah Mutasi Lokal (Pengeluaran Barang)" : "Update Mutasi Lokal (Pengeluaran Barang)" ?></h1>
+        <h1><?= empty($mutasi) ? "Tambah Mutasi Lokal" : "Update Mutasi Lokal" ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("mutasi/lokal"); ?>">
                 Kembali
             </a>
             <?php if (!empty($mutasi)) : ?>
                 <?php if ($mutasi['status_posting'] == "0") : ?>
-
                     <?php if (can('Inventori', 'Mutasi', 'd')) : ?>
                         <button class="btn btn-hapus delete-parent float-right">
                             Hapus
@@ -21,16 +20,12 @@
                             Posting
                         </button>
                     <?php endif; ?>
-                    <a class="btn btn-warning btn-print float-right" target="_blank" href="<?= base_url('mutasi/print-lokal/' . encrypt($mutasi['id'])) ?>">
-                        Print
-                    </a>
                     <?php if (can('Inventori', 'Mutasi', 'u')) : ?>
                         <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                             Simpan
                         </button>
                     <?php endif; ?>
                 <?php endif; ?>
-
             <?php else : ?>
                 <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                     Simpan
@@ -180,24 +175,20 @@
                             <thead class="thead-dark">
                                 <tr>
                                     <th>No</th>
-                                    <th>Sumber</th>
                                     <th>Kode</th>
                                     <th>Barang</th>
                                     <th>Spesifikasi</th>
-                                    <th>No Spp</th>
-                                    <th>Tgl Masuk</th>
-                                    <th>Ref No</th>
-                                    <th>Qty Keluar</th>
-                                    <th>Satuan Keluar</th>
+                                    <th>Qty Mutasi</th>
+                                    <th>Satuan Mutasi</th>
                                     <th>Keterangan</th>
-                                    <th>Action</th>
+                                    <th style="width: 100px;">Action</th>
                                 </tr>
                             </thead>
                             <tbody class="body-table">
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <td colspan="12">Tidak Ada Data</td>
+                                    <td colspan="8">Tidak Ada Data</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -244,8 +235,6 @@
                                     <label for="floatingInput" style="z-index: 1;">Keterangan</label>
                                 </div>
                             </div>
-
-
                         </div>
 
                         <label class="form-label font-weight-bold lable-title">Pilih Inventori Barang Yang Akan Anda Mutasikan</label>
@@ -357,104 +346,51 @@
                 <h5 class="modal-title title-secondary">Input Qty Mutasi</h5>
             </div>
             <form class="update-form-mutasi" role="form" method="POST">
-                <input type="hidden" name="id_detail" id="id_detail" class="id_detail">
+                <input type="hidden" name="id_stock_detail" id="id_stock_detail" class="id_stock_detail">
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-md-4">
-                            <div class="input-group">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly autocomplete="one-time-code" type="text" class="form-control kode_barang" id="kode_barang" name="kode_barang" placeholder="Kode Barang">
-                                    <label for="floatingInput">Kode Barang</label>
-                                </div>
+                        <div class="col-md-6">
+                            <div class="form-floating" style="height: 50px;">
+                                <input placeholder="Qty Mutasi Detail" oninput="this.value = greatFormatRupiah(this.value)" class="form-control qty_mutasi_detail" id="qty_mutasi_detail" name="qty_mutasi_detail" />
+                                <label for="floatingInput" style="z-index: 1;">Qty Mutasi</label>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="input-group">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly autocomplete="one-time-code" type="text" class="form-control barang_name" id="barang_name" name="barang_name" placeholder="Barang">
-                                    <label for="floatingInput">Nama Barang</label>
-                                </div>
+                        <div class="col-md-6">
+                            <div class="form-floating" style="height: 50px;">
+                                <input placeholder="Keterangan Detail" class="form-control keterangan_detail" id="keterangan_detail" name="keterangan_detail" />
+                                <label for="floatingInput" style="z-index: 1;">Keterangan</label>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="input-group">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly autocomplete="one-time-code" type="text" class="form-control spesifikasi" id="spesifikasi" name="spesifikasi" placeholder="Spesifikasi">
-                                    <label for="floatingInput">Spesifikasi</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="input-group">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input oninput="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control qty_mutasi" id="qty_mutasi" name="qty_mutasi" placeholder="Qty mutasi">
-                                    <label for="floatingInput">Qty Mutasi</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select unit_id_mutasi" name="unit_id_mutasi" id="unit_id_mutasi">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Satuan Mutasi</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="input-group">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly oninput="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control qty_konversi_total" id="qty_konversi_total" name="qty_konversi_total" placeholder="Qty Diambil Total">
-                                    <label for="floatingInput">Qty Diambil Total</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="input-group">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly oninput="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control qty_asal" id="qty_asal" name="qty_asal" placeholder="Qty Asal">
-                                    <label for="floatingInput">Stok Asal</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="input-group">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly oninput="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control qty_konversi" id="qty_konversi" name="qty_konversi" placeholder="Qty Konversi">
-                                    <label for="floatingInput">Qty Konversi</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select unit_id_konversi" name="unit_id_konversi" id="unit_id_konversi" disabled>
-                                    <option value=""></option>
-                                    <?php foreach ($dataSatuan as $d): ?>
-                                        <option value="<?= $d['id'] ?>"><?= $d['kode_satuan'] ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Satuan Konversi</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="input-group">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly oninput="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control qty_hasil_mutasi" id="qty_hasil_mutasi" name="qty_hasil_mutasi" placeholder="Qty Hasil mutasi">
-                                    <label for="floatingInput">Hasil mutasi</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-8">
-                            <div class="form-floating">
-                                <textarea
-                                    class="form-control keterangan_mutasi"
-                                    placeholder="Keterangan"
-                                    id="keterangan_mutasi"
-                                    name="keterangan_mutasi"
-                                    style="height: 100px;"></textarea>
-                                <label for="keterangan_mutasi" style="z-index: 1;">Keterangan</label>
-                            </div>
-                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 col-table-button-tts" style="margin-top: 10px;">
+                            <div class="table-responsive">
+                                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-inventori-detail" id="dataTableDetail" width="100%" cellspacing="0">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>No</th>
+                                            <th>#</th>
+                                            <th>Dept</th>
+                                            <th>Warehouse</th>
+                                            <th>No Spp</th>
+                                            <th>Sumber</th>
+                                            <th>Supplier / Vendor</th>
+                                            <th>Kode Barang</th>
+                                            <th>Barang</th>
+                                            <th>Spesifikasi</th>
+                                            <th>Tgl Masuk</th>
+                                            <th>Ref No</th>
+                                            <th>Qty</th>
+                                            <th>Satuan</th>
+                                            <th>Keterangan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="body-table">
 
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
 
                 </div>
@@ -470,6 +406,8 @@
 <script>
     var listStockInventori = [];
     var listStockSelected = [];
+    var listFormGroupped = [];
+
     $('.form-fifo').hide();
     <?php if (!empty($mutasiDetail)) : ?>
         listStockSelected = <?= json_encode($mutasiDetail) ?>;
@@ -507,42 +445,11 @@
                 data.search = $("#search").val();
             },
             dataSrc: function(json) {
-
-                const selected = window.listStockSelected || [];
-
-                json.data = json.data.map(row => {
-                    // cari apakah row ini sudah dipilih di FIFO
-                    const used = selected.filter(s => s.id === row.id);
-
-                    if (used.length > 0) {
-                        // hitung berapa qty yang sudah terpakai
-                        let totalUsed = 0;
-                        used.forEach(u => {
-                            totalUsed += parseFloat(u.mutasi.qty_mutasi);
-                        });
-
-                        // kurangi stok saat ini
-                        row.qty_diterima = parseFloat(row.qty_diterima) - totalUsed;
-
-                        // kalau habis jadikan 0
-                        if (row.qty_diterima < 0) row.qty_diterima = 0;
-                    }
-
-                    return row;
-                });
-
-                // simpan untuk FIFO pemanggilan berikutnya
+                // simpan data hasil request ke variabel global
                 window.listStockInventori = json.data;
-
+                // kembalikan array data agar DataTables bisa menampilkannya
                 return json.data;
             }
-
-            // dataSrc: function(json) {
-            //     // simpan data hasil request ke variabel global
-            //     window.listStockInventori = json.data;
-            //     // kembalikan array data agar DataTables bisa menampilkannya
-            //     return json.data;
-            // }
         },
         "initComplete": function(settings, json) {
             $('.dataTables_length').empty();
@@ -864,7 +771,6 @@
         var dataIds = checkedCheckboxes.map(function() {
             return parseFloat($(this).val());
         }).get();
-
         if (dataIds.length == 0) {
             Swal.fire({
                 icon: 'error',
@@ -879,7 +785,7 @@
                 var currentID = Number(v.id);
                 if ($.inArray(currentID, dataIds) !== -1) {
                     var isIDSelected = $.grep(listStockSelected, function(item) {
-                        return item.id == Number(currentID) && v.keterangan_mutasi == "";
+                        return item.id == Number(currentID);
                     }).length > 0;
 
                     if (!isIDSelected) {
@@ -891,14 +797,13 @@
                             unit_id_konversi: v.unit_id,
                             unit_name_konversi: v.kode_satuan,
                         }
-                        listStockInventori[i].id_detail = getID();
-                        listStockInventori[i].keterangan_mutasi = "";
                         listStockSelected.push(listStockInventori[i]);
                     }
                 }
             });
         }
-        drawTableSelectedItem(listStockSelected);
+        grouppedArr(listStockSelected);
+        // drawTableSelectedItem(listStockSelected);
         // Tutup Modal Stok
         $('#detailStockModal').modal('hide');
     }
@@ -912,171 +817,86 @@
         if (listStockInventori.length === 0) {
             Swal.fire({
                 icon: 'error',
-                title: 'Stok Inventori Kosong'
+                title: 'Stok Inventori Kosong',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Oke',
             });
             return;
-        }
-        if (isNaN(qtyMutasiFifo)) {
+        } else if (isNaN(qtyMutasiFifo)) {
             Swal.fire({
                 icon: 'error',
-                title: 'Qty Mutasi Keluar Wajib Diisi'
+                title: 'Terjadi Kesalahan : Qty Mutasi Keluar Wajib Diisi',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                reverseButtons: true,
+                confirmButtonText: 'Oke',
             });
             return;
-        }
-        if (spesifikasiId == '') {
+        } else if (spesifikasiId == '') {
             Swal.fire({
                 icon: 'error',
-                title: 'Kode & Nama Barang Wajib Diisi'
+                title: 'Kode & Nama Barang Wajib Diisi',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Oke',
             });
             return;
-        }
-        if (keteranganFifo == '') {
+        } else if (keteranganFifo == '') {
             Swal.fire({
                 icon: 'error',
-                title: 'Keterangan Wajib Diisi'
+                title: 'Keterangan Wajib Diisi',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Oke',
             });
             return;
-        }
-
-        var totalStok = listStockInventori.reduce((a, b) => a + parseFloat(b.qty_diterima), 0);
-
-        if (qtyMutasiFifo > totalStok) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Stok barang tidak cukup!'
+        } else {
+            var totalStokTotal = 0;
+            $.each(listStockInventori, function(i, v) {
+                totalStokTotal += parseFloat(v.qty_diterima);
             });
-            return;
+
+            if (qtyMutasiFifo > totalStokTotal) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Terjadi Kesalahan : Stok barang tidak cukup !',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    reverseButtons: true,
+                    confirmButtonText: 'Oke',
+                });
+                return;
+            } else {
+                $.each(listStockInventori, function(i, v) {
+                    var currentID = Number(v.id);
+                    if ($.inArray(currentID, dataIds) == -1) {
+                        var isIDSelected = $.grep(listStockSelected, function(item) {
+                            return item.id == Number(currentID);
+                        }).length > 0;
+                        if (!isIDSelected && qtyMutasiFifo != 0 && parseFloat(listStockInventori[i].qty_diterima) != 0) {
+                            var mutasiQty = Math.min(qtyMutasiFifo, parseFloat(listStockInventori[i].qty_diterima));
+                            var hasilMutasi = v.qty_diterima - mutasiQty;
+
+                            listStockInventori[i].mutasi = {
+                                qty_mutasi: parseFloat(mutasiQty),
+                                unit_id_mutasi: v.unit_id,
+                                unit_name_mutasi: v.kode_satuan,
+                                qty_konversi: parseFloat(mutasiQty).toFixed(2),
+                                unit_id_konversi: v.unit_id,
+                                unit_name_konversi: v.kode_satuan,
+                                hasil_mutasi: parseFloat(hasilMutasi).toFixed(2),
+                            }
+                            listStockInventori[i].keterangan_mutasi = keteranganFifo;
+                            listStockSelected.push(listStockInventori[i]);
+                            qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
+                        }
+                    }
+                });
+            }
         }
-
-        // Sort FIFO
-        listStockInventori.sort((a, b) => new Date(a.lpb_date) - new Date(b.lpb_date));
-
-        // FIFO per row
-        $.each(listStockInventori, function(i, v) {
-            if (qtyMutasiFifo <= 0) return false;
-
-            var stokRow = parseFloat(v.qty_diterima);
-            if (stokRow <= 0) return;
-
-            var mutasiQty = Math.min(qtyMutasiFifo, stokRow);
-
-            // SIMPAN MUTASI BARU
-            let mutasiData = JSON.parse(JSON.stringify(v));
-            mutasiData.id_detail = getID();
-
-            mutasiData.mutasi = {
-                qty_mutasi: mutasiQty,
-                unit_id_mutasi: v.unit_id,
-                unit_name_mutasi: v.kode_satuan,
-                qty_konversi: mutasiQty.toFixed(2),
-                unit_id_konversi: v.unit_id,
-                unit_name_konversi: v.kode_satuan,
-                hasil_mutasi: (stokRow - mutasiQty).toFixed(2)
-            };
-            mutasiData.keterangan_mutasi = keteranganFifo;
-
-            listStockSelected.push(mutasiData);
-
-            qtyMutasiFifo -= mutasiQty;
-        });
-
-        drawTableSelectedItem(listStockSelected);
+        grouppedArr(listStockSelected);
+        // drawTableSelectedItem(listStockSelected);
+        // Tutup Modal Stok
         $('#detailStockModal').modal('hide');
     }
-
-    // function insertListFifo() {
-    //     var dataIds = getIDListDataSelected();
-    //     var qtyMutasiFifo = parseFloat(destroyFormatRupiah($('#qty_mutasi_fifo').val()));
-    //     var spesifikasiId = $(".spesifikasi_id option:selected").val();
-    //     var keteranganFifo = $(".keterangan_fifo").val();
-
-    //     console.log("STOK INVENTORI", listStockInventori);
-    //     console.log("STOK SELECTED", listStockSelected);
-
-    //     if (listStockInventori.length === 0) {
-    //         Swal.fire({
-    //             icon: 'error',
-    //             title: 'Stok Inventori Kosong',
-    //             confirmButtonColor: '#4e73df',
-    //             confirmButtonText: 'Oke',
-    //         });
-    //         return;
-    //     } else if (isNaN(qtyMutasiFifo)) {
-    //         Swal.fire({
-    //             icon: 'error',
-    //             title: 'Terjadi Kesalahan : Qty Mutasi Keluar Wajib Diisi',
-    //             confirmButtonColor: '#4e73df',
-    //             cancelButtonColor: '#d33',
-    //             reverseButtons: true,
-    //             confirmButtonText: 'Oke',
-    //         });
-    //         return;
-    //     } else if (spesifikasiId == '') {
-    //         Swal.fire({
-    //             icon: 'error',
-    //             title: 'Kode & Nama Barang Wajib Diisi',
-    //             confirmButtonColor: '#4e73df',
-    //             confirmButtonText: 'Oke',
-    //         });
-    //         return;
-    //     } else if (keteranganFifo == '') {
-    //         Swal.fire({
-    //             icon: 'error',
-    //             title: 'Keterangan Wajib Diisi',
-    //             confirmButtonColor: '#4e73df',
-    //             confirmButtonText: 'Oke',
-    //         });
-    //         return;
-    //     } else {
-    //         var totalStokTotal = 0;
-    //         $.each(listStockInventori, function(i, v) {
-    //             totalStokTotal += parseFloat(v.qty_diterima);
-    //         });
-
-    //         if (qtyMutasiFifo > totalStokTotal) {
-    //             Swal.fire({
-    //                 icon: 'error',
-    //                 title: 'Terjadi Kesalahan : Stok barang tidak cukup !',
-    //                 confirmButtonColor: '#4e73df',
-    //                 cancelButtonColor: '#d33',
-    //                 reverseButtons: true,
-    //                 confirmButtonText: 'Oke',
-    //             });
-    //             return;
-    //         } else {
-    //             $.each(listStockInventori, function(i, v) {
-    //                 var currentID = Number(v.id);
-    //                 if ($.inArray(currentID, dataIds) == -1) {
-    //                     var isIDSelected = $.grep(listStockSelected, function(item) {
-    //                         return item.id == Number(currentID) && item.keterangan_mutasi == keteranganFifo;
-    //                     }).length > 0;
-
-    //                     if (!isIDSelected && qtyMutasiFifo != 0 && parseFloat(listStockInventori[i].qty_diterima) != 0) {
-    //                         var mutasiQty = Math.min(qtyMutasiFifo, parseFloat(listStockInventori[i].qty_diterima));
-    //                         var hasilMutasi = v.qty_diterima - mutasiQty;
-
-    //                         listStockInventori[i].mutasi = {
-    //                             qty_mutasi: parseFloat(mutasiQty),
-    //                             unit_id_mutasi: v.unit_id,
-    //                             unit_name_mutasi: v.kode_satuan,
-    //                             qty_konversi: parseFloat(mutasiQty).toFixed(2),
-    //                             unit_id_konversi: v.unit_id,
-    //                             unit_name_konversi: v.kode_satuan,
-    //                             hasil_mutasi: parseFloat(hasilMutasi).toFixed(2)
-    //                         }
-    //                         listStockInventori[i].keterangan_mutasi = keteranganFifo;
-
-    //                         listStockSelected.push(listStockInventori[i]);
-    //                         qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
-    //                     }
-    //                 }
-    //             });
-    //         }
-    //     }
-    //     drawTableSelectedItem(listStockSelected);
-    //     // Tutup Modal Stok
-    //     $('#detailStockModal').modal('hide');
-    // }
 
     // VALIDATOR
     var validator = $(".create-form").validate({
@@ -1162,9 +982,6 @@
             qty_hasil_mutasi: {
                 required: true
             },
-            keterangan_mutasi: {
-                required: true
-            },
         },
         messages: {
             qty_mutasi: {
@@ -1178,9 +995,6 @@
             },
             qty_hasil_mutasi: {
                 required: "Qty hasil mutasi wajib diisi"
-            },
-            keterangan_mutasi: {
-                required: "Keterangan mutasi wajib diisi"
             },
         },
         errorElement: 'span',
@@ -1278,21 +1092,21 @@
                 });
                 return;
             } else {
-                var id_detail = $('#id_detail').val();
+                var id_stock_detail = $('#id_stock_detail').val();
                 var qty_mutasi = parseFloat(destroyFormatRupiah($('#qty_mutasi').val()));
                 var unit_id_mutasi = $('#unit_id_mutasi option:selected').val();
                 var unit_name_mutasi = $('#unit_id_mutasi option:selected').text().trim();
                 var qty_konversi = parseFloat(destroyFormatRupiah($('#qty_konversi').val()));
                 var hasil_mutasi = parseFloat(destroyFormatRupiah($('#qty_hasil_mutasi').val()));
-                var keterangan_mutasi = $('#keterangan_mutasi').val();
 
                 var index = null;
                 for (let i = 0; i < listStockSelected.length; i++) {
-                    if (listStockSelected[i].id_detail == id_detail) {
+                    if (listStockSelected[i].id == id_stock_detail) {
                         index = i;
                     }
                 }
-                listStockSelected[index].keterangan_mutasi = keterangan_mutasi;
+
+                listStockSelected[index].keterangan = "";
                 listStockSelected[index].mutasi.qty_mutasi = qty_mutasi;
                 listStockSelected[index].mutasi.unit_id_mutasi = unit_id_mutasi;
                 listStockSelected[index].mutasi.unit_name_mutasi = unit_name_mutasi;
@@ -1305,10 +1119,10 @@
     })
 
 
-    function remove(id_detail) {
+    function remove(id) {
         var indexToRemove = -1;
         for (var i = 0; i < listStockSelected.length; i++) {
-            if (listStockSelected[i].id_detail == id_detail) {
+            if (listStockSelected[i].id == id) {
                 indexToRemove = i;
                 break;
             }
@@ -1338,19 +1152,14 @@
         $('#qty_konversi').val(greatFormatRupiah(qty_konversi));
     }
 
-    function detail(id, id_detail) {
+    function detail(id) {
         resetFormDetail();
         var item = null;
-        var qty_konversi_total = 0;
         for (let i = 0; i < listStockSelected.length; i++) {
-            if (listStockSelected[i].id_detail == id_detail) {
+            if (listStockSelected[i].id == id) {
                 item = listStockSelected[i];
             }
-            if (listStockSelected[i].id == id) {
-                qty_konversi_total = qty_konversi_total + parseFloat(listStockSelected[i].mutasi.qty_konversi);
-            }
         }
-
         if (item == '') {
             Swal.fire({
                 icon: 'error',
@@ -1359,52 +1168,13 @@
             });
             return;
         } else {
-            $.ajax({
-                url: "<?= base_url("mutasi/list-satuan-konversi"); ?>",
-                data: {
-                    id: id
-                },
-                method: "GET",
-                success: function(response) {
-                    if (response.status) {
-                        var satuanmutasiArr = response.data;
-                        $('#id_detail').val(item.id_detail);
-                        $('#kode_barang').val(item.kode_barang);
-                        $('#barang_name').val(item.barang_name);
-                        $('#spesifikasi').val(item.spesifikasi);
-                        $('#qty_mutasi').val(greatFormatRupiah(item.mutasi.qty_mutasi));
-                        $('#unit_id_mutasi').val(item.mutasi.unit_id_mutasi).change();
-                        $('#qty_konversi').val(greatFormatRupiah(item.mutasi.qty_konversi));
-                        $('#unit_id_konversi').val(item.mutasi.unit_id_konversi).change();
-                        $('#qty_hasil_mutasi').val(greatFormatRupiah(item.mutasi.hasil_mutasi));
-                        $('#operasi_mutasi_detail').val(item.mutasi.operasi_mutasi_detail).change();
-                        $('#qty_asal').val(greatFormatRupiah(item.qty_diterima));
-                        $('#keterangan_mutasi').val(item.keterangan_mutasi);
-                        $('#qty_konversi_total').val(greatFormatRupiah(qty_konversi_total));
 
-                        // append select
-                        dropdownUnitMutasi(satuanmutasiArr);
-                        $('#unit_id_mutasi').val(item.mutasi.unit_id_konversi).change();
-
-                        $('#detailMutasiModal').modal('show');
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: response.message,
-                            confirmButtonColor: '#4e73df',
-                            cancelButtonColor: '#d33',
-                            reverseButtons: true,
-                            confirmButtonText: 'Oke',
-                        });
-                        return;
-                    }
-                },
-            });
+            $('#detailMutasiModal').modal('show');
         }
     }
 
     function resetFormDetail() {
-        $('#id_detail').val(null);
+        $('#id_stock_detail').val(null);
         $('#kode_barang').val(null);
         $('#barang_name').val(null);
         $('#spesifikasi').val(null);
@@ -1414,7 +1184,6 @@
         $('#unit_id_konversi').val(null).change();
         $('#qty_hasil_mutasi').val(null);
         $('#operasi_mutasi_detail').val(null).change();
-        $('#keterangan_mutasi').val(null).change();
         $('#qty_asal').val(null);
     }
 
@@ -1507,7 +1276,7 @@
         var no = 1;
         if (data.length == 0) {
             var newRow = $('<tr>');
-            newRow.append($('<td  colspan="17" >').text("Tidak Ada Data"));
+            newRow.append($('<td  colspan="8" >').text("Tidak Ada Data"));
             table.find('tfoot').append(newRow);
         } else {
             $.each(data, function(i, v) {
@@ -1517,22 +1286,18 @@
                    ${no++} 
                 `
                 ));
-                newRow.append($('<td>').text(v.reference_type));
                 newRow.append($('<td>').text(v.kode_barang));
                 newRow.append($('<td>').text(v.barang_name));
                 newRow.append($('<td>').text(v.spesifikasi));
-                newRow.append($('<td>').text(v.spp_no));
-                newRow.append($('<td>').text(v.lpb_date));
-                newRow.append($('<td>').text(v.reference_no));
-                newRow.append($('<td>').text(greatFormatRupiah(v.mutasi.qty_konversi)));
-                newRow.append($('<td>').text(v.mutasi.unit_name_konversi));
-                newRow.append($('<td>').text(v.keterangan_mutasi));
+                newRow.append($('<td>').text(greatFormatRupiah(v.total_qty_mutasi)));
+                newRow.append($('<td>').text(v.unit));
+                newRow.append($('<td>').text(v.keterangan));
                 newRow.append($('<td >').html(
                     `
-                    <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detail('${v.id}','${v.id_detail}')">
+                    <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detail('${v.spesifikasi_id}')">
                         <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                     </button>
-                    <button type="button" class="btn btn-danger" onclick="remove('${v.id_detail}')">
+                    <button type="button" class="btn btn-danger" onclick="remove('${v.spesifikasi_id}')">
                         <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                     </button>
                 `
@@ -1586,7 +1351,7 @@
                                 title: response.message,
                                 confirmButtonColor: '#4e73df',
                             }).then((result) => {
-                                window.location.href = "<?= base_url("mutasi/lokal"); ?>";
+                                window.location.href = "<?= base_url("mutasi"); ?>";
                             });
                         } else {
                             Swal.fire({
@@ -1644,16 +1409,35 @@
         })
     });
 
-    function getID() {
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        let randomString = '';
+    function grouppedArr(data) {
+        const grouped = Object.values(
+            data.reduce((acc, item) => {
+                const key = item.spesifikasi_id;
 
-        for (let i = 0; i < 10; i++) {
-            randomString += characters.charAt(Math.floor(Math.random() * characters.length));
-        }
+                if (!acc[key]) {
+                    acc[key] = {
+                        spesifikasi_id: item.spesifikasi_id,
+                        spesifikasi: item.spesifikasi,
+                        barang_name: item.barang_name,
+                        kode_barang: item.kode_barang,
+                        unit: item.unit_name_mutasi || item.kode_satuan,
+                        total_qty_mutasi: 0,
+                        keterangan: item.keterangan,
+                        items: []
+                    };
+                }
 
-        return randomString;
-    };
+
+                acc[key].total_qty_mutasi += Number(item.mutasi.qty_mutasi);
+                acc[key].items.push(item);
+
+                return acc;
+            }, {})
+        );
+
+        listFormGroupped = grouped;
+        drawTableSelectedItem(listFormGroupped);
+    }
 </script>
 
 

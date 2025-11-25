@@ -5,6 +5,7 @@ namespace App\Controllers\Inventori;
 use App\Controllers\BaseController;
 use App\Models\AdjusmentDetailModel;
 use App\Models\AdjusmentModel;
+use App\Models\AMPurchaseOrderDetailModel;
 use App\Models\BarangMasterModel;
 use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\DivisisModel;
@@ -20,6 +21,7 @@ use App\Models\WarehousesModel;
 use App\Models\BC23Model;
 use App\Models\BC27Model;
 use App\Models\BC40Model;
+use App\Models\PenerimaanBarangDetailModel;
 use App\Models\PPBKBModel;
 use App\Models\StockRevampDetailModel;
 use App\Models\StockRevampHistoryModel;
@@ -54,6 +56,7 @@ class StokAdjusment extends BaseController
     protected $stockRevampDetailModel;
     protected $stockRevampLogModel;
     protected $stockRevampHistoryModel;
+    protected $penerimaanBarangDetailModel;
 
     public function __construct()
     {
@@ -82,6 +85,7 @@ class StokAdjusment extends BaseController
         $this->barangMasterModel = new BarangMasterModel();
         $this->stockRevampLogModel = new StockRevampLogModel();
         $this->stockRevampHistoryModel = new StockRevampHistoryModel();
+        $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
     }
 
     public function index()
@@ -245,15 +249,25 @@ class StokAdjusment extends BaseController
             $start
         );
 
+        $mapKeterangan = $this->getMapKeteranganPoLokalBp(
+            $condition['dateStart'],
+            $condition['dateEnd']
+        );
+
         $dataResult = array();
         $no = $start + 1;
         foreach ($data['data'] as $d) {
             $bc_all = "";
+            $keterangan = "";
+
             if ($d['type_bc'] != "NON PABEAN" && $d['no_daftar'] != "") {
                 // ADA DOKUMEN BEA CUKAI
                 $bc_all = $d['type_bc'] . " / " . $d['no_daftar'] . " / " . $d['no_aju'];
             } else {
                 $bc_all = $d['type_bc'];
+            }
+            if ($d['po_type'] == "LOKAL PENOLONG") {
+                $keterangan = $mapKeterangan[$d['po_id']][$d['spesifikasi_id']];
             }
             array_push($dataResult, [
                 'no' => $no++,
@@ -275,6 +289,7 @@ class StokAdjusment extends BaseController
                 'qty_diterima' => (float)$d['qty_diterima'],
                 'kode_satuan' => $d['kode_satuan'],
                 "unit_id"               => $d['unit_id'],
+                "keterangan" => $keterangan,
             ]);
         }
 
@@ -1097,5 +1112,33 @@ class StokAdjusment extends BaseController
         }
 
         return $total;
+    }
+
+    private function getMapKeteranganPoLokalBp($startDate, $endDate)
+    {
+        $dataQry = $this->penerimaanBarangDetailModel
+            ->select('penerimaan_barang_detail.*')
+            ->join('penerimaan_barang', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id', 'left')
+            ->where('penerimaan_barang.company_id', $this->this_company_id)
+            ->where('penerimaan_barang_detail.deletedAt', null)
+            ->where('penerimaan_barang.status_penerimaan', "LOKAL")
+            ->where('penerimaan_barang.tipe_bahan', "PENOLONG")
+            ->groupStart()
+            ->where('penerimaan_barang.tanggal >=', $startDate)
+            ->where('penerimaan_barang.tanggal <=', $endDate)
+            ->groupEnd()
+            ->findAll();
+
+        $dataMapKeterangan = [];
+
+        foreach ($dataQry as $d) {
+            $po = $d['purchase_order_id'];
+            $spesifikasi = $d['spesifikasi_id'];
+
+            // buat nested array
+            $dataMapKeterangan[$po][$spesifikasi] = $d['keterangan'];
+        }
+
+        return $dataMapKeterangan;
     }
 }

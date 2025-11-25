@@ -365,10 +365,12 @@ class BiayaUdang extends BaseController
     public function dropdownJasaVendorIn()
     {
         $divisiID = $this->request->getVar('divisi_id');
+        $vendorID = $this->request->getVar('vendor_id');
+
         if (empty($divisiID)) {
             $data = [];
         } else {
-            $data = $this->biayaUdangModel->dropdownJasaVendorIn($divisiID);
+            $data = $this->biayaUdangModel->dropdownJasaVendorIn($divisiID, $vendorID);
         }
 
         return response()->setJSON([

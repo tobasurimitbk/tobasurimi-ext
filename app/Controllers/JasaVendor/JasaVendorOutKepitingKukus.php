@@ -17,6 +17,7 @@ use App\Models\SatuansModel;
 use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
 use App\Models\StockModel;
+use App\Models\StockRevampModel;
 use App\Models\SupplierModel;
 use App\Models\VendorModel;
 use App\Models\WarehousesModel;
@@ -53,7 +54,7 @@ class JasaVendorOutKepitingKukus extends BaseController
         $this->vendorModel = new VendorModel();
         $this->metaDataModel = new MetadataModel();
         $this->divisiModel = new DivisisModel();
-        $this->stockModel = new StockModel();
+        $this->stockModel = new StockRevampModel();
         $this->stockDetailModel = new StockDetailModel();
         $this->stockDetail2Model = new StockDetail2Model();
         $this->jasaVendorOutKepitingKukusModel = new JasaVendorOutKepitingKukusModel();
@@ -476,7 +477,7 @@ class JasaVendorOutKepitingKukus extends BaseController
             );
         } else {
             // Stok Dengan Master Barang & Spesifikasi
-            $data = $this->stockModel->getBarangRebusAndStock(
+            $data = $this->stockModel->getBarangAndStock(
                 $this->request->getVar('type_barang'),
                 $this->request->getVar('divisi_id'),
                 $this->request->getVar('warehouse_id')

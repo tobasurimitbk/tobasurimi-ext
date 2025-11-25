@@ -376,6 +376,7 @@ class JasaVendorOutDetailModel extends Model
         $stockRevampDetailModel = new StockRevampDetailModel();
         $jasaVendorInModel = new JasaVendorInModel();
         $prosesRebusModel = new ProsesRebusModel();
+        $productionResult = new ProductionResultModel();
         $result = [];
 
         $jasaVendorOutDetail = $this->asArray()
@@ -388,9 +389,6 @@ class JasaVendorOutDetailModel extends Model
         foreach ($jasaVendorOutDetail as $m) {
             $stockList = $stockRevampDetailModel->where('id', $m['stock_out_detail_id'])->first();
             $stock = $stockRevampModel->where('id', $stockList['stock_id'])->first();
-                // $stockOutput = $stockRevampModel->select('stock_revamp.id')
-                //                                         ->where('stock_revamp.spesifikasi_id', $stock['spesifikasi_id'])
-                //                                         ->first();
 
                 $dataBarangIn = $stockRevampModel->select('stock_revamp.spesifikasi_id, barang_master.barang_name')
                                                         ->where('stock_revamp.id', $stockList['stock_id'])
@@ -420,35 +418,37 @@ class JasaVendorOutDetailModel extends Model
                             ->where('id', $rmPurchaseOrder['supplier_id'])
                             ->first();
             }
-
-            // $jasaVendorIn = $jasaVendorInModel
-            //     ->select('jasa_vendor_in.*, vendors.name as nama_vendor')
-            //     ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
-            //     ->where('no_penerimaan_surat_jalan', $noJasaVendorIn)
-            //     ->where('jasa_vendor_in.company_id', session()->get("login")->this_company_id)
-            //     ->first();
                 
                
                     if ($stockList['reference_type'] == "PROSES REBUS") {
                         $doc = $prosesRebusModel
-                            ->select("no_rebus")
+                            ->select("id, no_rebus AS reference_no, tanggal AS tanggal")
                             ->where("id", $stockList['reference_id'])
                             ->first();
-                        $stock_dokumen = $doc ? $doc['no_rebus'] : null;
+
+                    } elseif ($stockList['reference_type'] == "HASIL PRODUKSI") {
+                        $doc = $productionResult
+                            ->select("id, pr_no AS reference_no, receive_date as tanggal")
+                            ->where("id", $stockList['reference_id'])
+                            ->first();
+
                     } elseif ($stockList['reference_type'] == "JASA VENDOR") {
-                        $jasaVendorIn = $jasaVendorInModel
-                            ->select('jasa_vendor_in.*, vendors.name as nama_vendor')
+                        $doc = $jasaVendorInModel
+                            ->select("jasa_vendor_in.id,
+                                    jasa_vendor_in.no_penerimaan_surat_jalan AS reference_no,
+                                    jasa_vendor_in.tanggal AS tanggal,
+                                    vendors.name AS nama_vendor")
                             ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
                             ->where("jasa_vendor_in.id", $stockList['reference_id'])
                             ->first();
-                        $stock_dokumen = $jasaVendorIn ? $jasaVendorIn['no_penerimaan_surat_jalan'] : null;
+
                     } else {
                         $doc = $rmPurchaseOrderModel
-                            ->select("po_no")
+                            ->select("id, po_no AS reference_no, po_date AS tanggal")
                             ->where("id", $stockList['po_id'])
                             ->first();
-                        $stock_dokumen = $doc ? $doc['po_no'] : null;
                     }
+
 
             $stockList['qty'] = $m['qty'] ?? 0;
             $bcType = isset($stockList['bc_id']) ? $metaDataModel->find($stockList['bc_id']) : null;
@@ -457,7 +457,7 @@ class JasaVendorOutDetailModel extends Model
             $stockList['satuan'] = $satuanOutput['kode_satuan'] ?? '';
             $stockList['sumber'] = $stockList['reference_type'] ?? '';
             $stockList['barang'] = strtoupper($barangNameOutput);
-            $stockList['stock_dokumen'] = $stock_dokumen;
+            $stockList['stock_dokumen'] = $doc['reference_no'] ?? null;
             $stockList['stock_id'] = $stockList['stock_id'] ?? null;
             $stockList['po_id'] = $stockList['po_id'] ?? null;
             $stockList['satuan_id'] = $m['satuan_id'] ?? null;
@@ -465,11 +465,11 @@ class JasaVendorOutDetailModel extends Model
             $stockList['type_barang'] = $stock['tipe_barang'] ?? '';
             $stockList['type_barang_text'] = isset($stock['tipe_barang']) ? strtoupper(str_replace('_', ' ', $stock['tipe_barang'])) : '';
             $stockList['stok_total'] = $stockList['qty_diterima'] ?? 0;
-            $stockList['stock_date'] =  $rmPurchaseOrder['po_date'] ?? $jasaVendorIn['tanggal'];
+            $stockList['stock_date'] =  $doc['tanggal'] ?? "-";
             $stockList['keterangan'] =  $m['keterangan'];
             $stockList['supplier_name'] = ($jasaVendorIn ?? false) 
                         ? (($supplierName['supplier_name'] ?? '') . ' / ' . ($jasaVendorIn['nama_vendor'] ?? ''))
-                        : ($supplierName['supplier_name'] ?? '');
+                        : ($supplierName['supplier_name'] ?? 'HASIL PRODUKSI');
 
 
             // id langsung encrypt tanpa grouping
