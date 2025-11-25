@@ -180,7 +180,7 @@
                         <div class="row">
                             <div class="col-md-12 col-table-button-tts" style="margin-top: 5px;">
                                 <div class="table-responsive">
-                                    <table class="table table-responsive table-bordered nowrap table-hover-tobasurimi dataTable table-pemasukkan" id="dataTableMasuk" width="100%" cellspacing="0">
+                                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-pemasukkan" id="dataTableMasuk" width="100%" cellspacing="0">
                                         <thead class="thead-dark">
                                             <tr>
                                                 <th>No</th>
@@ -740,19 +740,12 @@
 
     $('#btnExportKartuStock').click(function(e) {
         e.preventDefault();
-        var barangMasterId = $('#barang_master_id option:selected').val();
         var start_date = $('#start_date').val();
         var end_date = $('#end_date').val();
+        var divisi_id = $('#divisi_id').val();
+        var warehouse_id = $('#warehouse_id').val();
 
-        if (barangMasterId == '') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Pilih master barang',
-                confirmButtonColor: '#4e73df',
-                confirmButtonText: 'Oke',
-            });
-            return;
-        } else if (start_date == '') {
+        if (start_date == '') {
             Swal.fire({
                 icon: 'error',
                 title: 'Pilih tanggal mulai',
@@ -768,8 +761,24 @@
                 confirmButtonText: 'Oke',
             });
             return;
+        } else if (divisi_id == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Departemen wajib diisi',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Oke',
+            });
+            return;
+        } else if (warehouse_id == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Warehouse wajib diisi',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Oke',
+            });
+            return;
         } else {
-            var url = "<?= base_url('stock-list/export-kartu-stock') ?>" + "?barang_master_id=" + barangMasterId + "&start_date=" + start_date + "&end_date=" + end_date;
+            var url = "<?= base_url('stock-list/export-kartu-stock') ?>" + "?start_date=" + start_date + "&end_date=" + end_date + "&warehouse_id=" + warehouse_id + "&divisi_id=" + divisi_id;
             window.location.href = url;
         }
 
