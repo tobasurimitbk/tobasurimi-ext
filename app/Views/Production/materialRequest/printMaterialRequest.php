@@ -9,12 +9,12 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             letter-spacing: 2px;
-            font-size: 10px;
+            font-size: 6px;
         }
 
         h5 {
             font-weight: normal;
-            font-size: 12px;
+            font-size: 8px;
             margin-bottom: 10px;
             text-align: center;
             font-weight: bold;
@@ -23,7 +23,7 @@
 
         h6 {
             font-weight: normal;
-            font-size: 11px;
+            font-size: 7px;
             text-align: left;
             font-weight: bold;
             margin-top: 10px;
@@ -31,7 +31,7 @@
 
         hr {
             border: none;
-            border-top: 1px dashed #000;
+            border-top: 0.5px dashed #000;
         }
 
         @page {
@@ -46,7 +46,7 @@
 
         #dashed-border-table th,
         #dashed-border-table td {
-            border: 1px solid #000;
+            border: 0.5px solid #000;
             padding: 5px;
             text-align: center;
         }
@@ -58,10 +58,11 @@
         Data Material Request
     </h5>
 
-    <table width="100%" border="1" id="dashed-border-table" style="">
+    <table width="100%" border="1" id="dashed-border-table">
         <thead>
             <tr>
                 <th rowspan="2">No</th>
+                <th rowspan="2">Vendor</th>
                 <th rowspan="2">Supplier</th>
                 <th colspan="<?= $banyakHeader ?>">Spesifikasi</th>
                 <th rowspan="2">Total</th>
@@ -81,6 +82,7 @@
             <?php foreach ($pivotSupplier as $supplier): ?>
                 <tr>
                     <td><?= $no++ ?></td>
+                    <td style="text-align:left"></td>
                     <td style="text-align:left"><?= $supplier['supplier_name'] ?></td>
 
                     <?php foreach ($dataHeader as $h): ?>
@@ -95,7 +97,7 @@
             <?php if ($counterPivotSupplier > 0): ?>
                 <tr>
                     <td></td>
-                    <td style="text-align:right; font-weight:bold;">TOTAL</td>
+                    <td style="text-align:right; font-weight:bold;" colspan="2">TOTAL</td>
 
                     <?php foreach ($dataHeader as $h): ?>
                         <td style="text-align:center; font-weight:bold;">
@@ -115,6 +117,7 @@
                 <tr>
                     <td><?= $noVendor++ ?></td>
                     <td style="text-align:left"><?= $jasavendor['keterangan_full'] ?? $jasavendor['vendor_name'] ?></td>
+                    <td style="text-align:left"><?= $jasavendor['supplier_name'] ?? '' ?> (<?= $jasavendor['supplier_po_day'] ?? '' ?>)</td>
 
                     <?php foreach ($dataHeader as $h): ?>
                         <td style="text-align:center">
@@ -128,7 +131,7 @@
             <?php if ($counterPivotJasaVendor > 0): ?>
                 <tr>
                     <td></td>
-                    <td style="text-align:right; font-weight:bold;">TOTAL</td>
+                    <td style="text-align:right; font-weight:bold;" colspan="2">TOTAL</td>
 
                     <?php foreach ($dataHeader as $h): ?>
                         <td style="text-align:center; font-weight:bold;">
@@ -137,6 +140,74 @@
                     <?php endforeach; ?>
 
                     <td style="text-align:center; font-weight:bold;"><?= $footerGrandTotalJasaVendor; ?></td>
+                </tr>
+            <?php endif; ?>
+
+            <?php
+            $noProsesUlang = 1;
+            $counterPivotProsesUlang = count($pivotProsesUlang);
+            ?>
+            <?php foreach ($pivotProsesUlang as $prosesulang): ?>
+                <tr>
+                    <td><?= $noProsesUlang++ ?></td>
+                    <td style="text-align:left"><?= $prosesulang['keterangan_full'] ?? $prosesulang['supplier_name'] ?></td>
+                    <td style="text-align:left"><?= $prosesulang['keterangan_full'] ?? $prosesulang['supplier_name'] ?></td>
+
+                    <?php foreach ($dataHeader as $h): ?>
+                        <td style="text-align:center">
+                            <?= $prosesulang['specs'][$h->barang2_id] ?? 0 ?>
+                        </td>
+                    <?php endforeach; ?>
+
+                    <td style="text-align:center"><?= $prosesulang['total'] ?></td>
+                </tr>
+            <?php endforeach; ?>
+            <?php if ($counterPivotProsesUlang > 0): ?>
+                <tr>
+                    <td></td>
+                    <td style="text-align:right; font-weight:bold;" colspan="2">TOTAL</td>
+
+                    <?php foreach ($dataHeader as $h): ?>
+                        <td style="text-align:center; font-weight:bold;">
+                            <?= $footerTotalProsesUlang[$h->barang2_id] ?? 0 ?>
+                        </td>
+                    <?php endforeach; ?>
+
+                    <td style="text-align:center; font-weight:bold;"><?= $footerGrandTotalProsesUlang; ?></td>
+                </tr>
+            <?php endif; ?>
+
+            <?php
+            $noDitapak = 1;
+            $counterPivotDitapak = count($pivotDitapak);
+            ?>
+            <?php foreach ($pivotDitapak as $ditapak): ?>
+                <tr>
+                    <td><?= $noDitapak++ ?></td>
+                    <td style="text-align:left"><?= $ditapak['keterangan_full'] ?? $ditapak['supplier_name'] ?></td>
+                    <td style="text-align:left"><?= $ditapak['keterangan_full'] ?? $ditapak['supplier_name'] ?></td>
+
+                    <?php foreach ($dataHeader as $h): ?>
+                        <td style="text-align:center">
+                            <?= $ditapak['specs'][$h->barang2_id] ?? 0 ?>
+                        </td>
+                    <?php endforeach; ?>
+
+                    <td style="text-align:center"><?= $ditapak['total'] ?></td>
+                </tr>
+            <?php endforeach; ?>
+            <?php if ($counterPivotDitapak > 0): ?>
+                <tr>
+                    <td></td>
+                    <td style="text-align:right; font-weight:bold;" colspan="2">TOTAL</td>
+
+                    <?php foreach ($dataHeader as $h): ?>
+                        <td style="text-align:center; font-weight:bold;">
+                            <?= $footerTotalDitapak[$h->barang2_id] ?? 0 ?>
+                        </td>
+                    <?php endforeach; ?>
+
+                    <td style="text-align:center; font-weight:bold;"><?= $footerGrandTotalDitapak; ?></td>
                 </tr>
             <?php endif; ?>
 
