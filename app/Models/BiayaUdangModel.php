@@ -226,7 +226,7 @@ class BiayaUdangModel extends Model
         }
 
         if (empty($ids)) {
-            return $this->respond([]);
+            return [];
         }
 
         // ==================================================================
@@ -249,7 +249,8 @@ class BiayaUdangModel extends Model
             // DETAIL IN (bersih / kotor) + barang & spek
             $detailRows = $db->table('jasa_vendor_in_detail jvid')
                 ->select('jvid.qty_bersih, jvid.qty_kotor, jvid.stock_detail_in_id,
-                        bm.barang_name, bms.spesifikasi')
+                        bm.barang_name, bms.spesifikasi, bm.id as barang_master_id, 
+                        bms.id as barang_master_spesifikasi_id, s.barang_master_id, s.spesifikasi_id')
                 ->join('stock_revamp_detail srd', 'srd.id = jvid.stock_detail_in_id', 'left')
                 ->join('stock_revamp s', 's.id = srd.stock_id', 'left')
                 ->join('barang_master bm', 'bm.id = s.barang_master_id', 'left')
@@ -262,6 +263,8 @@ class BiayaUdangModel extends Model
             $sum_kotor = 0;
             $barang_name = null;
             $spesifikasi = null;
+            $barang_master_id = null;
+            $barang_master_spesifikasi_id = null;
 
             foreach ($detailRows as $d) {
                 $sum_bersih += floatval($d['qty_bersih'] ?? 0);
@@ -272,6 +275,12 @@ class BiayaUdangModel extends Model
                 }
                 if ($spesifikasi === null && !empty($d['spesifikasi'])) {
                     $spesifikasi = $d['spesifikasi'];
+                }
+                if ($barang_master_id === null && !empty($d['barang_master_id'])) {
+                    $barang_master_id = $d['barang_master_id'];
+                }
+                if ($barang_master_spesifikasi_id === null && !empty($d['barang_master_spesifikasi_id'])) {
+                    $barang_master_spesifikasi_id = $d['barang_master_spesifikasi_id'];
                 }
             }
 
@@ -301,6 +310,8 @@ class BiayaUdangModel extends Model
             }
 
             // ==================================================================
+            // 5. HITUNG RATIO
+            // ==================================================================
             if ($sum_keluar > 0) {
                 // ratio = IN / OUT dalam persen
                 $ratio = round(($sum_kotor / $sum_keluar) * 100, 2);
@@ -314,6 +325,7 @@ class BiayaUdangModel extends Model
             $final[$parentId] = [
                 'parent' => [
                     'id' => $parentId,
+                    'jasa_vendor_in_id' => $parentId,
                     'tanggal_masuk' => $p['tanggal'],
                     'sum_bersih' => round($sum_bersih, 3),
                     'sum_kotor' => round($sum_kotor, 3),
@@ -321,7 +333,9 @@ class BiayaUdangModel extends Model
                     'ratio' => $ratio,
                     'barang_name' => $barang_name,
                     'spesifikasi' => $spesifikasi,
-                    'tb_harga' => 0,
+                    'barang_master_id' => $barang_master_id,
+                    'barang_master_spesifikasi_id' => $barang_master_spesifikasi_id,
+                    'harga_per_kilo' => 0, // Hanya harga_per_kilo, tanpa tb_harga
                     'total_harga' => 0
                 ],
                 'detail' => []
@@ -349,79 +363,67 @@ class BiayaUdangModel extends Model
         }
 
         // ==================================================================
-        // 8. RETURN JSON
+        // 8. RETURN DATA
         // ==================================================================
         return $final;
     }
 
     public function getBarangDetail($jasaVendorInArrID, $id)
     {
-        $biayaUdangDetail = $this->dropdownBarang($jasaVendorInArrID, $id);
+        // Ambil data dari biaya_udang_detail berdasarkan ID
+        $db = \Config\Database::connect();
+        
+        $existingData = $db->table('biaya_udang_detail bud')
+            ->select('bud.*, bm.barang_name, bms.spesifikasi')
+            ->join('jasa_vendor_in jvi', 'jvi.id = bud.jasa_vendor_in_id', 'left')
+            ->join('barang_master bm', 'bm.id = bud.barang_master_id', 'left')
+            ->join('barang_master_spesifikasi bms', 'bms.id = bud.barang_master_spesifikasi_id', 'left')
+            ->where('bud.biaya_udang_id', $id)
+            ->get()
+            ->getResultArray();
 
-        if (empty($biayaUdangDetail)) {
+        if (empty($existingData)) {
             return [];
         }
 
         $result = [];
-        $barang_master_id_last = null;
-        $totals = [
-            'kg_rebus_total' => 0,
-            'kg_fauzy_total' => 0,
-            'kg_cn_total' => 0,
-            'kg_daging_total' => 0
-        ];
-        $tb_harga_last = null;
-
-        foreach ($biayaUdangDetail as $detail) {
-            if ($barang_master_id_last !== $detail['barang_master_id']) {
-                if ($barang_master_id_last !== null) {
-                    $result[] = [
-                        'barang_master_id' => $barang_master_id_last,
-                        'tb_harga' => $tb_harga_last,
-                        'kg_rebus_total' => $totals['kg_rebus_total'],
-                        'kg_fauzy_total' => $totals['kg_fauzy_total'],
-                        'kg_cn_total' => $totals['kg_cn_total'],
-                        'kg_daging_total' => $totals['kg_daging_total']
-                    ];
-                }
-                // Reset totals and tb_harga for the new barang_master_id
-                $totals = [
-                    'kg_rebus_total' => (float)$detail['qty_rebus'],
-                    'kg_fauzy_total' => (float)$detail['kg_fauzy'],
-                    'kg_cn_total' => (float)$detail['kg_cn'],
-                    'kg_daging_total' => (float)$detail['kg_daging']
-                ];
-                $barang_master_id_last = $detail['barang_master_id'];
-                $tb_harga_last = $detail['tb_harga'];
-            } else {
-                // Add to existing totals
-                $totals['kg_rebus_total'] += (float)$detail['qty_rebus'];
-                $totals['kg_fauzy_total'] += (float)$detail['kg_fauzy'];
-                $totals['kg_cn_total'] += (float)$detail['kg_cn'];
-                $totals['kg_daging_total'] += (float)$detail['kg_daging'];
-            }
-        }
-
-        // Add the last barang_master_id to the result
-        $result[] = [
-            'barang_master_id' => $barang_master_id_last,
-            'tb_harga' => $tb_harga_last,
-            'kg_rebus_total' => $totals['kg_rebus_total'],
-            'kg_fauzy_total' => $totals['kg_fauzy_total'],
-            'kg_cn_total' => $totals['kg_cn_total'],
-            'kg_daging_total' => $totals['kg_daging_total']
-        ];
-
-        for ($i = 0; $i < count($result); $i++) {
-            if ($result[$i]['kg_daging_total'] == 0) {
-                $result[$i]['kg_daging_total'] = 1;
-            }
-
-            $result[$i]['total_harga'] = (float)($result[$i]['kg_daging_total'] * $result[$i]['tb_harga']);
-            $result[$i]['ratio'] = ((float)($result[$i]['kg_daging_total'] / $result[$i]['kg_rebus_total']) * 100);
+        
+        foreach ($existingData as $detail) {
+            $jasaVendorInId = $detail['jasa_vendor_in_id'];
+            
+            // Hitung ratio
+            $kg_rebus = floatval($detail['kg_cn'] ?? 0);
+            $kg_daging = floatval($detail['kg_daging'] ?? 0);
+            $ratio = ($kg_rebus > 0) ? round(($kg_daging / $kg_rebus) * 100, 2) : 0;
+            
+            // Gunakan harga_per_kilo dari database
+            $harga_per_kilo = floatval($detail['harga_per_kilo'] ?? 0);
+            $total_harga = floatval($detail['total_harga'] ?? 0);
+            
+            $result[$jasaVendorInId] = [
+                'harga_per_kilo' => $harga_per_kilo,
+                'kg_rebus_total' => $kg_rebus,
+                'kg_cn_total' => $kg_rebus, // kg_cn sama dengan kg_rebus
+                'kg_daging_total' => $kg_daging,
+                'total_harga' => $total_harga,
+                'ratio' => $ratio,
+                'tanggal_po' => $detail['tanggal_po'],
+                'barang_name' => $detail['barang_name'],
+                'spesifikasi' => $detail['spesifikasi']
+            ];
         }
 
         return $result;
+    }
+
+    public function getExistingData($biayaUdangId)
+    {
+        $db = \Config\Database::connect();
+        
+        return $db->table('biaya_udang_detail')
+            ->where('biaya_udang_id', $biayaUdangId)
+            ->get()
+            ->getResultArray();
     }
 
     public function getDataTotalAutoComplete($listBarang)
