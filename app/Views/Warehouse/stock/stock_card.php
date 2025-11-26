@@ -262,6 +262,63 @@
                             </div>
                         </div>
 
+                        <ul class="nav nav-tabs mb-2 mt-3">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="pengeluaran_all" data-toggle="tab" href="#" onclick="filterPengeluarans('ALL')">
+                                    All
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="pengeluaran_jasa_vendor" data-toggle="tab" href="#" onclick="filterPengeluarans('JASA VENDOR')">
+                                    Jasa Vendor
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="pengeluaran_proses_rebus" data-toggle="tab" href="#" onclick="filterPengeluarans('PROSES REBUS')">
+                                    Proses Rebus
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="pengeluaran_material_request" data-toggle="tab" href="#" onclick="filterPengeluarans('MATERIAL REQUEST')">
+                                    Material Request
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="pengeluaran_mutasi" data-toggle="tab" href="#" onclick="filterPengeluarans('MUTASI')">
+                                    Mutasi
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="pengeluaran_stuffing" data-toggle="tab" href="#" onclick="filterPengeluarans('STUFFING')">
+                                    Stuffing
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="pengeluaran_adjusment_analisa" data-toggle="tab" href="#" onclick="filterPengeluarans('ANALISA')">
+                                    Adjusment (Analisa)
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="pengeluaran_adjusment_sample" data-toggle="tab" href="#" onclick="filterPengeluarans('SAMPLE')">
+                                    Adjusment (Sample)
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="pengeluaran_adjusment_lainnya" data-toggle="tab" href="#" onclick="filterPengeluarans('LAINNYA')">
+                                    Adjusment (Lainnya)
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="pengeluaran_adjusment_bonus" data-toggle="tab" href="#" onclick="filterPengeluarans('BONUS')">
+                                    Adjusment (Bonus)
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="pengeluaran_adjusment_jual_lokal" data-toggle="tab" href="#" onclick="filterPengeluarans('JUAL LOKAL')">
+                                    Adjusment (Jual Lokal)
+                                </a>
+                            </li>
+                        </ul>
 
                         <div class="row mt-3 justify-content-end">
                             <div class="col-sm-3 mb-2">
@@ -310,8 +367,113 @@
     </div>
 </div>
 
+<div class="modal detail-modal" id="detailSaldoAkhir" tabindex="1">
+    <div class="modal-dialog modal-xl" style="min-width: 100rem !important;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary">Detail Saldo Akhir</h5>
+            </div>
+            <div class="modal-body">
+                <div class="detail-form-component">
+                    <div class="detail-form-layout">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table>
+                                    <tr>
+                                        <td>Kode Barang</td>
+                                        <td>:</td>
+                                        <td id="txt_kode_barang_saldo_akhir"></td>
+                                        <td></td>
+                                        <td>Dept / Warehouse</td>
+                                        <td>:</td>
+                                        <td id="txt_dept_saldo_akhir"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Nama Barang</td>
+                                        <td>:</td>
+                                        <td id="txt_nama_barang_saldo_akhir"></td>
+                                        <td></td>
+                                        <td>Rentang Tanggal</td>
+                                        <td>:</td>
+                                        <td id="txt_date_range_saldo_akhir"></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="7">
+                                            <button class="btn btn-discard float-right" type="button" id="btnExportDetailSaldo" style="background-color: #FFA426 !important;color: white !important;border: 0px solid !important;">
+                                                Export Detail Saldo
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+
+                        <div class="row mt-3 justify-content-end">
+                            <div class="col-sm-3 mb-2">
+                                <input autocomplete="one-time-code" class="form-control search search_detail_saldo form-out-search" id="search_detail_saldo" placeholder="Search Data" value="" />
+
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 col-table-button-tts" style="margin-top: 5px;">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-detail-saldo-akhir" id="dataTableDetailSaldoAkhir" width="100%" cellspacing="0">
+
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <th>No</th>
+                                                <th>Sumber</th>
+                                                <th>Tanggal</th>
+                                                <th>No Po</th>
+                                                <th>Reference No</th>
+                                                <th>Keterangan</th>
+                                                <th>Masuk</th>
+                                                <th>Keluar</th>
+                                                <th>Kode Satuan</th>
+                                            </tr>
+                                        </thead>
+                                        <thead>
+                                            <tr>
+                                                <th colspan="6" class="text-right">SALDO AWAL</th>
+                                                <th colspan="2" id="qty_awal"></th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="body-table">
+
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th colspan="6" class="text-right">TOTAL</th>
+                                                <th id="qty_masuk"></th>
+                                                <th id="qty_keluar"></th>
+                                                <th></th>
+                                            </tr>
+                                            <tr>
+                                                <th colspan="6" class="text-right">SALDO AKHIR</th>
+                                                <th colspan="2" id="qty_akhir"></th>
+                                                <th></th>
+                                            </tr>
+                                        </tfoot>
+
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-discard mr-2" id="btnHideSaldoAkhir">Kembali</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     var listStock = [];
+    var filterPengeluaran = "ALL";
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
 
@@ -411,8 +573,9 @@
                 data: "qty_akhir",
                 className: "text-left",
                 render: function(data, type, row) {
+                    let id = row.id;
                     let qty_akhir = parseFloat(row.qty_akhir).toFixed(2);
-                    return `<b>${greatFormatRupiah(qty_akhir)}</b>`;
+                    return `<b><a onclick="detailSaldoAkhir('${id}')" href="#">${greatFormatRupiah(qty_akhir)}</a></b>`;
                 }
             },
             {
@@ -572,6 +735,7 @@
             url: "<?= base_url("stock-list/all-keluar-kartu-stock"); ?>",
             dataSrc: "data",
             data: function(data) {
+                data.filter_pengeluaran = filterPengeluaran;
                 data.search = $(".search_keluar").val();
                 data.start_date = $("#start_date").val();
                 data.end_date = $("#end_date").val();
@@ -660,6 +824,116 @@
         },
     });
 
+    const tableSaldoAkhir = $('#dataTableDetailSaldoAkhir').DataTable({
+        processing: true,
+        serverSide: true,
+        ordering: true,
+        order: [
+            [6, 'desc']
+        ],
+        fixedHeader: true,
+        lengthMenu: [
+            [25],
+            [25],
+        ],
+        pageLength: 25,
+        ajax: {
+            url: "<?= base_url("stock-list/all-kartu-stock-saldo-akhir"); ?>",
+            dataSrc: "data",
+            data: function(data) {
+                data.search = $(".search_detail_saldo").val();
+                data.start_date = $("#start_date").val();
+                data.end_date = $("#end_date").val();
+                data.stock_id = stock_id;
+                data.sort = sort;
+                data.sortType = sortType;
+            },
+
+        },
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+        },
+        display: "stripe",
+        searching: false,
+        columns: [{
+                data: "no",
+                className: "text-left",
+                orderable: false
+            },
+            {
+                data: "reference_type",
+                className: "text-left"
+            },
+            {
+                data: "tanggal",
+                className: "text-left"
+            },
+            {
+                data: "po_no",
+                className: "text-left",
+            },
+            {
+                data: "reference_no",
+                className: "text-left"
+            },
+            {
+                data: "keterangan",
+                className: "text-left"
+            },
+            {
+                data: "qty_masuk",
+                className: "text-left",
+                render: function(data) {
+                    return `<b>${greatFormatRupiah(data)}</b>`;
+                }
+            },
+            {
+                data: "qty_keluar",
+                className: "text-left",
+                render: function(data) {
+                    return `<b>${greatFormatRupiah(data)}</b>`;
+                }
+            },
+            {
+                data: "kode_satuan",
+                className: "text-left"
+            },
+        ],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
+        language: {
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        },
+        footerCallback: function(row, data, start, end, display) {
+            const json = this.api().ajax.json();
+            const qty_awal = parseFloat(json.qty_awal).toFixed(2);
+            const qty_akhir = parseFloat(json.qty_akhir).toFixed(2);
+            const qty_masuk = parseFloat(json.qty_masuk).toFixed(2);
+            const qty_keluar = parseFloat(json.qty_keluar).toFixed(2);
+
+            $('#qty_awal').html(greatFormatRupiah(qty_awal ?? 0));
+            $('#qty_akhir').html(greatFormatRupiah(qty_akhir ?? 0));
+            $('#qty_masuk').html(greatFormatRupiah(qty_masuk ?? 0));
+            $('#qty_keluar').html(greatFormatRupiah(qty_keluar ?? 0));
+        }
+
+    });
+
     $('#search_masuk').change((e) => {
         e.preventDefault();
         tableMasuk.ajax.reload()
@@ -669,6 +943,12 @@
         e.preventDefault();
         tableKeluar.ajax.reload()
     });
+
+    $('#search_detail_saldo').change((e) => {
+        e.preventDefault();
+        tableSaldoAkhir.ajax.reload()
+    });
+
 
     $('#type_barang').select2({
         placeholder: "Pilih Tipe Barang",
@@ -784,6 +1064,42 @@
 
     });
 
+    $('#btnExportDetailSaldo').click(function(e) {
+        e.preventDefault();
+        var stockId = stock_id;
+        var start_date = $('#start_date').val();
+        var end_date = $('#end_date').val();
+
+        if (stockId == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pilih barang dulu',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Oke',
+            });
+            return;
+        } else if (start_date == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pilih tanggal mulai',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Oke',
+            });
+            return;
+        } else if (end_date == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pilih tanggal selesai',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Oke',
+            });
+            return;
+        } else {
+            var url = "<?= base_url('stock-list/export-kartu-stock-saldo-akhir') ?>" + "?stock_id=" + stockId + "&start_date=" + start_date + "&end_date=" + end_date;
+            window.location.href = url;
+        }
+    })
+
     $('#btnExportPemasukkan').click(function(e) {
         e.preventDefault();
         var stockId = stock_id;
@@ -852,10 +1168,15 @@
             });
             return;
         } else {
-            var url = "<?= base_url('stock-list/export-kartu-stock-keluar') ?>" + "?stock_id=" + stockId + "&start_date=" + start_date + "&end_date=" + end_date;
+            var url = "<?= base_url('stock-list/export-kartu-stock-keluar') ?>" + "?stock_id=" + stockId + "&start_date=" + start_date + "&end_date=" + end_date + '&filter_pengeluaran=' + filterPengeluaran;
             window.location.href = url;
         }
 
+    });
+
+    $('#btnHideSaldoAkhir').click(function(e) {
+        e.preventDefault();
+        $('#detailSaldoAkhir').modal('hide');
     });
 
     function detailMasuk(id) {
@@ -981,6 +1302,49 @@
                 $(".warehouse_id").val();
             }
         });
+    }
+
+    function detailSaldoAkhir(id) {
+        $.ajax({
+            url: `<?= base_url('stock-list/stock-identity-detail'); ?>`,
+            method: "GET",
+            data: {
+                id: id,
+            },
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            dataType: "json",
+            success: function(res) {
+                if (res.status) {
+                    var data = res.data;
+                    var start_date = $('#start_date').val();
+                    var end_date = $('#end_date').val();
+                    $('#txt_date_range_saldo_akhir').text(`${start_date} s.d ${end_date}`);
+                    $('#txt_kode_barang_saldo_akhir').text(`${data.kode_barang}`);
+                    $('#txt_nama_barang_saldo_akhir').text(`${data.barang_name} / ${data.spesifikasi}`);
+                    $('#txt_dept_saldo_akhir').text(`${data.divisi} ${data.warehouse_name}`);
+                    stock_id = data.id;
+                    tableSaldoAkhir.ajax.reload();
+                    $('#detailSaldoAkhir').modal('show');
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: res.message,
+                        confirmButtonColor: '#4e73df',
+                    });
+                }
+
+            }
+        });
+    }
+
+    function filterPengeluarans(val) {
+        filterPengeluaran = val;
+        tableKeluar.ajax.reload();
     }
 
     function changeSort(val) {

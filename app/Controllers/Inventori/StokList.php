@@ -34,6 +34,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 
 class StokList extends BaseController
 {
@@ -2636,13 +2637,15 @@ class StokList extends BaseController
             : null;
         $stockId = ($this->request->getGet('stock_id'));
         $search = $this->request->getGet('search');
+        $filterPengeluaran = trim($this->request->getGet('filter_pengeluaran'));
 
         $condition = [
             'company_id'        => $this->this_company_id,
             'dateStart'         => $dateStart,
             'dateEnd'           => $dateEnd,
             'stock_id'         => $stockId,
-            'search'            => $search
+            'search'            => $search,
+            'filter_pengeluaran' => $filterPengeluaran
         ];
 
         if (empty($stockId) || $stockId == '') {
@@ -2992,13 +2995,15 @@ class StokList extends BaseController
 
         $stockId = $this->request->getVar("stock_id");
         $search  = $this->request->getVar("search");
+        $filterPengeluaran = trim($this->request->getGet('filter_pengeluaran'));
 
         $condition = [
             'company_id' => $this->this_company_id,
             'dateStart'  => $dateStart,
             'dateEnd'    => $dateEnd,
             'stock_id'   => $stockId,
-            'search'     => $search
+            'search'     => $search,
+            'filter_pengeluaran' => $filterPengeluaran
         ];
 
         $data = $this->stockRevampLogModel->getKartuStockKeluar(
@@ -3073,5 +3078,294 @@ class StokList extends BaseController
         $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
         $writer->save("php://output");
         exit;
+    }
+
+    public function allDetailSaldoAkhir()
+    {
+        $draw = $this->request->getGet('draw');
+        $start = (int)$this->request->getGet('start');
+        $length = (int)$this->request->getGet('length');
+        $orderDir = $this->request->getGet('order')[0]['dir'] ?? 'asc';
+        $orderColumnIndex = $this->request->getGet('order')[0]['column'] ?? null;
+
+        $condition = [
+            "dateStart" => $this->request->getVar("start_date")
+                ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("start_date"))))
+                : null,
+            "dateEnd" => $this->request->getVar("end_date")
+                ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("end_date"))))
+                : null,
+            "stock_id" => ($this->request->getVar('stock_id')),
+            "search" => $this->request->getVar('search')
+        ];
+
+        if (empty($condition['stock_id']) || $condition['stock_id'] == '') {
+            return $this->response->setJSON([
+                'draw' => intval($draw),
+                'recordsTotal' => 0,
+                'recordsFiltered' => 0,
+                'data' => [],
+                'qty_awal' => 0,
+                'qty_akhir' => 0
+            ]);
+        }
+
+        $dataQry = $this->stockRevampLogModel->getDetailSaldoAkhir(
+            $condition,
+            $orderColumnIndex,
+            $orderDir,
+            $length,
+            $start
+        );
+
+        $masuk = $this->getTotalKartuStockMasuk(
+            $condition['dateStart'],
+            $condition['dateEnd'],
+        );
+
+        $keluar = $this->getTotalKartuStockKeluar(
+            $condition['dateStart'],
+            $condition['dateEnd']
+        );
+
+        // get stok awal
+        $stockMasukAwal = $this->getTotalKartuStockMasuk(
+            "2025-09-01",
+            $condition['dateStart']
+        );
+
+        $stockKeluarAwal = $this->getTotalKartuStockKeluar(
+            "2025-09-01",
+            $condition['dateStart']
+        );
+
+        $stock_in_awal =  isset($stockMasukAwal[$condition['stock_id']]) ?  $stockMasukAwal[$condition['stock_id']] : 0;
+        $stock_out_awal = isset($stockKeluarAwal[$condition['stock_id']]) ?  $stockKeluarAwal[$condition['stock_id']] : 0;
+
+        $qty_masuk_filter = 0;
+        $qty_keluar_filter = 0;
+
+        $dataResult = [];
+        $no = $start + 1;
+        foreach ($dataQry['data'] as $d) {
+            array_push($dataResult, [
+                'no' => $no++,
+                'id' => encrypt($d['id']),
+                'reference_type' => $d['reference_type'],
+                'tanggal' => date('d/m/Y', strtotime($d['tanggal'])),
+                'po_no' => $d['po_no'],
+                'reference_no' => $d['reference_no'],
+                'keterangan' => $d['keterangan'],
+                'qty_masuk' => (float)$d['qty_masuk'],
+                'qty_keluar' => (float)$d['qty_keluar'],
+                'kode_satuan' => $d['kode_satuan'],
+            ]);
+
+            $qty_masuk_filter += (float)$d['qty_masuk'];
+            $qty_keluar_filter += (float)$d['qty_keluar'];
+        }
+
+        if (empty($condition['search'])) {
+            $qty_masuk = isset($masuk[$condition['stock_id']]) ? (float)$masuk[$condition['stock_id']] ?? 0 : 0;
+            $qty_keluar = isset($keluar[$condition['stock_id']]) ? (float)$keluar[$condition['stock_id']] ?? 0 : 0;
+        } else {
+            $qty_masuk = $qty_masuk_filter;
+            $qty_keluar = $qty_keluar_filter;
+        }
+
+        $qty_awal =  $stock_in_awal - $stock_out_awal;
+        $qty_akhir = $qty_awal + $qty_masuk - $qty_keluar;
+
+        $data = [
+            'draw' => intval($draw),
+            'recordsTotal' => intval($data['totalData'] ?? 0),
+            'recordsFiltered' => intval($data['totalFilteredData'] ?? 0),
+            'data' => $dataResult,
+            'qty_awal' => (float)$qty_awal,
+            'qty_akhir' => (float)$qty_akhir,
+            'qty_masuk' => (float)$qty_masuk,
+            'qty_keluar'  => (float)$qty_keluar
+        ];
+
+        return response()->setJSON($data);
+    }
+
+    public function exportDetailSaldo()
+    {
+        $condition = [
+            "dateStart" => $this->request->getVar("start_date")
+                ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("start_date"))))
+                : null,
+            "dateEnd" => $this->request->getVar("end_date")
+                ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("end_date"))))
+                : null,
+            "stock_id" => ($this->request->getVar('stock_id')),
+            "search" => $this->request->getVar('search')
+        ];
+
+        $dataQry = $this->stockRevampLogModel->getDetailSaldoAkhir(
+            $condition,
+            null,
+            'asc',
+            100000000,
+            0
+        );
+
+        $masuk = $this->getTotalKartuStockMasuk($condition['dateStart'], $condition['dateEnd']);
+        $keluar = $this->getTotalKartuStockKeluar($condition['dateStart'], $condition['dateEnd']);
+
+        // stok awal
+        $stockMasukAwal = $this->getTotalKartuStockMasuk("2025-09-01", $condition['dateStart']);
+        $stockKeluarAwal = $this->getTotalKartuStockKeluar("2025-09-01", $condition['dateStart']);
+
+        $stock_in_awal = $stockMasukAwal[$condition['stock_id']] ?? 0;
+        $stock_out_awal = $stockKeluarAwal[$condition['stock_id']] ?? 0;
+
+        $qty_awal = $stock_in_awal - $stock_out_awal;
+        $qty_masuk = $masuk[$condition['stock_id']] ?? 0;
+        $qty_keluar = $keluar[$condition['stock_id']] ?? 0;
+        $qty_akhir = $qty_awal + $qty_masuk - $qty_keluar;
+
+        // --- Create Spreadsheet ---
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle("Detail Saldo");
+
+        // -----------------------------------------------------
+        // HEADER TABLE
+        // -----------------------------------------------------
+        $header = [
+            "No",
+            "Sumber",
+            "Tanggal",
+            "No PO",
+            "Reference No",
+            "Keterangan",
+            "Masuk",
+            "Keluar",
+            "Kode Satuan"
+        ];
+
+        $sheet->fromArray($header, null, 'A1');
+
+        // Style header
+        $sheet->getStyle("A1:I1")->applyFromArray([
+            'font' => ['bold' => true],
+            'alignment' => ['horizontal' => 'center'],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['rgb' => '343A40']
+            ],
+            'font' => ['color' => ['rgb' => 'FFFFFF']]
+        ]);
+
+        // -----------------------------------------------------
+        // SALDO AWAL ROW (ROW 2)
+        // -----------------------------------------------------
+        $sheet->setCellValue("A2", "SALDO AWAL");
+        $sheet->mergeCells("A2:F2");
+
+        $sheet->setCellValue("G2", $qty_awal);
+        $sheet->mergeCells("G2:H2");
+        $sheet->setCellValue("I2", "");
+
+        // styling
+        $sheet->getStyle("A2:I2")->applyFromArray([
+            'font' => ['bold' => true],
+            'alignment' => ['horizontal' => 'right'],
+            'borders' => [
+                'allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN]
+            ]
+        ]);
+
+        // -----------------------------------------------------
+        // DATA BODY (mulai dari row 3)
+        // -----------------------------------------------------
+        $row = 3;
+        $no = 1;
+
+        foreach ($dataQry['data'] as $d) {
+
+            $sheet->setCellValue("A{$row}", $no++);
+            $sheet->setCellValue("B{$row}", $d['reference_type']);
+            $sheet->setCellValue("C{$row}", date('d/m/Y', strtotime($d['tanggal'])));
+            $sheet->setCellValue("D{$row}", $d['po_no']);
+            $sheet->setCellValue("E{$row}", $d['reference_no']);
+            $sheet->setCellValue("F{$row}", $d['keterangan']);
+            $sheet->setCellValue("G{$row}", (float)$d['qty_masuk']);
+            $sheet->setCellValue("H{$row}", (float)$d['qty_keluar']);
+            $sheet->setCellValue("I{$row}", $d['kode_satuan']);
+
+            $row++;
+        }
+
+        // -----------------------------------------------------
+        // TOTAL ROW
+        // -----------------------------------------------------
+        $sheet->setCellValue("A{$row}", "TOTAL");
+        $sheet->mergeCells("A{$row}:F{$row}");
+
+        $sheet->setCellValue("G{$row}", $qty_masuk);
+        $sheet->setCellValue("H{$row}", $qty_keluar);
+        $sheet->setCellValue("I{$row}", "");
+
+        $sheet->getStyle("A{$row}:I{$row}")->applyFromArray([
+            'font' => ['bold' => true],
+            'borders' => [
+                'allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN]
+            ],
+            'alignment' => ['horizontal' => 'right']
+        ]);
+
+        $row++;
+
+        // -----------------------------------------------------
+        // SALDO AKHIR
+        // -----------------------------------------------------
+        $sheet->setCellValue("A{$row}", "SALDO AKHIR");
+        $sheet->mergeCells("A{$row}:F{$row}");
+
+        $sheet->setCellValue("G{$row}", $qty_akhir);
+        $sheet->mergeCells("G{$row}:H{$row}");
+        $sheet->setCellValue("I{$row}", "");
+
+        $sheet->getStyle("A{$row}:I{$row}")->applyFromArray([
+            'font' => ['bold' => true],
+            'borders' => [
+                'allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN]
+            ],
+            'alignment' => ['horizontal' => 'right']
+        ]);
+
+        // -----------------------------------------------------
+        // FORMAT ANGKA (RIBUAN, TANPA "RP", RATA KANAN)
+        // -----------------------------------------------------
+        $sheet->getStyle("G2:H{$row}")
+            ->getNumberFormat()
+            ->setFormatCode('#,##0');
+
+        $sheet->getStyle("G2:H{$row}")
+            ->getAlignment()
+            ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+
+        // -----------------------------------------------------
+        // AUTO SIZE COLUMN
+        // -----------------------------------------------------
+        foreach (range('A', 'I') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // -----------------------------------------------------
+        // OUTPUT FILE
+        // -----------------------------------------------------
+        $filename = "Detail_Saldo_" . date("Ymd_His") . ".xlsx";
+
+        header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        header("Content-Disposition: attachment; filename=\"{$filename}\"");
+        header("Cache-Control: max-age=0");
+
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save("php://output");
+        exit();
     }
 }
