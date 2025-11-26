@@ -225,6 +225,7 @@
     // ==================== GLOBAL VARIABLES ====================
 const csrfToken = '<?= csrf_token() ?>';
 const csrf = $(`[name="${csrfToken}"]`);
+let biayaKepiting = <?= json_encode($biayaKepiting); ?>;
 var listBarang = [];
 var listPerolehanGaji = [];
 var listBonus = [];
@@ -237,6 +238,8 @@ $(document).ready(function() {
     
     <?php if (!empty($biayaKepiting)) : ?>
         $('#vendor_id').val('<?= $biayaKepiting['vendor_id'] ?>').trigger('change');
+        window.selectedSuratJalanId = biayaKepiting.jasa_vendor_in_kepiting_kukus_id;
+        window.isEditMode = true;
         loadExistingData();
     <?php endif; ?>
 });
@@ -270,14 +273,10 @@ function handleVendorChange() {
     const vendorId = $(this).val();
     const $selectSuratJalan = $('.jasa_vendor_in_id');
 
-    // $selectSuratJalan.val(null).trigger('change');
-
     if (!vendorId) {
         $selectSuratJalan.empty();
         return;
     }
-
-    // $selectSuratJalan.empty().append('<option value="">Loading...</option>').trigger('change');
 
     $.ajax({
         url: `/biaya-kepiting/get-jasa-vendor-in/${vendorId}`,
@@ -300,10 +299,16 @@ function handleVendorChange() {
                 $selectSuratJalan.append('<option value="">Tidak ada surat jalan</option>');
             }
 
-            // $selectSuratJalan.trigger('change');
+            // === AUTO SELECT IF EDIT MODE ===
+            if (isEditMode && selectedSuratJalanId) {
+                $selectSuratJalan.val(selectedSuratJalanId).trigger('change');
+            }
+
         },
         error: function() {
-            $selectSuratJalan.empty().append('<option value="">Gagal memuat data</option>').trigger('change');
+            $selectSuratJalan
+                .empty()
+                .append('<option value="">Gagal memuat data</option>');
         }
     });
 }
@@ -316,76 +321,108 @@ function handleJasaVendorChange() {
         $('.vendor').val(firstSelected.data('vendor'));
         $('.divisi').val(firstSelected.data('divisi'));
         $('.thead-bonus').text("Bonus Khusus Untuk " + (firstSelected.data('vendor') || 'Vendor'));
+        
+        // Load data barang hanya jika ada jasa_vendor_in_id yang dipilih
+        listDataBarang();
     } else {
         $('.vendor').val('');
         $('.divisi').val('');
         $('.thead-bonus').text("Bonus Khusus Untuk Vendor");
+        
+        // Kosongkan list barang jika tidak ada yang dipilih
+        listBarang = [];
+        drawTableBarang();
     }
 
-    listDataBarang();
     changeStatus();
 }
 
 // ==================== DATA LOADING ====================
 function loadExistingData() {
+    // Untuk mode edit, langsung load data tanpa bergantung jasa_vendor_in_id
     $.ajax({
         url: `<?= base_url('biaya-kepiting/list-barang'); ?>`,
         method: "GET",
         data: {
-            jasa_vendor_in_id: $(".jasa_vendor_in_id").val(),
             id: $('.id').val()
         },
         dataType: "json",
         success: function(res) {
             csrf.val(res.token);
-            listBarang = res.data;
-            listPerolehanGaji = res.dataPerolehanGaji;
-            listDataVendor = res.dataVendor;
-            listBonus = res.dataBonus;
             
-            // Untuk mode edit, set nilai select2 berdasarkan jasa_vendor_in_kepiting_kukus_id
+            // Reset data dulu
+            listBarang = [];
+            listPerolehanGaji = [];
+            listDataVendor = [];
+            listBonus = [];
+            
+            // Hanya set data jika response sukses
+            if (res.status !== false) {
+                listBarang = res.data || [];
+                listPerolehanGaji = res.dataPerolehanGaji || [];
+                listDataVendor = res.dataVendor || [];
+                listBonus = res.dataBonus || [];
+
+                drawAllTables();
+            }
+            
+            // Set nilai select2 jika ada data jasa_vendor_in_kepiting_kukus_id
             if (res.biayaKepiting && res.biayaKepiting.jasa_vendor_in_kepiting_kukus_id) {
                 const jasaVendorIds = res.biayaKepiting.jasa_vendor_in_kepiting_kukus_id.split(',');
                 $('.jasa_vendor_in_id').val(jasaVendorIds).trigger('change');
             }
-            
-            drawAllTables();
         },
         error: function(xhr, status, error) {
             console.error("Error loading existing data:", error);
+            // Set data kosong
+            listBarang = [];
+            listPerolehanGaji = [];
+            listDataVendor = [];
+            listBonus = [];
             alert("Terjadi kesalahan saat memuat data. Silakan refresh halaman.");
         }
     });
 }
 
+// ==================== TABLE FUNCTIONS ====================
 function listDataBarang() {
-    $.ajax({
-        url: `<?= base_url('biaya-kepiting/list-barang'); ?>`,
-        method: "GET",
-        beforeSend: setLoading,
-        complete: stopLoading,
-        data: { 
-            jasa_vendor_in_id: $(".jasa_vendor_in_id").val(),
-            id: $('.id').val() // Tambahkan ini untuk mode edit
-        },
-        dataType: "json",
-        success: function(res) {
-            window.listBarang = res.data || {};
-            window.listPerolehanGaji = res.dataPerolehanGaji || [];
-            window.listBonus = res.dataBonus || [];
-            window.listDataVendor = res.dataVendor || {};
+    const jasaVendorInId = $(".jasa_vendor_in_id").val();
+    
+    // Reset data dulu
+    listBarang = [];
+    listPerolehanGaji = [];
+    listDataVendor = [];
+    listBonus = [];
+    
+    // Hanya load data barang jika ada jasa_vendor_in_id yang dipilih
+    if (jasaVendorInId && jasaVendorInId.length > 0) {
+        $.ajax({
+            url: `<?= base_url('biaya-kepiting/list-barang'); ?>`,
+            method: "GET",
+            data: {
+                jasa_vendor_in_id: jasaVendorInId,
+                id: $('.id').val()
+            },
+            dataType: "json",
+            success: function(res) {
+                csrf.val(res.token);
+                
+                // Hanya set data jika response sukses
+                if (res.status !== false) {
+                    listBarang = res.data || [];
+                    listPerolehanGaji = res.dataPerolehanGaji || [];
+                    listDataVendor = res.dataVendor || [];
+                    listBonus = res.dataBonus || [];
+
+                     drawAllTables();
+                }
             
-            if ($('input[name="csrf_token_name"]').length) {
-                $('input[name="csrf_token_name"]').val(res.token);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error loading barang data:", error);
             }
-            
-            drawAllTables();
-        },
-        error: function(xhr, status, error) {
-            console.error("Error loading data:", error);
-            alert("Terjadi kesalahan saat memuat data. Silakan refresh halaman.");
-        }
-    });
+        });
+    }
 }
 
 // ==================== TABLE DRAWING ====================
@@ -556,53 +593,29 @@ function drawTable2() {
     const $tbody = $table.find('tbody');
     $tbody.empty();
 
-    if (listPerolehanGaji.length === 0) {
+    if (!listPerolehanGaji || listPerolehanGaji.length === 0) {
         $tbody.append('<tr><td colspan="9" style="text-align: center;">Tidak Ada Data</td></tr>');
         return;
     }
 
-    const specs = ["JB", "SP LUMP", "BF", "SPL", "CLAW", "MH", "CF"];
-    const vendorData = listDataVendor || {};
-    const hargaPerKategori = {};
+    // Column mapping yang benar
+    const columns = ['jumbo', 'ex_lump', 'lump', 'special', 'claw', 'mh', 'cf'];
+    const columnLabels = ['JUMBO', 'EX LUMP', 'LUMP', 'SPESIAL', 'CLAW', 'MH', 'CF'];
 
-    // Setup harga per kategori
-    listPerolehanGaji.forEach(item => {
-        hargaPerKategori[item.value] = {};
-        
-        if (item.value === 'upah_kopek') {
-            specs.forEach(spec => {
-                const key = `upah_${spec.toLowerCase().replace(' ', '_')}`;
-                hargaPerKategori[item.value][spec] = vendorData[key] || item[spec.toLowerCase().replace(' ', '_')] || 0;
-            });
-        } else if (item.value === 'komisi_kg_daging') {
-            const komisiValue = vendorData.komisi_vendor || item.jumbo || 0;
-            specs.forEach(spec => hargaPerKategori[item.value][spec] = komisiValue);
-        } else if (item.value === 'bonus_kg_daging') {
-            specs.forEach(spec => {
-                const key = `bonus_${spec.toLowerCase().replace(' ', '_')}`;
-                hargaPerKategori[item.value][spec] = vendorData[key] || item[spec.toLowerCase().replace(' ', '_')] || 0;
-            });
-        } else if (item.value === 'tamb_upah_kopek') {
-            specs.forEach(spec => {
-                const key = `tambahan_upah_kopek_${spec.toLowerCase().replace(' ', '_')}`;
-                hargaPerKategori[item.value][spec] = vendorData[key] || item[spec.toLowerCase().replace(' ', '_')] || 0;
-            });
-        }
-    });
-
-    // Draw rows
-    listPerolehanGaji.forEach((v, i) => {
-        let rowHTML = `<tr><td>${v.description || ''}</td>`;
+    // Draw rows untuk setiap jenis perolehan gaji
+    listPerolehanGaji.forEach((item, index) => {
         let total = 0;
+        let rowHTML = `<tr><td>${item.description || ''}</td>`;
 
-        specs.forEach(spec => {
-            const value = (hargaPerKategori[v.value] && hargaPerKategori[v.value][spec]) || 0;
-            total += parseFloat(value || 0);
+        // Loop melalui setiap column
+        columns.forEach(col => {
+            const value = parseFloat(item[col] || 0);
+            total += value;
             
             rowHTML += `
                 <td style="text-align: center;">
-                    <input id="${i+'_2_'+spec.replace(/\s+/g, '_')}" 
-                        class="form-control ${v.value}_${spec.replace(/\s+/g, '_')}" 
+                    <input id="gaji_${index}_${col}" 
+                        class="form-control gaji-input ${col}" 
                         type="text" 
                         value="${value}"
                         oninput="calculateAll()">
@@ -614,7 +627,7 @@ function drawTable2() {
         $tbody.append(rowHTML);
     });
 
-    // Calculate and display totals
+    // Calculate totals setelah draw
     calculateTable2Totals();
 }
 
@@ -680,7 +693,6 @@ function calculateTable2Totals() {
     if (!window.currentTotals) return;
     
     const { totalPerSpek, totalTotal } = window.currentTotals;
-    const specs = ["JB", "SP LUMP", "BF", "SPL", "CLAW", "MH", "CF"];
     const $tbody = $('#dataTable2 tbody');
     
     // Clear existing total rows
@@ -688,13 +700,28 @@ function calculateTable2Totals() {
     $tbody.find('tr').filter(':contains("PRESENTASE")').remove();
     $tbody.find('tr').filter(':contains("GRAND TOTAL")').remove();
 
-    // Calculate current values from inputs
+    // Column mapping
+    const columns = ['jumbo', 'ex_lump', 'lump', 'special', 'claw', 'mh', 'cf'];
+    const columnLabels = ['JUMBO', 'EX LUMP', 'LUMP', 'SPESIAL', 'CLAW', 'MH', 'CF'];
+    
+    // Mapping antara nama kolom dan spek dari table 1
+    const spekMapping = {
+        'jumbo': 'JB',
+        'ex_lump': 'SP LUMP', 
+        'lump': 'LUMP',
+        'special': 'SPL',
+        'claw': 'CLAW',
+        'mh': 'MH',
+        'cf': 'CF'
+    };
+
+    // Get current values dari input
     const currentValues = {};
-    listPerolehanGaji.forEach((v, i) => {
-        currentValues[v.value] = {};
-        specs.forEach(spec => {
-            const inputVal = $(`#${i+'_2_'+spec.replace(/\s+/g, '_')}`).val();
-            currentValues[v.value][spec] = parseFloat(inputVal) || 0;
+    listPerolehanGaji.forEach((item, index) => {
+        currentValues[item.value] = {};
+        columns.forEach(col => {
+            const inputVal = $(`#gaji_${index}_${col}`).val();
+            currentValues[item.value][col] = parseFloat(inputVal) || 0;
         });
     });
 
@@ -704,9 +731,10 @@ function calculateTable2Totals() {
         let totalKategori = 0;
         let rowHTML = `<tr style="background-color:#f2c996;"><td style="text-align: center;"><b>TOTAL ${kategoriName.toUpperCase()}</b></td>`;
 
-        specs.forEach(spec => {
-            const harga = currentValues[kategori][spec] || 0;
-            const qty = totalPerSpek[spec] || 0;
+        columns.forEach(col => {
+            const harga = currentValues[kategori][col] || 0;
+            const spekKey = spekMapping[col];
+            const qty = totalPerSpek[spekKey] || 0;
             const totalSpec = harga * qty;
             totalKategori += totalSpec;
             rowHTML += `<td>${totalSpec !== 0 ? formatRupiah(totalSpec.toFixed(2)) : '0'}</td>`;
@@ -720,8 +748,9 @@ function calculateTable2Totals() {
     let totalPresentase = 0;
     let presentaseRow = `<tr style="background-color:#f2c996;"><td style="text-align: center;"><b>PRESENTASE KOPEK</b></td>`;
     
-    specs.forEach(spec => {
-        const qty = totalPerSpek[spec] || 0;
+    columnLabels.forEach((label, index) => {
+        const spekKey = spekMapping[columns[index]];
+        const qty = totalPerSpek[spekKey] || 0;
         const presentase = totalTotal ? (qty * 100 / totalTotal) : 0;
         totalPresentase += presentase;
         presentaseRow += `<td>${presentase.toFixed(2)} %</td>`;
@@ -731,25 +760,26 @@ function calculateTable2Totals() {
     $tbody.append(presentaseRow);
 
     // GRAND TOTAL
-    const grandTotalPerSpek = {};
+    const grandTotalPerCol = {};
     let grandTotalUpahKopek = 0;
     
-    specs.forEach(spec => grandTotalPerSpek[spec] = 0);
+    columns.forEach(col => grandTotalPerCol[col] = 0);
     
     Object.keys(currentValues).forEach(kategori => {
-        specs.forEach(spec => {
-            const harga = currentValues[kategori][spec] || 0;
-            const qty = totalPerSpek[spec] || 0;
-            grandTotalPerSpek[spec] += (harga * qty);
+        columns.forEach(col => {
+            const harga = currentValues[kategori][col] || 0;
+            const spekKey = spekMapping[col];
+            const qty = totalPerSpek[spekKey] || 0;
+            grandTotalPerCol[col] += (harga * qty);
         });
     });
     
-    grandTotalUpahKopek = Object.values(grandTotalPerSpek).reduce((sum, val) => sum + val, 0);
+    grandTotalUpahKopek = Object.values(grandTotalPerCol).reduce((sum, val) => sum + val, 0);
     
     let grandTotalRow = `<tr style="background-color:#c7922f; font-weight:bold;"><td style="text-align:center;"><b>GRAND TOTAL UPAH KOPEK</b></td>`;
     
-    specs.forEach(spec => {
-        grandTotalRow += `<td>${formatRupiah(grandTotalPerSpek[spec].toFixed(2))}</td>`;
+    columns.forEach(col => {
+        grandTotalRow += `<td>${formatRupiah(grandTotalPerCol[col].toFixed(2))}</td>`;
     });
     
     grandTotalRow += `<td>${formatRupiah(grandTotalUpahKopek.toFixed(2))}</td></tr>`;
@@ -832,18 +862,22 @@ function submitBiayaKepiting() {
 
     const data = collectAllData();
     
+    // Tentukan URL berdasarkan mode (create/update)
+    const isEditMode = $('.id').val() !== '';
+    const url = isEditMode ? '<?= base_url("biaya-kepiting/update"); ?>' : '<?= base_url("biaya-kepiting/save"); ?>';
+    
     Swal.fire({
         title: 'Konfirmasi',
-        text: 'Apakah Anda yakin ingin menyimpan data biaya kepiting ini?',
+        text: `Apakah Anda yakin ingin ${isEditMode ? 'mengupdate' : 'menyimpan'} data biaya kepiting ini?`,
         icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Ya, Simpan!',
+        confirmButtonText: `Ya, ${isEditMode ? 'Update' : 'Simpan'}!`,
         cancelButtonText: 'Batal'
     }).then((result) => {
         if (result.isConfirmed) {
-            sendDataToServer(data);
+            sendDataToServer(data, url);
         }
     });
 }
@@ -926,7 +960,7 @@ function collectBarangData() {
 
 function collectGajiData() {
     const data = [];
-    const specs = ["JB", "SP LUMP", "BF", "SPL", "CLAW", "MH", "CF"];
+    const columns = ['jumbo', 'ex_lump', 'lump', 'special', 'claw', 'mh', 'cf'];
     
     $('#dataTable2 tbody tr').each(function() {
         const row = $(this);
@@ -936,7 +970,7 @@ function collectGajiData() {
             firstCell.includes('GRAND TOTAL') || firstCell === 'Tidak Ada Data') return;
         
         const gajiType = listPerolehanGaji.find(item => 
-            item.description === firstCell || item.value === getValueFromDescription(firstCell)
+            item.description === firstCell
         );
         
         if (!gajiType) return;
@@ -947,19 +981,10 @@ function collectGajiData() {
             jumbo: 0, ex_lump: 0, lump: 0, special: 0, claw: 0, mh: 0, cf: 0
         };
         
-        specs.forEach((spec, index) => {
+        columns.forEach((col, index) => {
             const inputValue = row.find(`td:eq(${index + 1}) input`).val();
             const value = parseFloat(inputValue) || 0;
-            
-            switch(spec) {
-                case "JB": gajiData.jumbo = value; break;
-                case "SP LUMP": gajiData.ex_lump = value; break;
-                case "BF": gajiData.lump = value; break;
-                case "SPL": gajiData.special = value; break;
-                case "CLAW": gajiData.claw = value; break;
-                case "MH": gajiData.mh = value; break;
-                case "CF": gajiData.cf = value; break;
-            }
+            gajiData[col] = value;
         });
         
         data.push(gajiData);
@@ -995,9 +1020,10 @@ function collectBonusData() {
     return data;
 }
 
-function sendDataToServer(data) {
+// Ubah sendDataToServer untuk menerima URL parameter
+function sendDataToServer(data, url) {
     Swal.fire({
-        title: 'Menyimpan Data',
+        title: `${$('.id').val() ? 'Mengupdate' : 'Menyimpan'} Data`,
         text: 'Sedang memproses data, harap tunggu...',
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading()
@@ -1015,16 +1041,21 @@ function sendDataToServer(data) {
         no_pembayaran: data.no_pembayaran,
         tanggal: data.tanggal,
         keterangan: data.keterangan,
-        jasa_vendor_in_id: jasaVendorInId // Kirim sebagai array
+        jasa_vendor_in_id: jasaVendorInId
     };
     
-    console.log('Data jasa_vendor_in_id:', jasaVendorInId); // Debug
+    // Jika edit mode, tambahkan ID
+    if ($('.id').val()) {
+        formData.id = $('.id').val();
+    }
+    
+    console.log('Data yang dikirim:', formData); // Debug
     
     $.ajax({
-        url: '<?= base_url("biaya-kepiting/save"); ?>',
+        url: url,
         type: 'POST',
         dataType: 'json',
-        traditional: true, // Penting untuk kirim array via AJAX
+        traditional: true,
         beforeSend: function(xhr) {
             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
         },
@@ -1047,7 +1078,7 @@ function sendDataToServer(data) {
         },
         error: function(xhr, status, error) {
             Swal.close();
-            Swal.fire('Error', 'Terjadi kesalahan saat menyimpan data: ' + error, 'error');
+            Swal.fire('Error', 'Terjadi kesalahan: ' + error, 'error');
         }
     });
 }
