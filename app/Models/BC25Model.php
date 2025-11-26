@@ -17,7 +17,7 @@ class BC25Model extends Model
     protected $allowedFields    = [];
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'createdAt';
     protected $updatedField  = 'updatedAt';
@@ -40,85 +40,108 @@ class BC25Model extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getList($condition, $addCondition, $limit = 10, $offset = 0)
-    {
-        $availableSort = [
-            'bc_25.tipe_sales_order' => 'bc_25.tipe_sales_order',
-            'bc_25.no_aju' => 'bc_25.no_aju',
-            'bc_25.createdAt' => 'bc_25.createdAt',
-            'bc_25.status_posting' => 'bc_25.status_posting',
+    public function getList(
+        $condition,
+        $orderColumnIndex,
+        $orderDir,
+        $limit = 10,
+        $offset = 0
+
+    ) {
+        $db = \Config\Database::connect();
+        $where = [];
+        $whereDate = "";
+        $searchOrderForm = "";
+
+        if (!empty($condition['company_id'])) {
+            $where[] = "bc_25.company_id ='$condition[company_id]'";
+        }
+
+        if (!empty($condition['dateStart']) && !empty($condition['dateEnd'])) {
+            $whereDate = "AND bc_25.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
+        }
+
+        if (!empty($condition['status_posting'])) {
+            if ($condition['status_posting'] == "ALL") {
+                $where[] = "(bc_25.status_posting='1' OR bc_25.status_posting='0')";
+            } elseif ($condition['status_posting'] == "SUDAH POSTING") {
+                $where[] = "bc_25.status_posting='1'";
+            } else {
+                $where[] = "bc_25.status_posting='0'";
+            }
+        }
+
+        if (!empty($condition['search'])) {
+            $search = $db->escapeLikeString(trim($condition['search']));
+            $searchOrderForm = "
+              AND (
+                    customers.name LIKE '%{$search}%'
+                    OR bc_25.no_daftar LIKE '%{$search}%'
+                    OR bc_25.no_aju LIKE '%{$search}%'     
+                    OR bc_25.multiple_reference_no LIKE '%{$search}%'   
+                )
+            ";
+        }
+
+
+        $filterCondition = !empty($where) ? " AND " . implode(" AND ", $where) : "";
+
+        $columns = [
+            'id',
+            'jenis_pengeluaran',
+            'reference_penerima',
+            'reference_pengeluaran_id',
+            'multiple_reference_no',
+            'no_aju',
+            'tanggal',
+            'status_posting',
         ];
-        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'bc_25.createdAt';
-        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
-
-        $selectQry = "bc_25.*";
-
-        $bcDataQry = $this->asObject()
-            ->select($selectQry)
-            ->where($condition)
-            ->orderBy($sort, $sortType);
-
-        $totalData = $bcDataQry->countAllResults(false);
-
-        if ($addCondition['statusPosting'] || $addCondition['noAju']  && (empty($addCondition['mulaiTanggalBC25']) && empty($addCondition['selesaiTanggalBC25']))) {
-            $bcDataQry->groupStart();
+        $orderBy = "";
+        if ($orderColumnIndex !== null && isset($columns[$orderColumnIndex])) {
+            $col = $columns[$orderColumnIndex];
+            $dir = strtoupper($orderDir) === 'DESC' ? 'DESC' : 'ASC';
+            $orderBy = " ORDER BY $col $dir ";
         }
 
-        if ($addCondition['statusPosting']) {
-            if ($addCondition['statusPosting'] == "ALL") {
-                $bcDataQry->whereIn('bc_25.status_posting', ['1', '0']);
-            } elseif ($addCondition['statusPosting'] == "SUDAH POSTING") {
-                $bcDataQry->where('bc_25.status_posting', "1");
-            } else if ($addCondition['statusPosting'] == "BELUM POSTING") {
-                $bcDataQry->where('bc_25.status_POSTING', "0");
-            }
-        }
+        $baseQuery = "
+        (
+            -- BC 2.5
+            SELECT
+                bc_25.*,
+                customers.name AS reference_penerima
+            FROM bc_25
+            LEFT JOIN customers ON customers.id = bc_25.reference_penerima_id
+            WHERE bc_25.deletedAt IS NULL
+            $filterCondition
+            $whereDate
+            $searchOrderForm
+        )
+        ";
+        // ============================
+        // 📊 COUNT + PAGINATION
+        // ============================
+        $countQuery = "SELECT COUNT(*) AS cnt FROM ($baseQuery) AS x";
+        $totalFiltered = (int) $db->query($countQuery)->getRow()->cnt;
 
-        if ($addCondition['asalPengeluaran']) {
-            if ($addCondition['asalPengeluaran'] == "ORDER FORM LAIN") {
-                $bcDataQry->where('sales_order_lain !=', null);
-            } else
-            if ($addCondition['asalPengeluaran'] == "ORDER FORM LOKAL") {
-                $bcDataQry->where('sales_order_id !=', null);
-            }
-            if ($addCondition['asalPengeluaran'] == "RETUR PEMBELIAN") {
-                $bcDataQry->where('pengembalian_barang_id !=', null);
-            }
-        }
+        $mainQuery = "
+            SELECT * FROM ($baseQuery) AS x
+            $orderBy
+            LIMIT $limit OFFSET $offset
+        ";
 
-        if ($addCondition['noAju']) {
-            $bcDataQry->like('no_aju', $addCondition['noAju'])->orLike('no_daftar', $addCondition['noAju']);
-        }
+        $data = $db->query($mainQuery)->getResultArray();
 
-        if ($addCondition['statusPosting'] || $addCondition['noAju']  && (empty($addCondition['mulaiTanggalBC25']) && empty($addCondition['selesaiTanggalBC25']))) {
-            $bcDataQry->groupEnd();
-        }
-
-        if ($addCondition['mulaiTanggalBC25'] && $addCondition['selesaiTanggalBC25']) {
-            $bcDataQry->groupStart();
-            $mulaiTanggalBC25Timestamp = date_format(date_create_from_format("d/m/Y", $addCondition['mulaiTanggalBC25']), "Y-m-d");
-            $selesaiTanggalBC25Timestamp = date_format(date_create_from_format("d/m/Y", $addCondition['selesaiTanggalBC25']), "Y-m-d");
-
-            if ($addCondition['mulaiTanggalBC25']) {
-                $bcDataQry->where('bc_25.createdAt >=', $mulaiTanggalBC25Timestamp);
-            }
-
-            if ($addCondition['selesaiTanggalBC25']) {
-                $bcDataQry->where('bc_25.createdAt <=', $selesaiTanggalBC25Timestamp);
-            }
-
-            $bcDataQry->groupEnd();
-        }
-
-        $totalFilteredData = $bcDataQry->countAllResults(false);
-        $data = $bcDataQry->findAll($limit, $offset);
+        // ============================
+        // 📦 RETURN RESULT
+        // ============================
 
         return [
             'data'              => $data,
-            'totalData'         => $totalData,
-            'totalFilteredData' => $totalFilteredData,
+            'totalData'         => $totalFiltered,
+            'totalFilteredData' => $totalFiltered,
+            'sort'              => $orderColumnIndex,
+            'sortType'          => $orderDir,
         ];
     }
 

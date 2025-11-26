@@ -1995,6 +1995,7 @@ $routes->group('bea-cukai-bc-25', ['filter' => 'Auth'], function ($routes) {
     $routes->post('save', 'BeaCukai\BC25::createAction');
     $routes->get('id/(:segment)', 'BeaCukai\BC25::detail/$1');
     $routes->get('get-referensi', 'BeaCukai\BC25::getReferensiPengeluaran');
+    $routes->post('delete', 'BeaCukai\BC25::delete');
     // HEADER
     $routes->get('id/header/(:segment)', 'BeaCukai\BC25::header/$1');
     $routes->post('id/header', 'BeaCukai\BC25::updateHeader');

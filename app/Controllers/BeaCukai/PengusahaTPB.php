@@ -47,14 +47,14 @@ class PengusahaTPB extends BaseController
 
 
         if ($this->validate($rules)) {
-            $first = $this->pengusahaTpbModel->where('company_id', $this->this_company_id)->where('npwp', $this->request->getVar('npwp'))->first();
-            if ($first != null) {
-                return response()->setJSON([
-                    'status' => false,
-                    'token' => csrf_hash(),
-                    'message' => "Nomor NPWP Sudah Digunakan"
-                ]);
-            }
+            // $first = $this->pengusahaTpbModel->where('company_id', $this->this_company_id)->where('npwp', $this->request->getVar('npwp'))->first();
+            // if ($first != null) {
+            //     return response()->setJSON([
+            //         'status' => false,
+            //         'token' => csrf_hash(),
+            //         'message' => "Nomor NPWP Sudah Digunakan"
+            //     ]);
+            // }
 
             $this->pengusahaTpbModel->insert([
                 'company_id' => $this->this_company_id,
@@ -96,14 +96,14 @@ class PengusahaTPB extends BaseController
         $id = decrypt($this->request->getVar('id'));
 
         if ($this->validate($rules)) {
-            $first = $this->pengusahaTpbModel->where('company_id', $this->this_company_id)->where('npwp', $this->request->getVar('npwp'))->where('id !=', $id)->first();
-            if ($first != null) {
-                return response()->setJSON([
-                    'status' => false,
-                    'token' => csrf_hash(),
-                    'message' => "Nomor NPWP Sudah Digunakan"
-                ]);
-            }
+            // $first = $this->pengusahaTpbModel->where('company_id', $this->this_company_id)->where('npwp', $this->request->getVar('npwp'))->where('id !=', $id)->first();
+            // if ($first != null) {
+            //     return response()->setJSON([
+            //         'status' => false,
+            //         'token' => csrf_hash(),
+            //         'message' => "Nomor NPWP Sudah Digunakan"
+            //     ]);
+            // }
 
             $this->pengusahaTpbModel->update($id, [
                 'company_id' => $this->this_company_id,

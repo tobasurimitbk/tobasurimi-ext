@@ -1703,69 +1703,69 @@ class StockRevampLogModel extends Model
             $search = $db->escapeLikeString(trim($condition['search']));
 
             $searchProsesRebus = "
-        AND (
-            proses_rebus.no_rebus LIKE '%{$search}%'
-            OR divisis.divisi LIKE '%{$search}%'
-            OR warehouses.warehouse_name LIKE '%{$search}%'        
-            )
-    ";
+                AND (
+                    proses_rebus.no_rebus LIKE '%{$search}%'
+                    OR divisis.divisi LIKE '%{$search}%'
+                    OR warehouses.warehouse_name LIKE '%{$search}%'        
+                    )
+            ";
 
             $searchJasaVendor = "
-        AND (
-            jasa_vendor_out.no_surat_jalan LIKE '%{$search}%'
-            OR divisis.divisi LIKE '%{$search}%'
-            OR warehouses.warehouse_name LIKE '%{$search}%'
-        )
-    ";
+                AND (
+                    jasa_vendor_out.no_surat_jalan LIKE '%{$search}%'
+                    OR divisis.divisi LIKE '%{$search}%'
+                    OR warehouses.warehouse_name LIKE '%{$search}%'
+                )
+            ";
 
             $searchMaterialRequest = "
-        AND (
-            material_requests.req_no LIKE '%{$search}%'
-            OR divisis.divisi LIKE '%{$search}%'
-            OR warehouses.warehouse_name LIKE '%{$search}%'
-        )
-    ";
+                AND (
+                    material_requests.req_no LIKE '%{$search}%'
+                    OR divisis.divisi LIKE '%{$search}%'
+                    OR warehouses.warehouse_name LIKE '%{$search}%'
+                )
+            ";
 
             $searchMaterialRequestPenolong = "
-        AND (
-            material_requests_penolong.req_no LIKE '%{$search}%'
-            OR divisis.divisi LIKE '%{$search}%'
-            OR warehouses.warehouse_name LIKE '%{$search}%'
-        )
-    ";
+                AND (
+                    material_requests_penolong.req_no LIKE '%{$search}%'
+                    OR divisis.divisi LIKE '%{$search}%'
+                    OR warehouses.warehouse_name LIKE '%{$search}%'
+                )
+            ";
 
             $searchMutasi = "
-        AND (
-            mutasi.no_mutasi LIKE '%{$search}%'
-            OR divisis.divisi LIKE '%{$search}%'
-            OR warehouses.warehouse_name LIKE '%{$search}%'
-        )
-    ";
+                AND (
+                    mutasi.no_mutasi LIKE '%{$search}%'
+                    OR divisis.divisi LIKE '%{$search}%'
+                    OR warehouses.warehouse_name LIKE '%{$search}%'
+                )
+            ";
 
             $searchMutasiGlobal = "
-        AND (
-            mutasi_global.no_mutasi LIKE '%{$search}%'
-        )
-    ";
+                AND (
+                    mutasi_global.no_mutasi LIKE '%{$search}%'
+                )
+            ";
 
             $searchStuffingLokal = "
-        AND (
-            stuffing_lokal.no_stuffing LIKE '%{$search}%'
-        )
-    ";
+                AND (
+                    stuffing_lokal.no_stuffing LIKE '%{$search}%'
+                )
+            ";
 
             $searchStuffingEkspor = "
-        AND (
-            stuffing_internasional.no_stuffing LIKE '%{$search}%'
-        )
-    ";
+                AND (
+                    stuffing_internasional.no_stuffing LIKE '%{$search}%'
+                )
+            ";
 
             $searchAdjusment = "
-        AND (
-            adjusment.no_adjusment LIKE '%{$search}%'
-            OR adjusment.keterangan LIKE '%{$search}%'
-        )
-    ";
+                AND (
+                    adjusment.no_adjusment LIKE '%{$search}%'
+                    OR adjusment.keterangan LIKE '%{$search}%'
+                )
+            ";
         }
 
 
