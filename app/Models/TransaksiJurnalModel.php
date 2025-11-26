@@ -329,4 +329,101 @@ class TransaksiJurnalModel extends Model
             'totalData' => $totalData
         ];
     }
+
+    public function getList2($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $builder = $this->db->table('v_transaksi_jurnal_full');
+
+        // === CONDITION UTAMA ===
+        $builder->where('company_id', $condition['jurnal_umum.company_id']);
+        $builder->where('deleted_at', null); // kolom tetap ada di view dari transaksi_jurnal
+
+        // === FILTER TANGGAL ===
+        if (!empty($addCondition['start_date'])) {
+            $builder->where('tanggal_transaksi >=', $addCondition['start_date']);
+        }
+
+        if (!empty($addCondition['end_date'])) {
+            $builder->where('tanggal_transaksi <=', $addCondition['end_date']);
+        }
+
+        // === FILTER TYPE TRANSAKSI ===
+        if (!empty($addCondition['type_transaksi'])) {
+
+            if ($addCondition['type_transaksi'] === "BAHAN BAKU") {
+
+                // Bahan baku: local atau import
+                $builder->groupStart()
+                    ->where('id_local_bb IS NOT NULL')
+                    ->orWhere('id_import_bb IS NOT NULL')
+                    ->groupEnd();
+            } elseif ($addCondition['type_transaksi'] === "BAHAN PENOLONG") {
+
+                // Bahan penolong: pakai PO BP
+                $builder->where('id_po_bp IS NOT NULL');
+            } else {
+
+                // Type lain: ambil dari metadata.value
+                $builder->where('transaksi_type_name', $addCondition['type_transaksi']);
+            }
+        }
+
+        // === SEARCH GLOBAL ===
+        if (!empty($addCondition['search'])) {
+            $s = $addCondition['search'];
+
+            $builder->groupStart()
+                ->like('no_transaksi', $s)
+                ->orLike('uraian_transaksi', $s)
+                ->orLike('total_debit', $s)
+                ->orLike('no_bukti', $s)
+                ->orLike('no_penerimaan_barang', $s)
+                ->orLike('supplier_name', $s)
+                ->orLike('keterangan_jurnal', $s)
+                ->orLike('divisi_name', $s)
+                ->groupEnd();
+        }
+
+        // === SORT (default: tanggal DESC) ===
+        $sort     = $addCondition['sort'] ?? 'tanggal_transaksi';
+        $sortType = $addCondition['sortType'] ?? 'DESC';
+
+        // untuk keamanan, pastikan nama kolom valid
+        $allowedSort = [
+            'tanggal_transaksi',
+            'no_transaksi',
+            'total_debit',
+            'supplier_name',
+            'no_bukti',
+            'no_penerimaan_barang',
+            'transaksi_type_name',
+            'divisi_name'
+        ];
+
+        if (!in_array($sort, $allowedSort)) {
+            $sort = 'tanggal_transaksi';
+        }
+
+        // === HITUNG FILTERED DATA ===
+        $filteredBuilder = clone $builder;
+        $totalFilteredData = $filteredBuilder->countAllResults(false);
+
+        // === HITUNG TOTAL DATA (tanpa filter, tapi tetap company_id) ===
+        $totalData = $this->db->table('v_transaksi_jurnal_full')
+            ->where('company_id', $condition['jurnal_umum.company_id'])
+            ->countAllResults();
+
+        // === AMBIL DATA ===
+        $data = $builder
+            ->orderBy($sort, $sortType)
+            ->limit($limit, $offset)
+            ->get()
+            ->getResult();
+
+        return [
+            'data' => $data,
+            'totalFilteredData' => $totalFilteredData,
+            'totalData' => $totalData
+        ];
+    }
 }
