@@ -2571,13 +2571,25 @@ class StokList extends BaseController
         }
 
 
-        $dataTotal =  $this->stockRevampLogModel->getKartuStockMasuk(
-            $condition,
-            $orderColumnIndex,
-            $orderDir,
-            $length,
-            $start
-        );
+        if (empty($condition['search'])) {
+            $dataTotal =  $this->stockRevampLogModel->getKartuStockMasuk(
+                $condition,
+                $orderColumnIndex,
+                $orderDir,
+                100000000,
+                0
+            );
+        } else {
+            $dataTotal =  $this->stockRevampLogModel->getKartuStockMasuk(
+                $condition,
+                $orderColumnIndex,
+                $orderDir,
+                $length,
+                $start
+            );
+        }
+
+
 
         $totalMasuk = 0;
         foreach ($dataTotal['data'] as $d) {
@@ -2658,13 +2670,23 @@ class StokList extends BaseController
             ]);
         }
 
-        $dataTotal =  $this->stockRevampLogModel->getKartuStockKeluar(
-            $condition,
-            $orderColumnIndex,
-            $orderDir,
-            $length,
-            $start
-        );
+        if (empty($condition['search'])) {
+            $dataTotal =  $this->stockRevampLogModel->getKartuStockKeluar(
+                $condition,
+                $orderColumnIndex,
+                $orderDir,
+                100000000,
+                0
+            );
+        } else {
+            $dataTotal =  $this->stockRevampLogModel->getKartuStockKeluar(
+                $condition,
+                $orderColumnIndex,
+                $orderDir,
+                $length,
+                $start
+            );
+        }
 
         $totalKeluar = 0;
         foreach ($dataTotal['data'] as $d) {
@@ -3178,8 +3200,8 @@ class StokList extends BaseController
 
         $data = [
             'draw' => intval($draw),
-            'recordsTotal' => intval($data['totalData'] ?? 0),
-            'recordsFiltered' => intval($data['totalFilteredData'] ?? 0),
+            'recordsTotal' => intval($dataQry['totalData'] ?? 0),
+            'recordsFiltered' => intval($dataQry['totalFilteredData'] ?? 0),
             'data' => $dataResult,
             'qty_awal' => (float)$qty_awal,
             'qty_akhir' => (float)$qty_akhir,
