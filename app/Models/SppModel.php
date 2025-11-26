@@ -295,17 +295,20 @@ class SppModel extends Model
             ->findAll();
 
         $mapSppDetail = [];
+
         foreach ($sppDetail as $s) {
-            $barangId = $s['barang1_id'];
-            $spesifikasiId = $s['barang2_id'];
-            $purchaseRequestId = $s['id'];
+            $b = $s['barang1_id'];
+            $sp = $s['barang2_id'];
+            $pr = $s['id'];
             $note = trim($s['note']);
 
-            $mapSppDetail[$barangId][$spesifikasiId][$purchaseRequestId][$note] = [
-                'qty' => $s['qty'],
-                'id'  => $s['id'],
-            ];
+            if (!isset($mapSppDetail[$b][$sp][$pr][$note])) {
+                $mapSppDetail[$b][$sp][$pr][$note] = ['qty' => 0, 'id' => $s['id']];
+            }
+
+            $mapSppDetail[$b][$sp][$pr][$note]['qty'] += $s['qty'];
         }
+
 
         $selectQryPoDetail = "
         SUM(am_purchase_order_details.qty) as total_qty,
@@ -324,6 +327,7 @@ class SppModel extends Model
             ->where('am_purchase_order_details.deletedAt', null)
             ->groupBy('am_purchase_order_details.barang_id, am_purchase_order_details.spesifikasi_id, am_purchase_orders.purchase_request_id, am_purchase_order_details.note')
             ->findAll();
+
 
         $sppIdNotUsedFull = [];
 
