@@ -139,18 +139,15 @@
                 </div>
                 <div class="col-md-12">
                     <div class="table-responsive">
-                        <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" border="1" cellspacing="0"=>
+                        <table class="table table-bordered nowrap table-hover-tobasurimi" id="dataTable" width="100%" border="1" cellspacing="0">
                             <thead class="thead-dark" id="dynamicHeader">
                                 <!-- Header akan diisi secara dinamis -->
                             </thead>
                             <tbody class="body-table">
+                                <!-- Data akan diisi secara dinamis -->
                             </tbody>
-                            <tfoot class="foot-detail-table" id="foot-detail-table">
-                                <tr>
-                                    <td colspan="13" style="text-align: center;">
-                                        Tidak Ada Barang
-                                    </td>
-                                </tr>
+                            <!-- HAPUS tfoot atau biarkan kosong -->
+                            <tfoot style="display: none;">
                             </tfoot>
                         </table>
                     </div>
@@ -163,7 +160,7 @@
                 </div>
                 <div class="col-md-12">
                     <div class="table-responsive">
-                        <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable2" width="100%" border="1" cellspacing="0">
+                        <table class="table table-bordered nowrap table-hover-tobasurimi" id="dataTable2" width="100%" border="1" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
                                     <th style="text-align: center;">JENIS</th>
@@ -178,13 +175,10 @@
                                 </tr>
                             </thead>
                             <tbody class="body-table-2">
+                                <!-- Data akan diisi secara dinamis -->
                             </tbody>
-                            <tfoot class="foot-detail-table-2" id="foot-detail-table">
-                                <tr>
-                                    <td colspan="9" style="text-align: center;">
-                                        Tidak Ada Barang
-                                    </td>
-                                </tr>
+                            <!-- HAPUS tfoot atau biarkan kosong -->
+                            <tfoot style="display: none;">
                             </tfoot>
                         </table>
                     </div>
@@ -197,7 +191,7 @@
                 </div>
                 <div class="col-md-12">
                     <div class="table-responsive">
-                        <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable3" width="100%" border="1" cellspacing="0">
+                        <table class="table table-bordered nowrap table-hover-tobasurimi" id="dataTable3" width="100%" border="1" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
                                     <th style="text-align: center;" colspan="6" class="thead-bonus"><?= !empty($biayaKepiting) ? "Bonus Khusus Untuk Vendor " . $jasaVendorInDetail['name'] : "Bonus Khusus Untuk Vendor" ?></th>
@@ -212,13 +206,10 @@
                                 </tr>
                             </thead>
                             <tbody class="body-table-3">
+                                <!-- Data akan diisi secara dinamis -->
                             </tbody>
-                            <tfoot class="foot-detail-table-3" id="foot-detail-table">
-                                <tr>
-                                    <td colspan="6" style="text-align: center;">
-                                        Tidak Ada Barang
-                                    </td>
-                                </tr>
+                            <!-- HAPUS tfoot atau biarkan kosong -->
+                            <tfoot style="display: none;">
                             </tfoot>
                         </table>
                     </div>
@@ -231,860 +222,666 @@
 </section>
 
 <script>
-    const csrfToken = '<?= csrf_token() ?>';
-    const csrf = $(`[name="${csrfToken}"]`);
+    // ==================== GLOBAL VARIABLES ====================
+const csrfToken = '<?= csrf_token() ?>';
+const csrf = $(`[name="${csrfToken}"]`);
+let biayaKepiting = <?= json_encode($biayaKepiting); ?>;
+var listBarang = [];
+var listPerolehanGaji = [];
+var listBonus = [];
+var listDataVendor = [];
 
-    var request;
-    var listBarang = [];
-    var listPerolehanGaji = [];
-    var listBonus = [];
-    var listDataVendor= [];
-
+// ==================== INITIALIZATION ====================
+$(document).ready(function() {
+    initializeSelect2();
+    initializeDatePicker();
+    
     <?php if (!empty($biayaKepiting)) : ?>
-        $.ajax({
-            url: `<?= base_url('biaya-kepiting/list-barang'); ?>`,
-            method: "GET",
-            data: {
-                jasa_vendor_in_id: $(".jasa_vendor_in_id option:selected").val(),
-                id: $('.id').val()
-            },
-            dataType: "json",
-            success: function(res) {
-                csrf.val(res.token);
-                listBarang = res.data;
-                listPerolehanGaji = res.dataPerolehanGaji;
-                listDataVendor = res.dataVendor;
-                listBonus = res.dataBonus;
-                drawTable();
-            }
-        });
+        $('#vendor_id').val('<?= $biayaKepiting['vendor_id'] ?>').trigger('change');
+        window.selectedSuratJalanId = biayaKepiting.jasa_vendor_in_kepiting_kukus_id;
+        window.isEditMode = true;
+        loadExistingData();
     <?php endif; ?>
+});
 
+function initializeSelect2() {
+    $('#vendor_id').select2({
+        placeholder: "Pilih Vendor",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).on('change', handleVendorChange);
+
+    $('.jasa_vendor_in_id').select2({
+        placeholder: "Pilih Nomor Penerimaan",
+        theme: "bootstrap-5",
+        multiple: true,
+        allowClear: true,
+    }).on('change', handleJasaVendorChange);
+}
+
+function initializeDatePicker() {
     $(".tanggal").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
         autoclose: true
     });
-
-    $('#vendor_id').select2({
-        placeholder: "Pilih Vendor",
-        theme: "bootstrap-5",
-        allowClear: true
-    }).change(function () {
-        const vendorId = $(this).val();
-
-        // Kosongkan select surat jalan setiap ganti vendor
-        const $selectSuratJalan = $('.jasa_vendor_in_id');
-        $selectSuratJalan.empty().trigger('change');
-
-        if (!vendorId) return;
-
-        // 🔹 Panggil AJAX ke backend
-        $.ajax({
-            url: `/biaya-kepiting/get-jasa-vendor-in/${vendorId}`, // ubah sesuai endpoint kamu
-            type: 'GET',
-            dataType: 'json',
-            success: function (response) {
-                $selectSuratJalan.empty(); // clear existing
-                if (response && response.length > 0) {
-                    response.forEach(item => {
-                        const option = new Option(
-                            `${item.no_penerimaan_surat_jalan} - ${item.tanggal}`, // text tampil
-                            item.id, // value
-                            false,
-                            false
-                        );
-                        $selectSuratJalan.append(option);
-                    });
-                } else {
-                    $selectSuratJalan.append('<option value="">Tidak ada surat jalan</option>');
-                }
-
-                // trigger select2 refresh
-                $selectSuratJalan.trigger('change');
-            },
-            error: function () {
-                $selectSuratJalan.html('<option value="">Gagal memuat data</option>');
-            }
-        });
-    });
-
-    $('.jasa_vendor_in_id').select2({
-        placeholder: "Pilih Surat Jalan",
-        theme: "bootstrap-5",
-        multiple: true,
-    }).change(function() {
-        var selected = $('.jasa_vendor_in_id option:selected');
-        $('.vendor').val(selected.data('vendor'));
-        $('.divisi').val(selected.data('divisi'));
-        $('.thead-bonus').text("Bonus Khusus Untuk " + selected.data('vendor'));
-
-        listDataBarang();
-        changeStatus();
-    })
-
-    $(".jasa_vendor_in_id")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
-
-    // VALIDATOR
-    var validator = $(".create-form").validate({
-        rules: {
-            tanggal: {
-                required: true
-            },
-            jasa_vendor_in_id: {
-                required: true
-            },
-        },
-        messages: {
-            tanggal: {
-                required: "Tanggal wajib diisi"
-            },
-            jasa_vendor_in_id: {
-                required: "Penerimaan surat jalan wajib diisi"
-            },
-        },
-        errorElement: 'span',
-        errorClass: 'text-danger',
-        errorPlacement: function(error, element) {
-            var elem = $(element);
-            if (elem.hasClass("select2-hidden-accessible")) {
-                element = $("#select2-" + elem.attr("id") + "-container").parent();
-                error.insertAfter(element);
-            } else {
-                error.insertAfter(element);
-            }
-        },
-        highlight: function(element) {
-            $(element).closest('.form-group').addClass('has-error');
-            $(element).addClass('select-class');
-
-        },
-        unhighlight: function(element) {
-            $(element).closest('.form-group').removeClass('has-error');
-            $(element).removeClass('select-class');
-        },
-    });
-
-    changeStatus();
-
-    function changeStatus() {
-        let value = document.getElementById('auto_generate').checked ? true : false;
-        if (value) {
-            $(".no_pembayaran").attr("readonly", true);
-            $.ajax({
-                url: `<?= base_url("biaya-kepiting/get-no"); ?>`,
-                method: "GET",
-                data: {
-                    warehouse_id: $('#jasa_vendor_in_id option:selected').data('warehouse_id')
-                },
-                dataType: "json",
-                success: function(res) {
-                    if (res.status) {
-                        $(".no_pembayaran").val(res.data);
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: res.message,
-                            confirmButtonColor: '#4e73df',
-                        })
-                        $(".no_pembayaran").attr("readonly", false);
-                        $("#auto_generate").prop("checked", false);
-                        $(".no_pembayaran").val("");
-                    }
-                }
-            })
-        } else {
-            $(".no_pembayaran").attr("readonly", false);
-            $(".no_pembayaran").val("");
-        }
-    }
-
-    function listDataBarang() {
-        $.ajax({
-            url: `<?= base_url('biaya-kepiting/list-barang'); ?>`,
-            method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            data: {
-                jasa_vendor_in_id: $(".jasa_vendor_in_id").val(),
-            },
-            dataType: "json",
-            success: function(res) {
-                csrf.val(res.token);
-                listBarang = res.data;
-                listPerolehanGaji = res.dataPerolehanGaji;
-                listBonus = res.dataBonus;
-                listDataVendor = res.dataVendor;
-                drawTable();
-            }
-        });
-    }
-
-    // Fungsi untuk membuat header tabel secara dinamis
-    function buildDynamicHeader() {
-        const thead = $('#dynamicHeader');
-        thead.empty();
-
-        // Pastikan listBarang punya struktur dasar
-        if (!window.listBarang) window.listBarang = {};
-        if (!listBarang.thead) listBarang.thead = [];
-
-        // Baris pertama header
-        let firstRow = `<tr>
-            <th style="text-align: center;" colspan="3"></th>
-            <th style="text-align: center;" colspan="2">Kg Bahan Baku</th>
-            <th style="text-align: center;" colspan="${listBarang.thead.length || 7}">Hasil Kopek</th>
-            <th style="text-align: center;" colspan="1"></th>
-        </tr>`;
-
-        // Baris kedua header
-        let secondRow = `<tr>
-            <th style="text-align: center;">No</th>
-            <th style="text-align: center;">Tanggal Masuk</th>
-            <th style="text-align: center;">Supplier - Keterangan</th>
-            <th style="text-align: center;">Qty Sebelum Kopek</th>
-            <th style="text-align: center;">Rasio (%)</th>`;
-
-        if (listBarang.thead.length > 0) {
-            listBarang.thead.forEach(spec => {
-                secondRow += `<th style="text-align: center;">${spec}</th>`;
-            });
-        } else {
-            // fallback default header
-            secondRow += `
-                <th style="text-align: center;">JUMBO</th>
-                <th style="text-align: center;">EX LUMP</th>
-                <th style="text-align: center;">LUMP</th>
-                <th style="text-align: center;">SPESIAL</th>
-                <th style="text-align: center;">CLAW</th>
-                <th style="text-align: center;">MH</th>
-                <th style="text-align: center;">CF</th>
-            `;
-        }
-
-        secondRow += `<th style="text-align: center;">TOTAL</th></tr>`;
-
-        thead.append(firstRow);
-        thead.append(secondRow);
-    }
-
-
-    // Fungsi utama untuk menggambar tabel
-    function drawTable() {
-        // Pastikan semua variabel global ada
-        if (!window.listBarang) window.listBarang = {};
-        if (!listBarang.data) listBarang.data = [];
-        if (!listBarang.thead) listBarang.thead = [];
-        if (!window.listPerolehanGaji) window.listPerolehanGaji = [];
-        if (!window.listDataVendor) window.listDataVendor = {};
-        if (!window.listBonus) window.listBonus = [];
-
-        const table = $('#dataTable');
-        $('.foot-detail-table').empty();
-        $('.body-table').empty();
-
-        // Bangun header dinamis
-        buildDynamicHeader();
-        
-        var no = 1;
-        let row = null;
-        
-        if (listBarang.data && listBarang.data.length == 0) {
-            row = `
-                <tr>
-                    <td colspan="${5 + (listBarang.thead ? listBarang.thead.length : 0)}" style="text-align: center;">
-                        Tidak Ada Barang
-                    </td>
-                </tr>
-            `;
-            $('.foot-detail-table').append(row);
-        } else {
-            var totalPerSpek = {}; // simpan total tiap spek
-            var qtyKopekTotal = 0;
-            var totalTotal = 0;
-
-            // Proses data
-            $.each(listBarang.data, function(i, v) {
-                // Hitung total berdasarkan spesifikasi yang ada
-                let total = 0;
-                if (v.spek) {
-                    for (const [key, value] of Object.entries(v.spek)) {
-                        total += parseFloat(value || 0);
-                    }
-                }
-                
-                var rasio = total == 0.00 ? 0 : ((total / v.qty_sebelum_kopek) * 100).toFixed(2);
-                
-                var newRow = $('<tr style="color:whitesmoke;">');
-                newRow.append($('<td style="text-align: center;">').html(`${no++}`));
-                newRow.append($('<td style="text-align: center;">').text(v.tanggal_masuk));
-                newRow.attr('data-keterangan', v.keterangan);
-                newRow.attr('data-supplier_id', v.supplier_id);
-                newRow.attr('data-master_barang_id', v.master_barang_id);
-                newRow.append($('<td style="text-align: center;">').text(v.supplier + ' - ' + v.keterangan));
-                newRow.append($('<td>').text(parseFloat(v.qty_sebelum_kopek).toFixed(2)));
-                newRow.append($('<td>').text(rasio + ' %'));
-                
-                // Tambahkan input untuk setiap spesifikasi (dinamis)
-                if (listBarang.thead && listBarang.thead.length > 0) {
-                    listBarang.thead.forEach(spec => {
-                        const value = v.spek && v.spek[spec] ? v.spek[spec] : 0;
-
-                        newRow.append($('<td style="text-align: center;">').html(`
-                            <input id="${i+'_'+spec}" 
-                                style="height: 40px; padding-bottom: 10px; min-width: 100px;" 
-                                class="form-control ${spec.toLowerCase().replace(/\s+/g, '_')}" 
-                                oninput="preventNegativeInput(this)" 
-                                autocomplete="one-time-code" 
-                                type="text" 
-                                value="${value}">
-                        `));
-                        
-                        // Akumulasi total spek
-                        if (!totalPerSpek[spec]) totalPerSpek[spec] = 0;
-                        totalPerSpek[spec] += parseFloat(value || 0);
-                    });
-                }
-
-                newRow.append($('<td>').text(total.toFixed(3)));
-                table.find('tbody').append(newRow);
-
-                totalTotal += total;
-                qtyKopekTotal += parseFloat(v.qty_sebelum_kopek);
-            });
-
-            var totalRasio = qtyKopekTotal == 0 ? 0 : ((totalTotal / qtyKopekTotal) * 100);
-
-            // GRAND TOTAL (dinamis)
-            var newRow = $('<tr class="bg-total">');
-            newRow.append($('<td style="text-align: center;">').html("<b>TOTAL</b>"));
-            newRow.append($('<td style="text-align: center;">')); // kosong biar balance
-            newRow.append($('<td style="text-align: center;">')); // kosong biar balance
-            newRow.append($('<td>').text(qtyKopekTotal.toFixed(2)));
-            newRow.append($('<td>').text(totalRasio.toFixed(2) + ' %'));
-            
-            if (listBarang.thead && listBarang.thead.length > 0) {
-                listBarang.thead.forEach(spec => {
-                    let totalSpec = totalPerSpek[spec] ? totalPerSpek[spec] : 0;
-                    newRow.append($('<td>').text(totalSpec.toFixed(2)));
-                });
-            }
-            
-            newRow.append($('<td>').text(totalTotal.toFixed(3)));
-            table.find('tbody').append(newRow);
-        }
-        
-        // Inisialisasi DataTable
-        if ($.fn.DataTable.isDataTable('#dataTable')) {
-            $('#dataTable').DataTable().destroy();
-        }
-        $('#dataTable').DataTable({
-            scrollX: true,          // ⬅️ aktifin scroll horizontal
-            autoWidth: false,       // ⬅️ biar gak dipaksa balance kolom
-            responsive: false,      // ⬅️ jangan pakai responsive kalau mau scrollX
-            ordering: false,
-            paging: false,
-            searching: false,
-            info: false
-        });
-
-        // ---------- DATA TABLE 2 ----------
-        const table2 = $('#dataTable2');
-        $('.foot-detail-table-2').empty();
-        $('.body-table-2').empty();
-
-        // Definisikan expectedCols2
-        const headerSpecs = (listBarang.thead && listBarang.thead.length > 0) ? listBarang.thead : ["JB", "SP LUMP", "BF", "SPL", "CLAW", "MH", "CF"];
-        const expectedCols2 = 1 + headerSpecs.length + 1; // 1 kolom deskripsi + n kolom spesifikasi + 1 kolom total
-
-        if (listPerolehanGaji.length == 0) {
-            let emptyRow = $('<tr>');
-            for (let c = 0; c < expectedCols2; c++) {
-                emptyRow.append($('<td>').css('text-align', 'center').text(c === 0 ? 'Tidak Ada Data' : ''));
-            }
-            $('.body-table-2').append(emptyRow);
-        } else {
-            var gajiTotal = 0;
-            var hargaPerKategori = {}; 
-            var vendorData = listDataVendor || {};
-
-            // definisikan specs fix (selalu sama di semua tempat)
-            const specs = ["JB", "SP LUMP", "BF", "SPL", "CLAW", "MH", "CF"];
-
-            // init hargaPerKategori
-            listPerolehanGaji.forEach(item => {
-                hargaPerKategori[item.value] = {};
-                if (item.value === 'upah_kopek') {
-                    hargaPerKategori[item.value]['JB']      = vendorData.upah_jb || item.jumbo;
-                    hargaPerKategori[item.value]['SP LUMP'] = vendorData.upah_xl || item.ex_lump;
-                    hargaPerKategori[item.value]['BF']      = vendorData.upah_lp || item.lump;
-                    hargaPerKategori[item.value]['SPL']     = vendorData.upah_sp || item.special;
-                    hargaPerKategori[item.value]['CLAW']    = vendorData.upah_cl || item.claw;
-                    hargaPerKategori[item.value]['MH']      = vendorData.upah_mh || item.mh;
-                    hargaPerKategori[item.value]['CF']      = vendorData.upah_cf || item.cf;
-                } else if (item.value === 'komisi_kg_daging') {
-                    const komisiValue = vendorData.komisi_vendor || item.jumbo;
-                    specs.forEach(spec => {
-                        hargaPerKategori[item.value][spec] = komisiValue;
-                    });
-                } else if (item.value === 'bonus_kg_daging') {
-                    hargaPerKategori[item.value]['JB']      = vendorData.bonus_jb || item.jumbo;
-                    hargaPerKategori[item.value]['SP LUMP'] = vendorData.bonus_xl || item.ex_lump;
-                    hargaPerKategori[item.value]['BF']      = vendorData.bonus_lp || item.lump;
-                    hargaPerKategori[item.value]['SPL']     = vendorData.bonus_sp || item.special;
-                    hargaPerKategori[item.value]['CLAW']    = vendorData.bonus_cl || item.claw;
-                    hargaPerKategori[item.value]['MH']      = vendorData.bonus_mh || item.mh;
-                    hargaPerKategori[item.value]['CF']      = vendorData.bonus_cf || item.cf;
-                } else if (item.value === 'tamb_upah_kopek') {
-                    hargaPerKategori[item.value]['JB']      = vendorData.tambahan_upah_kopek_jb || item.jumbo;
-                    hargaPerKategori[item.value]['SP LUMP'] = vendorData.tambahan_upah_kopek_xl || item.ex_lump;
-                    hargaPerKategori[item.value]['BF']      = vendorData.tambahan_upah_kopek_lp || item.lump;
-                    hargaPerKategori[item.value]['SPL']     = vendorData.tambahan_upah_kopek_sp || item.special;
-                    hargaPerKategori[item.value]['CLAW']    = vendorData.tambahan_upah_kopek_cl || item.claw;
-                    hargaPerKategori[item.value]['MH']      = vendorData.tambahan_upah_kopek_mh || item.mh;
-                    hargaPerKategori[item.value]['CF']      = vendorData.tambahan_upah_kopek_cf || item.cf;
-                }
-            });
-
-            // ---------------- ROW DATA ----------------
-            $.each(listPerolehanGaji, function(i, v) {
-                var total = 0;
-                var newRow = $('<tr style="color:whitesmoke;">');
-                newRow.append($('<td>').text(v.description || ''));
-
-                specs.forEach(spec => {
-                    const value = (hargaPerKategori[v.value] && hargaPerKategori[v.value][spec]) ? hargaPerKategori[v.value][spec] : 0;
-                    newRow.append($('<td style="text-align: center;">').html(`
-                        <input id="${i+'_2_'+spec.replace(/\s+/g, '_')}" 
-                            class="form-control ${v.value}_${spec.replace(/\s+/g, '_')}" 
-                            type="text" 
-                            value="${value}">
-                    `));
-                    total += parseFloat(value || 0);
-                });
-
-                newRow.append($('<td>').text(formatRupiah1(total.toFixed(2))));
-                fillRowToCols(newRow, expectedCols2);
-                table2.find('tbody').append(newRow);
-                gajiTotal += total;
-            });
-
-            // ---------------- TOTAL PER KATEGORI ----------------
-            const totalPerKategori = {};
-
-            Object.keys(hargaPerKategori).forEach(kategori => {
-                const kategoriName = listPerolehanGaji.find(item => item.value === kategori)?.description || kategori;
-                var newRow = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
-                newRow.append($('<td style="text-align: center;">').html(`<b>TOTAL ${kategoriName.toUpperCase()}</b>`));
-
-                let totalKategori = 0;
-                specs.forEach(spec => {
-                    const harga = parseFloat(hargaPerKategori[kategori][spec] || 0);
-                    const qty   = parseFloat(totalPerSpek?.[spec] || 0);
-                    const totalSpec = harga * qty;
-                    totalKategori += totalSpec;
-                    newRow.append($('<td>').text(totalSpec !== 0 ? formatRupiah1(totalSpec.toFixed(2)) : '0'));
-                });
-
-                newRow.append($('<td>').text(formatRupiah1(totalKategori.toFixed(2))));
-                fillRowToCols(newRow, expectedCols2);
-                table2.find('tbody').append(newRow);
-
-                totalPerKategori[kategori] = totalKategori;
-            });
-
-            // ---------------- PRESENTASE KOPEK ----------------
-            var newRow2 = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
-            newRow2.append($('<td style="text-align: center;">').html("<b>PRESENTASE KOPEK</b>"));
-
-            let totalPresentase = 0;
-            specs.forEach(spec => {
-                const qty = parseFloat(totalPerSpek?.[spec] || 0);
-
-                if (!qty || !totalTotal) {
-                    newRow2.append($('<td>').text('0 %'));
-                    return;
-                }
-
-                const presentase = (qty * 100 / totalTotal);
-                totalPresentase += presentase;
-                newRow2.append($('<td>').text(presentase.toFixed(2) + ' %'));
-            });
-
-            newRow2.append($('<td>').text(totalPresentase.toFixed(2) + ' %'));
-            fillRowToCols(newRow2, expectedCols2);
-            table2.find('tbody').append(newRow2);
-
-            // ---------------- GRAND TOTAL ----------------
-            const grandTotalPerSpek = {};
-            specs.forEach(spec => { grandTotalPerSpek[spec] = 0; });
-
-            // jumlahkan semua kategori per spec
-            Object.keys(hargaPerKategori).forEach(kategori => {
-                specs.forEach(spec => {
-                    const harga = parseFloat(hargaPerKategori[kategori][spec] || 0);
-                    const qty   = parseFloat(totalPerSpek?.[spec] || 0);
-                    grandTotalPerSpek[spec] += (harga * qty);
-                });
-            });
-
-            const grandTotalUpahKopek = Object.values(grandTotalPerSpek)
-                .reduce((sum, value) => sum + value, 0);
-
-            var newRow1 = $('<tr style="color:whitesmoke; background-color:#c7922f; font-weight:bold;">');
-            newRow1.append($('<td style="text-align:center;">').html("<b>GRAND TOTAL UPAH KOPEK</b>"));
-
-            specs.forEach(spec => {
-                newRow1.append($('<td>').text(formatRupiah1(grandTotalPerSpek[spec].toFixed(2))));
-            });
-
-            newRow1.append($('<td>').text(formatRupiah1(grandTotalUpahKopek.toFixed(2))));
-            fillRowToCols(newRow1, expectedCols2);
-            table2.find('tbody').append(newRow1);
-
-        }
-
-        // ---------- DATA TABLE 3 ----------
-        const table3 = $('#dataTable3');
-        $('.foot-detail-table-3').empty();
-        $('.body-table-3').empty();
-        var no = 1;
-        var totalBonusResult = 0;
-        var vendorData = listDataVendor || {};
-
-        if (listBonus.length == 0) {
-            let emptyRow = $('<tr>');
-            for (let c=0; c<expectedCols3; c++) {
-                emptyRow.append($('<td>').css('text-align','center').text(c===0 ? 'Tidak Ada Data Bonus' : ''));
-            }
-            $('.body-table-3').append(emptyRow);
-        } else {
-            $.each(listBonus, function(i, v) {
-                // safe assignment
-                if (v.spesifikasi === "JB") v.bonus_nominal = vendorData.bonus_karyawan_jb || v.bonus_nominal;
-                else if (v.spesifikasi === "SP LUMP") v.bonus_nominal = vendorData.bonus_karyawan_xl || v.bonus_nominal;
-                else if (v.spesifikasi === "BF") v.bonus_nominal = vendorData.bonus_karyawan_lp || v.bonus_nominal;
-                else if (v.spesifikasi === "SPL") v.bonus_nominal = vendorData.bonus_karyawan_sp || v.bonus_nominal;
-                else if (v.spesifikasi === "CLAW") v.bonus_nominal = vendorData.bonus_karyawan_cl || v.bonus_nominal;
-                else if (v.spesifikasi === "MH") v.bonus_nominal = vendorData.bonus_karyawan_mh || v.bonus_nominal;
-                else if (v.spesifikasi === "CF") v.bonus_nominal = vendorData.bonus_karyawan_cf || v.bonus_nominal;
-                
-                var totalBonus = parseFloat(v.kg_bonus || 0) * parseFloat(v.bonus_nominal || 0);
-                totalBonusResult += totalBonus;
-
-                var newRow = $('<tr style="color:whitesmoke;">');
-                newRow.append($('<td style="text-align: center;">').html(`${no++}`));
-                newRow.append($('<td style="text-align: center;">').text(v.tanggal_masuk));
-                newRow.append($('<td style="text-align: center;">').text(v.nama_barang));
-                newRow.append($('<td style="text-align: center;">').html(`<input id="${i+'_3_kg'}" class="form-control kg_bonus" ... value="${v.kg_bonus || 0}">`));
-                newRow.append($('<td style="text-align: center;">').html(`<input id="${i+'_3_bonus'}" class="form-control bonus_nominal" ... value="${v.bonus_nominal || 0}">`));
-                newRow.append($('<td>').text(formatRupiah1(totalBonus.toFixed(2))));
-                fillRowToCols(newRow, expectedCols3);
-                table3.find('tbody').append(newRow);
-            });
-
-            var newRow = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
-            // isi 5 td kosong kecuali terakhir berisi grand total
-            for (let i=0; i<expectedCols3-1; i++){
-                if (i===0) newRow.append($('<td style="text-align:center;">').html("<b>GRAND TOTAL</b>"));
-                else newRow.append($('<td>'));
-            }
-            newRow.append($('<td>').text(formatRupiah1(totalBonusResult.toFixed(2))));
-            table3.find('tbody').append(newRow);
-
-            // Recalculate total bonus kalau input Kg / Bonus berubah
-            $(document).off("input", ".kg_bonus, .bonus_nominal").on("input", ".kg_bonus, .bonus_nominal", function () {
-                var totalBonusResult = 0;
-
-                $("#dataTable3 tbody tr").each(function () {
-                    let kg = parseFloat($(this).find(".kg_bonus").val() || 0);
-                    let bonus = parseFloat($(this).find(".bonus_nominal").val() || 0);
-                    let total = kg * bonus;
-
-                    // update kolom TOTAL di row ini
-                    $(this).find("td:last").text(formatRupiah1(total.toFixed(2)));
-
-                    // tambahin ke akumulasi
-                    totalBonusResult += total;
-                });
-
-                // update GRAND TOTAL (row terakhir)
-                $("#dataTable3 tbody tr:last td:last").text(formatRupiah1(totalBonusResult.toFixed(2)));
-            });
-
-        }
-    }
-
-    // helper: pastikan row punya jumlah kolom yang sama dengan header akhir
-    function fillRowToCols($row, expectedCols) {
-        let curr = $row.find('td, th').length;
-        while (curr < expectedCols) {
-            $row.append($('<td>').html('')); // tambahin td kosong
-            curr++;
-        }
-        return $row;
-    }
-
-    // hitung berapa kolom final (ambil baris terakhir thead)
-    const expectedCols2 = $('#dataTable2 thead tr').last().find('th').length || 9;
-    const expectedCols3 = $('#dataTable3 thead tr').last().find('th').length || 6;
-
-
-    function preventNegativeInput(inputElement) {
-        var inputValue = inputElement.value;
-        var numericValue = inputValue.replace(/[^0-9.]/g, '');
-        numericValue = numericValue.replace(/^0+/g, '');
-        numericValue = numericValue.replace(/^\./g, '0.');
-        if (parseFloat(numericValue) < 0 || isNaN(parseFloat(numericValue))) {
-            inputElement.value = '0';
-        } else {
-            inputElement.value = numericValue;
-        }
-    }
-
-    function formatRupiah1(angka) {
-        return new Intl.NumberFormat('id-ID', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        }).format(angka);
-
-    }
-
-    const print = function(url) {
-        window.open(url, "_blank");
-    }
-
-
-    const posting = function(id) {
-        Swal.fire({
-            icon: 'question',
-            title: 'Posting Biaya Kepiting ?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Simpan',
-            cancelButtonText: 'Kembali',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const csrf = $(`[name="${csrfToken}"]`);
-                $.ajax({
-                    url: "<?= base_url("biaya-kepiting/posting"); ?>",
-                    data: {
-                        id: id
-                    },
-                    beforeSend: function(xhr) {
-                        setLoading();
-                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                    },
-                    complete: function() {
-                        stopLoading();
-                    },
-                    method: "POST",
-                    dataType: "json",
-                    success: function(response) {
-                        csrf.val(response.token);
-                        if (response.status) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            }).then((result) => {
-                                window.location.href = "<?= base_url("biaya-kepiting") ?>";
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            })
-                        }
-                    },
-                });
-            }
-        })
-    }
-
-    const remove = function(id) {
-        Swal.fire({
-            icon: 'question',
-            title: 'Hapus Biaya Kepiting ?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Simpan',
-            cancelButtonText: 'Kembali',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const csrf = $(`[name="${csrfToken}"]`);
-                $.ajax({
-                    url: "<?= base_url("biaya-kepiting/delete"); ?>",
-                    data: {
-                        id: id
-                    },
-                    beforeSend: function(xhr) {
-                        setLoading();
-                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                    },
-                    complete: function() {
-                        stopLoading();
-                    },
-                    method: "POST",
-                    dataType: "json",
-                    success: function(response) {
-                        if (response.status) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            }).then((result) => {
-                                location.reload();
-                            });
-                        }
-                    },
-                });
-            }
-        })
-    }
-
-    function autoComplete() {
-        $.each(listBarang, function(i, v) {
-            var barangJumboElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].jumbo');
-            var barangExLumpElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].ex_lump');
-            var barangLumpElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].lump');
-            var barangSpecialElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].special');
-            var barangClawElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].claw');
-            var barangMhElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].mh');
-            var barangCfElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].cf');
-
-            listBarang[i].jumbo = barangJumboElement.val();
-            listBarang[i].ex_lump = barangExLumpElement.val();
-            listBarang[i].lump = barangLumpElement.val();
-            listBarang[i].special = barangSpecialElement.val();
-            listBarang[i].claw = barangClawElement.val();
-            listBarang[i].mh = barangMhElement.val();
-            listBarang[i].cf = barangCfElement.val();
-        });
-
-        $.each(listPerolehanGaji, function(i, v) {
-            var hargaJumboElement = $('input.' + v.value + '_jumbo');
-            var hargaExLumpElement = $('input.' + v.value + '_ex_lump');
-            var hargaLumpElement = $('input.' + v.value + '_lump');
-            var hargaSpecialElement = $('input.' + v.value + '_special');
-            var hargaClawElement = $('input.' + v.value + '_claw');
-            var hargaMhElement = $('input.' + v.value + '_mh');
-            var hargaCfElement = $('input.' + v.value + '_cf');
-
-            listPerolehanGaji[i].jumbo = hargaJumboElement.val();
-            listPerolehanGaji[i].ex_lump = hargaExLumpElement.val();
-            listPerolehanGaji[i].lump = hargaLumpElement.val();
-            listPerolehanGaji[i].special = hargaSpecialElement.val();
-            listPerolehanGaji[i].claw = hargaClawElement.val();
-            listPerolehanGaji[i].mh = hargaMhElement.val();
-            listPerolehanGaji[i].cf = hargaCfElement.val();
-        });
-
-        $.each(listBonus, function(i, v) {
-            var barangBonusKgElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].kg_bonus');
-            var barangBonusNominalElement = $('input[data-spesifikasi_id="' + v.barang_master_spesifikasi_id + '"].bonus_nominal');
-
-            listBonus[i].kg_bonus = barangBonusKgElement.val();
-            listBonus[i].bonus_nominal = barangBonusNominalElement.val();
-        });
-
-        let data = new FormData();
-        data.append('listBarang', JSON.stringify(listBarang));
-        data.append('listPerolehanGaji', JSON.stringify(listPerolehanGaji));
-        data.append("listBonus", JSON.stringify(listBonus));
-        data.append("listDataVendor", JSON.stringify(listDataVendor));
-
-        if (request) {
-            request.abort();
-        }
-
-        var focusedElementId = document.activeElement.id;
-        request = $.ajax({
-            url: "<?= base_url('biaya-kepiting/autocomplete'); ?>",
-            data: data,
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-            },
-            method: "POST",
-            dataType: "json",
-            processData: false,
-            contentType: false,
-            success: function(res) {
-                csrf.val(res.token);
-                listBarang = res.data;
-                listPerolehanGaji = res.dataPerolehanGaji;
-                listBonus = res.dataBonus;
-                listDataVendor = res.dataVendor;
-                drawTable();
-
-                if (focusedElementId) {
-                    var newFocusedElement = document.getElementById(focusedElementId);
-                    if (newFocusedElement) {
-                        newFocusedElement.focus();
-                        var val = newFocusedElement.value;
-                        newFocusedElement.value = '';
-                        newFocusedElement.value = val;
-                    }
-                }
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                if (textStatus !== 'abort') {
-                    // Handle error selain abort
-                    console.error('Error:', textStatus, errorThrown);
-                }
-            }
-        });
-    }
-
-
-
-
-
-    // Fungsi untuk mengumpulkan data dan submit
-function submitBiayaKepiting() {
-    // Validasi dasar
-    if (!validateForm()) {
+}
+
+// ==================== EVENT HANDLERS ====================
+function handleVendorChange() {
+    const vendorId = $(this).val();
+    const $selectSuratJalan = $('.jasa_vendor_in_id');
+
+    if (!vendorId) {
+        $selectSuratJalan.empty();
         return;
     }
 
-    // Kumpulkan data dari semua tabel
-    const data = collectAllData();
-    
-    // Tampilkan konfirmasi sebelum submit
-    Swal.fire({
-        title: 'Konfirmasi',
-        text: 'Apakah Anda yakin ingin menyimpan data biaya kepiting ini?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Ya, Simpan!',
-        cancelButtonText: 'Batal'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Kirim data ke server
-            sendDataToServer(data);
+    $.ajax({
+        url: `/biaya-kepiting/get-jasa-vendor-in/${vendorId}`,
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            $selectSuratJalan.empty();
+            
+            if (response && response.length > 0) {
+                response.forEach(item => {
+                    const option = new Option(
+                        `${item.no_penerimaan_surat_jalan} - ${item.tanggal}`,
+                        item.id,
+                        false,
+                        false
+                    );
+                    $selectSuratJalan.append(option);
+                });
+            } else {
+                $selectSuratJalan.append('<option value="">Tidak ada surat jalan</option>');
+            }
+
+            // === AUTO SELECT IF EDIT MODE ===
+            if (isEditMode && selectedSuratJalanId) {
+                $selectSuratJalan.val(selectedSuratJalanId).trigger('change');
+            }
+
+        },
+        error: function() {
+            $selectSuratJalan
+                .empty()
+                .append('<option value="">Gagal memuat data</option>');
         }
     });
 }
 
-// Fungsi validasi form
+function handleJasaVendorChange() {
+    var selected = $('.jasa_vendor_in_id option:selected');
+    
+    if (selected.length > 0) {
+        const firstSelected = selected.first();
+        $('.vendor').val(firstSelected.data('vendor'));
+        $('.divisi').val(firstSelected.data('divisi'));
+        $('.thead-bonus').text("Bonus Khusus Untuk " + (firstSelected.data('vendor') || 'Vendor'));
+        
+        // Load data barang hanya jika ada jasa_vendor_in_id yang dipilih
+        listDataBarang();
+    } else {
+        $('.vendor').val('');
+        $('.divisi').val('');
+        $('.thead-bonus').text("Bonus Khusus Untuk Vendor");
+        
+        // Kosongkan list barang jika tidak ada yang dipilih
+        listBarang = [];
+        drawTableBarang();
+    }
+
+    changeStatus();
+}
+
+// ==================== DATA LOADING ====================
+function loadExistingData() {
+    // Untuk mode edit, langsung load data tanpa bergantung jasa_vendor_in_id
+    $.ajax({
+        url: `<?= base_url('biaya-kepiting/list-barang'); ?>`,
+        method: "GET",
+        data: {
+            id: $('.id').val()
+        },
+        dataType: "json",
+        success: function(res) {
+            csrf.val(res.token);
+            
+            // Reset data dulu
+            listBarang = [];
+            listPerolehanGaji = [];
+            listDataVendor = [];
+            listBonus = [];
+            
+            // Hanya set data jika response sukses
+            if (res.status !== false) {
+                listBarang = res.data || [];
+                listPerolehanGaji = res.dataPerolehanGaji || [];
+                listDataVendor = res.dataVendor || [];
+                listBonus = res.dataBonus || [];
+
+                drawAllTables();
+            }
+            
+            // Set nilai select2 jika ada data jasa_vendor_in_kepiting_kukus_id
+            if (res.biayaKepiting && res.biayaKepiting.jasa_vendor_in_kepiting_kukus_id) {
+                const jasaVendorIds = res.biayaKepiting.jasa_vendor_in_kepiting_kukus_id.split(',');
+                $('.jasa_vendor_in_id').val(jasaVendorIds).trigger('change');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("Error loading existing data:", error);
+            // Set data kosong
+            listBarang = [];
+            listPerolehanGaji = [];
+            listDataVendor = [];
+            listBonus = [];
+            alert("Terjadi kesalahan saat memuat data. Silakan refresh halaman.");
+        }
+    });
+}
+
+// ==================== TABLE FUNCTIONS ====================
+function listDataBarang() {
+    const jasaVendorInId = $(".jasa_vendor_in_id").val();
+    
+    // Reset data dulu
+    listBarang = [];
+    listPerolehanGaji = [];
+    listDataVendor = [];
+    listBonus = [];
+    
+    // Hanya load data barang jika ada jasa_vendor_in_id yang dipilih
+    if (jasaVendorInId && jasaVendorInId.length > 0) {
+        $.ajax({
+            url: `<?= base_url('biaya-kepiting/list-barang'); ?>`,
+            method: "GET",
+            data: {
+                jasa_vendor_in_id: jasaVendorInId,
+                id: $('.id').val()
+            },
+            dataType: "json",
+            success: function(res) {
+                csrf.val(res.token);
+                
+                // Hanya set data jika response sukses
+                if (res.status !== false) {
+                    listBarang = res.data || [];
+                    listPerolehanGaji = res.dataPerolehanGaji || [];
+                    listDataVendor = res.dataVendor || [];
+                    listBonus = res.dataBonus || [];
+
+                     drawAllTables();
+                }
+            
+            },
+            error: function(xhr, status, error) {
+                console.error("Error loading barang data:", error);
+            }
+        });
+    }
+}
+
+// ==================== TABLE DRAWING ====================
+function drawAllTables() {
+    // Inisialisasi variabel
+    if (!window.listBarang) window.listBarang = {};
+    if (!listBarang.data) listBarang.data = [];
+    if (!listBarang.thead) listBarang.thead = [];
+    if (!window.listPerolehanGaji) window.listPerolehanGaji = [];
+    if (!window.listDataVendor) window.listDataVendor = {};
+    if (!window.listBonus) window.listBonus = [];
+
+    // Hancurkan DataTables yang ada
+    destroyDataTables();
+
+    // Gambar semua tabel
+    drawTable1();
+    drawTable2();
+    drawTable3();
+
+    // Inisialisasi DataTables
+    initializeDataTables();
+}
+
+function destroyDataTables() {
+    ['#dataTable', '#dataTable2', '#dataTable3'].forEach(selector => {
+        if ($.fn.DataTable.isDataTable(selector)) {
+            $(selector).DataTable().destroy();
+            $(selector).removeAttr('style');
+        }
+    });
+}
+
+function initializeDataTables() {
+    const dtConfig = {
+        scrollX: true,
+        autoWidth: false,
+        responsive: false,
+        ordering: false,
+        paging: false,
+        searching: false,
+        info: false,
+        destroy: true,
+        retrieve: true
+    };
+
+    $('#dataTable').DataTable(dtConfig);
+    $('#dataTable2').DataTable(dtConfig);
+    $('#dataTable3').DataTable(dtConfig);
+}
+
+function drawTable1() {
+    const $table = $('#dataTable');
+    const $tbody = $table.find('.body-table');
+    $tbody.empty();
+
+    // Build header
+    const $thead = $('#dynamicHeader');
+    $thead.empty();
+    
+    if (!listBarang.thead) listBarang.thead = [];
+    const specCount = listBarang.thead.length || 7;
+
+    $thead.append(`
+        <tr>
+            <th colspan="3"></th>
+            <th colspan="2">Kg Bahan Baku</th>
+            <th colspan="${specCount}">Hasil Kopek</th>
+            <th colspan="1"></th>
+        </tr>
+        <tr>
+            <th>No</th>
+            <th>Tanggal Masuk</th>
+            <th>Supplier - Keterangan</th>
+            <th>Qty Sebelum Kopek</th>
+            <th>Rasio (%)</th>
+            ${listBarang.thead.map(spec => `<th>${spec}</th>`).join('')}
+            ${listBarang.thead.length === 0 ? `
+                <th>JUMBO</th><th>EX LUMP</th><th>LUMP</th><th>SPESIAL</th>
+                <th>CLAW</th><th>MH</th><th>CF</th>
+            ` : ''}
+            <th>TOTAL</th>
+        </tr>
+    `);
+
+    if (!listBarang.data || listBarang.data.length === 0) {
+        $tbody.append(`<tr><td colspan="${5 + specCount}" style="text-align: center;">Tidak Ada Barang</td></tr>`);
+        return;
+    }
+
+    const totalPerSpek = {};
+    let qtyKopekTotal = 0;
+    let totalTotal = 0;
+
+    // Init total per spec
+    (listBarang.thead.length > 0 ? listBarang.thead : ['JUMBO','EX LUMP','LUMP','SPESIAL','CLAW','MH','CF']).forEach(spec => {
+        totalPerSpek[spec] = 0;
+    });
+
+    // Process data
+    listBarang.data.forEach((v, i) => {
+        let total = 0;
+        if (v.spek) {
+            Object.values(v.spek).forEach(value => total += parseFloat(value || 0));
+        }
+        
+        const rasio = total === 0 ? 0 : ((total / parseFloat(v.qty_sebelum_kopek)) * 100).toFixed(2);
+        const specs = listBarang.thead.length > 0 ? listBarang.thead : ['JUMBO','EX LUMP','LUMP','SPESIAL','CLAW','MH','CF'];
+        
+        let rowHTML = `
+            <tr>
+                <td style="text-align: center;">${i + 1}</td>
+                <td style="text-align: center;">${v.tanggal_masuk}</td>
+                <td style="text-align: center;">${v.supplier || ''} - ${v.keterangan || ''}</td>
+                <td style="text-align: center;">${parseFloat(v.qty_sebelum_kopek || 0).toFixed(2)}</td>
+                <td style="text-align: center;">${rasio} %</td>
+        `;
+
+        specs.forEach(spec => {
+            const value = v.spek && v.spek[spec] ? v.spek[spec] : 0;
+            totalPerSpek[spec] += parseFloat(value || 0);
+            
+            rowHTML += `
+                <td style="text-align: center;">
+                    <input id="${i+'_'+spec}" 
+                        style="height: 40px; padding: 5px; min-width: 100px;" 
+                        class="form-control ${spec.toLowerCase().replace(/\s+/g, '_')}" 
+                        oninput="preventNegativeInput(this); calculateAll()" 
+                        autocomplete="off" 
+                        type="text" 
+                        value="${value}">
+                </td>
+            `;
+        });
+
+        rowHTML += `<td style="text-align: center;">${total.toFixed(3)}</td></tr>`;
+        $tbody.append(rowHTML);
+
+        totalTotal += total;
+        qtyKopekTotal += parseFloat(v.qty_sebelum_kopek || 0);
+    });
+
+    // Grand total row
+    const totalRasio = qtyKopekTotal === 0 ? 0 : ((totalTotal / qtyKopekTotal) * 100).toFixed(2);
+    const specs = listBarang.thead.length > 0 ? listBarang.thead : ['JUMBO','EX LUMP','LUMP','SPESIAL','CLAW','MH','CF'];
+    
+    let totalRow = `
+        <tr class="bg-total">
+            <td style="text-align: center;"><b>TOTAL</b></td>
+            <td></td><td></td>
+            <td style="text-align: center;">${qtyKopekTotal.toFixed(2)}</td>
+            <td style="text-align: center;">${totalRasio} %</td>
+    `;
+
+    specs.forEach(spec => {
+        totalRow += `<td style="text-align: center;">${(totalPerSpek[spec] || 0).toFixed(2)}</td>`;
+    });
+
+    totalRow += `<td style="text-align: center;">${totalTotal.toFixed(3)}</td></tr>`;
+    $tbody.append(totalRow);
+
+    // Simpan data untuk perhitungan
+    window.currentTotals = { totalPerSpek, totalTotal };
+}
+
+function drawTable2() {
+    const $table = $('#dataTable2');
+    const $tbody = $table.find('tbody');
+    $tbody.empty();
+
+    if (!listPerolehanGaji || listPerolehanGaji.length === 0) {
+        $tbody.append('<tr><td colspan="9" style="text-align: center;">Tidak Ada Data</td></tr>');
+        return;
+    }
+
+    // Column mapping yang benar
+    const columns = ['jumbo', 'ex_lump', 'lump', 'special', 'claw', 'mh', 'cf'];
+    const columnLabels = ['JUMBO', 'EX LUMP', 'LUMP', 'SPESIAL', 'CLAW', 'MH', 'CF'];
+
+    // Draw rows untuk setiap jenis perolehan gaji
+    listPerolehanGaji.forEach((item, index) => {
+        let total = 0;
+        let rowHTML = `<tr><td>${item.description || ''}</td>`;
+
+        // Loop melalui setiap column
+        columns.forEach(col => {
+            const value = parseFloat(item[col] || 0);
+            total += value;
+            
+            rowHTML += `
+                <td style="text-align: center;">
+                    <input id="gaji_${index}_${col}" 
+                        class="form-control gaji-input ${col}" 
+                        type="text" 
+                        value="${value}"
+                        oninput="calculateAll()">
+                </td>
+            `;
+        });
+
+        rowHTML += `<td>${formatRupiah(total.toFixed(2))}</td></tr>`;
+        $tbody.append(rowHTML);
+    });
+
+    // Calculate totals setelah draw
+    calculateTable2Totals();
+}
+
+function drawTable3() {
+    const $tbody = $('#dataTable3 tbody');
+    $tbody.empty();
+
+    if (listBonus.length === 0) {
+        $tbody.append('<tr><td colspan="6" style="text-align: center;">Tidak Ada Data Bonus</td></tr>');
+        return;
+    }
+
+    const vendorData = listDataVendor || {};
+    let totalBonusResult = 0;
+
+    listBonus.forEach((v, i) => {
+        // Set bonus nominal from vendor data
+        if (v.spesifikasi === "JB") v.bonus_nominal = vendorData.bonus_karyawan_jb || v.bonus_nominal || 0;
+        else if (v.spesifikasi === "SP LUMP") v.bonus_nominal = vendorData.bonus_karyawan_xl || v.bonus_nominal || 0;
+        else if (v.spesifikasi === "BF") v.bonus_nominal = vendorData.bonus_karyawan_lp || v.bonus_nominal || 0;
+        else if (v.spesifikasi === "SPL") v.bonus_nominal = vendorData.bonus_karyawan_sp || v.bonus_nominal || 0;
+        else if (v.spesifikasi === "CLAW") v.bonus_nominal = vendorData.bonus_karyawan_cl || v.bonus_nominal || 0;
+        else if (v.spesifikasi === "MH") v.bonus_nominal = vendorData.bonus_karyawan_mh || v.bonus_nominal || 0;
+        else if (v.spesifikasi === "CF") v.bonus_nominal = vendorData.bonus_karyawan_cf || v.bonus_nominal || 0;
+        
+        const totalBonus = parseFloat(v.kg_bonus || 0) * parseFloat(v.bonus_nominal || 0);
+        totalBonusResult += totalBonus;
+
+        const rowHTML = `
+            <tr>
+                <td style="text-align: center;">${i + 1}</td>
+                <td style="text-align: center;">${v.tanggal_masuk}</td>
+                <td style="text-align: center;">${v.nama_barang || ''}</td>
+                <td style="text-align: center;">
+                    <input class="form-control kg_bonus" type="text" value="${v.kg_bonus || 0}" oninput="calculateBonus()">
+                </td>
+                <td style="text-align: center;">
+                    <input class="form-control bonus_nominal" type="text" value="${v.bonus_nominal || 0}" oninput="calculateBonus()">
+                </td>
+                <td>${formatRupiah(totalBonus.toFixed(2))}</td>
+            </tr>
+        `;
+        $tbody.append(rowHTML);
+    });
+
+    // Grand total row
+    $tbody.append(`
+        <tr style="background-color:#f2c996;">
+            <td style="text-align:center;"><b>GRAND TOTAL</b></td>
+            <td></td><td></td><td></td><td></td>
+            <td>${formatRupiah(totalBonusResult.toFixed(2))}</td>
+        </tr>
+    `);
+}
+
+// ==================== CALCULATION FUNCTIONS ====================
+function calculateAll() {
+    updateTable1Totals();
+    calculateTable2Totals();
+}
+
+function calculateTable2Totals() {
+    if (!window.currentTotals) return;
+    
+    const { totalPerSpek, totalTotal } = window.currentTotals;
+    const $tbody = $('#dataTable2 tbody');
+    
+    // Clear existing total rows
+    $tbody.find('tr').filter(':contains("TOTAL")').remove();
+    $tbody.find('tr').filter(':contains("PRESENTASE")').remove();
+    $tbody.find('tr').filter(':contains("GRAND TOTAL")').remove();
+
+    // Column mapping
+    const columns = ['jumbo', 'ex_lump', 'lump', 'special', 'claw', 'mh', 'cf'];
+    const columnLabels = ['JUMBO', 'EX LUMP', 'LUMP', 'SPESIAL', 'CLAW', 'MH', 'CF'];
+    
+    // Mapping antara nama kolom dan spek dari table 1
+    const spekMapping = {
+        'jumbo': 'JB',
+        'ex_lump': 'SP LUMP', 
+        'lump': 'LUMP',
+        'special': 'SPL',
+        'claw': 'CLAW',
+        'mh': 'MH',
+        'cf': 'CF'
+    };
+
+    // Get current values dari input
+    const currentValues = {};
+    listPerolehanGaji.forEach((item, index) => {
+        currentValues[item.value] = {};
+        columns.forEach(col => {
+            const inputVal = $(`#gaji_${index}_${col}`).val();
+            currentValues[item.value][col] = parseFloat(inputVal) || 0;
+        });
+    });
+
+    // TOTAL PER KATEGORI
+    Object.keys(currentValues).forEach(kategori => {
+        const kategoriName = listPerolehanGaji.find(item => item.value === kategori)?.description || kategori;
+        let totalKategori = 0;
+        let rowHTML = `<tr style="background-color:#f2c996;"><td style="text-align: center;"><b>TOTAL ${kategoriName.toUpperCase()}</b></td>`;
+
+        columns.forEach(col => {
+            const harga = currentValues[kategori][col] || 0;
+            const spekKey = spekMapping[col];
+            const qty = totalPerSpek[spekKey] || 0;
+            const totalSpec = harga * qty;
+            totalKategori += totalSpec;
+            rowHTML += `<td>${totalSpec !== 0 ? formatRupiah(totalSpec.toFixed(2)) : '0'}</td>`;
+        });
+
+        rowHTML += `<td>${formatRupiah(totalKategori.toFixed(2))}</td></tr>`;
+        $tbody.append(rowHTML);
+    });
+
+    // PRESENTASE KOPEK
+    let totalPresentase = 0;
+    let presentaseRow = `<tr style="background-color:#f2c996;"><td style="text-align: center;"><b>PRESENTASE KOPEK</b></td>`;
+    
+    columnLabels.forEach((label, index) => {
+        const spekKey = spekMapping[columns[index]];
+        const qty = totalPerSpek[spekKey] || 0;
+        const presentase = totalTotal ? (qty * 100 / totalTotal) : 0;
+        totalPresentase += presentase;
+        presentaseRow += `<td>${presentase.toFixed(2)} %</td>`;
+    });
+    
+    presentaseRow += `<td>${totalPresentase.toFixed(2)} %</td></tr>`;
+    $tbody.append(presentaseRow);
+
+    // GRAND TOTAL
+    const grandTotalPerCol = {};
+    let grandTotalUpahKopek = 0;
+    
+    columns.forEach(col => grandTotalPerCol[col] = 0);
+    
+    Object.keys(currentValues).forEach(kategori => {
+        columns.forEach(col => {
+            const harga = currentValues[kategori][col] || 0;
+            const spekKey = spekMapping[col];
+            const qty = totalPerSpek[spekKey] || 0;
+            grandTotalPerCol[col] += (harga * qty);
+        });
+    });
+    
+    grandTotalUpahKopek = Object.values(grandTotalPerCol).reduce((sum, val) => sum + val, 0);
+    
+    let grandTotalRow = `<tr style="background-color:#c7922f; font-weight:bold;"><td style="text-align:center;"><b>GRAND TOTAL UPAH KOPEK</b></td>`;
+    
+    columns.forEach(col => {
+        grandTotalRow += `<td>${formatRupiah(grandTotalPerCol[col].toFixed(2))}</td>`;
+    });
+    
+    grandTotalRow += `<td>${formatRupiah(grandTotalUpahKopek.toFixed(2))}</td></tr>`;
+    $tbody.append(grandTotalRow);
+}
+
+function updateTable1Totals() {
+    const $tbody = $('#dataTable tbody');
+    let qtyKopekTotal = 0;
+    let totalTotal = 0;
+    const totalPerSpek = {};
+    const specs = listBarang.thead.length > 0 ? listBarang.thead : ['JUMBO','EX LUMP','LUMP','SPESIAL','CLAW','MH','CF'];
+
+    // Init totals
+    specs.forEach(spec => totalPerSpek[spec] = 0);
+
+    // Calculate new totals from inputs
+    $tbody.find('tr').not('.bg-total').each(function() {
+        const $row = $(this);
+        if ($row.find('td').first().text().includes('Tidak Ada Barang')) return;
+
+        const qty = parseFloat($row.find('td').eq(3).text()) || 0;
+        qtyKopekTotal += qty;
+
+        let rowTotal = 0;
+        specs.forEach((spec, index) => {
+            const inputVal = $row.find(`td:eq(${5 + index}) input`).val();
+            const value = parseFloat(inputVal) || 0;
+            totalPerSpek[spec] += value;
+            rowTotal += value;
+        });
+
+        // Update row total
+        $row.find('td:last').text(rowTotal.toFixed(3));
+        totalTotal += rowTotal;
+    });
+
+    // Update grand total row
+    const $totalRow = $tbody.find('.bg-total');
+    const totalRasio = qtyKopekTotal === 0 ? 0 : ((totalTotal / qtyKopekTotal) * 100).toFixed(2);
+    
+    $totalRow.find('td').eq(3).text(qtyKopekTotal.toFixed(2));
+    $totalRow.find('td').eq(4).text(totalRasio + ' %');
+    
+    specs.forEach((spec, index) => {
+        $totalRow.find('td').eq(5 + index).text((totalPerSpek[spec] || 0).toFixed(2));
+    });
+    
+    $totalRow.find('td:last').text(totalTotal.toFixed(3));
+
+    // Save for table 2 calculations
+    window.currentTotals = { totalPerSpek, totalTotal };
+}
+
+function calculateBonus() {
+    let totalBonusResult = 0;
+    const $tbody = $('#dataTable3 tbody');
+
+    $tbody.find('tr').each(function() {
+        const $row = $(this);
+        if ($row.find('.kg_bonus').length > 0) {
+            const kg = parseFloat($row.find('.kg_bonus').val()) || 0;
+            const bonus = parseFloat($row.find('.bonus_nominal').val()) || 0;
+            const total = kg * bonus;
+            totalBonusResult += total;
+            $row.find('td:last').text(formatRupiah(total.toFixed(2)));
+        }
+    });
+
+    // Update grand total
+    $tbody.find('tr:last td:last').text(formatRupiah(totalBonusResult.toFixed(2)));
+}
+
+// ==================== SUBMIT FUNCTIONS ====================
+function submitBiayaKepiting() {
+    if (!validateForm()) return;
+
+    calculateAll();
+    calculateBonus();
+
+    const data = collectAllData();
+    
+    // Tentukan URL berdasarkan mode (create/update)
+    const isEditMode = $('.id').val() !== '';
+    const url = isEditMode ? '<?= base_url("biaya-kepiting/update"); ?>' : '<?= base_url("biaya-kepiting/save"); ?>';
+    
+    Swal.fire({
+        title: 'Konfirmasi',
+        text: `Apakah Anda yakin ingin ${isEditMode ? 'mengupdate' : 'menyimpan'} data biaya kepiting ini?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: `Ya, ${isEditMode ? 'Update' : 'Simpan'}!`,
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            sendDataToServer(data, url);
+        }
+    });
+}
+
 function validateForm() {
     const noPembayaran = $('#no_pembayaran').val();
     const tanggal = $('#tanggal').val();
@@ -1105,7 +902,6 @@ function validateForm() {
         return false;
     }
     
-    // Validasi data barang
     if (!listBarang.data || listBarang.data.length === 0) {
         Swal.fire('Peringatan', 'Data barang tidak boleh kosong', 'warning');
         return false;
@@ -1114,7 +910,6 @@ function validateForm() {
     return true;
 }
 
-// Fungsi untuk mengumpulkan semua data dari tabel
 function collectAllData() {
     return {
         listBarang: collectBarangData(),
@@ -1127,19 +922,14 @@ function collectAllData() {
     };
 }
 
-// Fungsi untuk mengumpulkan data barang dari tabel pertama
 function collectBarangData() {
     const data = [];
+    const specs = listBarang.thead.length > 0 ? listBarang.thead : ['JUMBO','EX LUMP','LUMP','SPESIAL','CLAW','MH','CF'];
     
-    // Loop melalui setiap baris data (kecuali baris total)
     $('#dataTable tbody tr').not('.bg-total').each(function() {
         const row = $(this);
-        // Skip baris kosong
-        if (row.find('td').first().text().includes('Tidak Ada Barang')) {
-            return;
-        }
+        if (row.find('td').first().text().includes('Tidak Ada Barang')) return;
         
-        // Ambil data dari kolom tetap
         const barangData = {
             tanggal_masuk: row.find('td:eq(1)').text(),
             supplier_keterangan: row.find('td:eq(2)').text(),
@@ -1151,15 +941,11 @@ function collectBarangData() {
             spek: {}
         };
         
-        // Ambil data spesifikasi dinamis
-        if (listBarang.thead && listBarang.thead.length > 0) {
-            listBarang.thead.forEach((spec, index) => {
-                const inputValue = row.find(`td:eq(${5 + index}) input`).val();
-                barangData.spek[spec] = parseFloat(inputValue) || 0;
-            });
-        }
+        specs.forEach((spec, index) => {
+            const inputValue = row.find(`td:eq(${5 + index}) input`).val();
+            barangData.spek[spec] = parseFloat(inputValue) || 0;
+        });
         
-        // Ambil ID dari data asli jika ada
         const rowIndex = row.index();
         if (listBarang.data && listBarang.data[rowIndex]) {
             barangData.barang_master_id = listBarang.data[rowIndex].barang_master_id;
@@ -1172,50 +958,33 @@ function collectBarangData() {
     return data;
 }
 
-// Fungsi untuk mengumpulkan data gaji dari tabel kedua
 function collectGajiData() {
     const data = [];
-    const specs = ["JB", "SP LUMP", "BF", "SPL", "CLAW", "MH", "CF"];
+    const columns = ['jumbo', 'ex_lump', 'lump', 'special', 'claw', 'mh', 'cf'];
     
-    // Loop melalui setiap baris data (kecuali baris total)
     $('#dataTable2 tbody tr').each(function() {
         const row = $(this);
         const firstCell = row.find('td:first').text().trim();
         
-        // Skip baris total dan baris kosong
         if (firstCell.includes('TOTAL') || firstCell.includes('PRESENTASE') || 
-            firstCell.includes('GRAND TOTAL') || firstCell === 'Tidak Ada Data') {
-            return;
-        }
+            firstCell.includes('GRAND TOTAL') || firstCell === 'Tidak Ada Data') return;
         
-        // Ambil data gaji
+        const gajiType = listPerolehanGaji.find(item => 
+            item.description === firstCell
+        );
+        
+        if (!gajiType) return;
+        
         const gajiData = {
             description: firstCell,
-            value: getValueFromDescription(firstCell), // Helper function untuk mapping
-            jumbo: 0,
-            ex_lump: 0,
-            lump: 0,
-            special: 0,
-            claw: 0,
-            mh: 0,
-            cf: 0
+            value: gajiType.value,
+            jumbo: 0, ex_lump: 0, lump: 0, special: 0, claw: 0, mh: 0, cf: 0
         };
         
-        // Ambil nilai untuk setiap spesifikasi
-        specs.forEach((spec, index) => {
+        columns.forEach((col, index) => {
             const inputValue = row.find(`td:eq(${index + 1}) input`).val();
             const value = parseFloat(inputValue) || 0;
-            
-            // Assign ke property yang sesuai
-            switch(spec) {
-                case "JB": gajiData.jumbo = value; break;
-                case "SP LUMP": gajiData.ex_lump = value; break;
-                case "BF": gajiData.lump = value; break;
-                case "SPL": gajiData.special = value; break;
-                case "CLAW": gajiData.claw = value; break;
-                case "MH": gajiData.mh = value; break;
-                case "CF": gajiData.cf = value; break;
-            }
+            gajiData[col] = value;
         });
         
         data.push(gajiData);
@@ -1224,32 +993,13 @@ function collectGajiData() {
     return data;
 }
 
-// Helper function untuk mapping description ke value
-function getValueFromDescription(description) {
-    const mapping = {
-        'Upah Kopek': 'upah_kopek',
-        'Komisi per Kg Daging': 'komisi_kg_daging',
-        'Bonus per Kg Daging': 'bonus_kg_daging',
-        'Tambahan Upah Kopek': 'tamb_upah_kopek'
-    };
-    
-    return mapping[description] || description.toLowerCase().replace(/\s+/g, '_');
-}
-
-// Fungsi untuk mengumpulkan data bonus dari tabel ketiga
 function collectBonusData() {
     const data = [];
     
-    // Loop melalui setiap baris data (kecuali baris total)
     $('#dataTable3 tbody tr').not(':last').each(function() {
         const row = $(this);
+        if (row.find('td').first().text().includes('Tidak Ada Data Bonus')) return;
         
-        // Skip baris kosong
-        if (row.find('td').first().text().includes('Tidak Ada Data Bonus')) {
-            return;
-        }
-        
-        // Ambil data bonus
         const bonusData = {
             tanggal_masuk: row.find('td:eq(1)').text(),
             nama_barang: row.find('td:eq(2)').text(),
@@ -1257,7 +1007,6 @@ function collectBonusData() {
             bonus_nominal: parseFloat(row.find('td:eq(4) input').val()) || 0
         };
         
-        // Ambil ID dari data asli jika ada
         const rowIndex = row.index();
         if (listBonus && listBonus[rowIndex]) {
             bonusData.barang_master_id = listBonus[rowIndex].barang_master_id;
@@ -1271,67 +1020,124 @@ function collectBonusData() {
     return data;
 }
 
-// Fungsi untuk mengirim data ke server
-function sendDataToServer(data) {
-    // Tampilkan loading
+// Ubah sendDataToServer untuk menerima URL parameter
+function sendDataToServer(data, url) {
     Swal.fire({
-        title: 'Menyimpan Data',
+        title: `${$('.id').val() ? 'Mengupdate' : 'Menyimpan'} Data`,
         text: 'Sedang memproses data, harap tunggu...',
         allowOutsideClick: false,
-        didOpen: () => {
-            Swal.showLoading();
-        }
+        didOpen: () => Swal.showLoading()
     });
     
-    // Kirim data ke server menggunakan AJAX
+    // Pastikan jasa_vendor_in_id adalah array
+    const jasaVendorInId = Array.isArray(data.jasa_vendor_in_id) 
+        ? data.jasa_vendor_in_id 
+        : [data.jasa_vendor_in_id];
+    
+    const formData = {
+        listBarang: JSON.stringify(data.listBarang),
+        listPerolehanGaji: JSON.stringify(data.listPerolehanGaji),
+        listBonus: JSON.stringify(data.listBonus),
+        no_pembayaran: data.no_pembayaran,
+        tanggal: data.tanggal,
+        keterangan: data.keterangan,
+        jasa_vendor_in_id: jasaVendorInId
+    };
+    
+    // Jika edit mode, tambahkan ID
+    if ($('.id').val()) {
+        formData.id = $('.id').val();
+    }
+    
+    console.log('Data yang dikirim:', formData); // Debug
+    
     $.ajax({
-        url: '<?= base_url("biaya-kepiting/save"); ?>', // Ganti dengan URL yang sesuai
+        url: url,
         type: 'POST',
         dataType: 'json',
+        traditional: true,
         beforeSend: function(xhr) {
             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
         },
-        data: {
-            listBarang: JSON.stringify(data.listBarang),
-            listPerolehanGaji: JSON.stringify(data.listPerolehanGaji),
-            listBonus: JSON.stringify(data.listBonus),
-            no_pembayaran: data.no_pembayaran,
-            tanggal: data.tanggal,
-            keterangan: data.keterangan,
-            jasa_vendor_in_id: data.jasa_vendor_in_id,
-        },
+        data: formData,
         success: function(response) {
             Swal.close();
             
             if (response.status) {
-                // Berhasil
                 Swal.fire({
                     title: 'Sukses',
                     text: response.message,
                     icon: 'success',
                     confirmButtonText: 'OK'
                 }).then(() => {
-                    // Redirect atau lakukan sesuatu setelah sukses
                     window.location.href = '/biaya-kepiting/';
                 });
             } else {
-                // Gagal
                 Swal.fire('Error', response.message, 'error');
             }
         },
         error: function(xhr, status, error) {
             Swal.close();
-            Swal.fire('Error', 'Terjadi kesalahan saat menyimpan data: ' + error, 'error');
+            Swal.fire('Error', 'Terjadi kesalahan: ' + error, 'error');
         }
     });
 }
 
-// Event handler untuk tombol submit
+// ==================== HELPER FUNCTIONS ====================
+function getValueFromDescription(description) {
+    const mapping = {
+        'Upah Kopek': 'upah_kopek',
+        'Komisi / Kg Daging': 'komisi_kg_daging',
+        'Bonus / Kg Daging': 'bonus_kg_daging',
+        'Tamb. Upah Kopek': 'tamb_upah_kopek'
+    };
+    return mapping[description] || description.toLowerCase().replace(/\s+/g, '_');
+}
+
+function formatRupiah(angka) {
+    if (!angka) return 'Rp 0';
+    const number_string = angka.toString().replace(/[^,\d]/g, '');
+    const split = number_string.split(',');
+    let rupiah = split[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+    return 'Rp ' + rupiah;
+}
+
+function preventNegativeInput(input) {
+    if (parseFloat(input.value) < 0) input.value = 0;
+}
+
+function changeStatus() {
+    let value = document.getElementById('auto_generate').checked ? true : false;
+    if (value) {
+        $(".no_pembayaran").attr("readonly", true);
+        $.ajax({
+            url: `<?= base_url("biaya-kepiting/get-no"); ?>`,
+            method: "GET",
+            data: { warehouse_id: $('#jasa_vendor_in_id option:selected').data('warehouse_id') },
+            dataType: "json",
+            success: function(res) {
+                if (res.status) {
+                    $(".no_pembayaran").val(res.data);
+                } else {
+                    Swal.fire({ icon: 'error', title: res.message, confirmButtonColor: '#4e73df' });
+                    $(".no_pembayaran").attr("readonly", false);
+                    $("#auto_generate").prop("checked", false);
+                    $(".no_pembayaran").val("");
+                }
+            }
+        })
+    } else {
+        $(".no_pembayaran").attr("readonly", false);
+        $(".no_pembayaran").val("");
+    }
+}
+
+// ==================== EVENT BINDINGS ====================
 $(document).on('click', '.btn-submit-parent', function(e) {
     e.preventDefault();
     submitBiayaKepiting();
 });
-
 </script>
 
 <?= $this->endSection(); ?>

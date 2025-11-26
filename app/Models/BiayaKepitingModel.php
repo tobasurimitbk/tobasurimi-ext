@@ -487,92 +487,132 @@ class BiayaKepitingModel extends Model
     }   
 
 
-   public function dropdownBarangKepitingKukusPrint($jasaVendorInID, $id = null)
+    public function dropdownBarangKepitingKukusPrint($jasaVendorInID, $id = null)
     {
         $biayaKepitingDetailModel = new BiayaKepitingDetailModel();
         $jasaVendorInModel = new JasaVendorInModel();
 
-        // cari data jasa vendor in buat tanggal masuk
-        $jasaVendorIn = $jasaVendorInModel->find($jasaVendorInID);
-        $tanggalMasuk = $jasaVendorIn ? date('d/m/Y', strtotime($jasaVendorIn['tanggal'])) : '-';
+        // Validasi input
+        if (!$jasaVendorInID) {
+            return [];
+        }
 
-        // ambil semua detail kepiting berdasarkan jasa_vendor_in_id
-        $biayaKepiting = $biayaKepitingDetailModel
-            ->select("
-                biaya_kepiting_detail.*,
-                barang_master.id AS barang_master_id,
-                barang_master.barang_name,
-                suppliers.name as supplier_name
-            ")
-            ->join('barang_master', 'barang_master.id = biaya_kepiting_detail.barang_master_id', 'left')
-            ->join('suppliers', 'suppliers.id = biaya_kepiting_detail.supplier_id', 'left')
-            ->where('biaya_kepiting_detail.jasa_vendor_in_id', $jasaVendorInID)
-            ->where('biaya_kepiting_detail.deletedAt', null)
-            ->findAll();
+        try {
+            // cari data jasa vendor in buat tanggal masuk
+            $jasaVendorIn = $jasaVendorInModel->find($jasaVendorInID);
+            if (!$jasaVendorIn) {
+                return [];
+            }
+            
+            $tanggalMasuk = date('d/m/Y', strtotime($jasaVendorIn['tanggal']));
 
-        $result = [];
+            // ambil semua detail kepiting berdasarkan jasa_vendor_in_id
+            $biayaKepiting = $biayaKepitingDetailModel
+                ->select("
+                    biaya_kepiting_detail.*,
+                    barang_master.id AS barang_master_id,
+                    barang_master.barang_name,
+                    suppliers.name as supplier_name
+                ")
+                ->join('barang_master', 'barang_master.id = biaya_kepiting_detail.barang_master_id', 'left')
+                ->join('suppliers', 'suppliers.id = biaya_kepiting_detail.supplier_id', 'left')
+                ->where('biaya_kepiting_detail.jasa_vendor_in_id', $jasaVendorInID)
+                ->where('biaya_kepiting_detail.deletedAt', null)
+                ->findAll();
 
-        foreach ($biayaKepiting as $item) {
-            $key = $tanggalMasuk . '|' . ($item['supplier_name'] ?? '-');
+            $result = [];
 
-            if (!isset($result[$key])) {
-                $result[$key] = [
-                    'tanggal_masuk' => $tanggalMasuk,
-                    'supplier_name' => $item['supplier_name'] ?? '-',
+            foreach ($biayaKepiting as $item) {
+                $key = $tanggalMasuk . '|' . ($item['supplier_name'] ?? '-');
+
+                if (!isset($result[$key])) {
+                    $result[$key] = [
+                        'tanggal_masuk' => $tanggalMasuk,
+                        'supplier_name' => $item['supplier_name'] ?? '-',
+                        'jumbo' => 0,
+                        'ex_lump' => 0,
+                        'lump' => 0,
+                        'special' => 0,
+                        'claw' => 0,
+                        'mh' => 0,
+                        'cf' => 0,
+                        'qty_kopek' => 0,
+                    ];
+                }
+
+                $result[$key]['jumbo']   += (float)($item['jumbo'] ?? 0);
+                $result[$key]['ex_lump'] += (float)($item['ex_lump'] ?? 0);
+                $result[$key]['lump']    += (float)($item['lump'] ?? 0);
+                $result[$key]['special'] += (float)($item['special'] ?? 0);
+                $result[$key]['claw']    += (float)($item['claw'] ?? 0);
+                $result[$key]['mh']      += (float)($item['mh'] ?? 0);
+                $result[$key]['cf']      += (float)($item['cf'] ?? 0);
+                $result[$key]['qty_kopek'] += (float)($item['qty_kopek'] ?? 0);
+            }
+            
+            return array_values($result);
+        } catch (\Exception $e) {
+            log_message('error', 'Error in dropdownBarangKepitingKukusPrint: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function dropdownPerolehanGaji($id = null)
+    {
+        try {
+            $metaDataModel = new MetadataModel();
+            $biayaKepitingGajiModel = new BiayaKepitingGajiModel();
+            
+            $jenisBiayaKepiting = $metaDataModel->where('name', "Jenis Biaya Kepiting")->findAll();
+
+            // Validasi jika tidak ada data metadata
+            if (empty($jenisBiayaKepiting)) {
+                return [];
+            }
+
+            foreach ($jenisBiayaKepiting as $i => $j) {
+                // Set default values
+                $defaultValues = [
                     'jumbo' => 0,
                     'ex_lump' => 0,
                     'lump' => 0,
                     'special' => 0,
                     'claw' => 0,
                     'mh' => 0,
-                    'cf' => 0,
-                    'qty_kopek' => 0,
+                    'cf' => 0
                 ];
+
+                // Cari data gaji jika ada ID
+                if ($id != null) {
+                    $biayaKepitingGaji = $biayaKepitingGajiModel
+                        ->where('biaya_kepiting_id', $id)
+                        ->where('jenis', $j['description'] ?? '')
+                        ->first();
+
+                    if ($biayaKepitingGaji) {
+                        $jenisBiayaKepiting[$i]['jumbo'] = (float)($biayaKepitingGaji['jumbo'] ?? 0);
+                        $jenisBiayaKepiting[$i]['ex_lump'] = (float)($biayaKepitingGaji['ex_lump'] ?? 0);
+                        $jenisBiayaKepiting[$i]['lump'] = (float)($biayaKepitingGaji['lump'] ?? 0);
+                        $jenisBiayaKepiting[$i]['special'] = (float)($biayaKepitingGaji['special'] ?? 0);
+                        $jenisBiayaKepiting[$i]['claw'] = (float)($biayaKepitingGaji['claw'] ?? 0);
+                        $jenisBiayaKepiting[$i]['mh'] = (float)($biayaKepitingGaji['mh'] ?? 0);
+                        $jenisBiayaKepiting[$i]['cf'] = (float)($biayaKepitingGaji['cf'] ?? 0);
+                    } else {
+                        // Jika tidak ditemukan, set default values
+                        $jenisBiayaKepiting[$i] = array_merge($jenisBiayaKepiting[$i], $defaultValues);
+                    }
+                } else {
+                    // Jika tidak ada ID, set default values
+                    $jenisBiayaKepiting[$i] = array_merge($jenisBiayaKepiting[$i], $defaultValues);
+                }
             }
 
-            $result[$key]['jumbo']   += (float)$item['jumbo'];
-            $result[$key]['ex_lump'] += (float)$item['ex_lump'];
-            $result[$key]['lump']    += (float)$item['lump'];
-            $result[$key]['special'] += (float)$item['special'];
-            $result[$key]['claw']    += (float)$item['claw'];
-            $result[$key]['mh']      += (float)$item['mh'];
-            $result[$key]['cf']      += (float)$item['cf'];
-            $result[$key]['qty_kopek'] += (float)$item['qty_kopek'];
+            return $jenisBiayaKepiting;
+            
+        } catch (\Exception $e) {
+            log_message('error', 'Error in dropdownPerolehanGaji: ' . $e->getMessage());
+            return [];
         }
-        
-        return array_values($result);
-    }
-
-
-    public function dropdownPerolehanGaji($id = null)
-    {
-        $metaDataModel = new MetadataModel();
-        $biayaKepitingGajiModel = new BiayaKepitingGajiModel();
-        $jenisBiayaKepiting = $metaDataModel->where('name', "Jenis Biaya Kepiting")->findAll();
-
-        foreach ($jenisBiayaKepiting as $i => $j) {
-            if ($id != null) {
-                $biayaKepitingGaji = $biayaKepitingGajiModel->where('biaya_kepiting_id', $id)->where('jenis', $j['description'])->first();
-                $jenisBiayaKepiting[$i]['jumbo'] = $biayaKepitingGaji['jumbo'] ?? 0;
-                $jenisBiayaKepiting[$i]['ex_lump'] = $biayaKepitingGaji['ex_lump'] ?? 0;
-                $jenisBiayaKepiting[$i]['lump'] = $biayaKepitingGaji['lump'] ?? 0;
-                $jenisBiayaKepiting[$i]['special'] = $biayaKepitingGaji['special'] ?? 0;
-                $jenisBiayaKepiting[$i]['claw'] = $biayaKepitingGaji['claw'] ?? 0;
-                $jenisBiayaKepiting[$i]['mh'] = $biayaKepitingGaji['mh'] ?? 0;
-                $jenisBiayaKepiting[$i]['cf'] = $biayaKepitingGaji['cf'] ?? 0;
-            } else {
-                $biayaKepitingGaji = $biayaKepitingGajiModel->where('biaya_kepiting_id', $id)->where('jenis', $j['description'])->first();
-                $jenisBiayaKepiting[$i]['jumbo'] = 0;
-                $jenisBiayaKepiting[$i]['ex_lump'] = 0;
-                $jenisBiayaKepiting[$i]['lump'] = 0;
-                $jenisBiayaKepiting[$i]['special'] = 0;
-                $jenisBiayaKepiting[$i]['claw'] = 0;
-                $jenisBiayaKepiting[$i]['mh'] = 0;
-                $jenisBiayaKepiting[$i]['cf'] = 0;
-            }
-        }
-
-        return $jenisBiayaKepiting;
     }
 
     public function getPenerimaanSuratJalanDetail($id)

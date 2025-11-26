@@ -18,12 +18,12 @@ use App\Models\JasaVendorInKepitingKukusDetailModel;
 use App\Models\JasaVendorInKepitingKukusModel;
 use App\Models\JasaVendorOutKepitingKukusDetailModel;
 use App\Models\JasaVendorOutKepitingKukusModel;
-
+use Config\Database;
 use Dompdf\Dompdf;
 
 class BiayaKepiting extends BaseController
 {
-
+    protected $db;
     protected $this_company_id;
     protected $this_user_id;
     protected $divisiModel;
@@ -63,6 +63,7 @@ class BiayaKepiting extends BaseController
         $this->biayaKepitingBonusModel = new BiayaKepitingBonusModel();
         $this->barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
         $this->dompdf = new Dompdf();
+        $this->db = \Config\Database::connect();
     }
 
     public function index()
@@ -154,15 +155,11 @@ class BiayaKepiting extends BaseController
     public function detail($id)
     {
         $id = decrypt($id);
-        $biayaKepiting = $this->biayaKepitingModel->find($id);
-
-        if ($biayaKepiting == null) {
-            return redirect()->to('biaya-kepiting');
-        }
 
         $data = [
             'tanggal' => date('Y-m-d'),
-            'biayaKepiting' => $this->biayaKepitingModel->find($id),
+            'vendor' => $this->vendorModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', "ASC")->findAll(),
+            'biayaKepiting' => $this->biayaKepitingModel->where('id', $id)->first(),
             'jasaVendorInDetail' => $this->biayaKepitingModel->getPenerimaanSuratJalanDetail($id),
         ];
 
@@ -184,272 +181,580 @@ class BiayaKepiting extends BaseController
         return $this->response->setJSON($data);
     }
 
-
-
-
     public function createAction()
     {
-        // Decode data JSON dengan parameter true untuk mendapatkan array assosiatif
-        $listBarang = json_decode($this->request->getPost('listBarang'), true);
-        $listPerolehanGaji = json_decode($this->request->getPost('listPerolehanGaji'), true);
-        $listBonus = json_decode($this->request->getPost('listBonus'), true);
-        
-        $jasaVendorIn = $this->jasaVendorInKepitingKukusModel->find($this->request->getVar('jasa_vendor_in_id'));
-        $biayaKepiting = $this->biayaKepitingModel->where('company_id', $this->this_company_id)
-            ->where('no_pembayaran', $this->request->getVar('no_pembayaran'))
-            ->first();
+        try {
+            // Debug semua input data
+            $debugData = [
+                'listBarang_count' => count(json_decode($this->request->getPost('listBarang'), true) ?? []),
+                'listPerolehanGaji_count' => count(json_decode($this->request->getPost('listPerolehanGaji'), true) ?? []),
+                'listBonus_count' => count(json_decode($this->request->getPost('listBonus'), true) ?? []),
+                'jasa_vendor_in_ids' => $this->request->getPost('jasa_vendor_in_id'),
+                'no_pembayaran' => $this->request->getVar('no_pembayaran'),
+                'tanggal' => $this->request->getVar('tanggal'),
+                'keterangan' => $this->request->getVar('keterangan'),
+            ];
+            
+            log_message('error', 'DEBUG CREATE ACTION: ' . print_r($debugData, true));
 
-        if ($biayaKepiting != null) {
-            return $this->response->setJSON([
-                'message' => "No pembayaran sudah ada!",
-                'status' => false,
-                'token' => csrf_hash()
-            ]);
-        }
+            // Decode data JSON dengan parameter true untuk mendapatkan array assosiatif
+            $listBarang = json_decode($this->request->getPost('listBarang'), true) ?? [];
+            $listPerolehanGaji = json_decode($this->request->getPost('listPerolehanGaji'), true) ?? [];
+            $listBonus = json_decode($this->request->getPost('listBonus'), true) ?? [];
+            
+            // Handle multiple jasa_vendor_in_id - PASTIKAN INI ARRAY
+            $jasaVendorInIds = $this->request->getPost('jasa_vendor_in_id');
+            
+            log_message('error', 'JASA VENDOR IN IDS RAW: ' . print_r($jasaVendorInIds, true));
+            
+            // Jika bukan array, konversi ke array
+            if (!is_array($jasaVendorInIds)) {
+                $jasaVendorInIds = [$jasaVendorInIds];
+            }
+            
+            log_message('error', 'JASA VENDOR IN IDS PROCESSED: ' . print_r($jasaVendorInIds, true));
+            
+            // Validasi minimal ada satu jasa vendor yang dipilih
+            if (empty($jasaVendorInIds) || empty($jasaVendorInIds[0])) {
+                log_message('error', 'VALIDASI GAGAL: jasa_vendor_in_ids kosong');
+                return $this->response->setJSON([
+                    'message' => "Pilih minimal satu surat jalan!",
+                    'status' => false,
+                    'token' => csrf_hash()
+                ]);
+            }
 
-        if (count($listBarang) == 0) {
-            return $this->response->setJSON([
-                'message' => "Barang tidak boleh kosong",
-                'status' => false,
-                'token' => csrf_hash()
-            ]);
-        }
-
-
-        // Format tanggal
-        $tanggal = $this->request->getVar("tanggal");
-        if ($tanggal) {
-            $date = \DateTime::createFromFormat("d/m/Y", $tanggal);
-            $tanggalFormatted = $date ? $date->format("Y-m-d") : date("Y-m-d");
-        } else {
-            $tanggalFormatted = date("Y-m-d");
-        }
-
-        $id = $this->biayaKepitingModel->insert([
-            'company_id' => $this->this_company_id,
-            'divisi_id' => $jasaVendorIn['divisi_id'],
-            'jasa_vendor_in_id' => $jasaVendorIn['id'],
-            'vendor_id' => $jasaVendorIn['vendor_id'],
-            'warehouse_id' => $jasaVendorIn['warehouse_id'],
-            'no_pembayaran' => $this->request->getVar('no_pembayaran'),
-            "tanggal" => $tanggalFormatted,
-            'keterangan' => $this->request->getVar('keterangan'),
-            'status_posting' => '0',
-        ]);
-
-        // Jika insert gagal
-        if (!$id) {
-            return $this->response->setJSON([
-                'message' => "Gagal menyimpan data biaya kepiting",
-                'status' => false,
-                'token' => csrf_hash()
-            ]);
-        }
-
-        // Simpan data barang
-        foreach ($listBarang as $b) {
-            $this->biayaKepitingDetailModel->insert([
-                'biaya_kepiting_id' => $id,
-                'jasa_vendor_in_id' => $this->request->getVar('jasa_vendor_in_id'),
-                'barang_master_id' => $b['barang_master_id'] ?? null,
-                'barang_master_spesifikasi_id' => $b['barang_master_spesifikasi_id'] ?? null,
-                'supplier_id' => $b['supplier_id'] ?? null,
-                'keterangan' => $b['keterangan'] ?? null,
-                // 'tanggal_masuk' => $b['tanggal_masuk'] ?? null,
-                'qty_kopek' => $b['qty_sebelum_kopek'] ?? 0,
-                'rasio' => $b['rasio'] ?? 0,
-                'jumbo' => $b['spek']['JB'] ?? 0,
-                'ex_lump' => $b['spek']['SP LUMP'] ?? 0,
-                'lump' => $b['spek']['BF'] ?? 0,
-                'special' => $b['spek']['SPL'] ?? 0,
-                'claw' => $b['spek']['CLAW'] ?? 0,
-                'mh' => $b['spek']['MH'] ?? 0,
-                'cf' => $b['spek']['CF'] ?? 0,
-            ]);
-        }
-
-        // Simpan data perolehan gaji
-        foreach ($listPerolehanGaji as $b) {
-            $this->biayaKepitingGajiModel->insert([
-                'biaya_kepiting_id' => $id,
-                'jenis' => $b['description'] ?? $b['value'] ?? 'unknown',
-                'jumbo' => $b['jumbo'] ?? 0,
-                'ex_lump' => $b['ex_lump'] ?? 0,
-                'lump' => $b['lump'] ?? 0,
-                'special' => $b['special'] ?? 0,
-                'claw' => $b['claw'] ?? 0,
-                'mh' => $b['mh'] ?? 0,
-                'cf' => $b['cf'] ?? 0,
-            ]);
-        }
-
-        // Simpan data bonus (jika ada)
-        if (!empty($listBonus)) {
-            foreach ($listBonus as $b) {
-                if (!empty($b['kg_bonus']) && $b['kg_bonus'] > 0) {
-                    $this->biayaKepitingBonusModel->insert([
-                        'biaya_kepiting_id' => $id,
-                        'jasa_vendor_in_id' => $this->request->getVar('jasa_vendor_in_id'),
-                        'barang_master_id' => $b['barang_master_id'] ?? null,
-                        'barang_master_spesifikasi_id' => $b['barang_master_spesifikasi_id'] ?? null,
-                        // 'tanggal_masuk' => $b['tanggal_masuk'] ?? null,
-                        // 'nama_barang' => $b['nama_barang'] ?? null,
-                        // 'spesifikasi' => $b['spesifikasi'] ?? null,
-                        'kg_bonus' => $b['kg_bonus'] ?? 0,
-                        'bonus_nominal' => $b['bonus_nominal'] ?? 0,
-                    ]);
+            // Ambil data semua jasa vendor yang dipilih
+            $jasaVendorInList = [];
+            foreach ($jasaVendorInIds as $jasaVendorInId) {
+                $jasaVendor = $this->jasaVendorInKepitingKukusModel->find($jasaVendorInId);
+                if ($jasaVendor) {
+                    $jasaVendorInList[] = $jasaVendor;
                 }
             }
-        }
+            
+            log_message('error', 'JASA VENDOR LIST COUNT: ' . count($jasaVendorInList));
+            
+            // Gunakan yang pertama sebagai referensi utama
+            $mainJasaVendorIn = $jasaVendorInList[0] ?? null;
+            
+            if (!$mainJasaVendorIn) {
+                log_message('error', 'JASA VENDOR TIDAK DITEMUKAN');
+                return $this->response->setJSON([
+                    'message' => "Data jasa vendor tidak ditemukan!",
+                    'status' => false,
+                    'token' => csrf_hash()
+                ]);
+            }
 
-        return $this->response->setJSON([
-            'message' => "Biaya kepiting berhasil disimpan",
-            'token' => csrf_hash(),
-            'id' => encrypt($id),
-            'status' => true
-        ]);
+            // Cek duplikasi no pembayaran
+            $biayaKepiting = $this->biayaKepitingModel
+                ->where('company_id', $this->this_company_id)
+                ->where('no_pembayaran', $this->request->getVar('no_pembayaran'))
+                ->first();
+
+            if ($biayaKepiting != null) {
+                log_message('error', 'DUPLIKASI NO PEMBAYARAN: ' . $this->request->getVar('no_pembayaran'));
+                return $this->response->setJSON([
+                    'message' => "No pembayaran sudah ada!",
+                    'status' => false,
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            if (empty($listBarang)) {
+                log_message('error', 'LIST BARANG KOSONG');
+                return $this->response->setJSON([
+                    'message' => "Barang tidak boleh kosong",
+                    'status' => false,
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            // Format tanggal
+            $tanggal = $this->request->getVar("tanggal");
+            if ($tanggal) {
+                $date = \DateTime::createFromFormat("d/m/Y", $tanggal);
+                $tanggalFormatted = $date ? $date->format("Y-m-d") : date("Y-m-d");
+            } else {
+                $tanggalFormatted = date("Y-m-d");
+            }
+
+            log_message('error', 'MEMULAI TRANSACTION');
+
+            // Start transaction
+            $this->db->transStart();
+
+            // Data untuk insert biaya kepiting utama
+            $biayaKepitingData = [
+                'company_id' => $this->this_company_id,
+                'divisi_id' => $mainJasaVendorIn['divisi_id'],
+                'jasa_vendor_in_kepiting_kukus_id' => implode(',', $jasaVendorInIds), // Simpan sebagai string comma separated
+                'vendor_id' => $mainJasaVendorIn['vendor_id'],
+                'warehouse_id' => $mainJasaVendorIn['warehouse_id'],
+                'no_pembayaran' => $this->request->getVar('no_pembayaran'),
+                "tanggal" => $tanggalFormatted,
+                'keterangan' => $this->request->getVar('keterangan'),
+            ];
+
+            log_message('error', 'DATA BIYA KEPITING: ' . print_r($biayaKepitingData, true));
+
+            // Simpan data biaya kepiting utama
+            $id = $this->biayaKepitingModel->insert($biayaKepitingData);
+
+            log_message('error', 'INSERT BIYA KEPITING ID: ' . $id);
+
+            // Jika insert gagal
+            if (!$id) {
+                $error = $this->biayaKepitingModel->errors();
+                log_message('error', 'ERROR INSERT BIYA KEPITING: ' . print_r($error, true));
+                
+                $this->db->transRollback();
+                return $this->response->setJSON([
+                    'message' => "Gagal menyimpan data biaya kepiting: " . implode(', ', $error),
+                    'status' => false,
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            log_message('error', 'MENYIMPAN DATA BARANG - COUNT: ' . count($listBarang));
+
+            // Simpan data barang - GUNAKAN FOREACH untuk semua jasa_vendor_in_id
+            $barangSaved = 0;
+            foreach ($listBarang as $b) {
+                // Untuk setiap barang, simpan untuk semua jasa vendor yang dipilih
+                foreach ($jasaVendorInIds as $jasaVendorInId) {
+                    $barangData = [
+                        'biaya_kepiting_id' => $id,
+                        'jasa_vendor_in_id' => $jasaVendorInId,
+                        'barang_master_id' => $b['barang_master_id'] ?? null,
+                        'barang_master_spesifikasi_id' => $b['barang_master_spesifikasi_id'] ?? null,
+                        'supplier_id' => $b['supplier_id'] ?? null,
+                        'keterangan' => $b['keterangan'] ?? null,
+                        'qty_kopek' => $b['qty_sebelum_kopek'] ?? 0,
+                        'rasio' => $b['rasio'] ?? 0,
+                        'jumbo' => $b['spek']['JB'] ?? ($b['spek']['JUMBO'] ?? 0),
+                        'ex_lump' => $b['spek']['SP LUMP'] ?? ($b['spek']['EX LUMP'] ?? 0),
+                        'lump' => $b['spek']['BF'] ?? ($b['spek']['LUMP'] ?? 0),
+                        'special' => $b['spek']['SPL'] ?? ($b['spek']['SPESIAL'] ?? 0),
+                        'claw' => $b['spek']['CLAW'] ?? 0,
+                        'mh' => $b['spek']['MH'] ?? 0,
+                        'cf' => $b['spek']['CF'] ?? 0,
+                    ];
+                    
+                    $result = $this->biayaKepitingDetailModel->insert($barangData);
+                    if ($result) {
+                        $barangSaved++;
+                    } else {
+                        $error = $this->biayaKepitingDetailModel->errors();
+                        log_message('error', 'ERROR INSERT BARANG: ' . print_r($error, true));
+                        log_message('error', 'BARANG DATA: ' . print_r($barangData, true));
+                    }
+                }
+            }
+
+            log_message('error', 'BARANG BERHASIL DISIMPAN: ' . $barangSaved);
+
+            // Simpan data perolehan gaji
+            $gajiSaved = 0;
+            foreach ($listPerolehanGaji as $b) {
+                $gajiData = [
+                    'biaya_kepiting_id' => $id,
+                    'jenis' => $b['description'] ?? $b['value'] ?? 'unknown',
+                    'jumbo' => $b['jumbo'] ?? 0,
+                    'ex_lump' => $b['ex_lump'] ?? 0,
+                    'lump' => $b['lump'] ?? 0,
+                    'special' => $b['special'] ?? 0,
+                    'claw' => $b['claw'] ?? 0,
+                    'mh' => $b['mh'] ?? 0,
+                    'cf' => $b['cf'] ?? 0,
+                ];
+                
+                $result = $this->biayaKepitingGajiModel->insert($gajiData);
+                if ($result) {
+                    $gajiSaved++;
+                } else {
+                    $error = $this->biayaKepitingGajiModel->errors();
+                    log_message('error', 'ERROR INSERT GAJI: ' . print_r($error, true));
+                }
+            }
+
+            log_message('error', 'GAJI BERHASIL DISIMPAN: ' . $gajiSaved);
+
+            // Simpan data bonus (jika ada) - GUNAKAN FOREACH untuk semua jasa_vendor_in_id
+            $bonusSaved = 0;
+            if (!empty($listBonus)) {
+                foreach ($listBonus as $b) {
+                    if ((!empty($b['kg_bonus']) && $b['kg_bonus'] > 0) || (!empty($b['bonus_nominal']) && $b['bonus_nominal'] > 0)) {
+                        foreach ($jasaVendorInIds as $jasaVendorInId) {
+                            $bonusData = [
+                                'biaya_kepiting_id' => $id,
+                                'jasa_vendor_in_id' => $jasaVendorInId,
+                                'barang_master_id' => $b['barang_master_id'] ?? null,
+                                'barang_master_spesifikasi_id' => $b['barang_master_spesifikasi_id'] ?? null,
+                                'kg_bonus' => $b['kg_bonus'] ?? 0,
+                                'bonus_nominal' => $b['bonus_nominal'] ?? 0,
+                                'created_at' => date('Y-m-d H:i:s'),
+                                'updated_at' => date('Y-m-d H:i:s')
+                            ];
+                            
+                            $result = $this->biayaKepitingBonusModel->insert($bonusData);
+                            if ($result) {
+                                $bonusSaved++;
+                            } else {
+                                $error = $this->biayaKepitingBonusModel->errors();
+                                log_message('error', 'ERROR INSERT BONUS: ' . print_r($error, true));
+                            }
+                        }
+                    }
+                }
+            }
+
+            log_message('error', 'BONUS BERHASIL DISIMPAN: ' . $bonusSaved);
+
+            $this->db->transComplete();
+
+            if ($this->db->transStatus() === FALSE) {
+                log_message('error', 'TRANSACTION FAILED');
+                return $this->response->setJSON([
+                    'message' => "Gagal menyimpan data biaya kepiting - Transaction Failed",
+                    'status' => false,
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            log_message('error', 'SEMUA DATA BERHASIL DISIMPAN - ID: ' . $id);
+
+            return $this->response->setJSON([
+                'message' => "Biaya kepiting berhasil disimpan",
+                'token' => csrf_hash(),
+                'id' => encrypt($id),
+                'status' => true
+            ]);
+
+        } catch (\Exception $e) {
+            log_message('error', 'EXCEPTION: ' . $e->getMessage());
+            log_message('error', 'EXCEPTION TRACE: ' . $e->getTraceAsString());
+            
+            $this->db->transRollback();
+            return $this->response->setJSON([
+                'message' => "Terjadi kesalahan: " . $e->getMessage(),
+                'status' => false,
+                'token' => csrf_hash()
+            ]);
+        }
     }
 
     public function updateAction()
     {
-        $listBarang = json_decode($this->request->getPost('listBarang'), true);
-        $listPerolehanGaji = json_decode($this->request->getPost('listPerolehanGaji'), true);
-        $listBonus = json_decode($this->request->getPost('listBonus'), true);
-        $id = decrypt($this->request->getVar('id'));
+        try {
+            $id = decrypt($this->request->getPost('id'));
+            
+            // Debug semua input data
+            $debugData = [
+                'id' => $id,
+                'listBarang_count' => count(json_decode($this->request->getPost('listBarang'), true) ?? []),
+                'listPerolehanGaji_count' => count(json_decode($this->request->getPost('listPerolehanGaji'), true) ?? []),
+                'listBonus_count' => count(json_decode($this->request->getPost('listBonus'), true) ?? []),
+                'jasa_vendor_in_ids' => $this->request->getPost('jasa_vendor_in_id'),
+                'no_pembayaran' => $this->request->getVar('no_pembayaran'),
+                'tanggal' => $this->request->getVar('tanggal'),
+                'keterangan' => $this->request->getVar('keterangan'),
+            ];
+            
+            log_message('error', 'DEBUG UPDATE ACTION: ' . print_r($debugData, true));
 
-        if (empty($listBarang)) {
+            // Cek apakah data biaya kepiting exists
+            $existingBiayaKepiting = $this->biayaKepitingModel->find($id);
+            if (!$existingBiayaKepiting) {
+                log_message('error', 'DATA BIYA KEPITING TIDAK DITEMUKAN - ID: ' . $id);
+                return $this->response->setJSON([
+                    'message' => "Data biaya kepiting tidak ditemukan!",
+                    'status' => false,
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            // Cek status posting
+            if ($existingBiayaKepiting['status_posting'] == "1") {
+                log_message('error', 'DATA SUDAH DI POSTING - ID: ' . $id);
+                return $this->response->setJSON([
+                    'message' => "Data sudah diposting, tidak dapat diupdate!",
+                    'status' => false,
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            // Decode data JSON dengan parameter true untuk mendapatkan array assosiatif
+            $listBarang = json_decode($this->request->getPost('listBarang'), true) ?? [];
+            $listPerolehanGaji = json_decode($this->request->getPost('listPerolehanGaji'), true) ?? [];
+            $listBonus = json_decode($this->request->getPost('listBonus'), true) ?? [];
+            
+            // Handle multiple jasa_vendor_in_id - PASTIKAN INI ARRAY
+            $jasaVendorInIds = $this->request->getPost('jasa_vendor_in_id');
+            
+            log_message('error', 'JASA VENDOR IN IDS RAW: ' . print_r($jasaVendorInIds, true));
+            
+            // Jika bukan array, konversi ke array
+            if (!is_array($jasaVendorInIds)) {
+                $jasaVendorInIds = [$jasaVendorInIds];
+            }
+            
+            log_message('error', 'JASA VENDOR IN IDS PROCESSED: ' . print_r($jasaVendorInIds, true));
+            
+            // Validasi minimal ada satu jasa vendor yang dipilih
+            if (empty($jasaVendorInIds) || empty($jasaVendorInIds[0])) {
+                log_message('error', 'VALIDASI GAGAL: jasa_vendor_in_ids kosong');
+                return $this->response->setJSON([
+                    'message' => "Pilih minimal satu surat jalan!",
+                    'status' => false,
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            // Ambil data semua jasa vendor yang dipilih
+            $jasaVendorInList = [];
+            foreach ($jasaVendorInIds as $jasaVendorInId) {
+                $jasaVendor = $this->jasaVendorInKepitingKukusModel->find($jasaVendorInId);
+                if ($jasaVendor) {
+                    $jasaVendorInList[] = $jasaVendor;
+                }
+            }
+            
+            log_message('error', 'JASA VENDOR LIST COUNT: ' . count($jasaVendorInList));
+            
+            // Gunakan yang pertama sebagai referensi utama
+            $mainJasaVendorIn = $jasaVendorInList[0] ?? null;
+            
+            if (!$mainJasaVendorIn) {
+                log_message('error', 'JASA VENDOR TIDAK DITEMUKAN');
+                return $this->response->setJSON([
+                    'message' => "Data jasa vendor tidak ditemukan!",
+                    'status' => false,
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            // Cek duplikasi no pembayaran (kecuali untuk data yang sama)
+            $existingNoPembayaran = $this->biayaKepitingModel
+                ->where('company_id', $this->this_company_id)
+                ->where('no_pembayaran', $this->request->getVar('no_pembayaran'))
+                ->where('id !=', $id)
+                ->first();
+
+            if ($existingNoPembayaran != null) {
+                log_message('error', 'DUPLIKASI NO PEMBAYARAN: ' . $this->request->getVar('no_pembayaran'));
+                return $this->response->setJSON([
+                    'message' => "No pembayaran sudah ada!",
+                    'status' => false,
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            if (empty($listBarang)) {
+                log_message('error', 'LIST BARANG KOSONG');
+                return $this->response->setJSON([
+                    'message' => "Barang tidak boleh kosong",
+                    'status' => false,
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            // Format tanggal
+            $tanggal = $this->request->getVar("tanggal");
+            if ($tanggal) {
+                $date = \DateTime::createFromFormat("d/m/Y", $tanggal);
+                $tanggalFormatted = $date ? $date->format("Y-m-d") : date("Y-m-d");
+            } else {
+                $tanggalFormatted = date("Y-m-d");
+            }
+
+            log_message('error', 'MEMULAI TRANSACTION UPDATE');
+
+            // Start transaction
+            $this->db->transStart();
+
+            // Data untuk update biaya kepiting utama
+            $biayaKepitingData = [
+                'divisi_id' => $mainJasaVendorIn['divisi_id'],
+                'jasa_vendor_in_kepiting_kukus_id' => implode(',', $jasaVendorInIds), // Simpan sebagai string comma separated
+                'vendor_id' => $mainJasaVendorIn['vendor_id'],
+                'warehouse_id' => $mainJasaVendorIn['warehouse_id'],
+                'no_pembayaran' => $this->request->getVar('no_pembayaran'),
+                "tanggal" => $tanggalFormatted,
+                'keterangan' => $this->request->getVar('keterangan'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ];
+
+            log_message('error', 'DATA UPDATE BIYA KEPITING: ' . print_r($biayaKepitingData, true));
+
+            // Update data biaya kepiting utama
+            $updateResult = $this->biayaKepitingModel->update($id, $biayaKepitingData);
+
+            log_message('error', 'UPDATE BIYA KEPITING RESULT: ' . $updateResult);
+
+            // Jika update gagal
+            if (!$updateResult) {
+                $error = $this->biayaKepitingModel->errors();
+                log_message('error', 'ERROR UPDATE BIYA KEPITING: ' . print_r($error, true));
+                
+                $this->db->transRollback();
+                return $this->response->setJSON([
+                    'message' => "Gagal mengupdate data biaya kepiting: " . implode(', ', $error),
+                    'status' => false,
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            // ========== HAPUS DATA LAMA ==========
+            
+            // Hapus data barang lama
+            $deleteBarangResult = $this->biayaKepitingDetailModel
+                ->where('biaya_kepiting_id', $id)
+                ->delete();
+            log_message('error', 'DELETE BARANG LAMA RESULT: ' . $deleteBarangResult);
+
+            // Hapus data perolehan gaji lama
+            $deleteGajiResult = $this->biayaKepitingGajiModel
+                ->where('biaya_kepiting_id', $id)
+                ->delete();
+            log_message('error', 'DELETE GAJI LAMA RESULT: ' . $deleteGajiResult);
+
+            // Hapus data bonus lama
+            $deleteBonusResult = $this->biayaKepitingBonusModel
+                ->where('biaya_kepiting_id', $id)
+                ->delete();
+            log_message('error', 'DELETE BONUS LAMA RESULT: ' . $deleteBonusResult);
+
+            // ========== SIMPAN DATA BARU ==========
+
+            log_message('error', 'MENYIMPAN DATA BARANG BARU - COUNT: ' . count($listBarang));
+
+            // Simpan data barang - GUNAKAN FOREACH untuk semua jasa_vendor_in_id
+            $barangSaved = 0;
+            foreach ($listBarang as $b) {
+                // Untuk setiap barang, simpan untuk semua jasa vendor yang dipilih
+                foreach ($jasaVendorInIds as $jasaVendorInId) {
+                    $barangData = [
+                        'biaya_kepiting_id' => $id,
+                        'jasa_vendor_in_id' => $jasaVendorInId,
+                        'barang_master_id' => $b['barang_master_id'] ?? null,
+                        'barang_master_spesifikasi_id' => $b['barang_master_spesifikasi_id'] ?? null,
+                        'supplier_id' => $b['supplier_id'] ?? null,
+                        'keterangan' => $b['keterangan'] ?? null,
+                        'qty_kopek' => $b['qty_sebelum_kopek'] ?? 0,
+                        'rasio' => $b['rasio'] ?? 0,
+                        'jumbo' => $b['spek']['JB'] ?? ($b['spek']['JUMBO'] ?? 0),
+                        'ex_lump' => $b['spek']['SP LUMP'] ?? ($b['spek']['EX LUMP'] ?? 0),
+                        'lump' => $b['spek']['BF'] ?? ($b['spek']['LUMP'] ?? 0),
+                        'special' => $b['spek']['SPL'] ?? ($b['spek']['SPESIAL'] ?? 0),
+                        'claw' => $b['spek']['CLAW'] ?? 0,
+                        'mh' => $b['spek']['MH'] ?? 0,
+                        'cf' => $b['spek']['CF'] ?? 0,
+                    ];
+                    
+                    $result = $this->biayaKepitingDetailModel->insert($barangData);
+                    if ($result) {
+                        $barangSaved++;
+                    } else {
+                        $error = $this->biayaKepitingDetailModel->errors();
+                        log_message('error', 'ERROR INSERT BARANG: ' . print_r($error, true));
+                        log_message('error', 'BARANG DATA: ' . print_r($barangData, true));
+                    }
+                }
+            }
+
+            log_message('error', 'BARANG BARU BERHASIL DISIMPAN: ' . $barangSaved);
+
+            // Simpan data perolehan gaji
+            $gajiSaved = 0;
+            foreach ($listPerolehanGaji as $b) {
+                $gajiData = [
+                    'biaya_kepiting_id' => $id,
+                    'jenis' => $b['description'] ?? $b['value'] ?? 'unknown',
+                    'jumbo' => $b['jumbo'] ?? 0,
+                    'ex_lump' => $b['ex_lump'] ?? 0,
+                    'lump' => $b['lump'] ?? 0,
+                    'special' => $b['special'] ?? 0,
+                    'claw' => $b['claw'] ?? 0,
+                    'mh' => $b['mh'] ?? 0,
+                    'cf' => $b['cf'] ?? 0,
+                ];
+                
+                $result = $this->biayaKepitingGajiModel->insert($gajiData);
+                if ($result) {
+                    $gajiSaved++;
+                } else {
+                    $error = $this->biayaKepitingGajiModel->errors();
+                    log_message('error', 'ERROR INSERT GAJI: ' . print_r($error, true));
+                }
+            }
+
+            log_message('error', 'GAJI BARU BERHASIL DISIMPAN: ' . $gajiSaved);
+
+            // Simpan data bonus (jika ada) - GUNAKAN FOREACH untuk semua jasa_vendor_in_id
+            $bonusSaved = 0;
+            if (!empty($listBonus)) {
+                foreach ($listBonus as $b) {
+                    if ((!empty($b['kg_bonus']) && $b['kg_bonus'] > 0) || (!empty($b['bonus_nominal']) && $b['bonus_nominal'] > 0)) {
+                        foreach ($jasaVendorInIds as $jasaVendorInId) {
+                            $bonusData = [
+                                'biaya_kepiting_id' => $id,
+                                'jasa_vendor_in_id' => $jasaVendorInId,
+                                'barang_master_id' => $b['barang_master_id'] ?? null,
+                                'barang_master_spesifikasi_id' => $b['barang_master_spesifikasi_id'] ?? null,
+                                'kg_bonus' => $b['kg_bonus'] ?? 0,
+                                'bonus_nominal' => $b['bonus_nominal'] ?? 0,
+                                'created_at' => date('Y-m-d H:i:s'),
+                                'updated_at' => date('Y-m-d H:i:s')
+                            ];
+                            
+                            $result = $this->biayaKepitingBonusModel->insert($bonusData);
+                            if ($result) {
+                                $bonusSaved++;
+                            } else {
+                                $error = $this->biayaKepitingBonusModel->errors();
+                                log_message('error', 'ERROR INSERT BONUS: ' . print_r($error, true));
+                            }
+                        }
+                    }
+                }
+            }
+
+            log_message('error', 'BONUS BARU BERHASIL DISIMPAN: ' . $bonusSaved);
+
+            $this->db->transComplete();
+
+            if ($this->db->transStatus() === FALSE) {
+                log_message('error', 'TRANSACTION UPDATE FAILED');
+                return $this->response->setJSON([
+                    'message' => "Gagal mengupdate data biaya kepiting - Transaction Failed",
+                    'status' => false,
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            log_message('error', 'SEMUA DATA UPDATE BERHASIL - ID: ' . $id);
+
             return $this->response->setJSON([
-                'message' => "Barang tidak boleh kosong",
+                'message' => "Biaya kepiting berhasil diupdate",
+                'token' => csrf_hash(),
+                'id' => encrypt($id),
+                'status' => true
+            ]);
+
+        } catch (\Exception $e) {
+            log_message('error', 'EXCEPTION UPDATE: ' . $e->getMessage());
+            log_message('error', 'EXCEPTION UPDATE TRACE: ' . $e->getTraceAsString());
+            
+            $this->db->transRollback();
+            return $this->response->setJSON([
+                'message' => "Terjadi kesalahan saat update: " . $e->getMessage(),
                 'status' => false,
                 'token' => csrf_hash()
             ]);
         }
-
-        if (empty($listBonus)) {
-            return $this->response->setJSON([
-                'message' => "Bonus tidak boleh kosong",
-                'status' => false,
-                'token' => csrf_hash()
-            ]);
-        }
-
-        // update header
-        $this->biayaKepitingModel->update($id, [
-            'keterangan' => $this->request->getVar('keterangan'),
-            'status_posting' => '0'
-        ]);
-
-        $id_detail_all = [];
-        $id_detail_all_bonus = [];
-
-        // === UPDATE/INSERT DETAIL BARANG ===
-        foreach ($listBarang as $b) {
-            $check = $this->biayaKepitingDetailModel
-                ->where('biaya_kepiting_id', $id)
-                ->where('barang_master_id', $b['barang_master_id'])
-                ->where('barang_master_spesifikasi_id', $b['barang_master_spesifikasi_id'])
-                ->first();
-
-            if ($check) {
-                $this->biayaKepitingDetailModel->update($check['id'], [
-                    'jumbo' => $b['jumbo'],
-                    'ex_lump' => $b['ex_lump'],
-                    'lump' => $b['lump'],
-                    'special' => $b['special'],
-                    'claw' => $b['claw'],
-                    'mh' => $b['mh'],
-                    'cf' => $b['cf'],
-                ]);
-                $id_detail_all[] = $check['id'];
-            } else {
-                $id_detail_new = $this->biayaKepitingDetailModel->insert([
-                    'biaya_kepiting_id' => $id,
-                    'jasa_vendor_in_id' => $this->request->getVar('jasa_vendor_in_id'),
-                    'barang_master_id' => $b['barang_master_id'],
-                    'barang_master_spesifikasi_id' => $b['barang_master_spesifikasi_id'],
-                    'jumbo' => $b['jumbo'],
-                    'ex_lump' => $b['ex_lump'],
-                    'lump' => $b['lump'],
-                    'special' => $b['special'],
-                    'claw' => $b['claw'],
-                    'mh' => $b['mh'],
-                    'cf' => $b['cf'],
-                ]);
-                $id_detail_all[] = $id_detail_new;
-            }
-        }
-
-        // === UPDATE/INSERT BONUS ===
-        foreach ($listBonus as $b) {
-            $check = $this->biayaKepitingBonusModel
-                ->where('biaya_kepiting_id', $id)
-                ->where('barang_master_id', $b['barang_master_id'])
-                ->where('barang_master_spesifikasi_id', $b['barang_master_spesifikasi_id'])
-                ->first();
-
-            if ($check) {
-                $this->biayaKepitingBonusModel->update($check['id'], [
-                    'kg_bonus' => $b['kg_bonus'],
-                    'bonus_nominal' => $b['bonus_nominal']
-                ]);
-                $id_detail_all_bonus[] = $check['id'];
-            } else {
-                $id_detail_new = $this->biayaKepitingBonusModel->insert([
-                    'jasa_vendor_in_id' => $this->request->getVar('jasa_vendor_in_id'),
-                    'biaya_kepiting_id' => $id,
-                    'barang_master_id' => $b['barang_master_id'],
-                    'barang_master_spesifikasi_id' => $b['barang_master_spesifikasi_id'],
-                    'kg_bonus' => $b['kg_bonus'],
-                    'bonus_nominal' => $b['bonus_nominal']
-                ]);
-                $id_detail_all_bonus[] = $id_detail_new;
-            }
-        }
-
-        // DELETE yang tidak ada di list terbaru
-        $this->biayaKepitingDetailModel->where('biaya_kepiting_id', $id)->whereNotIn('id', $id_detail_all)->delete();
-        $this->biayaKepitingBonusModel->where('biaya_kepiting_id', $id)->whereNotIn('id', $id_detail_all_bonus)->delete();
-
-        // === UPDATE GAJI ===
-        foreach ($listPerolehanGaji as $b) {
-            $check = $this->biayaKepitingGajiModel
-                ->where('biaya_kepiting_id', $id)
-                ->where('jenis', $b['description'])
-                ->first();
-
-            if ($check) {
-                $this->biayaKepitingGajiModel->update($check['id'], [
-                    'jumbo' => $b['jumbo'],
-                    'ex_lump' => $b['ex_lump'],
-                    'lump' => $b['lump'],
-                    'special' => $b['special'],
-                    'claw' => $b['claw'],
-                    'mh' => $b['mh'],
-                    'cf' => $b['cf'],
-                ]);
-            } else {
-                $this->biayaKepitingGajiModel->insert([
-                    'biaya_kepiting_id' => $id,
-                    'jenis' => $b['description'],
-                    'jumbo' => $b['jumbo'],
-                    'ex_lump' => $b['ex_lump'],
-                    'lump' => $b['lump'],
-                    'special' => $b['special'],
-                    'claw' => $b['claw'],
-                    'mh' => $b['mh'],
-                    'cf' => $b['cf'],
-                ]);
-            }
-        }
-
-        return $this->response->setJSON([
-            'message' => "Biaya kepiting berhasil diupdate",
-            'token' => csrf_hash(),
-            'id' => encrypt($id),
-            'status' => true
-        ]);
     }
-
 
     public function delete()
     {
@@ -480,35 +785,65 @@ class BiayaKepiting extends BaseController
 
     public function print($id)
     {
-        $id = decrypt($id);
-        // var_dump($id);
-        // die;
-        $biayaKepiting = $this->biayaKepitingModel->find($id);
-        if ($biayaKepiting == null) {
-            return redirect()->to('biaya-kepiting');
+        try {
+            $id = decrypt($id);
+            $biayaKepitingData = $this->biayaKepitingModel
+                ->select('biaya_kepiting.*, jasa_vendor_out_kepiting_kukus.jenis_barang')
+                ->join('jasa_vendor_in_kepiting_kukus', 'jasa_vendor_in_kepiting_kukus.id = biaya_kepiting.jasa_vendor_in_id', 'left')
+                ->join('jasa_vendor_in_kepiting_kukus_detail', 'jasa_vendor_in_kepiting_kukus_detail.jasa_vendor_in_kepiting_kukus_id = jasa_vendor_in_kepiting_kukus.id', 'left')
+                ->join('jasa_vendor_out_kepiting_kukus', 'jasa_vendor_out_kepiting_kukus.id = jasa_vendor_in_kepiting_kukus_detail.jasa_vendor_out_kepiting_kukus_id', 'left')
+                ->where('biaya_kepiting.id', $id)
+                ->first();
+
+            $jasaVendorInId = $biayaKepitingData['jasa_vendor_in_kepiting_kukus_id'] ?? null;
+
+            // GUNAKAN METHOD YANG SAMA DENGAN EDIT MODE
+            $barangData = $this->biayaKepitingModel->dropdownBarangKepitingKukus([$jasaVendorInId], [$id]);
+
+            // KONVERSI STRUCTURE DATA UNTUK PRINT - YANG BENAR
+            $biayaKepitingDetail = [];
+            if (!empty($barangData['data'])) {
+                foreach ($barangData['data'] as $item) {
+                    $spek = $item['spek'] ?? [];
+                    
+                    $convertedItem = [
+                        'tanggal_masuk' => $item['tanggal_masuk'] ?? '-',
+                        'supplier_name' => $item['supplier'] ?? '-',
+                        'qty_kopek' => $item['qty_sebelum_kopek'] ?? 0,
+                        // MAPPING YANG BENAR
+                        'jumbo' => $spek['JB'] ?? $spek['JUMBO'] ?? 0,
+                        'ex_lump' => $spek['SP LUMP'] ?? $spek['EX LUMP'] ?? 0,
+                        'lump' => $spek['LUMP'] ?? 0,
+                        'special' => $spek['SPL'] ?? $spek['SPECIAL'] ?? 0,
+                        'claw' => $spek['CLAW'] ?? 0,
+                        'mh' => $spek['MH'] ?? 0,
+                        'cf' => $spek['CF'] ?? 0,
+                    ];
+                    $biayaKepitingDetail[] = $convertedItem;
+                }
+            }
+
+            $data = [
+                'tanggal' => date('Y-m-d'),
+                'biayaKepiting' => $biayaKepitingData,
+                'biayaKepitingBonus' => $this->biayaKepitingBonusModel->dropdownBarang($jasaVendorInId, $id),
+                'biayaKepitingDetail' => $biayaKepitingDetail, // AMBIL DARI METHOD YANG SAMA
+                'dataPerolehanGaji' => $this->biayaKepitingModel->dropdownPerolehanGaji($id)
+            ];
+
+
+            $data['vendor'] = $this->vendorModel->find($biayaKepitingData['vendor_id'] ?? null);
+            $data['gajiBiayaKepiting'] = $this->biayaKepitingGajiModel->where('biaya_kepiting_id', $biayaKepitingData['id'])->findAll();
+
+            $this->dompdf->loadHtml(view('jasaVendor/biayaKepiting/print', $data));
+            $this->dompdf->setPaper('A4', 'landscape');
+            $this->dompdf->render();
+            $this->dompdf->stream("Biaya Kepiting", array("Attachment" => false));
+            
+        } catch (\Exception $e) {
+            var_dump('error', 'Error in print method: ' . $e->getMessage());
+            die;
         }
-
-        $data = [
-            'tanggal' => date('Y-m-d'),
-            'biayaKepiting' => $this->biayaKepitingModel
-                                    ->select('biaya_kepiting.*, jasa_vendor_out_kepiting_kukus.jenis_barang')
-                                    ->join('jasa_vendor_in_kepiting_kukus', 'jasa_vendor_in_kepiting_kukus.id = biaya_kepiting.jasa_vendor_in_id', 'left')
-                                    ->join('jasa_vendor_in_kepiting_kukus_detail', 'jasa_vendor_in_kepiting_kukus_detail.jasa_vendor_in_kepiting_kukus_id = jasa_vendor_in_kepiting_kukus.id', 'left')
-                                    ->join('jasa_vendor_out_kepiting_kukus', 'jasa_vendor_out_kepiting_kukus.id = jasa_vendor_in_kepiting_kukus_detail.jasa_vendor_out_kepiting_kukus_id', 'left')
-                                    ->where('biaya_kepiting.id', $id)
-                                    ->first(),
-            'biayaKepitingBonus' => $this->biayaKepitingBonusModel->dropdownBarang($biayaKepiting['jasa_vendor_in_id'], $id),
-            'biayaKepitingDetail' => $this->biayaKepitingModel->dropdownBarangKepitingKukusPrint($biayaKepiting['jasa_vendor_in_id'], $id),
-            'dataPerolehanGaji' => $this->biayaKepitingModel->dropdownPerolehanGaji($id)
-        ];
-
-        $data['vendor'] = $this->vendorModel->find($biayaKepiting['vendor_id']);
-        $data['gajiBiayaKepiting'] = $this->biayaKepitingGajiModel->where('biaya_kepiting_id', $biayaKepiting['id'])->findAll();
-
-        $this->dompdf->loadHtml(view('jasaVendor/biayaKepiting/print', $data));
-        $this->dompdf->setPaper('A4', 'landscape');
-        $this->dompdf->render();
-        $this->dompdf->stream("Biaya Kepiting", array("Attachment" => false));
     }
 
     public function getNo()
@@ -562,41 +897,71 @@ class BiayaKepiting extends BaseController
 
     public function dropdownBarang()
     {
-        $jasaVendorInID = $this->request->getVar('jasa_vendor_in_id');
-        $id = $this->request->getVar('id');
-        // Pastikan $id bisa handle multiple atau single value
-        if (!empty($jasaVendorInID)) {
-            if (!empty($id)) {
-                $data = $this->biayaKepitingModel->dropdownBarangKepitingKukus($jasaVendorInID, $id);
-                $dataPerolehanGaji = $this->biayaKepitingModel->dropdownPerolehanGaji($id);
-                $dataBonus = $this->biayaKepitingBonusModel->dropdownBarang($jasaVendorInID, $$id);
-            } else {
-                // Kalau belum ada ID dikirim
-                $data = $this->biayaKepitingModel->dropdownBarangKepitingKukus($jasaVendorInID);
-                $dataPerolehanGaji = $this->biayaKepitingModel->dropdownPerolehanGaji();
-                $dataBonus = $this->biayaKepitingBonusModel->dropdownBarang($jasaVendorInID);
-            }
+        $jasaVendorInID = $this->request->getVar('jasa_vendor_in_id'); // bisa array
+        $id = decrypt($this->request->getVar('id')); // bisa array atau null
 
-             // Ambil data vendor terkait
-            $dataVendorIn = $this->jasaVendorInModel->where('id', $jasaVendorInID)->findAll();
-            $dataVendor = $this->vendorModel->where('id', $dataVendorIn['vendor_id'])->first();
-
+        if (empty($jasaVendorInID)) {
             return response()->setJSON([
-                'data' => $data,
-                'dataPerolehanGaji' => $dataPerolehanGaji,
-                'dataBonus' => $dataBonus,
-                'dataVendor' => $dataVendor,
-                'token' => csrf_hash(),
-                'status' => true
-            ]);
-        }
-
-        return response()->setJSON([
                 'message' => "Jasa Vendor In ID kosong",
                 'token' => csrf_hash(),
                 'status' => false
+            ]);
+        }
+
+        // Normalisasi ke array
+        $jviIDs = is_array($jasaVendorInID) ? $jasaVendorInID : [$jasaVendorInID];
+        $ids = !empty($id) ? (is_array($id) ? $id : [$id]) : [];
+
+        // Ambil data barang, perolehan gaji, bonus
+        if (!empty($ids)) {
+            $data = $this->biayaKepitingModel->dropdownBarangKepitingKukus($jviIDs, $ids);
+            $dataPerolehanGaji = $this->biayaKepitingModel->dropdownPerolehanGaji($ids);
+            $dataBonus = $this->biayaKepitingBonusModel->dropdownBarang($jviIDs, $ids);
+        } else {
+            $data = $this->biayaKepitingModel->dropdownBarangKepitingKukus($jviIDs);
+            $dataPerolehanGaji = $this->biayaKepitingModel->dropdownPerolehanGaji();
+            $dataBonus = $this->biayaKepitingBonusModel->dropdownBarang($jviIDs);
+        }
+
+        // ============================
+        //  AMBIL DETAIL VENDOR PER JVI
+        // ============================
+
+        $vendorList = [];
+        $vendorInList = [];
+
+        foreach ($jviIDs as $jviId) {
+
+            $vendorIn = $this->jasaVendorInModel
+                ->where('id', $jviId)
+                ->first();
+
+            if (!$vendorIn) {
+                continue;
+            }
+
+            $vendor = $this->vendorModel
+                ->where('id', $vendorIn['vendor_id'])
+                ->first();
+
+            $vendorInList[$jviId] = $vendorIn;
+            $vendorList[$jviId] = $vendor;
+        }
+
+        return response()->setJSON([
+            'data' => $data,
+            'dataPerolehanGaji' => $dataPerolehanGaji,
+            'dataBonus' => $dataBonus,
+
+            // PENTING → per VendorIn ID
+            'dataVendorIn' => $vendorInList,
+            'dataVendor' => $vendorList,
+
+            'token' => csrf_hash(),
+            'status' => true
         ]);
     }
+
 
     public function autoComplete()
     {
