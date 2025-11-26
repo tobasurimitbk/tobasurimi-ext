@@ -211,7 +211,7 @@ class JurnalUmum extends BaseController
             'transaksi_jurnal.deleted_at' => null,
         ];
 
-        $dataQry = $this->transaksiJurnalModel->getList($condition, $addCondition, $limit, $offset);
+        $dataQry = $this->transaksiJurnalModel->getList2($condition, $addCondition, $limit, $offset);
         $dataJurnal = $this->getData($dataQry['data'], $payload);
 
         $data = [
@@ -1970,7 +1970,7 @@ class JurnalUmum extends BaseController
 
                     // Hitung total semua PO dari detail
                     foreach ($dataPO as $value) {
-                        $totalNominal += $value->total; 
+                        $totalNominal += $value->total;
                     }
 
                     // ✅ Deskripsi cukup sekali aja (pas loop pertama yg ada datanya)
@@ -2584,7 +2584,7 @@ class JurnalUmum extends BaseController
                     $this->jurnalUmumModel->insertJurnalBatch($result);
                     $isFirstTransaction = false;
                 }
-                
+
                 return [
                     'status' => true,
                     'message' => 'Journal entries created successfully'
