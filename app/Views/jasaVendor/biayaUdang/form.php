@@ -59,7 +59,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly autocomplete="one-time-code" <?= !empty($biayaUdang) ? 'disabled=true' : ''; ?> value="<?= !empty($biayaUdang) ? $biayaUdang['no_pembayaran'] : "PAY-UDG/" . date('m') . "/1/" . date('Y'); ?>" type="text" class="form-control no_pembayaran" id="no_pembayaran" name="no_pembayaran" placeholder="No. Rebus">
+                                    <input readonly autocomplete="one-time-code" <?= !empty($biayaUdang) ? 'readonly=true' : ''; ?> value="<?= !empty($biayaUdang) ? $biayaUdang['no_pembayaran'] : "PAY-UDG/" . date('m') . "/1/" . date('Y'); ?>" type="text" class="form-control no_pembayaran" id="no_pembayaran" name="no_pembayaran" placeholder="No. Rebus">
                                     <label for="floatingInput">No. Pembayaran</label>
                                 </div>
                                 <div style="<?= !empty($biayaUdang) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -72,7 +72,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($biayaUdang) ? 'disabled' : '' ?> autocomplete="one-time-code" class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Dibuat" value="<?= date('d/m/Y', strtotime(!empty($biayaUdang) ? $biayaUdang['tanggal'] : $tanggal)); ?>">
+                                    <input <?= !empty($biayaUdang) ? 'readonly' : '' ?> autocomplete="one-time-code" class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Dibuat" value="<?= date('d/m/Y', strtotime(!empty($biayaUdang) ? $biayaUdang['tanggal'] : $tanggal)); ?>">
                                     <label for="floatingInput">Tanggal Pembayaran</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -83,7 +83,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($biayaUdang) ? 'disabled' : '' ?> class="form-select vendor_id" id="vendor_id" name="vendor_id" aria-label="Floating label select example">
+                            <select <?= !empty($biayaUdang) ? 'readonly' : '' ?> class="form-select vendor_id" id="vendor_id" name="vendor_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($vendor as $v) : ?>
                                     <option <?= !empty($biayaUdang) ? ($biayaUdang['vendor_id'] == $v['id'] ? 'selected' : '') : '' ?> value="<?= $v['id'] ?>">
@@ -96,7 +96,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($biayaUdang) ? 'disabled' : '' ?> class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
+                            <select <?= !empty($biayaUdang) ? 'readonly' : '' ?> class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php if (!empty($divisi)) : ?>
                                     <?php foreach ($divisi as $d) : ?>
@@ -111,7 +111,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($biayaUdang) ? 'disabled' : '' ?> multiple class="form-select multiple_jasa_vendor_in_id" id="multiple_jasa_vendor_in_id" name="multiple_jasa_vendor_in_id[]" aria-label="Floating label select example">
+                            <select <?= !empty($biayaUdang) ? 'readonly' : '' ?> multiple class="form-select multiple_jasa_vendor_in_id" id="multiple_jasa_vendor_in_id" name="multiple_jasa_vendor_in_id[]" aria-label="Floating label select example">
                                 <option value=""></option>
 
                                 <?php if (!empty($biayaUdang)) : ?>
@@ -124,7 +124,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($biayaUdang) ? ($biayaUdang['status_posting'] ? 'disabled' : '') : '' ?> placeholder="Keterangan" value="<?= !empty($biayaUdang) ? $biayaUdang['keterangan'] : '' ?>" class="form-control keterangan" id="keterangan" name="keterangan" aria-label="Floating label select example" />
+                            <input <?= !empty($biayaUdang) ? ($biayaUdang['status_posting'] ? 'readonly' : '') : '' ?> placeholder="Keterangan" value="<?= !empty($biayaUdang) ? $biayaUdang['keterangan'] : '' ?>" class="form-control keterangan" id="keterangan" name="keterangan" aria-label="Floating label select example" />
                             <label for="floatingInput" style="z-index: 1;">Keterangan (Opsional)</label>
                         </div>
                     </div>
@@ -139,39 +139,38 @@
                 </div>
                 <div class="col-md-12">
                     <div class="table-responsive">
-                        <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" border="1" cellspacing="0">
-                            <thead class="thead-dark">
+                        <table id="dataTable" class="table table-bordered">
+                            <thead>
                                 <tr>
-                                    <th style="text-align: center;" colspan="4"></th>
-                                    <th style="text-align: center;" colspan="1">Size</th>
-                                    <th style="text-align: center;" colspan="3"></th>
-                                    <th style="text-align: center;" colspan="4">Upah Kopek Yang Dibayar</th>
+                                    <th rowspan="2">No</th>
+                                    <th rowspan="2">PO</th>
+                                    <th colspan="2">Barang Masuk</th>
+                                    <th colspan="3">Quantity</th>
+                                    <th rowspan="2">Ratio</th>
+                                    <th rowspan="2">Harga/Kg</th>
+                                    <th rowspan="2">Total Harga</th>
+                                    <th colspan="4">Barang Keluar</th>
                                 </tr>
                                 <tr>
-                                    <th style="text-align: center;">No</th>
-                                    <th style="text-align: center;">Tanggal Keluar</th>
-                                    <th style="text-align: center;">Barang</th>
-                                    <th style="text-align: center;">Spesifikasi</th>
-
-                                    <th style="text-align: center;">KG KELUAR</th>
-                                    <th style="text-align: center;" class="kg-daging-vendor">KG DAGING VENDOR</th>
-                                    <th style="text-align: center;" class="kg-daging-divisi">KG DAGING DEPARTEMEN</th>
-
-                                    <th style="text-align: center;">Kg Daging</th>
-                                    <th style="text-align: center;">Ratio</th>
-                                    <th style="text-align: center;">TB Harga</th>
-                                    <th style="text-align: center;">Total Harga</th>
+                                    <!-- Barang Masuk -->
+                                    <th>Jenis</th>
+                                    <th>Spesifikasi</th>
+                                    
+                                    <!-- Quantity -->
+                                    <th>KG Kotor</th>
+                                    <th>Canning</th>
+                                    <th>KG Daging</th>
+                                    
+                                    <!-- Barang Keluar -->
+                                    <th>Tanggal Keluar</th>
+                                    <th>Qty Keluar</th>
+                                    <th>Jenis</th>
+                                    <th>Spesifikasi</th>
                                 </tr>
                             </thead>
-                            <tbody class="body-table">
+                            <tbody>
+                                <!-- Data akan diisi oleh JavaScript -->
                             </tbody>
-                            <!-- <tfoot class="foot-detail-table" id="foot-detail-table">
-                                <tr>
-                                    <td colspan="12" style="text-align: center;">
-                                        Tidak Ada Barang
-                                    </td>
-                                </tr>
-                            </tfoot> -->
                         </table>
                     </div>
                 </div>
@@ -184,7 +183,7 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
-    const disabledStatus = <?= !empty($biayaUdang) && $biayaUdang['status_posting'] == "1" ? "'disabled'" : "''" ?>;
+    const readonlyStatus = <?= !empty($biayaUdang) && $biayaUdang['status_posting'] == "1" ? "'readonly'" : "''" ?>;
 
     var request;
     var listBarang = [];
@@ -466,7 +465,7 @@
         tbody.innerHTML = '';
 
         if (!listBarang || Object.keys(listBarang).length === 0) {
-            tbody.innerHTML = '<tr><td colspan="11" class="no-data">Tidak Ada Barang</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="13" class="no-data">Tidak Ada Barang</td></tr>';
             return;
         }
 
@@ -496,7 +495,7 @@
             noCell.style = "vertical-align:middle; text-align:center;";
             mainRow.appendChild(noCell);
 
-            // PO
+            // PO (Tanggal Masuk)
             const poCell = document.createElement('td');
             poCell.rowSpan = rowspan;
             poCell.innerHTML = `
@@ -507,34 +506,28 @@
             poCell.style = "vertical-align:middle; text-align:center;";
             mainRow.appendChild(poCell);
 
-            // Jenis
+            // Jenis Barang Masuk
             const jenisCell = document.createElement('td');
             jenisCell.rowSpan = rowspan;
-            jenisCell.textContent = p.barang_name;
+            jenisCell.textContent = p.barang_name || '-';
             jenisCell.style = "vertical-align:middle;";
             mainRow.appendChild(jenisCell);
 
-            // Mentch
-            const mentchCell = document.createElement('td');
-            mentchCell.rowSpan = rowspan;
-            mentchCell.textContent = p.spesifikasi;
-            mentchCell.style = "vertical-align:middle;";
-            mainRow.appendChild(mentchCell);
+            // Spesifikasi Barang Masuk
+            const spesifikasiCell = document.createElement('td');
+            spesifikasiCell.rowSpan = rowspan;
+            spesifikasiCell.textContent = p.spesifikasi || '-';
+            spesifikasiCell.style = "vertical-align:middle;";
+            mainRow.appendChild(spesifikasiCell);
 
-            // KG Keluar dari detail[0]
-            const kgKeluarCell = document.createElement('td');
-            kgKeluarCell.textContent = detail[0]?.qty_keluar?.toFixed(2) ?? "0.00";
-            kgKeluarCell.style = "text-align:right;";
-            mainRow.appendChild(kgKeluarCell);
-
-            // Kotor
+            // KG Kotor
             const kgKotorCell = document.createElement('td');
             kgKotorCell.rowSpan = rowspan;
             kgKotorCell.textContent = p.sum_kotor?.toFixed(2) ?? "0.00";
             kgKotorCell.style = "vertical-align:middle; text-align:right;";
             mainRow.appendChild(kgKotorCell);
 
-            // Canning
+            // Canning (Bersih)
             const kgCanningCell = document.createElement('td');
             kgCanningCell.rowSpan = rowspan;
             kgCanningCell.textContent = p.sum_bersih?.toFixed(2) ?? "0.00";
@@ -580,10 +573,42 @@
             totalHargaCell.style = "vertical-align:middle;";
             mainRow.appendChild(totalHargaCell);
 
+            // =========================
+            // DETAIL OUT - BARIS PERTAMA
+            // =========================
+            
+            // Tanggal Keluar
+            const tanggalKeluarCell = document.createElement('td');
+            tanggalKeluarCell.innerHTML = `
+                <input type="date" class="tanggal_keluar" 
+                    value="${detail[0]?.tanggal_keluar || ''}"
+                    style="height:38px; width:130px; border-radius:6px; padding:4px; border:1px solid #ccc;">
+            `;
+            tanggalKeluarCell.style = "vertical-align:middle; text-align:center;";
+            mainRow.appendChild(tanggalKeluarCell);
+
+            // Qty Keluar
+            const qtyKeluarCell = document.createElement('td');
+            qtyKeluarCell.textContent = detail[0]?.qty_keluar?.toFixed(2) ?? "0.00";
+            qtyKeluarCell.style = "text-align:right; vertical-align:middle;";
+            mainRow.appendChild(qtyKeluarCell);
+
+            // Jenis Barang Keluar
+            const jenisKeluarCell = document.createElement('td');
+            jenisKeluarCell.textContent = detail[0]?.barang_name_out || '-';
+            jenisKeluarCell.style = "vertical-align:middle;";
+            mainRow.appendChild(jenisKeluarCell);
+
+            // Spesifikasi Barang Keluar
+            const spesifikasiKeluarCell = document.createElement('td');
+            spesifikasiKeluarCell.textContent = detail[0]?.spesifikasi_out || '-';
+            spesifikasiKeluarCell.style = "vertical-align:middle;";
+            mainRow.appendChild(spesifikasiKeluarCell);
+
             tbody.appendChild(mainRow);
 
             // =========================
-            // DETAIL ROWS
+            // DETAIL ROWS TAMBAHAN (jika ada lebih dari 1 out)
             // =========================
             for (let i = 1; i < detail.length; i++) {
                 const d = detail[i];
@@ -591,10 +616,33 @@
                 const detRow = document.createElement('tr');
                 detRow.style.background = "#fff";
 
-                const kgKeluarDetail = document.createElement('td');
-                kgKeluarDetail.textContent = d.qty_keluar?.toFixed(2) ?? "0.00";
-                kgKeluarDetail.style = "text-align:right;";
-                detRow.appendChild(kgKeluarDetail);
+                // Tanggal Keluar
+                const tanggalKeluarDet = document.createElement('td');
+                tanggalKeluarDet.innerHTML = `
+                    <input type="date" class="tanggal_keluar" 
+                        value="${d.tanggal_keluar || ''}"
+                        style="height:38px; width:130px; border-radius:6px; padding:4px; border:1px solid #ccc;">
+                `;
+                tanggalKeluarDet.style = "vertical-align:middle; text-align:center;";
+                detRow.appendChild(tanggalKeluarDet);
+
+                // Qty Keluar
+                const qtyKeluarDet = document.createElement('td');
+                qtyKeluarDet.textContent = d.qty_keluar?.toFixed(2) ?? "0.00";
+                qtyKeluarDet.style = "text-align:right; vertical-align:middle;";
+                detRow.appendChild(qtyKeluarDet);
+
+                // Jenis Barang Keluar
+                const jenisKeluarDet = document.createElement('td');
+                jenisKeluarDet.textContent = d.barang_name_out || '-';
+                jenisKeluarDet.style = "vertical-align:middle;";
+                detRow.appendChild(jenisKeluarDet);
+
+                // Spesifikasi Barang Keluar
+                const spesifikasiKeluarDet = document.createElement('td');
+                spesifikasiKeluarDet.textContent = d.spesifikasi_out || '-';
+                spesifikasiKeluarDet.style = "vertical-align:middle;";
+                detRow.appendChild(spesifikasiKeluarDet);
 
                 tbody.appendChild(detRow);
             }
@@ -605,8 +653,8 @@
         grandTotalRow.className = 'grand-total-row';
         grandTotalRow.style.color = 'black';
         grandTotalRow.innerHTML = `
-            <td colspan="10"><b>GRAND TOTAL</b></td>
-            <td id="grand_total">${grand_total.toLocaleString()}</td>
+            <td colspan="11"><b>GRAND TOTAL</b></td>
+            <td colspan="2" id="grand_total">${grand_total.toLocaleString()}</td>
         `;
         tbody.appendChild(grandTotalRow);
 
@@ -626,28 +674,28 @@
         });
     }
 
-    // ======================================================
-    // KEYUP HANDLER — AUTO HITUNG TOTAL
-    // ======================================================
-    $(document).on("keyup", ".harga_per_kilo", function () {
-        const parentId = $(this).data("parent_id");
+    // // ======================================================
+    // // KEYUP HANDLER — AUTO HITUNG TOTAL
+    // // ======================================================
+    // $(document).on("keyup", ".harga_per_kilo", function () {
+    //     const parentId = $(this).data("parent_id");
 
-        // harga per kilo yang diinput user
-        const harga = parseFloat($(this).val()) || 0;
+    //     // harga per kilo yang diinput user
+    //     const harga = parseFloat($(this).val()) || 0;
 
-        // ambil nilai bersih dari attribute data-per_kilo
-        const sumBersih = parseFloat($(this).data("per_kilo")) || 0;
+    //     // ambil nilai bersih dari attribute data-per_kilo
+    //     const sumBersih = parseFloat($(this).data("per_kilo")) || 0;
 
-        // hitung total
-        const total = harga * sumBersih;
+    //     // hitung total
+    //     const total = harga * sumBersih;
 
-        console.log("Harga:", harga, "Sum Bersih:", sumBersih, "Total:", total);
+    //     console.log("Harga:", harga, "Sum Bersih:", sumBersih, "Total:", total);
 
-        // update input total_harga_parent (readonly)
-        $(`.total_harga_parent[data-parent_id="${parentId}"]`).val(total.toLocaleString());
+    //     // update input total_harga_parent (readonly)
+    //     $(`.total_harga_parent[data-parent_id="${parentId}"]`).val(total.toLocaleString());
 
-        updateGrandTotal();
-    });
+    //     updateGrandTotal();
+    // });
 
     function updateGrandTotal() {
         let grand_total = 0;
