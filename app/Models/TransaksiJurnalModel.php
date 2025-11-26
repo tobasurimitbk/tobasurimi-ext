@@ -360,7 +360,11 @@ class TransaksiJurnalModel extends Model
             } elseif ($addCondition['type_transaksi'] === "BAHAN PENOLONG") {
 
                 // Bahan penolong: pakai PO BP
-                $builder->where('id_po_bp IS NOT NULL');
+                $builder->groupStart()
+                    ->where('transaksi_type_name =', 'PEMBELIAN')
+                    ->orWhere('tipe_barang =', 'BAHAN PENOLONG')
+                    ->orWhere('id_po_bp IS NOT NULL')
+                    ->groupEnd();
             } else {
 
                 // Type lain: ambil dari metadata.value
