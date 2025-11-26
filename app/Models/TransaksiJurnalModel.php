@@ -361,8 +361,8 @@ class TransaksiJurnalModel extends Model
 
                 // Bahan penolong: pakai PO BP
                 $builder->groupStart()
-                    ->where('transaksi_type_name =', 'PEMBELIAN')
-                    ->orWhere('tipe_barang =', 'BAHAN PENOLONG')
+                    ->where('transaksi_type_name', 'PEMBELIAN')
+                    ->where('tipe_barang', 'BAHAN PENOLONG')
                     ->orWhere('id_po_bp IS NOT NULL')
                     ->groupEnd();
             } else {

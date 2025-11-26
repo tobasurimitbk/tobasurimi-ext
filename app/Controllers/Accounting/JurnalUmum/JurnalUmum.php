@@ -212,6 +212,8 @@ class JurnalUmum extends BaseController
         ];
 
         $dataQry = $this->transaksiJurnalModel->getList2($condition, $addCondition, $limit, $offset);
+        // var_dump($dataQry['data']);
+        // exit;
         $dataJurnal = $this->getData($dataQry['data'], $payload);
 
         $data = [
@@ -244,8 +246,8 @@ class JurnalUmum extends BaseController
                 $tipePembelian = "LOKAL BB";
             } elseif ($data->id_import_bb != null) {
                 $tipePembelian = "IMPORT BB";
-            } elseif ($data->id_po_bp != null) {
-                $tipePembelian = ($data->po_type === "Lokal") ? "LOKAL BP" : "IMPORT BP";
+            } elseif ($data->id_po_bp != null || ($data->transaksi_type_name == "PEMBELIAN" && $data->tipe_barang == "BAHAN PENOLONG")) {
+                $tipePembelian = ($data->kategori_barang === "LOKAL") ? "LOKAL BP" : "IMPORT BP";
             }
 
             $dataResult[] = [
