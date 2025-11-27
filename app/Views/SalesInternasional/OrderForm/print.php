@@ -175,7 +175,7 @@
                             <tr>
                                 <td>CONSIGNEE</td>
                                 <td>:</td>
-                                <td><?= $dataSO->customer_name ?></td>
+                                <td><?= $dataSO->consigne ?></td>
                             </tr>
                             <?php if (!empty($dataSO->tax_id)): ?>
                                 <tr>

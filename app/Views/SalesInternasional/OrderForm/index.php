@@ -57,9 +57,9 @@
                                 <!-- <th onclick="changeSort('divisi_id')" class="sort">Department</th> -->
                                 <th onclick="changeSort('sales_order_export_no')" class="sort">Order Form No</th>
                                 <th onclick="changeSort('customer_po_no')" class="sort">PO No</th>
-                                <th onclick="changeSort('customer_name')" class="sort">Buyer</th>
+                                <th onclick="changeSort('consigne')" class="sort">Consigne</th>
                                 <th onclick="changeSort('dicharge_port')" class="sort">Destination</th>
-                                <th onclick="changeSort('shipment_date')" class="sort">Shipment Date</th>
+                                <th onclick="changeSort('deadline')" class="sort">Deadline</th>
                                 <th class="sort">Number Unpost</th>
                                 <th class="sort">Action</th>
                             </tr>
@@ -215,13 +215,13 @@
             data: "customer_po_no",
             className: "text-left"
         }, {
-            data: "customer_name",
+            data: "consigne",
             className: "text-left"
         }, {
             data: "dicharge_port",
             className: "text-left"
         }, {
-            data: "shipment_date",
+            data: "deadline",
             className: "text-left"
         }, {
             data: "jumlah_unpost",
@@ -268,6 +268,11 @@
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
                             <?php endif; ?>
+                            <?php if (can('Penjualan Ekspor', 'Order Form', 'ua')): ?>
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('${id}')" style="box-shadow: none !important;">
+                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                            </button>
+                            <?php endif; ?>
                             <?php if (can('Penjualan Ekspor', 'Order Form', 'c')) : ?>
                             <button data-toggle="tooltip" title="Duplicate" onclick="duplicate('${id}')" class="btn duplicate-btn text-white" style="background-color:#B8522A">
                                 <i class="fa fa-copy fa-sm" aria-hidden="true"></i>
@@ -297,6 +302,11 @@
                     } else {
                         return `
                             <?php if (can('Penjualan Ekspor', 'Order Form', 'p')): ?>
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('${id}')" style="box-shadow: none !important;">
+                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                            </button>
+                            <?php endif; ?>
+                            <?php if (can('Penjualan Ekspor', 'Order Form', 'ua')): ?>
                             <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>

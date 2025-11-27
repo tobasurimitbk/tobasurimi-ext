@@ -50,11 +50,13 @@ class SalesOrderExportModel extends Model
             'tanggal'               => 'sales_order_export.tanggal',
             'divisi_id'             => 'sales_order_export.divisi_id',
             'po_no'                 => 'sales_order_export.po_no',
+            'deadline'              => 'sales_order_export.deadline',
+            "consigne"              => 'sales_order_export.consigne'
         ];
 
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'sales_order_export.createdAt';
+        $sort = $availableSort[$addCondition['sort'] ?? 'sales_order_export.tanggal'] ?? 'sales_order_export.tanggal';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "sales_order_export.*, 
@@ -71,7 +73,8 @@ class SalesOrderExportModel extends Model
             ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
             ->join('divisis', 'divisis.id = sales_order_export.divisi_id', 'left')
             ->join('companies', 'companies.id = sales_order_export.user_id', 'left')
-            ->orderBy($sort, $sortType);
+            ->orderBy($sort, $sortType)
+            ->orderBy('sales_order_export.updatedAt', 'desc');
 
         $totalData = $salesDataQry->countAllResults(false);
 
@@ -81,9 +84,9 @@ class SalesOrderExportModel extends Model
                 ->groupStart()
                 ->like('sales_order_export.sales_order_export_no', $addCondition['search'])
                 ->orLike('sales_contract.customer_po_no', $addCondition['search'])
-                ->orLike('customers.name', $addCondition['search'])
-                ->orLike('divisis.divisi', $addCondition['search'])
+                ->orLike('sales_order_export.consigne', $addCondition['search'])
                 ->orLike('sales_order_export.destination', $addCondition['search'])
+                ->orLike('sales_order_export.deadline', $addCondition['search'])
                 ->groupEnd();
         }
 
@@ -618,9 +621,9 @@ class SalesOrderExportModel extends Model
                         'harga' => $s['harga'],
                         'total' => $s['total'],
                         //----------------------------
-                        'qty_convertion' => $s['kode_satuan'] == "KG" && $s['qty'] != 0  ? $s['qty'] : 0, // Jika Kg Otomatis Ambil Aja
-                        'satuan_convertion_id' =>  $s['kode_satuan'] == "KG" && $s['qty'] != 0  ?  $s['satuan_size_id'] : null,
-                        'satuan_convertion_kode' => $s['kode_satuan'] == "KG" && $s['qty'] != 0 ?  $s['kode_satuan'] : "",
+                        'qty_convertion' => $s['kode_satuan'] == "KG" && $s['qty'] != 0  ? 0 : 0, // Jika Kg Otomatis Ambil Aja
+                        'satuan_convertion_id' =>  $s['kode_satuan'] == "KG" && $s['qty'] != 0  ?  $s['satuan_size_id'] : "29", // KG
+                        'satuan_convertion_kode' => $s['kode_satuan'] == "KG" && $s['qty'] != 0 ?  $s['kode_satuan'] : "KG",
                         //------------------------------
                         'note_size' => "",
                         'note_grade' => "",
@@ -637,7 +640,7 @@ class SalesOrderExportModel extends Model
                         'note_palet' => "",
                         //-----------------------------
                         'qty_sisa' => $totalQtySisa,
-                        'qty_input' => $totalQtySisa,
+                        'qty_input' => 0,
                         'total_sisa' => $s['harga'] * $totalQtySisa,
                         'total_input' => $s['harga'] * $totalQtySisa
                     ]);
@@ -784,9 +787,9 @@ class SalesOrderExportModel extends Model
                                 'harga' => $s['harga'],
                                 'total' => $s['total'],
                                 //----------------------------
-                                'qty_convertion' => ($s['kode_satuan'] == "KG" && $totalQtySisa != 0) ? $totalQtySisa : 0, // Jika Kg Otomatis Ambil Aja
-                                'satuan_convertion_id' => ($s['kode_satuan'] == "KG" && $totalQtySisa != 0) ?  $s['satuan_size_id'] : null,
-                                'satuan_convertion_kode' => ($s['kode_satuan'] == "KG" && $totalQtySisa != 0) ?  $s['kode_satuan'] : "",
+                                'qty_convertion' => ($s['kode_satuan'] == "KG" && $totalQtySisa != 0) ? 0 : 0, // Jika Kg Otomatis Ambil Aja
+                                'satuan_convertion_id' => ($s['kode_satuan'] == "KG" && $totalQtySisa != 0) ?  $s['satuan_size_id'] : "29",
+                                'satuan_convertion_kode' => ($s['kode_satuan'] == "KG" && $totalQtySisa != 0) ?  $s['kode_satuan'] : "KG",
                                 //------------------------------
                                 'note_size' => "",
                                 'note_grade' => "",
@@ -803,7 +806,7 @@ class SalesOrderExportModel extends Model
                                 'note_palet' => "",
                                 //-----------------------------
                                 'qty_sisa' => $totalQtySisa,
-                                'qty_input' => $totalQtySisa,
+                                'qty_input' => 0,
                                 'total_sisa' => $s['harga'] * $totalQtySisa,
                                 'total_input' => $s['harga'] * $totalQtySisa
                             ]);
@@ -837,7 +840,7 @@ class SalesOrderExportModel extends Model
                 'species' => $subTitle == null ? $sd['species'] : $subTitle['species'],
                 'packing' =>  $subTitle == null ?  $sd['kemasan'] : $subTitle['packing'],
                 'divisi_id' => $subTitle == null ? null : $subTitle['divisi_id'],
-                'divisi_name' => $subTitle == null ? "" : $subTitle['divisi'],
+                'divisi_name' => $subTitle == null ? "" : $subTitle['divisi'] ?? '',
                 'qty' => $sd['qty'],
                 'harga' => $sd['harga'],
                 'total_harga' => $sd['total_harga'],

@@ -194,7 +194,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control consigne" id="consigne" name="consigne" placeholder="Consigne / Buyer" readonly value="<?= !empty($dataSalesExport) ? $dataSalesExport->customer_name : '' ?>">
+                            <input <?= !empty($dataSalesExport) ? ($dataSalesExport->status == "POSTED" ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control consigne" id="consigne" name="consigne" placeholder="Consigne / Buyer" value="<?= !empty($dataSalesExport) ? $dataSalesExport->consigne : '' ?>">
                             <label for="floatingInput">Consigne / Buyer</label>
                         </div>
                     </div>
@@ -1204,9 +1204,9 @@
                 sales_order_export_no: {
                     required: true
                 },
-                // divisi_id: {
-                //     required: true
-                // },
+                consigne: {
+                    required: true
+                },
                 sales_contract_id: {
                     required: true
                 },
@@ -1230,9 +1230,9 @@
                 sales_order_export_no: {
                     required: "Sales order no required"
                 },
-                // divisi_id: {
-                //     required: "Departemen required"
-                // },
+                consigne: {
+                    required: "Buyer / Consigne required"
+                },
                 sales_contract_id: {
                     required: "Select sales contract"
                 },
@@ -1654,9 +1654,9 @@
                 var itemFailed = null;
                 var sizeFailed = null;
                 $.each(listDataSalesKontrak.salesContractDetailList, function(i, v) {
-                    if (v.divisi_id == null || v.divisi_id == "") {
-                        itemFailed = v;
-                    }
+                    // if (v.divisi_id == null || v.divisi_id == "") {
+                    //     itemFailed = v;
+                    // }
 
                     $.each(v.size_breakdown, function(j, s) {
                         if ((s.satuan_convertion_id == null || s.satuan_convertion_id == "") && s.qty != 0) {
