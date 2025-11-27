@@ -1324,7 +1324,7 @@ class StockRevampDetailModel extends Model
 
         return $builder
             ->groupBy('stock_revamp_detail.id')
-            ->orderBy('stock_date', 'ASC')
+            ->orderBy('stock_date, stock_dokumen', 'ASC')
             ->findAll();
     }
 
