@@ -70,6 +70,19 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" class="form-control input-picker created_at" id="created_at" name="created_at" placeholder="Creation Date" value="<?= !empty($dataSalesKontrak) ? date('d/m/Y', strtotime($dataSalesKontrak['createdAt'])) : date('d/m/Y')  ?>">
+                                    <label for="floatingInput">Creation Date</label>
+                                </div>
+                                <div class="input-group-prepend group-prepend-password align-items-center">
+                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 25px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <!-- <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select 
@@ -833,19 +846,12 @@
         changeStatus();
     <?php endif; ?>
 
-    $(".due_date").datepicker({
+    $(".due_date,.created_at,.date_revision").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
         autoclose: true
-    })
-
-    $(".date_revision").datepicker({
-        todayHighlight: true,
-        format: "dd/mm/yyyy",
-        orientation: "bottom auto",
-        autoclose: true
-    })
+    });
 
     $('#btnAddSizeBreakdownModal').click(function() {
         clearFormSizeBreakdown();

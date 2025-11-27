@@ -43,7 +43,7 @@ $routes->get('/403', function () {
     return view('errors/html/error_403');
 });
 
-$routes->get('/update-status-pg', 'Warehouse\Penomoran_::updateStatusAbsensiPg');
+$routes->get('/salah-satuan', 'Warehouse\Penomoran_::salahSatuanBarang');
 // $routes->get('/generate-stock-revamp-nonpabean', 'Warehouse\Penomoran_::generateStokRevampNonPabean');
 // $routes->get('/generate-stock-revamp-pabean', 'Warehouse\Penomoran_::generateStokRevampPabean');
 // $routes->get('/generate-stock-detail-id-lpb-non-pabean', 'Warehouse\Penomoran_::generateStockDetailIdPenerimaanBarangDetailNonPabean');
@@ -1396,6 +1396,8 @@ $routes->get('/stock-list/all-keluar-kartu-stock', 'Inventori\StokList::allKelua
 $routes->get('/stock-list/export-kartu-stock', 'Inventori\StokList::exportKartuStock', ['filter' => 'Auth']);
 $routes->get('/stock-list/export-kartu-stock-masuk', 'Inventori\StokList::exportKartuStockMasuk', ['filter' => 'Auth']);
 $routes->get('/stock-list/export-kartu-stock-keluar', 'Inventori\StokList::exportKartuStockKeluar', ['filter' => 'Auth']);
+$routes->get('/stock-list/all-kartu-stock-saldo-akhir', 'Inventori\StokList::allDetailSaldoAkhir', ['filter' => 'Auth']);
+$routes->get('/stock-list/export-kartu-stock-saldo-akhir', 'Inventori\StokList::exportDetailSaldo', ['filter' => 'Auth']);
 
 // STOK ADJUSMENT
 $routes->get('/stock-adjusment', 'Inventori\StokAdjusment::index', ['filter' => 'Auth']);
