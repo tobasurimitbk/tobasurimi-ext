@@ -159,7 +159,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control consigne" id="consigne" name="consigne" placeholder="Consigne / Buyer" readonly value="">
+                            <input autocomplete="one-time-code" type="text" class="form-control consigne" id="consigne" name="consigne" placeholder="Consigne / Buyer" value="">
                             <label for="floatingInput">Consigne / Buyer</label>
                         </div>
                     </div>
@@ -1105,9 +1105,9 @@
                 sales_order_export_no: {
                     required: true
                 },
-                // divisi_id: {
-                //     required: true
-                // },
+                consigne: {
+                    required: true
+                },
                 sales_contract_id: {
                     required: true
                 },
@@ -1120,9 +1120,9 @@
                 deadline: {
                     required: true
                 },
-                // container: {
-                //     required: true
-                // },
+                destination: {
+                    required: true
+                },
                 document_required: {
                     required: true
                 }
@@ -1131,9 +1131,9 @@
                 sales_order_export_no: {
                     required: "Sales order no required"
                 },
-                // divisi_id: {
-                //     required: "Departemen required"
-                // },
+                consigne: {
+                    required: "Buyer / Consigne required"
+                },
                 sales_contract_id: {
                     required: "Select sales contract"
                 },
@@ -1146,9 +1146,9 @@
                 deadline: {
                     required: "Deadline required"
                 },
-                // container: {
-                //     required: "Container required"
-                // },
+                destination: {
+                    required: "Destination required"
+                },
                 document_required: {
                     required: "Document required"
                 }
@@ -1554,9 +1554,9 @@
                 var itemFailed = null;
                 var sizeFailed = null;
                 $.each(listDataSalesKontrak.salesContractDetailList, function(i, v) {
-                    if (v.divisi_id == null || v.divisi_id == "") {
-                        itemFailed = v;
-                    }
+                    // if (v.divisi_id == null || v.divisi_id == "") {
+                    //     itemFailed = v;
+                    // }
 
                     $.each(v.size_breakdown, function(j, s) {
                         if ((s.satuan_convertion_id == null || s.satuan_convertion_id == "") && s.qty != 0) {

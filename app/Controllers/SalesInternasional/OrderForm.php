@@ -135,8 +135,11 @@ class OrderForm extends BaseController
                 "sales_order_export_no"     => $data->sales_order_export_no,
                 "customer_po_no"            => $data->po_no,
                 "customer_name"             => $data->customer_name,
+                "consigne"                  => $data->consigne,
+                "deadline"                  => $data->deadline,
                 "dicharge_port"             => $data->destination,
                 "shipment_date"             => $data->shipment_date,
+                "deadline"                  => $data->deadline,
                 "tanggal"                   => date('d/m/Y', strtotime($data->tanggal)),
                 "status"                    => $data->status,
                 "used"                      => $data->used,
@@ -239,7 +242,8 @@ class OrderForm extends BaseController
                 'status' => "NEW",
                 'status_invoice' => "TERBIT",
                 'used' => "NOT USED",
-                'destination' => $this->request->getVar('destination')
+                'destination' => $this->request->getVar('destination'),
+                'consigne' => $this->request->getVar('consigne')
             ]);
 
             // Insert Detail Specs
@@ -627,7 +631,8 @@ class OrderForm extends BaseController
                 'document_required' => $this->request->getVar('document_required'),
                 'po_no' => $this->request->getVar('po_no'),
                 'tanggal_invoice' => $this->request->getVar("tanggal") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal")))) : "",
-                'destination' => $this->request->getVar('destination')
+                'destination' => $this->request->getVar('destination'),
+                'consigne' => $this->request->getVar('consigne')
             ]);
 
             $listDataSalesKontrak = json_decode($_POST['listDataSalesKontrak']);

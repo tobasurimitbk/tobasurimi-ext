@@ -496,6 +496,8 @@ class ProsesRebus extends BaseController
                     "qty_bersih_asal"  => round($p["qty_rebus"], 2) ?? 0,
                     "qty_diterima_asal"=> round($p["qty_kotor"], 2) ?? 0,
                     'reference_id'     => $id,
+                    "reference_tujuan_id" =>  $p['stock_detail_rebus_id'],
+                    "reference_tujuan_type" =>  "PROSES REBUS",
                     'po_type'          => "LOKAL BAKU",
                     'reference_type'   => "PROSES REBUS",
                     'status'           => "IN"

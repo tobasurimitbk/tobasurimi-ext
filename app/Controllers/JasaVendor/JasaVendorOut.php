@@ -533,7 +533,9 @@ class JasaVendorOut extends BaseController
                 $data = [
                     "stock_detail_id" => $j['stock_out_detail_id'],
                     "qty_digunakan" => $j['qty'],
-                    "no_dokumen" => $jasaVendorOut['no_surat_jalan']
+                    "no_dokumen" => $jasaVendorOut['no_surat_jalan'],
+                    "reference_tujuan_id" =>  $j['stock_out_detail_id'],
+                    "reference_tujuan_type" =>  "JASA VENDOR",
                 ];
 
                 $result = $stockRevampModel->outStockRevamp($db, $data);
