@@ -85,6 +85,16 @@
         .bold {
             font-weight: bold;
         }
+        
+        .ttd-section {
+            width: 100%;
+        }
+        
+        .ttd-box {
+            float: left;
+            margin-right: 85px;
+            text-align: center;
+        }
     </style>
 </head>
 
@@ -122,7 +132,6 @@
                     <tr>
                         <th class="text-center">Tgl Kembali</th>
                         <th class="text-center">Tgl Baham</th>
-                        <th class="text-center">Jenis</th>
                         <th class="text-center">Size Mth</th>
                         <th class="text-center">Kg. Rebus</th>
                         <th class="text-center">Kg Daging Martabe</th>
@@ -227,11 +236,6 @@
                                     </td>
                                 <?php endif; ?>
 
-                                <!-- Jenis -->
-                                <td class="text-left vertical-middle">
-                                    <?= $p['barang_name'] ?? '-' ?>
-                                </td>
-
                                 <!-- Size Mth -->
                                 <td class="text-center vertical-middle">
                                     <?= $p['spesifikasi'] ?? '-' ?>
@@ -278,7 +282,7 @@
 
                         <!-- ROW TOTAL PER GROUP -->
                         <tr style="font-weight: bold; background-color: #f0f0f0;">
-                            <td colspan="4" class="text-center bold">TOTAL</td>
+                            <td colspan="3" class="text-center bold">TOTAL</td>
                             <td class="text-right bold"><?= number_format($group['totals']['kg_rebus'], 1) ?></td>
                             <td class="text-right bold"><?= number_format($group['totals']['kg_daging_martabe'], 1) ?></td>
                             <td class="text-right bold"><?= number_format($group['totals']['kg_daging_cn'], 1) ?></td>
@@ -292,7 +296,7 @@
 
                     <!-- GRAND TOTAL SEMUA -->
                     <tr style="font-weight: bold; background-color: #d0d0d0;">
-                        <td colspan="4" class="text-center bold">GRAND TOTAL</td>
+                        <td colspan="3" class="text-center bold">GRAND TOTAL</td>
                         <td class="text-right bold"><?= number_format($total_kg_rebus, 1) ?></td>
                         <td class="text-right bold"><?= number_format($total_kg_daging_martabe, 1) ?></td>
                         <td class="text-right bold"><?= number_format($total_kg_daging_cn, 1) ?></td>
@@ -303,6 +307,42 @@
                     </tr>
                 </tbody>
             </table>
+
+            <!-- BAGIAN TANDA TANGAN -->
+            <?php 
+            setlocale(LC_TIME, 'id_ID.utf8');
+            ?>
+            <i>Medan, <?= strftime('%d %B %Y') ?></i>
+
+            <div class="ttd-section">
+                <div class="ttd-box">
+                    <p>Disetujui oleh,</p>
+                    <br><br><br><br>
+                    <p>_________________________</p>
+                    <p>Yanti</p>
+                </div>
+
+                <div class="ttd-box">
+                    <p>Disetujui oleh,</p>
+                    <br><br><br><br>
+                    <p>_________________________</p>
+                    <p>Audit</p>
+                </div>
+
+                <div class="ttd-box">
+                    <p>Disetujui oleh,</p>
+                    <br><br><br><br>
+                    <p>_________________________</p>
+                    <p>Bp. Herman</p>
+                </div>
+                
+                <div class="ttd-box">
+                    <p>Dibuat oleh,</p>
+                    <br><br><br><br>
+                    <p>_________________________</p>
+                    <p>Bp. Tony Siaputra</p>
+                </div>
+            </div>
 
         </div>
     <?php endif; ?>

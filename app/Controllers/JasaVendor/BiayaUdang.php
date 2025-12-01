@@ -332,7 +332,7 @@ class BiayaUdang extends BaseController
         }
 
         // Get data untuk print
-        $biayaUdangDetail = $this->biayaUdangModel->dropdownBarang(json_decode($biayaUdang['multiple_jasa_vendor_in_id']), $id);
+        $biayaUdangDetail = $this->biayaUdangModel->dropdownBarangPrint(json_decode($biayaUdang['multiple_jasa_vendor_in_id']), $id);
         $biayaUdangTotal = $this->biayaUdangModel->getBarangDetail(json_decode($biayaUdang['multiple_jasa_vendor_in_id']), $id);
 
         // Update parent data dengan data dari biayaUdangTotal
