@@ -219,6 +219,7 @@ class StokAdjusment extends BaseController
         $warehouseId = $this->request->getGet('warehouse_id');
         $typeBarang = $this->request->getGet('type_barang');
         $spesifikasiId = $this->request->getGet('spesifikasi_id');
+        $barangId = $this->request->getGet('barang_id');
         $search = $this->request->getGet('search');
 
         $condition = [
@@ -229,6 +230,7 @@ class StokAdjusment extends BaseController
             'divisi_id'         => $divisiId,
             'warehouse_id'      => $warehouseId,
             'spesifikasi_id'    => $spesifikasiId,
+            'barang_id'         => $barangId,
             'search'            => $search
         ];
 
@@ -287,6 +289,7 @@ class StokAdjusment extends BaseController
                 'lpb_date' => !empty($d['lpb_date']) && $d['lpb_date'] != null ? date('d/m/Y', strtotime($d['lpb_date'])) : "",
                 'reference_no' => $d['reference_no'],
                 'qty_diterima' => (float)$d['qty_diterima'],
+                'qty_bersih' => (float)$d['qty_bersih'],
                 'kode_satuan' => $d['kode_satuan'],
                 "unit_id"               => $d['unit_id'],
                 "keterangan" => $keterangan,
@@ -328,6 +331,48 @@ class StokAdjusment extends BaseController
                             $d['barang_name'] . '- ' . $d['spesifikasi']
                         )
                     )
+                ]);
+            }
+
+            return response()->setJSON([
+                'results' => $dataList,
+                'status' => true,
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            return  response()->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function dropdownBarangMaster()
+    {
+        try {
+            $typeBarang = $this->request->getVar('type_barang');
+            $search = $this->request->getVar('q');
+
+            if (empty($typeBarang)) {
+                return response()->setJSON(['data' => []]);
+            }
+            $dataBarang = $this->barangMasterModel->dropdownBarangMaster(
+                $typeBarang,
+                $this->this_company_id,
+                $search
+            );
+            $dataList = array();
+            foreach ($dataBarang as $d) {
+                array_push($dataList, [
+                    'id' => $d['id'],
+                    'text' => "(" . $d['kode_barang'] . ") " . trim(
+                        str_replace(
+                            ["\"", "\t"],
+                            "'",
+                            $d['barang_name']
+                        )
+                    ),
                 ]);
             }
 

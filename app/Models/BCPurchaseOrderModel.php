@@ -1192,6 +1192,10 @@ class BCPurchaseOrderModel extends Model
             $where[] = "bc_purchase_order.no_daftar IS NOT NULL AND bc_purchase_order.no_aju IS NOT NULL";
         }
 
+        if (!empty($condition['barang_master_id'])) {
+            $where[] = "penerimaan_barang_detail.barang_id = '$condition[barang_master_id]'";
+        }
+
         if (!empty($condition['company_id'])) {
             $where[] = "penerimaan_barang.company_id = '$condition[company_id]' AND barang_master.company_id = '$condition[company_id]'";
         }
