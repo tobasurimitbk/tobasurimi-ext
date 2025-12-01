@@ -77,7 +77,7 @@
                             <th onclick="changeSort('no_pembayaran')">No Pembayaran</th>
                             <th onclick="changeSort('tanggal')">Tanggal</th>
                             <th onclick="changeSort('divisi_id')">Departemen</th>
-                            <th onclick="changeSort('multiple_jasa_vendor_in_no')">No Penerimaan Surat Jalan</th>
+                            <!-- <th onclick="changeSort('multiple_jasa_vendor_in_no')">No Penerimaan Surat Jalan</th> -->
                             <th>Total Item</th>
                             <th>Action</th>
                         </tr>
@@ -148,10 +148,10 @@
                 data: "divisi",
                 className: "text-center",
             },
-            {
-                data: "multiple_jasa_vendor_in_no",
-                className: "text-center",
-            },
+            // {
+            //     data: "multiple_jasa_vendor_in_no",
+            //     className: "text-center",
+            // },
             {
                 data: "total_item",
                 className: "text-center",

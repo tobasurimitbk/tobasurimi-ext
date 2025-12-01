@@ -81,6 +81,10 @@
         .nowrap {
             white-space: nowrap;
         }
+        
+        .bold {
+            font-weight: bold;
+        }
     </style>
 </head>
 
@@ -92,194 +96,210 @@
                     <td style="text-align: center;">
                         <h2>
                             <u>
-                                Rincian Pembayaran Biaya Gaji Kopek Udang / Cumi Kulit Rebus
+                                Rincian Pembayaran Biaya Gaji Kopek Udang Kulit Rebus
                             </u>
                             <br>
                         </h2>
-                        <h4 style="margin-top: -10px;">
-                            NO : <?= $biayaUdang['no_pembayaran'] ?>
-                        </h4>
                     </td>
                 </tr>
             </table>
 
-            <table>
+            <table style="margin-bottom: 15px;">
                 <tr>
-                    <td>NAMA VENDOR</td>
+                    <td>A/n</td>
                     <td>:</td>
-                    <td><?= $vendor == null ? "-" : strtoupper($vendor != null ? $vendor['name'] : '') ?></td>
+                    <td><b><?= strtoupper($vendor['name'] ?? 'MARTABE') ?></b></td>
                 </tr>
                 <tr>
-                    <td>TANGGAL</td>
+                    <td>Di</td>
                     <td>:</td>
-                    <td><?= date('d/m/Y', strtotime($biayaUdang['tanggal'])) ?></td>
-                </tr>
-                <tr>
-                    <td>KETERANGAN</td>
-                    <td>:</td>
-                    <td><?= $biayaUdang['keterangan'] ?></td>
+                    <td>Psr 8</td>
                 </tr>
             </table>
 
-            <table class="table" style="margin-top: 15px;">
+            <table class="table">
                 <thead style="text-align: center; font-weight:bold;">
                     <tr>
-                        <th rowspan="2" class="text-center">No</th>
-                        <th rowspan="2" class="text-center">Tanggal PO</th>
-                        <th colspan="2" class="text-center">Barang Masuk</th>
-                        <th colspan="3" class="text-center">Quantity</th>
-                        <th rowspan="2" class="text-center">Ratio</th>
-                        <th rowspan="2" class="text-center">Harga Per Kilo</th>
-                        <th rowspan="2" class="text-center">Total Harga</th>
-                        <th colspan="4" class="text-center">Barang Keluar</th>
-                    </tr>
-                    <tr>
-                        <!-- Barang Masuk -->
+                        <th class="text-center">Tgl Kembali</th>
+                        <th class="text-center">Tgl Baham</th>
                         <th class="text-center">Jenis</th>
-                        <th class="text-center">Spesifikasi</th>
-                        
-                        <!-- Quantity -->
-                        <th class="text-center">KG Kotor</th>
-                        <th class="text-center">Canning</th>
-                        <th class="text-center">KG Daging</th>
-                        
-                        <!-- Barang Keluar -->
-                        <th class="text-center">Tanggal Keluar</th>
-                        <th class="text-center">Qty Keluar</th>
-                        <th class="text-center">Jenis</th>
-                        <th class="text-center">Spesifikasi</th>
+                        <th class="text-center">Size Mth</th>
+                        <th class="text-center">Kg. Rebus</th>
+                        <th class="text-center">Kg Daging Martabe</th>
+                        <th class="text-center">Kg Daging Cn</th>
+                        <th class="text-center">Uang Kopek Yang Dibayar</th>
+                        <th class="text-center">Ratio</th>
+                        <th class="text-center">Tb. Harga</th>
+                        <th class="text-center">Grand Total</th>
                     </tr>
                 </thead>
 
                 <tbody>
                     <?php
-                    $grand_total = 0;
-                    $no = 1;
+                    $grand_total_all = 0;
+                    $total_kg_rebus = 0;
+                    $total_kg_daging_martabe = 0;
+                    $total_kg_daging_cn = 0;
+                    $total_uang_kopek = 0;
+                    
+                    // Group data by tanggal untuk membuat struktur seperti screenshot
+                    $grouped_data = [];
+                    foreach ($biayaUdangDetail as $id => $parentBlock) {
+                        $p = $parentBlock['parent'];
+                        $tgl_kembali = $p['tanggal_masuk'] ?? '';
+                        
+                        // Cari tanggal baham dari detail
+                        $tgl_baham = '';
+                        if (!empty($parentBlock['detail'][0]['tanggal_keluar'])) {
+                            $tgl_baham = $parentBlock['detail'][0]['tanggal_keluar'];
+                        }
+                        
+                        $key = $tgl_kembali;
+                        if (!isset($grouped_data[$key])) {
+                            $grouped_data[$key] = [
+                                'tgl_kembali' => $tgl_kembali,
+                                'tgl_baham' => $tgl_baham,
+                                'items' => [],
+                                'totals' => [
+                                    'kg_rebus' => 0,
+                                    'kg_daging_martabe' => 0,
+                                    'kg_daging_cn' => 0,
+                                    'uang_kopek' => 0,
+                                    'grand_total' => 0
+                                ]
+                            ];
+                        }
+                        $grouped_data[$key]['items'][] = $parentBlock;
+                        
+                        // Hitung total untuk group ini
+                        $kg_rebus = $p['sum_keluar'] ?? 0;
+                        $kg_daging_martabe = $p['sum_kotor'] ?? 0;
+                        $kg_daging_cn = $p['sum_bersih'] ?? 0;
+                        $total_harga = ($p['sum_bersih'] ?? 0) * ($p['harga_per_kilo'] ?? 0);
+                        
+                        $grouped_data[$key]['totals']['kg_rebus'] += $kg_rebus;
+                        $grouped_data[$key]['totals']['kg_daging_martabe'] += $kg_daging_martabe;
+                        $grouped_data[$key]['totals']['kg_daging_cn'] += $kg_daging_cn;
+                        $grouped_data[$key]['totals']['uang_kopek'] += $kg_daging_cn; // Sama dengan Kg Daging Cn
+                        $grouped_data[$key]['totals']['grand_total'] += $total_harga;
+                    }
                     ?>
 
-                    <?php foreach ($biayaUdangDetail as $parentBlock) : ?>
-                        <?php
-                        $p = $parentBlock['parent'];
-                        $detail = $parentBlock['detail'];
-                        $rowspan = count($detail) > 0 ? count($detail) : 1;
-
-                        // Hitung total harga
-                        $total_harga = ($p['sum_bersih'] ?? 0) * ($p['harga_per_kilo'] ?? 0);
-                        $grand_total += $total_harga;
+                    <?php foreach ($grouped_data as $group) : ?>
+                        <?php 
+                        $first_item = true;
+                        $group_rowspan = count($group['items']);
                         ?>
 
-                        <!-- PARENT ROW -->
-                        <tr class="bg-gray">
-                            <!-- No -->
-                            <td rowspan="<?= $rowspan ?>" class="text-center vertical-middle">
-                                <?= $no++ ?>
-                            </td>
-
-                            <!-- Tanggal PO -->
-                            <td rowspan="<?= $rowspan ?>" class="text-center vertical-middle">
-                                <?= !empty($p['tanggal_po']) ? date('d/m/Y', strtotime($p['tanggal_po'])) : 
-                                    (!empty($p['tanggal_masuk']) ? date('d/m/Y', strtotime($p['tanggal_masuk'])) : '-') ?>
-                            </td>
-
-                            <!-- Jenis Barang Masuk -->
-                            <td rowspan="<?= $rowspan ?>" class="text-left vertical-middle">
-                                <?= $p['barang_name'] ?? '-' ?>
-                            </td>
-
-                            <!-- Spesifikasi Barang Masuk -->
-                            <td rowspan="<?= $rowspan ?>" class="text-left vertical-middle">
-                                <?= $p['spesifikasi'] ?? '-' ?>
-                            </td>
-
-                            <!-- KG Kotor -->
-                            <td rowspan="<?= $rowspan ?>" class="text-right vertical-middle">
-                                <?= number_format($p['sum_kotor'] ?? 0, 2) ?>
-                            </td>
-
-                            <!-- Canning -->
-                            <td rowspan="<?= $rowspan ?>" class="text-right vertical-middle">
-                                <?= number_format($p['sum_bersih'] ?? 0, 2) ?>
-                            </td>
-
-                            <!-- KG Daging -->
-                            <td rowspan="<?= $rowspan ?>" class="text-right vertical-middle">
-                                <?= number_format($p['sum_bersih'] ?? 0, 2) ?>
-                            </td>
-
-                            <!-- Ratio -->
-                            <td rowspan="<?= $rowspan ?>" class="text-center vertical-middle">
-                                <?= number_format($p['ratio'] ?? 0, 2) ?>%
-                            </td>
-
-                            <!-- Harga Per Kilo -->
-                            <td rowspan="<?= $rowspan ?>" class="text-right vertical-middle">
-                                <?= number_format($p['harga_per_kilo'] ?? 0, 2) ?>
-                            </td>
-
-                            <!-- Total Harga -->
-                            <td rowspan="<?= $rowspan ?>" class="text-right vertical-middle">
-                                <?= number_format($total_harga, 2) ?>
-                            </td>
-
-                            <!-- DETAIL OUT - BARIS PERTAMA -->
+                        <?php foreach ($group['items'] as $index => $parentBlock) : ?>
+                            <?php
+                            $p = $parentBlock['parent'];
                             
-                            <!-- Tanggal Keluar -->
-                            <td class="text-center vertical-middle">
-                                <?= !empty($detail[0]['tanggal_keluar']) ? date('d/m/Y', strtotime($detail[0]['tanggal_keluar'])) : '-' ?>
-                            </td>
+                            // Hitung nilai-nilai sesuai kebutuhan
+                            $kg_rebus = $p['sum_keluar'] ?? 0;
+                            $kg_daging_martabe = $p['sum_kotor'] ?? 0;
+                            $kg_daging_cn = $p['sum_bersih'] ?? 0;
+                            $uang_kopek_dibayar = $p['sum_bersih'] ?? 0; // Sesuai screenshot, sama dengan Kg Daging Cn
+                            $ratio = $p['ratio'] ?? 0;
+                            $harga_per_kilo = $p['harga_per_kilo'] ?? 0;
+                            $total_harga = ($p['sum_bersih'] ?? 0) * $harga_per_kilo;
+                            
+                            // Akumulasi grand total
+                            $grand_total_all += $total_harga;
+                            $total_kg_rebus += $kg_rebus;
+                            $total_kg_daging_martabe += $kg_daging_martabe;
+                            $total_kg_daging_cn += $kg_daging_cn;
+                            $total_uang_kopek += $uang_kopek_dibayar;
+                            ?>
 
-                            <!-- Qty Keluar -->
-                            <td class="text-right vertical-middle">
-                                <?= number_format($detail[0]['qty_keluar'] ?? 0, 2) ?>
-                            </td>
-
-                            <!-- Jenis Barang Keluar -->
-                            <td class="text-left vertical-middle">
-                                <?= $detail[0]['barang_name_out'] ?? '-' ?>
-                            </td>
-
-                            <!-- Spesifikasi Barang Keluar -->
-                            <td class="text-left vertical-middle">
-                                <?= $detail[0]['spesifikasi_out'] ?? '-' ?>
-                            </td>
-                        </tr>
-
-                        <!-- DETAIL ROWS TAMBAHAN (jika ada lebih dari 1 out) -->
-                        <?php for ($i = 1; $i < count($detail); $i++) : ?>
-                            <?php $d = $detail[$i]; ?>
                             <tr>
-                                <!-- Tanggal Keluar -->
+                                <!-- Tgl Kembali -->
+                                <?php if ($first_item) : ?>
+                                    <td rowspan="<?= $group_rowspan ?>" class="text-center vertical-middle">
+                                        <?= !empty($group['tgl_kembali']) ? date('d-M-y', strtotime($group['tgl_kembali'])) : '-' ?>
+                                    </td>
+                                <?php endif; ?>
+
+                                <!-- Tgl Baham -->
+                                <?php if ($first_item) : ?>
+                                    <td rowspan="<?= $group_rowspan ?>" class="text-center vertical-middle">
+                                        <?= !empty($group['tgl_baham']) ? date('d-M-y', strtotime($group['tgl_baham'])) : '-' ?>
+                                    </td>
+                                <?php endif; ?>
+
+                                <!-- Jenis -->
+                                <td class="text-left vertical-middle">
+                                    <?= $p['barang_name'] ?? '-' ?>
+                                </td>
+
+                                <!-- Size Mth -->
                                 <td class="text-center vertical-middle">
-                                    <?= !empty($d['tanggal_keluar']) ? date('d/m/Y', strtotime($d['tanggal_keluar'])) : '-' ?>
+                                    <?= $p['spesifikasi'] ?? '-' ?>
                                 </td>
 
-                                <!-- Qty Keluar -->
+                                <!-- Kg. Rebus -->
                                 <td class="text-right vertical-middle">
-                                    <?= number_format($d['qty_keluar'] ?? 0, 2) ?>
+                                    <?= number_format($kg_rebus, 1) ?>
                                 </td>
 
-                                <!-- Jenis Barang Keluar -->
-                                <td class="text-left vertical-middle">
-                                    <?= $d['barang_name_out'] ?? '-' ?>
+                                <!-- Kg Daging Martabe -->
+                                <td class="text-right vertical-middle">
+                                    <?= number_format($kg_daging_martabe, 1) ?>
                                 </td>
 
-                                <!-- Spesifikasi Barang Keluar -->
-                                <td class="text-left vertical-middle">
-                                    <?= $d['spesifikasi_out'] ?? '-' ?>
+                                <!-- Kg Daging Cn -->
+                                <td class="text-right vertical-middle">
+                                    <?= number_format($kg_daging_cn, 1) ?>
+                                </td>
+
+                                <!-- Uang Kopek Yang Dibayar -->
+                                <td class="text-right vertical-middle">
+                                    <?= number_format($uang_kopek_dibayar, 1) ?>
+                                </td>
+
+                                <!-- Ratio -->
+                                <td class="text-center vertical-middle">
+                                    <?= number_format($ratio, 1) ?>%
+                                </td>
+
+                                <!-- Tb. Harga -->
+                                <td class="text-right vertical-middle">
+                                    <?= number_format($harga_per_kilo, 0) ?>
+                                </td>
+
+                                <!-- Grand Total -->
+                                <td class="text-right vertical-middle">
+                                    <?= number_format($total_harga, 0) ?>
                                 </td>
                             </tr>
-                        <?php endfor; ?>
+
+                            <?php $first_item = false; ?>
+                        <?php endforeach; ?>
+
+                        <!-- ROW TOTAL PER GROUP -->
+                        <tr style="font-weight: bold; background-color: #f0f0f0;">
+                            <td colspan="4" class="text-center bold">TOTAL</td>
+                            <td class="text-right bold"><?= number_format($group['totals']['kg_rebus'], 1) ?></td>
+                            <td class="text-right bold"><?= number_format($group['totals']['kg_daging_martabe'], 1) ?></td>
+                            <td class="text-right bold"><?= number_format($group['totals']['kg_daging_cn'], 1) ?></td>
+                            <td class="text-right bold"><?= number_format($group['totals']['uang_kopek'], 1) ?></td>
+                            <td></td>
+                            <td></td>
+                            <td class="text-right bold"><?= number_format($group['totals']['grand_total'], 0) ?></td>
+                        </tr>
 
                     <?php endforeach; ?>
 
-                    <!-- GRAND TOTAL ROW -->
-                    <tr style="font-weight: bold;">
-                        <td colspan="9" class="text-center"><b>GRAND TOTAL</b></td>
-                        <td class="text-right"><?= number_format($grand_total, 2) ?></td>
+                    <!-- GRAND TOTAL SEMUA -->
+                    <tr style="font-weight: bold; background-color: #d0d0d0;">
+                        <td colspan="4" class="text-center bold">GRAND TOTAL</td>
+                        <td class="text-right bold"><?= number_format($total_kg_rebus, 1) ?></td>
+                        <td class="text-right bold"><?= number_format($total_kg_daging_martabe, 1) ?></td>
+                        <td class="text-right bold"><?= number_format($total_kg_daging_cn, 1) ?></td>
+                        <td class="text-right bold"><?= number_format($total_uang_kopek, 1) ?></td>
                         <td></td>
                         <td></td>
-                        <td></td>
-                        <td></td>
+                        <td class="text-right bold"><?= number_format($grand_total_all, 0) ?></td>
                     </tr>
                 </tbody>
             </table>
