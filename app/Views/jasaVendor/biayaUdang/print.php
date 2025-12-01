@@ -158,16 +158,22 @@
                         $tgl_kembali = $p['tanggal_masuk'] ?? '';
                         
                         // Cari tanggal baham dari detail
-                        $tgl_baham = '';
+                        $tgl_bahan = '';
                         if (!empty($parentBlock['detail'][0]['tanggal_keluar'])) {
-                            $tgl_baham = $parentBlock['detail'][0]['tanggal_keluar'];
+                            $tgl_bahan = $parentBlock['detail'][0]['tanggal_keluar'];
+                        }
+
+                        $spesifikasi_out = '';
+                        if (!empty($parentBlock['detail'][0]['spesifikasi_out'])) {
+                            $spesifikasi_out = $parentBlock['detail'][0]['spesifikasi_out'];
                         }
                         
                         $key = $tgl_kembali;
                         if (!isset($grouped_data[$key])) {
                             $grouped_data[$key] = [
                                 'tgl_kembali' => $tgl_kembali,
-                                'tgl_baham' => $tgl_baham,
+                                'tgl_bahan' => $tgl_bahan,
+                                'spesifikasi_out' => $spesifikasi_out,
                                 'items' => [],
                                 'totals' => [
                                     'kg_rebus' => 0,
@@ -232,13 +238,13 @@
                                 <!-- Tgl Baham -->
                                 <?php if ($first_item) : ?>
                                     <td rowspan="<?= $group_rowspan ?>" class="text-center vertical-middle">
-                                        <?= !empty($group['tgl_baham']) ? date('d-M-y', strtotime($group['tgl_baham'])) : '-' ?>
+                                        <?= !empty($group['tgl_bahan']) ? date('d-M-y', strtotime($group['tgl_bahan'])) : '-' ?>
                                     </td>
                                 <?php endif; ?>
 
                                 <!-- Size Mth -->
                                 <td class="text-center vertical-middle">
-                                    <?= $p['spesifikasi'] ?? '-' ?>
+                                    <?= $group['spesifikasi_out'] ?? '-' ?>
                                 </td>
 
                                 <!-- Kg. Rebus -->
@@ -316,28 +322,28 @@
 
             <div class="ttd-section">
                 <div class="ttd-box">
-                    <p>Disetujui oleh,</p>
+                    <p>Dibuat oleh,</p>
                     <br><br><br><br>
                     <p>_________________________</p>
                     <p>Yanti</p>
                 </div>
 
                 <div class="ttd-box">
-                    <p>Disetujui oleh,</p>
+                    <p>Diperiksa oleh,</p>
                     <br><br><br><br>
                     <p>_________________________</p>
                     <p>Audit</p>
                 </div>
 
                 <div class="ttd-box">
-                    <p>Disetujui oleh,</p>
+                    <p>Diketahui oleh,</p>
                     <br><br><br><br>
                     <p>_________________________</p>
                     <p>Bp. Herman</p>
                 </div>
                 
                 <div class="ttd-box">
-                    <p>Dibuat oleh,</p>
+                    <p>Disetujui oleh,</p>
                     <br><br><br><br>
                     <p>_________________________</p>
                     <p>Bp. Tony Siaputra</p>
