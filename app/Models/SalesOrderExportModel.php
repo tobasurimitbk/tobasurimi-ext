@@ -621,7 +621,7 @@ class SalesOrderExportModel extends Model
                         'harga' => $s['harga'],
                         'total' => $s['total'],
                         //----------------------------
-                        'qty_convertion' => $s['kode_satuan'] == "KG" && $s['qty'] != 0  ? 0 : 0, // Jika Kg Otomatis Ambil Aja
+                        'qty_convertion' => $s['kode_satuan'] == "KG" && $s['qty'] != 0  ? $s['qty'] : 0, // Jika Kg Otomatis Ambil Aja
                         'satuan_convertion_id' =>  $s['kode_satuan'] == "KG" && $s['qty'] != 0  ?  $s['satuan_size_id'] : "29", // KG
                         'satuan_convertion_kode' => $s['kode_satuan'] == "KG" && $s['qty'] != 0 ?  $s['kode_satuan'] : "KG",
                         //------------------------------
@@ -640,7 +640,7 @@ class SalesOrderExportModel extends Model
                         'note_palet' => "",
                         //-----------------------------
                         'qty_sisa' => $totalQtySisa,
-                        'qty_input' => 0,
+                        'qty_input' => $totalQtySisa,
                         'total_sisa' => $s['harga'] * $totalQtySisa,
                         'total_input' => $s['harga'] * $totalQtySisa
                     ]);
@@ -787,7 +787,7 @@ class SalesOrderExportModel extends Model
                                 'harga' => $s['harga'],
                                 'total' => $s['total'],
                                 //----------------------------
-                                'qty_convertion' => ($s['kode_satuan'] == "KG" && $totalQtySisa != 0) ? 0 : 0, // Jika Kg Otomatis Ambil Aja
+                                'qty_convertion' => ($s['kode_satuan'] == "KG" && $totalQtySisa != 0) ? $totalQtySisa : 0, // Jika Kg Otomatis Ambil Aja
                                 'satuan_convertion_id' => ($s['kode_satuan'] == "KG" && $totalQtySisa != 0) ?  $s['satuan_size_id'] : "29",
                                 'satuan_convertion_kode' => ($s['kode_satuan'] == "KG" && $totalQtySisa != 0) ?  $s['kode_satuan'] : "KG",
                                 //------------------------------
@@ -806,7 +806,7 @@ class SalesOrderExportModel extends Model
                                 'note_palet' => "",
                                 //-----------------------------
                                 'qty_sisa' => $totalQtySisa,
-                                'qty_input' => 0,
+                                'qty_input' => $totalQtySisa,
                                 'total_sisa' => $s['harga'] * $totalQtySisa,
                                 'total_input' => $s['harga'] * $totalQtySisa
                             ]);
