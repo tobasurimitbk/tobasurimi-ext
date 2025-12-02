@@ -77,17 +77,6 @@ class TipeBarang extends BaseController
             $barangMasterId = $this->barangMasterSpesifikasiModel->where('id', $barangMasterSpesifikasiId)
                 ->first()['barang_master_id'];
 
-            // var_dump([
-            //     'barang_master_id' => $barangMasterId,
-            //     'barang_master_spesifikasi_id' => $barangMasterSpesifikasiId,
-            //     'company_id' => $this->this_company_id,
-            //     'divisi_id' => $divisiId,
-            //     'ap_id' => $this->request->getVar('akun_ap_id'),
-            //     'ar_id' => $this->request->getVar('akun_ar_id'),
-            //     'pemakaian_id' => $this->request->getVar('akun_pemakaian_id'),
-            //     'kategori_id' => $this->request->getVar('kategori'),
-            // ]);
-            // exit;
             $this->accountBarangModel->insert([
                 'barang_master_id' => $barangMasterId,
                 'barang_master_spesifikasi_id' => $barangMasterSpesifikasiId,
