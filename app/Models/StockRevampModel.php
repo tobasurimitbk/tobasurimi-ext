@@ -2025,12 +2025,12 @@ class StockRevampModel extends Model
 
     public function allStockFisik($condition = [], $addCondition = [], $limit = 10, $offset = 0)
     {
+        $barangMasterModel = new BarangMasterModel();
+
         $availableSort = [
             'parent_type_id' => 'barang_master.parent_type_id',
             'kode_barang'    => 'barang_master.kode_barang',
             'barang_name'    => 'barang_master.barang_name',
-            'qty_diterima'   => 'stock_revamp.qty_diterima',
-            'unit_id'        => 'stock_revamp.unit_id',
         ];
 
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
@@ -2039,33 +2039,20 @@ class StockRevampModel extends Model
         $sortType = $availableSortType[strtolower($addCondition['sortType'] ?? 'asc')] ?? 'asc';
 
         $selectQry = "
-            stock_revamp.barang_master_id,
-            stock_revamp.unit_id,
-            SUM(stock_revamp.qty_bersih) AS total_qty_bersih,
+            barang_master.id,
             parent_barang.parent_name,
             barang_master.kode_barang,
-            barang_master.barang_name,
-            satuans.kode_satuan
+            barang_master.barang_name
         ";
 
-        // Builder dasar (tanpa search)
-        $baseBuilder = $this->asArray()
+        $baseBuilder = $barangMasterModel->asArray()
             ->select($selectQry)
-            ->join('barang_master', 'stock_revamp.barang_master_id = barang_master.id', 'left')
             ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
-            ->join('satuans', 'satuans.id = stock_revamp.unit_id', 'left')
             ->where($condition)
-            ->groupBy('stock_revamp.barang_master_id')
             ->orderBy($sort, $sortType);
 
-        // Total data (tanpa search)
         $totalData = $baseBuilder->countAllResults(false);
 
-        if (!empty($addCondition['barang_master_id'])) {
-            $baseBuilder->where('stock_revamp.barang_master_id', $addCondition['barang_master_id']);
-        }
-
-        // Filter pencarian
         if (!empty($addCondition['search'])) {
             $search = $addCondition['search'];
             $baseBuilder->groupStart()

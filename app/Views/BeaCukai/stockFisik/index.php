@@ -33,7 +33,6 @@
                             <th onclick="changeSort('kode_barang')">Kode Barang</th>
                             <th onclick="changeSort('barang_name')">Barang</th>
                             <th onclick="changeSort('qty_diterima')">Qty</th>
-                            <th onclick="changeSort('unit_id')">Unit</th>
                             <th style="width: 70px;">Action</th>
                         </tr>
                     </thead>
@@ -100,15 +99,12 @@
                 className: "text-left"
             },
             {
-                data: "total_qty_bersih",
+                data: "total_qty",
                 className: "text-left",
                 render: function(data) {
-                    return greatFormatRupiah(data);
+                    let datax = parseFloat(data).toFixed(2);
+                    return greatFormatRupiah(datax);
                 }
-            },
-            {
-                data: "kode_satuan",
-                className: "text-left"
             },
             {
                 data: "id",
@@ -116,7 +112,7 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    let id = row.barang_master_id;
+                    let id = row.id;
                     return `
                         <div class="mt-0 actions">
                             <a href="javascript:void(0)" onclick="detail('${id}')" data-toggle="tooltip" title="Detail Stok" class="btn btn-success posting-spp actions">
