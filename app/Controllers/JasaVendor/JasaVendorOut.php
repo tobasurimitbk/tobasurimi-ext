@@ -353,7 +353,7 @@ class JasaVendorOut extends BaseController
                 'proses_rebus_id'     => $b->reference_type == "PROSES REBUS" ? $b->reference_id : null,
                 'jasa_vendor_out_id'  => $decodedId,
                 'stock_out_detail_id' => $b->id,
-                'bc_out_id'           => $b->bc_id,
+                // 'bc_out_id'           => $b->bc_id,
                 'stock_dokumen'       => $stock_dokumen,
                 'satuan_id'           => $b->satuan_id,
                 'po_id'               => $b->po_id,
