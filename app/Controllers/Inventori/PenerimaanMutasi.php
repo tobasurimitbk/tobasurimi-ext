@@ -79,7 +79,7 @@ class PenerimaanMutasi extends BaseController
         $addCondition = [
             "sort"   => $this->request->getVar("sort"),
             "sortType"  => $this->request->getVar("sortType"),
-            "search" => $this->request->getVar("search"),
+            "search" => trim($this->request->getVar("search")),
             "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
@@ -103,31 +103,7 @@ class PenerimaanMutasi extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
         $dataResult = array();
 
-        // Get all data ppbkb
-        $ppbkbAll = $this->ppbkbModel->where('company_id', $this->this_company_id)->findAll();
-        // Buat map mutasi_id => no_ppbkb
-        $ppbkbMap = [];
-        foreach ($ppbkbAll as $ppbkb) {
-            $ppbkbMap[$ppbkb['mutasi_id']][] = $ppbkb['no_ppbkb'];
-        }
-
         foreach ($dataQry['data'] as $data) {
-
-            // decode JSON array dari multiple_mutasi_id
-            $multipleMutasiIdArr = json_decode($data->multiple_mutasi_id);
-
-            $noPpbkbArr = [];
-            if (is_array($multipleMutasiIdArr)) {
-                foreach ($multipleMutasiIdArr as $mutasiId) {
-                    if (isset($ppbkbMap[$mutasiId])) {
-                        // ambil semua no_ppbkb yang terkait mutasi_id ini
-                        $noPpbkbArr = array_merge($noPpbkbArr, $ppbkbMap[$mutasiId]);
-                    }
-                }
-            }
-
-            // gabungkan menjadi string, pisah koma
-            $noPpbkb = implode(', ', $noPpbkbArr);
 
             array_push($dataResult, [
                 "no"                    => $no++,
@@ -137,7 +113,7 @@ class PenerimaanMutasi extends BaseController
                 "multiple_no_mutasi"    => str_replace(['"', ']', '[', "'"], " ", $data->multiple_no_mutasi),
                 "tanggal"               => date('d/m/Y', strtotime($data->tanggal)),
                 "status_posting"        => $data->status_posting,
-                "no_ppbkb"              => $noPpbkb
+                "no_ppbkb"              => $data->no_ppbkb
             ]);
         }
 

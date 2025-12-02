@@ -265,6 +265,9 @@ class StokAdjusment extends BaseController
             if ($d['type_bc'] != "NON PABEAN" && $d['no_daftar'] != "") {
                 // ADA DOKUMEN BEA CUKAI
                 $bc_all = $d['type_bc'] . " / " . $d['no_daftar'] . " / " . $d['no_aju'];
+            } elseif ($d['type_bc'] == "PPBKB" && $d['no_aju'] != "") {
+                // ADA DOKUMEN BEA CUKAI
+                $bc_all = $d['type_bc'] . " / " . $d['no_aju'];
             } else {
                 $bc_all = $d['type_bc'];
             }

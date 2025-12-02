@@ -90,9 +90,11 @@ class Mutasi extends BaseController
             $offset
         );
 
+        $mapPpbkb = $this->ppbkbModel->getMapPpbkb($this->this_company_id);
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($dataQry['data'] as $data) {
+            $noPpbkb = $mapPpbkb[$data['id']] ?? null;
             array_push($dataResult, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data['id']),
@@ -102,7 +104,7 @@ class Mutasi extends BaseController
                 "divisi_tujuan"         => $data['divisi_tujuan'],
                 "warehouse_asal"        => $data['warehouse_name_asal'],
                 "warehouse_tujuan"      => $data['warehouse_name_tujuan'],
-                "no_ppbkb"              => $data['no_ppbkb'],
+                "no_ppbkb"              => $noPpbkb,
                 "status_posting"        => $data['status_posting']
             ]);
         }
@@ -153,7 +155,7 @@ class Mutasi extends BaseController
             ->findAll();
         $dataDivisi = $this->divisiModel->getDivisiAccess();
         $dataSatuan = $this->satuanModel->where('deletedAt', null)->findAll();
-        $dataMutasiDetail = $this->mutasiDetailModel->getDetail($id);
+        $dataMutasiDetail = $this->mutasiDetailModel->getDetail([$id]);
         $dataWarehouseAsal = $this->warehouseModel->where('id', $mutasi['warehouse_asal_id'])->findAll();
         $dataWarehouseTujuan = $this->warehouseModel->where('id', $mutasi['warehouse_tujuan_id'])->findAll();
 
@@ -263,6 +265,8 @@ class Mutasi extends BaseController
                     'message' => "nomor mutasi sudah digunakan",
                 ]);
             }
+
+            $first = $this->mutasiModel->where('id', $id)->first();
 
             $this->mutasiModel->update($id, [
                 'company_id' => $this->this_company_id,

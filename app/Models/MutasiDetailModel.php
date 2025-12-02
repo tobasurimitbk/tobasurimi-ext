@@ -41,7 +41,7 @@ class MutasiDetailModel extends Model
     protected $afterDelete    = [];
 
     public function getDetail(
-        $id
+        $multipleMutasiId
     ) {
         $stockRevampModel = new StockRevampModel();
         $pbbkbDetailModel = new PPBKBDetailModel();
@@ -49,13 +49,23 @@ class MutasiDetailModel extends Model
 
         $selectQry = "
             mutasi_detail.*,
-            satuans.kode_satuan AS kode_satuan_mutasi
+            satuans.kode_satuan AS kode_satuan_mutasi,
+            mutasi.no_mutasi,
+            tb_divisi_asal.divisi AS divisi_asal,
+            tb_divisi_tujuan.divisi AS divisi_tujuan,
+            tb_warehouse_asal.warehouse_name AS warehouse_asal,
+            tb_warehouse_tujuan.warehouse_name AS warehouse_tujuan
         ";
 
         $mutasiDetail = $this->asArray()
             ->select($selectQry)
             ->join('satuans', 'satuans.id = mutasi_detail.unit_id_mutasi', 'left')
-            ->where('mutasi_detail.mutasi_id', $id)
+            ->join('mutasi', 'mutasi.id = mutasi_detail.mutasi_id', 'left')
+            ->join('divisis tb_divisi_asal', 'tb_divisi_asal.id = mutasi.divisi_asal_id', 'left')
+            ->join('divisis tb_divisi_tujuan', 'tb_divisi_tujuan.id = mutasi.divisi_tujuan_id', 'left')
+            ->join('warehouses tb_warehouse_asal', 'tb_warehouse_asal.id = mutasi.warehouse_asal_id', 'left')
+            ->join('warehouses tb_warehouse_tujuan', 'tb_warehouse_tujuan.id = mutasi.warehouse_tujuan_id', 'left')
+            ->whereIn('mutasi_detail.mutasi_id', $multipleMutasiId)
             ->where('mutasi_detail.deletedAt', null)
             ->findAll();
 
@@ -108,15 +118,20 @@ class MutasiDetailModel extends Model
                         'qty_konversi' => $a['qty_konversi'],
                         'unit_id_konversi' => $a['unit_id_konversi'],
                         'unit_name_konversi' => $d['kode_satuan'],
-                        'hasil_mutasi' => $a['hasil_mutasi']
+                        'hasil_mutasi' => $a['hasil_mutasi'],
+                        'divisi_asal' => $a['divisi_asal'],
+                        'warehouse_asal' => $a['warehouse_asal'],
+                        'divisi_tujuan' => $a['divisi_tujuan'],
+                        'warehouse_tujuan' => $a['warehouse_tujuan']
                     ],
                     "dokumen_asal" => [
-                        'no_aju' => $d['no_aju'],
-                        'no_daftar' => $d['no_daftar'],
+                        'no_aju' => $d['no_aju'] ?? '-',
+                        'no_daftar' => $d['no_daftar'] ?? '-',
                         'tanggal_dokumen' => $d['tanggal_dokumen']
                     ],
                     "keterangan_mutasi" => $a['keterangan'],
-                    "spp_no" => $d['spp_no']
+                    "spp_no" => $d['spp_no'],
+                    "no_mutasi" => $a['no_mutasi']
                 ]);
             }
         }

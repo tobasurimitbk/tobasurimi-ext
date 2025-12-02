@@ -79,7 +79,7 @@ class MutasiLokal extends BaseController
             ->findAll();
         $dataDivisi = $this->divisiModel->getDivisiAccess();
         $dataSatuan = $this->satuanModel->where('deletedAt', null)->findAll();
-        $dataMutasiDetail = $this->mutasiDetailModel->getDetail($id);
+        $dataMutasiDetail = $this->mutasiDetailModel->getDetail([$id]);
         $dataWarehouseAsal = $this->warehouseModel->where('id', $mutasi['warehouse_asal_id'])->findAll();
         $dataWarehouseTujuan = $this->warehouseModel->where('id', $mutasi['warehouse_tujuan_id'])->findAll();
 
@@ -108,7 +108,7 @@ class MutasiLokal extends BaseController
         if ($mutasi == null) {
             return redirect()->to('mutasi/lokal');
         }
-        $dataMutasiDetail = $this->mutasiDetailModel->getDetail($id);
+        $dataMutasiDetail = $this->mutasiDetailModel->getDetail([$id]);
 
         $data = [
             'mutasi' => $mutasi,

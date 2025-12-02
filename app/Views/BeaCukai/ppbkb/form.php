@@ -5,6 +5,14 @@
         width: 4rem;
         height: 1.5rem;
     }
+
+    .form-add-spp .form-floating .form-floating-custom .select2 .selection .select2-selection {
+        height: 90px !important;
+    }
+
+    .form-add-spp .form-floating .form-floating-custom .select2 .selection .select2-selection__rendered {
+        height: 60px !important;
+    }
 </style>
 <section class="section section-form">
 
@@ -50,7 +58,7 @@
             <?php endif; ?>
         </div>
     </div>
-    <form class="create-form">
+    <form class="create-form form-add-spp">
         <div class="card">
             <div class="card-header" style="font-weight: bold;">
                 DATA MUTASI PPBKB
@@ -60,49 +68,19 @@
                 <input type="hidden" name="id" id="id" class="id" value="<?= !empty($ppbkb) ? encrypt($ppbkb['id']) : '' ?>">
                 <div class="row">
                     <div class="col-sm-4">
-                        <div class="form-floating mb-3 mt-1" style="height: 50px;">
-                            <select <?= !empty($ppbkb) ? 'disabled' : '' ?> class="form-select divisi_asal_id" id="divisi_asal_id" name="divisi_asal_id" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php foreach ($divisi as $d) : ?>
-                                    <option <?= !empty($ppbkb) ? ($ppbkb['divisi_asal_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>"><?= strtoupper($d['divisi']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            </select>
-                            <label style="z-index: 1;">Pilih Departemen Asal</label>
+                        <div class="form-floating mb-3 mt-1" style="height: 90px;">
+                            <div class="form-floating-custom">
+                                <select <?= !empty($ppbkb) ? 'disabled' : '' ?> class="form-select multiple_mutasi_id" id="multiple_mutasi_id" multiple name="multiple_mutasi_id[]">
+                                    <option value=""></option>
+                                    <?php foreach ($mutasi as $m): ?>
+                                        <option <?= !empty($ppbkb) ? 'selected' : '' ?> value="<?= $m['id'] ?>">
+                                            <?= $m['no_mutasi'] ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-sm-4">
-                        <div class="form-floating mb-3 mt-1" style="height: 50px;">
-                            <select <?= !empty($ppbkb) ? 'disabled' : '' ?> class="form-select mutasi_id" id="mutasi_id" name="mutasi_id" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php if (!empty($ppbkb)) : ?>
-                                    <option selected value="<?= $ppbkb['mutasi_id'] ?>">
-                                        <?= $ppbkb['no_mutasi'] ?>
-                                    </option>
-                                <?php endif; ?>
-                            </select>
-                            <label style="z-index: 1;">Pilih Nomor Mutasi</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input disabled placeholder="Warehouse Asal" value="<?= !empty($ppbkb) ? $ppbkb['warehouse_asal_name'] : '' ?>" class="form-control warehouse_asal_name" id="warehouse_asal_name" aria-label="Floating label select example" />
-                            <label for="floatingInput" style="z-index: 1;">Warehouse Asal</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input disabled placeholder="Departemen Tujuan" value="<?= !empty($ppbkb) ? ($divisiTujuan != null ? $divisiTujuan['divisi'] : '') : '' ?>" class="form-control divisi_tujuan_name" id="divisi_tujuan_name" aria-label="Floating label select example" />
-                            <label for="floatingInput" style="z-index: 1;">Departemen Tujuan</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input disabled placeholder="Warehouse Tujuan" value="<?= !empty($ppbkb) ? ($warehouseTujuan != null ? $warehouseTujuan['warehouse_name'] : '') : '' ?>" class="form-control warehouse_tujuan_name" id="warehouse_tujuan_name" aria-label="Floating label select example" />
-                            <label for="floatingInput" style="z-index: 1;">Warehouse Tujuan</label>
-                        </div>
-                    </div>
-
                 </div>
             </div>
             <div class="card-header" style="font-weight: bold; color:black;margin-top:-20px;">
@@ -124,12 +102,6 @@
                         </div>
                     </div>
                     <div class="col-sm-4">
-                        <div class="form-floating mb-3">
-                            <input <?= !empty($ppbkb) ? ($ppbkb['status_posting'] == "1" ? "disabled" : "") : '' ?> value="<?= !empty($ppbkb) ? $ppbkb['no_daftar'] : "" ?>" autocomplete="one-time-code" type="number" class="form-control no_daftar" id="no_daftar" name="no_daftar" placeholder="No Daftar">
-                            <label for="floatingInput">Nomor Daftar</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -144,7 +116,7 @@
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($ppbkb) ? ($ppbkb['status_posting'] == "1" ? "disabled" : "") : '' ?> class="form-select npwp" id="npwp" name="npwp" aria-label="Floating label select example">
+                            <select <?= !empty($ppbkb) ? ($ppbkb['status_posting'] == "1" ? "disabled" : "") : '' ?> class="form-select npwp" id="npwp" name="npwp">
                                 <option value=""></option>
                                 <?php foreach ($pengusahaTPB as $p) : ?>
                                     <option <?= !empty($ppbkb) ? ($ppbkb['npwp'] == $p['npwp'] ? 'selected' : '') : '' ?> data-id="<?= $p['id'] ?>" data-lokasi_asal_barang="<?= $p['alamat'] ?>" data-nama_perusahaan="<?= $p['nama_pengusaha'] ?>" value="<?= $p['npwp'] ?>">
@@ -152,19 +124,18 @@
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                            </select>
                             <label style="z-index: 1;">Pilih NPWP</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input readonly placeholder="Nama Perusahaan" value="<?= !empty($ppbkb) ? $ppbkb['nama_perusahaan'] : '' ?>" class="form-control nama_perusahaan" id="nama_perusahaan" name="nama_perusahaan" aria-label="Floating label select example" />
+                            <input readonly placeholder="Nama Perusahaan" value="<?= !empty($ppbkb) ? $ppbkb['nama_perusahaan'] : '' ?>" class="form-control nama_perusahaan" id="nama_perusahaan" name="nama_perusahaan" />
                             <label for="floatingInput" style="z-index: 1;">Nama Perusahaan</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($ppbkb) ? ($ppbkb['status_posting'] == "1" ? "disabled" : "") : '' ?> class="form-select no_ijin_tpb" id="no_ijin_tpb" name="no_ijin_tpb" aria-label="Floating label select example">
+                            <select <?= !empty($ppbkb) ? ($ppbkb['status_posting'] == "1" ? "disabled" : "") : '' ?> class="form-select no_ijin_tpb" id="no_ijin_tpb" name="no_ijin_tpb">
                                 <option value=""></option>
                                 <?php if (!empty($ppbkb)) : ?>
                                     <option selected value="<?= $ppbkb['no_ijin_tpb'] ?>">
@@ -181,13 +152,13 @@
                 <div class="row">
                     <div class="col-sm-4">
                         <div class="form-floating mb-3">
-                            <textarea name="lokasi_asal_barang" id="lokasi_asal_barang" class="form-control lokasi_asal_barang" style="height: 100px;"><?= !empty($ppbkb) ? $ppbkb['lokasi_asal_barang'] : '' ?></textarea>
+                            <textarea <?= !empty($ppbkb) ? ($ppbkb['status_posting'] == "1" ? "disabled" : "") : '' ?> name="lokasi_asal_barang" id="lokasi_asal_barang" class="form-control lokasi_asal_barang" style="height: 100px;"><?= !empty($ppbkb) ? $ppbkb['lokasi_asal_barang'] : '' ?></textarea>
                             <label>Asal Barang</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3">
-                            <textarea name="lokasi_tujuan_barang" id="lokasi_tujuan_barang" class="form-control lokasi_tujuan_barang" style="height: 100px;"><?= !empty($ppbkb) ? $ppbkb['lokasi_tujuan_barang'] : '' ?></textarea>
+                            <textarea <?= !empty($ppbkb) ? ($ppbkb['status_posting'] == "1" ? "disabled" : "") : '' ?> name="lokasi_tujuan_barang" id="lokasi_tujuan_barang" class="form-control lokasi_tujuan_barang" style="height: 100px;"><?= !empty($ppbkb) ? $ppbkb['lokasi_tujuan_barang'] : '' ?></textarea>
                             <label>Tujuan Pemindahan Barang</label>
                         </div>
                     </div>
@@ -204,15 +175,20 @@
                                 <thead class="thead-dark">
                                     <tr>
                                         <th>No</th>
-                                        <th>Kode Barang</th>
+                                        <th>No Mutasi</th>
+                                        <th>Dept Asal</th>
+                                        <th>Warehouse <br> Asal</th>
+                                        <th>Dept Tujuan</th>
+                                        <th>Warehouse <br> Tujuan</th>
+                                        <th>Kode <br> Barang</th>
                                         <th>Kode HS</th>
                                         <th>Barang</th>
                                         <th>Spesifikasi</th>
-                                        <th>Qty Mutasi</th>
+                                        <th>Qty <br> Mutasi</th>
                                         <th>Satuan</th>
-                                        <th>Dokumen Pemasukan</th>
-                                        <th>No Aju / No Daftar</th>
-                                        <th>Tgl Dokumen</th>
+                                        <th>Dokumen <br> Pemasukan</th>
+                                        <th>No Aju <br> No Daftar</th>
+                                        <th>Tgl <br> Dokumen</th>
                                         <th>Action</th>
 
                                     </tr>
@@ -221,7 +197,7 @@
                                 </tbody>
                                 <tfoot class="foot-detail-table" id="foot-detail-table">
                                     <tr>
-                                        <td colspan="11">
+                                        <td colspan="16">
                                             Tidak Ada Barang
                                         </td>
                                     </tr>
@@ -318,7 +294,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select <?= !empty($ppbkb) ? ($ppbkb['status_posting'] == "1" ? "disabled" : "") : '' ?> class="form-select hs_code_id" id="hs_code_id" name="hs_code_id" aria-label="Floating label select example">
+                                <select <?= !empty($ppbkb) ? ($ppbkb['status_posting'] == "1" ? "disabled" : "") : '' ?> class="form-select hs_code_id" id="hs_code_id" name="hs_code_id">
                                     <option value=""></option>
                                     <?php foreach ($hsCode as $h) : ?>
                                         <option value="<?= $h['id'] ?>">
@@ -359,11 +335,12 @@
 
     // INIT PAS UPDATE
     <?php if (!empty($ppbkb)) : ?>
+        let arr = $('.multiple_mutasi_id').val();
         $.ajax({
             url: `<?= base_url('bea-cukai-ppbkb/list-barang-mutasi'); ?>`,
             method: "GET",
             data: {
-                mutasi_id: $("#mutasi_id option:selected").val(),
+                multiple_mutasi_id: JSON.stringify(arr),
             },
             dataType: "json",
             success: function(res) {
@@ -381,27 +358,11 @@
         autoclose: true
     });
 
-    $('#divisi_asal_id').select2({
-        placeholder: "Pilih Departemen Asal",
-        theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {
-        getListMutasi();
-    });
-
-    $('#mutasi_id').select2({
+    $('#multiple_mutasi_id').select2({
         placeholder: "Pilih Nomor Mutasi",
         theme: "bootstrap-5",
-        allowClear: true
+        allowClear: false
     }).change(function() {
-        var warehouseAsalName = $('#mutasi_id option:selected').data('warehouse_asal_name');
-        var divisiTujuanName = $('#mutasi_id option:selected').data('divisi_tujuan_name');
-        var warehouseTujuanName = $('#mutasi_id option:selected').data('warehouse_tujuan_name');
-
-        $('#warehouse_asal_name').val(warehouseAsalName);
-        $('#divisi_tujuan_name').val(divisiTujuanName);
-        $('#warehouse_tujuan_name').val(warehouseTujuanName);
-
         // LIST BARANG
         getListMutasiDetail();
     });
@@ -441,7 +402,7 @@
         $('#update_hs_code_modal').modal('hide');
     })
 
-    $("#divisi_asal_id,#mutasi_id,#npwp,#no_ijin_tpb, #hs_code_id")
+    $("#divisi_tujuan_id,#multiple_mutasi_id,#npwp,#no_ijin_tpb, #hs_code_id")
         .parent('div')
         .children('span')
         .children('span')
@@ -452,10 +413,10 @@
 
     var validator = $(".create-form").validate({
         rules: {
-            divisi_asal_id: {
+            divisi_tujuan_id: {
                 required: true
             },
-            mutasi_id: {
+            multiple_mutasi_id: {
                 required: true
             },
             no_ppbkb: {
@@ -490,10 +451,10 @@
             },
         },
         messages: {
-            divisi_asal_id: {
+            divisi_tujuan_id: {
                 required: "Pilih Departemen Asal"
             },
-            mutasi_id: {
+            multiple_mutasi_id: {
                 required: "Pilih Nomor Mutasi"
             },
             no_ppbkb: {
@@ -698,6 +659,7 @@
     })
 
     function getListMutasiDetail() {
+        let arr = $('.multiple_mutasi_id').val();
         $.ajax({
             url: `<?= base_url('bea-cukai-ppbkb/list-barang-mutasi'); ?>`,
             method: "GET",
@@ -708,7 +670,7 @@
                 stopLoading();
             },
             data: {
-                mutasi_id: $("#mutasi_id option:selected").val(),
+                multiple_mutasi_id: JSON.stringify(arr),
             },
             dataType: "json",
             success: function(res) {
@@ -727,7 +689,7 @@
 
         if (listData.length === 0) {
             var newRow = $('<tr>');
-            newRow.append($('<td colspan="11" style="text-align:left">Tidak Ada Barang</td>'));
+            newRow.append($('<td colspan="12" style="text-align:left">Tidak Ada Barang</td>'));
             table.find('tfoot').append(newRow);
         } else {
             $.each(listData, function(i, v) {
@@ -737,6 +699,11 @@
                             ${no++} 
                         `
                 ));
+                newRow.append($('<td >').text(v.no_mutasi));
+                newRow.append($('<td >').text(v.mutasi.divisi_asal));
+                newRow.append($('<td >').text(v.mutasi.warehouse_asal));
+                newRow.append($('<td >').text(v.mutasi.divisi_tujuan));
+                newRow.append($('<td >').text(v.mutasi.warehouse_tujuan));
                 newRow.append($('<td >').text(v.kode_barang));
                 newRow.append($('<td >').text(v.hs_code == null ? "" : v.hs_code));
                 newRow.append($('<td >').text(v.barang_name));
@@ -785,21 +752,21 @@
                 stopLoading();
             },
             data: {
-                divisi_asal_id: $(".divisi_asal_id option:selected").val(),
+                divisi_tujuan_id: $(".divisi_tujuan_id option:selected").val(),
             },
             dataType: "json",
             success: function(res) {
-                $(".mutasi_id").empty()
-                $(".mutasi_id").append(`<option value=""></option>`)
+                $(".multiple_mutasi_id").empty()
+                $(".multiple_mutasi_id").append(`<option value=""></option>`)
                 res.data.forEach(function(item) {
-                    $(".mutasi_id").append(`<option 
+                    $(".multiple_mutasi_id").append(`<option 
                         data-warehouse_asal_name="${item.warehouse_asal_name}" 
                         data-divisi_tujuan_name="${item.divisi_tujuan_name}"
                         data-warehouse_tujuan_name="${item.warehouse_tujuan_name}" 
                         value="${item.id}">${item.no_mutasi}
                     </option>`)
                 })
-                $(".mutasi_id").val();
+                $(".multiple_mutasi_id").val();
             }
         });
     }

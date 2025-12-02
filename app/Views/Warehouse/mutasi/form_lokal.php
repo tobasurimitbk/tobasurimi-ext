@@ -1247,16 +1247,25 @@
                             processData: false,
                             contentType: false,
                             success: function(response) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                    confirmButtonText: 'Ok'
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        window.location.href = "<?= base_url("mutasi/lokal"); ?>";
-                                    }
-                                });
+                                if (response.status) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                        confirmButtonText: 'Ok'
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            window.location.href = "<?= base_url("mutasi"); ?>";
+                                        }
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    });
+                                    return;
+                                }
                             },
                         });
                     }

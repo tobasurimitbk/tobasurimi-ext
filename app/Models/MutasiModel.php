@@ -49,7 +49,6 @@ class MutasiModel extends Model
             'divisi_tujuan_id'                    => 'mutasi.divisi_tujuan_id',
             'warehouse_asal_id'                   => 'mutasi.warehouse_asal_id',
             'warehouse_tujuan_id'                 => 'mutasi.warehouse_tujuan_id',
-            'ppbkb.no_ppbkb'                      => 'ppbkb.no_ppbkb',
             'status_posting'                      => 'mutasi.status_posting',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
@@ -63,7 +62,6 @@ class MutasiModel extends Model
             tb_warehouse_asal.warehouse_name AS warehouse_name_asal,
             tb_divisi_tujuan.divisi AS divisi_tujuan,
             tb_warehouse_tujuan.warehouse_name AS warehouse_name_tujuan,
-            ppbkb.no_ppbkb
         ";
 
         $dataQry = $this->asArray()
@@ -72,7 +70,6 @@ class MutasiModel extends Model
             ->join('divisis AS tb_divisi_tujuan', 'tb_divisi_tujuan.id = mutasi.divisi_tujuan_id', 'left')
             ->join('warehouses AS tb_warehouse_asal', 'tb_warehouse_asal.id = mutasi.warehouse_asal_id', 'left')
             ->join('warehouses AS tb_warehouse_tujuan', 'tb_warehouse_tujuan.id = mutasi.warehouse_tujuan_id', 'left')
-            ->join('ppbkb', 'ppbkb.mutasi_id = mutasi.id', 'left')
             ->where($condition)
             ->orderBy($sort, $sortType);
 
@@ -94,8 +91,7 @@ class MutasiModel extends Model
                 ->orLike('tb_divisi_asal.divisi', $addCondition['search'])
                 ->orLike('tb_divisi_tujuan.divisi', $addCondition['search'])
                 ->orLike('tb_warehouse_asal.warehouse_name', $addCondition['search'])
-                ->orLike('tb_warehouse_tujuan.warehouse_name', $addCondition['search'])
-                ->orLike('ppbkb.no_ppbkb', $addCondition['search']);
+                ->orLike('tb_warehouse_tujuan.warehouse_name', $addCondition['search']);
         }
 
         if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
@@ -209,5 +205,12 @@ class MutasiModel extends Model
             $invNumber = $paddedNumber . $numberTemplate;
         }
         return $invNumber;
+    }
+
+    public function getNoMutasi($multipleMutasiIdArr)
+    {
+        $result = $this->asArray()->whereIn('id', $multipleMutasiIdArr)->where('deletedAt', null)->findAll();
+        $multipleMutasiNoArr = array_column($result, 'no_mutasi');
+        return json_encode($multipleMutasiNoArr, JSON_UNESCAPED_SLASHES);
     }
 }
