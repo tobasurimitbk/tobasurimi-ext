@@ -70,8 +70,10 @@ class StockFisik extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
         foreach ($stockFisikData['data'] as $data) {
             $totalQty = 0;
+            $kodeSatuan = "";
             if (isset($dataPemasukkanTotal[$data['id']])) {
-                $totalQty = $dataPemasukkanTotal[$data['id']];
+                $totalQty = $dataPemasukkanTotal[$data['id']]['qty_diterima'];
+                $kodeSatuan =  $dataPemasukkanTotal[$data['id']]['kode_satuan'];
             }
             array_push($dataStockFisik, [
                 "no"                    => $no++,
@@ -80,7 +82,7 @@ class StockFisik extends BaseController
                 "kode_barang"           => $data['kode_barang'],
                 "barang_name"           => $data['barang_name'],
                 "total_qty"             => $totalQty,
-                "kode_satuan"           => ""
+                "kode_satuan"           => $kodeSatuan
             ]);
         }
 
@@ -136,8 +138,10 @@ class StockFisik extends BaseController
 
         foreach ($dataQry['data'] as $d) {
             $totalQty = 0;
+            $kodeSatuan = "";
             if (isset($dataPemasukkanTotal[$d['id']])) {
-                $totalQty = $dataPemasukkanTotal[$d['id']];
+                $totalQty = $dataPemasukkanTotal[$d['id']]['qty_diterima'];
+                $kodeSatuan =  $dataPemasukkanTotal[$d['id']]['kode_satuan'];
             }
 
             $sheet->setCellValue('A' . $row, $no++);
@@ -145,7 +149,7 @@ class StockFisik extends BaseController
             $sheet->setCellValue('C' . $row, $d['kode_barang']);
             $sheet->setCellValue('D' . $row, trim($d['barang_name']));
             $sheet->setCellValue('E' . $row, (float)$totalQty);
-            $sheet->setCellValue('F' . $row, "");
+            $sheet->setCellValue('F' . $row, $kodeSatuan);
             $row++;
         }
 
@@ -301,9 +305,12 @@ class StockFisik extends BaseController
         foreach ($dataPemasukkan['data'] as $d) {
             $barangId = $d['barang_id'];
             if (!isset($dataPemasukkanMap[$barangId])) {
-                $dataPemasukkanMap[$barangId] = 0;
+                $dataPemasukkanMap[$barangId] = [
+                    'qty_diterima' => 0,
+                    'kode_satuan' => $d['kode_satuan']
+                ];
             }
-            $dataPemasukkanMap[$barangId] += floatval($d['qty_diterima']);
+            $dataPemasukkanMap[$barangId]['qty_diterima'] += floatval($d['qty_diterima']);
         }
 
         return $dataPemasukkanMap;

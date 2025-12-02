@@ -32,7 +32,8 @@
                             <th onclick="changeSort('parent_type_id')">Kategori</th>
                             <th onclick="changeSort('kode_barang')">Kode Barang</th>
                             <th onclick="changeSort('barang_name')">Barang</th>
-                            <th onclick="changeSort('qty_diterima')">Qty</th>
+                            <th>Qty</th>
+                            <th>Kode Satuan</th>
                             <th style="width: 70px;">Action</th>
                         </tr>
                     </thead>
@@ -101,10 +102,18 @@
             {
                 data: "total_qty",
                 className: "text-left",
+                searchable: false,
+                sortable: false,
                 render: function(data) {
                     let datax = parseFloat(data).toFixed(2);
                     return greatFormatRupiah(datax);
                 }
+            },
+            {
+                data: "kode_satuan",
+                className: "text-left",
+                searchable: false,
+                sortable: false,
             },
             {
                 data: "id",
@@ -143,7 +152,7 @@
         }
     });
 
-    $('.search').keyup(function(e) {
+    $('.search').change(function(e) {
         table.ajax.reload();
     });
 
