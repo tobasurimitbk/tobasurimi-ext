@@ -108,6 +108,16 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-sm-12">
+                            <div class="form-floating mb-3 mt-1" style="height: 50px;">
+                                <select class="form-select jenis_pengeluaran" id="jenis_pengeluaran" name="jenis_pengeluaran" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <option value="ORDER FORM LOKAL">ORDER FORM LOKAL</option>
+                                    <option value="LAINNYA">LAINNYA</option>
+                                </select>
+                                <label style="z-index: 1;">Pilih Pengeluaran</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -206,7 +216,7 @@
 
             {
                 data: "id",
-                className: "text-left actions",
+                className: "text-center actions",
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
@@ -283,10 +293,16 @@
             tanggal: {
                 required: true
             },
+            jenis_pengeluaran: {
+                required: true
+            },
         },
         messages: {
             tanggal: {
                 required: "Tanggal dokumen wajib diisi"
+            },
+            jenis_pengeluaran: {
+                required: "Pilih tujuan pengeluaran"
             },
         },
         errorElement: 'span',
@@ -311,6 +327,23 @@
         },
     });
 
+    $('#jenis_pengeluaran').select2({
+        placeholder: "Pilih Jenis Pengeluaran",
+        theme: "bootstrap-5",
+        allowClear: false,
+        dropdownParent: $('#btnModalTambahDokumen')
+    }).change(function() {
+
+    });
+
+    $('.form-select')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
     $('#btnTambahModal').click(function(e) {
         e.preventDefault();
         $('#tanggal').val(null).change();
@@ -326,8 +359,10 @@
         if ($('.create-form').valid()) {
             var formData = new FormData();
             var tanggal = $('#tanggal').val();
+            var jenisPengeluaran = $('#jenis_pengeluaran').val();
 
             formData.append("tanggal", tanggal);
+            formData.append("jenis_pengeluaran", jenisPengeluaran);
             $.ajax({
                 url: `<?= base_url("bea-cukai-bc-25/save"); ?>`,
                 method: "POST",

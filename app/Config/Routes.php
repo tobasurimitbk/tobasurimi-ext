@@ -43,7 +43,7 @@ $routes->get('/403', function () {
     return view('errors/html/error_403');
 });
 
-$routes->get('/salah-satuan', 'Warehouse\Penomoran_::salahSatuanBarang');
+$routes->get('/update-consigne', 'Warehouse\Penomoran_::updateConsigne');
 // $routes->get('/generate-stock-revamp-nonpabean', 'Warehouse\Penomoran_::generateStokRevampNonPabean');
 // $routes->get('/generate-stock-revamp-pabean', 'Warehouse\Penomoran_::generateStokRevampPabean');
 // $routes->get('/generate-stock-detail-id-lpb-non-pabean', 'Warehouse\Penomoran_::generateStockDetailIdPenerimaanBarangDetailNonPabean');
@@ -1121,6 +1121,7 @@ $routes->get('/barang/dropdown/type-server', 'Purchase\SPP::dropdownBarang', ['f
 $routes->get('/barang/dropdown/type-server-first', 'Purchase\SPP::dropdownBarangFirst', ['filter' => 'Auth']);
 $routes->get('/barang/dropdown/type-server-inventori', 'Inventori\StokAdjusment::dropdownBarangInventori', ['filter' => 'Auth']);
 $routes->get('/barang/dropdown/type-server-inventori-warehouse-divisi', 'Inventori\StokAdjusment::dropdownBarangStockList', ['filter' => 'Auth']);
+$routes->get('/barang/dropdown/type-server-barang-master-inventori', 'Inventori\StokAdjusment::dropdownBarangMaster', ['filter' => 'Auth']);
 
 // ACCOUNT
 $routes->get('/kategori-account/dropdown', 'Master\Account::dropdownKategoriAccount', ['filter' => 'Auth']);
@@ -1988,6 +1989,13 @@ $routes->group('bea-cukai-ppbkb', ['filter' => 'Auth'], function ($routes) {
     $routes->get('ppbkb-outstanding-export', 'BeaCukai\PPBKB::OutstandingSheet');
 });
 
+// STOCK FISIK
+$routes->get('stock-fisik', 'BeaCukai\StockFisik::index', ['filter' => 'Auth']);
+$routes->get('stock-fisik/all', 'BeaCukai\StockFisik::all', ['filter' => 'Auth']);
+$routes->get('stock-fisik/export-excel', 'BeaCukai\StockFisik::exportExcel', ['filter' => 'Auth']);
+$routes->get('stock-fisik/id/(:segment)', 'BeaCukai\StockFisik::detail/$1', ['filter' => 'Auth']);
+$routes->get('stock-fisik/all-masuk', 'BeaCukai\StockFisik::allPemasukkan', ['filter' => 'Auth']);
+
 // BC 2.5
 $routes->group('bea-cukai-bc-25', ['filter' => 'Auth'], function ($routes) {
     $routes->get('/', 'BeaCukai\BC25::index');
@@ -1997,7 +2005,14 @@ $routes->group('bea-cukai-bc-25', ['filter' => 'Auth'], function ($routes) {
     $routes->post('save', 'BeaCukai\BC25::createAction');
     $routes->get('id/(:segment)', 'BeaCukai\BC25::detail/$1');
     $routes->get('get-referensi', 'BeaCukai\BC25::getReferensiPengeluaran');
+    $routes->get('get-referensi-penerima', 'BeaCukai\BC25::getReferensiPenerima');
     $routes->post('delete', 'BeaCukai\BC25::delete');
+    $routes->get('warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse');
+    $routes->get('all-stock-list', 'Inventori\StokAdjusment::allStockList');
+    $routes->get('list-satuan-konversi', 'Inventori\StokAdjusment::getSatuanKonversi');
+    $routes->post('update', 'BeaCukai\BC25::updateDetail');
+    $routes->post('update-no-aju', 'BeaCukai\BC25::updateNoAju');
+
     // HEADER
     $routes->get('id/header/(:segment)', 'BeaCukai\BC25::header/$1');
     $routes->post('id/header', 'BeaCukai\BC25::updateHeader');

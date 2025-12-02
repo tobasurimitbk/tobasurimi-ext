@@ -180,16 +180,15 @@
             <thead class="thead-dark">
                 <tr>
                     <th style="text-align: center;">No</th>
-                    <th style="text-align: center;">Kode Barang</th>
-                    <th style="text-align: center;">Nama Barang</th>
+                    <th style="text-align: center;">Kode</th>
+                    <th style="text-align: center;">Barang</th>
                     <th style="text-align: center;">No SPP</th>
-                    <!-- <th style="text-align: center;">No PO</th> -->
                     <th style="text-align: center;">Satuan</th>
                     <th style="text-align: center;">Jml. Order</th>
-                    <th style="text-align: center;">Jml. Diterima LPB ini</th>
-                    <th style="text-align: center;">Jml. Diterima LPB ini (Konversi)</th>
-                    <th style="text-align: center;">Jml. Diterima Total</th>
-                    <th style="text-align: center;">Sisa Total</th>
+                    <th style="text-align: center;">Jml. Diterima <br> LPB ini</th>
+                    <th style="text-align: center;">Konversi</th>
+                    <th style="text-align: center;">Jml. Diterima <br> Total</th>
+                    <th style="text-align: center;">Sisa</th>
                     <th class="label-harga" style="text-align: center;">Harga</th>
                     <th style="text-align: center;">Sub Total</th>
                     <th style="text-align: center;">Keterangan</th>

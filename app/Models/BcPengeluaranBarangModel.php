@@ -4,10 +4,10 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class BcPengeluaranModel extends Model
+class BcPengeluaranBarangModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'bc_pengeluaran';
+    protected $table            = 'bc_pengeluaran_barang';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
@@ -49,12 +49,12 @@ class BcPengeluaranModel extends Model
         $offset = 0
     ) {
         $db = \Config\Database::connect();
-        $whereSalesOrder = [];
+        $where = [];
         $whereDateSalesOrder = "";
         $searchSalesOrder = "";
 
         if (!empty($condition['company_id'])) {
-            $whereSalesOrder[] = "sales_order.id_company = '$condition[company_id]'";
+            $where[] = "sales_order.id_company = '$condition[company_id]'";
         }
 
         if (!empty($condition['dateStart']) && !empty($condition['dateEnd'])) {
@@ -139,13 +139,16 @@ class BcPengeluaranModel extends Model
         ];
     }
 
-    public function referensiPengeluaranOrderFormLokal($companyId)
-    {
+    public function referensiPengeluaranOrderFormLokal(
+        $companyId,
+        $customerId
+    ) {
         $bc25Model = new BC25Model();
         $bc25List = $bc25Model->where('company_id', $companyId)->where('jenis_pengeluaran', "ORDER FORM LOKAL")->where('deletedAt', null)->findAll();
 
         $build = $this->db->table('sales_order')
             ->where('id_company', $companyId)
+            ->where('id_customer', $customerId)
             ->where('deletedAt', null);
 
         if (count($bc25List) != 0) {
@@ -160,6 +163,93 @@ class BcPengeluaranModel extends Model
                 'id' => $o['id'],
                 'reference_no' => $o['no_sales_order']
             ]);
+        }
+
+        return $dataResult;
+    }
+
+    public function getReferensiNoPengeluaranOrderFormLokal($orderFormIdArr)
+    {
+        $salesOrderModel = new SalesOrderModel();
+        $result = $salesOrderModel->whereIn('id', $orderFormIdArr)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        $salesOrderNoArr = array_column($result, 'no_sales_order');
+
+        return json_encode($salesOrderNoArr, JSON_UNESCAPED_SLASHES);
+    }
+
+    public function getDetailBarang(
+        $bcPengeluaranId,
+        $tipeBc
+    ) {
+        $stockRevampModel = new StockRevampModel();
+        $dataResult = array();
+
+        $selectQry = "
+            bc_pengeluaran_barang.*,
+            tb_satuan_konversi.kode_satuan AS unit_name_konversi,
+            tb_satuan_keluar.kode_satuan AS unit_name_keluar,
+            metadata.value AS valas_name
+        ";
+
+        $detail = $this->asArray()
+            ->select($selectQry)
+            ->join('satuans tb_satuan_konversi', 'tb_satuan_konversi.id = bc_pengeluaran_barang.unit_id_konversi', 'left')
+            ->join('satuans tb_satuan_keluar', 'tb_satuan_keluar.id = bc_pengeluaran_barang.unit_id_keluar', 'left')
+            ->join('metadata', 'metadata.id = bc_pengeluaran_barang.valas_id', 'left')
+            ->where('bc_pengeluaran_barang.bc_pengeluaran_id', $bcPengeluaranId)
+            ->where('bc_pengeluaran_barang.tipe_bc', $tipeBc)
+            ->where('bc_pengeluaran_barang.deletedAt', null)
+            ->findAll();
+
+        $no = 1;
+        foreach ($detail as $a) {
+
+            $fromStock = $stockRevampModel->getStockListAll(
+                ["id" => $a['stock_detail_id']],
+                0,
+                "desc",
+                1
+            );
+
+            foreach ($fromStock['data'] as $d) {
+                // Stock
+                array_push($dataResult, [
+                    'no' => $no++,
+                    'id' => $d['id'],
+                    'divisi' => $d['divisi'],
+                    'warehouse_name' => $d['warehouse_name'],
+                    'reference_type' => $d['reference_type'],
+                    'supplier_name' => $d['supplier_name'],
+                    'kode_barang' => $d['kode_barang'],
+                    'barang_name' => $d['barang_name'],
+                    'spesifikasi' => $d['spesifikasi'],
+                    'type_bc' => $d['type_bc'],
+                    'po_no' => $d['po_no'],
+                    'po_date' => !empty($d['po_date']) ? date('d/m/Y', strtotime($d['po_date'])) : "",
+                    'lpb_date' => !empty($d['lpb_date']) ? date('d/m/Y', strtotime($d['lpb_date'])) : "",
+                    'reference_no' => $d['reference_no'],
+                    'qty_diterima' => (float)$d['qty_diterima'],
+                    'qty_bersih' => (float)$d['qty_bersih'],
+                    'kode_satuan' => $d['kode_satuan'],
+                    "unit_id" => $d['unit_id'],
+                    "keluar" => [
+                        "qty_keluar" => $a['qty_keluar'],
+                        "unit_id_keluar" => $a['unit_id_keluar'],
+                        "unit_name_keluar" => $a['unit_name_keluar'],
+                        "qty_konversi" => (float)$a['qty_konversi'],
+                        "unit_id_konversi" => $a['unit_id_konversi'],
+                        "unit_name_konversi" => $a['unit_name_konversi'],
+                        "valas_id" => $a['valas_id'],
+                        "valas_name" => $a['valas_name'],
+                        "nilai_tukar" => (float)$a['nilai_tukar'],
+                        "harga_satuan" => (float)$a['harga_satuan'],
+                        "sub_total" => (float)$a['sub_total']
+                    ],
+                ]);
+            }
         }
 
         return $dataResult;

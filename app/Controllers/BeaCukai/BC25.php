@@ -6,12 +6,13 @@ use App\Controllers\BaseController;
 use App\Helpers\BeaCukaiApi;
 use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\BC25Model;
-use App\Models\BC30Model;
 use App\Models\BC41Model;
-use App\Models\BcPengeluaranModel;
+use App\Models\BcPengeluaranBarangModel;
 use App\Models\BCPurchaseOrderModel;
 use App\Models\CeisaSettingModel;
 use App\Models\CountryModel;
+use App\Models\CustomerModel;
+use App\Models\DivisisModel;
 use App\Models\HsCodesModel;
 use App\Models\KantorBeaCukaiModel;
 use App\Models\MetadataModel;
@@ -24,8 +25,10 @@ use App\Models\StockDetail2Model;
 use App\Models\SalesOrderLainDetailModel;
 use App\Models\SalesOrderLainModel;
 use App\Models\SalesOrderModel;
+use App\Models\SatuansModel;
 use App\Models\StockDetailModel;
 use App\Models\StockModel;
+use App\Models\StockRevampDetailModel;
 use Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -69,7 +72,11 @@ class BC25 extends BaseController
     protected $salesOrderModel;
     protected $salesOrderDetailModel;
     protected $bc41Model;
-    protected $bcPengeluaranModel;
+    protected $bcPengeluaranBarangModel;
+    protected $customerModel;
+    protected $divisiModel;
+    protected $satuanModel;
+    protected $stockRevampDetailModel;
 
     public function __construct()
     {
@@ -95,7 +102,11 @@ class BC25 extends BaseController
         $this->salesOrderModel = new SalesOrderModel();
         $this->salesOrderDetailModel = new SalesOrderDetailModel();
         $this->bc41Model = new BC41Model();
-        $this->bcPengeluaranModel = new BcPengeluaranModel();
+        $this->bcPengeluaranBarangModel = new BcPengeluaranBarangModel();
+        $this->divisiModel = new DivisisModel();
+        $this->customerModel = new CustomerModel();
+        $this->satuanModel = new SatuansModel();
+        $this->stockRevampDetailModel = new StockRevampDetailModel();
 
         $this->this_user_id = session()->get("login")->user_id;
         $this->this_company_id = session()->get("login")->this_company_id;
@@ -174,23 +185,137 @@ class BC25 extends BaseController
     {
         $id = decrypt($id);
         $bc25 = $this->bc25Model->where('id', $id)->first();
+        $dataTipeBarang = $this->metaDataModel
+            ->where('deletedAt', null)
+            ->where('name', "Kategori Barang")
+            ->where('description !=', "kemasan")
+            ->findAll();
+
         if ($bc25 == null) {
             return redirect()->to('bea-cukai-bc-25');
         }
+
+        $divisi = $this->divisiModel->getDivisiAccess();
+        $satuan = $this->satuanModel->where('deletedAt', null)->findAll();
+        $dataValuta = $this->metaDataModel->where('name', "Valuta")->where('deletedAt', null)->findAll();
+        $dataCustomer = [];
+        $dataReferencePengeluaran = [];
+
+        if ($bc25['reference_penerima_id'] != null) {
+            $dataCustomer = $this->customerModel->where('id', $bc25['reference_penerima_id'])->findAll();
+        }
+
+        if ($bc25['multiple_reference_id'] != null) {
+            $dataReferencePengeluaran = $this->salesOrderModel->whereIn('id', json_decode($bc25['multiple_reference_id']))->where('deletedAt', null)->findAll();
+        }
+
+        $dataBarang = $this->bcPengeluaranBarangModel->getDetailBarang(
+            $id,
+            "BC 2.5"
+        );
+
         $data = [
-            'bc25' => $bc25
+            'bc25' => $bc25,
+            'tipeBarang' => $dataTipeBarang,
+            'divisi' => $divisi,
+            'dataSatuan' => $satuan,
+            'noAju' => $bc25 == null ? $this->generateNomorAju($bc25['tanggal']) : $bc25['no_aju'],
+            'dataValuta' => $dataValuta,
+            'dataCustomer' => $dataCustomer,
+            'dataReferencePengeluaran' => $dataReferencePengeluaran,
+            'dataBarang' => $dataBarang
         ];
+
         return view('BeaCukai/bc-25/form', $data);
+    }
+
+    public function updateDetail()
+    {
+        // return response()->setJSON([
+        //     'token' => csrf_hash(),
+        //     '$_POST' => $_POST,
+        //     'listStock' => json_decode($_POST['listStock']),
+        //     'status' => false
+        // ]);
+        $db = \Config\Database::connect();
+        $db->transBegin();
+        try {
+            $id = decrypt($this->request->getVar('id'));
+            $tanggal = formatDMYtoYMD($this->request->getVar('tanggal'));
+            $jenisPengeluaran = $this->request->getVar('jenis_pengeluaran');
+            $noAju = $this->request->getVar('no_pengajuan');
+            $noDaftar = $this->request->getVar('no_daftar');
+            $referencePenerimaId = $this->request->getVar('reference_penerima_id');
+            $multipleReferenceIdArr = $this->request->getVar('multiple_reference_id');
+            $multipleReferenceNo = null;
+            $multipleReferenceId = null;
+
+            if (!empty($multipleReferenceIdArr) && count($multipleReferenceIdArr) != 0) {
+                $multipleReferenceNo = $this->bcPengeluaranBarangModel->getReferensiNoPengeluaranOrderFormLokal($multipleReferenceIdArr);
+                $multipleReferenceId = "[" . implode(",", $multipleReferenceIdArr) . "]";
+            }
+
+
+            $this->bc25Model->update($id, [
+                'tanggal' => $tanggal,
+                'reference_penerima_id' => $referencePenerimaId,
+                'no_aju' => $noAju,
+                'no_daftar' => $noDaftar,
+                'multiple_reference_id' => $multipleReferenceId,
+                'multiple_reference_no' => $multipleReferenceNo,
+                'jenis_pengeluaran' => $jenisPengeluaran,
+            ]);
+
+            $listStock = json_decode($this->request->getVar('listStock'));
+            $this->bcPengeluaranBarangModel->where('bc_pengeluaran_id', $id)->where('tipe_bc', "BC 2.5")->delete(null, true);
+            foreach ($listStock as $l) {
+                $stock = $this->stockRevampDetailModel
+                    ->select('stock_revamp_detail.*,stock_revamp.barang_master_id')
+                    ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
+                    ->where('stock_revamp_detail.id', $l->id)
+                    ->first();
+
+                $this->bcPengeluaranBarangModel->insert([
+                    'stock_detail_id'    => $l->id,
+                    'barang_master_id'   => $stock['barang_master_id'],
+                    'bc_pengeluaran_id'  => $id,
+                    'unit_id_konversi'   => $l->keluar->unit_id_konversi,
+                    'unit_id_keluar'     => $l->keluar->unit_id_keluar,
+                    'valas_id'           => $l->keluar->valas_id,
+                    'tipe_bc'            => "BC 2.5",
+                    'harga_satuan'       => $l->keluar->harga_satuan,
+                    'nilai_tukar'        => $l->keluar->nilai_tukar,
+                    'sub_total'          => $l->keluar->sub_total,
+                    'qty_keluar'         => $l->keluar->qty_keluar,
+                    'qty_konversi'       => $l->keluar->qty_konversi,
+                ]);
+            }
+
+            $db->transCommit();
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'message' => "Berhasil update",
+                'status' => true
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 
     public function getReferensiPengeluaran()
     {
         try {
             $jenisPengeluaran = $this->request->getVar('jenis_pengeluaran');
+            $referencePenerimaId = $this->request->getVar('reference_penerima_id');
             $dataResult = [];
             if ($jenisPengeluaran == "ORDER FORM LOKAL") {
-                $dataResult = $this->bcPengeluaranModel->referensiPengeluaranOrderFormLokal(
-                    $this->this_company_id
+                $dataResult = $this->bcPengeluaranBarangModel->referensiPengeluaranOrderFormLokal(
+                    $this->this_company_id,
+                    $referencePenerimaId
                 );
             }
             return response()->setJSON([
@@ -207,10 +332,56 @@ class BC25 extends BaseController
         }
     }
 
+    public function getReferensiPenerima()
+    {
+        try {
+            $jenisPengeluaran = $this->request->getVar('jenis_pengeluaran');
+            $dataPenerima = [];
+            if ($jenisPengeluaran == "ORDER FORM LOKAL") {
+
+                $id_company_arr = [];
+                if (in_array($this->this_company_id, [1, 2, 15])) {
+                    $id_company_arr = [1, 2, 15];
+                } else {
+                    $id_company_arr = [16];
+                }
+
+                $dataQry = $this->customerModel
+                    ->select('customers.*,companies.company')
+                    ->join('companies', 'companies.id = customers.company_id', 'left')
+                    ->where('tipe_customer', "LOKAL")
+                    ->where('customers.deletedAt', null)
+                    ->whereIn('customers.company_id', $id_company_arr)
+                    ->orderBy('customers.name', "asc")
+                    ->findAll();
+
+                foreach ($dataQry as $d) {
+                    array_push($dataPenerima, [
+                        'id' => $d['id'],
+                        'name' => $d['name'] . " (" . $d['company'] . ")"
+                    ]);
+                }
+            }
+
+            return response()->setJSON([
+                'status' => true,
+                'data' => $dataPenerima,
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
     public function createAction()
     {
         try {
             $tanggal = formatDMYtoYMD($this->request->getVar('tanggal'));
+            $jenisPengeluaran = $this->request->getVar('jenis_pengeluaran');
             $noAju = $this->generateNomorAju($tanggal);
             $payload = $this->get_payload();
 
@@ -224,7 +395,7 @@ class BC25 extends BaseController
             $id = $this->bc25Model->insert([
                 'company_id' => $this->this_company_id,
                 'tanggal' => $tanggal,
-                'jenis_pengeluaran' => null,
+                'jenis_pengeluaran' => $jenisPengeluaran,
                 'no_aju' => $noAju,
                 'no_daftar' => null,
                 'multiple_reference_id' => null,
@@ -1612,7 +1783,7 @@ class BC25 extends BaseController
                 : null,
         ];
 
-        $dataQry = $this->bcPengeluaranModel->getListOutstansingPengeluaran(
+        $dataQry = $this->bcPengeluaranBarangModel->getListOutstansingPengeluaran(
             $condition,
             $orderColumnIndex,
             $orderDir,
@@ -1659,7 +1830,7 @@ class BC25 extends BaseController
                 : null,
         ];
 
-        $dataQry = $this->bcPengeluaranModel->getListOutstansingPengeluaran(
+        $dataQry = $this->bcPengeluaranBarangModel->getListOutstansingPengeluaran(
             $condition,
             2,
             "desc",

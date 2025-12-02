@@ -1016,6 +1016,10 @@ class StockRevampModel extends Model
         if (!empty($condition['spesifikasi_id'])) {
             $where[] = "stock_revamp.spesifikasi_id = '$condition[spesifikasi_id]'";
         }
+
+        if (!empty($condition['barang_id'])) {
+            $where[] = "stock_revamp.barang_master_id = '$condition[barang_id]'";
+        }
         if (!empty($condition['search'])) {
             $search = $db->escapeLikeString(trim($condition['search']));
             $searchPoLokalBb = "
@@ -1181,7 +1185,8 @@ class StockRevampModel extends Model
                 stock_revamp_detail.bc_id,
                 stock_revamp_detail.reference_id,
                 stock_revamp_detail.po_type,
-                stock_revamp_detail.po_id
+                stock_revamp_detail.po_id,
+                stock_revamp_detail.qty_bersih
             FROM 
                 stock_revamp_detail
             LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
@@ -1235,7 +1240,8 @@ class StockRevampModel extends Model
                 stock_revamp_detail.bc_id,
                 stock_revamp_detail.reference_id,
                 stock_revamp_detail.po_type,
-                stock_revamp_detail.po_id
+                stock_revamp_detail.po_id,
+                stock_revamp_detail.qty_bersih
             FROM 
                 stock_revamp_detail
             LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
@@ -1290,7 +1296,8 @@ class StockRevampModel extends Model
                 stock_revamp_detail.bc_id,
                 stock_revamp_detail.reference_id,
                 stock_revamp_detail.po_type,
-                stock_revamp_detail.po_id
+                stock_revamp_detail.po_id,
+                stock_revamp_detail.qty_diterima
             FROM 
                 stock_revamp_detail
             LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
@@ -1345,7 +1352,8 @@ class StockRevampModel extends Model
                 stock_revamp_detail.bc_id,
                 stock_revamp_detail.reference_id,
                 stock_revamp_detail.po_type,
-                stock_revamp_detail.po_id
+                stock_revamp_detail.po_id,
+                stock_revamp_detail.qty_diterima
             FROM 
                 stock_revamp_detail
             LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
@@ -1399,7 +1407,8 @@ class StockRevampModel extends Model
                 stock_revamp_detail.bc_id,
                 stock_revamp_detail.reference_id,
                 stock_revamp_detail.po_type,
-                stock_revamp_detail.po_id
+                stock_revamp_detail.po_id,
+                stock_revamp_detail.qty_diterima
             FROM
                 stock_revamp_detail
             LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
@@ -1449,7 +1458,8 @@ class StockRevampModel extends Model
                 stock_revamp_detail.bc_id,
                 stock_revamp_detail.reference_id,
                 stock_revamp_detail.po_type,
-                stock_revamp_detail.po_id
+                stock_revamp_detail.po_id,
+                stock_revamp_detail.qty_diterima
             FROM
                 stock_revamp_detail
             LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
@@ -1498,7 +1508,8 @@ class StockRevampModel extends Model
                 stock_revamp_detail.bc_id,
                 stock_revamp_detail.reference_id,
                 stock_revamp_detail.po_type,
-                stock_revamp_detail.po_id
+                stock_revamp_detail.po_id,
+                stock_revamp_detail.qty_diterima
             FROM
                 stock_revamp_detail
             LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
@@ -1546,7 +1557,8 @@ class StockRevampModel extends Model
                 stock_revamp_detail.bc_id,
                 stock_revamp_detail.reference_id,
                 stock_revamp_detail.po_type,
-                stock_revamp_detail.po_id
+                stock_revamp_detail.po_id,
+                stock_revamp_detail.qty_diterima
             FROM
                 stock_revamp_detail
             LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
@@ -1594,7 +1606,8 @@ class StockRevampModel extends Model
                 stock_revamp_detail.bc_id,
                 stock_revamp_detail.reference_id,
                 stock_revamp_detail.po_type,
-                stock_revamp_detail.po_id
+                stock_revamp_detail.po_id,
+                stock_revamp_detail.qty_diterima
             FROM
                 stock_revamp_detail
             LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
@@ -1642,7 +1655,8 @@ class StockRevampModel extends Model
                 stock_revamp_detail.bc_id,
                 stock_revamp_detail.reference_id,
                 stock_revamp_detail.po_type,
-                stock_revamp_detail.po_id
+                stock_revamp_detail.po_id,
+                stock_revamp_detail.qty_diterima
             FROM
                 stock_revamp_detail
             LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
@@ -1687,7 +1701,8 @@ class StockRevampModel extends Model
                 stock_revamp_detail.bc_id,
                 stock_revamp_detail.reference_id,
                 stock_revamp_detail.po_type,
-                stock_revamp_detail.po_id
+                stock_revamp_detail.po_id,
+                stock_revamp_detail.qty_diterima
             FROM
                 stock_revamp_detail
             LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
@@ -1735,7 +1750,8 @@ class StockRevampModel extends Model
                 stock_revamp_detail.bc_id,
                 stock_revamp_detail.reference_id,
                 stock_revamp_detail.po_type,
-                stock_revamp_detail.po_id
+                stock_revamp_detail.po_id,
+                stock_revamp_detail.qty_diterima
             FROM
                 stock_revamp_detail
             LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
@@ -1784,7 +1800,8 @@ class StockRevampModel extends Model
                 stock_revamp_detail.bc_id,
                 stock_revamp_detail.reference_id,
                 stock_revamp_detail.po_type,
-                stock_revamp_detail.po_id
+                stock_revamp_detail.po_id,
+                stock_revamp_detail.qty_diterima
             FROM
                 stock_revamp_detail
             LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
@@ -2004,5 +2021,68 @@ class StockRevampModel extends Model
 
         $dataBarang = $dataQry->findAll(100);
         return $dataBarang;
+    }
+
+    public function allStockFisik($condition = [], $addCondition = [], $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'parent_type_id' => 'barang_master.parent_type_id',
+            'kode_barang'    => 'barang_master.kode_barang',
+            'barang_name'    => 'barang_master.barang_name',
+            'qty_diterima'   => 'stock_revamp.qty_diterima',
+            'unit_id'        => 'stock_revamp.unit_id',
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'barang_master.barang_name'] ?? 'barang_master.barang_name';
+        $sortType = $availableSortType[strtolower($addCondition['sortType'] ?? 'asc')] ?? 'asc';
+
+        $selectQry = "
+            stock_revamp.barang_master_id,
+            stock_revamp.unit_id,
+            SUM(stock_revamp.qty_bersih) AS total_qty_bersih,
+            parent_barang.parent_name,
+            barang_master.kode_barang,
+            barang_master.barang_name,
+            satuans.kode_satuan
+        ";
+
+        // Builder dasar (tanpa search)
+        $baseBuilder = $this->asArray()
+            ->select($selectQry)
+            ->join('barang_master', 'stock_revamp.barang_master_id = barang_master.id', 'left')
+            ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
+            ->join('satuans', 'satuans.id = stock_revamp.unit_id', 'left')
+            ->where($condition)
+            ->groupBy('stock_revamp.barang_master_id')
+            ->orderBy($sort, $sortType);
+
+        // Total data (tanpa search)
+        $totalData = $baseBuilder->countAllResults(false);
+
+        if (!empty($addCondition['barang_master_id'])) {
+            $baseBuilder->where('stock_revamp.barang_master_id', $addCondition['barang_master_id']);
+        }
+
+        // Filter pencarian
+        if (!empty($addCondition['search'])) {
+            $search = $addCondition['search'];
+            $baseBuilder->groupStart()
+                ->like('barang_master.barang_name', $search)
+                ->orLike('barang_master.kode_barang', $search)
+                ->orLike('parent_barang.parent_name', $search)
+                ->groupEnd();
+        }
+
+        $countBuilder = clone $baseBuilder;
+        $totalFilteredData = $countBuilder->countAllResults(false);
+        $data = $baseBuilder->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+        ];
     }
 }

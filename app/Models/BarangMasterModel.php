@@ -442,4 +442,30 @@ class BarangMasterModel extends Model
 
         return $dataBarang;
     }
+
+    public function dropdownBarangMaster(
+        $type,
+        $companyId,
+        $search
+    ) {
+        $condition = [
+            'barang_master.company_id' => $companyId,
+            'barang_master.type_barang' => $type,
+        ];
+
+        $selectQry = "
+            barang_master.id,
+            barang_master.kode_barang,
+            barang_master.barang_name
+        ";
+
+        $dataQry = $this->select($selectQry)->where('barang_master.deletedAt', null)->where($condition);
+        $dataQry->groupStart();
+        $dataQry->like('barang_master.kode_barang', $search);
+        $dataQry->orLike('barang_master.barang_name', $search);
+        $dataQry->groupEnd();
+
+        $dataBarang = $dataQry->findAll(100);
+        return $dataBarang;
+    }
 }
