@@ -7,6 +7,7 @@ use App\Models\MetadataModel;
 use App\Models\BarangMasterModel;
 use App\Models\Sub_AkunsModel;
 use App\Models\AccountBarangModel;
+use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\DivisisModel;
 
 class TipeBarang extends BaseController
@@ -15,6 +16,7 @@ class TipeBarang extends BaseController
     protected $this_company_id;
     protected $Sub_AkunsModel;
     protected $barangMasterModel;
+    protected $barangMasterSpesifikasiModel;
     protected $accountBarangModel;
     protected $divisiModel;
 
@@ -25,6 +27,7 @@ class TipeBarang extends BaseController
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->Sub_AkunsModel = new Sub_AkunsModel();
         $this->barangMasterModel = new BarangMasterModel();
+        $this->barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
         $this->accountBarangModel = new AccountBarangModel();
         $this->divisiModel = new DivisisModel();
     }
@@ -55,10 +58,13 @@ class TipeBarang extends BaseController
 
     public function saveTipeBarang()
     {
-        $barangMasterId = $this->request->getVar('barang_id');
+        $barangMasterSpesifikasiId = $this->request->getVar('barang_id');
         $accountBarangId = $this->request->getVar('id');
         $divisiId = $this->request->getVar('divisi_id');
-        $getDataAccountBarang = $this->accountBarangModel->where('divisi_id', $divisiId)->where('id', $accountBarangId)->where('deleted_at', NULL)->first();
+        $getDataAccountBarang = $this->accountBarangModel->where('divisi_id', $divisiId)
+            ->where('id', $accountBarangId)
+            ->where('deleted_at', NULL)
+            ->first();
 
         if ($getDataAccountBarang != null) {
             $this->accountBarangModel->update($getDataAccountBarang['id'], [
@@ -68,8 +74,23 @@ class TipeBarang extends BaseController
                 'kategori_id' => $this->request->getVar('kategori'),
             ]);
         } else {
+            $barangMasterId = $this->barangMasterSpesifikasiModel->where('id', $barangMasterSpesifikasiId)
+                ->first()['barang_master_id'];
+
+            // var_dump([
+            //     'barang_master_id' => $barangMasterId,
+            //     'barang_master_spesifikasi_id' => $barangMasterSpesifikasiId,
+            //     'company_id' => $this->this_company_id,
+            //     'divisi_id' => $divisiId,
+            //     'ap_id' => $this->request->getVar('akun_ap_id'),
+            //     'ar_id' => $this->request->getVar('akun_ar_id'),
+            //     'pemakaian_id' => $this->request->getVar('akun_pemakaian_id'),
+            //     'kategori_id' => $this->request->getVar('kategori'),
+            // ]);
+            // exit;
             $this->accountBarangModel->insert([
                 'barang_master_id' => $barangMasterId,
+                'barang_master_spesifikasi_id' => $barangMasterSpesifikasiId,
                 'company_id' => $this->this_company_id,
                 'divisi_id' => $divisiId,
                 'ap_id' => $this->request->getVar('akun_ap_id'),

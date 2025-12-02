@@ -2312,6 +2312,12 @@ $routes->get('/jurnal/print-excel', 'Accounting\JurnalUmum\JurnalUmum::exportExc
 $routes->get('/jurnal/print-pdf', 'Accounting\JurnalUmum\JurnalUmum::exportPdf', ['filter' => 'Auth']);
 $routes->get('/jurnal/fix', 'Accounting\JurnalUmum\JurnalUmum::fix', ['filter' => 'Auth']);
 
+$routes->get('/jurnal/insert-nilai-barang', 'Accounting\JurnalUmum\insertNilaiBarang::index', ['filter' => 'Auth']);
+$routes->get('/jurnal/get-divisi', 'Accounting\JurnalUmum\insertNilaiBarang::dropdownDivisi', ['filter' => 'Auth']);
+$routes->get('/jurnal/get-warehouse', 'Accounting\JurnalUmum\insertNilaiBarang::dropdownWarehouse', ['filter' => 'Auth']);
+$routes->get('/jurnal/get-barang', 'Accounting\JurnalUmum\insertNilaiBarang::dropdownBarang', ['filter' => 'Auth']);
+$routes->get('/jurnal/get-data', 'Accounting\JurnalUmum\insertNilaiBarang::getData', ['filter' => 'Auth']);
+
 // set no bukti
 $routes->get('/no-bukti', 'Accounting\NoBuktiAccounting\NoBukti::index', ['filter' => 'Auth']);
 $routes->get('/no-bukti/all', 'Accounting\NoBuktiAccounting\NoBukti::allNoBukti', ['filter' => 'Auth']);

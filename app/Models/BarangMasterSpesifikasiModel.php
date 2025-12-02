@@ -92,4 +92,80 @@ class BarangMasterSpesifikasiModel extends Model
 
         return $dataResult1;
     }
+
+    public function getListBarangSpesifikasiWithAccount($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'barang_master_spesifikasi.id' => 'barang_master_spesifikasi.id',
+            'barang_master_spesifikasi.spesifikasi' => 'barang_master_spesifikasi.spesifikasi',
+            'barang_master_spesifikasi.createdAt' => 'barang_master_spesifikasi.createdAt',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'barang_master_spesifikasi.createdAt'] ?? 'barang_master_spesifikasi.createdAt';
+        $sortType = $availableSortType[strtolower($addCondition['sortType'] ?? 'desc')] ?? 'DESC';
+
+        $selectQry = "
+            barang_master_spesifikasi.id,
+            barang_master_spesifikasi.spesifikasi,
+            account_barang.id as account_barang_id,
+            account_barang.ap_id,
+            account_barang.ar_id,
+            account_barang.pemakaian_id,
+            account_barang.kategori_id,
+            akun_pembelian.no_sub as no_sub_pembelian,
+            akun_pembelian.nama_sub as nama_sub_pembelian,
+            akun_penjualan.no_sub as no_sub_penjualan,
+            akun_penjualan.nama_sub as nama_sub_penjualan,
+            akun_pemakaian.no_sub as no_sub_pemakaian,
+            akun_pemakaian.nama_sub as nama_sub_pemakaian,
+        ";
+
+        $dataQry = $this->asObject()->select($selectQry)
+            ->join('account_barang', 'account_barang.barang_master_spesifikasi_id = barang_master_spesifikasi.id', 'left')
+            ->join('sub_akuns as akun_pembelian', 'akun_pembelian.id = account_barang.ar_id', 'left')
+            ->join('sub_akuns as akun_penjualan', 'akun_penjualan.id = account_barang.ap_id', 'left')
+            ->join('sub_akuns as akun_pemakaian', 'akun_pemakaian.id = account_barang.pemakaian_id', 'left')
+            ->where($condition)
+            ->groupBy('barang_master_spesifikasi.id');
+
+        if (!empty($addCondition['kode_barang'])) {
+            $dataQry->where('barang_master_spesifikasi.barang_master_id', $addCondition['kode_barang']);
+        }
+
+        if (!empty($addCondition['company_id'])) {
+            $dataQry->groupStart()
+                ->where('account_barang.company_id', $addCondition['company_id'])
+                ->orWhere('account_barang.id', null) // artinya belum punya account
+                ->groupEnd();
+        }
+
+        if (!empty($addCondition['kode_department'])) {
+            $dataQry->groupStart()
+                ->where('account_barang.divisi_id', $addCondition['kode_department'])
+                ->orWhere('account_barang.id', null) // artinya belum punya account
+                ->groupEnd();
+        }
+
+        // $filteredBuilder = clone $dataQry;
+        $totalFilteredData = $dataQry->countAllResults(false);
+
+        // === Total Data Keseluruhan ===
+        $totalData = $this->db->table('barang_master_spesifikasi')
+            ->select('barang_master_spesifikasi.id')
+            ->countAllResults();
+
+        // === Get Data ===
+        $data = $dataQry
+            ->limit($limit, $offset)
+            ->orderBy($sort, $sortType)
+            ->get()
+            ->getResult();
+
+        return [
+            'data' => $data,
+            'totalFilteredData' => $totalFilteredData,
+            'totalData' => $totalData
+        ];
+    }
 }

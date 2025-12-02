@@ -5,6 +5,9 @@
 <section class="section">
     <div class="section-header d-flex justify-content-end">
         <h1 class="me-auto">Jurnal Umum</h1>
+        <a class="btn btn-show-form btn-add" style="margin-right: 293px!important;" href="<?= base_url("jurnal/insert-nilai-barang"); ?>">
+            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah Nilai Barang
+        </a>
         <?php if (can('Accounting', 'Jurnal', 'p')) : ?>
             <button class="btn btn-discard btn-dropdown-export dropdown-toggle" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
                 Import / Export
