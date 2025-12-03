@@ -3153,7 +3153,7 @@ class Attendance extends BaseController
         ];
     }
 
-    public function syncAttendance()
+    public function syncAttendance_Backup()
     {
         $db = \Config\Database::connect();
 
@@ -3221,6 +3221,113 @@ class Attendance extends BaseController
             ]);
         }
     }
+
+    public function syncAttendance()
+    {
+        $db = \Config\Database::connect();
+
+        try {
+            $db->transBegin();
+
+            $attendanceUnitId = $this->request->getVar('attendances_unit_id');
+            $startDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('start_date_unit'))));
+            $endDate   = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('end_date_unit'))));
+
+            // Ambil data dari mesin finger
+            $dataFromFinger = $this->AttendancesApi->get_sync_attendance($attendanceUnitId);
+
+            if (!$dataFromFinger['status']) {
+                $db->transRollback();
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "Mesin finger tidak terhubung.",
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            $dataAttendance = $dataFromFinger['data'];
+
+            // Buat range datetime lengkap
+            $startDateTime = $startDate . " 00:00:00";
+            $endDateTime   = $endDate . " 23:59:59";
+
+            // Filter data dari mesin finger sesuai rentang tanggal
+            $filteredData = array_filter($dataAttendance, function ($item) use ($startDateTime, $endDateTime) {
+                $dateCreate = date('Y-m-d H:i:s', strtotime($item['date_create']));
+                return $dateCreate >= $startDateTime && $dateCreate <= $endDateTime;
+            });
+
+            $filteredData = array_values($filteredData);
+
+            if (empty($filteredData)) {
+                return response()->setJSON([
+                    "status" => false,
+                    "message" => "Tidak ada data presensi finger dalam rentang tanggal tersebut",
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            // Ambil company_id dari first data
+            $companyId = $filteredData[0]['company_id'];
+
+            // ================================
+            // 1 QUERY → Ambil data yang sudah ada
+            // ================================
+            $existing = $this->AttendancesLogModel
+                ->select('employees_id, date_create')
+                ->where('company_id', $companyId)
+                ->where('attendances_unit_id', $attendanceUnitId)
+                ->where('date_create >=', $startDateTime)
+                ->where('date_create <=', $endDateTime)
+                ->findAll();
+
+            // Masukkan ke hashmap agar pencarian cepat O(1)
+            $existingMap = [];
+            foreach ($existing as $ex) {
+                $existingMap[$ex['employees_id'] . '|' . $ex['date_create']] = true;
+            }
+
+            // ================================
+            // Siapkan batch insert
+            // ================================
+            $insertBatch = [];
+
+            foreach ($filteredData as $f) {
+                $key = $f['employee_id'] . '|' . $f['date_create'];
+
+                // jika belum ada → tambahkan ke batch
+                if (!isset($existingMap[$key])) {
+                    $insertBatch[] = [
+                        'company_id' => $f['company_id'],
+                        'employees_id' => $f['employee_id'],
+                        'attendances_unit_id' => $f['attendances_unit_id'],
+                        'date_create' => $f['date_create'],
+                    ];
+                }
+            }
+
+            if (!empty($insertBatch)) {
+                $this->AttendancesLogModel->insertBatch($insertBatch);
+            }
+
+            $db->transCommit();
+
+            return response()->setJSON([
+                'status' => true,
+                'message' => "Sinkronisasi berhasil",
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+
+            $db->transRollback();
+            return response()->setJSON([
+                'status' => false,
+                'message' => $e->getMessage(),
+                'token' => csrf_hash()
+            ]);
+        }
+    }
+
 
     public function getListDataFingerAllByAttendance()
     {
