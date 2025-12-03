@@ -199,10 +199,43 @@
                                     <label for="floatingInput" style="z-index: 1;">Pilih Warehouse</label>
                                 </div>
                             </div>
+
+                        </div>
+                        <label class="form-label font-weight-bold lable-title form-fifo">Input nilai barang</label>
+                        <div class="row mt-3">
+                            <div class="col-md-2 form-fifo">
+                                <div class="form-floating" style="height: 50px;">
+                                    <input placeholder="Qty Keluar" oninput="this.value = greatFormatRupiah(this.value)" class="form-control qty_keluar_fifo" id="qty_keluar_fifo" name="qty_keluar_fifo" />
+                                    <label for="floatingInput" style="z-index: 1;">Qty Keluar</label>
+                                </div>
+                            </div>
+                            <div class="col-md-2 form-fifo">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select valas_id_fifo" name="valas_id_fifo" id="valas_id_fifo">
+                                        <option value=""></option>
+                                        <?php foreach ($dataValuta as $d): ?>
+                                            <option value="<?= $d['id'] ?>"><?= $d['value']  ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <label for="floatingInput" style="z-index: 1;">Mata Uang</label>
+                                </div>
+                            </div>
                             <div class="col-md-3 form-fifo">
                                 <div class="form-floating" style="height: 50px;">
-                                    <input placeholder="Qty Mutasi" oninput="this.value = greatFormatRupiah(this.value)" class="form-control qty_keluar_fifo" id="qty_keluar_fifo" name="qty_keluar_fifo" />
-                                    <label for="floatingInput" style="z-index: 1;">Qty Keluar</label>
+                                    <input placeholder="Harga Satuan" oninput="this.value = greatFormatRupiah(this.value)" class="form-control harga_satuan_fifo" id="harga_satuan_fifo" name="harga_satuan_fifo" />
+                                    <label for="floatingInput" style="z-index: 1;">Harga Satuan</label>
+                                </div>
+                            </div>
+                            <div class="col-md-2 form-fifo">
+                                <div class="form-floating" style="height: 50px;">
+                                    <input placeholder="Nilai Tukar" oninput="this.value = greatFormatRupiah(this.value)" class="form-control nilai_tukar_fifo" id="nilai_tukar_fifo" name="nilai_tukar_fifo" />
+                                    <label for="floatingInput" style="z-index: 1;">Nilai Tukar</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3 form-fifo">
+                                <div class="form-floating" style="height: 50px;">
+                                    <input placeholder="Nilai Tukar" oninput="this.value = greatFormatRupiah(this.value)" class="form-control sub_total_fifo" id="sub_total_fifo" name="sub_total_fifo" />
+                                    <label for="floatingInput" style="z-index: 1;">Sub Total</label>
                                 </div>
                             </div>
                         </div>
@@ -916,6 +949,13 @@
         dropdownParent: $('#updateStockModal')
     }).change(function() {});
 
+    $('#valas_id_fifo').select2({
+        placeholder: "Pilih Mata Uang",
+        theme: "bootstrap-5",
+        allowClear: false,
+        dropdownParent: $('#inventoriModal')
+    }).change(function() {});
+
     $('#jenis_pengeluaran').select2({
         placeholder: "Pilih Jenis Pengeluaran",
         theme: "bootstrap-5",
@@ -990,6 +1030,12 @@
 
     $('#btninventoriModal').click(function(e) {
         e.preventDefault();
+        $('#valas_id_fifo').val(30).change();
+        $('#harga_satuan_fifo').val(null);
+        $('#nilai_tukar_fifo').val(1);
+        $('#sub_total_fifo').val(null);
+        $('#qty_keluar_fifo').val(null);
+
         $('#inventoriModal').modal('show');
     });
 
@@ -1062,6 +1108,7 @@
         hitungHasilKeluar();
     });
 
+    // Keyup Bawah
     $('#harga_satuan').keyup(function(e) {
         e.preventDefault();
         var hargaSatuan = destroyFormatRupiah($('#harga_satuan').val());
@@ -1089,6 +1136,36 @@
 
         var subTotal = ((hargaSatuan * nilaiTukar) * qtyKeluar).toFixed(2);
         $('#sub_total').val(greatFormatRupiah(subTotal));
+    });
+
+    // Keyup Fifo
+    $('#harga_satuan_fifo').keyup(function(e) {
+        e.preventDefault();
+        var hargaSatuan = destroyFormatRupiah($('#harga_satuan_fifo').val());
+        var qtyKeluar = destroyFormatRupiah($('#qty_keluar_fifo').val());
+        var nilaiTukar = destroyFormatRupiah($('#nilai_tukar_fifo').val());
+        var subTotal = ((hargaSatuan * nilaiTukar) * qtyKeluar).toFixed(2);
+        $('#sub_total_fifo').val(greatFormatRupiah(subTotal));
+    });
+
+    $('#sub_total_fifo').keyup(function(e) {
+        e.preventDefault();
+        var subTotal = destroyFormatRupiah($('#sub_total_fifo').val());
+        var qtyKeluar = destroyFormatRupiah($('#qty_keluar_fifo').val());
+
+        var hargaSatuan = (subTotal / qtyKeluar).toFixed(2);
+        $('#harga_satuan_fifo').val(greatFormatRupiah(hargaSatuan));
+        $('#nilai_tukar_fifo').val(1);
+    });
+
+    $('#nilai_tukar_fifo').keyup(function(e) {
+        e.preventDefault();
+        var nilaiTukar = destroyFormatRupiah($('#nilai_tukar_fifo').val());
+        var hargaSatuan = destroyFormatRupiah($('#harga_satuan_fifo').val());
+        var qtyKeluar = destroyFormatRupiah($('#qty_keluar_fifo').val());
+
+        var subTotal = ((hargaSatuan * nilaiTukar) * qtyKeluar).toFixed(2);
+        $('#sub_total_fifo').val(greatFormatRupiah(subTotal));
     });
 
     // SUBMIT HEADER
@@ -1208,6 +1285,11 @@
         var dataIds = getIDListDataSelected();
         var qtyKeluarFifo = parseFloat(destroyFormatRupiah($('#qty_keluar_fifo').val()));
         var barangId = $(".barang_id option:selected").val();
+        var valasIdFifo = $('#valas_id_fifo option:selected').val();
+        var valasNameFifo = $('#valas_id_fifo option:selected').text();
+        var hargaSatuanFifo = parseFloat(destroyFormatRupiah($('#harga_satuan_fifo').val()));
+        var nilaiTukarFifo = parseFloat(destroyFormatRupiah($('#nilai_tukar_fifo').val()));
+        var subTotalFifo = parseFloat(destroyFormatRupiah($('#sub_total_fifo').val()));
 
         if (listStockInventori.length === 0) {
             Swal.fire({
@@ -1229,6 +1311,30 @@
             Swal.fire({
                 icon: 'error',
                 title: 'Kode & Nama Barang Wajib Diisi',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Oke',
+            });
+            return;
+        } else if (isNaN(hargaSatuanFifo)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Harga satuan wajib diisi',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Oke',
+            });
+            return;
+        } else if (isNaN(nilaiTukarFifo)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Nilai tukar wajib diisi',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Oke',
+            });
+            return;
+        } else if (isNaN(subTotalFifo)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Sub total wajib diisi',
                 confirmButtonColor: '#4e73df',
                 confirmButtonText: 'Oke',
             });
@@ -1256,6 +1362,7 @@
 
                         if (!isIDSelected && qtyKeluarFifo != 0 && parseFloat(listStockInventori[i].qty_diterima) != 0) {
                             var keluarFifo = Math.min(qtyKeluarFifo, parseFloat(listStockInventori[i].qty_diterima));
+                            var subTotal = (nilaiTukarFifo * hargaSatuanFifo) * keluarFifo;
 
                             listStockInventori[i].keluar = {
                                 qty_keluar: parseFloat(keluarFifo),
@@ -1264,12 +1371,13 @@
                                 qty_konversi: parseFloat(keluarFifo),
                                 unit_id_konversi: v.unit_id,
                                 unit_name_konversi: v.kode_satuan,
-                                valas_id: 30,
-                                valas_name: "IDR",
-                                nilai_tukar: 1,
-                                harga_satuan: 0,
-                                sub_total: 0,
+                                valas_id: valasIdFifo,
+                                valas_name: valasNameFifo,
+                                nilai_tukar: nilaiTukarFifo,
+                                harga_satuan: hargaSatuanFifo,
+                                sub_total: parseFloat(subTotal).toFixed(2),
                             }
+
                             listStock.push(listStockInventori[i]);
 
                             qtyKeluarFifo = qtyKeluarFifo - keluarFifo;

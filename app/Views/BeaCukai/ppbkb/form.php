@@ -92,7 +92,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly autocomplete="one-time-code" <?= !empty($ppbkb) ? 'disabled=true' : ''; ?> value="<?= !empty($ppbkb) ? $ppbkb['no_ppbkb'] : $noPPBKB; ?>" type="text" class="form-control no_ppbkb" id="no_ppbkb" name="no_ppbkb" placeholder="No. PPBKB">
+                                    <input autocomplete="one-time-code" <?= !empty($ppbkb) ? ($ppbkb['status_posting'] == "1" ? "readonly" : "") : 'readonly' ?> value="<?= !empty($ppbkb) ? $ppbkb['no_ppbkb'] : $noPPBKB; ?>" type="text" class="form-control no_ppbkb" id="no_ppbkb" name="no_ppbkb" placeholder="No. PPBKB">
                                     <label for="floatingInput">Nomor PPBKB</label>
                                 </div>
                                 <div style="<?= !empty($ppbkb) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -576,60 +576,49 @@
                     });
                 } else {
                     // IS VALID
-                    Swal.fire({
-                        icon: 'question',
-                        title: 'Simpan Data ?',
-                        confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        showCancelButton: true,
-                        reverseButtons: true,
-                        confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Kembali',
-                    }).then((result) => {
-                        var id = $('#id').val();
-                        var data = new FormData(document.querySelector(".create-form"));
-                        var url = id == '' ? '<?= base_url("bea-cukai-ppbkb/save"); ?>' : '<?= base_url("bea-cukai-ppbkb/update"); ?>';
-                        data.append('listData', JSON.stringify(listData));
-                        $.ajax({
-                            url: url,
-                            data: data,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                setLoading();
-                            },
-                            complete: function() {
-                                stopLoading()
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                if (response.status) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                        confirmButtonText: 'Ok'
-                                    }).then((result) => {
-                                        if (result.isConfirmed) {
-                                            window.location.href = "<?= base_url("bea-cukai-ppbkb") ?>";
-                                        }
-                                    });
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                        cancelButtonColor: '#d33',
-                                        reverseButtons: true,
-                                        confirmButtonText: 'Oke',
-                                    })
-                                }
+                    var id = $('#id').val();
+                    var data = new FormData(document.querySelector(".create-form"));
+                    var url = id == '' ? '<?= base_url("bea-cukai-ppbkb/save"); ?>' : '<?= base_url("bea-cukai-ppbkb/update"); ?>';
+                    data.append('listData', JSON.stringify(listData));
+                    $.ajax({
+                        url: url,
+                        data: data,
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading()
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            if (response.status) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                    confirmButtonText: 'Ok'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        window.location.href = "<?= base_url("bea-cukai-ppbkb") ?>";
+                                    }
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                    cancelButtonColor: '#d33',
+                                    reverseButtons: true,
+                                    confirmButtonText: 'Oke',
+                                })
+                            }
 
-                            },
-                        });
-                    })
+                        },
+                    });
                 }
 
             }

@@ -296,6 +296,7 @@ class PPBKB extends BaseController
                 'jabatan' => $this->request->getVar('jabatan'),
                 'no_daftar' => $this->request->getVar('no_daftar'),
                 'penerimaan_otomatis' => $this->request->getVar('penerimaan_otomatis'),
+                'no_ppbkb' => $this->request->getVar('no_ppbkb'),
             ]);
 
             // get all id detail
