@@ -102,30 +102,41 @@ class BarangMasterSpesifikasiModel extends Model
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'barang_master_spesifikasi.createdAt'] ?? 'barang_master_spesifikasi.createdAt';
+        $sort = $availableSort[$addCondition['sort'] ?? 'barang_master_spesifikasi.spesifikasi'] ?? 'barang_master_spesifikasi.spesifikasi';
         $sortType = $availableSortType[strtolower($addCondition['sortType'] ?? 'desc')] ?? 'DESC';
 
         $selectQry = "
             barang_master_spesifikasi.id,
             barang_master_spesifikasi.spesifikasi,
+
             account_barang.id as account_barang_id,
             account_barang.ap_id,
             account_barang.ar_id,
             account_barang.pemakaian_id,
             account_barang.kategori_id,
+
             akun_pembelian.no_sub as no_sub_pembelian,
-            akun_pembelian.nama_sub as nama_sub_pembelian,
             akun_penjualan.no_sub as no_sub_penjualan,
-            akun_penjualan.nama_sub as nama_sub_penjualan,
             akun_pemakaian.no_sub as no_sub_pemakaian,
-            akun_pemakaian.nama_sub as nama_sub_pemakaian,
+
+            IFNULL(sab_pembelian.saldo_awal, 0) as saldo_awal_barang_pembelian,
+            IFNULL(sab_penjualan.saldo_awal, 0) as saldo_awal_barang_penjualan,
+            IFNULL(sab_pemakaian.saldo_awal, 0) as saldo_awal_barang_pemakaian
         ";
 
         $dataQry = $this->asObject()->select($selectQry)
             ->join('account_barang', 'account_barang.barang_master_spesifikasi_id = barang_master_spesifikasi.id', 'left')
-            ->join('sub_akuns as akun_pembelian', 'akun_pembelian.id = account_barang.ar_id', 'left')
-            ->join('sub_akuns as akun_penjualan', 'akun_penjualan.id = account_barang.ap_id', 'left')
+
+            // Join akun
+            ->join('sub_akuns as akun_pembelian', 'akun_pembelian.id = account_barang.ap_id', 'left')
+            ->join('sub_akuns as akun_penjualan', 'akun_penjualan.id = account_barang.ar_id', 'left')
             ->join('sub_akuns as akun_pemakaian', 'akun_pemakaian.id = account_barang.pemakaian_id', 'left')
+
+            // Join saldo awal PENTING!
+            ->join('saldo_awal_barang as sab_pembelian', 'sab_pembelian.coa_id = account_barang.ap_id AND sab_pembelian.barang_master_spesifikasi_id = barang_master_spesifikasi.id', 'left')
+            ->join('saldo_awal_barang as sab_penjualan', 'sab_penjualan.coa_id = account_barang.ar_id AND sab_penjualan.barang_master_spesifikasi_id = barang_master_spesifikasi.id', 'left')
+            ->join('saldo_awal_barang as sab_pemakaian', 'sab_pemakaian.coa_id = account_barang.pemakaian_id AND sab_pemakaian.barang_master_spesifikasi_id = barang_master_spesifikasi.id', 'left')
+
             ->where($condition)
             ->groupBy('barang_master_spesifikasi.id');
 
@@ -144,6 +155,39 @@ class BarangMasterSpesifikasiModel extends Model
             $dataQry->groupStart()
                 ->where('account_barang.divisi_id', $addCondition['kode_department'])
                 ->orWhere('account_barang.id', null) // artinya belum punya account
+                ->groupEnd();
+        }
+
+        if (!empty($addCondition['transaksi_date'])) {
+            // var_dump($addCondition['transaksi_date'], $addCondition['company_id'], $addCondition['kode_department'], $addCondition['kode_barang']);
+            $dataQry->groupStart()
+                ->groupStart()
+                ->where('sab_pembelian.tanggal_transaksi', $addCondition['transaksi_date'])
+                ->where('sab_pembelian.company_id', $addCondition['company_id'])
+                ->where('sab_pembelian.divisi_id', $addCondition['kode_department'])
+                ->where('sab_pembelian.barang_master_id', $addCondition['kode_barang'])
+                ->groupEnd()
+                ->orWhere('sab_pembelian.id', null)
+                ->groupEnd();
+
+            $dataQry->groupStart()
+                ->groupStart()
+                ->where('sab_penjualan.tanggal_transaksi', $addCondition['transaksi_date'])
+                ->where('sab_penjualan.company_id', $addCondition['company_id'])
+                ->where('sab_penjualan.divisi_id', $addCondition['kode_department'])
+                ->where('sab_penjualan.barang_master_id', $addCondition['kode_barang'])
+                ->groupEnd()
+                ->orWhere('sab_penjualan.id', null)
+                ->groupEnd();
+
+            $dataQry->groupStart()
+                ->groupStart()
+                ->where('sab_pemakaian.tanggal_transaksi', $addCondition['transaksi_date'])
+                ->where('sab_pemakaian.company_id', $addCondition['company_id'])
+                ->where('sab_pemakaian.divisi_id', $addCondition['kode_department'])
+                ->where('sab_pemakaian.barang_master_id', $addCondition['kode_barang'])
+                ->groupEnd()
+                ->orWhere('sab_pemakaian.id', null)
                 ->groupEnd();
         }
 

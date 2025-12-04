@@ -7,6 +7,7 @@ use App\Models\BarangMasterModel;
 use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\DivisisModel;
 use App\Models\MetadataModel;
+use App\Models\SaldoAwalBarangModel;
 use App\Models\Sub_AkunsModel;
 use App\Models\WarehousesModel;
 
@@ -21,6 +22,7 @@ class insertNilaiBarang extends BaseController
     protected $warehouseModel;
     protected $barangMasterModel;
     protected $barangMasterSpesifikasiModel;
+    protected $saldoAwalBarangModel;
 
     protected $db;
 
@@ -35,6 +37,7 @@ class insertNilaiBarang extends BaseController
         $this->warehouseModel = new WarehousesModel();
         $this->barangMasterModel = new BarangMasterModel();
         $this->barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
+        $this->saldoAwalBarangModel = new SaldoAwalBarangModel();
 
         $this->db = \Config\Database::connect();
     }
@@ -108,6 +111,7 @@ class insertNilaiBarang extends BaseController
             "kode_warehouse"    => $this->request->getVar("kode_warehouse"),
             "type_barang"       => $this->request->getVar('type_barang'),
             "kode_barang"       => $this->request->getVar("kode_barang"),
+            "transaksi_date"    => $this->request->getVar("transaksi_date") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("transaksi_date")))) : date("Y-m-d"),
             "company_id"        => $this->this_company_id,
         ];
 
@@ -129,5 +133,130 @@ class insertNilaiBarang extends BaseController
         ];
 
         return response()->setJSON($data);
+    }
+
+    public function save()
+    {
+        $db = \Config\Database::connect();
+        $db->transBegin(); // === START TRANSACTION ===
+
+        try {
+
+            $companyId = $this->this_company_id;
+            $tanggalTransaksi = $this->request->getVar('tanggal_transaksi')
+                ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal_transaksi"))))
+                : date("Y-m-d");
+
+            $divisiId = $this->request->getVar('divisi_id_saldo_barang');
+            $barangMasterSpesifikasiId = $this->request->getVar('barang_id_saldo_barang');
+            $barangMasterId = $this->barangMasterSpesifikasiModel
+                ->where('id', $barangMasterSpesifikasiId)
+                ->first()['barang_master_id'];
+
+            $akunPembelianId = $this->request->getVar('akun_ap_id_saldo_barang');
+            $saldoPembelian   = $this->request->getVar('saldo_akun_pembelian');
+
+            $akunPenjualanId = $this->request->getVar('akun_ar_id_saldo_barang');
+            $saldoPenjualan   = $this->request->getVar('saldo_akun_penjualan');
+
+            $akunPemakaianId = $this->request->getVar('akun_pemakaian_id_saldo_barang');
+            $saldoPemakaian   = $this->request->getVar('saldo_akun_pemakaian');
+
+            // === INSERT / UPDATE: PEMBELIAN ===
+            $this->_insertOrUpdateSaldo(
+                $companyId,
+                $divisiId,
+                $barangMasterId,
+                $barangMasterSpesifikasiId,
+                $tanggalTransaksi,
+                $akunPembelianId,
+                $saldoPembelian
+            );
+
+            // === INSERT / UPDATE: PENJUALAN ===
+            $this->_insertOrUpdateSaldo(
+                $companyId,
+                $divisiId,
+                $barangMasterId,
+                $barangMasterSpesifikasiId,
+                $tanggalTransaksi,
+                $akunPenjualanId,
+                $saldoPenjualan
+            );
+
+            // === INSERT / UPDATE: PEMAKAIAN ===
+            $this->_insertOrUpdateSaldo(
+                $companyId,
+                $divisiId,
+                $barangMasterId,
+                $barangMasterSpesifikasiId,
+                $tanggalTransaksi,
+                $akunPemakaianId,
+                $saldoPemakaian
+            );
+
+            // === COMMIT ===
+            if ($db->transStatus() === false) {
+                $db->transRollback();
+                return response()->setJSON([
+                    'token' => csrf_hash(),
+                    'status' => false,
+                    'message' => "Gagal menyimpan saldo barang (DB error)"
+                ]);
+            }
+
+            $db->transCommit();
+
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => true,
+                'message' => "Saldo Barang Berhasil Ditambahkan"
+            ]);
+        } catch (\Throwable $th) {
+
+            // === FORCE ROLLBACK JIKA ADA ERROR PHP ===
+            $db->transRollback();
+
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => false,
+                'message' => "Terjadi error: " . $th->getMessage()
+            ]);
+        }
+    }
+
+    private function _insertOrUpdateSaldo(
+        $companyId,
+        $divisiId,
+        $barangMasterId,
+        $barangMasterSpesifikasiId,
+        $tanggalTransaksi,
+        $coaId,
+        $saldo
+    ) {
+        $existing = $this->saldoAwalBarangModel
+            ->where('company_id', $companyId)
+            ->where('divisi_id', $divisiId)
+            ->where('barang_master_spesifikasi_id', $barangMasterSpesifikasiId)
+            ->where('tanggal_transaksi', $tanggalTransaksi)
+            ->where('coa_id', $coaId)
+            ->where('deletedAt', NULL)
+            ->first();
+
+        if ($existing) {
+            return $this->saldoAwalBarangModel->update($existing['id'], [
+                'saldo_awal' => $saldo
+            ]);
+        }
+
+        return $this->saldoAwalBarangModel->insert([
+            'tanggal_transaksi' => $tanggalTransaksi,
+            'company_id'        => $companyId,
+            'divisi_id'         => $divisiId,
+            'barang_master_id'  => $barangMasterId,
+            'barang_master_spesifikasi_id' => $barangMasterSpesifikasiId,
+            'coa_id'            => $coaId,
+            'saldo_awal'        => $saldo,
+        ]);
     }
 }

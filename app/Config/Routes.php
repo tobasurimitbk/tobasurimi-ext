@@ -2332,6 +2332,7 @@ $routes->get('/jurnal/get-divisi', 'Accounting\JurnalUmum\insertNilaiBarang::dro
 $routes->get('/jurnal/get-warehouse', 'Accounting\JurnalUmum\insertNilaiBarang::dropdownWarehouse', ['filter' => 'Auth']);
 $routes->get('/jurnal/get-barang', 'Accounting\JurnalUmum\insertNilaiBarang::dropdownBarang', ['filter' => 'Auth']);
 $routes->get('/jurnal/get-data', 'Accounting\JurnalUmum\insertNilaiBarang::getData', ['filter' => 'Auth']);
+$routes->post('/jurnal/save-nilai-barang', 'Accounting\JurnalUmum\insertNilaiBarang::save', ['filter' => 'Auth']);
 
 // set no bukti
 $routes->get('/no-bukti', 'Accounting\NoBuktiAccounting\NoBukti::index', ['filter' => 'Auth']);
