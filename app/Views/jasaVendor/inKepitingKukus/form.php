@@ -1332,7 +1332,7 @@
         if (e.key === "Enter") {
             let value = $(this).val();
             let result = evaluateExpression(value);
-            $(this).val(greatFormatQty(result)).trigger("input"); // update isi & trigger input biar total ke-refresh
+            $(this).val(format3Decimal(result)).trigger("input"); // update isi & trigger input biar total ke-refresh
         }
     });
 
@@ -1342,7 +1342,7 @@
         $(".qty_kotor").each(function () {
             sum += evaluateExpression($(this).val());
         });
-        $(".total-qty-kotor").text(greatFormatQty(sum));
+        $(".total-qty-kotor").text(format3Decimal(sum));
     });
 
     // Kalkulasi total qty_bersih
