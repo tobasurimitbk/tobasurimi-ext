@@ -532,7 +532,7 @@ class Employee extends BaseController
                 'data' => [
                     'missing_in_machine' => array_values($missingInMachine),
                     'extra_in_machine'   => array_values($extraInMachine),
-                    'need_sync_count'    => count($missingInMachine) + count($extraInMachine)
+                    'need_sync_count'    => count($missingInMachine)
                 ]
             ]);
 
