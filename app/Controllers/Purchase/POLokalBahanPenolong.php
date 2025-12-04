@@ -833,6 +833,7 @@ class POLokalBahanPenolong extends BaseController
         $result = [];
         $sppIdArr = [];
 
+        $divisiId = $this->request->getGet('divisi_id');
         $id = formatter($this->request->getGet("id"), "STR_TO_INT");
         $dataPOLokal = $this->aMPurchaseOrderModel->getNoPenerimaanBarang("LOKAL", $id);
 
@@ -843,7 +844,7 @@ class POLokalBahanPenolong extends BaseController
         if (empty($sppIdArr)) {
             return response()->setJSON(['data' => []]);
         } else {
-            $result = $this->sppModel->whereIn('id', $sppIdArr)->findAll();
+            $result = $this->sppModel->whereIn('id', $sppIdArr)->where('divisi_id', $divisiId)->findAll();
             return response()->setJSON(['data' => $result]);
         }
     }

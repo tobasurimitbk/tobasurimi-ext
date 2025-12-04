@@ -17,7 +17,7 @@ class PPBKBModel extends Model
     protected $allowedFields    = [];
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'createdAt';
     protected $updatedField  = 'updatedAt';
@@ -45,38 +45,21 @@ class PPBKBModel extends Model
     {
         $availableSort = [
             'ppbkb.tanggal' => 'ppbkb.tanggal',
-            'mutasi.divisi_asal_id'           => 'mutasi.divisi_asal_id',
-            'mutasi.warehouse_asal_id'        => 'mutasi.warehouse_asal_id',
-            'mutasi.divisi_tujuan_id'           => 'mutasi.divisi_tujuan_id',
-            'mutasi.warehouse_tujuan_id'        => 'mutasi.warehouse_tujuan_id',
-            'mutasi.no_mutasi'                => 'mutasi.no_mutasi',
-            'ppbkb.no_ppbkb'                  => 'ppbkb.no_ppbkb',
-            'ppbkb.tanggal'                   => 'ppbkb.tanggal',
-            'ppbkb.no_daftar'                   => 'ppbkb.no_daftar',
-            'ppbkb.status_posting'            => 'ppbkb.status_posting',
+            'ppbkb.multiple_mutasi_no' => 'mutasi.multiple_mutasi_no',
+            'ppbkb.no_ppbkb' => 'ppbkb.no_ppbkb',
+            'ppbkb.tanggal' => 'ppbkb.tanggal',
+            'ppbkb.status_posting' => 'ppbkb.status_posting',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'ppbkb.createdAt';
+        $sort = $availableSort[$addCondition['sort'] ?? 'ppbkb.tanggal'] ?? 'ppbkb.tanggal';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "ppbkb.*,
-            tb_divisi_asal.divisi AS divisi_asal,
-            tb_divisi_tujuan.divisi AS divisi_tujuan,
-            tb_warehouse_asal.warehouse_name AS warehouse_asal,
-            tb_warehouse_tujuan.warehouse_name AS warehouse_tujuan,
-            mutasi.no_mutasi,
-            ppbkb.no_ppbkb,
-            ppbkb.no_daftar";
+        $selectQry = "ppbkb.*";
 
         $bcDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->join('mutasi', 'mutasi.id = ppbkb.mutasi_id', 'left')
-            ->join('divisis tb_divisi_asal', 'tb_divisi_asal.id = mutasi.divisi_asal_id', 'left')
-            ->join('divisis tb_divisi_tujuan', 'tb_divisi_tujuan.id = mutasi.divisi_tujuan_id', 'left')
-            ->join('warehouses tb_warehouse_asal', 'tb_warehouse_asal.id = mutasi.warehouse_asal_id', 'left')
-            ->join('warehouses tb_warehouse_tujuan', 'tb_warehouse_tujuan.id = mutasi.warehouse_tujuan_id', 'left')
             ->orderBy($sort, $sortType);
 
         $totalData = $bcDataQry->countAllResults(false);
@@ -232,25 +215,70 @@ class PPBKBModel extends Model
     public function getDetail($id)
     {
 
-        $selectQry = "ppbkb.*,
-        mutasi.divisi_asal_id,
-        mutasi.divisi_tujuan_id,
-        mutasi.divisi_tujuan_id,
-        mutasi.warehouse_tujuan_id,
-        mutasi.no_mutasi,
-        divisis.divisi AS divisi_asal_name,
-        warehouses.warehouse_name AS warehouse_asal_name";
+        $selectQry = "ppbkb.*";
 
         $result = $this->asArray()
             ->select($selectQry)
-            ->join('mutasi', 'mutasi.id = ppbkb.mutasi_id', 'left')
-            ->join('divisis', 'divisis.id = mutasi.divisi_asal_id', 'left')
-            ->join('warehouses', 'warehouses.id = mutasi.warehouse_asal_id', 'left')
             ->where('ppbkb.id', $id)
             ->first();
 
         return $result;
     }
+
+    public function getdropdownMutasi($companyId)
+    {
+        $mutasiModel = new MutasiModel();
+
+        $ppbkbList = $this->where('company_id', $companyId)->where('deletedAt', null)->findAll();
+        $mutasiUsedArr = [];
+
+        foreach ($ppbkbList as $p) {
+            $mutasiArr = json_decode($p['multiple_mutasi_id']);
+            foreach ($mutasiArr as $m) {
+                array_push($mutasiUsedArr, $m);
+            }
+        }
+
+        $mutasiQry = $mutasiModel->where('tipe_mutasi', "PPBKB");
+        $mutasiQry->where('company_id', $companyId);
+        if (count($mutasiUsedArr) != 0) {
+            $mutasiQry->whereNotIn('id', $mutasiUsedArr);
+        }
+
+        $mutasiList = $mutasiQry->where('deletedAt', null)->findAll();
+        $dataResult = array();
+        foreach ($mutasiList as $m) {
+            array_push($dataResult, [
+                'id' => $m['id'],
+                'no_mutasi' => $m['no_mutasi']
+            ]);
+        }
+
+        return $dataResult;
+    }
+
+    public function getMapPpbkb($companyId)
+    {
+        $dataQry = $this->asArray()
+            ->where('company_id', $companyId)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        $dataResult = [];
+
+        foreach ($dataQry as $d) {
+            $mutasiList = json_decode($d['multiple_mutasi_id'], true);
+            if (!is_array($mutasiList)) {
+                continue;
+            }
+            foreach ($mutasiList as $m) {
+                $dataResult[$m] = $d['no_ppbkb'];
+            }
+        }
+
+        return $dataResult;
+    }
+
 
     public function getNo($companyId)
     {

@@ -43,48 +43,54 @@ class StockFisik extends BaseController
         ];
 
         $condition = [
-            "stock_revamp.company_id"  => $this->this_company_id,
-            "stock_revamp.deletedAt" => null,
+            "barang_master.company_id"  => $this->this_company_id,
+            "barang_master.deletedAt" => null,
         ];
 
         $addCondition = [
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
             "company_id" => $this->this_company_id,
-            "search" => $this->request->getVar('search')
+            "search" => trim($this->request->getVar('search'))
         ];
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        $beaCukaiData = $this->stockRevampModel->allStockFisik(
+        $stockFisikData = $this->stockRevampModel->allStockFisik(
             $condition,
             $addCondition,
             $limit,
             $offset
         );
 
-        $dataBeaCukai = [];
+        $dataPemasukkanTotal = $this->getTotalPemasukkan();
+        $dataStockFisik = [];
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
-
-        foreach ($beaCukaiData['data'] as $data) {
-            array_push($dataBeaCukai, [
+        foreach ($stockFisikData['data'] as $data) {
+            $totalQty = 0;
+            $kodeSatuan = "";
+            if (isset($dataPemasukkanTotal[$data['id']])) {
+                $totalQty = $dataPemasukkanTotal[$data['id']]['qty_diterima'];
+                $kodeSatuan =  $dataPemasukkanTotal[$data['id']]['kode_satuan'];
+            }
+            array_push($dataStockFisik, [
                 "no"                    => $no++,
-                "barang_master_id"      => encrypt($data['barang_master_id']),
+                "id"                    => encrypt($data['id']),
                 "parent_name"           => $data['parent_name'],
                 "kode_barang"           => $data['kode_barang'],
                 "barang_name"           => $data['barang_name'],
-                "total_qty_bersih"            => (float)$data['total_qty_bersih'],
-                "kode_satuan"           => $data['kode_satuan']
+                "total_qty"             => $totalQty,
+                "kode_satuan"           => $kodeSatuan
             ]);
         }
 
         $data = [
             "draw"              => intval($this->request->getGet("draw")),
-            "recordsTotal"      => $beaCukaiData['totalData'],
-            "recordsFiltered"   => $beaCukaiData['totalFilteredData'],
-            "data"              => $dataBeaCukai,
+            "recordsTotal"      => $stockFisikData['totalData'],
+            "recordsFiltered"   => $stockFisikData['totalFilteredData'],
+            "data"              => $dataStockFisik,
             "payload"           => $payload
         ];
 
@@ -97,8 +103,8 @@ class StockFisik extends BaseController
         $offset = 0;
 
         $condition = [
-            "stock_revamp.company_id"  => $this->this_company_id,
-            "stock_revamp.deletedAt" => null,
+            "barang_master.company_id"  => $this->this_company_id,
+            "barang_master.deletedAt" => null,
         ];
 
         $addCondition = [
@@ -113,6 +119,8 @@ class StockFisik extends BaseController
             $limit,
             $offset
         );
+
+        $dataPemasukkanTotal = $this->getTotalPemasukkan();
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -129,12 +137,19 @@ class StockFisik extends BaseController
         $no = 1;
 
         foreach ($dataQry['data'] as $d) {
+            $totalQty = 0;
+            $kodeSatuan = "";
+            if (isset($dataPemasukkanTotal[$d['id']])) {
+                $totalQty = $dataPemasukkanTotal[$d['id']]['qty_diterima'];
+                $kodeSatuan =  $dataPemasukkanTotal[$d['id']]['kode_satuan'];
+            }
+
             $sheet->setCellValue('A' . $row, $no++);
             $sheet->setCellValue('B' . $row, $d['parent_name']);
             $sheet->setCellValue('C' . $row, $d['kode_barang']);
-            $sheet->setCellValue('D' . $row, $d['barang_name']);
-            $sheet->setCellValue('E' . $row, (float)$d['total_qty_bersih']);
-            $sheet->setCellValue('F' . $row, $d['kode_satuan']);
+            $sheet->setCellValue('D' . $row, trim($d['barang_name']));
+            $sheet->setCellValue('E' . $row, (float)$totalQty);
+            $sheet->setCellValue('F' . $row, $kodeSatuan);
             $row++;
         }
 
@@ -177,26 +192,8 @@ class StockFisik extends BaseController
             ->where('barang_master.id', $id)
             ->first();
 
-        $condition = [
-            "stock_revamp.company_id"  => $this->this_company_id,
-            "stock_revamp.barang_master_id" => $id,
-        ];
-
-        $stock = $this->stockRevampModel->allStockFisik(
-            $condition,
-            [],
-            1,
-            0
-        );
-
-        if (count($stock['data']) == 0) {
-            var_dump("data stock tidak ditemukan");
-            die;
-        }
-
         $data = [
             'barangMaster' => $barangMaster,
-            'stock' => $stock['data'][0]
         ];
 
         return view('BeaCukai/stockFisik/detail', $data);
@@ -217,10 +214,11 @@ class StockFisik extends BaseController
             'company_id'   => $this->this_company_id,
             'barang_master_id'  => $barangMasterId,
             'search'       => $search,
-            'bc_id' => ''
+            'dateStartLpb' => "2025-09-01",
+            'dateEndLpb' => "2100-12-01",
         ];
 
-        $dataPemasukkan = $this->bcPurchaseOrderModel->getListLapPemasukanBarang(
+        $dataPemasukkan = $this->bcPurchaseOrderModel->getFisikPemasukkanBarang(
             $condition,
             $orderColumnIndex,
             $orderDir,
@@ -228,9 +226,33 @@ class StockFisik extends BaseController
             $start
         );
 
+        if (empty($condition['search'])) {
+            $dataTotal =  $this->bcPurchaseOrderModel->getFisikPemasukkanBarang(
+                $condition,
+                $orderColumnIndex,
+                $orderDir,
+                100000000,
+                0
+            );
+        } else {
+            $dataTotal =  $this->bcPurchaseOrderModel->getFisikPemasukkanBarang(
+                $condition,
+                $orderColumnIndex,
+                $orderDir,
+                $length,
+                $start
+            );
+        }
+
+        $totalMasuk = 0;
+        foreach ($dataTotal['data'] as $d) {
+            $totalMasuk += (float)$d['qty_diterima'];
+        }
+
         $dataResult = [];
         $no = $start + 1;
         foreach ($dataPemasukkan['data'] as $d) {
+
             $dataResult[] = [
                 "no" => $no++,
                 "divisi" => $d['divisi'],
@@ -257,6 +279,40 @@ class StockFisik extends BaseController
             'recordsTotal' => intval($dataPemasukkan['totalData'] ?? 0),
             'recordsFiltered' => intval($dataPemasukkan['totalFilteredData'] ?? 0),
             'data' => $dataResult,
+            'footerTotals' => $totalMasuk
         ]);
+    }
+
+    private function getTotalPemasukkan()
+    {
+        $dataPemasukkanMap = array();
+
+        $condition = [
+            'company_id'   => $this->this_company_id,
+            'dateStartLpb' => "2025-09-01",
+            'dateEndLpb' => "2100-12-01",
+            'search' => ''
+        ];
+
+        $dataPemasukkan = $this->bcPurchaseOrderModel->getFisikPemasukkanBarang(
+            $condition,
+            0,
+            "desc",
+            1000000000,
+            0
+        );
+
+        foreach ($dataPemasukkan['data'] as $d) {
+            $barangId = $d['barang_id'];
+            if (!isset($dataPemasukkanMap[$barangId])) {
+                $dataPemasukkanMap[$barangId] = [
+                    'qty_diterima' => 0,
+                    'kode_satuan' => $d['kode_satuan']
+                ];
+            }
+            $dataPemasukkanMap[$barangId]['qty_diterima'] += floatval($d['qty_diterima']);
+        }
+
+        return $dataPemasukkanMap;
     }
 }

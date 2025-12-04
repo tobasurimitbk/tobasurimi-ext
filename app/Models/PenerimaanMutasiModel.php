@@ -53,13 +53,16 @@ class PenerimaanMutasiModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'penerimaan_mutasi_no'] ?? 'penerimaan_mutasi_no';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "penerimaan_mutasi.*,
-        divisis.divisi AS divisi,
+        $selectQry = "
+            penerimaan_mutasi.*,
+            divisis.divisi AS divisi,
+            ppbkb.no_ppbkb
         ";
 
         $dataQry = $this->asObject()
             ->select($selectQry)
             ->join('divisis', 'divisis.id = penerimaan_mutasi.divisi_id', 'left')
+            ->join('ppbkb', 'ppbkb.id = penerimaan_mutasi.ppbkb_id', 'left')
             ->where($condition)
             ->orderBy($sort, $sortType);
 
@@ -74,14 +77,14 @@ class PenerimaanMutasiModel extends Model
         }
 
         if ($addCondition['dateStart']) {
-            $dataQry->where('tanggal >=',  $addCondition['dateStart']);
+            $dataQry->where('penerimaan_mutasi.tanggal >=',  $addCondition['dateStart']);
         }
         if ($addCondition['dateEnd']) {
-            $dataQry->where('tanggal <=', $addCondition['dateEnd']);
+            $dataQry->where('penerimaan_mutasi.tanggal <=', $addCondition['dateEnd']);
         }
 
         if ($addCondition['search']) {
-            $dataQry->like('multiple_no_mutasi', $addCondition['search'])
+            $dataQry->like('penerimaan_mutasi.multiple_no_mutasi', $addCondition['search'])
                 ->orLike('divisis.divisi', $addCondition['search'])
                 ->orLike('penerimaan_mutasi_no', $addCondition['search']);
         }
@@ -585,9 +588,16 @@ class PenerimaanMutasiModel extends Model
         $penerimaanMutasiDetailModel = new PenerimaanMutasiDetailModel();
 
         $penerimaanMutasi = $this->asArray()->where('id', $id)->first();
+        $selectQry = "
+            penerimaan_mutasi_detail.*,
+            mutasi.divisi_tujuan_id,
+            mutasi.warehouse_tujuan_id,
+            mutasi_detail.stock_detail_id
+        ";
         $penerimaanMutasiDetail = $penerimaanMutasiDetailModel
-            ->select('penerimaan_mutasi_detail.*,mutasi_detail.stock_detail_id')
+            ->select($selectQry)
             ->join('mutasi_detail', 'mutasi_detail.id = penerimaan_mutasi_detail.mutasi_detail_id', 'left')
+            ->join('mutasi', 'mutasi_detail.mutasi_id = mutasi.id', 'left')
             ->where('penerimaan_mutasi_detail.penerimaan_mutasi_id', $id)
             ->where('penerimaan_mutasi_detail.deletedAt', null)
             ->findAll();
@@ -601,8 +611,8 @@ class PenerimaanMutasiModel extends Model
                 'barang_master_id'  => $stock['barang_master_id'],
                 'spesifikasi_id'    => $stock['spesifikasi_id'],
                 'unit_id'           => $stock['unit_id'],
-                'divisi_id'         => $stock['divisi_id'],
-                'warehouse_id'      => $stock['warehouse_id'],
+                'divisi_id'         => $p['divisi_tujuan_id'],
+                'warehouse_id'      => $p['warehouse_tujuan_id'],
                 'qty_bersih'        => $p['qty'],
                 'qty_diterima'      => $p['qty'],
                 'bc_id'             => $penerimaanMutasi['tipe_mutasi'] == "LOKAL" ? 0 : 1426,

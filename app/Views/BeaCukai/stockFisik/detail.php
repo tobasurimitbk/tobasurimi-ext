@@ -32,16 +32,16 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" value="<?= $barangMaster['barang_name'] ?>" type="text" class="form-control" placeholder="">
+                        <input disabled autocomplete="one-time-code" value="<?= trim($barangMaster['barang_name']) ?>" type="text" class="form-control" placeholder="">
                         <label for="floatingInput">Barang</label>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <!-- <div class="col-md-4">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" value="<?= number_format($stock['total_qty_bersih'], 2) ?>" type="text" class="form-control" placeholder="">
-                        <label for="floatingInput">Qty (<?= $stock['kode_satuan'] ?>)</label>
+                        <input disabled autocomplete="one-time-code" value="" type="text" class="form-control" placeholder="">
+                        <label for="floatingInput">Qty </label>
                     </div>
-                </div>
+                </div> -->
             </div>
             <div class="row">
                 <div class="col mb-3">
@@ -87,6 +87,13 @@
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table">
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="13" class="text-right">TOTAL</th>
+                                <th id="total_qty_masuk"></th>
+                                <th colspan="3"></th>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -110,7 +117,7 @@
             url: "<?= base_url('stock-fisik/all-masuk') ?>",
             type: "GET",
             data: function(d) {
-                d.search = $('#search').val();
+                d.search = $('#search_masuk').val();
                 d.barang_master_id = "<?= ($barangMaster['id']) ?>"
             }
         },
@@ -196,7 +203,18 @@
                 previous: '<i class="fa fa-angle-left"></i>',
                 next: '<i class="fa fa-angle-right"></i>'
             }
-        }
+        },
+        footerCallback: function(row, data, start, end, display) {
+            const api = this.api();
+            const total = api.ajax.json().footerTotals || 0;
+
+            if (total) {
+                $('#total_qty_masuk').html(greatFormatRupiah(total.toFixed(2)));
+            } else {
+                $('#total_qty_masuk').html(greatFormatRupiah(0));
+
+            }
+        },
     });
 
     $('#search_masuk').keyup(function(e) {

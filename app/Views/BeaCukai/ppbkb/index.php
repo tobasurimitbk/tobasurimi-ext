@@ -68,17 +68,12 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th style="text-align: center;">No</th>
-                                <th onclick="changeSort('ppbkb.tanggal')">Tgl</th>
-                                <th onclick="changeSort('mutasi.divisi_asal_id')">Dept Asal</th>
-                                <th onclick="changeSort('mutasi.warehouse_asal_id')">Warehouse Asal</th>
-                                <th onclick="changeSort('mutasi.divisi_tujuan_id')">Dept Tujuan</th>
-                                <th onclick="changeSort('mutasi.warehouse_tujuan_id')">Warehouse Tujuan</th>
-                                <th onclick="changeSort('mutasi.no_mutasi')">No Mutasi</th>
+                                <th style="text-align: center; width:10px;">No</th>
+                                <th onclick="changeSort('ppbkb.tanggal')" style="width: 100px;">Tgl</th>
+                                <th onclick="changeSort('ppbkb.multiple_mutasi_id')">No Mutasi</th>
                                 <th onclick="changeSort('ppbkb.no_ppbkb')">No PPBKB</th>
-                                <th onclick="changeSort('ppbkb.no_daftar')">No Daftar</th>
-                                <th onclick="changeSort('ppbkb.status_posting')">Status</th>
-                                <th style="text-align: center;">Action</th>
+                                <th onclick="changeSort('ppbkb.status_posting')" style="width: 80px;">Status</th>
+                                <th style="text-align: center; width:120px;">Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table">
@@ -137,25 +132,10 @@
                 data: "tanggal",
             },
             {
-                data: "divisi_asal",
-            },
-            {
-                data: "warehouse_asal",
-            },
-            {
-                data: "divisi_tujuan",
-            },
-            {
-                data: "warehouse_tujuan",
-            },
-            {
-                data: "no_mutasi",
+                data: "multiple_mutasi_no",
             },
             {
                 data: "no_ppbkb",
-            },
-            {
-                data: "no_daftar",
             },
             {
                 data: "status_posting",
@@ -379,6 +359,15 @@
                 })
             }
         })
+    }
+
+    function changeSort(val) {
+        if (sort !== val) {
+            sortType = "asc";
+            sort = val;
+        } else {
+            sortType = sortType === "asc" ? "desc" : "asc";
+        }
     }
 
     function printAction(id) {

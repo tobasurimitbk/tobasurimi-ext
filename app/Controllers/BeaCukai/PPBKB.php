@@ -15,6 +15,7 @@ use App\Models\PenerimaanMutasiModel;
 use App\Models\PengusahaTPBModel;
 use App\Models\PPBKBDetailModel;
 use App\Models\PPBKBModel;
+use App\Models\PPBKBMutasiModel;
 use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
 use App\Models\StockModel;
@@ -47,6 +48,7 @@ class PPBKB extends BaseController
     protected $penerimaanMutasiDetailModel;
     protected $metaDataModel;
     protected $dompdf;
+    protected $ppbkbMutasiModel;
 
     public function __construct()
     {
@@ -69,7 +71,7 @@ class PPBKB extends BaseController
         $this->penerimaanMutasiDetailModel = new PenerimaanMutasiDetailModel();
         $this->metaDataModel = new MetadataModel();
         $this->dompdf = new Dompdf();
-
+        $this->ppbkbMutasiModel = new PPBKBMutasiModel();
         $this->akunCeisa = $this->ceisaSettingModel->where('company_id', $this->this_company_id)->first();
     }
 
@@ -126,13 +128,8 @@ class PPBKB extends BaseController
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
                 "tanggal"               => date('d/m/Y', strtotime($data->tanggal)),
-                "divisi_asal"      => $data->divisi_asal,
-                "warehouse_asal"    => $data->warehouse_asal,
-                "divisi_tujuan"   => $data->divisi_tujuan,
-                "warehouse_tujuan" => $data->warehouse_tujuan,
-                "no_mutasi"             => $data->no_mutasi,
+                "multiple_mutasi_no"    => str_replace(['"', ']', '['], " ",  $data->multiple_mutasi_no),
                 "no_ppbkb"              => $data->no_ppbkb,
-                "no_daftar" => $data->no_daftar,
                 "status_posting"        => $data->status_posting,
             ]);
         }
@@ -150,12 +147,18 @@ class PPBKB extends BaseController
 
     public function create()
     {
+        $hsCode = $this->hsCodeModel->where('deletedAt', null)->findAll();
+        $noPpbkb = $this->ppbkbModel->getNo($this->this_company_id);
+        $akunCeisa = $this->akunCeisa;
+        $pengusahaTPB = $this->pengusahaTPBModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll();
+        $mutasi = $this->ppbkbModel->getdropdownMutasi($this->this_company_id);
+
         $data = [
-            'hsCode' => $this->hsCodeModel->where('deletedAt', null)->findAll(),
-            'akunCeisa' => $this->akunCeisa,
-            'noPPBKB' => $this->ppbkbModel->getNo($this->this_company_id),
-            'pengusahaTPB' => $this->pengusahaTPBModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll(),
-            'divisi' => $this->divisiModel->getDivisiAccess(),
+            'hsCode' => $hsCode,
+            'akunCeisa' => $akunCeisa,
+            'noPPBKB' => $noPpbkb,
+            'pengusahaTPB' => $pengusahaTPB,
+            'mutasi' => $mutasi
         ];
 
         return view('BeaCukai/ppbkb/form', $data);
@@ -170,14 +173,17 @@ class PPBKB extends BaseController
             return redirect()->to('bea-cukai-ppbkb');
         }
 
+        $hsCode = $this->hsCodeModel->where('deletedAt', null)->findAll();
+        $akunCeisa = $this->akunCeisa;
+        $pengusahaTPB = $this->pengusahaTPBModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll();
+        $mutasi = $this->mutasiModel->whereIn('id', json_decode($ppbkb['multiple_mutasi_id']))->where('deletedAt', null)->findAll();
+
         $data = [
-            'hsCode' => $this->hsCodeModel->where('deletedAt', null)->findAll(),
-            'akunCeisa' => $this->akunCeisa,
-            'pengusahaTPB' => $this->pengusahaTPBModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll(),
-            'divisi' => $this->divisiModel->getDivisiAccess(),
+            'hsCode' => $hsCode,
+            'akunCeisa' => $akunCeisa,
+            'pengusahaTPB' => $pengusahaTPB,
             'ppbkb' => $ppbkb,
-            'warehouseTujuan' => $this->warehouseModel->find($ppbkb['warehouse_tujuan_id']),
-            'divisiTujuan' => $this->divisiModel->find($ppbkb['divisi_tujuan_id'])
+            'mutasi' => $mutasi
         ];
 
         return view('BeaCukai/ppbkb/form', $data);
@@ -193,6 +199,15 @@ class PPBKB extends BaseController
         $db = \Config\Database::connect();
         try {
             $db->transBegin();
+            $multipleMutasiIdArr = $this->request->getVar('multiple_mutasi_id');
+
+            if (empty($multipleMutasiIdArr) || count($multipleMutasiIdArr) == 0) {
+                return response()->setJSON([
+                    'status' => false,
+                    'token' => csrf_hash(),
+                    'message' => "Pilih nomor mutasi terlebih dahulu"
+                ]);
+            }
 
             $first = $this->ppbkbModel
                 ->where('company_id', $this->this_company_id)
@@ -207,9 +222,15 @@ class PPBKB extends BaseController
                 ]);
             }
 
+            $multipleMutasiNo = $this->mutasiModel->getNoMutasi(
+                $multipleMutasiIdArr
+            );
+            $multipleMutasiId = "[" . implode(",", $multipleMutasiIdArr) . "]";
+
             $id = $this->ppbkbModel->insert([
                 'company_id' => $this->this_company_id,
-                'mutasi_id' => $this->request->getVar('mutasi_id'),
+                'multiple_mutasi_id' => $multipleMutasiId,
+                'multiple_mutasi_no' => $multipleMutasiNo,
                 'no_ppbkb' => $this->request->getVar('no_ppbkb'),
                 'npwp' => $this->request->getVar('npwp'),
                 'nama_perusahaan' => $this->request->getVar('nama_perusahaan'),
@@ -224,6 +245,13 @@ class PPBKB extends BaseController
                 'no_daftar' => $this->request->getVar('no_daftar'),
                 'penerimaan_otomatis' => $this->request->getVar('penerimaan_otomatis'),
             ]);
+
+            foreach ($multipleMutasiIdArr as $m) {
+                $this->ppbkbMutasiModel->insert([
+                    'mutasi_id' => $m,
+                    'ppbkb_id' => $id
+                ]);
+            }
 
             foreach (json_decode($_POST['listData']) as $d) {
                 $this->ppbkbDetailModel->insert([
@@ -268,6 +296,7 @@ class PPBKB extends BaseController
                 'jabatan' => $this->request->getVar('jabatan'),
                 'no_daftar' => $this->request->getVar('no_daftar'),
                 'penerimaan_otomatis' => $this->request->getVar('penerimaan_otomatis'),
+                'no_ppbkb' => $this->request->getVar('no_ppbkb'),
             ]);
 
             // get all id detail
@@ -332,6 +361,7 @@ class PPBKB extends BaseController
         $id = decrypt($this->request->getVar('id'));
         $this->ppbkbModel->delete($id);
         $this->ppbkbDetailModel->where('ppbkb_id', $id)->delete();
+        $this->ppbkbMutasiModel->where('ppbkb_id', $id)->delete(null, true);
 
         return response()->setJSON([
             'token' => csrf_hash(),
@@ -377,38 +407,41 @@ class PPBKB extends BaseController
     private function terimaOtomatis($ppbkbId, $db)
     {
         $ppbkb = $this->ppbkbModel->where('id', $ppbkbId)->first();
-        $mutasi = $this->mutasiModel->where('id', $ppbkb['mutasi_id'])->where('deletedAt', null)->first();
-        $mutasiDetail = $this->mutasiDetailModel->where('mutasi_id', $mutasi['id'])->where('deletedAt', null)->findAll();
-        $penerimaanMutasiNo = $this->get_no_str(
-            $ppbkb['tanggal'],
-            "PPBKB"
-        );
+        foreach (json_decode($ppbkb['multiple_mutasi_id']) as $m) {
+            $mutasi = $this->mutasiModel->where('id', $m)->where('deletedAt', null)->first();
+            $mutasiDetail = $this->mutasiDetailModel->where('mutasi_id', $m)->where('deletedAt', null)->findAll();
 
-        $id = $this->penerimaanMutasiModel->insert([
-            'company_id' => $this->this_company_id,
-            'divisi_id' => $mutasi['divisi_tujuan_id'],
-            'tipe_mutasi' => "PPBKB",
-            'penerimaan_mutasi_no' => $penerimaanMutasiNo,
-            'multiple_mutasi_id' => "[$mutasi[id]]",
-            'multiple_no_mutasi' => "[" . $mutasi['no_mutasi'] . "]",
-            'tanggal' =>  $ppbkb['tanggal'],
-            'keterangan' => null,
-            'status_posting' => '1',
-            'createdBy' => $this->this_user_id,
-            'ppbkb_id' => $ppbkb['id']
-        ]);
+            $penerimaanMutasiNo = $this->get_no_str(
+                $ppbkb['tanggal'],
+                "PPBKB"
+            );
 
-        foreach ($mutasiDetail as $m) {
-            $this->penerimaanMutasiDetailModel->insert([
-                'penerimaan_mutasi_id' => $id,
-                'mutasi_id' => $m['mutasi_id'],
-                'mutasi_detail_id' => $m['id'],
-                'stock_detail_id' => null,
-                'qty' => $m['qty_konversi']
+            $id = $this->penerimaanMutasiModel->insert([
+                'company_id' => $this->this_company_id,
+                'divisi_id' => $mutasi['divisi_tujuan_id'],
+                'tipe_mutasi' => "PPBKB",
+                'penerimaan_mutasi_no' => $penerimaanMutasiNo,
+                'multiple_mutasi_id' => "[$mutasi[id]]",
+                'multiple_no_mutasi' => '[' . $mutasi['no_mutasi'] . ']',
+                'tanggal' =>  $ppbkb['tanggal'],
+                'keterangan' => null,
+                'status_posting' => '1',
+                'createdBy' => $this->this_user_id,
+                'ppbkb_id' => $ppbkb['id']
             ]);
-        }
 
-        $this->penerimaanMutasiModel->posting($id, $db);
+            foreach ($mutasiDetail as $m) {
+                $this->penerimaanMutasiDetailModel->insert([
+                    'penerimaan_mutasi_id' => $id,
+                    'mutasi_id' => $m['mutasi_id'],
+                    'mutasi_detail_id' => $m['id'],
+                    'stock_detail_id' => null,
+                    'qty' => $m['qty_konversi']
+                ]);
+            }
+
+            $this->penerimaanMutasiModel->posting($id, $db);
+        }
 
         return true;
         // INSERT KEDALAM STOK TODO
@@ -440,7 +473,7 @@ class PPBKB extends BaseController
         }
 
         $detailBarang = $this->mutasiDetailModel->getDetail(
-            $ppbkb['mutasi_id']
+            json_decode($ppbkb['multiple_mutasi_id'])
         );
 
         $data = [
@@ -456,9 +489,19 @@ class PPBKB extends BaseController
 
     public function getListMutasiDetail()
     {
-        $mutasiId = $this->request->getVar('mutasi_id');
+        $mutasiId = $this->request->getVar('multiple_mutasi_id');
+
+        if (empty($mutasiId)) {
+            return response()->setJSON([
+                'status' => true,
+                'token' => csrf_hash(),
+                'data' => [],
+            ]);
+        }
+
+        $mutasiIdArr = json_decode($mutasiId);
         $dataResultDetail = $this->mutasiDetailModel->getDetail(
-            $mutasiId
+            $mutasiIdArr
         );
 
         return response()->setJSON([

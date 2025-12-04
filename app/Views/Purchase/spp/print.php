@@ -119,7 +119,7 @@
                         <tr>
                             <td class="table-border"><b class="table-font-size"><?= $detail->no ?></b></td>
                             <td class="table-border"><b class="table-font-size"><?= $detail->kode_barang ?></b></td>
-                            <td class="table-border"><b class="table-font-size"><?= $detail->nama_barang ?></b></td>
+                            <td class="table-border"><b class="table-font-size"><?= $detail->barang_name . " " . $detail->spesifikasi ?></b></td>
                             <td class="table-border"><b class="table-font-size"><?= $detail->qty . " " . $detail->kode_satuan ?></b></td>
                             <td class="table-border"><b class="table-font-size"><?= $detail->note ?></b></td>
                             <td class="table-border"></td>
