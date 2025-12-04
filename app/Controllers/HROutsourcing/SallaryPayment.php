@@ -8,6 +8,8 @@ use App\Models\DivisisModel;
 use App\Models\HROutsourcingCompanyModel;
 use App\Models\HROutsourcingEmployeeModel;
 use App\Models\HROutsourcingSallaryPaymentModel;
+use Exception;
+use mysqli;
 
 class SallaryPayment extends BaseController
 {
@@ -493,26 +495,102 @@ class SallaryPayment extends BaseController
             ]);
         }
 
-        // ==== STEP 2: Request ke scale system ====
-        $url = "http://{$deptIp}:8001/api/local-data?company_id={$companyId}&tanggal={$tanggal}";
-
         try {
-            $client = \Config\Services::curlrequest([
-                'timeout' => 10,
-            ]);
+            $mysqli = new mysqli($deptIp, 'root', '', 'scale', 3306);
+            
+            if ($mysqli->connect_error) {
+                throw new Exception('Connect Error: ' . $mysqli->connect_error);
+            }
 
-            $response = $client->get($url);
-            $json = json_decode($response->getBody(), true);
+            // **QUERY YANG DIPERBAIKI:**
+            $sql = "
+                SELECT 
+                    sd.id,
+                    sd.employee_id,
+                    COALESCE(emp.nama, 'Tidak Dikenal') as employee_name,
+                    COALESCE(emp.badge, 'Tidak Ada Badge') as employee_badge,
+                    sd.spesifikasi_id,
+                    brg.name as item_name,
+                    brg.harga as item_price, 
+                    brg.id as barang_id, 
+                    sd.weight,
+                    sd.net_weight,
+                    sd.scale_id,
+                    sd.scanner_id,
+                    sd.tray_id,
+                    COALESCE(sd.tray_weight, 0) as tray_weight,
+                    sd.createdAt,
+                    sd.updatedAt
+                FROM scale_data sd
+                JOIN hr_outsourcing_employee emp ON sd.employee_id = emp.id
+                JOIN master_barang_sortir brg ON sd.spesifikasi_id = brg.id
+                WHERE emp.company_id = ? AND DATE(sd.createdAt) = ?
+                ORDER BY sd.createdAt DESC
+            ";
+            
+            $stmt = $mysqli->prepare($sql);
+            if (!$stmt) {
+                throw new Exception('Prepare failed: ' . $mysqli->error);
+            }
+            
+            $stmt->bind_param('ss', $companyId, $tanggal);
+            
+            if (!$stmt->execute()) {
+                throw new Exception('Execute failed: ' . $stmt->error);
+            }
+            
+            $result = $stmt->get_result();
+            $results = $result->fetch_all(MYSQLI_ASSOC);
+            
+            // **VALIDASI DATA SEBELUM DIPROSES:**
+            $processedResults = [];
+            foreach ($results as $item) {
+                // Debug log untuk memeriksa data harga
+                error_log("Item: {$item['item_name']}, Harga: {$item['item_price']}");
+                
+                $processedResults[] = [
+                    'id' => $item['id'],
+                    'employee_id' => $item['employee_id'] ?? 'Tidak Dikenal',
+                    'employee_name' => $item['employee_name'] ?? 'Tidak Dikenal',
+                    'employee_badge' => $item['employee_badge'] ?? 'Tidak Ada Badge',
+                    'spesifikasi_id' => $item['spesifikasi_id'] ?? 'Tidak Dikenal',
+                    'item_name' => $item['item_name'] ?? 'Barang Tidak Dikenal',
+                    'item_price' => $item['item_price'],
+                    'weight' => floatval($item['weight'] ?? 0),
+                    'net_weight' => floatval($item['net_weight'] ?? 0),
+                    'scale_id' => $item['scale_id'] ?? 'Tidak Dikenal',
+                    'scanner_id' => $item['scanner_id'] ?? 'Tidak Dikenal',
+                    'tray_id' => $item['tray_id'] ?? '',
+                    'tray_weight' => floatval($item['tray_weight'] ?? 0),
+                    'tray_name' => 'Tidak Ada Nampan',
+                    'created_at' => $item['createdAt'],
+                    'updated_at' => $item['updatedAt']
+                ];
+            }
+            
+            $stmt->close();
+            $mysqli->close();
 
             return $this->response->setJSON([
                 'success' => true,
-                'data' => $json
-            ]);
-
+                'data' => [
+                    'status' => 'success',
+                    'count' => count($processedResults),
+                    'filters' => [
+                        'company_id' => $companyId,
+                        'tanggal' => $tanggal
+                    ],
+                    'data' => $processedResults
+                ]
+            ]); 
         } catch (\Exception $e) {
+            // Clean up jika ada error
+            if (isset($stmt)) $stmt->close();
+            if (isset($mysqli)) $mysqli->close();
+            
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'Gagal mengambil data dari scale system: ' . $e->getMessage()
+                'message' => 'Gagal mengambil data dari database: ' . $e->getMessage()
             ]);
         }
     }

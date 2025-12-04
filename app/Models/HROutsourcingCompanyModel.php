@@ -20,6 +20,7 @@ class HROutsourcingCompanyModel extends Model
         'divisi_id',
         'name',
         'address',
+        'ip_finger',
         'createdAt',
         'updatedAt',
         'deletedAt'

@@ -1,19 +1,17 @@
 <?php
 
-namespace App\Controllers\Master;
+namespace App\Controllers\HROutsourcing;
 
 use App\Controllers\API\Employees;
 use App\Controllers\BaseController;
-use App\Models\AttendancesUnitModel;
-use App\Models\EmployeesModel;
-use App\Models\EmployeesFingerModel;
+use App\Models\AttendancesUnitOutsourceModel;
 use Exception;
 
 class AttendancesUnit extends BaseController
 {
     protected $token;
     protected $this_company_id;
-    protected $AttendancesUnitModel;
+    protected $AttendancesUnitOutsourceModel;
     protected $EmployeesModel;
     protected $EmployeesFingerModel;
     protected $maxTimeOut = 5; // Maksimal timeout 5 detik
@@ -23,15 +21,12 @@ class AttendancesUnit extends BaseController
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
-        $this->AttendancesUnitModel = new AttendancesUnitModel();
-        $this->EmployeesModel = new EmployeesModel();
-        $this->EmployeesFingerModel = new EmployeesFingerModel();
-        $this->EmployeesController = new Employees();
+        $this->AttendancesUnitOutsourceModel = new AttendancesUnitOutsourceModel();
     }
 
     public function ListData()
     {
-        return view('Master/AttendancesUnit/index');
+        return view('HROutsourcing/AttendancesUnit/index');
     }
 
     public function allData()
@@ -56,7 +51,7 @@ class AttendancesUnit extends BaseController
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
-        $res = $this->AttendancesUnitModel->getList($condition, $addCondition, $limit, $offset);
+        $res = $this->AttendancesUnitOutsourceModel->getList($condition, $addCondition, $limit, $offset);
 
         $rdata = [];
 
@@ -91,7 +86,7 @@ class AttendancesUnit extends BaseController
 
         $company_id = $this->this_company_id;
 
-        $getIp = $this->AttendancesUnitModel->select('id')
+        $getIp = $this->AttendancesUnitOutsourceModel->select('id')
             ->where('ip', $ip)
             ->where('company_id', $company_id)
             ->where('deletedAt', null)
@@ -126,7 +121,7 @@ class AttendancesUnit extends BaseController
 
             if ($this->validate($rules)) {
                 if ($this->request->getPost("master") == 1) {
-                    $this->AttendancesUnitModel->set('master', 0)->where('company_id', $this->this_company_id)->update();
+                    $this->AttendancesUnitOutsourceModel->set('master', 0)->where('company_id', $this->this_company_id)->update();
                 }
 
                 $values = [
@@ -136,7 +131,7 @@ class AttendancesUnit extends BaseController
                     "unit_key" => $this->request->getPost("unit_key"),
                     "master" => (empty($this->request->getPost("master"))) ? '0' : '1'
                 ];
-                if ($this->AttendancesUnitModel->insert($values)) {
+                if ($this->AttendancesUnitOutsourceModel->insert($values)) {
                     $data = [
                         "status"    => true,
                         "message"   => "Data Berhasil disimpan",
@@ -183,7 +178,7 @@ class AttendancesUnit extends BaseController
         $company_id = $this->this_company_id;
         $ip = $this->request->getPost("ip");
 
-        $getIpNull = $this->AttendancesUnitModel->select('id')
+        $getIpNull = $this->AttendancesUnitOutsourceModel->select('id')
             ->where('ip', $ip)
             ->where('company_id', $company_id)
             ->where('deletedAt', null)
@@ -194,7 +189,7 @@ class AttendancesUnit extends BaseController
         if (!empty($getIpNull)) {
 
             //cek name yg diedit masih sama dengan yg di ID?
-            $getIpNow = $this->AttendancesUnitModel->select('id')
+            $getIpNow = $this->AttendancesUnitOutsourceModel->select('id')
                 ->where('ip', $ip)
                 ->where('company_id', $company_id)
                 ->where('deletedAt', null)
@@ -230,7 +225,7 @@ class AttendancesUnit extends BaseController
 
             if ($this->validate($rules)) {
                 if ($this->request->getPost("master") == 1) {
-                    $this->AttendancesUnitModel->set('master', 0)->where('company_id', $this->this_company_id)->update();
+                    $this->AttendancesUnitOutsourceModel->set('master', 0)->where('company_id', $this->this_company_id)->update();
                 }
 
                 $values = [
@@ -241,7 +236,7 @@ class AttendancesUnit extends BaseController
                     "master" => (empty($this->request->getPost("master"))) ? '0' : '1'
                 ];
 
-                if ($this->AttendancesUnitModel->update($id, $values)) {
+                if ($this->AttendancesUnitOutsourceModel->update($id, $values)) {
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil diubah",
@@ -285,7 +280,7 @@ class AttendancesUnit extends BaseController
     public function getById($id = null)
     {
         if (!empty($id)) {
-            $res = $this->AttendancesUnitModel->getById($id);
+            $res = $this->AttendancesUnitOutsourceModel->getById($id);
             if ($res) {
                 $data = [
                     "status"  => true,
@@ -319,7 +314,7 @@ class AttendancesUnit extends BaseController
                 $values = [
                     "deletedAt" => date("Y-m-d H:i:s")
                 ];
-                if ($this->AttendancesUnitModel->update($id, $values)) {
+                if ($this->AttendancesUnitOutsourceModel->update($id, $values)) {
                     $data = [
                         "status"            => true,
                         "message"   => "Data Berhasil dihapus",
@@ -390,7 +385,7 @@ class AttendancesUnit extends BaseController
     {
         try {
             $id = $this->request->getVar('id');
-            $attendanceUnit = $this->AttendancesUnitModel->where('id', $id)->first();
+            $attendanceUnit = $this->AttendancesUnitOutsourceModel->where('id', $id)->first();
             $ip = $attendanceUnit['ip'];
             $unitKey = $attendanceUnit['unit_key'];
             $isAlive = icmpPing($ip, 2);
@@ -426,7 +421,7 @@ class AttendancesUnit extends BaseController
 
     public function dropdownData()
     {
-        $dataDivisi = $this->AttendancesUnitModel->get_by_company_id($this->this_company_id);
+        $dataDivisi = $this->AttendancesUnitOutsourceModel->get_by_company_id($this->this_company_id);
 
         /*
         $responseDivisi = curl_request("GET", "/divisis/all", $this->token);
@@ -446,8 +441,8 @@ class AttendancesUnit extends BaseController
 
     public function CopyToFinger()
     {
-        $res_master = $this->AttendancesUnitModel->getByCompany_id_and_master($this->this_company_id, 1);
-        $res_child = $this->AttendancesUnitModel->getByCompany_id_and_master($this->this_company_id, 0);
+        $res_master = $this->AttendancesUnitOutsourceModel->getByCompany_id_and_master($this->this_company_id, 1);
+        $res_child = $this->AttendancesUnitOutsourceModel->getByCompany_id_and_master($this->this_company_id, 0);
         $res_employees = $this->EmployeesModel->getEmployeesNotSyncAttendances2($this->this_company_id);
 
         //        $this->EmployeesModel = new EmployeesModel();
@@ -540,114 +535,6 @@ class AttendancesUnit extends BaseController
         //echo "<B>Result:</B><BR>";
         //echo $buffer;
         return;
-    }
-
-    public function insert_finger_user_by_rian($userId, $ip, $unitKey, $name)
-    {
-        try {
-            // CONNECT
-            $conn = @fsockopen($ip, 80, $errno, $errstr, 2);
-
-            if (!$conn) {
-                return "Koneksi gagal: $errstr ($errno)";
-            }
-
-            // XML REQUEST
-            $xml = "<SetUserInfo><ArgComKey Xsi:type=\"xsd:integer\">$unitKey</ArgComKey><Arg><PIN>$userId</PIN><Name>$name</Name></Arg></SetUserInfo>";
-
-            $nl = "\r\n";
-
-            // SEND RAW SOCKET REQUEST
-            fputs($conn, "POST /iWsService HTTP/1.0" . $nl);
-            fputs($conn, "Content-Type: text/xml" . $nl);
-            fputs($conn, "Content-Length: " . strlen($xml) . $nl . $nl);
-            fputs($conn, $xml . $nl);
-
-            // READ RESPONSE
-            $response = "";
-            while ($line = fgets($conn, 1024)) {
-                $response .= $line;
-            }
-            fclose($conn);
-
-            // PARSE HASIL <Information>OK</Information>
-            $info = $this->parseFingerResponse($response);
-
-            if ($info === "OK") {
-                return true;
-            }
-
-            if ($info === "Fail" || $info === "" || $info === null) {
-                return false;
-            }
-
-            // Kalau mesin balikin pesan aneh
-            return "Mesin Response: $info";
-
-        } catch (\Throwable $e) {
-            return "Error: " . $e->getMessage();
-        }
-    }
-
-    public function getAllUsersFromMachine($ip)
-    {
-        $conn = @fsockopen($ip, 80, $errno, $errstr, 2);
-
-        if (!$conn) {
-            return false;
-        }
-
-        $xml = "<GetAllUserInfo><ArgComKey>0</ArgComKey></GetAllUserInfo>";
-
-        $nl = "\r\n";
-        fputs($conn, "POST /iWsService HTTP/1.0" . $nl);
-        fputs($conn, "Content-Type: text/xml" . $nl);
-        fputs($conn, "Content-Length: " . strlen($xml) . $nl . $nl);
-        fputs($conn, $xml . $nl);
-
-        $response = "";
-        while ($line = fgets($conn, 1024)) {
-            $response .= $line;
-        }
-        fclose($conn);
-
-        // Parse XML user list
-        preg_match_all('/<Row>(.*?)<\/Row>/s', $response, $rows);
-
-        $result = [];
-
-        foreach ($rows[1] as $rowXml) {
-
-            preg_match('/<PIN2>(.*?)<\/PIN2>/',          $rowXml, $pin2);
-            preg_match('/<Name>(.*?)<\/Name>/',          $rowXml, $name);
-            preg_match('/<Privilege>(.*?)<\/Privilege>/', $rowXml, $priv);
-
-            // Ambil hanya User (privilege = 0)
-            if (($priv[1] ?? '') !== "0") {
-                continue;
-            }
-
-            $result[] = [
-                'PIN2'      => $pin2[1] ?? '',
-                'Name'      => $name[1] ?? '',
-                'Privilege' => $priv[1] ?? '',
-            ];
-        }
-
-        return $result;
-    }
-
-    
-    private function parseFingerResponse($data)
-    {
-        $start = strpos($data, "<Information>");
-        $end   = strpos($data, "</Information>");
-
-        if ($start === false || $end === false) {
-            return null;
-        }
-
-        return trim(substr($data, $start + 13, $end - ($start + 13)));
     }
 
     public function insert_finger_data($user_id, $ip, $finger_id, $unit_key, $data_finger)

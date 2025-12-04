@@ -3,6 +3,7 @@
 namespace App\Controllers\HROutsourcing;
 
 use App\Controllers\BaseController;
+use App\Models\AttendancesUnitOutsourceModel;
 use App\Models\DivisisModel;
 use App\Models\HROutsourcingCompanyModel;
 use App\Models\HROutsourcingEmployeeModel;
@@ -13,6 +14,7 @@ class Company extends BaseController
     protected $divisiModel;
     protected $hrOutsourcingCompanyModel;
     protected $hrOutsourcingEmployeeModel;
+    protected $hrOutsourcingAttendanceModel;
 
     public function __construct()
     {
@@ -20,12 +22,14 @@ class Company extends BaseController
         $this->divisiModel = new DivisisModel();
         $this->hrOutsourcingCompanyModel = new HROutsourcingCompanyModel();
         $this->hrOutsourcingEmployeeModel = new HROutsourcingEmployeeModel();
+        $this->hrOutsourcingAttendanceModel = new AttendancesUnitOutsourceModel();
     }
 
     public function index()
     {
         $data = [
-            'divisi' => $this->divisiModel->getDivisiAccess()
+            'divisi' => $this->divisiModel->getDivisiAccess(),
+            'dataAttendanceUnit' => $this->hrOutsourcingAttendanceModel->findAll(),
         ];
 
         return view('HROutsourcing/company/index', $data);
@@ -88,6 +92,7 @@ class Company extends BaseController
         $name = $this->request->getVar('name');
         $divisiId = $this->request->getVar('divisi_id');
         $address = $this->request->getVar('address');
+        $ip_finger = $this->request->getVar('ip_finger');
 
         // $check = $this->hrOutsourcingCompanyModel->where('company_id', $this->this_company_id)
         //     ->where('name', $name)
@@ -105,7 +110,8 @@ class Company extends BaseController
             'company_id' => $this->this_company_id,
             'divisi_id' => $divisiId,
             'name' => $name,
-            'address' => $address
+            'address' => $address,
+            'ip_finger' => $ip_finger
         ]);
 
         return response()->setJSON([
@@ -121,6 +127,7 @@ class Company extends BaseController
         $name = $this->request->getVar('name');
         $divisiId = $this->request->getVar('divisi_id');
         $address = $this->request->getVar('address');
+        $ip_finger = $this->request->getVar('ip_finger');
 
         // $check = $this->hrOutsourcingCompanyModel
         //     ->where('company_id', $this->this_company_id)
@@ -140,7 +147,8 @@ class Company extends BaseController
             'company_id' => $this->this_company_id,
             'divisi_id' => $divisiId,
             'name' => $name,
-            'address' => $address
+            'address' => $address,
+            'ip_finger' => $ip_finger
         ]);
 
         return response()->setJSON([

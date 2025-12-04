@@ -9,6 +9,9 @@
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("/hr-outsourcing-company"); ?>">
                 Kembali
             </a>
+            <button class="btn btn-sync btn-add" float-right style="right:110px;">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Sync Karyawan ke Fingerprint
+            </button>
         </div>
     </div>
 
@@ -129,7 +132,6 @@
         </div>
     </div>
 
-
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "createdAt";
@@ -228,6 +230,80 @@
             $('#auto_generate').prop('checked', false);
             $(".badge_karyawan").attr("readonly", false);
         });
+
+        const companyId = "<?= $company['id'] ?? '' ?>";
+        const csrfTokenName = "<?= csrf_token() ?>";
+        const csrfTokenValue = $("input[name='<?= csrf_token() ?>']").val();
+
+        let $btnSync = $(".btn-sync");
+
+        // Kondisi: Tidak ada ip_finger (langsung disable)
+        const companyIpFinger = "<?= $company['ip_finger'] ?? '' ?>";
+        if (!companyIpFinger) {
+            $btnSync
+                .removeClass("btn-primary btn-danger")
+                .addClass("btn-secondary")
+                .prop("disabled", true)
+                .html(`<i class="fa fa-ban mr-2"></i> Mesin Finger Belum Dikonfigurasi`);
+            return; // stop sampai sini
+        }
+
+        // Lanjutkan cek status sinkron
+        $.ajax({
+            url: "<?= base_url('hr-outsourcing-company/employee/check-sync-status'); ?>",
+            method: "POST",
+            data: {
+                company_id: companyId,
+                [csrfTokenName]: csrfTokenValue
+            },
+            success: function(res) {
+
+                // ERROR → mesin mati / ip ga valid
+                if (!res.status) {
+                    $btnSync
+                        .removeClass("btn-primary btn-danger")
+                        .addClass("btn-secondary")
+                        .prop("disabled", true)
+                        .html(`<i class="fa fa-plug mr-2"></i> Mesin Finger Tidak Terhubung`);
+                    return;
+                }
+
+                // SUCCESS → cek mismatch
+                const needSync = res.data.need_sync_count;
+
+                if (needSync > 0) {
+                    // Ada karyawan belum tersinkron
+                    $btnSync
+                        .removeClass("btn-primary btn-secondary")
+                        .addClass("btn-danger")
+                        .prop("disabled", false)
+                        .html(`
+                            <i class="fa fa-sync-alt mr-2"></i>
+                            ${needSync} Karyawan Belum Sinkron — Klik Untuk Sinkron
+                        `);
+                } else {
+                    // Semua sudah sinkron
+                    $btnSync
+                        .removeClass("btn-danger btn-secondary")
+                        .addClass("btn-primary")
+                        .prop("disabled", false)
+                        .html(`
+                            <i class="fa fa-check mr-2"></i>
+                            Semua Sudah Sinkron
+                        `);
+                }
+            },
+
+            // Jika AJAX error → treat sebagai mesin offline
+            error: function() {
+                $btnSync
+                    .removeClass("btn-primary btn-danger")
+                    .addClass("btn-secondary")
+                    .prop("disabled", true)
+                    .html(`<i class="fa fa-plug mr-2"></i> Mesin Finger Tidak Terhubung`);
+            }
+        });
+
     });
 
     $('.search').keyup(function() {
@@ -262,6 +338,156 @@
         unhighlight: function(element) {
             $(element).closest('.form-group').removeClass('has-error');
         },
+    });
+
+    $('.btn-sync').click(function(e) {
+        e.preventDefault();
+        
+        const csrf = $(`[name="${csrfToken}"]`);
+        let companyId = "<?= $company['id'] ?? '' ?>";
+        
+        if (!companyId) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Company ID tidak ditemukan',
+                confirmButtonColor: '#4e73df',
+            });
+            return;
+        }
+        
+        // Konfirmasi sebelum sync
+        Swal.fire({
+            title: 'Sinkronisasi Fingerprint',
+            text: 'Apakah Anda yakin ingin mensinkronisasi data karyawan ke mesin fingerprint?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Sync Sekarang',
+            cancelButtonText: 'Batal',
+            showLoaderOnConfirm: true,
+            preConfirm: () => {
+                return new Promise((resolve) => {
+                    $.ajax({
+                        url: "<?= base_url('hr-outsourcing-company/employee/sync-employee-finger'); ?>",
+                        method: "POST",
+                        data: { 
+                            company_id: companyId,
+                            [csrfToken]: csrf.val() 
+                        },
+                        dataType: 'json',
+                        beforeSend: function(xhr) {
+                            setLoading();
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        success: function(response) {
+                            csrf.val(response.token);
+                            resolve(response);
+                        },
+                        error: function(xhr, status, error) {
+                            resolve({
+                                status: false,
+                                message: 'Terjadi kesalahan koneksi: ' + error
+                            });
+                        }
+                    });
+                });
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed) {
+                if (result.value.status) {
+                    const data = result.value.data;
+                    
+                    // Format pesan sukses dengan detail
+                    let successMessage = `
+                        <div class="text-left">
+                            <h5 class="text-success"><i class="fas fa-check-circle"></i> ${result.value.message}</h5>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Detail Sinkronisasi:</strong></p>
+                                    <ul class="list-unstyled">
+                                        <li><i class="fas fa-building mr-2"></i> Company: ${data.company_name || 'N/A'}</li>
+                                        <li><i class="fas fa-users mr-2"></i> Total Karyawan: ${data.total_employees}</li>
+                                        <li><i class="fas fa-check text-success mr-2"></i> Berhasil: ${data.success_count}</li>
+                                        <li><i class="fas fa-times text-danger mr-2"></i> Gagal: ${data.failed_count}</li>
+                                        <li><i class="fas fa-server mr-2"></i> IP Mesin: ${data.attendance_unit_ip}</li>
+                                        <li><i class="fas fa-clock mr-2"></i> Waktu: ${new Date().toLocaleString()}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        `;
+                    
+                    // Tambahkan detail yang gagal jika ada
+                    if (data.failed_count > 0 && data.failed_details && data.failed_details.length > 0) {
+                        successMessage += `
+                            <hr>
+                            <p class="text-danger"><strong>Detail Karyawan yang Gagal:</strong></p>
+                            <div style="max-height: 200px; overflow-y: auto;">
+                                <table class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Nama</th>
+                                            <th>Alasan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>`;
+                        
+                        data.failed_details.forEach(detail => {
+                            successMessage += `
+                                <tr>
+                                    <td>${detail.employee_id || '-'}</td>
+                                    <td>${detail.name || '-'}</td>
+                                    <td><span class="text-danger">${detail.reason || 'Tidak diketahui'}</span></td>
+                                </tr>`;
+                        });
+                        
+                        successMessage += `</tbody></table></div>`;
+                    }
+                    
+                    Swal.fire({
+                        title: 'Sinkronisasi Berhasil!',
+                        html: successMessage,
+                        icon: 'success',
+                        confirmButtonColor: '#4e73df',
+                        showCancelButton: data.failed_count > 0,
+                        cancelButtonText: 'Lihat Log',
+                        cancelButtonColor: '#dc3545',
+                        confirmButtonText: 'Tutup',
+                        width: '800px'
+                    }).then((result) => {
+                        if (result.dismiss === Swal.DismissReason.cancel) {
+                            // Redirect atau modal untuk log detail
+                            window.open('#log-detail', '_blank');
+                        }
+                        table.ajax.reload();
+                        $(".sync-fingerprint-modal").modal("hide");
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Sinkronisasi Gagal',
+                        html: `
+                            <div class="text-left">
+                                <p>${result.value.message}</p>
+                                ${result.value.data ? `
+                                    <hr>
+                                    <p><strong>Detail Error:</strong></p>
+                                    <pre class="bg-light p-2 rounded" style="font-size: 12px;">${JSON.stringify(result.value.data, null, 2)}</pre>
+                                ` : ''}
+                            </div>`,
+                        confirmButtonColor: '#4e73df',
+                        width: '600px'
+                    });
+                }
+            }
+        });
     });
 
     $(".btn-submit").click(function() {
