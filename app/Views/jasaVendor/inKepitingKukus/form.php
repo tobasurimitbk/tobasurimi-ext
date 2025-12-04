@@ -1028,19 +1028,6 @@
                     `
                 ));
 
-                // newRow.append($('<td style="text-align: center;">').html(
-                //     `
-                //     <input <?= !empty($jasaVendorIn) ? (($jasaVendorIn['status_posting'] == "1") ? 'disabled' : '') : '' ?> 
-                //         style="height: 40px; padding-bottom: 10px;" 
-                //         class="form-control qty_bersih" 
-                //         onkeydown="handleCalcInput(this, event)"
-                //         autocomplete="one-time-code" 
-                //         data-spesifikasi_in_id="${v.spesifikasi_in_id}" 
-                //         type="text" 
-                //         value="${v.qty_bersih == '' || v.qty_bersih == 0 ? '' : v.qty_bersih.toFixed(2)}">
-                //     `
-                // ));
-
                 newRow.append($('<td style="text-align: center;">').html(
                     `
                     <button <?= !empty($jasaVendorIn) ? (($jasaVendorIn['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${supplier_id}, '${keterangan}', '${v.spesifikasi_in_id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
@@ -1052,7 +1039,7 @@
             });
             var newRow1 = $('<<tr style="color:whitesmoke; background-color:#f2c996;">>');
             newRow1.append($('<td colspan="4" style="text-align:right"><b>GRAND TOTAL</b></td>'));
-            newRow1.append($('<td class="total-qty-kotor">').text(greatFormatQty(totalQtyKotor)));
+            newRow1.append($('<td class="total-qty-kotor">').text(format3Decimal(totalQtyKotor)));
             // newRow1.append($('<td class="total-qty-bersih">').text(greatFormatQty(totalQtyBersih)));
             newRow1.append($('<td>'));
             table.find('tbody').append(newRow1);
@@ -1060,6 +1047,18 @@
 
         }
     }
+
+    function format3Decimal(num) {
+        if (num === null || num === undefined || num === "") return "0.000";
+
+        // Pastikan numeric
+        num = parseFloat(num);
+        if (isNaN(num)) return "0.000";
+
+        // Fix jadi 3 angka di belakang koma tanpa pembulatan
+        return (Math.floor(num * 1000) / 1000).toFixed(3);
+    }
+
 
     function drawTable3(listBarangGroup) {
         const table = $('#dataTable3');
