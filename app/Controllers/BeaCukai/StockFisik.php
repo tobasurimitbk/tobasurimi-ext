@@ -65,6 +65,7 @@ class StockFisik extends BaseController
         );
 
         $dataPemasukkanTotal = $this->getTotalPemasukkan();
+        $dataPemasukkanProduksiTotal = $this->getTotalPemasukkanProduksi();
         $dataStockFisik = [];
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
@@ -72,9 +73,14 @@ class StockFisik extends BaseController
             $totalQty = 0;
             $kodeSatuan = "";
             if (isset($dataPemasukkanTotal[$data['id']])) {
-                $totalQty = $dataPemasukkanTotal[$data['id']]['qty_diterima'];
+                $totalQty += $dataPemasukkanTotal[$data['id']]['qty_diterima'];
                 $kodeSatuan =  $dataPemasukkanTotal[$data['id']]['kode_satuan'];
             }
+
+            if (isset($dataPemasukkanProduksiTotal[$data['id']])) {
+                $totalQty += $dataPemasukkanProduksiTotal[$data['id']]['qty_diterima'];
+            }
+
             array_push($dataStockFisik, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data['id']),
@@ -283,6 +289,82 @@ class StockFisik extends BaseController
         ]);
     }
 
+    public function allPemasukkanProduksi()
+    {
+        $draw = $this->request->getGet('draw');
+        $start = (int)$this->request->getGet('start');
+        $length = (int)$this->request->getGet('length');
+        $orderDir = $this->request->getGet('order')[0]['dir'] ?? 'asc';
+        $orderColumnIndex = $this->request->getGet('order')[0]['column'] ?? null;
+
+        $barangMasterId = ($this->request->getGet('barang_master_id'));
+        $search = $this->request->getGet('search') ?? '';
+
+        $condition = [
+            'company_id'   => $this->this_company_id,
+            'barang1_id'  => $barangMasterId,
+            'search'       => $search,
+            'dateStart' => "2025-09-01",
+            'dateEnd' => "2100-12-01",
+        ];
+
+        $dataPemasukkan = $this->bcPurchaseOrderModel->getFisikPemasukkanProduksi(
+            $condition,
+            $orderColumnIndex,
+            $orderDir,
+            $length,
+            $start
+        );
+
+        if (empty($condition['search'])) {
+            $dataTotal =  $this->bcPurchaseOrderModel->getFisikPemasukkanProduksi(
+                $condition,
+                $orderColumnIndex,
+                $orderDir,
+                100000000,
+                0
+            );
+        } else {
+            $dataTotal =  $this->bcPurchaseOrderModel->getFisikPemasukkanProduksi(
+                $condition,
+                $orderColumnIndex,
+                $orderDir,
+                $length,
+                $start
+            );
+        }
+
+        $totalMasuk = 0;
+        foreach ($dataTotal['data'] as $d) {
+            $totalMasuk += (float)$d['qty_diterima'];
+        }
+
+        $dataResult = [];
+        $no = $start + 1;
+        foreach ($dataPemasukkan['data'] as $d) {
+            $dataResult[] = [
+                "no" => $no++,
+                "divisi" => $d['divisi'],
+                "warehouse_name" => $d['warehouse_name'],
+                "receive_date" => date('d/m/Y', strtotime($d['receive_date'])),
+                'pr_no' => $d['pr_no'],
+                "kode_barang" => $d['kode_barang'],
+                "barang_name" => $d['barang_name'],
+                "spesifikasi" => $d['spesifikasi'],
+                "qty_diterima" => (float)$d['qty_diterima'],
+                "kode_satuan" => $d['kode_satuan'],
+            ];
+        }
+
+        return $this->response->setJSON([
+            'draw' => intval($draw),
+            'recordsTotal' => intval($dataPemasukkan['totalData'] ?? 0),
+            'recordsFiltered' => intval($dataPemasukkan['totalFilteredData'] ?? 0),
+            'data' => $dataResult,
+            'footerTotals' => $totalMasuk
+        ]);
+    }
+
     private function getTotalPemasukkan()
     {
         $dataPemasukkanMap = array();
@@ -304,6 +386,39 @@ class StockFisik extends BaseController
 
         foreach ($dataPemasukkan['data'] as $d) {
             $barangId = $d['barang_id'];
+            if (!isset($dataPemasukkanMap[$barangId])) {
+                $dataPemasukkanMap[$barangId] = [
+                    'qty_diterima' => 0,
+                    'kode_satuan' => $d['kode_satuan']
+                ];
+            }
+            $dataPemasukkanMap[$barangId]['qty_diterima'] += floatval($d['qty_diterima']);
+        }
+
+        return $dataPemasukkanMap;
+    }
+
+    private function getTotalPemasukkanProduksi()
+    {
+        $dataPemasukkanMap = array();
+
+        $condition = [
+            'company_id'   => $this->this_company_id,
+            'dateStart' => "2025-09-01",
+            'dateEnd' => "2100-12-01",
+            'search' => ''
+        ];
+
+        $dataPemasukkan = $this->bcPurchaseOrderModel->getFisikPemasukkanProduksi(
+            $condition,
+            0,
+            "desc",
+            1000000000,
+            0
+        );
+
+        foreach ($dataPemasukkan['data'] as $d) {
+            $barangId = $d['barang1_id'];
             if (!isset($dataPemasukkanMap[$barangId])) {
                 $dataPemasukkanMap[$barangId] = [
                     'qty_diterima' => 0,

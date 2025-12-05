@@ -48,10 +48,35 @@ class BcPengeluaranBarangModel extends Model
         $limit = 10,
         $offset = 0
     ) {
+        $bc25Model = new BC25Model();
+        $bc41Model = new BC41Model();
+
+        $bc25All = $bc25Model->where('jenis_pengeluaran', "ORDER FORM LOKAL")->where('deletedAt', null)->findAll();
+        $bc41All = $bc41Model->where('jenis_pengeluaran', "ORDER FORM LOKAL")->where('deletedAt', null)->findAll();
+
+        $multipleRefBc25 = array_column($bc25All, 'multiple_reference_id');
+        $multipleRefBc41 = array_column($bc41All, 'multiple_reference_id');
+
+        $multipleIdMerged = array_merge($multipleRefBc25, $multipleRefBc41);
+        $idUsed = array();
+        foreach ($multipleIdMerged as $m) {
+            foreach (json_decode($m) as $mx) {
+                array_push($idUsed, $mx);
+            }
+        }
+
+        $notIn = "";
+        if (!empty($idUsed)) {
+            $idUsedEscaped = implode(",", array_map('intval', $idUsed));
+            $notIn = " AND sales_order_detail.id_sales_order NOT IN ($idUsedEscaped) ";
+        }
+
         $db = \Config\Database::connect();
         $where = [];
         $whereDateSalesOrder = "";
         $searchSalesOrder = "";
+
+        // DARI BC 25 & BC 41
 
         if (!empty($condition['company_id'])) {
             $where[] = "sales_order.id_company = '$condition[company_id]'";
@@ -114,6 +139,7 @@ class BcPengeluaranBarangModel extends Model
             LEFT JOIN satuans ON satuans.id = barang_master_sales.satuan_id 
             LEFT JOIN customers ON customers.id = sales_order.id_customer
             WHERE sales_order_detail.deletedAt IS NULL
+            $notIn
             $filterCondition
             $whereDateSalesOrder
             $searchSalesOrder
@@ -144,7 +170,9 @@ class BcPengeluaranBarangModel extends Model
         $customerId
     ) {
         $bc25Model = new BC25Model();
+        $bc41Model = new BC41Model();
         $bc25List = $bc25Model->where('company_id', $companyId)->where('jenis_pengeluaran', "ORDER FORM LOKAL")->where('deletedAt', null)->findAll();
+        $bc41List = $bc41Model->where('company_id', $companyId)->where('jenis_pengeluaran', "ORDER FORM LOKAL")->where('deletedAt', null)->findAll();
 
         $build = $this->db->table('sales_order')
             ->where('id_company', $companyId)
@@ -155,6 +183,12 @@ class BcPengeluaranBarangModel extends Model
             $orderFormIdArr = array_column($bc25List, 'multiple_reference_id');
             $build->whereNotIn('id', $orderFormIdArr);
         }
+
+        if (count($bc41List) != 0) {
+            $orderFormIdArr = array_column($bc41List, 'multiple_reference_id');
+            $build->whereNotIn('id', $orderFormIdArr);
+        }
+
         $orderForm = $build->orderBy('id', "desc")->get()->getResultArray();
         $dataResult = array();
 

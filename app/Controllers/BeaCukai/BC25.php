@@ -445,6 +445,7 @@ class BC25 extends BaseController
         try {
             $id = decrypt($this->request->getVar('id'));
             $this->bc25Model->delete($id);
+            $this->bcPengeluaranBarangModel->where('bc_pengeluaran_id', $id)->where('tipe_bc', "2.5")->delete(null, false);
             return response()->setJSON([
                 'status' => true,
                 'token' => csrf_hash(),

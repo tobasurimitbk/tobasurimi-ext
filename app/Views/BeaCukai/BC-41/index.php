@@ -7,16 +7,12 @@
         <div class="col-button-tambah-spp">
             <?php if ($akunCeisa != null) : ?>
                 <?php if ($akunCeisa['status_integrasi']) : ?>
-                    <a href="<?= base_url('bea-cukai-bc-41/online') ?>" class="btn btn-discard btn-dropdown-export float-right" type="button">
-                        <i class="fa fa-upload fa-sm" aria-hidden="true"></i>
-                        Status Respon
-                    </a>
                     <a href="<?= base_url('bea-cukai-bc-41/bc-41-outstanding') ?>" class="btn btn-save float-right" type="button">
                         <i class="fa fa-ship fa-sm" aria-hidden="true"></i>
                         Outstanding
                     </a>
                     <?php if (can("Bea Cukai", "BC 4.1", "c")) : ?>
-                        <a href="<?= base_url('bea-cukai-bc-41/create') ?>" type="button" class="btn btn-success float-right">
+                        <a href="#" type="button" class="btn btn-success float-right" id="btnTambahModal">
                             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                         </a>
                     <?php endif; ?>
@@ -45,22 +41,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3 mb-3">
-                    <select name="asalPengeluaran" class="form-select asalPengeluaran" id="asalPengeluaran">
-                        <option selected value="ALL">PILIH ASAL PENGELUARAN</option>
-                        <option value="ORDER FORM LOKAL">ORDER FORM LOKAL</option>
-                        <option value="RETUR PEMBELIAN">RETUR PEMBELIAN LOKAL</option>
-                        <option value="ORDER FORM LAIN">ORDER FORM LAIN (SCRAP, KEMASAN, BARANG BEKAS)</option>
-                    </select>
-                </div>
-                <div class="col-md-3 mb-3">
+                <div class="col-md-2 mb-3">
                     <select name="statusPosting" class="form-select statusPosting" id="statusPosting">
                         <option selected value="ALL">STATUS POSTING : SEMUA</option>
                         <option value="SUDAH POSTING">STATUS POSTING : SUDAH POSTING</option>
                         <option value="BELUM POSTING">STATUS POSTING : BELUM POSTING</option>
                     </select>
                 </div>
-                <div class="col-md-2 mb-3">
+                <div class="col-md-6 mb-3">
                     <input autocomplete="one-time-code" class="form-control noAju search form-out-search" placeholder="Cari Data" value="" />
                 </div>
             </div>
@@ -80,18 +68,17 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th style="text-align: center;">No</th>
-                                <th onclick="changeSort('bc_41.tipe_sales_order')" class="sort" style="text-align: center;">Tujuan Pengeluaran</th>
-                                <th style="text-align: center;">No Order Form</th>
-                                <th style="text-align: center;">Tipe Penerima</th>
-                                <th style="text-align: center;">Penerima</th>
-                                <th onclick="changeSort('bc_41.no_aju')" class="sort" style="text-align: center;">No Aju / Daftar</th>
-                                <th onclick="changeSort('bc_41.createdAt')" class="sort" style="text-align: center;">Tanggal</th>
-                                <th onclick="changeSort('bc_41.status_posting')" style="text-align: center;">Status Posting</th>
-                                <th style="text-align: center;">Action</th>
+                                <th>No</th>
+                                <th>Tujuan Pengeluaran</th>
+                                <th>Penerima</th>
+                                <th>No Referensi</th>
+                                <th>No Aju / Daftar</th>
+                                <th>Tanggal</th>
+                                <th>Status Posting</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
                         </tbody>
                     </table>
                 </div>
@@ -100,6 +87,46 @@
     </div>
 </section>
 
+<div class="modal detail-modal" id="btnModalTambahDokumen" tabindex="1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary">Tambah Dokumen Pengeluaran BC 2.5</h5>
+            </div>
+            <form class="create-form">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3">
+                                    <input autocomplete="one-time-code" type="text" class="form-control tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Dokumen">
+                                    <label for="floatingInput">Tanggal Dokumen</label>
+                                </div>
+                                <div class="input-group-prepend group-prepend-password align-items-center">
+                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 20px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-floating mb-3 mt-1" style="height: 50px;">
+                                <select class="form-select jenis_pengeluaran" id="jenis_pengeluaran" name="jenis_pengeluaran" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <option value="ORDER FORM LOKAL">ORDER FORM LOKAL</option>
+                                    <option value="LAINNYA">LAINNYA</option>
+                                </select>
+                                <label style="z-index: 1;">Pilih Pengeluaran</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-discard mr-2" id="btnHideTambahDokumen">Kembali</button>
+                    <button type="button" class="btn btn-submit-form" id="btnSubmitTambah">Buat Dokumen</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
@@ -108,12 +135,11 @@
     let sortType = "desc";
 
     const table = $('.dataTable').DataTable({
-
         processing: true,
         serverSide: true,
         ordering: true,
         order: [
-            [1, 'asc']
+            [5, 'desc']
         ],
         fixedHeader: true,
         lengthMenu: [
@@ -125,59 +151,50 @@
             url: "<?= base_url("bea-cukai-bc-41/all"); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.mulaiTanggalBC41 = $('.mulaiTanggalBC41').val();
-                data.selesaiTanggalBC41 = $('.selesaiTanggalBC41').val();
-                data.statusPosting = $('.statusPosting').val();
-                data.noAju = $('.noAju').val();
-                data.asalPengeluaran = $('.asalPengeluaran').val();
-                data.sort = sort;
-                data.sortType = sortType;
+                data.dateStart = $('.dateStart').val();
+                data.dateEnd = $('.dateEnd').val();
+                data.status_posting = $('.statusPosting').val();
+                data.search = $('.search').val();
             }
         },
         "initComplete": function(settings, json) {
             $('.dataTables_length').empty();
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTables_length').html("<div><label class='text-left ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
             $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
         },
         display: "stripe",
         searching: false,
         columns: [{
                 data: "no",
-                className: "text-center",
+                className: "text-left",
                 sortable: false,
                 width: "5%"
             },
             {
-                data: "tipe_sales_order",
-                className: "text-center",
+                data: "jenis_pengeluaran",
+                className: "text-left",
             },
             {
-                data: "no_order_form",
-                className: "text-center",
-                sortable: false,
+                data: "reference_penerima",
+                className: "text-left",
             },
             {
-                data: "tipe_penerima",
-                className: "text-center",
-                sortable: false,
-            },
-            {
-                data: "nama_penerima",
-                className: "text-center",
+                data: "multiple_reference_no",
+                className: "text-left",
                 sortable: false,
             },
             {
                 data: "no_aju",
-                className: "text-center",
+                className: "text-left",
+                sortable: false,
             },
             {
-                data: "tanggal_bc_41",
-                className: "text-center",
+                data: "tanggal",
+                className: "text-left",
             },
-
             {
                 data: "status_posting",
-                className: "text-center",
+                className: "text-left",
                 render: function(data, type, row) {
                     let htmlRes = '';
 
@@ -196,13 +213,18 @@
                     return htmlRes;
                 }
             },
+
             {
                 data: "id",
                 className: "text-center actions",
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    let htmlRes = '';
+                    let htmlRes = `
+                        <a href="<?= base_url("bea-cukai-bc-41/id"); ?>/${row.id}" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    `;
 
                     if (row.status_posting == "0") {
                         <?php if (can('Bea Cukai', 'BC 4.1', 'd')) : ?>
@@ -259,31 +281,132 @@
         }
     });
 
-    $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-        const data = table.row(this).data();
-        location.replace(`<?= base_url("bea-cukai-bc-41/id/"); ?>${data.id}`);
-    });
-
-    $(".mulaiTanggalBC41, .selesaiTanggalBC41").datepicker({
+    $("#tanggal,#dateStart,#dateEnd").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
         autoclose: true
     });
 
+    var validator = $(".create-form").validate({
+        rules: {
+            tanggal: {
+                required: true
+            },
+            jenis_pengeluaran: {
+                required: true
+            },
+        },
+        messages: {
+            tanggal: {
+                required: "Tanggal dokumen wajib diisi"
+            },
+            jenis_pengeluaran: {
+                required: "Pilih tujuan pengeluaran"
+            },
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
 
-    $('.mulaiTanggalBC41, .selesaiTanggalBC41,.statusPosting,.asalPengeluaran').change(function() {
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
+
+    $('#jenis_pengeluaran').select2({
+        placeholder: "Pilih Jenis Pengeluaran",
+        theme: "bootstrap-5",
+        allowClear: false,
+        dropdownParent: $('#btnModalTambahDokumen')
+    }).change(function() {
+
+    });
+
+    $('.form-select')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+    $('#btnTambahModal').click(function(e) {
+        e.preventDefault();
+        $('#tanggal').val(null).change();
+        $('#btnModalTambahDokumen').modal('show');
+    });
+
+    $('#btnHideTambahDokumen').click(function(e) {
+        e.preventDefault();
+        $('#btnModalTambahDokumen').modal('hide');
+    });
+
+    $('#btnSubmitTambah').click(function(e) {
+        if ($('.create-form').valid()) {
+            var formData = new FormData();
+            var tanggal = $('#tanggal').val();
+            var jenisPengeluaran = $('#jenis_pengeluaran').val();
+
+            formData.append("tanggal", tanggal);
+            formData.append("jenis_pengeluaran", jenisPengeluaran);
+            $.ajax({
+                url: `<?= base_url("bea-cukai-bc-41/save"); ?>`,
+                method: "POST",
+                data: formData,
+                beforeSend: function(xhr) {
+                    setLoading();
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                method: "POST",
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function(res) {
+                    if (res.status) {
+                        var id = res.id;
+                        window.location.href = "<?= base_url('bea-cukai-bc-41/id/'); ?>" + id;
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: res.message,
+                            confirmButtonColor: '#4e73df',
+                            confirmButtonText: 'Ok'
+                        })
+                    }
+                }
+            })
+        }
+    });
+
+    $('.dateStart, .dateEnd,.statusPosting').change(function() {
         table.ajax.reload();
     });
 
-    $('.noAju').keyup(function() {
+    $('.search').keyup(function() {
         table.ajax.reload();
     });
 
     function deleteAction(id) {
         Swal.fire({
             icon: 'question',
-            title: 'Hapus Dokumen BC 4.1 ?',
+            title: 'Hapus Dokumen BC 2.5 ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
@@ -310,8 +433,8 @@
                     processData: false,
                     contentType: false,
                     success: function(res) {
+                        csrf.val(res.token);
                         if (res.status) {
-                            csrf.val(res.token);
                             Swal.fire({
                                 icon: 'success',
                                 title: res.message,
@@ -319,6 +442,13 @@
                                 confirmButtonText: 'Ok'
                             }).then((result) => {
                                 table.ajax.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: res.message,
+                                confirmButtonColor: '#4e73df',
+                                confirmButtonText: 'Ok'
                             });
                         }
                     }
@@ -330,7 +460,7 @@
     function postingAction(id) {
         Swal.fire({
             icon: 'question',
-            title: 'Posting Dokumen BC 4.1 ?',
+            title: 'Posting Dokumen BC 2.5 ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
@@ -376,7 +506,7 @@
     function kirimCeisaAction(id) {
         Swal.fire({
             icon: 'question',
-            title: 'Posting BC 4.1 ke aplikasi Ceisa Bea Cukai ?',
+            title: 'Posting BC 4.0 ke aplikasi Ceisa Bea Cukai ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
@@ -417,15 +547,6 @@
                 })
             }
         })
-    }
-
-    function changeSort(val) {
-        if (sort !== val) {
-            sortType = "asc";
-            sort = val;
-        } else {
-            sortType = sortType === "asc" ? "desc" : "asc";
-        }
     }
 </script>
 <?= $this->endSection(); ?>

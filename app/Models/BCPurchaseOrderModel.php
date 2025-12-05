@@ -1502,7 +1502,7 @@ class BCPurchaseOrderModel extends Model
         }
 
         if (!empty($condition['company_id'])) {
-            $where[] = "penerimaan_barang.company_id = '$condition[company_id]' AND barang_master.company_id = '$condition[company_id]'";
+            $where[] = "penerimaan_barang.company_id = '$condition[company_id]'";
         }
 
         $search = $db->escapeLikeString($condition['search']);
@@ -1753,6 +1753,131 @@ class BCPurchaseOrderModel extends Model
             $filterCondition
             $searchPoImportBahanBaku
             GROUP BY penerimaan_barang_detail.id
+        )
+    ";
+
+
+        // ============================
+        // 📊 COUNT + PAGINATION
+        // ============================
+
+        $countQuery = "SELECT COUNT(*) AS cnt FROM ($baseQuery) AS x";
+        $totalFiltered = (int) $db->query($countQuery)->getRow()->cnt;
+
+        $mainQuery = $baseQuery . $orderBy . " LIMIT $limit OFFSET $offset";
+
+
+        // var_dump($mainQuery);
+        // die;
+        $data = $db->query($mainQuery)->getResultArray();
+
+        // ============================
+        // 📦 RETURN RESULT
+        // ============================
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalFiltered,
+            'totalFilteredData' => $totalFiltered,
+            'sort'              => $orderColumnIndex,
+            'sortType'          => $orderDir,
+        ];
+    }
+
+    public function getFisikPemasukkanProduksi(
+        $condition,
+        $orderColumnIndex,
+        $orderDir,
+        $limit = 10,
+        $offset = 0
+    ) {
+        $db = \Config\Database::connect();
+        $where = [];
+        $search = "";
+
+        // ============================
+        // 🔍 FILTER KONDISI
+        // ============================
+
+        $where = [];
+
+        if (!empty($condition['dateStart']) && !empty($condition['dateEnd'])) {
+            $where[] = "production_results.receive_date BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
+        }
+
+        if (!empty($condition['company_id'])) {
+            $where[] = "production_results.company_id = '$condition[company_id]'";
+        }
+
+        if (!empty($condition['barang1_id'])) {
+            $where[] = "production_result_details.barang1_id = '$condition[barang1_id]'";
+        }
+
+        $search = $db->escapeLikeString($condition['search']);
+        if (!empty($condition['search'])) {
+            $search = "AND (
+                production_results.pr_no LIKE '%{$search}%'
+                OR barang_master.kode_barang LIKE '%{$search}%' 
+                OR CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) LIKE '%{$search}%'
+                OR divisis.divisi LIKE '%{$search}%' 
+                OR warehouses.warehouse_name LIKE '%{$search}%'
+            )";
+        }
+
+        $filterCondition = !empty($where) ? " AND " . implode(" AND ", $where) : "";
+
+        // ============================
+        // 🧾 MAPPING KOLOM UNTUK SORT
+        // ============================
+
+        $columns = [
+            'id',
+            'divisi',
+            'warehouse_name',
+            'receive_date',
+            'pr_no',
+            'barang_name',
+            'spesifikasi',
+            'qty',
+            'kode_satuan',
+        ];
+
+        $orderBy = "";
+        if ($orderColumnIndex !== null && isset($columns[$orderColumnIndex])) {
+            $col = $columns[$orderColumnIndex];
+            $dir = strtoupper($orderDir) === 'DESC' ? 'DESC' : 'ASC';
+            $orderBy = " ORDER BY $col $dir ";
+        }
+        // ============================
+        // 🧩 BASE QUERY 3 UNION
+        // ============================
+
+        $baseQuery = "
+        (
+            -- HASIL PRODUKSI
+            SELECT 
+                production_result_details.id,
+                divisis.divisi AS divisi,
+                warehouses.warehouse_name,
+                production_results.receive_date,
+                production_results.pr_no,
+                barang_master.kode_barang,
+                barang_master.barang_name,
+                barang_master_spesifikasi.spesifikasi,
+                production_result_details.qty AS qty_diterima,
+                satuans.kode_satuan,
+                production_result_details.barang1_id
+            FROM production_result_details
+            LEFT JOIN production_results ON production_results.id = production_result_details.production_result_id
+            LEFT JOIN barang_master ON barang_master.id = production_result_details.barang1_id
+            LEFT JOIN barang_master_spesifikasi ON barang_master_spesifikasi.id = production_result_details.barang2_id
+            LEFT JOIN stock_revamp ON stock_revamp.id = production_result_details.stock_id
+            LEFT JOIN satuans ON satuans.id = stock_revamp.unit_id
+            LEFT JOIN divisis ON divisis.id = production_result_details.divisi_id
+            LEFT JOIN warehouses ON warehouses.id = production_result_details.warehouse_id
+            WHERE production_result_details.deletedAt IS NULL
+            $filterCondition
+            $search
         )
     ";
 

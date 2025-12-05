@@ -826,6 +826,9 @@
         if (data.order[0].column === 9) {
             data.order[0].column = 13;
         }
+        if (data.order[0].column === 11) {
+            data.order[0].column = 15;
+        }
     });
 
     $('#dateStart,#dateEnd,#divisi_id,#warehouse_id,#barang_id,#type_barang').change(function() {
