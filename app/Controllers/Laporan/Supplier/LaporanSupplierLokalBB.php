@@ -318,9 +318,9 @@ class LaporanSupplierLokalBB extends BaseController
             $proporsi   = ($qtyTotalPO > 0) ? ($qtyDetail / $qtyTotalPO) : 0;
 
             // Proporsional tambahan
-            $dppTambahan   = floatval($r->sum_dpp_tambahan ?? 0) * $proporsi;
-            $pphTambahan   = floatval($r->sum_pph_tambahan ?? 0) * $proporsi;
-            $totalTambahan = floatval($r->sum_nilai_total_tambahan ?? 0) * $proporsi;
+            $dppTambahan   = floatval($r->sum_dpp_tambahan ?? 0);
+            $pphTambahan   = floatval($r->sum_pph_tambahan ?? 0);
+            $totalTambahan = floatval($r->sum_nilai_total_tambahan ?? 0);
 
             // === NILAI SESUAI DATATABLE (PAKAI sum_*) ===
             $dppUmum    = floatval($r->sum_dpp_umum ?? 0);
@@ -619,9 +619,9 @@ class LaporanSupplierLokalBB extends BaseController
             $proporsi   = ($qtyTotalPO > 0) ? ($qtyDetail / $qtyTotalPO) : 0;
 
             // Proporsional tambahan
-            $dppTambahan   = floatval($r->sum_dpp_tambahan ?? 0) * $proporsi;
-            $pphTambahan   = floatval($r->sum_pph_tambahan ?? 0) * $proporsi;
-            $totalTambahan = floatval($r->sum_nilai_total_tambahan ?? 0) * $proporsi;
+            $dppTambahan   = floatval($r->sum_dpp_tambahan ?? 0);
+            $pphTambahan   = floatval($r->sum_pph_tambahan ?? 0);
+            $totalTambahan = floatval($r->sum_nilai_total_tambahan ?? 0);
 
             // === NILAI SESUAI DATATABLE (PAKAI sum_*) ===
             $dppUmum    = floatval($r->sum_dpp_umum ?? 0);
@@ -770,9 +770,9 @@ class LaporanSupplierLokalBB extends BaseController
             $proporsi   = ($qtyTotalPO > 0) ? ($qtyDetail / $qtyTotalPO) : 0;
 
             // Proporsional tambahan
-            $dppTambahan   = floatval($r->sum_dpp_tambahan ?? 0) * $proporsi;
-            $pphTambahan   = floatval($r->sum_pph_tambahan ?? 0) * $proporsi;
-            $totalTambahan = floatval($r->sum_nilai_total_tambahan ?? 0) * $proporsi;
+            $dppTambahan   = floatval($r->sum_dpp_tambahan ?? 0);
+            $pphTambahan   = floatval($r->sum_pph_tambahan ?? 0);
+            $totalTambahan = floatval($r->sum_nilai_total_tambahan ?? 0);
 
             // === NILAI SESUAI DATATABLE (PAKAI sum_*) ===
             $dppUmum    = floatval($r->sum_dpp_umum ?? 0);
@@ -1030,9 +1030,9 @@ class LaporanSupplierLokalBB extends BaseController
             $proporsi   = ($qtyTotalPO > 0) ? ($qtyDetail / $qtyTotalPO) : 0;
 
             // Proporsional tambahan
-            $dppTambahan   = floatval($r->sum_dpp_tambahan ?? 0) * $proporsi;
-            $pphTambahan   = floatval($r->sum_pph_tambahan ?? 0) * $proporsi;
-            $totalTambahan = floatval($r->sum_nilai_total_tambahan ?? 0) * $proporsi;
+            $dppTambahan   = floatval($r->sum_dpp_tambahan ?? 0);
+            $pphTambahan   = floatval($r->sum_pph_tambahan ?? 0);
+            $totalTambahan = floatval($r->sum_nilai_total_tambahan ?? 0);
 
             // === NILAI SESUAI DATATABLE (PAKAI sum_*) ===
             $dppUmum    = floatval($r->sum_dpp_umum ?? 0);
