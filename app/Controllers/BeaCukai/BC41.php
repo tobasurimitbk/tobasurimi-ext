@@ -5,10 +5,12 @@ namespace App\Controllers\BeaCukai;
 use App\Controllers\BaseController;
 use App\Helpers\BeaCukaiApi;
 use App\Models\BarangMasterSpesifikasiModel;
-use App\Models\BC25Model;
 use App\Models\BC41Model;
+use App\Models\BcPengeluaranBarangModel;
 use App\Models\BCPurchaseOrderModel;
 use App\Models\CeisaSettingModel;
+use App\Models\CustomerModel;
+use App\Models\DivisisModel;
 use App\Models\HsCodesModel;
 use App\Models\KantorBeaCukaiModel;
 use App\Models\MetadataModel;
@@ -20,11 +22,12 @@ use App\Models\SalesOrderDetailModel;
 use App\Models\SalesOrderLainDetailModel;
 use App\Models\SalesOrderLainModel;
 use App\Models\SalesOrderModel;
+use App\Models\SatuansModel;
 use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
 use App\Models\StockModel;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use App\Models\StockRevampDetailModel;
+use Exception;
 
 // META DATA -> jenis_dok_aju
 // BC 2.3 -> 48
@@ -52,7 +55,6 @@ class BC41 extends BaseController
     protected $pengusahaTPBModel;
     protected $barangMasterSpesifikasiModel;
     protected $bc41Model;
-    protected $bc25Model;
     protected $hsCodeModel;
     protected $bcPurchaseOrderModel;
     protected $pengembalianBarangModel;
@@ -60,6 +62,11 @@ class BC41 extends BaseController
     protected $pengembalianBarangDetailModel;
     protected $salesOrderModel;
     protected $salesOrderDetailModel;
+    protected $divisiModel;
+    protected $satuanModel;
+    protected $customerModel;
+    protected $bcPengeluaranBarangModel;
+    protected $stockRevampDetailModel;
 
     public function __construct()
     {
@@ -74,7 +81,6 @@ class BC41 extends BaseController
         $this->kantorBeaCukaiModel = new KantorBeaCukaiModel();
         $this->pengusahaTPBModel = new PengusahaTPBModel();
         $this->barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
-        $this->bc25Model = new BC25Model();
         $this->hsCodeModel = new HsCodesModel();
         $this->bcPurchaseOrderModel = new BCPurchaseOrderModel();
         $this->pengembalianBarangModel = new PengembalianBarangModel();
@@ -82,10 +88,14 @@ class BC41 extends BaseController
         $this->pengembalianBarangDetailModel = new PengembalianBarangDetailModel();
         $this->salesOrderModel = new SalesOrderModel();
         $this->salesOrderDetailModel = new SalesOrderDetailModel();
-
+        $this->stockRevampDetailModel = new StockRevampDetailModel();
         $this->this_user_id = session()->get("login")->user_id;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->akunCeisa = $this->ceisaSettingModel->where('company_id', $this->this_company_id)->first();
+        $this->satuanModel = new SatuansModel();
+        $this->bcPengeluaranBarangModel = new BcPengeluaranBarangModel();
+        $this->divisiModel = new DivisisModel();
+        $this->customerModel = new CustomerModel();
     }
 
     public function index()
@@ -97,493 +107,257 @@ class BC41 extends BaseController
         return view('BeaCukai/BC-41/index', $data);
     }
 
-    public function online()
-    {
-        $data = [
-            'baseUrl' => $this->metaDataModel->where('name', "Base Url BC")->first()['value']
-        ];
-
-        return view('BeaCukai/BC-41/online', $data);
-    }
-
-    public function allOnline()
-    {
-        $username = ($this->akunCeisa == null ? "" : $this->akunCeisa['username']);
-        $password = ($this->akunCeisa == null ? "" : $this->akunCeisa['password']);
-
-        $beacukaiApi = new BeaCukaiApi($username, $password);
-        $dataOnline = $beacukaiApi->getListStatusResponseAll();
-
-        $newDataResult = [];
-        foreach ($dataOnline->dataRespon as $d) {
-            if ($d->kodeDokumen == "41") {
-                $newDataResult[] = $d;
-            }
-        }
-        $dataOnline->dataRespon = $newDataResult;
-
-        if ($dataOnline->status == false) {
-            return response()->setJSON($dataOnline);
-        } else {
-            return response()->setJSON([
-                'data' => $dataOnline,
-                'status' => true
-            ]);
-        }
-    }
     public function all()
     {
-        $payload = [
-            "pageSize"      => $this->request->getGet("length"),
-            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search"        => $this->request->getGet("search"),
-            "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType"),
-            "company_id"    => $this->this_company_id,
-            "type"          => "BC 4.1"
-        ];
+        $draw = $this->request->getGet('draw');
+        $start = (int)$this->request->getGet('start');
+        $length = (int)$this->request->getGet('length');
+        $orderDir = $this->request->getGet('order')[0]['dir'] ?? 'asc';
+        $orderColumnIndex = $this->request->getGet('order')[0]['column'] ?? null;
+
+        $dateStart = $this->request->getVar("dateStart")
+            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart"))))
+            : null;
+
+        $dateEnd = $this->request->getVar("dateEnd")
+            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd"))))
+            : null;
+
+        $statusPosting = $this->request->getGet('status_posting');
+        $search = $this->request->getGet('search');
 
         $condition = [
-            "bc_41.company_id"  => $this->this_company_id,
-            "bc_41.deletedAt" => null,
+            'company_id'        => $this->this_company_id,
+            'dateStart'         => $dateStart,
+            'dateEnd'           => $dateEnd,
+            'status_posting'    => $statusPosting,
+            'search'            => $search
         ];
 
-        $addCondition = [
-            "sort" => $this->request->getGet("sort"),
-            "sortType" => $this->request->getGet("sortType"),
-            "statusPosting" => $this->request->getGet("statusPosting"),
-            "mulaiTanggalBC41" => $this->request->getGet("mulaiTanggalBC41"),
-            "selesaiTanggalBC41" => $this->request->getGet('selesaiTanggalBC41'),
-            "noAju" => $this->request->getGet('noAju'),
-            'asalPengeluaran' => $this->request->getGet('asalPengeluaran'),
-        ];
+        $data = $this->bc41Model->getList(
+            $condition,
+            $orderColumnIndex,
+            $orderDir,
+            $length,
+            $start
+        );
 
-        $limit = $this->request->getGet("length");
-        $offset = $this->request->getGet("start");
-
-        $beaCukaiData = $this->bc41Model->getList($condition, $addCondition, $limit, $offset);
-
-        $dataBeaCukai = [];
-
-        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
-
-        foreach ($beaCukaiData['data'] as $data) {
-            $detail = $this->bc41Model->detail($data->id);
-            if ($data->tipe_sales_order == "ORDER FORM LOKAL" || $data->tipe_sales_order == "ORDER FORM LAIN") {
-                // CUSTOMER EKSPOR
-                $tipe_penerima = "CUSTOMER";
-            } else {
-                // SUPPLIER
-                $tipe_penerima = "SUPPLIER";
-            }
-            array_push($dataBeaCukai, [
-                "no"                    => $no++,
-                "id"                    => encrypt($data->id),
-                "tipe_sales_order"      => $data->tipe_sales_order,
-                "no_order_form"         => $detail['no_reference'],
-                "tipe_penerima"         => $tipe_penerima,
-                "nama_penerima"         => $detail['nama_penerima'],
-                "no_aju"                => $data->no_aju . " / " . $data->no_daftar,
-                "tanggal_bc_41"         => $data->createdAt == null ? '-' : date('d/m/Y', strtotime($data->createdAt)),
-                "status_posting"        => $data->status_posting,
-                "status_dokumen"        => strtoupper($data->status_dokumen),
+        $dataResult = array();
+        $no = $start + 1;
+        foreach ($data['data'] as $d) {
+            array_push($dataResult, [
+                'no' => $no++,
+                'id' => encrypt($d['id']),
+                'jenis_pengeluaran' => $d['jenis_pengeluaran'],
+                'reference_penerima' => $d['reference_penerima'],
+                'multiple_reference_no' => str_replace(['"', ']', '['], " ",  $d['multiple_reference_no']),
+                "no_aju" => ($d['no_aju'] == "" ? "-" : $d['no_aju']) . " / " . ($d['no_daftar'] == "" ? "-" : $d['no_daftar']),
+                'tanggal' => !empty($d['tanggal']) && $d['tanggal'] != null ? date('d/m/Y', strtotime($d['tanggal'])) : "",
+                'status_posting' => $d['status_posting'],
             ]);
         }
 
-        $data = [
-            "draw"              => intval($this->request->getGet("draw")),
-            "recordsTotal"      => $beaCukaiData['totalData'],
-            "recordsFiltered"   => $beaCukaiData['totalFilteredData'],
-            "data"              => $dataBeaCukai,
-            "payload"           => $payload
-        ];
-
-        return response()->setJSON($data);
-    }
-
-    public function getReference()
-    {
-        $referenceType = $this->request->getVar('reference_type');
-        if ($referenceType == "RETUR PEMBELIAN") {
-            $reference = $this->bc41Model->getListPengembalianBarang($this->this_company_id);
-        } elseif ($referenceType == "ORDER FORM LAIN") {
-            $reference = $this->bc41Model->getListSalesOrderLain($this->this_company_id);
-        } elseif ($referenceType == "ORDER FORM LOKAL") {
-            $reference = $this->bc41Model->getListSalesOrderLokal($this->this_company_id);
-        }
-
-        return response()->setJSON([
-            'status' => true,
-            'data' => $reference,
+        return $this->response->setJSON([
+            'draw' => intval($draw),
+            'recordsTotal' => intval($data['totalData'] ?? 0),
+            'recordsFiltered' => intval($data['totalFilteredData'] ?? 0),
+            'data' => $dataResult,
         ]);
-    }
-
-    public function getDetailReference()
-    {
-        $referenceType = $this->request->getVar('reference_type');
-        $referenceId = ($this->request->getVar('reference_id'));
-
-        if ($referenceType == "RETUR PEMBELIAN") {
-            $referenceDetail = $this->pengembalianBarangModel->getReturBeaCukaiDetail($referenceId);
-        } elseif ($referenceType == "ORDER FORM LAIN") {
-            $referenceDetail = $this->salesOrderLainDetailModel->detail($referenceId);
-        } elseif ($referenceType == "ORDER FORM LOKAL") {
-            $referenceDetail = $this->bc25Model->getListBarangSalesOrderLokal($referenceId, $referenceType);
-        }
-
-        return response()->setJSON([
-            'data' => $referenceDetail,
-            'token' => csrf_hash(),
-            'status' => true
-        ]);
-    }
-
-    public function create()
-    {
-        $data = [
-            'noAju' => $this->generateNomorAju(),
-        ];
-
-        return view('BeaCukai/BC-41/form', $data);
     }
 
     public function createAction()
     {
-        $referenceType = $this->request->getVar('reference_type');
-        if ($referenceType == "ORDER FORM LOKAL") {
-            $salesOrderId = $this->request->getVar('reference_id');
-            $salesOrderLainId = null;
-            $pengembalianBarangId = null;
-        } elseif ($referenceType == "RETUR PEMBELIAN") {
-            $salesOrderId = null;
-            $salesOrderLainId = null;
-            $pengembalianBarangId = $this->request->getVar('reference_id');
-        } elseif ($referenceType == "ORDER FORM LAIN") {
-            $salesOrderId = null;
-            $salesOrderLainId = $this->request->getVar('reference_id');
-            $pengembalianBarangId = null;
-        }
+        try {
+            $tanggal = formatDMYtoYMD($this->request->getVar('tanggal'));
+            $jenisPengeluaran = $this->request->getVar('jenis_pengeluaran');
+            $noAju = $this->generateNomorAju($tanggal);
+            $payload = $this->get_payload();
 
-        $this->bc41Model->insert([
-            'company_id' => $this->this_company_id,
-            'sales_order_id' => $salesOrderId,
-            'sales_order_lain_id' => $salesOrderLainId,
-            'pengembalian_barang_id' => $pengembalianBarangId,
-            'tipe_sales_order' => $this->request->getVar('reference_type'),
-            'no_aju' => $this->request->getVar('no_aju'),
-            'no_daftar' => $this->request->getVar('no_daftar'),
-            'status_posting' => '0',
-            'createdAt' => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal"))))
-        ]);
+            $payload = json_decode($payload);
+            $payload->nomorAju = $noAju;
+            $payload->tanggalAju = $tanggal;
+            $payload->idPengguna = "NPWP";
 
-        if ($referenceType == "ORDER FORM LOKAL") {
-            $this->salesOrderModel->update($salesOrderId, [
-                'bc_type' => 54
+            $payloadUpdate = json_encode($payload);
+
+            $id = $this->bc41Model->insert([
+                'company_id' => $this->this_company_id,
+                'tanggal' => $tanggal,
+                'jenis_pengeluaran' => $jenisPengeluaran,
+                'no_aju' => $noAju,
+                'no_daftar' => null,
+                'multiple_reference_id' => null,
+                'multiple_reference_no' => null,
+                'status_dokumen' => "Belum Lengkap",
+                'payload' => $payloadUpdate,
+                'status_posting' => 0
+            ]);
+
+            return response()->setJSON([
+                'message' => 'Dokumen berhasil dibuat',
+                'id' => encrypt($id),
+                'status' => true
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'message' => $e->getMessage(),
+                'token' => csrf_hash(),
+                'status' => false
             ]);
         }
-
-        if ($referenceType == "RETUR PEMBELIAN") {
-            $this->pengembalianBarangModel->update($pengembalianBarangId, [
-                'bc_pengeluaran_id' => 54
-            ]);
-        }
-
-
-        return response()->setJSON([
-            'status' => true,
-            'message' => "Dokumen BC 4.1 Berhasil Disimpan"
-        ]);
     }
-
-    public function updateAction()
+    public function updateDetail()
     {
-        $id = decrypt($this->request->getVar('id'));
+        // return response()->setJSON([
+        //     'token' => csrf_hash(),
+        //     '$_POST' => $_POST,
+        //     'listStock' => json_decode($_POST['listStock']),
+        //     'status' => false
+        // ]);
+        $db = \Config\Database::connect();
+        $db->transBegin();
+        try {
+            $id = decrypt($this->request->getVar('id'));
+            $tanggal = formatDMYtoYMD($this->request->getVar('tanggal'));
+            $jenisPengeluaran = $this->request->getVar('jenis_pengeluaran');
+            $noAju = $this->request->getVar('no_pengajuan');
+            $noDaftar = $this->request->getVar('no_daftar');
+            $referencePenerimaId = $this->request->getVar('reference_penerima_id');
+            $multipleReferenceIdArr = $this->request->getVar('multiple_reference_id');
+            $multipleReferenceNo = null;
+            $multipleReferenceId = null;
 
-        $referenceType = $this->request->getVar('reference_type');
-        if ($referenceType == "ORDER FORM LOKAL") {
-            $salesOrderId = $this->request->getVar('reference_id');
-            $salesOrderLainId = null;
-            $pengembalianBarangId = null;
-        } elseif ($referenceType == "RETUR PEMBELIAN") {
-            $salesOrderId = null;
-            $salesOrderLainId = null;
-            $pengembalianBarangId = $this->request->getVar('reference_id');
-        } elseif ($referenceType == "ORDER FORM LAIN") {
-            $salesOrderId = null;
-            $salesOrderLainId = $this->request->getVar('reference_id');
-            $pengembalianBarangId = null;
-        }
+            if (!empty($multipleReferenceIdArr) && count($multipleReferenceIdArr) != 0) {
+                $multipleReferenceNo = $this->bcPengeluaranBarangModel->getReferensiNoPengeluaranOrderFormLokal($multipleReferenceIdArr);
+                $multipleReferenceId = "[" . implode(",", $multipleReferenceIdArr) . "]";
+            }
 
-        $this->bc41Model->update($id, [
-            'company_id' => $this->this_company_id,
-            'sales_order_id' => $salesOrderId,
-            'sales_order_lain_id' => $salesOrderLainId,
-            'pengembalian_barang_id' => $pengembalianBarangId,
-            'tipe_sales_order' => $this->request->getVar('reference_type'),
-            'no_aju' => $this->request->getVar('no_aju'),
-            'no_daftar' => $this->request->getVar('no_daftar'),
-            'status_posting' => '0',
-            'createdAt' => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal"))))
-        ]);
 
-        if ($referenceType == "ORDER FORM LOKAL") {
-            $this->salesOrderModel->update($salesOrderId, [
-                'bc_type' => 54
+            $this->bc41Model->update($id, [
+                'tanggal' => $tanggal,
+                'reference_penerima_id' => $referencePenerimaId,
+                'no_aju' => $noAju,
+                'no_daftar' => $noDaftar,
+                'multiple_reference_id' => $multipleReferenceId,
+                'multiple_reference_no' => $multipleReferenceNo,
+                'jenis_pengeluaran' => $jenisPengeluaran,
+            ]);
+
+            $listStock = json_decode($this->request->getVar('listStock'));
+            $this->bcPengeluaranBarangModel->where('bc_pengeluaran_id', $id)->where('tipe_bc', "BC 4.1")->delete(null, true);
+            foreach ($listStock as $l) {
+                $stock = $this->stockRevampDetailModel
+                    ->select('stock_revamp_detail.*,stock_revamp.barang_master_id')
+                    ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
+                    ->where('stock_revamp_detail.id', $l->id)
+                    ->first();
+
+                $this->bcPengeluaranBarangModel->insert([
+                    'stock_detail_id'    => $l->id,
+                    'barang_master_id'   => $stock['barang_master_id'],
+                    'bc_pengeluaran_id'  => $id,
+                    'unit_id_konversi'   => $l->keluar->unit_id_konversi,
+                    'unit_id_keluar'     => $l->keluar->unit_id_keluar,
+                    'valas_id'           => $l->keluar->valas_id,
+                    'tipe_bc'            => "BC 4.1",
+                    'harga_satuan'       => $l->keluar->harga_satuan,
+                    'nilai_tukar'        => $l->keluar->nilai_tukar,
+                    'sub_total'          => $l->keluar->sub_total,
+                    'qty_keluar'         => $l->keluar->qty_keluar,
+                    'qty_konversi'       => $l->keluar->qty_konversi,
+                ]);
+            }
+
+            $db->transCommit();
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'message' => "Berhasil update",
+                'status' => true
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => $e->getMessage()
             ]);
         }
-
-        if ($referenceType == "RETUR PEMBELIAN") {
-            $this->pengembalianBarangModel->update($pengembalianBarangId, [
-                'bc_pengeluaran_id' => 54
-            ]);
-        }
-
-        return response()->setJSON([
-            'status' => true,
-            'message' => "Dokumen BC 4.1 Berhasil Diupdate"
-        ]);
     }
+
 
     public function detail($id)
     {
         $id = decrypt($id);
-        $bc41 = $this->bc41Model->detail($id);
+        $bc41 = $this->bc41Model->where('id', $id)->first();
+        $dataTipeBarang = $this->metaDataModel
+            ->where('deletedAt', null)
+            ->where('name', "Kategori Barang")
+            ->where('description !=', "kemasan")
+            ->findAll();
 
         if ($bc41 == null) {
             return redirect()->to('bea-cukai-bc-41');
         }
 
-        if ($bc41['tipe_sales_order'] == "ORDER FORM LAIN") {
-            $reference = $this->bc41Model->getListSalesOrderLain($this->this_company_id, $bc41['sales_order_lain_id']);
-        } elseif ($bc41['tipe_sales_order'] == "RETUR PEMBELIAN") {
-            $reference = $this->bc41Model->getListPengembalianBarang($this->this_company_id, $bc41['pengembalian_barang_id']);
-        } elseif ($bc41['tipe_sales_order'] == "ORDER FORM LOKAL") {
-            $reference = $this->bc41Model->getListSalesOrderLokal($this->this_company_id, $bc41['sales_order_id']);
+        $satuan = $this->satuanModel->where('deletedAt', null)->findAll();
+        $dataValuta = $this->metaDataModel->where('name', "Valuta")->where('deletedAt', null)->findAll();
+        $divisi = $this->divisiModel->getDivisiAccess();
+        $dataCustomer = [];
+        $dataReferencePengeluaran = [];
+
+        if ($bc41['reference_penerima_id'] != null) {
+            $dataCustomer = $this->customerModel->where('id', $bc41['reference_penerima_id'])->findAll();
         }
 
+        if ($bc41['multiple_reference_id'] != null) {
+            $dataReferencePengeluaran = $this->salesOrderModel->whereIn('id', json_decode($bc41['multiple_reference_id']))->where('deletedAt', null)->findAll();
+        }
+
+        $dataBarang = $this->bcPengeluaranBarangModel->getDetailBarang(
+            $id,
+            "BC 4.1"
+        );
+
         $data = [
-            'noAju' => $this->generateNomorAju(),
-            'reference' => $reference,
-            'bc41' => $bc41
+            'bc41' => $bc41,
+            'tipeBarang' => $dataTipeBarang,
+            'dataSatuan' => $satuan,
+            'noAju' => $bc41 == null ? $this->generateNomorAju($bc41['tanggal']) : $bc41['no_aju'],
+            'dataValuta' => $dataValuta,
+            'dataCustomer' => $dataCustomer,
+            'dataReferencePengeluaran' => $dataReferencePengeluaran,
+            'dataBarang' => $dataBarang,
+            'divisi' => $divisi
         ];
 
         return view('BeaCukai/BC-41/form', $data);
     }
 
-    public function checkNoAju()
-    {
-        $id = decrypt($this->request->getVar('id'));
-        $noAju = $this->request->getVar('no_aju');
-        $isUsed = true;
-
-        if (!empty($this->request->getVar('id'))) {
-            // UPDATE
-            $first = $this->bc41Model
-                ->where('company_id', $this->this_company_id)
-                ->where(
-                    'no_aju',
-                    $noAju
-                )
-                ->where('id != ', $id)
-                ->first();
-
-            if ($first != null) {
-                $isUsed = false;
-            }
-        } else {
-            // CREATE
-            $first = $this->bc41Model
-                ->where('company_id', $this->this_company_id)
-                ->where(
-                    'no_aju',
-                    $noAju
-                )
-                ->first();
-
-            if ($first != null) {
-                $isUsed = false;
-            }
-        }
-
-        if (!$isUsed) {
-            return response()->setJSON([
-                'status' => false,
-                'message' => "No aju sudah digunakan"
-            ]);
-        } else {
-            return response()->setJSON([
-                'status' => true,
-                'message' => "No aju tersedia"
-            ]);
-        }
-    }
 
     public function delete()
     {
-        $id = decrypt($this->request->getVar('id'));
-        $bc41 = $this->bc41Model->where('id', $id)->first();
-        $this->bc41Model->delete($id);
-
-
-        if ($bc41['tipe_sales_order'] == "ORDER FORM LOKAL") {
-            $this->salesOrderModel->update($bc41['sales_order_id'], [
-                'bc_type' => null
+        try {
+            $id = decrypt($this->request->getVar('id'));
+            $this->bc41Model->delete($id);
+            $this->bcPengeluaranBarangModel->where('bc_pengeluaran_id', $id)->where('tipe_bc', "4.1")->delete(null, false);
+            return response()->setJSON([
+                'status' => true,
+                'token' => csrf_hash(),
+                'message' => "Dokumen BC 4.1 Berhasil Dihapus"
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'message' => $e->getMessage(),
+                'token' => csrf_hash(),
+                'status' => false
             ]);
         }
-
-        if ($bc41['tipe_sales_order'] == "RETUR PEMBELIAN") {
-            $this->pengembalianBarangModel->update($bc41['pengembalian_barang_id'], [
-                'bc_pengeluaran_id' => null
-            ]);
-        }
-
-        return response()->setJSON([
-            'status' => true,
-            'message' => "Dokumen BC 4.1 Berhasil Dihapus"
-        ]);
     }
 
     public function posting()
     {
         $id = decrypt($this->request->getVar('id'));
-        $bc41 = $this->bc41Model->find($id);
-
         $db = \Config\Database::connect();
         $db->transStart();
-
-        if ($bc41['sales_order_lain_id'] != null) {
-            // KURANGIN STOK NYA
-            $salesOrderLain = $this->salesOrderLainModel->find($bc41['sales_order_lain_id']);
-            $salesOrderLainList = $this->salesOrderLainDetailModel->where('sales_order_lain_id', $bc41['sales_order_lain_id'])->findAll();
-
-            foreach ($salesOrderLainList as $s) {
-                $stock = $this->stockModel->find($s['stock_id']);
-                $qty = $s['qty_konversi'];
-
-                if ($stock['tipe_barang'] == "kemasan") {
-                    $barang2_id = $stock['kemasan_id'];
-                } else {
-                    $barang2_id = $stock['barang2_id'];
-                }
-
-                // BARANG LAMA
-                $stockOldDetail = $this->stockDetail2Model->getStockListDetail(
-                    $s['stock_id'],
-                    $s['bc_id'],
-                    $s['no_aju'],
-                    $s['stock_dokumen']
-                );
-
-                $stok = $this->stockModel->insertStok(
-                    $salesOrderLain['company_id'],
-                    $salesOrderLain['warehouse_id'],
-                    $salesOrderLain['divisi_id'],
-                    $stock['tipe_barang'],
-                    $stock['barang1_id'],
-                    $barang2_id,
-                    ($qty * -1),
-                );
-
-                // DETAIL
-                $stokDetail = $this->stockDetailModel->insertStokDetail(
-                    $stok,
-                    $qty,
-                    "Out",
-                    date('Y-m-d'),
-                    $this->this_user_id,
-                    "PENJUALAN",
-                    $salesOrderLain['no_sales_order'],
-                    $salesOrderLain['keterangan'],
-                );
-
-                // SUB DETAIL
-                $this->stockDetail2Model->insertStokDetail2(
-                    $s['bc_id'],
-                    $stok,
-                    $stokDetail,
-                    $qty,
-                    $s['no_aju'],
-                    $salesOrderLain['no_sales_order'],
-                    $s['stock_dokumen'],
-                    $stockOldDetail['supplier_id'],
-                    $s['total_harga'],
-                    null,
-                    null,
-                    $stockOldDetail['no_po']
-                );
-            }
-        } elseif ($bc41['pengembalian_barang_id'] != null) {
-
-            $pengembalianBarang = $this->pengembalianBarangModel->find($bc41['pengembalian_barang_id']);
-            $penerimaanBarang = $this->penerimaanBarangModel->find($pengembalianBarang['penerimaan_barang_id']);
-
-            if ($penerimaanBarang == null) {
-                return response()->setJSON([
-                    'status' => true,
-                    'message' => "Gagal Posting, Terjadi Kesalahan Saat Menambahkan Stok"
-                ]);
-            } else {
-                $pengembalianBarangDetail =  $this->pengembalianBarangModel->getReturBeaCukaiDetail($bc41['pengembalian_barang_id']);
-
-                foreach ($pengembalianBarangDetail as $p) {
-
-                    $stock = $this->stockModel->find($p['stock_id']);
-                    $qty = $p['qty_konversi'];
-
-                    if ($stock['tipe_barang'] == "kemasan") {
-                        $barang2_id = $stock['kemasan_id'];
-                    } else {
-                        $barang2_id = $stock['barang2_id'];
-                    }
-
-                    // BARANG LAMA
-                    $stockOldDetail = $this->stockDetail2Model->getStockListDetail(
-                        $p['stock_id'],
-                        $p['bc_id'],
-                        $p['no_aju'],
-                        $p['stock_dokumen']
-                    );
-
-                    $stok = $this->stockModel->insertStok(
-                        $penerimaanBarang['company_id'],
-                        $penerimaanBarang['warehouse_id'],
-                        $penerimaanBarang['divisi_id'],
-                        $stock['tipe_barang'],
-                        $stock['barang1_id'],
-                        $barang2_id,
-                        ($qty * -1),
-                    );
-
-                    // DETAIL
-                    $stokDetail = $this->stockDetailModel->insertStokDetail(
-                        $stok,
-                        $qty,
-                        "Out",
-                        date('Y-m-d'),
-                        $this->this_user_id,
-                        "RETUR",
-                        $pengembalianBarang['no_surat_jalan'],
-                        $pengembalianBarang['keterangan'],
-                    );
-
-                    // SUB DETAIL
-                    $this->stockDetail2Model->insertStokDetail2(
-                        $p['bc_id'],
-                        $stok,
-                        $stokDetail,
-                        $qty,
-                        $p['no_aju'],
-                        $pengembalianBarang['no_surat_jalan'],
-                        $p['stock_dokumen'],
-                        $stockOldDetail['supplier_id'],
-                        $p['total_harga'],
-                        null,
-                        null,
-                        $stockOldDetail['no_po']
-                    );
-                }
-            }
-        }
 
         $this->bc41Model->update($id, ['status_posting' => '1']);
         $db->transComplete();
@@ -595,46 +369,77 @@ class BC41 extends BaseController
         $db->transCommit();
 
         return response()->setJSON([
+            'token'  => csrf_hash(),
             'status' => true,
             'message' => "Dokumen BC 4.1 Berhasil Diposting"
         ]);
     }
 
 
-    public function generateNomorAju()
+    public function generateNomorAju($tanggalDokumen)
     {
-        $ceisaSetting = $this->ceisaSettingModel->where('company_id', $this->this_company_id)->first();
-        $kodeDokumenbc41Static = $this->metaDataModel->where('name', "Kode BC41 Static")->first();
-
-        $kodeKantorStatic = $ceisaSetting['kode_kantor_pabean'];
-        $tanggalAju = date('Ymd');
-        $sequenceNoUrutPengajuan = "";
-
-        $bc41Last = $this->bc41Model->orderBy('createdAt', "DESC")->limit(1)->first();
-
-        if ($bc41Last == null) {
-            $sequenceNoUrutPengajuan = "000001";
+        if ($this->this_company_id == 1 || $this->this_company_id == 2) {
+            $company_id_arr = [1, 2];
         } else {
-            if ($bc41Last['no_aju'] == null) {
-                $sequenceNoUrutPengajuan = "000001";
-            } else {
-                // Buatkan auto increment
-                $arrNo = explode('-', $bc41Last['no_aju']);
+            $company_id_arr = [$this->this_company_id];
+        }
+        $ceisaSetting = $this->ceisaSettingModel
+            ->where('company_id', $this->this_company_id)
+            ->first();
+
+        $kodeDokumenbc41Static = $this->metaDataModel
+            ->where('name', "Kode BC41 Static")
+            ->first();
+
+        $kodeKantorStatic = $ceisaSetting['kode_unik']
+            ? $ceisaSetting['kode_unik']
+            : $ceisaSetting['kode_kantor_pabean'];
+
+        $tanggalAju = date('Ymd', strtotime($tanggalDokumen));
+        $tahunAjuSekarang = date('Y', strtotime($tanggalDokumen));
+
+        // Ambil BC40 terakhir berdasarkan urutan no_aju terbaru
+        $bc41Last = $this->bc41Model
+            ->whereIn('company_id', $company_id_arr)
+            ->orderBy('tanggal', "DESC")
+            ->limit(1)
+            ->first();
+
+        // Default urutan
+        $sequenceNoUrutPengajuan = "000001";
+
+        if ($bc41Last && $bc41Last['no_aju']) {
+            $arrNo = explode('-', $bc41Last['no_aju']);
+
+            // Pastikan format sesuai: DOC-KANTOR-YYYYMMDD-NOMOR
+            if (count($arrNo) === 4) {
+                $tanggalTerakhir = $arrNo[2];
+                $tahunTerakhir = substr($tanggalTerakhir, 0, 4);
                 $lastNomor = $arrNo[3];
-                // lakukan increment
-                $nextNomor = str_pad((int)$lastNomor + 1, strlen($lastNomor), '0', STR_PAD_LEFT);
-                $sequenceNoUrutPengajuan = $nextNomor;
+
+                if ($tahunTerakhir === $tahunAjuSekarang) {
+                    // Masih tahun yang sama → lanjutkan nomor urut
+                    $nextNomor = str_pad((int)$lastNomor + 1, strlen($lastNomor), '0', STR_PAD_LEFT);
+
+                    $sequenceNoUrutPengajuan = $nextNomor;
+                } else {
+                    // Tahun baru → reset ke 000001
+                    $sequenceNoUrutPengajuan = "000001";
+                }
             }
         }
 
-        return $kodeDokumenbc41Static['value'] . '-' . $kodeKantorStatic . '-' . $tanggalAju . '-' . $sequenceNoUrutPengajuan;
+        return $kodeDokumenbc41Static['value']
+            . '-' . $kodeKantorStatic
+            . '-' . $tanggalAju
+            . '-' . $sequenceNoUrutPengajuan;
     }
 
     public function header($id)
     {
         $id = decrypt($id);
 
-        $bc41 = $this->bc41Model->find($id);
+        $bc41 = $this->bc41Model->where('id', $id)->first();
         $ceisaSetting = $this->ceisaSettingModel->where('company_id', $this->this_company_id)->first();
 
         $this->setFlashDataNavigatorSession($id);
@@ -645,7 +450,7 @@ class BC41 extends BaseController
 
         $data = [
             'bc41' => $bc41,
-            'noAju' => $bc41 == null ? $this->generateNomorAju() : $bc41['no_aju'],
+            'noAju' => $bc41 == null ? $this->generateNomorAju($bc41['tanggal']) : $bc41['no_aju'],
             'kodeKantor' => $this->kantorBeaCukaiModel->findAll(),
             'kodeTujuanTpb' => $this->metaDataModel->where('name', "Jenis TPB")->findAll(),
             'kodeTujuanPengiriman' => $this->metaDataModel->where('name', "Kode Tujuan Pengiriman BC")->like('value', 40)->where('deletedAt', null)->findAll(),
@@ -970,7 +775,7 @@ class BC41 extends BaseController
             'payload' => $payload,
             'seriKemasan' => $seriKemasan,
             'seriKontainer' => $seriKontainer,
-            'dropdownKemasan' => $this->bc25Model->dropdownKemasan($bc41['sales_order_lain_id']),
+            // 'dropdownKemasan' => $this->bc25Model->dropdownKemasan($bc41['sales_order_lain_id']),
             'kodeJenisKemasan' => $this->metaDataModel->where('name', 'Jenis Kemasan')->orderBy('description', "ASC")->findAll(),
             'kodeTipeKontainer' => $this->metaDataModel->where('name', "Kode Tipe Kontainer BC")->findAll(),
             'kodeUkuranKontainer' => $this->metaDataModel->where('name', "Kode Ukuran Kontainer BC")->findAll(),
@@ -1510,241 +1315,54 @@ class BC41 extends BaseController
             $this->bc41Model->set('status_dokumen', "Belum Lengkap")->where('id', $id)->update();
         }
     }
-    public function viewOutstanding()
+
+    public function get_payload()
     {
-        return view('BeaCukai/BC-41/bc41outstanding');
-    }
+        $payloadArr = [
+            "asalData"               => "S",
+            "asuransi"               => 0,
+            "bruto"                  => 0,
+            "cif"                    => 0,
+            "dasarPengenaanPajak"    => 0,
+            "kodeJenisTpb"           => "",
+            "kodeJenisImpor"         => "",
+            "kodeJenisEkspor"        => "",
+            "freight"                => 0,
+            "hargaPenyerahan"        => 0,
+            "jabatanTtd"             => "",
+            "jumlahKontainer"        => 0,
+            "kodeDokumen"            => "41",
+            "kodeKantor"             => "",
+            "kodeLokasiBayar"        => "",
+            "kodePembayar"           => "",
+            "kodeTujuanPengiriman"   => "",
+            "kotaTtd"                => "",
+            "namaTtd"                => "",
+            "ndpbm"                  => 0,
+            "netto"                  => 0,
+            "nik"                    => "",
+            "nilaiBarang"            => 0,
+            "nomorAju"               => "",
+            "seri"                   => 1,
+            "tanggalAju"             => "",
+            "tanggalTtd"             => "",
+            "volume"                 => 0,
+            "biayaTambahan"          => 0,
+            "biayaPengurang"         => 0,
+            "vd"                     => 0,
+            "uangMuka"               => 0,
+            "ppnPajak"               => 0,
+            "ppnbmPajak"            => 0,
+            "tarifPpnPajak"          => 0,
+            "tarifPpnbmPajak"        => 0,
+            "entitas"                => [],
+            "dokumen"                => [],
+            "pengangkut"             => [],
+            "kontainer"              => [],
+            "kemasan"                => [],
+            "barang"                 => []
+        ];
 
-    public function allOutstanding()
-    {
-        $bc25Data = $this->bc25Model
-            ->where('company_id', $this->this_company_id)
-            ->where('deletedAt', null)
-            ->findAll();
-        $bc41Data = $this->bc41Model
-            ->where('company_id', $this->this_company_id)
-            ->where('deletedAt', null)
-            ->findAll();
-        $salesOrderLokalData = $this->salesOrderModel
-            ->where('id_company', $this->this_company_id)
-            ->where('deletedAt', null)
-            ->where('used', "USED")
-            ->findAll();
-        $pengembalianBarangData =  $this->pengembalianBarangModel
-            ->select('pengembalian_barang.*')
-            ->join('penerimaan_barang', 'penerimaan_barang.id = pengembalian_barang.penerimaan_barang_id', 'left')
-            ->where('penerimaan_barang.status_penerimaan', "LOKAL")
-            ->where('pengembalian_barang.company_id', $this->this_company_id)
-            ->where('pengembalian_barang.bc_pengeluaran_id', NULL)
-            ->where('pengembalian_barang.deletedAt', null)
-            ->findAll();
-        $salesOrderLainData = $this->salesOrderLainModel->where('company_id', $this->this_company_id)
-            ->where('deletedAt', null)
-            ->where('bc_id', 54)
-            ->findAll();
-
-
-        // Sales Order Lokal
-        $salesOrderLokalIdUse = [];
-        $salesOrderLokalIdNotUse = [];
-        $allSalesOrderLokalId = [];
-
-        // Pengembalian Barang
-        $pengembalianBarangIdUse = [];
-        $pengembalianBarangIdNotUse = [];
-        $allPengembalianBarangId = [];
-
-        // Sales Order Lain
-        $salesOrderLainIdUse = [];
-        $salesOrderLainIdNotUse = [];
-        $allSalesOrderLainId = [];
-
-        // Sales Order Lokal
-        foreach ($salesOrderLokalData as $s) {
-            array_push($allSalesOrderLokalId, $s['id']);
-        }
-
-        // Pengembalian Barang
-        foreach ($pengembalianBarangData as $p) {
-            array_push($allPengembalianBarangId, $p['id']);
-        }
-
-        // Sales Order Lain
-        foreach ($salesOrderLainData as $s) {
-            array_push($allSalesOrderLainId, $s['id']);
-        }
-
-        foreach ($bc41Data as $b) {
-            if ($b['tipe_sales_order'] == "ORDER FORM LOKAL") {
-                array_push($salesOrderLokalIdUse, $b['sales_order_id']);
-            } elseif ($b['tipe_sales_order'] == "ORDER FORM LAIN") {
-                array_push($salesOrderLainIdUse, $b['sales_order_lain_id']);
-            } elseif ($b['tipe_sales_order'] == "RETUR PEMBELIAN") {
-                array_push($pengembalianBarangIdUse, $b['pengembalian_barang_id']);
-            }
-        }
-
-        foreach ($bc25Data as $b) {
-            if ($b['tipe_sales_order'] == "ORDER FORM LOKAL") {
-                array_push($salesOrderLokalIdUse, $b['sales_order_id']);
-            } elseif ($b['tipe_sales_order'] == "RETUR PEMBELIAN") {
-                array_push($pengembalianBarangIdUse, $b['pengembalian_barang_id']);
-            }
-        }
-
-        $salesOrderLokalIdNotUse = array_diff($allSalesOrderLokalId, $salesOrderLokalIdUse);
-        $pengembalianBarangIdNotUse = array_diff($allPengembalianBarangId, $pengembalianBarangIdUse);
-        $salesOrderLainIdNotUse = array_diff($allSalesOrderLainId, $salesOrderLainIdUse);
-
-        $list = [];
-
-        // SALES ORDER LOKAL NOT USE
-        foreach ($salesOrderLokalIdNotUse as $s) {
-            $sol = $this->salesOrderModel
-                ->select('
-                    sales_order.id,
-                    sales_order.no_sales_order,
-                    customers.name as customer_name,
-                    customers.address
-                    ')
-                ->join('customers', 'customers.id = sales_order.id_customer', 'left')
-                ->where('sales_order.id', $s)
-                ->first();
-
-            $sold = $this->salesOrderDetailModel
-                ->select('count(*) as jumlah_barang, sum(amount) as total_harga')
-                ->where('id_sales_order', $s)
-                ->first();
-
-            if ($sold != null) {
-                array_push($list, [
-                    'id' => $sol['id'],
-                    'reference_type' => 'ORDER FORM LOKAL',
-                    'no_order' => $sol['no_sales_order'],
-                    'penerima' => $sol['customer_name'],
-                    'alamat' => $sol['address'],
-                    'jumlah_barang' => $sold['jumlah_barang'],
-                    'harga_barang' => number_format($sold['total_harga'], 2),
-                ]);
-            }
-        }
-
-        // RETUR PEMBELIAN NOT USE
-        foreach ($pengembalianBarangIdNotUse as $p) {
-            $pb = $this->pengembalianBarangModel
-                ->select('pengembalian_barang.*,suppliers.name as supplier_name, suppliers.address')
-                ->join('penerimaan_barang', 'penerimaan_barang.id = pengembalian_barang.penerimaan_barang_id', 'left')
-                ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
-                ->where('pengembalian_barang.id', $p)
-                ->first();
-
-            $pbd = $this->pengembalianBarangDetailModel
-                ->select('harga,harga_harian,harga_bulanan,jumlah_return')
-                ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.id = pengembalian_barang_detail.penerimaan_barang_detail_id')
-                ->where('pengembalian_barang_detail.pengembalian_barang_id', $p)
-                ->where('pengembalian_barang_detail.deletedAt', null)
-                ->findAll();
-
-            if ($pbd) {
-                $jumlahBarang = count($pbd);
-                $hargaBarang = 0;
-
-                foreach ($pbd as $p) {
-                    $hargaBarang += ($p['harga'] + $p['harga_harian'] + $p['harga_bulanan']) * $p['jumlah_return'];
-                }
-
-                array_push($list, [
-                    'id' => $pb['id'],
-                    'reference_type' => "RETUR PEMBELIAN",
-                    'no_order' => $pb['no_surat_jalan'],
-                    'penerima' => $pb['supplier_name'],
-                    'alamat' => $pb['address'],
-                    'tanggal' => date("d/m/Y", strtotime($pb['tanggal_surat_jalan'])),
-                    'jumlah_barang' => $jumlahBarang,
-                    'harga_barang' => number_format($hargaBarang, 2)
-                ]);
-            }
-        }
-
-        // SALES ORDER LAIN NOT USE
-        foreach ($salesOrderLainIdNotUse as $id) {
-            $sol = $this->salesOrderLainModel
-                ->select('
-                    sales_order_lain.id,
-                    customers.name,
-                    customers.address,
-                    sales_order_lain.no_sales_order,
-                    sales_order_lain.tanggal
-                ')
-                ->join('customers', 'customers.id = sales_order_lain.customer_id')
-                ->where('sales_order_lain.bc_id', '49')
-                ->where('sales_order_lain.id', $id)
-                ->first();
-
-            $sold = $this->salesOrderLainDetailModel
-                ->select('count(*) as jumlah_barang, sum(total_harga) as harga_barang')
-                ->where('sales_order_lain_detail.sales_order_lain_id', $id)
-                ->first();
-
-            if ($sold != null) {
-                array_push($list, [
-                    'id' => ($sol['id']),
-                    'reference_type' => "ORDER FORM LAIN",
-                    'penerima' => $sol['name'],
-                    'no_order' => $sol['no_sales_order'],
-                    'alamat' => $sol['address'],
-                    'tanggal' => date("d/m/Y", strtotime($sol['tanggal'])),
-                    'jumlah_barang' => $sold['jumlah_barang'],
-                    'harga_barang' => number_format($sold['harga_barang'], 2)
-                ]);
-            }
-        }
-        return json_encode($list);
-    }
-
-    public function OutstandingSheet()
-    {
-        $list = json_decode($this->allOutstanding());
-
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-
-        $spreadsheet->setActiveSheetIndex(0)
-            ->setCellValue('A1', 'No')
-            ->setCellValue('B1', 'Tujuan Pengeluaran')
-            ->setCellValue('C1', 'Order Form')
-            ->setCellValue('D1', 'Penerima')
-            ->setCellValue('E1', 'Alamat')
-            ->setCellValue('F1', 'Jumlah Barang')
-            ->setCellValue('G1', 'Nilai Barang');
-        $no = 1;
-        $column = 2;
-
-        foreach ($list as $l) {
-            $spreadsheet->setActiveSheetIndex(0)
-                ->setCellValue('A' . $column, $no++)
-                ->setCellValue('B' . $column,  $l->reference_type)
-                ->setCellValue('C' . $column,  $l->no_order)
-                ->setCellValue('D' . $column,  $l->penerima)
-                ->setCellValue('E' . $column,  $l->alamat)
-                ->setCellValue('F' . $column,  $l->jumlah_barang)
-                ->setCellValue('G' . $column,  $l->harga_barang);
-            $column++;
-        }
-        $writer = new Xlsx($spreadsheet);
-        $filename = 'Rekap BC25';
-        foreach (range('A', 'K') as $columnID) {
-            $sheet->getColumnDimension($columnID)->setAutoSize(true);
-        }
-
-        $writer = new Xlsx($spreadsheet);
-        $filename = 'Laporan-Outstanding-BC-4.1';
-
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename=' . $filename . '.xlsx');
-        header('Cache-Control: max-age=0');
-
-        $writer->save('php://output');
-        die;
+        return json_encode($payloadArr, JSON_UNESCAPED_SLASHES);
     }
 }

@@ -17,7 +17,7 @@ class BC41Model extends Model
     protected $allowedFields    = [];
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'createdAt';
     protected $updatedField  = 'updatedAt';
@@ -41,103 +41,108 @@ class BC41Model extends Model
     protected $afterDelete    = [];
 
 
-    public function getList($condition, $addCondition, $limit = 10, $offset = 0)
-    {
-        $availableSort = [
-            'sales_order_lain.divisi_id' => 'sales_order_lain.divisi_id',
-            'sales_order_lain.warehouse_id' => 'sales_order_lain.warehouse_id',
-            'sales_order_lain.no_sales_order' => 'sales_order_lain.no_sales_order',
-            'customers.name' => 'customers.name',
-            'bc_41.no_aju' => 'bc_41.no_aju',
-            'bc_41.createdAt' => 'bc_41.createdAt',
-            'bc_41.status_posting' => 'bc_41.status_posting',
-            'bc_41.status_dokumen' => 'bc_41.status_dokumen',
-            'pengembalian_barang.no_surat_jalan' => 'pengembalian_barang.no_surat_jalan',
-            'suppliers.name' => 'suppliers.name'
+    public function getList(
+        $condition,
+        $orderColumnIndex,
+        $orderDir,
+        $limit = 10,
+        $offset = 0
 
+    ) {
+        $db = \Config\Database::connect();
+        $where = [];
+        $whereDate = "";
+        $searchOrderForm = "";
+
+        if (!empty($condition['company_id'])) {
+            $where[] = "bc_41.company_id ='$condition[company_id]'";
+        }
+
+        if (!empty($condition['dateStart']) && !empty($condition['dateEnd'])) {
+            $whereDate = "AND bc_41.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
+        }
+
+        if (!empty($condition['status_posting'])) {
+            if ($condition['status_posting'] == "ALL") {
+                $where[] = "(bc_41.status_posting='1' OR bc_41.status_posting='0')";
+            } elseif ($condition['status_posting'] == "SUDAH POSTING") {
+                $where[] = "bc_41.status_posting='1'";
+            } else {
+                $where[] = "bc_41.status_posting='0'";
+            }
+        }
+
+        if (!empty($condition['search'])) {
+            $search = $db->escapeLikeString(trim($condition['search']));
+            $searchOrderForm = "
+              AND (
+                    customers.name LIKE '%{$search}%'
+                    OR bc_41.no_daftar LIKE '%{$search}%'
+                    OR bc_41.no_aju LIKE '%{$search}%'     
+                    OR bc_41.multiple_reference_no LIKE '%{$search}%'   
+                )
+            ";
+        }
+
+
+        $filterCondition = !empty($where) ? " AND " . implode(" AND ", $where) : "";
+
+        $columns = [
+            'id',
+            'jenis_pengeluaran',
+            'reference_penerima',
+            'reference_pengeluaran_id',
+            'multiple_reference_no',
+            'no_aju',
+            'tanggal',
+            'status_posting',
         ];
-        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'bc_41.createdAt';
-        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
-
-        $selectQry = "bc_41.*,
-        sales_order_lain.no_sales_order,
-        divisis.divisi,
-        warehouses.warehouse_name,
-        customers.name AS customer_name,
-        suppliers.name as supplier_name,
-        pengembalian_barang.no_surat_jalan";
-
-        $bcDataQry = $this->asObject()
-            ->select($selectQry)
-            ->join('sales_order_lain', 'sales_order_lain.id = bc_41.sales_order_lain_id', 'left')
-            ->join('divisis', 'divisis.id = sales_order_lain.divisi_id', 'left')
-            ->join('warehouses', 'warehouses.id = sales_order_lain.warehouse_id', 'left')
-            ->join('customers', 'customers.id = sales_order_lain.customer_id', 'left')
-            ->join('pengembalian_barang', 'pengembalian_barang.id = bc_41.pengembalian_barang_id', 'left')
-            ->join('penerimaan_barang', 'pengembalian_barang.penerimaan_barang_id = penerimaan_barang.id', 'left')
-            ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
-            ->where($condition)
-            ->orderBy($sort, $sortType);
-
-        $totalData = $bcDataQry->countAllResults(false);
-
-        if ($addCondition['statusPosting'] || $addCondition['noAju']  && (empty($addCondition['mulaiTanggalBC41']) && empty($addCondition['selesaiTanggalBC41']))) {
-            $bcDataQry->groupStart();
+        $orderBy = "";
+        if ($orderColumnIndex !== null && isset($columns[$orderColumnIndex])) {
+            $col = $columns[$orderColumnIndex];
+            $dir = strtoupper($orderDir) === 'DESC' ? 'DESC' : 'ASC';
+            $orderBy = " ORDER BY $col $dir ";
         }
 
-        if ($addCondition['statusPosting']) {
-            if ($addCondition['statusPosting'] == "ALL") {
-                $bcDataQry->whereIn('bc_41.status_posting', ['1', '0']);
-            } elseif ($addCondition['statusPosting'] == "SUDAH POSTING") {
-                $bcDataQry->where('bc_41.status_posting', "1");
-            } else if ($addCondition['statusPosting'] == "BELUM POSTING") {
-                $bcDataQry->where('bc_41.status_POSTING', "0");
-            }
-        }
+        $baseQuery = "
+        (
+            -- BC 2.5
+            SELECT
+                bc_41.*,
+                customers.name AS reference_penerima
+            FROM bc_41
+            LEFT JOIN customers ON customers.id = bc_41.reference_penerima_id
+            WHERE bc_41.deletedAt IS NULL
+            $filterCondition
+            $whereDate
+            $searchOrderForm
+        )
+        ";
+        // ============================
+        // 📊 COUNT + PAGINATION
+        // ============================
+        $countQuery = "SELECT COUNT(*) AS cnt FROM ($baseQuery) AS x";
+        $totalFiltered = (int) $db->query($countQuery)->getRow()->cnt;
 
-        if ($addCondition['asalPengeluaran']) {
-            if ($addCondition['asalPengeluaran'] == "RETUR") {
-                $bcDataQry->where('pengembalian_barang_id !=', null);
-            } else
-            if ($addCondition['asalPengeluaran'] == "PENJUALAN") {
-                $bcDataQry->where('sales_order_lain_id !=', null);
-            }
-        }
+        $mainQuery = "
+            SELECT * FROM ($baseQuery) AS x
+            $orderBy
+            LIMIT $limit OFFSET $offset
+        ";
 
+        $data = $db->query($mainQuery)->getResultArray();
 
-        if ($addCondition['noAju']) {
-            $bcDataQry->like('no_aju', $addCondition['noAju'])->orLike('no_daftar', $addCondition['noAju']);
-        }
-
-        if ($addCondition['statusPosting'] || $addCondition['noAju']  && (empty($addCondition['mulaiTanggalBC41']) && empty($addCondition['selesaiTanggalBC41']))) {
-            $bcDataQry->groupEnd();
-        }
-
-        if ($addCondition['mulaiTanggalBC41'] && $addCondition['selesaiTanggalBC41']) {
-            $bcDataQry->groupStart();
-            $mulaiTanggalBC41Timestamp = date_format(date_create_from_format("d/m/Y", $addCondition['mulaiTanggalBC41']), "Y-m-d");
-            $selesaiTanggalBC41Timestamp = date_format(date_create_from_format("d/m/Y", $addCondition['selesaiTanggalBC41']), "Y-m-d");
-
-            if ($addCondition['mulaiTanggalBC41']) {
-                $bcDataQry->where('bc_41.createdAt >=', $mulaiTanggalBC41Timestamp);
-            }
-
-            if ($addCondition['selesaiTanggalBC41']) {
-                $bcDataQry->where('bc_41.createdAt <=', $selesaiTanggalBC41Timestamp);
-            }
-
-            $bcDataQry->groupEnd();
-        }
-
-        $totalFilteredData = $bcDataQry->countAllResults(false);
-        $data = $bcDataQry->findAll($limit, $offset);
+        // ============================
+        // 📦 RETURN RESULT
+        // ============================
 
         return [
             'data'              => $data,
-            'totalData'         => $totalData,
-            'totalFilteredData' => $totalFilteredData,
+            'totalData'         => $totalFiltered,
+            'totalFilteredData' => $totalFiltered,
+            'sort'              => $orderColumnIndex,
+            'sortType'          => $orderDir,
         ];
     }
 

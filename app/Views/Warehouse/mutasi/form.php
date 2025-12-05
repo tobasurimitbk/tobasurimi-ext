@@ -275,7 +275,7 @@
                             </div>
                             <div class="col-sm-3 mb-2">
                                 <div class="form-floating" style="height: 50px;">
-                                    <select class="form-select spesifikasi_id" id="spesifikasi_id" name="spesifikasi_id">
+                                    <select class="form-select barang_id" id="barang_id" name="barang_id">
                                         <option value=""></option>
                                     </select>
                                     <label for="floatingInput" style="z-index: 1;">Cari Barang</label>
@@ -461,7 +461,7 @@
             url: "<?= base_url('mutasi/all-stock-list'); ?>",
             type: "GET",
             data: function(data) {
-                data.spesifikasi_id = $("#spesifikasi_id").val();
+                data.barang_id = $("#barang_id").val();
                 data.divisi_id = $("#divisi_asal_id").val();
                 data.warehouse_id = $("#warehouse_asal_id").val();
                 data.dateStart = $("#dateStart").val();
@@ -606,7 +606,7 @@
         changeStatus();
     });
 
-    $('#dateStart,#dateEnd,#type_barang,#spesifikasi_id').change(function(e) {
+    $('#dateStart,#dateEnd,#type_barang,#barang_id').change(function(e) {
         e.preventDefault();
         table.ajax.reload();
     });
@@ -663,7 +663,7 @@
         } else {
             $('.form-fifo').hide();
         }
-        $('#spesifikasi_id').val(null).change();
+        $('#barang_id').val(null).change();
     });
 
     $('#warehouse_tujuan_id').select2({
@@ -726,13 +726,13 @@
         allowClear: true,
     });
 
-    $('#spesifikasi_id').select2({
+    $('#barang_id').select2({
         placeholder: "Cari Kode / Nama Barang",
         theme: "bootstrap-5",
         allowClear: true,
         dropdownParent: $('#detailStockModal'),
         ajax: {
-            url: '<?= base_url("barang/dropdown/type-server-inventori") ?>',
+            url: '<?= base_url("barang/dropdown/type-server-barang-master-inventori") ?>',
             dataType: 'json',
             delay: 250,
             data: function(params) {
@@ -764,7 +764,7 @@
 
 
 
-    $("#type_barang,#divisi_asal_id,#divisi_tujuan_id,#warehouse_asal_id,#warehouse_tujuan_id,#spesifikasi_id,#bc_id,#unit_id_mutasi,#unit_id_konversi,#type_pengambilan_stock")
+    $("#type_barang,#divisi_asal_id,#divisi_tujuan_id,#warehouse_asal_id,#warehouse_tujuan_id,#barang_id,#bc_id,#unit_id_mutasi,#unit_id_konversi,#type_pengambilan_stock")
         .parent('div')
         .children('span')
         .children('span')
@@ -826,7 +826,7 @@
     function insertListFifo() {
         var dataIds = getIDListDataSelected();
         var qtyMutasiFifo = parseFloat(destroyFormatRupiah($('#qty_mutasi_fifo').val()));
-        var spesifikasiId = $(".spesifikasi_id option:selected").val();
+        var spesifikasiId = $(".barang_id option:selected").val();
 
         if (listStockInventori.length === 0) {
             Swal.fire({

@@ -1995,6 +1995,7 @@ $routes->get('stock-fisik/all', 'BeaCukai\StockFisik::all', ['filter' => 'Auth']
 $routes->get('stock-fisik/export-excel', 'BeaCukai\StockFisik::exportExcel', ['filter' => 'Auth']);
 $routes->get('stock-fisik/id/(:segment)', 'BeaCukai\StockFisik::detail/$1', ['filter' => 'Auth']);
 $routes->get('stock-fisik/all-masuk', 'BeaCukai\StockFisik::allPemasukkan', ['filter' => 'Auth']);
+$routes->get('stock-fisik/all-masuk-produksi', 'BeaCukai\StockFisik::allPemasukkanProduksi', ['filter' => 'Auth']);
 
 // BC 2.5
 $routes->group('bea-cukai-bc-25', ['filter' => 'Auth'], function ($routes) {
@@ -2066,29 +2067,23 @@ $routes->group('bea-cukai-bc-25', ['filter' => 'Auth'], function ($routes) {
     $routes->get('debug-payload/(:segment)', 'BeaCukai\BC25::debug_payload/$1');
 });
 
-
-
-
 // BC 4.1
 $routes->group('bea-cukai-bc-41', ['filter' => 'Auth'], function ($routes) {
     $routes->get('/', 'BeaCukai\BC41::index');
     $routes->get('create', 'BeaCukai\BC41::create');
     $routes->get('all', 'BeaCukai\BC41::all');
-    $routes->get('online', 'BeaCukai\BC41::online');
     $routes->get('download-response', 'BeaCukai\BC40::downloadResponPdf');
-    $routes->get('all-online', 'BeaCukai\BC41::allOnline');
     $routes->get('id/(:segment)', 'BeaCukai\BC41::detail/$1');
     $routes->post('save', 'BeaCukai\BC41::createAction');
-    $routes->post('update', 'BeaCukai\BC41::updateAction');
+    $routes->post('update', 'BeaCukai\BC41::updateDetail');
     $routes->post('delete', 'BeaCukai\BC41::delete');
     $routes->post('posting', 'BeaCukai\BC41::posting');
-    $routes->get('check-no-aju', 'BeaCukai\BC41::checkNoAju');
-    $routes->get('list-reference', 'BeaCukai\BC41::getReference');
-    $routes->get('list-reference-detail', 'BeaCukai\BC41::getDetailReference');
-    // OUTSTANDING
-    $routes->get('bc-41-outstanding-all', 'BeaCukai\BC41::allOutstanding');
-    $routes->get('bc-41-outstanding', 'BeaCukai\BC41::viewOutstanding');
-    $routes->get('bc-41-outstanding-export', 'BeaCukai\BC41::OutstandingSheet');
+    $routes->get('all-stock-list', 'Inventori\StokAdjusment::allStockList');
+    $routes->get('list-satuan-konversi', 'Inventori\StokAdjusment::getSatuanKonversi');
+    $routes->get('get-referensi', 'BeaCukai\BC25::getReferensiPengeluaran');
+    $routes->get('get-referensi-penerima', 'BeaCukai\BC25::getReferensiPenerima');
+    $routes->get('warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse');
+
     // HEADER
     $routes->get('id/header/(:segment)', 'BeaCukai\BC41::header/$1');
     $routes->post('id/header', 'BeaCukai\BC41::updateHeader');
@@ -2126,6 +2121,10 @@ $routes->group('bea-cukai-bc-41', ['filter' => 'Auth'], function ($routes) {
     $routes->post('id/pernyataan', 'BeaCukai\BC41::pernyataanUpdate');
     // KIRIM CEISA
     $routes->get('api/kirim-dokumen/(:segment)', 'BeaCukai\BC41::kirimCeisa/$1');
+    // OUTSTANDING
+    $routes->get('bc-41-outstanding-all', 'BeaCukai\BC25::allOutstanding');
+    $routes->get('bc-41-outstanding', 'BeaCukai\BC41::viewOutstanding');
+    $routes->get('bc-41-outstanding-export', 'BeaCukai\BC25::OutstandingExcel');
 });
 
 // HUMAN RESOURCE

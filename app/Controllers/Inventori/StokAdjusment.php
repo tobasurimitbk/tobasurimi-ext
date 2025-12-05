@@ -355,7 +355,7 @@ class StokAdjusment extends BaseController
     {
         try {
             $typeBarang = $this->request->getVar('type_barang');
-            $search = $this->request->getVar('q');
+            $search = trim($this->request->getVar('q'));
 
             if (empty($typeBarang)) {
                 return response()->setJSON(['data' => []]);
