@@ -1997,7 +1997,13 @@
             console.log(list_items_barang_digunakan);
             list_items_barang_digunakan.map((item, index) => {
                 var qty = item.qty2 ? item.qty2 : item.type_barang == "bahan_jadi" ? item.qty_isi ?? item.qty : item.qty_now ?? item.qty;
-                totalQtyDigunakan += parseFloat(qty || 0);
+
+                <?php if (isset($data)) : ?>
+                    totalQtyDigunakan += parseFloat(item.qty || 0);
+                <?php else: ?>
+                    totalQtyDigunakan += parseFloat(qty || 0);
+                <?php endif; ?>
+
                 totalQtyRequest += parseFloat((item.qty_now ?? item.qty) || 0);
 
                 row += '<tr style="color:whitesmoke;">';
@@ -2011,9 +2017,15 @@
                 row += '<td>' + item.nama_barang + '</td>';
                 row += '<td>' + (item.type_barang == "bahan_jadi" ? "KG" : item.satuan) + '</td>';
                 row += '<td>' + greatFormatRupiah(item.type_barang == "bahan_jadi" ? item.qty_isi ?? item.qty : item.qty_now ?? item.qty) + '</td>';
-                row += '<td>' + `
-                <input class="form-control qty-barang-digunakan" <?= isset($data) ? ($data->is_posted ? 'readonly' : '') : '' ?>   style="height:40px" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" value="${qty}">` +
-                    '</td>';
+                <?php if (isset($data)) : ?>
+                    row += '<td>' + `
+                    <input class="form-control qty-barang-digunakan" <?= isset($data) ? ($data->is_posted ? 'readonly' : '') : '' ?>   style="height:40px" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" value="${item.qty}">` +
+                        '</td>';
+                <?php else: ?>
+                    row += '<td>' + `
+                    <input class="form-control qty-barang-digunakan" <?= isset($data) ? ($data->is_posted ? 'readonly' : '') : '' ?>   style="height:40px" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" value="${qty}">` +
+                        '</td>';
+                <?php endif; ?>
 
                 no++;
             });
