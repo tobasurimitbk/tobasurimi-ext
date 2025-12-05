@@ -102,7 +102,7 @@
             </div>
             <div class="modal-body">
                 <div class="alert alert-secondary text-black" role="alert">
-                    UNDUH TEMPLEATE EXCEL <a href="<?= base_url('assets/import/IMPORT_JURNAL.xlsx') ?>" style="text-decoration: none;"><b style="color: black;">DISINI</b></a>
+                    UNDUH TEMPLATE EXCEL <a href="<?= base_url('assets/import/IMPORT_JURNAL.xlsx') ?>" style="text-decoration: none;"><b style="color: black;">DISINI</b></a>
                 </div>
                 <form class="form-excel" method="post">
                     <div class="form-floating" style="height: 50px;">

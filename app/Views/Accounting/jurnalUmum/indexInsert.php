@@ -5,11 +5,19 @@
 <section class="section">
     <div class="section-header d-flex justify-content-end">
         <h1 class="me-auto">Tambah Nilai Barang</h1>
+        <button style="margin-right: -100px!important;" class="btn btn-discard btn-dropdown-export dropdown-toggle" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+            Import / Export
+        </button>
+        <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+            <li><button class="dropdown-item" id="btn_import_excel">Import Excel</button></li>
+            <!-- <li><button class="dropdown-item" onclick="pdfExcel('<?= base_url("jurnal/print-pdf"); ?>')">Export Pdf (By Filter)</button></li>
+            <li><button class="dropdown-item" onclick="pdfExcel('<?= base_url("jurnal/print-excel"); ?>')">Export Excel (By Filter)</button></li> -->
+        </ul>
     </div>
     <div class="card">
         <div class="card-body">
             <div class="row row-col-spp mb-3">
-                <div class="col-md-2" style="max-width: 20%!important;flex: 0 0 20%!important;">
+                <div class="col-md-3">
                     <div class="form-floating mb-3">
                         <select class="form-select kode_department" name="kode_department" id="kode_department">
                             <option value="" data-code=""></option>
@@ -17,15 +25,7 @@
                         <label for="floatingInput">Pilih Department</label>
                     </div>
                 </div>
-                <div class="col-md-2" style="max-width: 20%!important;flex: 0 0 20%!important;">
-                    <div class="form-floating mb-3">
-                        <select class="form-select kode_warehouse" name="kode_warehouse" id="kode_warehouse">
-                            <option value="" data-code=""></option>
-                        </select>
-                        <label for="floatingInput">Pilih Warehouse</label>
-                    </div>
-                </div>
-                <div class="col-md-2" style="max-width: 20%!important;flex: 0 0 20%!important;">
+                <div class="col-md-3">
                     <div class="form-floating mb-3">
                         <select class="form-select type_barang" name="type_barang" id="type_barang">
                             <option value="" data-code=""></option>
@@ -39,7 +39,7 @@
                         <label for="floatingInput">Pilih Type Barang</label>
                     </div>
                 </div>
-                <div class="col-md-2" style="max-width: 20%!important;flex: 0 0 20%!important;">
+                <div class="col-md-3">
                     <div class="form-floating mb-3">
                         <select class="form-select kode_barang" name="kode_barang" id="kode_barang">
                             <option value="" data-code=""></option>
@@ -47,7 +47,7 @@
                         <label for="floatingInput">Pilih Barang</label>
                     </div>
                 </div>
-                <div class="col-md-2" style="max-width: 20%!important;flex: 0 0 20%!important;">
+                <div class="col-md-3">
                     <div class="input-group input-group-password">
                         <input style="height: 50px;" autocomplete="one-time-code" class="form-control input-picker transaksi_date" id="transaksi_date" name="transaksi_date" placeholder="Tanggal Akhir">
                         <div class="input-group-prepend group-prepend-password align-items-center">
@@ -192,6 +192,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-submit-form btn-submit-form-akun">Simpan</button>
+                <button type="button" class="btn btn-discard delete-btn delete-btn-akun">Hapus</button>
                 <button type="button" class="btn btn-hide-form btn-discard btn-discard-akun mr-2">Kembali</button>
             </div>
         </div>
@@ -227,12 +228,12 @@
                         <div class="col-md-4">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" value="" type="text" class="form-control tanggal_transaksi" name="tanggal_transaksi" id="tanggal_transaksi" placeholder="">
+                                    <input autocomplete="one-time-code" value="" type="date" class="form-control tanggal_transaksi" name="tanggal_transaksi" id="tanggal_transaksi" placeholder="">
                                     <label for="floatingInput">Tanggal Transaksi</label>
                                 </div>
-                                <div class="input-group-prepend group-prepend-password align-items-center">
+                                <!-- <div class="input-group-prepend group-prepend-password align-items-center">
                                     <i style="cursor: pointer; z-index: 99; margin-bottom: 0px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                     </div>
@@ -315,7 +316,32 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-submit-form btn-submit-form-saldo-barang">Simpan</button>
+                <button type="button" class="btn btn-discard delete-btn delete-btn-saldo">Hapus</button>
                 <button type="button" class="btn btn-hide-form btn-discard btn-discard-saldo-barang mr-2">Kembali</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="import_excel_modal" tabindex="-1">
+    <div class="modal-dialog" style="min-width: 900px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Import Saldo Barang</h5>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-secondary text-black" role="alert">
+                    UNDUH TEMPLATE EXCEL <a href="<?= base_url('jurnal/template-nilai-barang') ?>" style="text-decoration: none;"><b style="color: black;">DISINI</b></a>
+                </div>
+                <form class="form-excel" method="post">
+                    <div class="form-floating" style="height: 50px;">
+                        <input type="file" name="file" id="excelFileInput" accept=".xlsx" class="form-control">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btn-discard-import-excel" class="btn btn-hide-form btn-discard btn-discard-import-excel mr-2">Kembali</button>
+                <button type="submit" onclick="importExcel()" class="btn btn-submit-form btn-submit-excel">Simpan</button>
             </div>
         </div>
     </div>
@@ -346,7 +372,6 @@
             dataSrc: "data",
             data: function(data) {
                 data.kode_department = $("#kode_department").val();
-                data.kode_warehouse = $("#kode_warehouse").val();
                 data.type_transaksi = $('#type_barang').val();
                 data.kode_barang = $("#kode_barang").val();
                 data.transaksi_date = $("#transaksi_date").val();
@@ -477,7 +502,19 @@
         $("#akun_pemakaian_id").val(pemakaian_id).change();
         $('#kategori').val(kategori_id).change();
 
+        if (!ap_id && !ar_id && !pemakaian_id) {
+            $('.delete-btn-akun').hide();
+        } else {
+            $('.delete-btn-akun').show();
+        }
+
         $('.add-modal').modal('show');
+    }
+
+    function convertDMYtoYMD(dateStr) {
+        if (!dateStr) return "";
+        const parts = dateStr.split("/");
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
     }
 
     function detail(id) {
@@ -505,13 +542,15 @@
             });
             return;
         } else {
+            let transaksi2 = convertDMYtoYMD(transaksi_date);
+
             $('#id_saldo_barang').val(account_barang_id);
             $('#divisi_id_saldo_barang').val(divisiId);
             $('#barang_id_saldo_barang').val(id);
             $('#type_saldo_barang').val(typeBarang);
             $("#parentName_saldo_barang").val(parentName);
             $('#divisi_name_saldo_barang').val(divisiName);
-            $('#tanggal_transaksi').val(transaksi_date);
+            $('#tanggal_transaksi').val(transaksi2).trigger('change');
             $("#akun_ap_id_saldo_barang").val(ap_id).change();
             $("#saldo_akun_penjualan").val(greatFormatRupiah(saldo_awal_barang_penjualan)).change();
             $('#akun_ar_id_saldo_barang').val(ar_id).change();
@@ -519,8 +558,88 @@
             $("#akun_pemakaian_id_saldo_barang").val(pemakaian_id).change();
             $("#saldo_akun_pemakaian").val(greatFormatRupiah(saldo_awal_barang_pemakaian)).change();
 
+            console.log(saldo_awal_barang_pembelian, saldo_awal_barang_penjualan, saldo_awal_barang_pemakaian);
+
+            if (saldo_awal_barang_pembelian > 0 || saldo_awal_barang_penjualan > 0 || saldo_awal_barang_pemakaian > 0) {
+                $('.delete-btn-saldo').show();
+            } else {
+                $('.delete-btn-saldo').hide();
+            }
+
             $('.add-saldo-modal').modal('show');
         }
+    }
+
+    // Function to handle the Excel file upload using AJAX
+    function importExcel() {
+        Swal.fire({
+            icon: 'question',
+            title: 'Import Saldo Barang ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Import Data',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const fileInput = document.getElementById('excelFileInput');
+                const file = fileInput.files[0];
+                const csrf = $(`[name="${csrfToken}"]`);
+
+                if (file) {
+                    const formData = new FormData();
+                    formData.append('file', file);
+
+                    $.ajax({
+                        url: '<?= base_url("jurnal/import-nilai-barang"); ?>',
+                        type: 'POST',
+                        data: formData,
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        contentType: false,
+                        processData: false,
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        location.reload()
+                                    }
+                                })
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                            }
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error importing file: ' + errorThrown,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Please select a file to import.',
+                        confirmButtonColor: '#4e73df',
+                    })
+                }
+            }
+        })
     }
 
     $(document).ready(function() {
@@ -530,13 +649,6 @@
         // ==========================
         $('.kode_department').select2({
             placeholder: "Pilih Departemen",
-            theme: "bootstrap-5",
-            allowClear: true,
-            width: '100%'
-        });
-
-        $('.kode_warehouse').select2({
-            placeholder: "Pilih Warehouse",
             theme: "bootstrap-5",
             allowClear: true,
             width: '100%'
@@ -638,12 +750,12 @@
             document.querySelector(".select2-container--open .select2-search__field").focus()
         })
 
-        $("#tanggal_transaksi").datepicker({
-            todayHighlight: true,
-            format: "dd/mm/yyyy",
-            orientation: "bottom auto",
-            autoclose: true
-        });
+        // $("#tanggal_transaksi").datepicker({
+        //     todayHighlight: true,
+        //     format: "dd/mm/yyyy",
+        //     orientation: "bottom auto",
+        //     autoclose: true
+        // });
 
         $("#transaksi_date").datepicker({
             todayHighlight: true,
@@ -658,16 +770,6 @@
         function loadDivisi() {
             return $.ajax({
                 url: '<?= base_url("jurnal/get-divisi"); ?>',
-                dataType: 'json'
-            });
-        }
-
-        function loadWarehouse(deptID) {
-            return $.ajax({
-                url: '<?= base_url("jurnal/get-warehouse"); ?>',
-                data: {
-                    department_id: deptID
-                },
                 dataType: 'json'
             });
         }
@@ -697,18 +799,6 @@
             $el.trigger('change.select2');
         }
 
-        function populateWarehouse(data) {
-            let $el = $('.kode_warehouse');
-
-            $el.empty().append(`<option value=""></option>`);
-
-            data.data.forEach(item => {
-                $el.append(`<option value="${item.id}">${item.warehouse_name}</option>`);
-            });
-
-            $el.trigger('change.select2');
-        }
-
         function populateBarang(data) {
             let $el = $('.kode_barang');
 
@@ -726,23 +816,6 @@
         // ==========================
         loadDivisi().then(res => {
             populateDivisi(res);
-        });
-
-        // ==========================
-        // ON CHANGE DEPARTMENT → LOAD WAREHOUSE
-        // ==========================
-        $('.kode_department').on('change', function() {
-
-            let deptID = $(this).val();
-
-            $('.kode_warehouse').empty().append(`<option value=""></option>`).trigger('change');
-
-            if (!deptID) return;
-
-            loadWarehouse(deptID).then(res => {
-                populateWarehouse(res);
-                $('.kode_warehouse').select2('open'); // auto open
-            });
         });
 
         // ==========================
@@ -766,14 +839,14 @@
         // ==========================
         // FIX HEIGHT & LABEL
         // ==========================
-        $('.kode_department, .kode_warehouse, .type_barang, .kode_barang')
+        $('.kode_department, .type_barang, .kode_barang')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.kode_department, .kode_warehouse, .type_barang, .kode_barang')
+        $('.kode_department, .type_barang, .kode_barang')
             .parent('div')
             .children('span')
             .children('span')
@@ -781,21 +854,18 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px').css('z-index', '1');
 
-        $('.kode_department, .kode_warehouse, .type_barang, .kode_barang')
+        $('.kode_department, .type_barang, .kode_barang')
             .parent('div')
             .find('label')
             .css('z-index', '1');
 
         $("#search").on('click', function() {
             let departmentId = $('#kode_department').val();
-            let warehouseId = $('#kode_warehouse').val();
             let typeBarang = $('#type_barang').val();
             let kodeBarang = $('#kode_barang').val();
             let transaksi_date = $('#transaksi_date').val();
 
-            console.log(departmentId, warehouseId, typeBarang, kodeBarang, transaksi_date);
-
-            if (departmentId && warehouseId && typeBarang && kodeBarang && transaksi_date) {
+            if (departmentId && typeBarang && kodeBarang && transaksi_date) {
                 table.ajax.reload();
             } else {
                 Swal.fire({
@@ -805,6 +875,15 @@
                 });
                 return;
             }
+        })
+
+        $('#btn_import_excel').click(function() {
+            $('#file').val(null);
+            $('#import_excel_modal').modal('show');
+        });
+
+        $('#btn-discard-import-excel').click(function() {
+            $('#import_excel_modal').modal('hide');
         })
 
         // hide modal
@@ -883,6 +962,59 @@
             }
         });
 
+        $(".delete-btn-akun").click(function() {
+            Swal.fire({
+                icon: 'question',
+                title: 'Hapus Data?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Kembali',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const csrf = $(`[name="${csrfToken}"]`);
+                    let id = $("#id").val();
+                    setLoading()
+                    $.ajax({
+                        url: "<?= base_url("tipe-barang/delete"); ?>",
+                        data: {
+                            id: id
+                        },
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                stopLoading()
+                                Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        $(".add-modal").modal("hide")
+                                        table.ajax.reload()
+                                    });
+                            }
+                        },
+                        onError: function(response) {
+                            csrf.val(response.token);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Data Gagal Disimpan, coba Lagi',
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    });
+                }
+            })
+        });
+
         // hide modal
         $('.btn-discard-saldo-barang').click(function() {
             $('.add-saldo-modal').modal('hide');
@@ -891,6 +1023,7 @@
         // action save or update
         $('.btn-submit-form-saldo-barang').click(function(e) {
             e.preventDefault();
+            // Abaikan tanggal
             if ($(".create-saldo-form").valid()) {
                 Swal.fire({
                     icon: 'question',
@@ -960,6 +1093,59 @@
                 })
 
             }
+        });
+
+        $(".delete-btn-saldo").click(function() {
+            Swal.fire({
+                icon: 'question',
+                title: 'Hapus Data?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Kembali',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const csrf = $(`[name="${csrfToken}"]`);
+                    let id = $("#id").val();
+                    setLoading()
+                    $.ajax({
+                        url: "<?= base_url("tipe-barang/delete"); ?>",
+                        data: {
+                            id: id
+                        },
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                stopLoading()
+                                Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        $(".add-modal").modal("hide")
+                                        table.ajax.reload()
+                                    });
+                            }
+                        },
+                        onError: function(response) {
+                            csrf.val(response.token);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Data Gagal Disimpan, coba Lagi',
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    });
+                }
+            })
         });
     });
 </script>

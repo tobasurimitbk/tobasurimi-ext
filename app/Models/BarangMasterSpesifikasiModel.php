@@ -125,17 +125,17 @@ class BarangMasterSpesifikasiModel extends Model
         ";
 
         $dataQry = $this->asObject()->select($selectQry)
-            ->join('account_barang', 'account_barang.barang_master_spesifikasi_id = barang_master_spesifikasi.id', 'left')
+            ->join('account_barang', 'account_barang.barang_master_spesifikasi_id = barang_master_spesifikasi.id AND account_barang.deleted_at IS NULL', 'left')
 
             // Join akun
-            ->join('sub_akuns as akun_pembelian', 'akun_pembelian.id = account_barang.ap_id', 'left')
-            ->join('sub_akuns as akun_penjualan', 'akun_penjualan.id = account_barang.ar_id', 'left')
-            ->join('sub_akuns as akun_pemakaian', 'akun_pemakaian.id = account_barang.pemakaian_id', 'left')
+            ->join('sub_akuns as akun_pembelian', 'akun_pembelian.id = account_barang.ap_id AND account_barang.deleted_at IS NULL', 'left')
+            ->join('sub_akuns as akun_penjualan', 'akun_penjualan.id = account_barang.ar_id AND account_barang.deleted_at IS NULL', 'left')
+            ->join('sub_akuns as akun_pemakaian', 'akun_pemakaian.id = account_barang.pemakaian_id AND account_barang.deleted_at IS NULL', 'left')
 
             // Join saldo awal PENTING!
-            ->join('saldo_awal_barang as sab_pembelian', 'sab_pembelian.coa_id = account_barang.ap_id AND sab_pembelian.barang_master_spesifikasi_id = barang_master_spesifikasi.id', 'left')
-            ->join('saldo_awal_barang as sab_penjualan', 'sab_penjualan.coa_id = account_barang.ar_id AND sab_penjualan.barang_master_spesifikasi_id = barang_master_spesifikasi.id', 'left')
-            ->join('saldo_awal_barang as sab_pemakaian', 'sab_pemakaian.coa_id = account_barang.pemakaian_id AND sab_pemakaian.barang_master_spesifikasi_id = barang_master_spesifikasi.id', 'left')
+            ->join('saldo_awal_barang as sab_pembelian', 'sab_pembelian.coa_id = account_barang.ap_id AND sab_pembelian.barang_master_spesifikasi_id = barang_master_spesifikasi.id AND sab_pembelian.deletedAt IS NULL', 'left')
+            ->join('saldo_awal_barang as sab_penjualan', 'sab_penjualan.coa_id = account_barang.ar_id AND sab_penjualan.barang_master_spesifikasi_id = barang_master_spesifikasi.id AND sab_penjualan.deletedAt IS NULL', 'left')
+            ->join('saldo_awal_barang as sab_pemakaian', 'sab_pemakaian.coa_id = account_barang.pemakaian_id AND sab_pemakaian.barang_master_spesifikasi_id = barang_master_spesifikasi.id AND sab_pemakaian.deletedAt IS NULL', 'left')
 
             ->where($condition)
             ->groupBy('barang_master_spesifikasi.id');

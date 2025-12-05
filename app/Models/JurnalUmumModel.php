@@ -28,6 +28,8 @@ class JurnalUmumModel extends Model
         'kurs',
         'keterangan',
         'id_inputer',
+        'reference_id',
+        'reference_type',
     ];
 
     // Dates
@@ -152,7 +154,7 @@ class JurnalUmumModel extends Model
             ->where('deletedAt', null)
             ->findAll();
 
-       
+
 
         if (empty($subList)) {
             return 0;
@@ -184,7 +186,7 @@ class JurnalUmumModel extends Model
 
         $totalDebit  = (float) ($row['total_debit'] ?? 0);
         $totalKredit = (float) ($row['total_kredit'] ?? 0);
-        
+
         // var_dump($totalDebit, $totalKredit);
         // die;
 
