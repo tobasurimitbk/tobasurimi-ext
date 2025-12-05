@@ -3,6 +3,8 @@
 namespace App\Controllers\HROutsourcing;
 
 use App\Controllers\BaseController;
+use App\Controllers\Master\AttendancesUnit;
+use App\Models\AttendancesUnitOutsourceModel;
 use App\Models\DivisisModel;
 use App\Models\HROutsourcingCompanyModel;
 use App\Models\HROutsourcingEmployeeModel;
@@ -16,6 +18,8 @@ class Employee extends BaseController
     protected $divisiModel;
     protected $hrOutsourcingCompanyModel;
     protected $hrOutsourcingEmployeeModel;
+    protected $hrOutsourcingAttendanceModel;
+    protected $attendanceUnit;
 
     public function __construct()
     {
@@ -23,6 +27,8 @@ class Employee extends BaseController
         $this->divisiModel = new DivisisModel();
         $this->hrOutsourcingCompanyModel = new HROutsourcingCompanyModel();
         $this->hrOutsourcingEmployeeModel = new HROutsourcingEmployeeModel();
+        $this->hrOutsourcingAttendanceModel = new AttendancesUnitOutsourceModel();
+        $this->attendanceUnit = new AttendancesUnit();
     }
 
 
@@ -283,5 +289,259 @@ class Employee extends BaseController
         }
     }
 
+    public function syncEmployeeFinger()
+    {
+        try {
+            $companyId = $this->request->getVar('company_id');
+
+            if (empty($companyId)) {
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "Company ID tidak ditemukan",
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            // Ambil data company
+            $companyData = $this->hrOutsourcingCompanyModel
+                ->where('id', $companyId)
+                ->first();
+
+            if (!$companyData) {
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "Data company tidak ditemukan",
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            // Validasi IP finger
+            if (empty($companyData['ip_finger'])) {
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "IP Finger tidak ditemukan untuk company ini",
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            // Ambil attendance unit
+            $attendanceUnit = $this->hrOutsourcingAttendanceModel
+                ->where('id', $companyData['ip_finger'])
+                ->first();
+
+            if (!$attendanceUnit) {
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "Attendance unit tidak ditemukan untuk IP: {$companyData['ip_finger']}",
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            if (empty($attendanceUnit['ip'])) {
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "IP mesin finger tidak ditemukan di attendance unit",
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            // TEST KONEKSI
+            $timeout = max(1, min(5, 2)); // fix range
+            $isAlive = icmpPing($attendanceUnit['ip'], $timeout);
+
+            if (!$isAlive) {
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "Mesin finger tidak dapat dihubungi",
+                    'data' => [
+                        'ip' => $attendanceUnit['ip'],
+                        'timeout' => $timeout
+                    ],
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            // Ambil karyawan outsourcing
+            $outsourcingEmployees = $this->hrOutsourcingEmployeeModel
+                ->where('company_id', $companyId)
+                ->where('deletedAt', null)
+                ->findAll();
+
+            if (empty($outsourcingEmployees)) {
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "Tidak ada karyawan untuk company ini",
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            // ==========================================
+            // PROSES SINKRONISASI KE MESIN FINGER
+            // ==========================================
+            $successCount = 0;
+            $failedCount = 0;
+            $successDetails = [];
+            $failedDetails = [];
+
+            foreach ($outsourcingEmployees as $emp) {
+                $pin  = $emp['id'];
+                $name = trim($emp['nama']);
+
+                try {
+                    $result = $this->attendanceUnit->insert_finger_user_by_rian(
+                        $pin,
+                        $attendanceUnit['ip'],
+                        0,
+                        $name
+                    );
+
+                    if ($result === true) {
+                        $successCount++;
+                        $successDetails[] = [
+                            'id'   => $pin,
+                            'nama' => $name,
+                            'status' => "Berhasil"
+                        ];
+                    } else {
+                        $failedCount++;
+                        $failedDetails[] = [
+                            'id'   => $pin,
+                            'nama' => $name,
+                            'status' => "Gagal",
+                            'reason' => $result ?: "Unknown"
+                        ];
+                    }
+                } catch (Exception $e) {
+                    $failedCount++;
+                    $failedDetails[] = [
+                        'id'   => $pin,
+                        'nama' => $name,
+                        'status' => "Error",
+                        'reason' => $e->getMessage()
+                    ];
+
+                    log_message('error', "Sync Employee Finger Error [ID $pin]: {$e->getMessage()}");
+                }
+            }
+
+            // ==========================================
+            // MESSAGE RESULT
+            // ==========================================
+            $total = count($outsourcingEmployees);
+
+            if ($successCount === $total) {
+                $message = "Semua karyawan berhasil disinkronisasi ke mesin finger.";
+            } elseif ($successCount > 0 && $failedCount > 0) {
+                $message = "Sinkronisasi selesai, beberapa karyawan gagal.";
+            } else {
+                $message = "Semua sinkronisasi gagal.";
+            }
+
+            return response()->setJSON([
+                'status'  => $successCount > 0,
+                'message' => $message,
+                'data' => [
+                    'attendance_unit_ip' => $attendanceUnit['ip'],
+                    'company_id' => $companyId,
+                    'company_name' => $companyData['name'] ?? '-',
+                    'sync_date' => date("Y-m-d H:i:s"),
+
+                    'summary' => [
+                        'total' => $total,
+                        'success' => $successCount,
+                        'failed' => $failedCount,
+                        'percentage' => round(($successCount / $total) * 100, 2)
+                    ],
+
+                    'success_details' => $successDetails,
+                    'failed_details' => $failedDetails
+                ],
+                'token' => csrf_hash()
+            ]);
+
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => "System Error",
+                'data' => [
+                    'error' => $e->getMessage()
+                ],
+                'token' => csrf_hash()
+            ]);
+        }
+    }
+
+    public function checkSyncStatus()
+    {
+        try {
+            $companyId = $this->request->getVar('company_id');
+
+            if (!$companyId) {
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "Company ID tidak ditemukan"
+                ]);
+            }
+
+            // Ambil IP mesin
+            $company = $this->hrOutsourcingCompanyModel->where('id', $companyId)->first();
+            if (!$company || empty($company['ip_finger'])) {
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "IP Finger tidak ditemukan"
+                ]);
+            }
+
+            $attendanceUnit = $this->hrOutsourcingAttendanceModel->where('id', $company['ip_finger'])->first();
+            if (!$attendanceUnit) {
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "Attendance unit tidak valid"
+                ]);
+            }
+
+            // Ambil user dari DB
+            $employees = $this->hrOutsourcingEmployeeModel
+                ->select('id, nama')
+                ->where('company_id', $companyId)
+                ->where('deletedAt', null)
+                ->findAll();
+
+            // Ambil user dari mesin
+            $machineUsers = $this->attendanceUnit->getAllUsersFromMachine($attendanceUnit['ip']);
+
+            if (!is_array($machineUsers)) {
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "Gagal mengambil data user dari mesin"
+                ]);
+            }
+
+            // ==========================================
+            // HITUNG MISMATCH / DATA BELUM TER-SYNC
+            // ==========================================
+            $dbIds = array_map('strval', array_column($employees, 'id'));
+            $machineIds = array_map('strval', array_column($machineUsers, 'PIN2'));
+
+            $missingInMachine = array_diff($dbIds, $machineIds);
+            $extraInMachine   = array_diff($machineIds, $dbIds);
+
+            return response()->setJSON([
+                'status' => true,
+                'message' => "Status sync berhasil diambil",
+                'data' => [
+                    'missing_in_machine' => array_values($missingInMachine),
+                    'extra_in_machine'   => array_values($extraInMachine),
+                    'need_sync_count'    => count($missingInMachine)
+                ]
+            ]);
+
+        } catch (\Throwable $e) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Error: " . $e->getMessage()
+            ]);
+        }
+    }
 
 }

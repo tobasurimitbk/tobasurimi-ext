@@ -82,6 +82,15 @@
                             </div>
                         </div>
                         <div class="col-md-12 mt-3 mb-3">
+                             <label>Mesin Finger</label>
+                            <select class="form-select ip_finger" id="ip_finger" name="ip_finger">
+                                <option value=""></option>
+                                <?php foreach ($dataAttendanceUnit as $d): ?>
+                                    <option value="<?= $d['id'] ?>"><?= $d['name'] ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-12 mt-3 mb-3">
                             <label>Alamat Company / Vendor</label>
                             <div class="form-floating" style="height: 50px;">
                                 <textarea name="address" class="form-control address" id="address" placeholder="Alamat Perusahaan / Vendor" style="height: 100px;"></textarea>
@@ -195,6 +204,16 @@
 
     });
 
+    $('#ip_finger').select2({
+        placeholder: "Pilih Mesin Finger",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+
+    });
+
+   
+
     $('#divisi_id').select2({
         placeholder: "Pilih Departemen",
         theme: "bootstrap-5",
@@ -295,6 +314,7 @@
                         $(".name").val(res.data.name);
                         $(".divisi_id").val(res.data.divisi_id).change();
                         $(".address").val(res.data.address);
+                        $(".ip_finger").val(res.data.ip_finger).change();
 
                         $(".add-modal").modal("show")
                     } else {

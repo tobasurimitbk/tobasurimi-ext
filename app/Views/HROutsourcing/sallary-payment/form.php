@@ -292,278 +292,445 @@
     }
 
     // ===== DATA FETCHING =====
-    function handleGetData() {
-        const companyId = $('#company').val();
-        const tanggal = $('#tanggal_pembayaran').val();
-        const departmentId = $('#departemen').val();
+// ===== GLOBAL VARIABLES =====
+let globalItemTypesOrder = []; // Untuk menyimpan urutan item types
 
-        if (!validateGetData(companyId, tanggal)) return;
+// ===== DATA FETCHING =====
+function handleGetData() {
+    const companyId = $('#company').val();
+    const tanggal = $('#tanggal_pembayaran').val();
+    const departmentId = $('#departemen').val();
 
-        toggleLoadingState(true);
+    if (!validateGetData(companyId, tanggal)) return;
 
-        $.ajax({
-            url: `<?= base_url("hr-outsourcing-sallary-payment/getData") ?>`,
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                company_id: companyId,
-                tanggal: tanggal,
-                department_id: departmentId,
-                <?= csrf_token() ?>: '<?= csrf_hash() ?>'
-            },
-            success: function(res) {
-                if (res.success) {
-                    handleGetDataSuccess(res.data);
-                } else {
-                    showError(res.message);
-                }
-            },
-            error: function(xhr) {
-                showError('Terjadi kesalahan saat mengambil data.');
-            },
-            complete: function() {
-                toggleLoadingState(false);
+    toggleLoadingState(true);
+    
+    // Reset global variables
+    processedEmployeeData = [];
+    globalItemTypesOrder = [];
+
+    $.ajax({
+        url: `<?= base_url("hr-outsourcing-sallary-payment/getData") ?>`,
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            company_id: companyId,
+            tanggal: tanggal,
+            department_id: departmentId,
+            <?= csrf_token() ?>: '<?= csrf_hash() ?>'
+        },
+        success: function(res) {
+            if (res.success) {
+                handleGetDataSuccess(res.data);
+            } else {
+                showError(res.message);
             }
-        });
-    }
-
-
-    function validateGetData(companyId, tanggal) {
-        if (!companyId) {
-            showWarning('Pilih perusahaan terlebih dahulu!');
-            return false;
+        },
+        error: function(xhr) {
+            showError('Terjadi kesalahan saat mengambil data.');
+        },
+        complete: function() {
+            toggleLoadingState(false);
         }
-        if (!tanggal) {
-            showWarning('Pilih tanggal pembayaran terlebih dahulu!');
-            return false;
+    });
+}
+
+function validateGetData(companyId, tanggal) {
+    if (!companyId) {
+        showWarning('Pilih perusahaan terlebih dahulu!');
+        return false;
+    }
+    if (!tanggal) {
+        showWarning('Pilih tanggal pembayaran terlebih dahulu!');
+        return false;
+    }
+    return true;
+}
+
+function handleGetDataSuccess(res) {
+    if (res.status === 'success' && res.data && res.data.length > 0) {
+        processScaleDataToTable(res.data);
+    } else {
+        showAlert('warning', 'Tidak Ada Data Untuk Kriteria Yang Di Pilih');
+        clearTable();
+    }
+}
+
+function toggleLoadingState(loading) {
+    const $btn = $('.btn-get-data');
+    if (loading) {
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Loading...');
+    } else {
+        $btn.prop('disabled', false).html('<i class="fas fa-download"></i> Get Data');
+    }
+}
+
+function clearTable() {
+    $('#dataTable tbody').empty();
+    $('#tableHeader').empty();
+    processedEmployeeData = [];
+    globalItemTypesOrder = [];
+}
+
+// ===== DYNAMIC TABLE PROCESSING =====
+function processScaleDataToTable(scaleData) {
+    $('#dataTable tbody').empty();
+    $('#tableHeader').empty();
+    
+    const employeeGroups = groupScaleDataByEmployee(scaleData);
+    generateDynamicTableHeader(employeeGroups);
+    
+    processedEmployeeData = Object.values(employeeGroups).map(employee => 
+        processEmployeeDataDynamic(employee)
+    );
+    
+    addDynamicToTable(processedEmployeeData);
+}
+
+function groupScaleDataByEmployee(scaleData) {
+    const employeeGroups = {};
+    
+    scaleData.forEach(item => {
+        const employeeId = item.employee_id;
+        if (!employeeGroups[employeeId]) {
+            employeeGroups[employeeId] = createEmployeeGroup(item);
         }
-        return true;
-    }
-
-    // function getApiUrl(companyId, tanggal, callback) {
-    //     const departmentId = $('#departemen').val();
         
-    //     $.ajax({
-    //         url: `<?= base_url("hr-outsourcing-sallary-payment/getIpByDepartment/") ?>${departmentId}`,
-    //         type: 'GET',
-    //         dataType: 'json',
-    //         success: function(ipResponse) {
-    //             if (ipResponse.success && ipResponse.ip_address) {
-    //                 const baseUrl = `http://${ipResponse.ip_address}:8001/api/local-data`;
-    //                 const apiUrl = `${baseUrl}?company_id=${companyId}&tanggal=${tanggal}`;
-    //                 callback(apiUrl);
-    //             } else {
-    //                 showError(ipResponse.message || 'IP address tidak ditemukan untuk department ini');
-    //                 callback(null);
-    //             }
-    //         },
-    //         error: function(error) {
-    //             showError('Gagal mengambil konfigurasi IP: ' + error.statusText);
-    //             callback(null);
-    //         }
-    //     });
-    // }
-
-    function handleGetDataSuccess(res) {
-        if (res.status === 'success' && res.data && res.data.length > 0) {
-            processScaleDataToTable(res.data);
-        } else {
-            showAlert('warning', 'Tidak Ada Data Untuk Kriteria Yang Di Pilih');
-            clearTable();
+        if (item.item_name && item.item_name !== 'Unknown Item') {
+            addItemToEmployeeGroup(employeeGroups[employeeId], item);
         }
-    }
+    });
+    
+    return employeeGroups;
+}
 
-    function handleGetDataError(xhr) {
-        console.error(xhr.responseText);
-        showAlert('warning', 'Terjadi Kesalahan Bro');
-    }
+function createEmployeeGroup(item) {
+    return {
+        employee_id: item.employee_id,
+        employee_name: item.employee_name,
+        employee_badge: item.employee_badge,
+        items: [],
+        total_berat: 0,
+        total_harga: 0,
+        item_types: new Set()
+    };
+}
 
-    function toggleLoadingState(loading) {
-        const $btn = $('.btn-get-data');
-        if (loading) {
-            $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Loading...');
-        } else {
-            $btn.prop('disabled', false).html('<i class="fas fa-download"></i> Get Data');
-        }
-    }
+function addItemToEmployeeGroup(employeeGroup, item) {
+    const itemPrice = item.item_price ? parseFloat(destroyFormatRupiah(item.item_price)) : 0;
+    
+    // Konversi gram ke kg (dibagi 1000)
+    const weightInGrams = item.net_weight || item.weight || 0;
+    const weightInKg = weightInGrams / 1000;
+    
+    const itemData = {
+        spesifikasi_id: item.spesifikasi_id,
+        item_name: item.item_name,
+        item_price: itemPrice,
+        weight_grams: weightInGrams, // Simpan asli dalam gram
+        weight_kg: weightInKg,       // Simpan dalam kg
+        net_weight: item.net_weight || 0,
+        created_at: item.created_at
+    };
+    
+    employeeGroup.items.push(itemData);
+    employeeGroup.item_types.add(item.item_name);
+    
+    // Calculate totals DALAM KG
+    employeeGroup.total_berat += weightInKg;  // Sekarang sudah dalam kg
+    employeeGroup.total_harga += weightInKg * itemPrice;
+}
 
-    function clearTable() {
-        $('#dataTable tbody').empty();
-        $('#tableHeader').empty();
-    }
+function generateDynamicTableHeader(employeeGroups) {
+    // Dapatkan semua item types dari semua employee
+    const allItemTypesSet = new Set();
+    Object.values(employeeGroups).forEach(employee => {
+        employee.item_types.forEach(type => allItemTypesSet.add(type));
+    });
+    
+    // Simpan urutan item types (diurutkan alphabetically untuk konsistensi)
+    globalItemTypesOrder = Array.from(allItemTypesSet).sort();
+    
+    // Buat header untuk row 1 (nama item)
+    const itemHeaders = globalItemTypesOrder.map(type => 
+        `<th style="min-width:100px; vertical-align: middle;">${type}</th>`
+    ).join('');
+    
+    // Buat header untuk row 2 (label HARGA)
+    const priceHeaders = globalItemTypesOrder.map(() => 
+        `<th style="min-width:100px; vertical-align: middle;">HARGA</th>`
+    ).join('');
 
-    // ===== DYNAMIC TABLE PROCESSING =====
-    function processScaleDataToTable(scaleData) {
-        $('#dataTable tbody').empty();
+    const headerHtml = `
+        <tr>
+            <th class="text-center" rowspan="3" style="vertical-align: middle;">NO</th>
+            <th class="text-center" rowspan="3" style="vertical-align: middle;">BADGE</th>
+            <th class="text-center" style="min-width: 150px;" rowspan="3" style="vertical-align: middle;">NAMA</th>
+            <th class="text-center" colspan="${globalItemTypesOrder.length}" style="vertical-align: middle;">DATA PEKERJAAN (KG)</th>
+            <th class="text-center" rowspan="3" style="vertical-align: middle;">TOTAL KG</th>
+            <th class="text-center" rowspan="3" style="vertical-align: middle;">TOTAL HARGA</th>
+        </tr>
+        <tr>${itemHeaders}</tr>
+        <tr>${priceHeaders}</tr>
+    `;
+    
+    $('#tableHeader').html(headerHtml);
+}
+
+function processEmployeeDataDynamic(employee) {
+    const result = {
+        employee_id: employee.employee_id,
+        employee_name: employee.employee_name,
+        badge: employee.employee_badge,
+        total_kg: employee.total_berat, // Sudah dalam kg dari addItemToEmployeeGroup
+        total_harga: employee.total_harga,
+        items: {}
+    };
+    
+    // Group items by item_name
+    const itemGroups = {};
+    
+    employee.items.forEach(item => {
+        const itemName = item.item_name;
         
-        const employeeGroups = groupScaleDataByEmployee(scaleData);
-        generateDynamicTableHeader(employeeGroups);
-        
-        processedEmployeeData = Object.values(employeeGroups).map(employee => 
-            processEmployeeDataDynamic(employee)
-        );
-        
-        addDynamicToTable(processedEmployeeData);
-    }
-
-    function groupScaleDataByEmployee(scaleData) {
-        const employeeGroups = {};
-        
-        scaleData.forEach(item => {
-            const employeeId = item.employee_id;
-            if (!employeeGroups[employeeId]) {
-                employeeGroups[employeeId] = createEmployeeGroup(item);
-            }
-            
-            if (item.item_name && item.item_name !== 'Unknown Item') {
-                addItemToEmployeeGroup(employeeGroups[employeeId], item);
-            }
-        });
-        
-        return employeeGroups;
-    }
-
-    function createEmployeeGroup(item) {
-        return {
-            employee_id: item.employee_id,
-            employee_name: item.employee_name,
-            employee_badge: item.employee_badge,
-            items: [],
-            total_berat: 0,
-            total_harga: 0,
-            item_types: new Set()
-        };
-    }
-
-    function addItemToEmployeeGroup(employeeGroup, item) {
-        const itemData = {
-            spesifikasi_id: item.spesifikasi_id,
-            item_name: item.item_name,
-            item_price: item.item_price ? parseFloat(destroyFormatRupiah(item.item_price)) : 0,
-            weight: item.weight || 0,
-            net_weight: item.net_weight || 0,
-            created_at: item.created_at
-        };
-        
-        employeeGroup.items.push(itemData);
-        employeeGroup.item_types.add(item.item_name);
-        
-        // Calculate totals
-        employeeGroup.total_berat += item.net_weight || item.weight || 0;
-        employeeGroup.total_harga += (item.net_weight || item.weight || 0) * itemData.item_price;
-    }
-
-    function generateDynamicTableHeader(employeeGroups) {
-        const allItemTypes = getAllItemTypes(employeeGroups);
-        const headerHtml = createTableHeaderHtml(allItemTypes);
-        
-        $('#tableHeader').html(headerHtml);
-    }
-
-    function getAllItemTypes(employeeGroups) {
-        const allItemTypes = new Set();
-        Object.values(employeeGroups).forEach(employee => {
-            employee.item_types.forEach(type => allItemTypes.add(type));
-        });
-        return Array.from(allItemTypes);
-    }
-
-    function createTableHeaderHtml(itemTypes) {
-        const itemHeaders = itemTypes.map(type => 
-            `<th style="min-width:100px;">${type}</th>`
-        ).join('');
-        
-        const priceHeaders = itemTypes.map(() => 
-            `<th style="min-width:100px;">HARGA</th>`
-        ).join('');
-
-        return `
-            <tr>
-                <th class="text-center" rowspan="3">NO</th>
-                <th class="text-center" rowspan="3">BADGE</th>
-                <th class="text-center" style="min-width: 150px;" rowspan="3">NAMA</th>
-                <th class="text-center" colspan="${itemTypes.length}">DATA PEKERJAAN (KG)</th>
-                <th class="text-center" rowspan="3">TOTAL KG</th>
-                <th class="text-center" rowspan="3">TOTAL HARGA</th>
-            </tr>
-            <tr>${itemHeaders}</tr>
-            <tr>${priceHeaders}</tr>
-        `;
-    }
-
-    function processEmployeeDataDynamic(employee) {
-        const result = {
-            employee_id: employee.employee_id,
-            employee_name: employee.employee_name,
-            badge: employee.employee_badge,
-            total_kg: employee.total_berat,
-            total_harga: employee.total_harga,
-            items: {}
-        };
-        
-        employee.items.forEach(item => {
-            const itemName = item.item_name;
-            if (!result.items[itemName]) {
-                result.items[itemName] = {
-                    berat: 0,
-                    total: 0,
-                    harga: item.item_price,
-                    items: []
-                };
-            }
-            
-            result.items[itemName].berat += item.net_weight || item.weight || 0;
-            result.items[itemName].total += (item.net_weight || item.weight || 0) * item.item_price;
-            result.items[itemName].items.push({
-                berat: item.net_weight || item.weight || 0,
+        if (!itemGroups[itemName]) {
+            itemGroups[itemName] = {
+                berat_grams: 0,    // Total dalam gram
+                berat_kg: 0,       // Total dalam kg
+                total: 0,
                 harga: item.item_price,
-                subtotal: (item.net_weight || item.weight || 0) * item.item_price,
-                created_at: item.created_at
-            });
+                sub_items: []
+            };
+        }
+        
+        // Validasi harga konsisten
+        if (Math.abs(itemGroups[itemName].harga - item.item_price) > 0.01) {
+            console.warn(`⚠️ Harga berbeda untuk ${itemName} - ${employee.employee_name}`);
+        }
+        
+        const subtotal = item.weight_kg * item.item_price;
+        
+        itemGroups[itemName].berat_grams += item.weight_grams;
+        itemGroups[itemName].berat_kg += item.weight_kg;
+        itemGroups[itemName].total += subtotal;
+        itemGroups[itemName].sub_items.push({
+            spesifikasi_id: item.spesifikasi_id,
+            berat_grams: item.weight_grams,
+            berat_kg: item.weight_kg,
+            harga: item.item_price,
+            subtotal: subtotal,
+            created_at: item.created_at
         });
-        
-        return result;
-    }
+    });
+    
+    result.items = itemGroups;
+    return result;
+}
 
-    function addDynamicToTable(processedData) {
-        processedData.forEach((employee, index) => {
-            const rowHtml = createDynamicTableRow(employee, index);
-            $('#dataTable tbody').append(rowHtml);
-        });
-    }
+function addDynamicToTable(processedData) {
+    $('#dataTable tbody').empty();
+    
+    processedData.forEach((employee, index) => {
+        const rowHtml = createDynamicTableRow(employee, index);
+        $('#dataTable tbody').append(rowHtml);
+    });
+    
+    // Tambahkan event listener untuk view details
+    $(document).off('click', '.view-details').on('click', '.view-details', handleViewItemDetails);
+}
 
-    function createDynamicTableRow(employee, index) {
-        const itemTypes = Object.keys(employee.items);
+function createDynamicTableRow(employee, index) {
+    let rowHtml = `
+        <tr data-employee-id="${employee.employee_id}">
+            <td class="text-center">${index + 1}</td>
+            <td class="text-center">${employee.badge}</td>
+            <td>${employee.employee_name}</td>
+    `;
+    
+    globalItemTypesOrder.forEach(itemType => {
+        const itemData = employee.items[itemType];
         
-        let rowHtml = `
-            <tr data-employee-id="${employee.employee_id}">
-                <td>${index + 1}</td>
-                <td>${employee.badge}</td>
-                <td>${employee.employee_name}</td>
-        `;
-        
-        // Add columns untuk setiap item type
-        itemTypes.forEach(itemType => {
-            const itemData = employee.items[itemType];
+        if (itemData && itemData.berat_kg > 0) {
             rowHtml += `
-                <td>
-                    <div class="text-center">
-                        <div>${itemData.berat.toFixed(2)} kg</div>
-                        <small class="text-muted">${greatFormatRupiah(itemData.harga.toString())},00</small>
-                    </div>
+                <td class="text-center" style="cursor: pointer;" 
+                    onclick="showItemDetails('${employee.employee_id}', '${itemType}')">
+                    <div class="font-weight-bold">${formatNumberSallaryPayment(itemData.berat_kg)} kg</div>
+                    <small class="text-muted">${formatCurrencyWithComma(itemData.harga)},00</small>
+                    <br>
+                    <small class="text-info">(${formatNumberSallaryPayment(itemData.berat_grams)} g)</small>
                 </td>
             `;
-        });
+        } else {
+            rowHtml += `
+                <td class="text-center text-muted">
+                    <div>0 kg</div>
+                    <small>-</small>
+                </td>
+            `;
+        }
+    });
+    
+    // Total columns (dalam kg)
+    rowHtml += `
+            <td class="text-center font-weight-bold">
+                ${formatNumberSallaryPayment(employee.total_kg)} kg<br>
+                <small class="text-info">(${formatNumberSallaryPayment(employee.total_kg * 1000)} g)</small>
+            </td>
+            <td class="text-center font-weight-bold">${formatCurrencyWithComma(employee.total_harga)},00</td>
+        </tr>
+    `;
+    
+    return rowHtml;
+}
+
+// ===== ITEM DETAIL VIEW =====
+function showItemDetails(employeeId, itemType) {
+    const employeeData = processedEmployeeData.find(emp => emp.employee_id == employeeId);
+    
+    if (!employeeData || !employeeData.items[itemType]) {
+        showAlert('warning', 'Data tidak ditemukan');
+        return;
+    }
+    
+    const itemGroup = employeeData.items[itemType];
+    const items = itemGroup.sub_items;
+    
+    let detailHtml = `
+        <div class="modal fade" id="itemDetailModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">
+                            <i class="fas fa-list-alt mr-2"></i>
+                            Detail ${itemType} - ${employeeData.employee_name}
+                        </h5>
+                        <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <strong>Total Berat:</strong> 
+                                <br>${formatNumberSallaryPayment(itemGroup.berat_kg)} kg
+                                <br><small>(${formatNumberSallaryPayment(itemGroup.berat_grams)} gram)</small>
+                            </div>
+                            <div class="col-md-4">
+                                <strong>Harga Satuan:</strong>
+                                <br>${formatCurrencyWithComma(itemGroup.harga)},00/kg
+                            </div>
+                            <div class="col-md-4">
+                                <strong>Total Harga:</strong>
+                                <br>${formatCurrencyWithComma(itemGroup.total)},00
+                            </div>
+                        </div>
+                        <table class="table table-bordered table-sm">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th class="text-center">#</th>
+                                    <th class="text-center">Berat</th>
+                                    <th class="text-center">Harga/kg</th>
+                                    <th class="text-center">Subtotal</th>
+                                    <th class="text-center">Waktu</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+    `;
+    
+    let totalItems = 0;
+    let totalWeightKg = 0;
+    let totalWeightGrams = 0;
+    let totalValue = 0;
+    
+    items.forEach((item, idx) => {
+        totalItems++;
+        totalWeightKg += item.berat_kg;
+        totalWeightGrams += item.berat_grams;
+        totalValue += item.subtotal;
         
-        // Total columns
-        rowHtml += `
-                <td class="text-center"><strong>${employee.total_kg.toFixed(2)} kg</strong></td>
-                <td class="text-center"><strong>${greatFormatRupiah(employee.total_harga.toString())},00</strong></td>
+        detailHtml += `
+            <tr>
+                <td class="text-center">${idx + 1}</td>
+                <td class="text-right">
+                    ${formatNumberSallaryPayment(item.berat_kg)} kg<br>
+                    <small>(${formatNumberSallaryPayment(item.berat_grams)} g)</small>
+                </td>
+                <td class="text-right">${formatCurrencyWithComma(item.harga)},00</td>
+                <td class="text-right">${formatCurrencyWithComma(item.subtotal)},00</td>
+                <td class="text-center">${formatDateTime(item.created_at)}</td>
             </tr>
         `;
-        
-        return rowHtml;
-    }
+    });
+    
+    detailHtml += `
+                            </tbody>
+                            <tfoot class="font-weight-bold">
+                                <tr>
+                                    <td colspan="2" class="text-right">
+                                        Total ${totalItems} item<br>
+                                        <small>${formatNumberSallaryPayment(totalWeightKg)} kg (${formatNumberSallaryPayment(totalWeightGrams)} g)</small>
+                                    </td>
+                                    <td class="text-right">-</td>
+                                    <td colspan="2" class="text-right">${formatCurrencyWithComma(totalValue)},00</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    $('#itemDetailModal').remove();
+    $('body').append(detailHtml);
+    $('#itemDetailModal').modal('show');
+}
+
+// ===== HELPER FUNCTIONS =====
+function formatNumberSallaryPayment(num, decimals = 2) {
+    const number = parseFloat(num);
+    if (isNaN(number)) return '0';
+    
+    return number.toLocaleString('id-ID', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+    });
+}
+
+// Untuk format gram (tanpa desimal)
+function formatGrams(grams) {
+    const number = parseFloat(grams);
+    if (isNaN(number)) return '0';
+    
+    return number.toLocaleString('id-ID', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    });
+}
+
+function formatDateTime(dateTimeString) {
+    const date = new Date(dateTimeString);
+    return date.toLocaleString('id-ID', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+
+function formatCurrencyWithComma(number) {
+    const num = parseFloat(number);
+    if (isNaN(num)) return '0,00';
+    
+    // Format dengan titik sebagai pemisah ribuan dan koma untuk desimal
+    return num.toLocaleString('id-ID', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).replace(/,/g, 'X').replace(/\./g, ',').replace(/X/g, '.');
+}
 
     // ===== ITEM DETAIL VIEW =====
     function handleViewItemDetails() {
@@ -601,8 +768,8 @@
                     <tr>
                         <td>${idx + 1}</td>
                         <td>${item.berat.toFixed(2)}</td>
-                        <td>${greatFormatRupiah(item.harga.toString())},00</td>
-                        <td>${greatFormatRupiah(item.subtotal.toString())},00</td>
+                        <td>${formatCurrencyWithComma(item.harga.toString())},00</td>
+                        <td>${formatCurrencyWithComma(item.subtotal.toString())},00</td>
                         <td>${new Date(item.created_at).toLocaleString()}</td>
                     </tr>
                 `;
@@ -614,7 +781,7 @@
                                         <tr>
                                             <th colspan="2">Total</th>
                                             <th>${employeeData.items[itemType].items.length} Item</th>
-                                            <th colspan="2">${greatFormatRupiah(employeeData.items[itemType].total.toString())},00</th>
+                                            <th colspan="2">${formatCurrencyWithComma(employeeData.items[itemType].total.toString())},00</th>
                                         </tr>
                                     </tfoot>
                                 </table>
