@@ -92,16 +92,16 @@ class Pembelian extends BaseController
             "lastdate" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
-        if ($this->this_company_id != 16 && $this->this_company_id != 15) {
-            $companyId = [1, 2];
-        } else if ($this->this_company_id == 15) {
-            $companyId = [15];
-        } else {
-            $companyId = [16];
-        }
+        // if ($this->this_company_id != 16 && $this->this_company_id != 15) {
+        //     $companyId = [1, 2];
+        // } else if ($this->this_company_id == 15) {
+        //     $companyId = [15];
+        // } else {
+        //     $companyId = [16];
+        // }
 
         $condition = [
-            // "penerimaan_barang.company_id"  => $this->this_company_id,
+            "penerimaan_barang.company_id"  => $this->this_company_id,
             "penerimaan_barang.deletedAt" => NULL
         ];
 
@@ -118,9 +118,10 @@ class Pembelian extends BaseController
         $offset = $this->request->getGet("start");
 
         // $res = $this->transaksiPembelianModel->getList($condition, $addCondition, $limit, $offset);
-        $res = $this->penerimaanBarangModel->getPenerimaanBarangListForAccounting($condition, $addCondition, $limit, $offset, $companyId);
+        $res = $this->penerimaanBarangModel->getPenerimaanBarangListForAccounting($condition, $addCondition, $limit, $offset);
         $metaValuta = $this->metadataModel->get_by_name('Valuta');
-
+        // var_dump($condition, $addCondition, $limit, $offset);
+        // exit;
         $rdata = [];
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
@@ -275,6 +276,11 @@ class Pembelian extends BaseController
 
     public function LaporanPembelianPrint($tglAwal, $tglAkhir, $rawFilter, $search)
     {
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
+        ob_end_clean();
+        ob_start();
+
         $dompdf = new Dompdf();
         $filter = [];
 
@@ -282,22 +288,22 @@ class Pembelian extends BaseController
             $filter = explode(',', $rawFilter);
         }
 
-        if ($this->this_company_id != 16 && $this->this_company_id != 15) {
-            $companyId = [1, 2];
-        } else if ($this->this_company_id == 15) {
-            $companyId = [15];
-        } else {
-            $companyId = [16];
-        }
+        // if ($this->this_company_id != 16 && $this->this_company_id != 15) {
+        //     $companyId = [1, 2];
+        // } else if ($this->this_company_id == 15) {
+        //     $companyId = [15];
+        // } else {
+        //     $companyId = [16];
+        // }
 
         $condition = [
-            // "penerimaan_barang.company_id"  => $this->this_company_id,
+            "penerimaan_barang.company_id"  => $this->this_company_id,
             "penerimaan_barang.deletedAt" => NULL
         ];
 
         $addCondition = [
-            "search"        => $search,
-            "filter"        => $filter,
+            "search"        => $search == "all" ? "" : $search,
+            "filter"        => $filter[0] == "all" ? [] : $filter,
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
             "startdate"     => $tglAwal ? date("Y-m-d", strtotime(str_replace("/", "-", $tglAwal))) : date("Y-m-d"),
@@ -305,9 +311,9 @@ class Pembelian extends BaseController
         ];
 
         // $res = $this->transaksiPembelianModel->getList($condition, $addCondition, $limit, $offset);
-        $res = $this->penerimaanBarangModel->getPenerimaanBarangListForPrintAccounting($condition, $addCondition, $companyId);
+        $res = $this->penerimaanBarangModel->getPenerimaanBarangListForAccounting($condition, $addCondition, null, null);
         $metaValuta = $this->metadataModel->get_by_name('Valuta');
-        // var_dump($res);
+        // var_dump($condition, $addCondition, null, null);
         // exit;
 
         $rdata = [];
@@ -426,9 +432,9 @@ class Pembelian extends BaseController
         }
 
         $data = [
-            "data"              => $rdata,
+            "data"      => $rdata,
             "dateStart" => $tglAwal != "all" ? date("d/m/Y", strtotime($tglAwal)) : "All",
-            "dateEnd" =>  $tglAkhir != "now" ? date("d/m/Y", strtotime($tglAkhir)) : "Now",
+            "dateEnd"   =>  $tglAkhir != "now" ? date("d/m/Y", strtotime($tglAkhir)) : "Now",
         ];
 
         // return view('Laporan/LaporanPembelian/print', $data);
@@ -448,8 +454,10 @@ class Pembelian extends BaseController
 
     public function exportExcel($tglAwal, $tglAkhir, $rawFilter, $search)
     {
+        ini_set('memory_limit', '-1');
         set_time_limit(0);
-        ini_set('memory_limit', '512M');
+        ob_end_clean();
+        ob_start();
 
         $spreadsheet = new Spreadsheet();
         $filter = [];
@@ -458,22 +466,22 @@ class Pembelian extends BaseController
             $filter = explode(',', $rawFilter);
         }
 
-        if ($this->this_company_id != 16 && $this->this_company_id != 15) {
-            $companyId = [1, 2];
-        } else if ($this->this_company_id == 15) {
-            $companyId = [15];
-        } else {
-            $companyId = [16];
-        }
+        // if ($this->this_company_id != 16 && $this->this_company_id != 15) {
+        //     $companyId = [1, 2];
+        // } else if ($this->this_company_id == 15) {
+        //     $companyId = [15];
+        // } else {
+        //     $companyId = [16];
+        // }
 
         $condition = [
-            // "penerimaan_barang.company_id"  => $this->this_company_id,
-            // "penerimaan_barang.deletedAt" => NULL
+            "penerimaan_barang.company_id"  => $this->this_company_id,
+            "penerimaan_barang.deletedAt" => NULL
         ];
 
         $addCondition = [
             "search"        => $search == "all" ? "" : $search,
-            "filter"        => $rawFilter == "all" ? [] : $filter,
+            "filter"        => $filter[0] == "all" ? [] : $filter,
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
             "startdate"     => $tglAwal ? date("Y-m-d", strtotime(str_replace("/", "-", $tglAwal))) : date("Y-m-d"),
@@ -509,7 +517,7 @@ class Pembelian extends BaseController
             ->setCellValue('N3', 'Nominal Value(IDR)')
             ->setCellValue('O3', 'Paid Value(IDR)');
 
-        $res = $this->penerimaanBarangModel->getPenerimaanBarangListForPrintAccounting($condition, $addCondition, $companyId);
+        $res = $this->penerimaanBarangModel->getPenerimaanBarangListForAccounting($condition, $addCondition, null, null);
         $metaValuta = $this->metadataModel->get_by_name('Valuta');
 
         $rdata = [];
