@@ -66,7 +66,7 @@
   <h6>PT. TOBA SURIMI INDUSTRIES, Tbk (<?= session()->get("login")->this_company; ?>)</h6>
   <p><b>Purchase Report</b> Period :<?= ($dateStart != "All") ? $dateStart : "" ?> - <?= ($dateEnd != "Now") ? $dateEnd : "" ?></p>
 
-  <table width="100%" id="table1" style=" margin-top: -20px;">
+  <table width="100%" id="table1">
     <thead>
       <tr>
         <th>No.</th>
