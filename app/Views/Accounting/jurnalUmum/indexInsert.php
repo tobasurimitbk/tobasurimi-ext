@@ -612,7 +612,7 @@
                                     confirmButtonColor: '#4e73df',
                                 }).then((result) => {
                                     if (result.isConfirmed) {
-                                        location.reload()
+                                        table.ajax.reload();
                                     }
                                 })
                             } else {
@@ -883,6 +883,7 @@
         });
 
         $('#btn-discard-import-excel').click(function() {
+            $('#file').val(null);
             $('#import_excel_modal').modal('hide');
         })
 
