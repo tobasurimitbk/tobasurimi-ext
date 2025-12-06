@@ -101,7 +101,7 @@ class Pembelian extends BaseController
         }
 
         $condition = [
-            // "penerimaan_barang.company_id"  => $this->this_company_id,
+            "penerimaan_barang.company_id"  => $this->this_company_id,
             "penerimaan_barang.deletedAt" => NULL
         ];
 

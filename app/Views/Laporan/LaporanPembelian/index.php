@@ -14,8 +14,6 @@
                 <li><button class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-accounting/pembelian/printExcel"); ?>')">EXCEL</button></li>
             </ul>
         <?php endif; ?>
-
-
     </div>
     <div class="card">
         <div class="card-body">
@@ -110,6 +108,22 @@
 <script>
     let sort = "createdAt";
     let sortType = "desc";
+
+    // Set default tanggal: awal bulan - hari ini
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    function formatDate(date) {
+        // Format dd/mm/yyyy
+        let dd = String(date.getDate()).padStart(2, '0');
+        let mm = String(date.getMonth() + 1).padStart(2, '0'); // Januari = 0
+        let yyyy = date.getFullYear();
+        return dd + '/' + mm + '/' + yyyy;
+    }
+
+    $(".dateStart").val(formatDate(firstDay));
+    $(".dateEnd").val(formatDate(today));
+
     $(document).ready(function() {
         const csrfToken = '<?= csrf_token() ?>';
         const table = $('.dataTable').DataTable({
