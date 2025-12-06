@@ -434,7 +434,7 @@
             allowOutsideClick: () => !Swal.isLoading()
         }).then((result) => {
 
-            if (!result.isConfirmed) return;
+            if (!result.isConfirmed) ;
 
             const res = result.value;
 
@@ -517,11 +517,11 @@
                     confirmButtonColor: '#4e73df',
                     width: '650px'
                 }).then(() => {
-                    table?.ajax?.reload();
+                    location.reload();
                 });
 
 
-                return;
+                location.reload();
             }
 
             // ======================================
@@ -532,6 +532,8 @@
                 title: 'Gagal!',
                 html: res.message || "Sinkronisasi gagal",
                 confirmButtonColor: '#4e73df',
+            }).then(() => {
+                location.reload();
             });
 
         });

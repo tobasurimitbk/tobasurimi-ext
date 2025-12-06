@@ -67,13 +67,17 @@ class HROutsourcingEmployeeModel extends Model
         $dataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
+            ->where('hr_outsourcing_employee.deletedAt', null)
             ->orderBy($sort, $sortType);
 
         if ($addCondition['search']) {
-            $dataQry->like('hr_outsourcing_employee.nama', $addCondition['search']);
-            $dataQry->orLike('hr_outsourcing_employee.badge', $addCondition['search']);
-            $dataQry->orLike('hr_outsourcing_employee.tanggal_masuk_kerja', $addCondition['search']);
+            $dataQry->groupStart()
+                ->like('hr_outsourcing_employee.nama', $addCondition['search'])
+                ->orLike('hr_outsourcing_employee.badge', $addCondition['search'])
+                ->orLike('hr_outsourcing_employee.tanggal_masuk_kerja', $addCondition['search'])
+            ->groupEnd();
         }
+
 
         $totalFilteredData = $dataQry->countAllResults(false);
         $data = $dataQry->findAll($limit, $offset);

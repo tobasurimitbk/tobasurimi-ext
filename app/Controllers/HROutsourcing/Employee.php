@@ -61,7 +61,6 @@ class Employee extends BaseController
 
         $condition = [
             'hr_outsourcing_employee.company_id' => $this->request->getVar('company_id'),
-            'hr_outsourcing_employee.deletedAt' => NULL,
         ];
 
         $limit = $this->request->getVar("length");
