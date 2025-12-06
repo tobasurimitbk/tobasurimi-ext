@@ -54,6 +54,7 @@ class StuffingInternasionalDetailModel extends Model
         $barangMasterSalesModel = new BarangMasterSalesModel();
         $metaDataModel = new MetadataModel();
         $salesOrderExportDetailModel = new SalesOrderExportDetailModel();
+        $salesOrderExportModel = new SalesOrderExportModel();
         $salesKontrakDetailModel = new SalesKontrakDetailModel();
 
         $result = array();
@@ -74,11 +75,14 @@ class StuffingInternasionalDetailModel extends Model
                 $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($stock['spesifikasi_id']);
                 $satuan = $satuanModel->find($barangMasterSpesifikasi['satuan_1']);
                 $barangName = $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'];
-           
+
+            $orderExportData = $salesOrderExportModel->where('sales_order_export_id', $m['sales_order_export_id'])->first();
+
+
             $stockOutput = $salesKontrakDetailModel
                 ->select('barang_master_sales.*, sales_contract_detail.qty')
                 ->join('barang_master_sales', 'barang_master_sales.id = sales_contract_detail.barang_master_sales_id', 'left')
-                ->where('sales_contract_detail.id', $m['sales_order_export_id'])
+                ->where('sales_contract_detail.sales_contract_id', $orderExportData['sales_contract_id'])
                 ->first();
            
                 $barangNameOutput = $stockOutput['barang_name'];
