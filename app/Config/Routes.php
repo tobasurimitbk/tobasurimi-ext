@@ -3107,6 +3107,8 @@ $routes->post('/hr-outsourcing-company/employee/delete', 'HROutsourcing\Employee
 $routes->post('/hr-outsourcing-company/employee/save', 'HROutsourcing\Employee::store', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-company/employee/update', 'HROutsourcing\Employee::update', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-company/employee/generateKode', 'HROutsourcing\Employee::generateKode', ['filter' => 'Auth']);
+$routes->post('/hr-outsourcing-company/employee/sync-employee-finger', 'HROutsourcing\Employee::syncEmployeeFinger', ['filter' => 'Auth']);
+$routes->post('/hr-outsourcing-company/employee/check-sync-status', 'HROutsourcing\Employee::checkSyncStatus', ['filter' => 'Auth']);
 
 // HR Outsourcing Sallary Payment
 $routes->get('/hr-outsourcing-sallary-payment', 'HROutsourcing\SallaryPayment::index', ['filter' => 'Auth']);
@@ -3125,8 +3127,6 @@ $routes->get('hr-outsourcing-sallary-payment/getDepartmentIpData', 'HROutsourcin
 $routes->get('hr-outsourcing-sallary-payment/getIpByDepartment/(:num)', 'HROutsourcing\SallaryPayment::getIpByDepartment/$1', ['filter' => 'Auth']);
 $routes->get('hr-outsourcing-sallary-payment/getIpByDepartment', 'HROutsourcing\SallaryPayment::getIpByDepartment', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-sallary-payment/getData', 'HROutsourcing\SallaryPayment::getData', ['filter' => 'Auth']);
-$routes->post('/hr-outsourcing-company/employee/sync-employee-finger', 'HROutsourcing\Employee::syncEmployeeFinger', ['filter' => 'Auth']);
-$routes->post('/hr-outsourcing-company/employee/check-sync-status', 'HROutsourcing\Employee::checkSyncStatus', ['filter' => 'Auth']);
 
 // HR outsourcing Mesin Finger
 $routes->get('hr-outsourcing-finger-machine', 'HROutsourcing\AttendancesUnit::ListData', ['filter' => 'Auth']);
