@@ -54,7 +54,17 @@
                         <label for="floatingInput">Cari Bagian</label>
                     </div>
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-2">
+                    <div class="form-floating">
+                        <select class="form-select" name="filterStatusPinjaman" id="filterStatusPinjaman">
+                            <option value="ALL" selected>ALL</option>
+                            <option value="AMBIL">AMBIL</option>
+                            <option value="TIDAK AMBIL">TIDAK AMBIL</option>
+                        </select>
+                        <label for="floatingInput">Status Pinjaman</label>
+                    </div>
+                </div>
+                <div class="col-sm-2">
                     <div class="form-floating">
                         <select class="form-select" name="filterGolongan">
                             <option value="" selected></option>
@@ -67,11 +77,11 @@
                         <label for="floatingInput">Cari Tipe / Golongan</label>
                     </div>
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-2">
                     <div class="form-floating">
                         <select class="form-select" name="filterEmployeeID">
                         </select>
-                        <label for="floatingInput">Cari Berdasarkan Nama Karyawan</label>
+                        <label for="floatingInput">Cari Karyawan</label>
                     </div>
                 </div>
             </div>
@@ -82,10 +92,10 @@
                             <tr>
                                 <th style="width: 10px;">No</th>
                                 <th onclick="changeSort('employees.nip')" class="sort">Nip</th>
-                                <th onclick="changeSort('employees.name')" class="sort">Nama Karyawan</th>
+                                <th onclick="changeSort('employees.name')" class="sort">Karyawan</th>
                                 <th onclick="changeSort('employees.tipe')" class="sort">Tipe/Gol</th>
                                 <th onclick="changeSort('employees.division_id')" class="sort">Dept</th>
-                                <th onclick="changeSort('pinjaman_karyawan.tanggal_ambil')" class="sort">Tanggal Ambil</th>
+                                <th onclick="changeSort('pinjaman_karyawan.tanggal_ambil')" class="sort">Tgl Ambil</th>
                                 <th onclick="changeSort('pinjaman_karyawan.start_date')">Range Absen</th>
                                 <th onclick="changeSort('pinjaman_karyawan.hadir')">Hadir</th>
                                 <th onclick="changeSort('pinjaman_karyawan.tidak_hadir')">Tidak Hadir</th>
@@ -353,8 +363,8 @@
     </div>
 </div>
 <script>
-    let sort = "pinjaman_karyawan.id";
-    let sortType = "desc";
+    let sort = "employees.nip";
+    let sortType = "asc";
     const csrfToken = '<?= csrf_token() ?>';
 
     const table = $('.dataTable').DataTable({
@@ -379,6 +389,7 @@
                 data.employee_id = $("select[name='filterEmployeeID']").val();
                 data.tipe = $("select[name='filterGolongan']").val();
                 data.bagian_id = $("select[name='filterBagianID']").val();
+                data.status_pinjaman = $("select[name='filterStatusPinjaman']").val();
                 data.month = $('#month').val();
                 data.sort = sort;
                 data.sortType = sortType;
@@ -548,15 +559,6 @@
             }
         }
     });
-    const changeSort = function(val) {
-        if (sort !== val) {
-            sortType = "asc";
-            sort = val;
-        } else {
-            sortType = sortType === "asc" ? "desc" : "asc";
-        }
-    }
-
     // select2 divisi
     $("select[name='filterDivisiID']").select2({
         placeholder: "Cari Departemen",
@@ -589,15 +591,45 @@
     });
 
     $("select[name='filterEmployeeID']").select2({
-        placeholder: "Cari Berdasarkan Karyawan",
+        placeholder: "Cari Karyawan",
+        theme: "bootstrap-5",
+        allowClear: true,
+        minimumInputLength: 2,
+        ajax: {
+            url: "<?= base_url('pinjaman-karyawan/like-employees') ?>",
+            dataType: 'json',
+            delay: 250,
+            data: function(params) {
+                return {
+                    employeesName: params.term,
+                };
+            },
+            processResults: function(data) {
+                var options = [];
+                $.each(data.data, function(index, employee) {
+                    options.push({
+                        id: employee.id,
+                        text: employee.name
+                    });
+                });
+                return {
+                    results: options
+                };
+            },
+            cache: true
+        }
+    });
+
+    $("select[name='filterGolongan']").select2({
+        placeholder: "Cari Tipe/Golongan",
         theme: "bootstrap-5",
         allowClear: true,
     });
 
-    $("select[name='filterGolongan']").select2({
-        placeholder: "Cari Tipe/Golongan Pegawai",
+    $("select[name='filterStatusPinjaman']").select2({
+        placeholder: "Cari Status Pinjaman",
         theme: "bootstrap-5",
-        allowClear: true,
+        allowClear: false,
     });
 
     $("#statusPinjaman").select2({
@@ -697,47 +729,6 @@
         .parent('div')
         .find('label')
         .css('z-index', '1');
-
-    $("select[name='filterDivisiID']").on('change', function(e) {
-        e.preventDefault();
-        const csrf = $(`[name="${csrfToken}"]`);
-        var divisionID = $(this).val();
-
-        var formData = new FormData();
-        formData.append('divisionID', divisionID);
-
-        $.ajax({
-            url: "<?= base_url("pinjaman-karyawan/employees"); ?>",
-            data: formData,
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-            },
-            method: "POST",
-            dataType: "json",
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                csrf.val(response.token);
-                var employeeSelect = $("select[name='filterEmployeeID']");
-                employeeSelect.empty();
-                employeeSelect.append($("<option></option>")
-                    .attr("value", "")
-                    .text("Silahkan pilih karyawan dahulu"));
-                $.each(response.data, function(index, data) {
-                    var option = $("<option></option>")
-                        .attr("value", data.id)
-                        .text(data.name);
-                    employeeSelect.append(option);
-                });
-
-            },
-            onError: function(response) {
-                csrf.val(response.token);
-
-            }
-        });
-
-    });
 
     const generateSingle = function(employeeID, employeeName, yearMonth, startDate, finishDate, tipeGol, id) {
         $('#tipeGol').val(tipeGol);
@@ -1063,7 +1054,7 @@
         }
     })
 
-    $("select[name='filterEmployeeID'], select[name='filterGolongan'], select[name='filterDivisiID'],#month").change(function() {
+    $("select[name='filterEmployeeID'], select[name='filterGolongan'], select[name='filterDivisiID'],#month,select[name='filterStatusPinjaman']").change(function() {
         table.ajax.reload();
     });
 
@@ -1097,9 +1088,15 @@
             window.open(url, "_blank");
         }
     }
-</script>
-<script>
 
+    const changeSort = function(val) {
+        if (sort !== val) {
+            sortType = "asc";
+            sort = val;
+        } else {
+            sortType = sortType === "asc" ? "desc" : "asc";
+        }
+    }
 </script>
 
 <?= $this->endSection(); ?>

@@ -266,6 +266,7 @@ class Divisi extends BaseController
             }
 
             // Update Gaji Harian Bulk
+            $this->gajiConjunctionModel->syncKomponenGaji($id);
             $this->gajiConjunctionModel->updateBulkGajiHarian($id);
             $db->transCommit();
 

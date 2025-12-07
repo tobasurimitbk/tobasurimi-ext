@@ -2206,6 +2206,7 @@ $routes->get('/payroll/print/detail', 'HR\Payroll::exportPdfPayrollDivisionDetai
 $routes->get('/payroll/print/summary', 'HR\Payroll::exportPdfSummary', ['filter' => 'Auth']);
 $routes->get('/payroll/print/potongan', 'HR\Payroll::exportPdfPotongan', ['filter' => 'Auth']);
 $routes->post('/payroll/employees-by-bagian', 'HR\Payroll::getEmployeeByBagian', ['filter' => 'Auth']);
+$routes->get('/payroll/like-employees', 'HR\Attendance::getEmployeesLike', ['filter' => 'Auth']);
 
 // pinjaman karyawan
 $routes->get('/pinjaman-karyawan', 'HR\PinjamanKaryawan::index', ['filter' => 'Auth']);
@@ -2215,6 +2216,7 @@ $routes->post('/pinjaman-karyawan/employees', 'HR\Payroll::getEmployeeByDivision
 $routes->post('/pinjaman-karyawan/generate-single', 'HR\PinjamanKaryawan::generateSinglePinjaman', ['filter' => 'Auth']);
 $routes->get('/pinjaman-karyawan/print', 'HR\PinjamanKaryawan::exportPDF', ['filter' => 'Auth']);
 $routes->post('/pinjaman-karyawan/update-status', 'HR\PinjamanKaryawan::updateStatus', ['filter' => 'Auth']);
+$routes->get('/pinjaman-karyawan/like-employees', 'HR\Attendance::getEmployeesLike', ['filter' => 'Auth']);
 
 // Perijinan
 $routes->get('/form-perijinan', 'HR\Perijinan::perijinan', ['filter' => 'Auth']);

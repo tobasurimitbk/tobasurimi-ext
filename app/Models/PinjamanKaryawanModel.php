@@ -32,7 +32,7 @@ class PinjamanKaryawanModel extends Model
     ];
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'createdAt';
     protected $updatedField  = 'updatedAt';
@@ -58,28 +58,26 @@ class PinjamanKaryawanModel extends Model
     public function getList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'employees.nip' => 'employees.nip',
-            'employees.tipe' => 'employees.tipe',
-            'employees.name' => 'employees.name',
-            'employees.division_id' => 'employees.division_id',
-            'pinjaman_karyawan.start_date' => 'pinjaman_karyawan.start_date',
-            'pinjaman_karyawan.end_date' => 'pinjaman_karyawan.end_date',
-            'pinjaman_karyawan.hadir' => 'pinjaman_karyawan.hadir',
-            'pinjaman_karyawan.tidak_hadir' => 'pinjaman_karyawan.tidak_hadir',
+            'employees.nip'                   => 'employees.nip',
+            'employees.tipe'                  => 'employees.tipe',
+            'employees.name'                  => 'employees.name',
+            'employees.division_id'           => 'employees.division_id',
+            'pinjaman_karyawan.start_date'    => 'pinjaman_karyawan.start_date',
+            'pinjaman_karyawan.end_date'      => 'pinjaman_karyawan.end_date',
+            'pinjaman_karyawan.hadir'         => 'pinjaman_karyawan.hadir',
+            'pinjaman_karyawan.tidak_hadir'   => 'pinjaman_karyawan.tidak_hadir',
             'pinjaman_karyawan.tanggal_ambil' => 'pinjaman_karyawan.tanggal_ambil'
-
         ];
 
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'employees.name';
-        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
-
+        $sort     = $availableSort[$addCondition['sort'] ?? 'employees.nip'] ?? 'employees.nip';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'asc'] ?? 'ASC';
 
         $selectQry = "pinjaman_karyawan.*,
-                    employees.nip, employees.name AS employeeName, employees.division_id, 
-                    employees.tipe,
-                    divisis.divisi";
+                  employees.nip, employees.name AS employeeName, 
+                  employees.division_id, employees.tipe,
+                  divisis.divisi";
 
         $pinjamanQry = $this->asObject()
             ->select($selectQry)
@@ -88,34 +86,47 @@ class PinjamanKaryawanModel extends Model
             ->join('divisis', 'divisis.id = employees.division_id', 'left')
             ->orderBy($sort, $sortType);
 
+        // Total Data (sebelum filter tambahan)
         $totalData = $pinjamanQry->countAllResults(false);
 
-        if ($addCondition['employee_id'] || $addCondition['divisi_id'] || $addCondition['employees.tipe']) {
-            $pinjamanQry->groupStart();
+        // Apakah ada filter tambahan?
+        $hasFilter =
+            !empty($addCondition['employee_id']) ||
+            !empty($addCondition['divisi_id']) ||
+            !empty($addCondition['employees.tipe']) ||
+            !empty($addCondition['status_pinjaman']) ||
+            !empty($addCondition['employees.bagian_id']);
+
+        // ========== FILTER ==========
+
+        if (!empty($addCondition['status_pinjaman'])) {
+            if ($addCondition['status_pinjaman'] === "AMBIL") {
+                $pinjamanQry->where('pinjaman_karyawan.status_pinjaman', 1);
+            } elseif ($addCondition['status_pinjaman'] === "TIDAK AMBIL") {
+                $pinjamanQry->where('pinjaman_karyawan.status_pinjaman', 0);
+            }
         }
 
-        if ($addCondition['employee_id']) {
-            $pinjamanQry->like('pinjaman_karyawan.employee_id', $addCondition['employee_id']);
+        if (!empty($addCondition['employee_id'])) {
+            $pinjamanQry->where('pinjaman_karyawan.employee_id', $addCondition['employee_id']);
         }
 
-        if ($addCondition['employees.bagian_id']) {
-            $pinjamanQry->like('employees.bagian_id', $addCondition['employees.bagian_id']);
+        if (!empty($addCondition['employees.bagian_id'])) {
+            $pinjamanQry->where('employees.bagian_id', $addCondition['employees.bagian_id']);
         }
 
-        if ($addCondition['divisi_id']) {
-            $pinjamanQry->like('pinjaman_karyawan.division_id', $addCondition['divisi_id']);
+        if (!empty($addCondition['divisi_id'])) {
+            $pinjamanQry->where('pinjaman_karyawan.division_id', $addCondition['divisi_id']);
         }
 
-        if ($addCondition['employees.tipe']) {
-            $pinjamanQry->like('employees.tipe', $addCondition['employees.tipe']);
+        if (!empty($addCondition['employees.tipe'])) {
+            $pinjamanQry->where('employees.tipe', $addCondition['employees.tipe']);
         }
 
-
-        if ($addCondition['employee_id'] || $addCondition['divisi_id'] || $addCondition['employees.tipe']) {
-            $pinjamanQry->groupEnd();
-        }
-
+        // Total data setelah filter
         $totalFilteredData = $pinjamanQry->countAllResults(false);
+
+        // Data final
         $data = $pinjamanQry->findAll($limit, $offset);
 
         return [
@@ -126,6 +137,7 @@ class PinjamanKaryawanModel extends Model
             'sortType'          => $sortType
         ];
     }
+
 
     public function getPinjamanKaryawanDiambil($employeeID, $monthYear)
     {

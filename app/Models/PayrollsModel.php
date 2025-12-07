@@ -92,8 +92,8 @@ class PayrollsModel extends Model
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
         // Ensure the sort and sortType values are valid
-        $sort = $availableSort[$addCondition['sort'] ?? 'id'] ?? 'payrolls.id';
-        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+        $sort = $availableSort[$addCondition['sort'] ?? 'employees.nip'] ?? 'employees.nip';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'asc'] ?? 'asc';
 
         $selectQry = "
             payrolls.*,

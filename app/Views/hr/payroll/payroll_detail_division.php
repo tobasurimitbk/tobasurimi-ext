@@ -130,7 +130,7 @@
                                             <tr>
                                                 <td>Tambahan Hari Libur Tidak Kerja</td>
                                                 <td>:</td>
-                                                <td><?= $p['payroll']['libur'] ?> Hari</td>
+                                                <td>0 Hari</td>
                                             </tr>
                                             <tr>
                                                 <td>Tambahan Hari Libur Resmi</td>

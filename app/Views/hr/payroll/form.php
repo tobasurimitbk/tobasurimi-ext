@@ -226,30 +226,55 @@
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade <?= (@$_GET['location'] == "nilaiKomponenGaji" || empty(@$_GET['location'])) ? 'show active' : '' ?> " id="perhitunganGaji" role="tabpanel">
                         <div class="table-responsive">
-                            <table class="table nowrap table-hover-tobasurimi dataTable" id="perhitunganGajiTable" width="100%" cellspacing="0">
-                                <thead class="thead-dark">
-                                    <tr>
-                                        <th style="width: 10px;" class="sort">No</th>
-                                        <th class="sort">Komponen Gaji</th>
-                                        <th class="sort">Nominal</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="body-table" id="body-table" style="cursor: pointer;">
-                                    <?php $no = 1; ?>
-                                    <?php foreach ($perhitunganGaji as  $p) : ?>
-                                        <tr style="cursor: pointer;" class="perhitunganGaji" data-id="<?= $p['id'] ?>" data-komponen_gaji="<?= $p['name'] ?>" data-nominal="<?= $p['nominal'] ?>" data-tipe="<?= $p['tipe'] == "PLUS" ? "+" : "-"  ?>">
-                                            <td><?= $no++; ?></td>
-                                            <td><b> <?= $p['name'] ?></b></td>
-                                            <td style="color: <?= $p['tipe'] == "PLUS" ? "green" : "red"  ?>; font-weight:bold;"><b> <?= $p['tipe'] == "PLUS" ? "(+)" : "(-)"  ?> <?= " " . number_format($p['nominal'],  2) ?></b></td>
+                            <form id="formUpdateKomponenGaji">
+                                <input type="hidden" name="payroll_id" value="<?= $payrollDetail['id'] ?>">
+                                <table class="table nowrap table-hover-tobasurimi dataTable" id="perhitunganGajiTable" width="100%" cellspacing="0">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th style="width: 10px;" class="sort">No</th>
+                                            <th class="sort">Komponen Gaji</th>
+                                            <th class="sort" style="width: 130px;">Nominal</th>
                                         </tr>
-                                    <?php endforeach ?>
-                                    <tr class="bg-secondary">
-                                        <td colspan="2" align="right"><b>Tunjangan Diterima</b></td>
-                                        <td><b><?= " " . number_format($totalPerhitunganGaji,  2) ?></b></td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody class="body-table" id="body-table">
+                                        <?php $no = 1; ?>
+                                        <?php foreach ($perhitunganGaji as  $p) : ?>
+                                            <tr>
+                                                <input type="hidden" name="komponen_gaji_id[]" value="<?= $p['id'] ?>">
+                                                <td><?= $no++; ?></td>
+                                                <td><b> <?= $p['name'] ?></b></td>
+                                                <td style="color: <?= $p['tipe'] == "PLUS" ? "green" : "red"  ?>; font-weight:bold;">
+                                                    <b> <?= $p['tipe'] == "PLUS" ? "(+)" : "(-)"  ?></b>
+                                                    <input type="text"
+                                                        style="
+                                                        border: 1px solid #999 !important;
+                                                        padding: 4px 6px;
+                                                        border-radius: 4px;
+                                                    "
+                                                        name="nominal[]"
+                                                        oninput="this.value = greatFormatRupiah(this.value)"
+                                                        value="<?= number_format($p['nominal'], 2) ?>">
+                                                </td>
+                                            </tr>
+                                        <?php endforeach ?>
+                                        <tr class="bg-secondary">
+                                            <td colspan="2" align="right"><b>Tunjangan Diterima</b></td>
+                                            <td><b><?= " " . number_format($totalPerhitunganGaji,  2) ?></b></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2"></td>
+                                            <td>
+                                                <a href="#" class="btn btn-primary" id="submitFormUpdateKomponenGaji" style="float: right;">
+                                                    Simpan Perubahan
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </form>
+
                         </div>
+
                     </div>
                     <div class="tab-pane fade <?= (@$_GET['location'] == "rekapKeterlambatanPresensi") ? 'show active' : '' ?>" id="keterlambatanPresensi" role="tabpanel">
                         <table class="table nowrap table-hover-tobasurimi dataTable" id="keterlambatanPresensiTabel" width="100%" cellspacing="0">
@@ -543,91 +568,46 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    $('.perhitunganGaji').click(function() {
-        var id = $(this).data('id');
-        var komponenGaji = $(this).data('komponen_gaji');
-        var nominal = $(this).data('nominal');
-        var tipe = $(this).data('tipe');
 
-        $('#nominalGajiModal').text("Nominal (" + tipe + ")");
-        $('#namaKomponenGaji').val(komponenGaji);
-        $('#nominalKomponenGaji').val(greatFormatRupiah(nominal));
-        $("input[name='komponenGajiID']").val(id);
-
-        $('#perhitunganGajiModal').modal('show');
-    });
-    var validatorNilaiKomponenGaji = $("#formUpdateKomponenGaji").validate({
-        rules: {
-            nominal: {
-                required: true
-            }
-        },
-        messages: {
-            nominal: {
-                required: "Nominal wajib diisi"
-            },
-        },
-        errorElement: 'span',
-        errorClass: 'text-danger',
-        errolacement: function(error, element) {
-            var elem = $(element);
-            if (elem.hasClass("select2-hidden-accessible")) {
-                element = $("#select2-" + elem.attr("id") + "-container").parent();
-                error.insertAfter(element);
-            } else {
-                error.insertAfter(element);
-            }
-        },
-        highlight: function(element) {
-            $(element).closest('.form-group').addClass('has-error');
-            $(element).addClass('select-class');
-
-        },
-        unhighlight: function(element) {
-            $(element).closest('.form-group').removeClass('has-error');
-            $(element).removeClass('select-class');
-        },
-    });
     $('#submitFormUpdateKomponenGaji').click(function(e) {
         e.preventDefault();
-        if ($("#formUpdateKomponenGaji").valid()) {
-            const csrf = $(`[name="${csrfToken}"]`);
-            let data = new FormData(document.querySelector("#formUpdateKomponenGaji"));
-            let nominal = destroyFormatRupiah($('#nominalKomponenGaji').val());
-            data.set('nominal', nominal);
+        const csrf = $(`[name="${csrfToken}"]`);
+        // ⬇️ Ambil form
+        let form = document.querySelector("#formUpdateKomponenGaji");
+        let data = new FormData(form);
+        // ⬇️ Convert semua nominal[] dengan destroyFormatRupiah()
+        let nominalInputs = form.querySelectorAll('input[name="nominal[]"]');
+        nominalInputs.forEach((input, index) => {
+            let cleaned = destroyFormatRupiah(input.value);
+            data.set(`nominal[${index}]`, cleaned);
+        });
 
-            $.ajax({
-                url: "<?= base_url("payroll/update/nominal-komponen-gaji"); ?>",
-                data: data,
-                beforeSend: function(xhr) {
-                    setLoading();
-                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                },
-                complete: function() {
-                    stopLoading();
-                },
-                method: "POST",
-                dataType: "json",
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: response.message,
-                        confirmButtonColor: '#4e73df',
-                    }).then((result) => {
-                        location.replace(`<?= base_url("payroll/id"); ?>/${response.id}?location=${response.location}`);
-                    });
-                },
-                onError: function(response) {
+        $.ajax({
+            url: "<?= base_url("payroll/update/nominal-komponen-gaji"); ?>",
+            data: data,
+            method: "POST",
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            beforeSend: function(xhr) {
+                setLoading();
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            complete: function() {
+                stopLoading();
+            },
+            success: function(response) {
+                if (response.status) {
+                    location.replace(`<?= base_url("payroll/id"); ?>/${response.id}?location=${response.location}`);
+                } else {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Data Gagal Disimpan, coba Lagi',
+                        title: response.message,
                         confirmButtonColor: '#4e73df',
                     });
                 }
-            });
-        }
+            },
+        });
     });
 </script>
 

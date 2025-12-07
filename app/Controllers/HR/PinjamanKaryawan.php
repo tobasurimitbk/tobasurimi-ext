@@ -424,6 +424,7 @@ class PinjamanKaryawan extends BaseController
             "employee_id"        => $this->request->getGet("employee_id"),
             "employees.tipe"     => $this->request->getGet("tipe"),
             "employees.bagian_id" => $this->request->getGet("bagian_id"),
+            "status_pinjaman" => $this->request->getGet('status_pinjaman'),
             "sort" => $this->request->getGet('sort'),
             "sortType" => $this->request->getGet('sortType')
         ];
@@ -505,6 +506,7 @@ class PinjamanKaryawan extends BaseController
                 ->where('employees.bagian_id', $bagianId)
                 ->where('pinjaman_karyawan.is_boleh_minjam', '1')
                 ->where('pinjaman_karyawan.is_ambil', '1')
+                ->orderBy('employees.nip', "asc")
                 ->findAll(),
             'yearMonth' => $yearMonth
         ];
