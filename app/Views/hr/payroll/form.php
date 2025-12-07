@@ -207,9 +207,9 @@
                     <li class="nav-item" role="presentation">
                         <button class="nav-link <?= (@$_GET['location'] == "nilaiKomponenGaji" || empty(@$_GET['location'])) ? 'active' : '' ?>" id="home-tab" data-toggle="tab" data-target="#perhitunganGaji" type="button" role="tab" aria-controls="home" aria-selected="true">Nilai Komponen Gaji</button>
                     </li>
-                    <li class="nav-item" role="presentation">
+                    <!-- <li class="nav-item" role="presentation">
                         <button class="nav-link <?= (@$_GET['location'] == "rekapKeterlambatanPresensi") ? 'active' : '' ?>" id="profile-tab" data-toggle="tab" data-target="#keterlambatanPresensi" type="button" role="tab" aria-selected="false">Rekap Keterlambatan Presensi</button>
-                    </li>
+                    </li> -->
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="contact-tab" data-toggle="tab" data-target="#rekapLembur" type="button" role="tab" aria-selected="false">Rekap Lembur</button>
                     </li>

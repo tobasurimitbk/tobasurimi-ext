@@ -200,6 +200,43 @@ class PayrollGajiConjunctionModel extends Model
         return $gajiConjunction;
     }
 
+
+    public function getPerhitunganKomponenGajiPayrollPrint($payrollID)
+    {
+        $gajiConjunction = $this->asArray()
+            ->select("payroll_gaji_conjunction.*, tunjangan.name, tunjangan.tipe")
+            ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id')
+            ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
+            ->where('tunjangan.is_gaji_harian !=', 1)
+            ->where('tunjangan.is_cadangan !=', 1)
+            ->orderBy('tunjangan.name', "ASC")
+            ->findAll();
+
+        $dataResult = [];
+        $koperasiNominal = 0;
+
+        foreach ($gajiConjunction as $g) {
+            // cek apakah tunjangan masuk kategori koperasi
+            if (in_array(trim($g['name']), ['BON KOPERASI', 'IURAN KOPERASI', 'PINJAMAN KOPERASI'])) {
+                $koperasiNominal += $g['nominal'];
+            } else {
+                $dataResult[] = [
+                    'name' => $g['name'],
+                    'nominal' => $g['nominal']
+                ];
+            }
+        }
+
+        $dataResult[] = [
+            'name' => 'Pot. Iuaran/Pinj/Bon Koperasi',
+            'nominal' => $koperasiNominal
+        ];
+
+
+        return $dataResult;
+    }
+
+
     public function getTotalKomponenGajiPayroll($payrollID)
     {
         $res = $this->asArray()->select("payroll_gaji_conjunction.*, tunjangan.name, tunjangan.tipe")

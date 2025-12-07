@@ -182,9 +182,11 @@
         <h1>List Payroll</h1>
         <div class="col-button-tambah-spp">
             <?= csrf_field() ?>
-            <a id="generate" class="btn btn-hide-form btn-discard float-right" data-bs-toggle="modal" data-bs-target="#generateModal" href="#" style="margin-right: 10px;">
-                <i class="fa-solid fa-clock-rotate-left"></i> Generate
-            </a>
+            <?php if (can('Personalia', 'Payroll', 'c')): ?>
+                <a id="generate" class="btn btn-hide-form btn-discard float-right" data-bs-toggle="modal" data-bs-target="#generateModal" href="#" style="margin-right: 10px;">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Generate
+                </a>
+            <?php endif; ?>
             <?php if (can('Personalia', 'Payroll', 'p')): ?>
                 <button class="btn btn-warning btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fa fa-download"></i> Export

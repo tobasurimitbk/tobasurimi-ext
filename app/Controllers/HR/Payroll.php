@@ -306,17 +306,17 @@ class Payroll extends BaseController
             //--------------------------------------
             // Generate Keterlambatan
             //---------------------------------------
-            $dataAttendanceKeterlambatan = $this->attendanceKeterlambatanModel->generateAmt(
-                $this->this_company_id,
-                $startDate,
-                $endDate,
-                $yearMonth,
-                $employeeIds,
-                $mapEmployeePayroll
-            );
-            if (count($dataAttendanceKeterlambatan) != 0) {
-                $this->attendanceKeterlambatanModel->insertBatch($dataAttendanceKeterlambatan);
-            }
+            // $dataAttendanceKeterlambatan = $this->attendanceKeterlambatanModel->generateAmt(
+            //     $this->this_company_id,
+            //     $startDate,
+            //     $endDate,
+            //     $yearMonth,
+            //     $employeeIds,
+            //     $mapEmployeePayroll
+            // );
+            // if (count($dataAttendanceKeterlambatan) != 0) {
+            //     $this->attendanceKeterlambatanModel->insertBatch($dataAttendanceKeterlambatan);
+            // }
 
             //--------------------------------------
             // Gaji Conjunction
@@ -989,6 +989,7 @@ class Payroll extends BaseController
         $company =  $this->companyModel->where('id', $this->this_company_id)->first();
         $tunjanganGajiPokok = $this->tunjanganModel->where('company_id', $this->this_company_id)->where('is_gaji_harian', 1)->where('deletedAt', null)->first();
         $tunjanganCadangan = $this->tunjanganModel->where('company_id', $this->this_company_id)->where('is_cadangan', 1)->where('deletedAt', null)->first();
+        $totalPinjamanDiambil = $this->pinjamanKaryawanModel->getTotalPinjamanKaryawanDiambil($payrollDetail['employee_id'], $payrollDetail['year_month']);
         $payrollDetail['total_gaji_harian_plus_cadangan'] = $payrollDetail['nominal_gaji_harian'] + $payrollDetail['nominal_cadangan'];
 
         $data = [
@@ -999,12 +1000,13 @@ class Payroll extends BaseController
             'rekapLembur' => $this->formLemburModel->rekapLemburDateRange($payrollDetail['employee_id'], $payrollDetail['start_date'], $payrollDetail['end_date']),
             'totalLemburJamPertama' => $splitJamLembur['jamPertama'],
             'totalLemburJamKedua' => $splitJamLembur['jamKedua'],
-            'perhitunganGaji' => $this->payrollGajiModel->getPerhitunganKomponenGajiPayroll($payrollID),
+            'perhitunganGaji' => $this->payrollGajiModel->getPerhitunganKomponenGajiPayrollPrint($payrollID),
             'company' => $company,
             'totalNominalKeterlambatanPresensi' => $this->attendanceKeterlambatanModel->getTotalRekap($payrollID),
             'totalNominalRekapPerizinanNotApproved' => $this->attendanceKeterlambatanModel->getTotalRekap($payrollID),
             'tunjanganGajiPokok' => $tunjanganGajiPokok,
-            'tunjanganCadangan' => $tunjanganCadangan
+            'tunjanganCadangan' => $tunjanganCadangan,
+            'totalPinjamanDiambil' => $totalPinjamanDiambil
         ];
 
         $dompdf->loadHtml(view('hr/payroll/payroll_single_print', $data));

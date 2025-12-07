@@ -198,11 +198,8 @@ class FormLemburModel extends Model
     }
 
 
-    public function getFormLemburAmt(
-        $employeeIds,
-        $startDate,
-        $endDate
-    ) {
+    public function getFormLemburAmt($employeeIds, $startDate, $endDate)
+    {
         $uangLemburQry = $this->asArray()
             ->select("SUM(total_uang_lembur) as total, form_lembur.employee_id")
             ->whereIn('employee_id', $employeeIds)
@@ -211,10 +208,12 @@ class FormLemburModel extends Model
             ->where('periode <=', $endDate)
             ->groupEnd()
             ->where('deletedAt', null)
+            ->groupBy('form_lembur.employee_id') // <-- harus ada untuk SUM per employee
             ->findAll();
 
         return $uangLemburQry;
     }
+
 
     public function getFormLemburRangeAmt(
         $employeeIds,

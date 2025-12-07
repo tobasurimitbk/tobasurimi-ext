@@ -144,6 +144,12 @@ class PinjamanKaryawanModel extends Model
         return $this->asArray()->where('month_year', $monthYear)->where('status_pinjaman', '1')->where('employee_id', $employeeID)->first();
     }
 
+    public function getTotalPinjamanKaryawanDiambil($employeeID, $monthYear)
+    {
+        $dataRes = $this->asArray()->where('month_year', $monthYear)->where('status_pinjaman', '1')->where('employee_id', $employeeID)->first();
+        return $dataRes == null ? 0 : (float)$dataRes['nominal'];
+    }
+
     public function getPinjamanKaryawanDiambilAmt(
         $employeeIds,
         $monthYear
