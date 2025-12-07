@@ -82,7 +82,7 @@
     <?php foreach (array_chunk($payrollData['data'], 2) as $chunk): ?>
         <div class="page-break">
             <?php foreach ($chunk as $p): ?>
-                <div class="karyawan-row" style="margin-top: -30px;">
+                <div class="karyawan-row" style="margin-top: -40px;">
                     <table class="slip-container">
                         <tr>
                             <?php foreach (['Karyawan', 'Perusahaan'] as $tipeSlip): ?>
