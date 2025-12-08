@@ -217,7 +217,7 @@
                         <button class="nav-link <?= (@$_GET['location'] == "rekapPerizinanTidakDisetujui") ? 'active' : '' ?>" id="contact-tab" data-toggle="tab" data-target="#perizinanNotApproved" type="button" role="tab" aria-selected="false">Rekap Perizinan Tidak Disetujui</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link <?= (@$_GET['location'] == "pinjamanKaryawan") ? 'active' : '' ?>" id="contact-tab" data-toggle="tab" data-target="#pinjamanKaryawan" type="button" role="tab" aria-selected="false">Pinjaman Karyawan</button>
+                        <button class="nav-link <?= (@$_GET['location'] == "pinjamanKaryawan") ? 'active' : '' ?>" id="contact-tab" data-toggle="tab" data-target="#pinjamanKaryawan" type="button" role="tab" aria-selected="false">Pinjaman Karyawan (Tgl 15)</button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link <?= (@$_GET['location'] == "rekapGajiHarian") ? 'active' : '' ?>" id="contact-tab" data-toggle="tab" data-target="#rekapGajiHarian" type="button" role="tab" aria-selected="false">Rekap Gaji Harian</button>
