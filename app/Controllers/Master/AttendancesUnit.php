@@ -639,6 +639,53 @@ class AttendancesUnit extends BaseController
         }
     }
 
+    public function update_finger_user_by_rian($userId, $ip, $unitKey, $name)
+    {
+        try {
+            // CONNECT
+            $conn = @fsockopen($ip, 80, $errno, $errstr, 2);
+
+            if (!$conn) {
+                return "Koneksi gagal: $errstr ($errno)";
+            }
+
+            // XML REQUEST untuk UPDATE (sama seperti SetUserInfo)
+            // Mesin fingerprint biasanya menggunakan SetUserInfo untuk update juga
+            $xml = "<SetUserInfo><ArgComKey Xsi:type=\"xsd:integer\">$unitKey</ArgComKey><Arg><PIN>$userId</PIN><Name>$name</Name></Arg></SetUserInfo>";
+
+            $nl = "\r\n";
+
+            // SEND RAW SOCKET REQUEST
+            fputs($conn, "POST /iWsService HTTP/1.0" . $nl);
+            fputs($conn, "Content-Type: text/xml" . $nl);
+            fputs($conn, "Content-Length: " . strlen($xml) . $nl . $nl);
+            fputs($conn, $xml . $nl);
+
+            // READ RESPONSE
+            $response = "";
+            while ($line = fgets($conn, 1024)) {
+                $response .= $line;
+            }
+            fclose($conn);
+
+            // PARSE HASIL <Information>OK</Information>
+            $info = $this->parseFingerResponse($response);
+
+            if ($info === "OK") {
+                return true;
+            }
+
+            if ($info === "Fail" || $info === "" || $info === null) {
+                return false;
+            }
+
+            // Kalau mesin balikin pesan aneh
+            return "Mesin Response: $info";
+
+        } catch (\Throwable $e) {
+            return "Error: " . $e->getMessage();
+        }
+    }
 
     public function getAllUsersFromMachine($ip)
     {
