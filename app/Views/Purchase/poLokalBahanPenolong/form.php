@@ -67,6 +67,7 @@
             </div>
             <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
                 <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" <?= !empty($poDetail) ? 'value="' . encrypt($poDetail['id']) . '"' : '' ?> />
+                <input type="hidden" name="form_id" id="form_id" value="<?= $form_id ?>">
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-4">
@@ -837,6 +838,7 @@
                     var sppID = $('#spp_id').val();
                     var note = $('#note').val();
                     var statusClosedSpp = $('#status_closed_spp option:selected').val();
+                    var formId = $('#form_id').val();
                     // append
                     var formData = new FormData();
                     formData.append("id", id);
@@ -849,6 +851,7 @@
                     formData.append("total", totalHarga);
                     formData.append("note", note);
                     formData.append("status_closed_spp", statusClosedSpp);
+                    formData.append("form_id", formId);
                     formData.append("listBarang", JSON.stringify(listBarang));
 
                     $.ajax({
@@ -898,6 +901,7 @@
                     var sppID = $('#spp_id').val();
                     var note = $('#note').val();
                     var statusClosedSpp = $('#status_closed_spp option:selected').val();
+                    var formId = $('#form_id').val();
                     // append
                     var formData = new FormData();
                     formData.append("poDate", poDate);
@@ -909,6 +913,7 @@
                     formData.append("total", totalHarga);
                     formData.append("note", note);
                     formData.append("status_closed_spp", statusClosedSpp);
+                    formData.append("form_id", formId);
                     formData.append("listBarang", JSON.stringify(listBarang));
 
                     $.ajax({
