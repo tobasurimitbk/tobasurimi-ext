@@ -140,6 +140,7 @@ class PayrollGajiHarianModel extends Model
             ->whereIn('employee_id', $employeeIds)
             ->where('periode >=', $startDate)
             ->where('periode <=', $endDate)
+            ->groupBy(['employee_id', 'periode'])   // penting!
             ->findAll();
 
         $bigDays = $bigDaysModel->where('company_id', $companyId)->where('deletedAt', null)->findAll();

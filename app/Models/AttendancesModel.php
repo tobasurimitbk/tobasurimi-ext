@@ -140,7 +140,9 @@ class AttendancesModel extends Model
             ->where('deletedAt', null)
             ->where('periode >=', $startDate)
             ->where('periode <=', $endDate)
+            ->groupBy(['employee_id', 'tgl'])   // penting!
             ->findAll();
+
 
         $result = [];
 
