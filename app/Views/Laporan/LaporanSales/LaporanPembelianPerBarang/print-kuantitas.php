@@ -96,7 +96,7 @@
         </tr>
       <?php else: ?>
         <tr>
-          <td colspan="6" class="text-center">Tidak ada data</td>
+          <td colspan="5" class="text-center">Tidak ada data</td>
         </tr>
       <?php endif; ?>
     </tbody>
