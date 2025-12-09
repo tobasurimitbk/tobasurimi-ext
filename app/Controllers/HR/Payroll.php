@@ -146,273 +146,6 @@ class Payroll extends BaseController
         return response()->setJSON($data);
     }
 
-    public function generateGlobalPayroll()
-    {
-        $yearMonth = $this->request->getVar('yearMonth');
-        $startDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('startDate'))));
-        $endDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('finishDate'))));
-        $divisionGlobalID = $this->request->getVar('divisionGlobalID');
-
-        if ($divisionGlobalID == 'ALL') {
-            $dataAbsensiGenerated = $this->attendanceModel
-                ->where('year_month', $yearMonth)
-                ->where('company_id', $this->this_company_id)
-                ->countAllResults();
-        } else {
-            $dataAbsensiGenerated = $this->attendanceModel
-                ->where('year_month', $yearMonth)
-                ->where('division_id', $divisionGlobalID)
-                ->where('company_id', $this->this_company_id)
-                ->countAllResults();
-        }
-
-        if ($dataAbsensiGenerated != 0) {
-
-            // get employees
-            if ($divisionGlobalID == 'ALL') {
-                $employeesData = $this->employeeModel->getEmployees($this->this_company_id);
-                // delete firts if ada
-                $this->payrollModel->where('company_id', $this->this_company_id)
-                    ->where('year_month', $yearMonth)
-                    ->delete();
-            } else {
-                $employeesData = $this->employeeModel->getEmployeesByDivisionID($this->this_company_id, $this->request->getVar('divisionGlobalID'));
-                // delete firts if ada
-                $this->payrollModel->where('company_id', $this->this_company_id)
-                    ->where('year_month', $yearMonth)
-                    ->where('division_id', $divisionGlobalID)
-                    ->delete();
-            }
-            $test = [];
-            // Insert Again
-            foreach ($employeesData as $e) {
-                $status = $this->attendanceModel->getStatusAttendancesInRange($startDate, $endDate, $e['id']);
-
-                // payroll insert
-                $payrollID = $this->payrollModel->insert([
-                    "company_id" => $e['company_id'],
-                    "employee_id" => $e['id'],
-                    "division_id" => $e['division_id'],
-                    "year_month" => $yearMonth,
-                    "cuti_tahunan" => $status['CUTI TAHUNAN_CT'],
-                    "cuti_haid" => $status['CUTI HAID_CHD'],
-                    "cuti_hamil" => $status['CUTI HAMIL_CHL'],
-                    "cuti_melahirkan" => $status['CUTI MELAHIRKAN_CM'],
-                    "pg" => $status['POTONG GAJI_PG'], // kolom ijin hasil pg
-                    'izin' => $status['IJIN_I'], // kolom pg itu hasil ijin
-                    "sakit" => $status['SAKIT_S'],
-                    "rl" => $status['RL_RL'],
-                    "hadir" => $status['HADIR_H'],
-                    "libur" => $status['LIBUR_L'],
-                    "alpha" => $status['ALPHA_A'],
-                    "dinas" => $status['DINAS_D'],
-                    "cuti_keguguran" => $status['CUTI KEGUGURAN_CKG'],
-                    "hadir_final" => 0,
-                    "total_perizinan_not_approved" => 0,
-                    "total_perizinan_approved" => 0,
-                    "nominal_cadangan" => 0,
-                    "nominal_gaji_harian" => 0,
-                    "nominal_pinjaman_karyawan" => 0,
-                    "nominal_uang_gaji" => 0,
-                    "nominal_uang_lembur" => 0,
-                    "nominal_pengurangan_gaji" => 0,
-                    "nominal_gaji_diterima" => 0,
-                    "nominal_penambahan_gaji" => 0,
-                    "start_date" => $startDate,
-                    "end_date" => $endDate
-                ]);
-
-                // generate keterlambatan
-                $this->attendanceKeterlambatanModel->generate(
-                    $payrollID,
-                    $e['id'],
-                    $this->this_company_id,
-                    $yearMonth,
-                    $startDate,
-                    $endDate
-                );
-
-                // generate payroll gaji 
-                $this->payrollGajiModel->generate(
-                    $payrollID,
-                    $e['id'],
-                    $this->this_company_id,
-                    $yearMonth
-                );
-
-                // generate form perijinan not approved
-                $res = $this->formPerizinanNotApprovedModel->generate(
-                    $payrollID,
-                    $e['id'],
-                    $this->this_company_id,
-                    $yearMonth,
-                    $startDate,
-                    $endDate
-                );
-
-                // update payroll
-                $payrollFinal = $this->payrollModel->generate(
-                    $e['id'],
-                    $yearMonth,
-                    $payrollID,
-                    $startDate,
-                    $endDate
-                );
-
-                $this->payrollModel
-                    ->set('hadir_final', ($status['HADIR_H'] + $res['total_perizinan_approved']))
-                    ->set('total_perizinan_not_approved', $res['total_perizinan_not_approved'])
-                    ->set('total_perizinan_approved', $res['total_perizinan_approved'])
-                    ->set('nominal_cadangan', $payrollFinal['nominal_cadangan'])
-                    ->set('nominal_gaji_harian', $payrollFinal['nominal_gaji_harian'])
-                    ->set('nominal_pinjaman_karyawan', $payrollFinal['nominal_pinjaman_karyawan'])
-                    ->set('nominal_uang_gaji', $payrollFinal['nominal_uang_gaji'])
-                    ->set('nominal_uang_lembur', $payrollFinal['nominal_uang_lembur'])
-                    ->set('nominal_pengurangan_gaji', $payrollFinal['nominal_pengurangan_gaji'])
-                    ->set('nominal_gaji_diterima', $payrollFinal['nominal_gaji_diterima'])
-                    ->set('nominal_penambahan_gaji', $payrollFinal['nominal_penambahan_gaji'])
-                    ->where('id', $payrollID)
-                    ->update();
-            }
-
-            return response()->setJSON([
-                'message' => "Data Payroll global berhasil digenerate ",
-                'status' => true,
-                'test' => $test
-            ]);
-        } else {
-            return response()->setJSON([
-                'message' => "Data absensi bulan " . $yearMonth . " tidak ada",
-                'status' => false
-            ]);
-        }
-    }
-
-    public function generateSinglePayroll()
-    {
-        $yearMonth = $this->request->getVar('yearMonth');
-        $employeeID = $this->request->getVar("employeeID");
-        $startDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('startDate'))));
-        $endDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('finishDate'))));
-
-        // $attendanceModel = new AttendancesModel();
-        // $payrollModel = new PayrollsModel();
-        // $employeesModel = new EmployeesModel();
-        // $FormPerizinanNotApprovedModel = new FormPerizinanNotApprovedModel();
-        // $AttendanceKeterlambatanModel = new AttendanceKeterlambatanModel();
-        // $PayrollGajiModel = new PayrollGajiConjunctionModel();
-
-        // delete first
-        $this->payrollModel->where('company_id', $this->this_company_id)
-            ->where('employee_id', $employeeID)
-            ->delete();
-
-        // get employee
-        $employeesData = $this->employeeModel->where('id', $employeeID)->first();
-
-        if ($employeesData['status'] != "Aktif") {
-            return $this->response->setJSON([
-                'message' => "Status karyawan " . $employeesData['name'] . " adalah " . $employeesData['status'],
-                'status' => false,
-                'token' => csrf_hash()
-            ]);
-        }
-
-        $status = $this->attendanceModel->getStatusAttendancesInRange($startDate, $endDate, $employeesData['id']);
-        // payroll insert
-        $payrollID = $this->payrollModel->insert([
-            "company_id" => $employeesData['company_id'],
-            "employee_id" => $employeesData['id'],
-            "division_id" => $employeesData['division_id'],
-            "year_month" => $yearMonth,
-            "cuti_tahunan" => $status['CUTI TAHUNAN_CT'],
-            "cuti_haid" => $status['CUTI HAID_CHD'],
-            "cuti_hamil" => $status['CUTI HAMIL_CHL'],
-            "cuti_melahirkan" => $status['CUTI MELAHIRKAN_CM'],
-            "pg" => $status['POTONG GAJI_PG'],
-            'izin' => $status['IJIN_I'],
-            "sakit" => $status['SAKIT_S'],
-            "rl" => $status['RL_RL'],
-            "hadir" => $status['HADIR_H'],
-            "libur" => $status['LIBUR_L'],
-            "alpha" => $status['ALPHA_A'],
-            "dinas" => $status['DINAS_D'],
-            "cuti_keguguran" => $status['CUTI KEGUGURAN_CKG'],
-            "hadir_final" => 0,
-            "total_perizinan_not_approved" => 0,
-            "total_perizinan_approved" => 0,
-            "nominal_cadangan" => 0,
-            "nominal_gaji_harian" => 0,
-            "nominal_pinjaman_karyawan" => 0,
-            "nominal_uang_gaji" => 0,
-            "nominal_uang_lembur" => 0,
-            "nominal_pengurangan_gaji" => 0,
-            "nominal_gaji_diterima" => 0,
-            "nominal_penambahan_gaji" => 0,
-            "start_date" => $startDate,
-            "end_date" => $endDate
-        ]);
-
-        // generate keterlambatan
-        $this->attendanceKeterlambatanModel->generate(
-            $payrollID,
-            $employeesData['id'],
-            $this->this_company_id,
-            $yearMonth,
-            $startDate,
-            $endDate
-        );
-
-        // generate payroll gaji 
-        $this->payrollGajiModel->generate(
-            $payrollID,
-            $employeesData['id'],
-            $this->this_company_id,
-            $yearMonth
-        );
-
-        // generate form perijinan not approved
-        $res = $this->formPerizinanNotApprovedModel->generate(
-            $payrollID,
-            $employeesData['id'],
-            $this->this_company_id,
-            $yearMonth,
-            $startDate,
-            $endDate
-        );
-
-        // update payroll
-        $payrollFinal = $this->payrollModel->generate(
-            $employeesData['id'],
-            $yearMonth,
-            $payrollID,
-            $startDate,
-            $endDate
-        );
-
-        $this->payrollModel
-            ->set('hadir_final', ($status['HADIR_H'] + $res['total_perizinan_approved']))
-            ->set('total_perizinan_not_approved', $res['total_perizinan_not_approved'])
-            ->set('total_perizinan_approved', $res['total_perizinan_approved'])
-            ->set('nominal_cadangan', $payrollFinal['nominal_cadangan'])
-            ->set('nominal_gaji_harian', $payrollFinal['nominal_gaji_harian'])
-            ->set('nominal_pinjaman_karyawan', $payrollFinal['nominal_pinjaman_karyawan'])
-            ->set('nominal_uang_gaji', $payrollFinal['nominal_uang_gaji'])
-            ->set('nominal_uang_lembur', $payrollFinal['nominal_uang_lembur'])
-            ->set('nominal_pengurangan_gaji', $payrollFinal['nominal_pengurangan_gaji'])
-            ->set('nominal_gaji_diterima', $payrollFinal['nominal_gaji_diterima'])
-            ->set('nominal_penambahan_gaji', $payrollFinal['nominal_penambahan_gaji'])
-            ->where('id', $payrollID)
-            ->update();
-
-
-        return response()->setJSON([
-            'message' => "Data Payroll atas nama " . $employeesData['name'] . " berhasil digenerate",
-            'token' => csrf_hash(),
-            'status' => true
-        ]);
-    }
-
     public function generateSinglePayrollRevamp()
     {
         $db = \Config\Database::connect();
@@ -573,17 +306,17 @@ class Payroll extends BaseController
             //--------------------------------------
             // Generate Keterlambatan
             //---------------------------------------
-            $dataAttendanceKeterlambatan = $this->attendanceKeterlambatanModel->generateAmt(
-                $this->this_company_id,
-                $startDate,
-                $endDate,
-                $yearMonth,
-                $employeeIds,
-                $mapEmployeePayroll
-            );
-            if (count($dataAttendanceKeterlambatan) != 0) {
-                $this->attendanceKeterlambatanModel->insertBatch($dataAttendanceKeterlambatan);
-            }
+            // $dataAttendanceKeterlambatan = $this->attendanceKeterlambatanModel->generateAmt(
+            //     $this->this_company_id,
+            //     $startDate,
+            //     $endDate,
+            //     $yearMonth,
+            //     $employeeIds,
+            //     $mapEmployeePayroll
+            // );
+            // if (count($dataAttendanceKeterlambatan) != 0) {
+            //     $this->attendanceKeterlambatanModel->insertBatch($dataAttendanceKeterlambatan);
+            // }
 
             //--------------------------------------
             // Gaji Conjunction
@@ -911,17 +644,17 @@ class Payroll extends BaseController
             //--------------------------------------
             // Generate Keterlambatan
             //---------------------------------------
-            $dataAttendanceKeterlambatan = $this->attendanceKeterlambatanModel->generateAmt(
-                $this->this_company_id,
-                $startDate,
-                $endDate,
-                $yearMonth,
-                $employeeIds,
-                $mapEmployeePayroll
-            );
-            if (count($dataAttendanceKeterlambatan) != 0) {
-                $this->attendanceKeterlambatanModel->insertBatch($dataAttendanceKeterlambatan);
-            }
+            // $dataAttendanceKeterlambatan = $this->attendanceKeterlambatanModel->generateAmt(
+            //     $this->this_company_id,
+            //     $startDate,
+            //     $endDate,
+            //     $yearMonth,
+            //     $employeeIds,
+            //     $mapEmployeePayroll
+            // );
+            // if (count($dataAttendanceKeterlambatan) != 0) {
+            //     $this->attendanceKeterlambatanModel->insertBatch($dataAttendanceKeterlambatan);
+            // }
 
             //--------------------------------------
             // Gaji Conjunction
@@ -1008,6 +741,7 @@ class Payroll extends BaseController
                 $startDate,
                 $endDate
             );
+
             if (count($dataPayrollGajiHarian['rows']) != 0) {
                 $this->payrollGajiHarianModel->insertBatch($dataPayrollGajiHarian['rows']);
             }
@@ -1108,21 +842,60 @@ class Payroll extends BaseController
 
     public function updateNominalKomponenGaji()
     {
-        $id = $this->request->getVar('komponenGajiID');
-        $payrollID = $this->request->getVar('payrollID');
-        $nominal =  $this->request->getVar('nominal');
+        // return response()->setJSON([
+        //     '$_POST' => $_POST,
+        // ]);
 
-        $this->payrollGajiModel->update($id, [
-            'nominal' => $nominal
-        ]);
+        $db = \Config\Database::connect();
+        try {
+            $db->transBegin();
 
-        $this->payrollModel->generateIfPayrollChanged($payrollID);
+            $payrollId = $this->request->getVar('payroll_id');
+            $komponenGajiId = $this->request->getVar('komponen_gaji_id');
+            $nominal = $this->request->getVar('nominal');
 
-        return response()->setJSON([
-            'message' => "Nominal komponen tunjangan berhasil diperbaruhi",
-            'location' => "nilaiKomponenGaji",
-            'id' => encrypt($payrollID)
-        ]);
+            if (empty($komponenGajiId) || count($komponenGajiId) == 0) {
+                return response()->setJSON([
+                    'status' => false,
+                    'token' => csrf_hash(),
+                    'message' => "komponen gaji tidak ditemukan"
+                ]);
+            }
+
+            if (empty($nominal) || count($nominal) == 0) {
+                return response()->setJSON([
+                    'status' => false,
+                    'token' => csrf_hash(),
+                    'message' => "nominal komponen gaji tidak ditemukan"
+                ]);
+            }
+
+            $mapKomponenGaji = [];
+            for ($i = 0; $i < count($komponenGajiId); $i++) {
+                array_push($mapKomponenGaji, [
+                    'id' => $komponenGajiId[$i],
+                    'nominal' => (float)$nominal[$i]
+                ]);
+            }
+
+            $this->payrollGajiModel->updateBatch($mapKomponenGaji, 'id');
+            $this->payrollModel->generateIfPayrollChanged($payrollId);
+            $db->transCommit();
+
+            return response()->setJSON([
+                'status' => true,
+                'message' => "Nominal komponen tunjangan berhasil diperbaruhi",
+                'location' => "nilaiKomponenGaji",
+                'id' => encrypt($payrollId)
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            return response()->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 
     public function updateNominalKeterlambatanPresensi()
@@ -1216,6 +989,7 @@ class Payroll extends BaseController
         $company =  $this->companyModel->where('id', $this->this_company_id)->first();
         $tunjanganGajiPokok = $this->tunjanganModel->where('company_id', $this->this_company_id)->where('is_gaji_harian', 1)->where('deletedAt', null)->first();
         $tunjanganCadangan = $this->tunjanganModel->where('company_id', $this->this_company_id)->where('is_cadangan', 1)->where('deletedAt', null)->first();
+        $totalPinjamanDiambil = $this->pinjamanKaryawanModel->getTotalPinjamanKaryawanDiambil($payrollDetail['employee_id'], $payrollDetail['year_month']);
         $payrollDetail['total_gaji_harian_plus_cadangan'] = $payrollDetail['nominal_gaji_harian'] + $payrollDetail['nominal_cadangan'];
 
         $data = [
@@ -1226,12 +1000,13 @@ class Payroll extends BaseController
             'rekapLembur' => $this->formLemburModel->rekapLemburDateRange($payrollDetail['employee_id'], $payrollDetail['start_date'], $payrollDetail['end_date']),
             'totalLemburJamPertama' => $splitJamLembur['jamPertama'],
             'totalLemburJamKedua' => $splitJamLembur['jamKedua'],
-            'perhitunganGaji' => $this->payrollGajiModel->getPerhitunganKomponenGajiPayroll($payrollID),
+            'perhitunganGaji' => $this->payrollGajiModel->getPerhitunganKomponenGajiPayrollPrint($payrollID),
             'company' => $company,
             'totalNominalKeterlambatanPresensi' => $this->attendanceKeterlambatanModel->getTotalRekap($payrollID),
             'totalNominalRekapPerizinanNotApproved' => $this->attendanceKeterlambatanModel->getTotalRekap($payrollID),
             'tunjanganGajiPokok' => $tunjanganGajiPokok,
-            'tunjanganCadangan' => $tunjanganCadangan
+            'tunjanganCadangan' => $tunjanganCadangan,
+            'totalPinjamanDiambil' => $totalPinjamanDiambil
         ];
 
         $dompdf->loadHtml(view('hr/payroll/payroll_single_print', $data));

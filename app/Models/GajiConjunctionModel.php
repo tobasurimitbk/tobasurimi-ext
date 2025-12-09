@@ -104,4 +104,114 @@ class GajiConjunctionModel extends Model
             }
         }
     }
+
+    public function syncKomponenGaji($divisiId)
+    {
+        $gajiConjunctionModel = new GajiConjunctionModel();
+        $gajiDivisiModel      = new GajiDivisiModel();
+        $employeeModel        = new EmployeesModel();
+
+        // ============================
+        // AMBIL LIST KOMPONEN DI DIVISI
+        // ============================
+        $gajiDivisi = $gajiDivisiModel->select('gaji_divisi.*')
+            ->join('tunjangan', 'tunjangan.id = gaji_divisi.tunjangan_id', 'left')
+            ->where('gaji_divisi.division_id', $divisiId)
+            ->where('gaji_divisi.deletedAt', null)
+            ->findAll();
+
+        // Format: [tunjangan_id => nominal]
+        $gajiDivisiMap = [];
+        foreach ($gajiDivisi as $g) {
+            $gajiDivisiMap[$g['tunjangan_id']] = $g['nominal'];
+        }
+
+        // ============================
+        // AMBIL KOMPONEN YANG SUDAH ADA DI gaji_conjunction
+        // ============================
+        $employeeConjunction = $gajiConjunctionModel->select(
+            '
+        employees.id AS employee_id,
+        employees.division_id,
+        gaji_conjunction.tunjangan_id,
+        gaji_conjunction.nominal'
+        )
+            ->join('employees', 'gaji_conjunction.employee_id = employees.id', 'left')
+            ->where('employees.division_id', $divisiId)
+            ->where('gaji_conjunction.deletedAt', null)
+            ->findAll();
+
+        // Format: [employee_id][tunjangan_id] = nominal
+        $existingMap = [];
+
+        foreach ($employeeConjunction as $e) {
+            $existingMap[$e['employee_id']][$e['tunjangan_id']] = $e['nominal'];
+        }
+
+        // ============================
+        // HASIL SYNC
+        // ============================
+        $gajiConjunctionInserted = [];
+        $gajiConjunctionDeleted  = [];
+
+        // ============================
+        // GET SEMUA KARYAWAN DI DIVISI
+        // ============================
+        $employees = $employeeModel
+            ->where('division_id', $divisiId)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        // ============================
+        // PROSES SYNC PER KARYAWAN
+        // ============================
+        $deletedAt = date('Y-m-d H:i:s');
+        foreach ($employees as $emp) {
+            $empId = $emp['id'];
+
+            $current = $existingMap[$empId] ?? [];   // tunjangan milik employee di conjunction
+
+            // 1. CEK APAKAH ADA KOMPONEN BARU (INSERT)
+            foreach ($gajiDivisiMap as $tunjanganId => $nominalDivisi) {
+                if (!isset($current[$tunjanganId])) {
+                    // employee belum punya komponen ini → tambahkan ke inserted
+                    $gajiConjunctionInserted[] = [
+                        'employee_id'  => $empId,
+                        'tunjangan_id' => $tunjanganId,
+                        'nominal'      => (float)$nominalDivisi
+                    ];
+                }
+            }
+
+            // 2. CEK APAKAH ADA KOMPONEN YANG SUDAH DIHAPUS DI gaji_divisi (DELETE)
+            foreach ($current as $tunjanganId => $nominalEmp) {
+                if (!isset($gajiDivisiMap[$tunjanganId])) {
+                    // komponen ada di conjunction namun tidak ada lagi di gaji_divisi
+                    $gajiConjunctionDeleted[] = [
+                        'employee_id'  => $empId,
+                        'tunjangan_id' => $tunjanganId,
+                        'deletedAt' => $deletedAt
+                    ];
+                }
+            }
+        }
+
+        // DELETE
+        if (!empty($gajiConjunctionDeleted)) {
+            foreach ($gajiConjunctionDeleted as $row) {
+                $gajiConjunctionModel
+                    ->where('employee_id', $row['employee_id'])
+                    ->where('tunjangan_id', $row['tunjangan_id'])
+                    ->delete();
+            }
+        }
+
+        // INSERT
+        if (!empty($gajiConjunctionInserted)) {
+            $gajiConjunctionModel->insertBatch($gajiConjunctionInserted);
+        }
+
+        // var_dump($gajiConjunctionDeleted, $gajiConjunctionInserted);
+        // die;
+    }
 }

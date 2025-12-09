@@ -130,10 +130,10 @@
                                     <div class="form-floating mb-2 mt-2">
                                         <select class="form-select" id="employeeID">
                                             <option value="">
-                                                Cari Berdasarkan Nama Karyawan
+                                                Cari Karyawan
                                             </option>
                                         </select>
-                                        <label for="floatingInput">Cari Berdasarkan Nama Karyawan</label>
+                                        <label for="floatingInput">Cari Karyawan</label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -182,9 +182,11 @@
         <h1>List Payroll</h1>
         <div class="col-button-tambah-spp">
             <?= csrf_field() ?>
-            <a id="generate" class="btn btn-hide-form btn-discard float-right" data-bs-toggle="modal" data-bs-target="#generateModal" href="#" style="margin-right: 10px;">
-                <i class="fa-solid fa-clock-rotate-left"></i> Generate
-            </a>
+            <?php if (can('Personalia', 'Payroll', 'c')): ?>
+                <a id="generate" class="btn btn-hide-form btn-discard float-right" data-bs-toggle="modal" data-bs-target="#generateModal" href="#" style="margin-right: 10px;">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Generate
+                </a>
+            <?php endif; ?>
             <?php if (can('Personalia', 'Payroll', 'p')): ?>
                 <button class="btn btn-warning btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fa fa-download"></i> Export
@@ -202,7 +204,7 @@
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-start mb-3">
-                <div class="col-sm-3 mt-3">
+                <div class="col-sm-2 mt-3">
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
                             <input placeholder="" value="<?= date('Y-m') ?>" class="form-control month" id="month" name="month" />
@@ -215,7 +217,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-2">
                     <div class="form-floating mt-3">
                         <select class="form-select" name="filterDivisiID" id="filterDivisiID">
                             <option value="">
@@ -230,7 +232,7 @@
                         <label for="floatingInput">Cari Departemen</label>
                     </div>
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-2">
                     <div class="form-floating mt-3">
                         <select class="form-select" name="filterBagianID" id="filterBagianID">
                             <option value="">
@@ -259,10 +261,10 @@
                     <div class="form-floating mt-3">
                         <select class="form-select" name="filterEmployeeID" id="filterEmployeeID">
                             <option value="">
-                                Cari Berdasarkan Nama Karyawan
+                                Cari Karyawan
                             </option>
                         </select>
-                        <label for="floatingInput">Cari Berdasarkan Nama Karyawan</label>
+                        <label for="floatingInput">Cari Karyawan</label>
                     </div>
                 </div>
             </div>
@@ -297,8 +299,8 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "nomor";
-    let sortType = "desc";
+    let sort = "employees.nip";
+    let sortType = "asc";
 
     const table = $('.dataTable').DataTable({
 
@@ -430,6 +432,12 @@
             defaultContent: "-",
             targets: "_all"
         }],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
         language: {
             emptyTable: "Data payroll bulan ini belum digenerate", // Change this line
             lengthMenu: "Show _MENU_ entries",
@@ -484,7 +492,7 @@
     });
 
     $("#employeeID").select2({
-        placeholder: "Cari Berdasarkan Nama Karyawan",
+        placeholder: "Cari Karyawan",
         theme: "bootstrap-5",
         allowClear: true,
         dropdownParent: $('#generateModal')
@@ -747,10 +755,33 @@
     })
 
     $("#filterEmployeeID").select2({
-        placeholder: "Cari Berdasarkan Karyawan",
+        placeholder: "Cari Karyawan",
         theme: "bootstrap-5",
         allowClear: true,
-
+        minimumInputLength: 2,
+        ajax: {
+            url: "<?= base_url('payroll/like-employees') ?>",
+            dataType: 'json',
+            delay: 250,
+            data: function(params) {
+                return {
+                    employeesName: params.term,
+                };
+            },
+            processResults: function(data) {
+                var options = [];
+                $.each(data.data, function(index, employee) {
+                    options.push({
+                        id: employee.id,
+                        text: employee.name
+                    });
+                });
+                return {
+                    results: options
+                };
+            },
+            cache: true
+        }
     });
 
     function dropdownKaryawanSinglePayroll() {
@@ -791,48 +822,6 @@
             }
         });
     }
-
-    $("#filterDivisiID").on('change', function(e) {
-        e.preventDefault();
-        const csrf = $(`[name="${csrfToken}"]`);
-        var divisionID = $(this).val();
-
-        var formData = new FormData();
-        formData.append('divisionID', divisionID);
-
-        $.ajax({
-            url: "<?= base_url("payroll/employees"); ?>",
-            data: formData,
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-            },
-            method: "POST",
-            dataType: "json",
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                csrf.val(response.token);
-                var employeeSelect = $("#filterEmployeeID");
-                employeeSelect.empty();
-                employeeSelect.append($("<option></option>")
-                    .attr("value", "")
-                    .text("Cari Berdasarkan Nama Karyawan"));
-                $.each(response.data, function(index, data) {
-                    var option = $("<option></option>")
-                        .attr("value", data.id)
-                        .text("(" + data.nip + ") " + data.name);
-                    employeeSelect.append(option);
-                });
-
-            },
-            onError: function(response) {
-                csrf.val(response.token);
-
-            }
-        });
-
-    });
-
 
     $('#filterDivisiID').change(function() {
         var divisi = $('#filterDivisiID option:selected').val();

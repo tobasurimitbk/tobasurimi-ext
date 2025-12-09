@@ -174,26 +174,26 @@ class JasaVendorInKepitingKukus extends BaseController
             return redirect()->to('jasa-vendor-in-kepiting-kukus');
         }
 
-        $selectQryJasaVendorDetail = "
-            SUM(jasa_vendor_in_kepiting_kukus_detail.qty_bersih) as qty_bersih,
-            SUM(jasa_vendor_in_kepiting_kukus_detail.qty_kotor) as qty_kotor,
-            satuans.kode_satuan,
-            barang_master.barang_name,
-            barang_master_spesifikasi.spesifikasi
-        ";
+        // ubah string JSON ke array
+        $ids = json_decode($jasaVendorIn['multiple_jasa_vendor_out_id'], true);
 
-        $jasaVendorInKepitingKukusDetail = $this->jasaVendorInKepitingKukusDetailModel->select($selectQryJasaVendorDetail)
-            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = jasa_vendor_in_kepiting_kukus_detail.spesifikasi_in_id')
-            ->join('barang_master', 'barang_master.id = barang_master_spesifikasi.barang_master_id')
-            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1')
-            ->where('jasa_vendor_in_kepiting_kukus_id', $id)
-            ->groupBy('jasa_vendor_in_kepiting_kukus_detail.id')
-            ->findAll();
+        // fallback kalau NULL atau bukan array
+        if (!is_array($ids)) {
+            $ids = [];
+        }
+
+        $jasaVendorInKepitingKukusDetail = $this->jasaVendorInKepitingKukusModel->listBarang(
+            $ids,
+            $id
+        );
+
+
+
 
         $data = [
             'jasaVendorIn' => $jasaVendorIn,
             'vendor' => $this->vendorModel->find($jasaVendorIn['vendor_id']),
-            'jasaVendorInKepitingKukusDetail' => $jasaVendorInKepitingKukusDetail
+            'dataDetail' => $jasaVendorInKepitingKukusDetail
         ];
 
         $this->dompdf->loadHtml(view('jasaVendor/inKepitingKukus/print', $data));
@@ -340,8 +340,6 @@ class JasaVendorInKepitingKukus extends BaseController
     public function createActionNew()
     {
         $barangs = json_decode($_POST['listBarang']);
-        var_dump($barangs);
-        die;
         $jasaVendorOutNo = $this->jasaVendorInKepitingKukusModel->getJasaVendorOutNo(
             $this->request->getVar('multiple_jasa_vendor_out_id')
         );

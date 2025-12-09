@@ -35,7 +35,7 @@ class AMPurchaseOrderModel extends Model
         'createdBy',
         'status_penerimaan',
         'status_closed_spp',
-
+        'form_id',
         // import field
         'shipper',
         'consigne',

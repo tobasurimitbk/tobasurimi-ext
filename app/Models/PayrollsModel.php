@@ -92,8 +92,8 @@ class PayrollsModel extends Model
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
         // Ensure the sort and sortType values are valid
-        $sort = $availableSort[$addCondition['sort'] ?? 'id'] ?? 'payrolls.id';
-        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+        $sort = $availableSort[$addCondition['sort'] ?? 'employees.nip'] ?? 'employees.nip';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'asc'] ?? 'asc';
 
         $selectQry = "
             payrolls.*,
@@ -573,6 +573,7 @@ class PayrollsModel extends Model
         $rekapPerizinanNotApprovedModel = new FormPerizinanNotApprovedModel();
         $companyModel = new CompaniesModel();
         $divisiModel = new DivisisModel();
+        $pinjamanKaryawanModel = new PinjamanKaryawanModel();
 
         $employeePayroll = $this->asArray()->select('payrolls.*, employees.division_id')
             ->join('employees', 'employees.id = payrolls.employee_id')
@@ -593,6 +594,7 @@ class PayrollsModel extends Model
                 $payrollDetail['end_date']
             );
             $payrollDetail['total_gaji_harian_plus_cadangan'] = $payrollDetail['nominal_gaji_harian'] + $payrollDetail['nominal_cadangan'];
+            $totalPinjamanDiambil = $pinjamanKaryawanModel->getTotalPinjamanKaryawanDiambil($payrollDetail['employee_id'], $payrollDetail['year_month']);
 
             $data[] = [
                 'payroll' => $payrollDetail,
@@ -600,9 +602,10 @@ class PayrollsModel extends Model
                 'rekapLembur' => $formLemburModel->rekap($payrollDetail['employee_id'], $payrollDetail['year_month']),
                 'totalLemburJamPertama' => $splitJamLembur['jamPertama'],
                 'totalLemburJamKedua' => $splitJamLembur['jamKedua'],
-                'perhitunganGaji' => $payrollGajiModel->getPerhitunganKomponenGajiPayroll($ep['id']),
+                'perhitunganGaji' => $payrollGajiModel->getPerhitunganKomponenGajiPayrollPrint($ep['id']),
                 'totalNominalKeterlambatanPresensi' => $attendanceTerlambatModel->getTotalRekap($ep['id']),
-                'totalNominalRekapPerizinanNotApproved' => $rekapPerizinanNotApprovedModel->getTotalRekap($ep['id'])
+                'totalNominalRekapPerizinanNotApproved' => $rekapPerizinanNotApprovedModel->getTotalRekap($ep['id']),
+                'totalPinjamanDiambil' => $totalPinjamanDiambil
             ];
         }
 

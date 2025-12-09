@@ -127,7 +127,7 @@
                                 <tr>
                                     <td>Tambahan Hari Libur Tidak Kerja</td>
                                     <td>:</td>
-                                    <td><?= $payroll['libur'] ?> Hari</td>
+                                    <td>0 Hari</td>
                                 </tr>
                                 <tr>
                                     <td>Tambahan Hari Libur Resmi</td>
@@ -142,7 +142,9 @@
                                 <tr>
                                     <td><?= $tunjanganCadangan == null ? "" : ucfirst(strtolower($tunjanganCadangan['name'])) ?></td>
                                     <td>:</td>
-                                    <td><?= "Rp " . number_format($payroll['nominal_cadangan'], 2, ',', '.') ?>/Hari</td>
+                                    <td>
+                                        <?= "Rp " . number_format($payroll['nominal_cadangan'], 2, ',', '.') ?>/Hari
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td>Total Gaji</td>
@@ -166,16 +168,22 @@
                                     <td>:</td>
                                     <td><?= "Rp " . number_format($payroll['nominal_uang_lembur'], 2, ',', '.') ?></td>
                                 </tr>
-                                <tr>
-                                    <td>Total Gaji & Lembur</td>
-                                    <td>:</td>
-                                    <td><?= "Rp " . number_format($payroll['nominal_uang_gaji'] + $payroll['nominal_uang_lembur'], 2, ',', '.') ?></td>
-                                </tr>
+
                             </table>
 
                             <hr style="border: 0.5px dashed #000;">
 
                             <table style="line-height: 8px;" border="0">
+                                <tr>
+                                    <td>Total Gaji & Lembur</td>
+                                    <td>:</td>
+                                    <td><?= "Rp " . number_format($payroll['nominal_uang_gaji'] + $payroll['nominal_uang_lembur'], 2, ',', '.') ?></td>
+                                </tr>
+                                <tr>
+                                    <td>Potongan Pinjaman</td>
+                                    <td>:</td>
+                                    <td><?= "Rp " . number_format($totalPinjamanDiambil, 2, ',', '.') ?></td>
+                                </tr>
                                 <?php foreach ($perhitunganGaji as $p): ?>
                                     <tr>
                                         <td style="width:260px;"><?= ucfirst(strtolower($p['name'])) ?></td>

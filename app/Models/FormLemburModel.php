@@ -180,27 +180,26 @@ class FormLemburModel extends Model
             $totalJamHariIni = (float) $lembur['total_jam_lembur'];
 
             if ($totalJamHariIni <= 1) {
-                // semua masuk ke jam pertama
+                // seluruh lembur hari ini masuk jam pertama (maksimal 1 jam)
                 $lemburJamPertama += $totalJamHariIni;
             } else {
-                // 1 jam pertama, sisanya ke jam kedua
+                // jam pertama maksimal 1
                 $lemburJamPertama += 1;
+
+                // jam kedua adalah sisanya
                 $lemburJamKedua += ($totalJamHariIni - 1);
             }
         }
 
         return [
             'jamPertama' => $lemburJamPertama,
-            'jamKedua' => $lemburJamKedua,
+            'jamKedua'   => $lemburJamKedua,
         ];
     }
 
 
-    public function getFormLemburAmt(
-        $employeeIds,
-        $startDate,
-        $endDate
-    ) {
+    public function getFormLemburAmt($employeeIds, $startDate, $endDate)
+    {
         $uangLemburQry = $this->asArray()
             ->select("SUM(total_uang_lembur) as total, form_lembur.employee_id")
             ->whereIn('employee_id', $employeeIds)
@@ -209,10 +208,12 @@ class FormLemburModel extends Model
             ->where('periode <=', $endDate)
             ->groupEnd()
             ->where('deletedAt', null)
+            ->groupBy('form_lembur.employee_id') // <-- harus ada untuk SUM per employee
             ->findAll();
 
         return $uangLemburQry;
     }
+
 
     public function getFormLemburRangeAmt(
         $employeeIds,

@@ -332,140 +332,296 @@ class Employee extends BaseController
             if (!$attendanceUnit) {
                 return response()->setJSON([
                     'status' => false,
-                    'message' => "Attendance unit tidak ditemukan untuk IP: {$companyData['ip_finger']}",
+                    'message' => "Attendance unit tidak ditemukan",
                     'token' => csrf_hash()
                 ]);
             }
 
-            if (empty($attendanceUnit['ip'])) {
-                return response()->setJSON([
-                    'status' => false,
-                    'message' => "IP mesin finger tidak ditemukan di attendance unit",
-                    'token' => csrf_hash()
-                ]);
-            }
-
-            // TEST KONEKSI
-            $timeout = max(1, min(5, 2)); // fix range
-            $isAlive = icmpPing($attendanceUnit['ip'], $timeout);
-
-            if (!$isAlive) {
-                return response()->setJSON([
-                    'status' => false,
-                    'message' => "Mesin finger tidak dapat dihubungi",
-                    'data' => [
-                        'ip' => $attendanceUnit['ip'],
-                        'timeout' => $timeout
-                    ],
-                    'token' => csrf_hash()
-                ]);
-            }
-
-            // Ambil karyawan outsourcing
-            $outsourcingEmployees = $this->hrOutsourcingEmployeeModel
+            // ==========================================
+            // CEK DATA YANG PERLU DI-SYNC
+            // ==========================================
+            
+            // 1. Ambil employee AKTIF di database
+            $activeEmployees = $this->hrOutsourcingEmployeeModel
                 ->where('company_id', $companyId)
                 ->where('deletedAt', null)
                 ->findAll();
-
-            if (empty($outsourcingEmployees)) {
-                return response()->setJSON([
-                    'status' => false,
-                    'message' => "Tidak ada karyawan untuk company ini",
-                    'token' => csrf_hash()
-                ]);
+            
+            // Cek badge yang kosong
+            $employeesWithoutBadge = [];
+            $employeesWithBadge = [];
+            
+            foreach ($activeEmployees as $emp) {
+                if (empty($emp['badge']) || trim($emp['badge']) === '') {
+                    $employeesWithoutBadge[] = [
+                        'id' => $emp['id'],
+                        'nama' => $emp['nama']
+                    ];
+                } else {
+                    $employeesWithBadge[] = $emp;
+                }
             }
+            
+            $activeEmployeeIds = array_column($activeEmployees, 'id');
+            
+            // 2. Ambil employee yang sudah DIHAPUS (soft delete)
+            $builder = $this->hrOutsourcingEmployeeModel->builder();
+            $deletedEmployees = $builder
+                ->select('id, nama, badge')
+                ->where('company_id', $companyId)
+                ->where('deletedAt IS NOT NULL')
+                ->get()
+                ->getResultArray();
+            
+            $deletedEmployeeIds = array_column($deletedEmployees, 'id');
 
-            // ==========================================
-            // PROSES SINKRONISASI KE MESIN FINGER
-            // ==========================================
-            $successCount = 0;
-            $failedCount = 0;
-            $successDetails = [];
-            $failedDetails = [];
-
-            foreach ($outsourcingEmployees as $emp) {
-                $pin  = $emp['id'];
-                $name = trim($emp['nama']);
-
-                try {
-                    $result = $this->attendanceUnit->insert_finger_user_by_rian(
-                        $pin,
-                        $attendanceUnit['ip'],
-                        0,
-                        $name
-                    );
-
-                    if ($result === true) {
-                        $successCount++;
-                        $successDetails[] = [
-                            'id'   => $pin,
-                            'nama' => $name,
-                            'status' => "Berhasil"
-                        ];
-                    } else {
-                        $failedCount++;
-                        $failedDetails[] = [
-                            'id'   => $pin,
-                            'nama' => $name,
-                            'status' => "Gagal",
-                            'reason' => $result ?: "Unknown"
+            // 3. Ambil data dari mesin
+            $machineUsers = $this->attendanceUnit->getAllUsersFromMachine($attendanceUnit['ip']);
+            
+            // 4. Identifikasi data yang perlu di-sync
+            $machineUserIds = !empty($machineUsers) ? array_column($machineUsers, 'PIN2') : [];
+            $machineUserNames = [];
+            $machineUserPrivileges = [];
+            
+            // Buat mapping untuk cek update
+            if (!empty($machineUsers)) {
+                foreach ($machineUsers as $user) {
+                    $pin = $user['PIN2'];
+                    $machineUserNames[$pin] = $user['Name'] ?? '';
+                    $machineUserPrivileges[$pin] = $user['Privilege'] ?? 0;
+                }
+            }
+            
+            // 5. User yang AKTIF di database tapi belum ada di mesin (INSERT)
+            $missingInMachine = array_diff($activeEmployeeIds, $machineUserIds);
+            
+            // 6. User yang sudah DIHAPUS di CI4 tapi masih ada di mesin (DELETE)
+            $toDeleteFromMachine = [];
+            foreach ($deletedEmployeeIds as $deletedId) {
+                if (in_array($deletedId, $machineUserIds)) {
+                    $toDeleteFromMachine[] = $deletedId;
+                }
+            }
+            
+            // 7. User yang ADA di database dan ADA di mesin tapi NAMA berbeda (UPDATE)
+            $toUpdateOnMachine = [];
+            foreach ($employeesWithBadge as $emp) {
+                $empId = $emp['id'];
+                if (in_array($empId, $machineUserIds)) {
+                    $expectedName = trim($emp['nama']) . ' ' . trim($emp['badge']);
+                    $currentName = $machineUserNames[$empId] ?? '';
+                    
+                    // Cek jika nama berbeda (case insensitive)
+                    if (strtolower(trim($currentName)) !== strtolower(trim($expectedName))) {
+                        $toUpdateOnMachine[] = [
+                            'id' => $empId,
+                            'nama' => $emp['nama'],
+                            'badge' => $emp['badge'],
+                            'current_name_on_machine' => $currentName,
+                            'expected_name_on_machine' => $expectedName
                         ];
                     }
-                } catch (Exception $e) {
-                    $failedCount++;
-                    $failedDetails[] = [
-                        'id'   => $pin,
-                        'nama' => $name,
-                        'status' => "Error",
-                        'reason' => $e->getMessage()
-                    ];
-
-                    log_message('error', "Sync Employee Finger Error [ID $pin]: {$e->getMessage()}");
                 }
             }
 
             // ==========================================
-            // MESSAGE RESULT
+            // VALIDASI BADGE SEBELUM SYNC
             // ==========================================
-            $total = count($outsourcingEmployees);
+            if (!empty($employeesWithoutBadge)) {
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "Terdapat karyawan tanpa badge number",
+                    'data' => [
+                        'employees_without_badge' => $employeesWithoutBadge,
+                        'count' => count($employeesWithoutBadge)
+                    ],
+                    'token' => csrf_hash()
+                ]);
+            }
 
-            if ($successCount === $total) {
-                $message = "Semua karyawan berhasil disinkronisasi ke mesin finger.";
-            } elseif ($successCount > 0 && $failedCount > 0) {
-                $message = "Sinkronisasi selesai, beberapa karyawan gagal.";
-            } else {
-                $message = "Semua sinkronisasi gagal.";
+            // ==========================================
+            // PROSES DELETE DULU (user yang sudah di-soft delete di CI4)
+            // ==========================================
+            $deleteSuccess = [];
+            $deleteFailed = [];
+
+            foreach ($toDeleteFromMachine as $userId) {
+                try {
+                    $result = $this->attendanceUnit->delete_finger_user_by_rian(
+                        $userId,
+                        $attendanceUnit['ip'],
+                        0
+                    );
+
+                    if ($result === true || stripos($result ?? '', 'success') !== false) {
+                        $deleteSuccess[] = $userId;
+                    } else {
+                        $deleteFailed[] = [
+                            'id' => $userId,
+                            'reason' => is_string($result) ? $result : 'Unknown error'
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    $deleteFailed[] = [
+                        'id' => $userId,
+                        'reason' => $e->getMessage()
+                    ];
+                }
+            }
+
+            // ==========================================
+            // PROSES UPDATE (user yang ADA tapi NAMA berubah)
+            // ==========================================
+            $updateSuccess = [];
+            $updateFailed = [];
+
+            foreach ($toUpdateOnMachine as $emp) {
+                try {
+                    // Gunakan fungsi UPDATE (atau SetUserInfo untuk update)
+                    $result = $this->attendanceUnit->update_finger_user_by_rian(
+                        $emp['id'],
+                        $attendanceUnit['ip'],
+                        0,
+                        $emp['expected_name_on_machine']
+                    );
+
+                    if ($result === true || stripos($result ?? '', 'success') !== false) {
+                        $updateSuccess[] = [
+                            'id' => $emp['id'],
+                            'nama' => $emp['nama'],
+                            'badge' => $emp['badge'],
+                            'old_name' => $emp['current_name_on_machine'],
+                            'new_name' => $emp['expected_name_on_machine']
+                        ];
+                    } else {
+                        $updateFailed[] = [
+                            'id' => $emp['id'],
+                            'nama' => $emp['nama'],
+                            'badge' => $emp['badge'],
+                            'reason' => $result,
+                            'old_name' => $emp['current_name_on_machine'],
+                            'new_name' => $emp['expected_name_on_machine']
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    $updateFailed[] = [
+                        'id' => $emp['id'],
+                        'nama' => $emp['nama'],
+                        'badge' => $emp['badge'],
+                        'reason' => $e->getMessage(),
+                        'old_name' => $emp['current_name_on_machine'],
+                        'new_name' => $emp['expected_name_on_machine']
+                    ];
+                }
+            }
+
+            // ==========================================
+            // PROSES INSERT (user yang AKTIF tapi belum ada di mesin)
+            // ==========================================
+            $insertSuccess = [];
+            $insertFailed = [];
+
+            // Filter: hanya insert user yang belum ada di mesin DAN belum diupdate
+            $alreadyProcessed = array_merge(
+                array_column($updateSuccess, 'id'),
+                array_column($updateFailed, 'id')
+            );
+            
+            $toInsert = array_diff($missingInMachine, $alreadyProcessed);
+
+            if (!empty($toInsert)) {
+                // Ambil detail employee yang perlu di-insert
+                $employeesToInsert = $this->hrOutsourcingEmployeeModel
+                    ->where('company_id', $companyId)
+                    ->where('deletedAt', null)
+                    ->whereIn('id', $toInsert)
+                    ->findAll();
+
+                foreach ($employeesToInsert as $emp) {
+                    try {
+                        // Format: "Nama - Badge Number"
+                        $nameForMachine = trim($emp['nama']) . ' ' . trim($emp['badge']);
+                        
+                        $result = $this->attendanceUnit->insert_finger_user_by_rian(
+                            $emp['id'],
+                            $attendanceUnit['ip'],
+                            0, // privilege biasa (bukan admin)
+                            $nameForMachine
+                        );
+
+                        if ($result === true || stripos($result ?? '', 'success') !== false) {
+                            $insertSuccess[] = [
+                                'id' => $emp['id'],
+                                'nama' => $emp['nama'],
+                                'badge' => $emp['badge'],
+                                'name_on_machine' => $nameForMachine
+                            ];
+                        } else {
+                            $insertFailed[] = [
+                                'id' => $emp['id'],
+                                'nama' => $emp['nama'],
+                                'badge' => $emp['badge'],
+                                'reason' => $result
+                            ];
+                        }
+                    } catch (\Exception $e) {
+                        $insertFailed[] = [
+                            'id' => $emp['id'],
+                            'nama' => $emp['nama'],
+                            'badge' => $emp['badge'],
+                            'reason' => $e->getMessage()
+                        ];
+                    }
+                }
+            }
+
+            // ==========================================
+            // RESULT
+            // ==========================================
+            $totalDelete = count($toDeleteFromMachine);
+            $totalUpdate = count($toUpdateOnMachine);
+            $totalInsert = count($toInsert);
+            $successDelete = count($deleteSuccess);
+            $successUpdate = count($updateSuccess);
+            $successInsert = count($insertSuccess);
+
+            $message = "Sinkronisasi selesai. ";
+            if ($successDelete > 0) $message .= "Berhasil hapus {$successDelete}/{$totalDelete} user yang sudah dihapus di sistem. ";
+            if ($successUpdate > 0) $message .= "Berhasil update {$successUpdate}/{$totalUpdate} user. ";
+            if ($successInsert > 0) $message .= "Berhasil tambah {$successInsert}/{$totalInsert} user baru.";
+            if ($successDelete == 0 && $successUpdate == 0 && $successInsert == 0) {
+                $message = "Tidak ada yang perlu disinkronisasi.";
             }
 
             return response()->setJSON([
-                'status'  => $successCount > 0,
+                'status' => ($successDelete + $successUpdate + $successInsert) > 0,
                 'message' => $message,
                 'data' => [
-                    'attendance_unit_ip' => $attendanceUnit['ip'],
-                    'company_id' => $companyId,
-                    'company_name' => $companyData['name'] ?? '-',
-                    'sync_date' => date("Y-m-d H:i:s"),
-
                     'summary' => [
-                        'total' => $total,
-                        'success' => $successCount,
-                        'failed' => $failedCount,
-                        'percentage' => round(($successCount / $total) * 100, 2)
+                        'delete_total' => $totalDelete,
+                        'delete_success' => $successDelete,
+                        'delete_failed' => count($deleteFailed),
+                        'update_total' => $totalUpdate,
+                        'update_success' => $successUpdate,
+                        'update_failed' => count($updateFailed),
+                        'insert_total' => $totalInsert,
+                        'insert_success' => $successInsert,
+                        'insert_failed' => count($insertFailed),
+                        'total_active_employees' => count($activeEmployees),
+                        'total_deleted_employees' => count($deletedEmployees),
+                        'total_machine_users' => count($machineUserIds)
                     ],
-
-                    'success_details' => $successDetails,
-                    'failed_details' => $failedDetails
+                    'delete_failed_details' => $deleteFailed,
+                    'update_failed_details' => $updateFailed,
+                    'insert_failed_details' => $insertFailed
                 ],
                 'token' => csrf_hash()
             ]);
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return response()->setJSON([
                 'status' => false,
-                'message' => "System Error",
-                'data' => [
-                    'error' => $e->getMessage()
-                ],
+                'message' => "System Error: " . $e->getMessage(),
                 'token' => csrf_hash()
             ]);
         }
@@ -477,71 +633,251 @@ class Employee extends BaseController
             $companyId = $this->request->getVar('company_id');
 
             if (!$companyId) {
-                return response()->setJSON([
-                    'status' => false,
-                    'message' => "Company ID tidak ditemukan"
-                ]);
+                return $this->fail("Company ID tidak ditemukan");
             }
 
-            // Ambil IP mesin
-            $company = $this->hrOutsourcingCompanyModel->where('id', $companyId)->first();
+            // ============================
+            // 1. VALIDASI MESIN & KONEKSI
+            // ============================
+            $company = $this->hrOutsourcingCompanyModel
+                ->where('id', $companyId)->first();
+
             if (!$company || empty($company['ip_finger'])) {
-                return response()->setJSON([
-                    'status' => false,
-                    'message' => "IP Finger tidak ditemukan"
-                ]);
+                return $this->fail("IP Finger tidak ditemukan");
             }
 
-            $attendanceUnit = $this->hrOutsourcingAttendanceModel->where('id', $company['ip_finger'])->first();
+            $attendanceUnit = $this->hrOutsourcingAttendanceModel
+                ->where('id', $company['ip_finger'])->first();
+
             if (!$attendanceUnit) {
-                return response()->setJSON([
-                    'status' => false,
-                    'message' => "Attendance unit tidak valid"
-                ]);
+                return $this->fail("Attendance unit tidak valid");
             }
 
-            // Ambil user dari DB
+            // ============================
+            // 2. AMBIL DATA USER CI4 (AKTIF) dan CEK BADGE
+            // ============================
             $employees = $this->hrOutsourcingEmployeeModel
-                ->select('id, nama')
+                ->select('id, nama, badge')
                 ->where('company_id', $companyId)
                 ->where('deletedAt', null)
                 ->findAll();
 
-            // Ambil user dari mesin
-            $machineUsers = $this->attendanceUnit->getAllUsersFromMachine($attendanceUnit['ip']);
+            // Cek badge yang kosong
+            $employeesWithoutBadge = [];
+            $employeesWithBadge = [];
+            
+            foreach ($employees as $emp) {
+                if (empty($emp['badge']) || trim($emp['badge']) === '') {
+                    $employeesWithoutBadge[] = [
+                        'id' => $emp['id'],
+                        'nama' => $emp['nama']
+                    ];
+                } else {
+                    $employeesWithBadge[] = $emp;
+                }
+            }
+            
+            $dbIds = array_map('strval', array_column($employees, 'id'));
 
-            if (!is_array($machineUsers)) {
+            // ============================
+            // 3. AMBIL USER YANG DIHAPUS (SOFT DELETE)
+            // ============================
+            $builder = $this->hrOutsourcingEmployeeModel->builder();
+            $deletedEmployees = $builder
+                ->select('id, nama, badge')
+                ->where('company_id', $companyId)
+                ->where('deletedAt IS NOT NULL')
+                ->get()
+                ->getResultArray();
+
+            $deletedIds = array_map('strval', array_column($deletedEmployees, 'id'));
+
+            // ============================
+            // 4. AMBIL USER DI MESIN
+            // ============================
+            $machineUsers = [];
+            $machineIds = [];
+            $machinePrivileges = [];
+            $machineNames = [];
+            
+            try {
+                $machineUsers = $this->attendanceUnit->getAllUsersFromMachine($attendanceUnit['ip']);
+                
+                if (!is_array($machineUsers)) {
+                    throw new \Exception("Format data mesin tidak valid");
+                }
+                
+                foreach ($machineUsers as $u) {
+                    $pin = strval($u['PIN2']);
+                    $machineIds[] = $pin;
+                    $machinePrivileges[$pin] = $u['Privilege'] ?? 0;
+                    $machineNames[$pin] = $u['Name'] ?? '';
+                }
+                
+            } catch (\Exception $e) {
                 return response()->setJSON([
                     'status' => false,
-                    'message' => "Gagal mengambil data user dari mesin"
+                    'machine_connected' => false,
+                    'has_missing_badge' => !empty($employeesWithoutBadge),
+                    'missing_badge_count' => count($employeesWithoutBadge),
+                    'message' => "Tidak dapat terhubung ke mesin fingerprint",
+                    'data' => [
+                        'missing_in_machine' => [],
+                        'deleted_in_ci4_but_exist_in_machine' => [],
+                        'insert_count' => 0,
+                        'deleted_ci4_count' => 0,
+                        'total_action' => 0,
+                        'employees_without_badge' => $employeesWithoutBadge
+                    ]
                 ]);
             }
 
-            // ==========================================
-            // HITUNG MISMATCH / DATA BELUM TER-SYNC
-            // ==========================================
-            $dbIds = array_map('strval', array_column($employees, 'id'));
-            $machineIds = array_map('strval', array_column($machineUsers, 'PIN2'));
+            // ============================
+            // 5. missing_in_machine
+            // User ada di CI4 tapi tidak ada di mesin
+            // ============================
+            $missingInMachine = [];
+            foreach ($employeesWithBadge as $emp) {
+                $empId = strval($emp['id']);
+                if (!in_array($empId, $machineIds)) {
+                    $missingInMachine[] = [
+                        'id' => $empId,
+                        'nama' => $emp['nama'],
+                        'badge' => $emp['badge'],
+                        'expected_name_on_machine' => trim($emp['nama']) . ' ' . trim($emp['badge'])
+                    ];
+                }
+            }
 
-            $missingInMachine = array_diff($dbIds, $machineIds);
-            $extraInMachine   = array_diff($machineIds, $dbIds);
+            // ============================
+            // 6. deleted_in_ci4_but_exist_in_machine
+            // User dihapus di CI4 (soft delete) tapi masih ada di mesin
+            // ============================
+            $deletedInCi4ButExistInMachine = [];
+            foreach ($deletedEmployees as $delEmp) {
+                $did = strval($delEmp['id']);
+                if (in_array($did, $machineIds)) {
+                    $deletedInCi4ButExistInMachine[] = [
+                        'id' => $did,
+                        'nama' => $delEmp['nama'],
+                        'badge' => $delEmp['badge'],
+                        'current_name_on_machine' => $machineNames[$did] ?? ''
+                    ];
+                }
+            }
+
+            // ============================
+            // 7. CEK USER YANG SUDAH ADA DI MESIN TAPI NAMA DI MESIN BELUM PAKE FORMAT BADGE
+            // ============================
+            $needsUpdateOnMachine = [];
+            foreach ($employeesWithBadge as $emp) {
+                $empId = strval($emp['id']);
+                if (in_array($empId, $machineIds)) {
+                    $expectedName = trim($emp['nama']) . ' ' . trim($emp['badge']);
+                    $currentName = $machineNames[$empId] ?? '';
+                    
+                    // Cek jika nama di mesin tidak sesuai format "Nama - Badge"
+                    if ($currentName !== $expectedName) {
+                        $needsUpdateOnMachine[] = [
+                            'id' => $empId,
+                            'nama' => $emp['nama'],
+                            'badge' => $emp['badge'],
+                            'current_name' => $currentName,
+                            'expected_name' => $expectedName
+                        ];
+                    }
+                }
+            }
+
+            // ============================
+            // 8. HITUNG USER LIAR (TANPA TAMPILKAN LIST)
+            // ============================
+            $liarCount = 0;
+            foreach ($machineIds as $mid) {
+                // Skip admin mesin
+                if (($machinePrivileges[$mid] ?? 0) == 1) {
+                    continue;
+                }
+                
+                // Jika bukan employee aktif kita DAN bukan employee yang di-delete kita
+                if (!in_array($mid, $dbIds) && !in_array($mid, $deletedIds)) {
+                    $liarCount++;
+                }
+            }
+
+            // ============================
+            // 9. TOTAL ACTION & STATS
+            // ============================
+            $insertCount = count($missingInMachine);
+            $deletedCi4Count = count($deletedInCi4ButExistInMachine);
+            $updateCount = count($needsUpdateOnMachine);
+            $totalAction = $insertCount + $deletedCi4Count + $updateCount;
+            $syncedCount = count($employeesWithBadge) - $insertCount;
+            $missingBadgeCount = count($employeesWithoutBadge);
+
+            // ============================
+            // 10. PRIORITAS WARNING
+            // ============================
+            $warningLevel = 'success';
+            if ($missingBadgeCount > 0) {
+                $warningLevel = 'danger'; // Prioritas tertinggi: badge kosong
+            } elseif ($deletedCi4Count > 0) {
+                $warningLevel = 'danger'; // Harus dihapus dari mesin
+            } elseif ($insertCount > 0) {
+                $warningLevel = 'warning'; // Harus ditambahkan ke mesin
+            } elseif ($updateCount > 0) {
+                $warningLevel = 'info'; // Perlu update nama di mesin
+            } elseif ($liarCount > 0) {
+                $warningLevel = 'info'; // Ada user company lain
+            }
 
             return response()->setJSON([
                 'status' => true,
-                'message' => "Status sync berhasil diambil",
+                'machine_connected' => true,
+                'warning_level' => $warningLevel,
+                'has_missing_badge' => $missingBadgeCount > 0,
+                'missing_badge_count' => $missingBadgeCount,
                 'data' => [
-                    'missing_in_machine' => array_values($missingInMachine),
-                    'extra_in_machine'   => array_values($extraInMachine),
-                    'need_sync_count'    => count($missingInMachine)
+                    'missing_in_machine' => $missingInMachine, // Array dengan detail
+                    'deleted_in_ci4_but_exist_in_machine' => $deletedInCi4ButExistInMachine, // Array dengan detail
+                    'needs_update_on_machine' => $needsUpdateOnMachine, // Array dengan detail
+                    
+                    'insert_count' => $insertCount,
+                    'update_count' => $updateCount,
+                    'liar_count' => $liarCount,
+                    'deleted_ci4_count' => $deletedCi4Count,
+                    'synced_count' => $syncedCount,
+                    'missing_badge_count' => $missingBadgeCount,
+                    
+                    'total_action' => $totalAction,
+                    'employees_count' => count($employees),
+                    'employees_without_badge' => $employeesWithoutBadge,
+                    
+                    'machine_info' => [
+                        'ip' => $attendanceUnit['ip'],
+                        'total_users' => count($machineIds),
+                        'our_users' => $syncedCount,
+                        'other_company_users' => $liarCount
+                    ]
                 ]
             ]);
 
         } catch (\Throwable $e) {
             return response()->setJSON([
                 'status' => false,
+                'machine_connected' => false,
                 'message' => "Error: " . $e->getMessage()
             ]);
         }
     }
+
+    private function fail($msg)
+    {
+        return response()->setJSON([
+            'status' => false,
+            'message' => $msg
+        ]);
+    }
+
 
 }
