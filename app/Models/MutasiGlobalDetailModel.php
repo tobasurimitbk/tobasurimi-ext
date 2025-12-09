@@ -74,6 +74,18 @@ class MutasiGlobalDetailModel extends Model
             );
 
             foreach ($fromStock['data'] as $d) {
+                $bc_all = "";
+
+                if ($d['type_bc'] != "NON PABEAN" && $d['no_daftar'] != "") {
+                    // ADA DOKUMEN BEA CUKAI
+                    $bc_all = $d['type_bc'] . " / " . $d['no_daftar'] . " / " . $d['no_aju'];
+                } elseif ($d['type_bc'] == "PPBKB" && $d['no_aju'] != "") {
+                    // ADA DOKUMEN BEA CUKAI
+                    $bc_all = $d['type_bc'] . " / " . $d['no_aju'];
+                } else {
+                    $bc_all = $d['type_bc'];
+                }
+
                 // Stock
                 array_push($dataResult, [
                     'no' => $no++,
@@ -86,6 +98,7 @@ class MutasiGlobalDetailModel extends Model
                     'barang_name' => $d['barang_name'],
                     'spesifikasi' => $d['spesifikasi'],
                     'type_bc' => $d['type_bc'],
+                    'bc_detail' => $bc_all,
                     'po_no' => $d['po_no'],
                     'po_date' => !empty($d['po_date']) ? date('d/m/Y', strtotime($d['po_date'])) : "",
                     'lpb_date' => !empty($d['lpb_date']) ? date('d/m/Y', strtotime($d['lpb_date'])) : "",
@@ -109,8 +122,10 @@ class MutasiGlobalDetailModel extends Model
                         'unit_hasil_id' => $a['unit_hasil_id'],
                         'kode_barang' => $a['kode_barang'],
                         'barang_name' => $a['barang_name'],
-                        'spesifikasi' => $a['spesifikasi']
-
+                        'harga_satuan' => (float)$a['harga_satuan'],
+                        'nilai_tukar' => (float)$a['nilai_tukar'],
+                        'sub_total' => (float)$a['sub_total'],
+                        'valas_id' => (float)$a['valas_id'],
                     ],
                     "dokumen_asal" => [
                         'no_aju' => $d['no_aju'],

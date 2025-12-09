@@ -132,6 +132,7 @@ class MutasiGlobal extends BaseController
             ->findAll();
         $dataDivisi = $this->divisiModel->getDivisiAccess();
         $dataSatuan = $this->satuanModel->where('deletedAt', null)->findAll();
+        $dataValuta = $this->metaDataModel->where('name', "Valuta")->where('deletedAt', null)->findAll();
 
         $data = [
             'tipeBarang' => $dataTipeBarang,
@@ -139,7 +140,8 @@ class MutasiGlobal extends BaseController
             'dataSatuan' => $dataSatuan,
             'tanggal' => date('Y-m-d'),
             'companyAsalName' => session()->get('login')->this_company,
-            'dropdownCompanyExcept' => $this->companyModel->getCompaniesExcepct($this->this_company_id)
+            'dropdownCompanyExcept' => $this->companyModel->getCompaniesExcepct($this->this_company_id),
+            'dataValuta' => $dataValuta
         ];
 
         return view('Warehouse/mutasi/form_global', $data);
@@ -162,6 +164,7 @@ class MutasiGlobal extends BaseController
         $dataSatuan = $this->satuanModel->where('deletedAt', null)->findAll();
         $dataWarehouseAsal = $this->warehouseModel->where('id', $mutasiGlobal['warehouse_asal_id'])->findAll();
         $dataMutasiGlobalDetail = $this->mutasiGlobalDetailModel->getDetail($id);
+        $dataValuta = $this->metaDataModel->where('name', "Valuta")->where('deletedAt', null)->findAll();
 
         $data = [
             'tipeBarang' => $dataTipeBarang,
@@ -171,7 +174,8 @@ class MutasiGlobal extends BaseController
             'mutasiGlobalDetail' => $dataMutasiGlobalDetail,
             'warehouseAsal' => $dataWarehouseAsal,
             'companyAsalName' => session()->get('login')->this_company,
-            'dropdownCompanyExcept' => $this->companyModel->getCompaniesExcepct($this->this_company_id)
+            'dropdownCompanyExcept' => $this->companyModel->getCompaniesExcepct($this->this_company_id),
+            'dataValuta' => $dataValuta
         ];
 
         return view('Warehouse/mutasi/form_global', $data);
@@ -221,7 +225,11 @@ class MutasiGlobal extends BaseController
                     'unit_id_mutasi' => $l->mutasi->unit_id_mutasi,
                     'qty_konversi' => $l->mutasi->qty_konversi,
                     'unit_id_konversi' => $l->mutasi->unit_id_konversi,
-                    'hasil_mutasi' => $l->mutasi->hasil_mutasi
+                    'hasil_mutasi' => $l->mutasi->hasil_mutasi,
+                    'harga_satuan' => $l->mutasi->harga_satuan,
+                    'nilai_tukar' => $l->mutasi->nilai_tukar,
+                    'sub_total' => $l->mutasi->sub_total,
+                    'valas_id' => $l->mutasi->valas_id
                 ]);
             }
 
@@ -299,7 +307,11 @@ class MutasiGlobal extends BaseController
                         'unit_id_mutasi' => $l->mutasi->unit_id_mutasi,
                         'qty_konversi' => $l->mutasi->qty_konversi,
                         'unit_id_konversi' => $l->mutasi->unit_id_konversi,
-                        'hasil_mutasi' => $l->mutasi->hasil_mutasi
+                        'hasil_mutasi' => $l->mutasi->hasil_mutasi,
+                        'harga_satuan' => $l->mutasi->harga_satuan,
+                        'nilai_tukar' => $l->mutasi->nilai_tukar,
+                        'sub_total' => $l->mutasi->sub_total,
+                        'valas_id' => $l->mutasi->valas_id
                     ]);
 
                     array_push($id_detail_all, $check['id']);
@@ -319,7 +331,11 @@ class MutasiGlobal extends BaseController
                         'unit_id_mutasi' => $l->mutasi->unit_id_mutasi,
                         'qty_konversi' => $l->mutasi->qty_konversi,
                         'unit_id_konversi' => $l->mutasi->unit_id_konversi,
-                        'hasil_mutasi' => $l->mutasi->hasil_mutasi
+                        'hasil_mutasi' => $l->mutasi->hasil_mutasi,
+                        'harga_satuan' => $l->mutasi->harga_satuan,
+                        'nilai_tukar' => $l->mutasi->nilai_tukar,
+                        'sub_total' => $l->mutasi->sub_total,
+                        'valas_id' => $l->mutasi->valas_id
                     ]);
 
                     array_push($id_detail_all,  $id_detail_new);

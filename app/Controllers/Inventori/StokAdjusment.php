@@ -243,6 +243,10 @@ class StokAdjusment extends BaseController
             ]);
         }
 
+        if ($condition['divisi_id'] == "ALL") {
+            $condition['divisi_id'] = "";
+        }
+
         $data = $this->stockRevampModel->getStockListAll(
             $condition,
             $orderColumnIndex,
