@@ -117,16 +117,8 @@ class POLokalBahanPenolong extends BaseController
         $db->transBegin();
         try {
             $poDate = formatDMYtoYMD($this->request->getVar('poDate'));
-
-            if ($this->request->getVar('poNo') != "AUTO GENERATE") {
-                $noPoNew = $this->request->getVar('poNo');
-            } else {
-                $noPoNew =  $this->aMPurchaseOrderModel->get_new_no_po(
-                    $poDate,
-                    $this->this_company_id,
-                    getLastDayByDate($poDate),
-                );
-            }
+            $formId = $this->request->getVar('form_id');
+            $noPoNew = $this->request->getVar('poNo');
 
             $first = $this->aMPurchaseOrderModel
                 ->where('company_id', $this->this_company_id)
@@ -142,6 +134,22 @@ class POLokalBahanPenolong extends BaseController
                 );
             }
 
+            // cek form id
+            $firstFormId = $this->aMPurchaseOrderModel
+                ->where('form_id', $formId)
+                ->first();
+
+            if ($firstFormId != null) {
+                // sudah ada form_id nya maka po sudah tersimpan
+                return response()->setJSON([
+                    'message' => "PO Bahan penolong berhasil ditambah",
+                    'status' => true,
+                    'id' => encrypt($firstFormId['id']),
+                    'token' => csrf_hash()
+                ]);
+                exit;
+            }
+
             $dataAmPurchaseOrderData = [
                 'po_no' => $noPoNew,
                 'purchase_request_id' => $this->request->getVar('spp_id'),
@@ -155,7 +163,7 @@ class POLokalBahanPenolong extends BaseController
                 'note' => $this->request->getVar('note'),
                 'status_closed_spp' => $this->request->getVar('status_closed_spp'),
                 "createdBy" => session()->get("login")->user_id,
-                "form_id" => $this->request->getVar('form_id')
+                "form_id" => $formId
             ];
 
             // insert new po
