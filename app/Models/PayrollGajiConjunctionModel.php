@@ -214,11 +214,14 @@ class PayrollGajiConjunctionModel extends Model
 
         $dataResult = [];
         $koperasiNominal = 0;
+        $potonganNominal = 0;
 
         foreach ($gajiConjunction as $g) {
             // cek apakah tunjangan masuk kategori koperasi
             if (in_array(trim($g['name']), ['BON KOPERASI', 'IURAN KOPERASI', 'PINJAMAN KOPERASI'])) {
                 $koperasiNominal += $g['nominal'];
+            } elseif (in_array(trim($g['name']), ['POTONGAN BAJU SERAGAM', 'POTONGAN SEPATU, CELANA, TOPI', 'POTONGAN TUTUP MULUT'])) {
+                $potonganNominal += $g['nominal'];
             } else {
                 $dataResult[] = [
                     'name' => $g['name'],
@@ -232,6 +235,10 @@ class PayrollGajiConjunctionModel extends Model
             'nominal' => $koperasiNominal
         ];
 
+        $dataResult[] = [
+            'name' => 'Pot. Perlengkapan Kerja',
+            'nominal' => $potonganNominal
+        ];
 
         return $dataResult;
     }

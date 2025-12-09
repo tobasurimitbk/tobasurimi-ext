@@ -129,18 +129,58 @@ class AttendancesModel extends Model
 
     public function getStatusAttendancesInRangeAmt($startDate, $endDate, $employeeIds)
     {
-        $query = $this->asArray()
-            ->select("COUNT(DISTINCT DATE(periode)) as total, status, employee_id")
+        $bigDaysModel = new BigDaysModel();
+        $bigDays = $bigDaysModel->where('deletedAt', null)->findAll();
+        $tanggalBigDays = array_column($bigDays, 'date'); // array of holiday dates
+
+        // 1. Ambil data per hari (tanpa group)
+        $rows = $this->asArray()
+            ->select("employee_id, status, DATE(periode) AS tgl")
             ->whereIn('employee_id', $employeeIds)
             ->where('deletedAt', null)
-            ->groupStart()
             ->where('periode >=', $startDate)
             ->where('periode <=', $endDate)
-            ->groupEnd()
-            ->groupBy(['employee_id', 'status']);
+            ->findAll();
 
-        return $query->findAll();
+        $result = [];
+
+        foreach ($rows as $row) {
+            $emp  = $row['employee_id'];
+            $tgl  = $row['tgl'];
+            $stat = $row['status'];
+
+            // --- CEK HARI LIBUR ---
+            $dayName = date('D', strtotime($tgl));
+            $isHoliday = in_array($tgl, $tanggalBigDays) || $dayName === 'Sun';
+
+            // Jika hari libur dan status HADIR_H → pindah ke LIBUR_L
+            if ($isHoliday && $stat === 'HADIR_H') {
+                $stat = 'LIBUR_L';
+            }
+
+            // --- GROUP MANUAL ---
+            if (!isset($result[$emp][$stat])) {
+                $result[$emp][$stat] = 0;
+            }
+            $result[$emp][$stat]++;
+        }
+
+        // 2. Ubah ke format return seperti GROUP BY SQL
+        $final = [];
+
+        foreach ($result as $empId => $statuses) {
+            foreach ($statuses as $status => $total) {
+                $final[] = [
+                    'employee_id' => $empId,
+                    'status'      => $status,
+                    'total'       => $total,
+                ];
+            }
+        }
+
+        return $final;
     }
+
 
     public function getTotalHariLiburEmployeeHadir(
         $startDate,

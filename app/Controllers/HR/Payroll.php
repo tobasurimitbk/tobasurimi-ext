@@ -401,6 +401,7 @@ class Payroll extends BaseController
                 $startDate,
                 $endDate
             );
+
             if (count($dataPayrollGajiHarian['rows']) != 0) {
                 $this->payrollGajiHarianModel->insertBatch($dataPayrollGajiHarian['rows']);
             }

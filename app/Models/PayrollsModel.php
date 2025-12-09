@@ -581,6 +581,7 @@ class PayrollsModel extends Model
             ->where('employees.company_id', $companyID)
             ->where('employees.division_id', $divisionID)
             ->where('employees.bagian_id', $bagianID)
+            ->orderBy('employees.nip', "asc")
             ->findAll();
 
         $data = [];
