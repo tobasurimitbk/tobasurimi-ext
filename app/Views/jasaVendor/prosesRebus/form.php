@@ -379,7 +379,7 @@
                 $(".spesifikasi_rebus_id").empty()
                 $(".spesifikasi_rebus_id").append(`<option value=""></option>`)
                 res.data.forEach(function(item) {
-                    $(".spesifikasi_rebus_id").append(`<option data-stock_id="${item.stock_id}" data-kode_barang="${item.kode_barang}" data-barang="${item.barang}" data-kode_satuan="${item.kode_satuan}" value="${item.spesifikasi_rebus_id}">(${item.kode_barang}) ${item.barang}</option>`)
+                    $(".spesifikasi_rebus_id").append(`<option data-stock_id="${item.stock_id}" data-kode_barang="${item.kode_barang}" data-barang="${item.barang}" data-kode_satuan="${item.kode_satuan}" value="${item.spesifikasi_id}">(${item.kode_barang}) ${item.barang}</option>`)
                 })
                 $(".spesifikasi_rebus_id").val();
             }
@@ -627,6 +627,9 @@
         var dataIds = checkedCheckboxes.map(function() {
             return $(this).data("id");
         }).get();
+
+        console.log(dataIds)
+
         var id_selected = getIDListDataSelected();
         var barangIn = $('#spesifikasi_hasil_rebus_id option:selected');
 
@@ -642,24 +645,26 @@
                 var currentID = Number(v.id);
 
                 if ($.inArray(currentID, dataIds) !== -1) {
-                    var isIDSelected = $.grep(listStockSelected, function(item) {
-                        return item.id == Number(currentID);
-                    }).length > 0;
 
-                    if (!isIDSelected) {
-                        listStockAsal[i].stok_total = destroyFormatRupiah(listStockAsal[i].stok_total);
-                        listStockAsal[i].qty = 0;
-                        listStockAsal[i].output = {
-                            barang: barangIn.data('barang'),
-                            barang_id: barangIn.data('barang_id'),
-                            kode_satuan: barangIn.data('kode_satuan'),
-                            satuan_id: barangIn.data('satuan_id'),
-                            stock_id: barangIn.data('stock_id'),
-                            qty: 0
-                        }
-                        listStockSelected.push(listStockAsal[i]);
-                    }
+                    // INVALIDATE seluruh pengecekan duplikat
+                    // karena kita memang mau boleh duplikat
+                    // var isDuplicate = false;
+
+                    listStockAsal[i].stok_total = destroyFormatRupiah(listStockAsal[i].stok_total);
+                    listStockAsal[i].qty = 0;
+                    listStockAsal[i].output = {
+                        barang: barangIn.data('barang'),
+                        barang_id: barangIn.data('barang_id'),
+                        kode_satuan: barangIn.data('kode_satuan'),
+                        satuan_id: barangIn.data('satuan_id'),
+                        stock_id: barangIn.data('stock_id'),
+                        qty: 0
+                    };
+
+                    // CLONE supaya ga keseret referensi
+                    listStockSelected.push({...listStockAsal[i]});
                 }
+
             });
             drawTableSelectedItem(listStockSelected);
         }
