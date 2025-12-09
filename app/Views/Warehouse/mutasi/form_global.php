@@ -158,21 +158,19 @@
                             <thead class="thead-dark">
                                 <tr>
                                     <th>No</th>
-                                    <th>Sumber</th>
-                                    <th>Supplier / Vendor</th>
+                                    <th>Tgl Masuk</th>
+                                    <th>Ref No</th>
                                     <th>Kode</th>
                                     <th>Barang</th>
                                     <th>Spesifikasi</th>
                                     <th>Doc</th>
-                                    <th>No Po</th>
-                                    <th>Tgl Po</th>
-                                    <th>Tgl Masuk</th>
-                                    <th>Ref No</th>
-                                    <th>Stok Awal</th>
-                                    <th>Qty Mutasi</th>
-                                    <th>Satuan Mutasi</th>
-                                    <th>Qty Konversi</th>
-                                    <th>Satuan Konversi</th>
+                                    <th>Qty</th>
+                                    <th>Satuan</th>
+                                    <th>Valas</th>
+                                    <th>Harga Satuan</th>
+                                    <th>Nilai Tukar</th>
+                                    <th>Satuan</th>
+                                    <th>Sub Total (IDR)</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -180,7 +178,7 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <td colspan="17">Tidak Ada Data</td>
+                                    <td colspan="15">Tidak Ada Data</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -207,17 +205,49 @@
                             <div class="col-md-4">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select type_pengambilan_stock" id="type_pengambilan_stock" name="type_pengambilan_stock">
-                                        <option value=""></option>
                                         <option value="PABEAN">PABEAN</option>
                                         <option value="FIFO">FIFO</option>
                                     </select>
                                     <label for="floatingInput" style="z-index: 1;">Tipe Pengambilan Stok</label>
                                 </div>
                             </div>
-                            <div class="col-md-4 form-fifo">
+                        </div>
+                        <label class="form-label font-weight-bold lable-title form-fifo">Input nilai barang</label>
+
+                        <div class="row mt-3">
+                            <div class="col-md-2 form-fifo">
                                 <div class="form-floating" style="height: 50px;">
                                     <input placeholder="Qty Mutasi" oninput="this.value = greatFormatRupiah(this.value)" class="form-control qty_mutasi_fifo" id="qty_mutasi_fifo" name="qty_mutasi_fifo" />
                                     <label for="floatingInput" style="z-index: 1;">Qty Mutasi</label>
+                                </div>
+                            </div>
+                            <div class="col-md-2 form-fifo">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select valas_id_fifo" name="valas_id_fifo" id="valas_id_fifo">
+                                        <option value=""></option>
+                                        <?php foreach ($dataValuta as $d): ?>
+                                            <option value="<?= $d['id'] ?>"><?= $d['value']  ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <label for="floatingInput" style="z-index: 1;">Mata Uang</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3 form-fifo">
+                                <div class="form-floating" style="height: 50px;">
+                                    <input placeholder="Harga Satuan" oninput="this.value = greatFormatRupiah(this.value)" class="form-control harga_satuan_fifo" id="harga_satuan_fifo" name="harga_satuan_fifo" />
+                                    <label for="floatingInput" style="z-index: 1;">Harga Satuan</label>
+                                </div>
+                            </div>
+                            <div class="col-md-2 form-fifo">
+                                <div class="form-floating" style="height: 50px;">
+                                    <input placeholder="Nilai Tukar" oninput="this.value = greatFormatRupiah(this.value)" class="form-control nilai_tukar_fifo" id="nilai_tukar_fifo" name="nilai_tukar_fifo" />
+                                    <label for="floatingInput" style="z-index: 1;">Nilai Tukar</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3 form-fifo">
+                                <div class="form-floating" style="height: 50px;">
+                                    <input placeholder="Nilai Tukar" oninput="this.value = greatFormatRupiah(this.value)" class="form-control sub_total_fifo" id="sub_total_fifo" name="sub_total_fifo" />
+                                    <label for="floatingInput" style="z-index: 1;">Sub Total</label>
                                 </div>
                             </div>
                         </div>
@@ -294,7 +324,7 @@
                                                 <th>Kode Barang</th>
                                                 <th>Barang</th>
                                                 <th>Spesifikasi</th>
-                                                <th>Doc</th>
+                                                <th>Doc Asal</th>
                                                 <th>No Po</th>
                                                 <th>Tgl Po</th>
                                                 <th>Tgl Masuk</th>
@@ -408,6 +438,49 @@
                                 </div>
                             </div>
                         </div>
+                        <label class="form-label font-weight-bold lable-title">Detail Nilai Barang</label>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select valas_id" name="valas_id" id="valas_id">
+                                        <option value=""></option>
+                                        <?php foreach ($dataValuta as $d): ?>
+                                            <option value="<?= $d['id'] ?>"><?= $d['value']  ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <label for="floatingInput" style="z-index: 1;">Mata Uang</label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input oninput="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control harga_satuan" id="harga_satuan" name="harga_satuan" placeholder="Harga Satuan">
+                                        <label for="floatingInput">Harga Satuan</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input oninput="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control nilai_tukar" id="nilai_tukar" name="nilai_tukar" placeholder="Nilai Tukar">
+                                        <label for="floatingInput">Nilai Tukar</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input oninput="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control sub_total" id="sub_total" name="sub_total" placeholder="Sub Total">
+                                        <label for="floatingInput">Sub Total</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
                     </div>
 
                 </div>
@@ -592,8 +665,6 @@
         $('#barang_id').val(null).change();
     });
 
-
-
     $('#btnDetailStockModal').click(function(e) {
         e.preventDefault();
         var divisiAsalId = $('#divisi_asal_id option:selected').val();
@@ -622,6 +693,12 @@
                 .text('Departemen ' + divisiAsal + ", Warehouse " + warehouseAsal)
                 .addClass('text-danger');
             $('#type_pengambilan_stock').val("PABEAN").change();
+            $('#valas_id_fifo').val(30).change();
+            $('#harga_satuan_fifo').val(null);
+            $('#nilai_tukar_fifo').val(1);
+            $('#sub_total_fifo').val(null);
+            $('#qty_keluar_fifo').val(null);
+
             $('#detailStockModal').modal('show');
         }
     });
@@ -671,6 +748,20 @@
         theme: "bootstrap-5",
         allowClear: false,
         dropdownParent: $('#detailMutasiModal')
+    });
+
+    $('#valas_id').select2({
+        placeholder: "Pilih Mata Uang",
+        theme: "bootstrap-5",
+        allowClear: false,
+        dropdownParent: $('#updateStockModal')
+    }).change(function() {});
+
+    $('#valas_id_fifo').select2({
+        placeholder: "Pilih Mata Uang",
+        theme: "bootstrap-5",
+        allowClear: false,
+        dropdownParent: $('#detailStockModal')
     });
 
     $('#unit_id_konversi').select2({
@@ -780,6 +871,11 @@
                 var unit_name_mutasi = $('#unit_id_mutasi option:selected').text().trim();
                 var qty_konversi = parseFloat(destroyFormatRupiah($('#qty_konversi').val()));
                 var hasil_mutasi = parseFloat(destroyFormatRupiah($('#qty_hasil_mutasi').val()));
+                var valas_id = $('#valas_id option:selected').val();
+                var valas_name = $('#valas_id option:selected').text();
+                var harga_satuan = parseFloat(destroyFormatRupiah($('#harga_satuan').val()));
+                var nilai_tukar = parseFloat(destroyFormatRupiah($('#nilai_tukar').val()));
+                var sub_total = parseFloat(destroyFormatRupiah($('#sub_total').val()));
 
                 var index = null;
                 for (let i = 0; i < listStockSelected.length; i++) {
@@ -793,6 +889,12 @@
                 listStockSelected[index].mutasi.unit_name_mutasi = unit_name_mutasi;
                 listStockSelected[index].mutasi.qty_konversi = qty_konversi;
                 listStockSelected[index].mutasi.hasil_mutasi = hasil_mutasi;
+                listStockSelected[index].mutasi.valas_id = valas_id;
+                listStockSelected[index].mutasi.valas_name = valas_name;
+                listStockSelected[index].mutasi.harga_satuan = harga_satuan;
+                listStockSelected[index].mutasi.nilai_tukar = nilai_tukar;
+                listStockSelected[index].mutasi.sub_total = sub_total;
+
                 drawTableSelectedItem(listStockSelected);
                 $('#detailMutasiModal').modal('hide');
             }
@@ -800,7 +902,7 @@
     })
 
 
-    $("#type_barang,#divisi_asal_id,#divisi_tujuan_id,#warehouse_asal_id,#warehouse_tujuan_id,#barang_id,#bc_id,#no_aju,#operasi,#type_pengambilan_stock,#company_tujuan_id,#unit_id_mutasi,#unit_id_konversi")
+    $("#type_barang,#divisi_asal_id,#divisi_tujuan_id,#warehouse_asal_id,#warehouse_tujuan_id,#barang_id,#bc_id,#no_aju,#operasi,#type_pengambilan_stock,#company_tujuan_id,#unit_id_mutasi,#unit_id_konversi,#valas_id_fifo,#valas_id")
         .parent('div')
         .children('span')
         .children('span')
@@ -848,6 +950,11 @@
                             qty_konversi: 0,
                             unit_id_konversi: v.unit_id,
                             unit_name_konversi: v.kode_satuan,
+                            valas_id: null,
+                            valas_name: "",
+                            nilai_tukar: 1,
+                            harga_satuan: 0,
+                            sub_total: 0
                         }
                         listStockSelected.push(listStockInventori[i]);
                     }
@@ -862,7 +969,12 @@
     function insertListFifo() {
         var dataIds = getIDListDataSelected();
         var qtyMutasiFifo = parseFloat(destroyFormatRupiah($('#qty_mutasi_fifo').val()));
-        var spesifikasiId = $(".barang_id option:selected").val();
+        var barangId = $(".barang_id option:selected").val();
+        var valasIdFifo = $('#valas_id_fifo option:selected').val();
+        var valasNameFifo = $('#valas_id_fifo option:selected').text();
+        var hargaSatuanFifo = parseFloat(destroyFormatRupiah($('#harga_satuan_fifo').val()));
+        var nilaiTukarFifo = parseFloat(destroyFormatRupiah($('#nilai_tukar_fifo').val()));
+        var subTotalFifo = parseFloat(destroyFormatRupiah($('#sub_total_fifo').val()));
 
         if (listStockInventori.length === 0) {
             Swal.fire({
@@ -882,10 +994,34 @@
                 confirmButtonText: 'Oke',
             });
             return;
-        } else if (spesifikasiId == '') {
+        } else if (barangId == '') {
             Swal.fire({
                 icon: 'error',
                 title: 'Kode & Nama Barang Wajib Diisi',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Oke',
+            });
+            return;
+        } else if (isNaN(hargaSatuanFifo)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Harga satuan wajib diisi',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Oke',
+            });
+            return;
+        } else if (isNaN(nilaiTukarFifo)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Nilai tukar wajib diisi',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Oke',
+            });
+            return;
+        } else if (isNaN(subTotalFifo)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Sub total wajib diisi',
                 confirmButtonColor: '#4e73df',
                 confirmButtonText: 'Oke',
             });
@@ -916,15 +1052,21 @@
                         if (!isIDSelected && qtyMutasiFifo != 0 && parseFloat(listStockInventori[i].qty_diterima) != 0) {
                             var mutasiQty = Math.min(qtyMutasiFifo, parseFloat(listStockInventori[i].qty_diterima));
                             var hasilMutasi = v.qty_diterima - mutasiQty;
+                            var subTotal = (nilaiTukarFifo * hargaSatuanFifo) * mutasiQty;
 
                             listStockInventori[i].mutasi = {
-                                qty_mutasi: parseFloat(mutasiQty),
+                                qty_mutasi: parseFloat(mutasiQty).toFixed(2),
                                 unit_id_mutasi: v.unit_id,
                                 unit_name_mutasi: v.kode_satuan,
                                 qty_konversi: parseFloat(mutasiQty).toFixed(2),
                                 unit_id_konversi: v.unit_id,
                                 unit_name_konversi: v.kode_satuan,
-                                hasil_mutasi: parseFloat(hasilMutasi).toFixed(2)
+                                hasil_mutasi: parseFloat(hasilMutasi).toFixed(2),
+                                valas_id: valasIdFifo,
+                                valas_name: valasNameFifo,
+                                nilai_tukar: nilaiTukarFifo,
+                                harga_satuan: hargaSatuanFifo,
+                                sub_total: parseFloat(subTotal).toFixed(2),
                             }
 
                             listStockSelected.push(listStockInventori[i]);
@@ -1116,6 +1258,66 @@
         hitungHasilMutasi();
     });
 
+    // Keyup Bawah
+    $('#harga_satuan').keyup(function(e) {
+        e.preventDefault();
+        var hargaSatuan = destroyFormatRupiah($('#harga_satuan').val());
+        var qtyMutasi = destroyFormatRupiah($('#qty_mutasi').val());
+        var nilaiTukar = destroyFormatRupiah($('#nilai_tukar').val());
+        var subTotal = ((hargaSatuan * nilaiTukar) * qtyMutasi).toFixed(2);
+        $('#sub_total').val(greatFormatRupiah(subTotal));
+    });
+
+    $('#sub_total').keyup(function(e) {
+        e.preventDefault();
+        var subTotal = destroyFormatRupiah($('#sub_total').val());
+        var qtyMutasi = destroyFormatRupiah($('#qty_mutasi').val());
+
+        var hargaSatuan = (subTotal / qtyMutasi).toFixed(2);
+        $('#harga_satuan').val(greatFormatRupiah(hargaSatuan));
+        $('#nilai_tukar').val(1);
+    });
+
+    $('#nilai_tukar').keyup(function(e) {
+        e.preventDefault();
+        var nilaiTukar = destroyFormatRupiah($('#nilai_tukar').val());
+        var hargaSatuan = destroyFormatRupiah($('#harga_satuan').val());
+        var qtyMutasi = destroyFormatRupiah($('#qty_mutasi').val());
+
+        var subTotal = ((hargaSatuan * nilaiTukar) * qtyMutasi).toFixed(2);
+        $('#sub_total').val(greatFormatRupiah(subTotal));
+    });
+
+    // Keyup Fifo
+    $('#harga_satuan_fifo').keyup(function(e) {
+        e.preventDefault();
+        var hargaSatuan = destroyFormatRupiah($('#harga_satuan_fifo').val());
+        var qtyMutasi = destroyFormatRupiah($('#qty_mutasi_fifo').val());
+        var nilaiTukar = destroyFormatRupiah($('#nilai_tukar_fifo').val());
+        var subTotal = ((hargaSatuan * nilaiTukar) * qtyMutasi).toFixed(2);
+        $('#sub_total_fifo').val(greatFormatRupiah(subTotal));
+    });
+
+    $('#sub_total_fifo').keyup(function(e) {
+        e.preventDefault();
+        var subTotal = destroyFormatRupiah($('#sub_total_fifo').val());
+        var qtyMutasi = destroyFormatRupiah($('#qty_mutasi_fifo').val());
+
+        var hargaSatuan = (subTotal / qtyMutasi).toFixed(2);
+        $('#harga_satuan_fifo').val(greatFormatRupiah(hargaSatuan));
+        $('#nilai_tukar_fifo').val(1);
+    });
+
+    $('#nilai_tukar_fifo').keyup(function(e) {
+        e.preventDefault();
+        var nilaiTukar = destroyFormatRupiah($('#nilai_tukar_fifo').val());
+        var hargaSatuan = destroyFormatRupiah($('#harga_satuan_fifo').val());
+        var qtyMutasi = destroyFormatRupiah($('#qty_mutasi_fifo').val());
+
+        var subTotal = ((hargaSatuan * nilaiTukar) * qtyMutasi).toFixed(2);
+        $('#sub_total_fifo').val(greatFormatRupiah(subTotal));
+    });
+
     function hitungHasilMutasi() {
         var qty_mutasi = destroyFormatRupiah($('#qty_mutasi').val());
         var konversi = parseFloat($('#unit_id_mutasi option:selected').data('konversi_satuan'));
@@ -1168,9 +1370,20 @@
                         $('#operasi_mutasi_detail').val(item.mutasi.operasi_mutasi_detail).change();
                         $('#qty_asal').val(greatFormatRupiah(item.qty_diterima));
 
+                        if (item.mutasi.valas_id == null) {
+                            $('#valas_id').val(30).change();
+                            $('#nilai_tukar').val(greatFormatRupiah(1));
+                        } else {
+                            $('#valas_id').val(item.mutasi.valas_id).change();
+                            $('#nilai_tukar').val(greatFormatRupiah(item.mutasi.nilai_tukar));
+                        }
+                        $('#harga_satuan').val(greatFormatRupiah(item.mutasi.harga_satuan));
+                        $('#nilai_tukar').val(greatFormatRupiah(item.mutasi.nilai_tukar));
+                        $('#sub_total').val(greatFormatRupiah(item.mutasi.sub_total));
+
                         // append select
                         dropdownUnitMutasi(satuanmutasiArr);
-                        $('#unit_id_mutasi').val(item.mutasi.unit_id_konversi).change();
+                        $('#unit_id_mutasi').val(item.mutasi.unit_id_mutasi).change();
 
                         $('#detailMutasiModal').modal('show');
                     } else {
@@ -1303,9 +1516,11 @@
         var no = 1;
         if (data.length == 0) {
             var newRow = $('<tr>');
-            newRow.append($('<td  colspan="17" >').text("Tidak Ada Data"));
+            newRow.append($('<td  colspan="15" >').text("Tidak Ada Data"));
             table.find('tfoot').append(newRow);
         } else {
+            var totalKeluar = 0;
+            var totalSubTotal = 0;
             $.each(data, function(i, v) {
                 var newRow = $('<tr>');
                 newRow.append($('<td>').html(
@@ -1313,21 +1528,19 @@
                    ${no++} 
                 `
                 ));
-                newRow.append($('<td>').text(v.reference_type));
-                newRow.append($('<td>').text(v.supplier_name));
+                newRow.append($('<td>').text(v.lpb_date));
+                newRow.append($('<td>').text(v.reference_no));
                 newRow.append($('<td>').text(v.kode_barang));
                 newRow.append($('<td>').text(v.barang_name));
                 newRow.append($('<td>').text(v.spesifikasi));
                 newRow.append($('<td>').text(v.bc_detail));
-                newRow.append($('<td>').text(v.po_no));
-                newRow.append($('<td>').text(v.po_date));
-                newRow.append($('<td>').text(v.lpb_date));
-                newRow.append($('<td>').text(v.reference_no));
-                newRow.append($('<td>').text(greatFormatRupiah(v.qty_diterima)));
                 newRow.append($('<td>').text(greatFormatRupiah(v.mutasi.qty_mutasi)));
                 newRow.append($('<td>').text(v.mutasi.unit_name_mutasi));
-                newRow.append($('<td>').text(greatFormatRupiah(v.mutasi.qty_konversi)));
-                newRow.append($('<td>').text(v.mutasi.unit_name_konversi));
+                newRow.append($('<td>').text(v.mutasi.valas_name));
+                newRow.append($('<td>').text(greatFormatRupiah(v.mutasi.harga_satuan)));
+                newRow.append($('<td>').text(greatFormatRupiah(v.mutasi.nilai_tukar)));
+                newRow.append($('<td>').text(v.mutasi.unit_name_mutasi));
+                newRow.append($('<td>').text(greatFormatRupiah(v.mutasi.sub_total)));
                 newRow.append($('<td >').html(
                     `
                     <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detail('${v.id}')">
@@ -1339,8 +1552,27 @@
                 `
                 ));
                 table.find('tbody').append(newRow);
+
+                totalKeluar += parseFloat(v.mutasi.qty_mutasi);
+                totalSubTotal += parseFloat(v.mutasi.sub_total);
             });
+
+            table.find('tfoot').empty();
+            var newRow = $('<tr>');
+            newRow.append($('<td colspan="7" style="text-align:right;"><b>TOTAL</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalKeluar) + '</b></td>'));
+            newRow.append($('<td><b></b></td>'));
+            newRow.append($('<td><b></b></td>'));
+            newRow.append($('<td><b></b></td>'));
+            newRow.append($('<td><b></b></td>'));
+            newRow.append($('<td><b></b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalSubTotal) + '</b></td>'));
+            newRow.append($('<td><b></b></td>'));
+            table.find('tfoot').append(newRow);
+
         }
+
+        console.log(data);
 
     }
 
