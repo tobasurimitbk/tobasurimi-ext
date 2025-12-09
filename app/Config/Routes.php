@@ -3002,6 +3002,8 @@ $routes->get('/laporan-sales/sales-per-pelanggan', 'Laporan\Penjualan\PenjualanP
 $routes->get('/laporan-sales/sales-per-pelanggan/all', 'Laporan\Penjualan\PenjualanPerPelanggan::allTransaksi', ['filter' => 'Auth']);
 $routes->get('/laporan-sales/sales-per-pelanggan/printPDF/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\PenjualanPerPelanggan::printPDF/$1/$2/$3/$4', ['filter' => 'Auth']);
 $routes->get('/laporan-sales/sales-per-pelanggan/printExcel/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\PenjualanPerPelanggan::printExcel/$1/$2/$3/$4', ['filter' => 'Auth']);
+$routes->get('/laporan-sales/sales-per-pelanggan-per-penjual/printPDF/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\PenjualanPerPelanggan::printPDFPerPelangganPerPenjual/$1/$2/$3/$4', ['filter' => 'Auth']);
+$routes->get('/laporan-sales/sales-per-pelanggan-per-penjual/printExcel/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\PenjualanPerPelanggan::printExcelPerPelangganPerPenjual/$1/$2/$3/$4', ['filter' => 'Auth']);
 
 $routes->get('/laporan-sales/rincian-sales-per-pelanggan', 'Laporan\Penjualan\RincianPenjualanPerPelanggan::index', ['filter' => 'Auth']);
 $routes->get('/laporan-sales/rincian-sales-per-pelanggan/all', 'Laporan\Penjualan\RincianPenjualanPerPelanggan::allTransaksi', ['filter' => 'Auth']);

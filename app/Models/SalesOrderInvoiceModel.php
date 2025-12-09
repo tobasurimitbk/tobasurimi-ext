@@ -231,11 +231,13 @@ class SalesOrderInvoiceModel extends Model
                     sales_order_invoice.id,
                     customers.name AS nama_pelanggan,
                     customers.kode AS kode_pelanggan,
+                    customers.jenis_penjualan AS jenis_penjualan,
                     SUM(barang_master_sales.harga_pokok) AS sum_harga_pokok,
                     SUM(barang_master_sales.harga_pokok * sales_order_invoice_detail.qty_invoice) AS amt_harga_pokok,
                     SUM(sales_order_invoice_detail.qty_invoice) AS sum_qty_invoice,
                     SUM(sales_order_invoice_detail.amount_invoice) AS sum_amount_invoice,
-                    COUNT(DISTINCT sales_order_invoice.id) AS count_invoice";
+                    COUNT(DISTINCT sales_order_invoice.id) AS count_invoice,
+                    employees.name AS salesName";
 
         $salesOrderInvoiceLokal = $this->asObject()
             ->select($selectQry)
@@ -243,7 +245,9 @@ class SalesOrderInvoiceModel extends Model
             ->join('employees', 'employees.id = customers.sales_id', 'left')
             ->join('sales_order', 'sales_order.id = sales_order_invoice.document_id AND sales_order_invoice.document_type = "pesanan"', 'LEFT')
             ->join('surat_jalan_so', 'surat_jalan_so.id = sales_order_invoice.document_id AND sales_order_invoice.document_type = "pengiriman"', 'LEFT')
+            ->join('sales_order as so_sj', 'so_sj.surat_jalan_so_id = surat_jalan_so.id', 'left')
             ->join('sales_order_invoice_detail', 'sales_order_invoice_detail.id_sales_order_invoice = sales_order_invoice.id', 'LEFT')
+            // ->join('employees', 'employees.id = COALESCE(sales_order.sales_id, so_sj.sales_id)', 'left')
             ->join('barang_master_sales', 'barang_master_sales.id = sales_order_invoice_detail.id_barang_invoice', 'LEFT')
             ->where($condition)
             ->groupBy('sales_order_invoice.id_customer')

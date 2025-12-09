@@ -11,10 +11,16 @@
         </button>
         <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
             <li>
-                <button class="dropdown-item" onclick="printPDF('<?= base_url("/laporan-sales/sales-per-pelanggan/printPDF"); ?>')">PDF</button>
+                <button class="dropdown-item" onclick="printPDF('<?= base_url("/laporan-sales/sales-per-pelanggan/printPDF"); ?>')">PDF Per Pelanggan</button>
             </li>
             <li>
-                <button class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-sales/sales-per-pelanggan/printExcel"); ?>')">EXCEL</button>
+                <button class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-sales/sales-per-pelanggan/printExcel"); ?>')">EXCEL Per Pelanggan</button>
+            </li>
+            <li>
+                <button class="dropdown-item" onclick="printPDF('<?= base_url("/laporan-sales/sales-per-pelanggan-per-penjual/printPDF"); ?>')">PDF Per Penjual</button>
+            </li>
+            <li>
+                <button class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-sales/sales-per-pelanggan-per-penjual/printExcel"); ?>')">EXCEL Per Penjual</button>
             </li>
         </ul>
     </div>
@@ -75,8 +81,9 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th class="text-center">No</th>
-                                <th class="text-center">Nama Pelanggan</th>
                                 <th class="text-center">No. Pelanggan</th>
+                                <th class="text-center">Nama Pelanggan</th>
+                                <th class="text-center">Nama Penjual</th>
                                 <th class="text-center">Jumlah Data</th>
                                 <th class="text-center">Jumlah</th>
                             </tr>
@@ -94,6 +101,22 @@
 <script>
     let sort = "createdAt";
     let sortType = "desc";
+
+    // Set default tanggal: awal bulan - hari ini
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    function formatDate(date) {
+        // Format dd/mm/yyyy
+        let dd = String(date.getDate()).padStart(2, '0');
+        let mm = String(date.getMonth() + 1).padStart(2, '0'); // Januari = 0
+        let yyyy = date.getFullYear();
+        return dd + '/' + mm + '/' + yyyy;
+    }
+
+    $(".dateStart").val(formatDate(firstDay));
+    $(".dateEnd").val(formatDate(today));
+
     $(document).ready(function() {
         const csrfToken = '<?= csrf_token() ?>';
         const table = $('.dataTable').DataTable({
@@ -136,12 +159,16 @@
                     width: "5%"
                 },
                 {
+                    data: "kode_pelanggan",
+                    className: "text-center"
+                },
+                {
                     data: "nama_pelanggan",
                     className: "text-left"
                 },
                 {
-                    data: "kode_pelanggan",
-                    className: "text-center"
+                    data: "nama_penjual",
+                    className: "text-left"
                 },
                 {
                     data: "count_invoice",
