@@ -1269,7 +1269,7 @@
                                 name="qty_hasil_rebus[]" 
                                 data-id="${item.id}"
                                 data-index="${i}"
-                                value="${greatFormatRupiah(item.output?.qty) || 0}" readonly />
+                                value="${greatFormatRupiah(item.output?.qty) || 0}">
                         </td>
                         <td>${item.output?.kode_satuan || '-'}</td>
                         <td><button type="button" class="btn btn-danger btn-sm btn-remove-row">Hapus</button></td>
@@ -1346,6 +1346,41 @@
 
         // --- Logic Ubah Qty Rebus Manual ---
         $tbody.on('input', '.qty-rebus-input, .qty-hasil-input, .total-hasil-input', function() {
+            updateTotalRow();
+        });
+
+        // Recalculate total-hasil-input when any qty-hasil-input changed
+        $tbody.on('input', '.qty-hasil-input', function () {
+            const $row = $(this).closest('tr');
+            const stockID = $row.data('group');
+
+            // Cari semua baris dalam grup yang sama
+            const groupRows = $(`tr.data-row[data-group="${stockID}"]`);
+
+            let newTotal = 0;
+
+            groupRows.each(function () {
+                const val = destroyFormatRupiah($(this).find('.qty-hasil-input').val());
+                if (!isNaN(val)) newTotal += val;
+            });
+
+            // Set input total group di atas
+            const formatted = greatFormatRupiah(newTotal);
+            $(`.total-hasil-input[data-stock-id="${stockID}"]`).val(formatted);
+
+            // Update ke listStockSelected
+            listStockSelected.forEach(item => {
+                if (item.output?.stock_id == stockID) {
+                    // biarkan tiap baris pegang qty masing²
+                    const baris = groupRows.index($(`tr[data-id="${item.id}"]`));
+                    if (baris >= 0) {
+                        item.output.qty = destroyFormatRupiah(
+                            $(groupRows[baris]).find('.qty-hasil-input').val()
+                        );
+                    }
+                }
+            });
+
             updateTotalRow();
         });
 
