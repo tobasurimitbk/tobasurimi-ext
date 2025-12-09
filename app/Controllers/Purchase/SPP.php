@@ -245,7 +245,7 @@ class SPP extends BaseController
                 'nama_barang' => $s->nama_barang,
                 'qty' => $s->qty,
                 'unit' => $s->satuan_id,
-                'note' => $s->keterangan,
+                'note' => trim($s->keterangan),
             ]);
         }
 
@@ -297,7 +297,7 @@ class SPP extends BaseController
                 'nama_barang' => $s->nama_barang,
                 'qty' => $s->qty,
                 'unit' => $s->satuan_id,
-                'note' => $s->keterangan,
+                'note' => trim($s->keterangan),
             ]);
         }
 
@@ -332,7 +332,7 @@ class SPP extends BaseController
 
                 if ($poDetailBarang) {
                     $this->amPurchaseOrderDetailModel->update($poDetail['id'], [
-                        'note' => $poDetailBarang['note']
+                        'note' => trim($poDetailBarang['note'])
                     ]);
                 }
             }
