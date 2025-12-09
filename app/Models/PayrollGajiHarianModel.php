@@ -142,18 +142,33 @@ class PayrollGajiHarianModel extends Model
             ->where('periode <=', $endDate)
             ->findAll();
 
+        $bigDays = $bigDaysModel->where('company_id', $companyId)->where('deletedAt', null)->findAll();
+        $tanggalBigDays = array_column($bigDays, 'date');
+
         $insertRows = [];
         $totalNominalGajiDiterimaPerPayroll = []; // if you want to accumulate per payroll_id
 
         foreach ($attendancesInRange as $p) {
             $employeeID = $p['employee_id'];
             $tanggal = $p['periode'];
+            $dayName = date('D', strtotime($tanggal)); // get nama hari
+            $statusLibur = false;
 
             // cari payroll id untuk employee ini
             $payrollID = $mapEmployeePayroll[$employeeID] ?? null;
             if ($payrollID === null && $p['status'] == "ALPHA_A") {
                 // skip kalau payroll tidak ditemukan (safety)
                 continue;
+            }
+
+            if (in_array($tanggal, $tanggalBigDays)) {
+                // Hari Besar
+                $statusLibur = true;
+            }
+
+            if ($dayName == 'Sun') {
+                // Hari Minggu
+                $statusLibur = true;
             }
 
             // ambil jamKerjaDetail dari map (fallback null)
@@ -182,7 +197,7 @@ class PayrollGajiHarianModel extends Model
             // rumus yang kamu pakai: ((gajiHarian + gajiCadangan) / 7) * totalJamKerja
             // $nominalDiterima = (($nominalGajiHarian + $nominalGajiCadangan) / 7) * $totalJamKerja;
 
-            if ($p['isApproved'] && !in_array($p['status'], ["LIBUR_L", "ALPHA_A"])) {
+            if ($p['isApproved'] && !in_array($p['status'], ["LIBUR_L", "ALPHA_A"]) && $statusLibur == false) {
                 // Di Approved Wajib Dibayar
                 // gaji harian + tambahan
                 $nominalDiterima = $nominalGajiHarian + $nominalGajiCadangan;
