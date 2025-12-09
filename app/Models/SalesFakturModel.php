@@ -176,6 +176,81 @@ class SalesFakturModel extends Model
         ];
     }
 
+    public function getSalesOrderLokalPerBarang($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'createdAt'         => 'sales_faktur.createdAt',
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'sales_faktur.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "
+                    sales_faktur.id,
+                    barang_master_sales.barang_name AS barang_name,
+                    SUM(sales_faktur_detail.qty) AS sum_qty_invoice,
+                    satuans.kode_satuan AS kode_satuan,
+                    SUM(sales_faktur_detail.amount) AS sum_amount_invoice,
+                    SUM(barang_master_sales.harga_pokok * sales_faktur_detail.qty) AS amt_harga_pokok,
+                    COUNT(DISTINCT sales_faktur.id) AS count_invoice,
+                    barang_master_sales.kode_barang AS kode_barang";
+
+        $salesOrderInvoiceLokal = $this->asObject()
+            ->select($selectQry)
+            ->join('supplier_lokals', 'supplier_lokals.id = sales_faktur.id_customer', 'left')
+            ->join('employees', 'employees.id = sales_faktur.sales_id', 'left')
+            ->join('sales_faktur_detail', 'sales_faktur_detail.id_sales_order = sales_faktur.id', 'LEFT')
+            ->join('barang_master_sales', 'barang_master_sales.id = sales_faktur_detail.id_barang', 'LEFT')
+            ->join('satuans', 'satuans.id = barang_master_sales.satuan_id', 'LEFT')
+            ->where($condition)
+            ->groupBy('sales_faktur_detail.id_barang')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $salesOrderInvoiceLokal->countAllResults(false);
+
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_barang']) {
+            $salesOrderInvoiceLokal->groupStart();
+        }
+
+        if ($addCondition['search']) {
+            $salesOrderInvoiceLokal
+                ->like('no_sales_order', $addCondition['search']);
+        }
+
+        if ($addCondition['filter_barang']) {
+            $salesOrderInvoiceLokal->where('sales_faktur_detail.id_barang', $addCondition['filter_barang']);
+        }
+
+        if ($addCondition['dateStart']) {
+            $salesOrderInvoiceLokal->where('sales_faktur.order_date >=',  $addCondition['dateStart']);
+        }
+        if ($addCondition['dateEnd']) {
+            $salesOrderInvoiceLokal->where('sales_faktur.order_date <=', $addCondition['dateEnd']);
+        }
+
+        $salesOrderInvoiceLokal->where('tipe_sales_order', 'LOKAL');
+
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_barang']) {
+            $salesOrderInvoiceLokal->groupEnd();
+        }
+
+        $totalFilteredData = $salesOrderInvoiceLokal->countAllResults(false);
+
+        if ($limit !== null && $offset !== null) {
+            $data = $salesOrderInvoiceLokal->findAll((int)$limit, (int)$offset);
+        } else {
+            $data = $salesOrderInvoiceLokal->findAll();
+        }
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
+    }
+
     public function getSalesOrderLokalById($id)
     {
         $selectQry = "sales_faktur.*,
