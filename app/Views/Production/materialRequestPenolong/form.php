@@ -1090,10 +1090,10 @@
         var id_selected = getIDListDataSelected();
 
         $.each(listStockAsal, function(i, v) {
-            var currentID = Number(v.id);
+            var currentID = (v.id);
             if ($.inArray(currentID, dataIds) !== -1) {
                 var isIDSelected = $.grep(listStockSelectedBahan, function(item) {
-                    return item.id == Number(currentID);
+                    return item.id == (currentID);
                 }).length > 0;
 
                 if (!isIDSelected) {
