@@ -16,6 +16,7 @@ use App\Models\RMImportPOModel;
 use App\Models\RMPurchaseOrderModel;
 use App\Models\SatuansModel;
 use Dompdf\Dompdf;
+use Exception;
 
 class SPP extends BaseController
 {
@@ -423,14 +424,34 @@ class SPP extends BaseController
 
     public function deleteSPPDetail()
     {
-        $id = decrypt($this->request->getVar('id'));
-        $this->SppDetailModel->delete($id);
+        try {
+            $id = decrypt($this->request->getVar('id'));
+            // cari spp detail first
+            $sppDetailFirst = $this->SppDetailModel->where('id', $id)->first();
+            // hapus detail spp
+            $this->SppDetailModel->delete($id);
+            // Get ALl Spp setelah dihapus
+            $sppDetailAll = $this->SppDetailModel
+                ->where('purchase_request_id', $sppDetailFirst['purchase_request_id'])
+                ->where('deletedAt', null)
+                ->findAll();
+            // hitung all spp setelah dihapus jika kosong maka hapus parentnya
+            if (count($sppDetailAll) == 0) {
+                $this->SppModel->delete($sppDetailFirst['purchase_request_id']);
+            }
 
-        return response()->setJSON([
-            'message' => "SPP Detail Berhasil Dihapus",
-            'token' => csrf_hash(),
-            'status' => true
-        ]);
+            return response()->setJSON([
+                'message' => "SPP Detail Berhasil Dihapus",
+                'token' => csrf_hash(),
+                'status' => true
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'status' => false,
+                'token' => $e->getMessage(),
+                'status' => csrf_hash()
+            ]);
+        }
     }
 
     public function printTable()
