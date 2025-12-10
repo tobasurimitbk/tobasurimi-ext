@@ -27,10 +27,10 @@ use DateTime;
 use Exception;
 use Locale;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Writer\Xls;
 
 use function PHPSTORM_META\map;
 
@@ -1608,8 +1608,9 @@ class Attendance extends BaseController
             ]);
 
         // ================= Download =================
-        $filename = "Log_Presensi_{$monthReq}.xlsx";
-        $writer = new Xlsx($spreadsheet);
+        ob_end_clean(); // penting
+        $filename = "Log_Presensi_{$monthReq}.xls";
+        $writer = new Xls($spreadsheet);
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment;filename=\"{$filename}\"");
@@ -1946,12 +1947,14 @@ class Attendance extends BaseController
         }
 
         // output excel
-        $filename = "Presensi_Harian_{$startDate}_sd_{$endDate}.xlsx";
+        ob_end_clean(); // penting
+        $filename = "Presensi_Harian_{$startDate}_sd_{$endDate}.xls";
+
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment;filename=\"{$filename}\"");
         header('Cache-Control: max-age=0');
 
-        $writer = new Xlsx($spreadsheet);
+        $writer = new Xls($spreadsheet);
         $writer->save('php://output');
         exit();
     }
@@ -2328,8 +2331,9 @@ class Attendance extends BaseController
             ]);
 
         // ================= Download =================
-        $filename = "Real_Presensi_{$monthReq}.xlsx";
-        $writer = new Xlsx($spreadsheet);
+        ob_end_clean(); // penting
+        $filename = "Real_Presensi_{$monthReq}.xls";
+        $writer = new Xls($spreadsheet);
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment;filename=\"{$filename}\"");
@@ -2548,8 +2552,9 @@ class Attendance extends BaseController
         }
 
         // Output file
-        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-        $fileName = "Presensi_Per_Karyawan.xlsx";
+        ob_end_clean(); // penting
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xls($spreadsheet);
+        $fileName = "Presensi_Per_Karyawan.xls";
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment; filename=\"$fileName\"");
         $writer->save("php://output");
@@ -2680,12 +2685,12 @@ class Attendance extends BaseController
         }
 
         // ✅ Download
-        $fileName = 'Triwulan_Presensi_' . date('Ymd_His') . '.xlsx';
+        $fileName = 'Triwulan_Presensi_' . date('Ymd_His') . '.xls';
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment;filename=\"{$fileName}\"");
         header('Cache-Control: max-age=0');
 
-        $writer = new Xlsx($spreadsheet);
+        $writer = new Xls($spreadsheet);
         $writer->save('php://output');
         exit();
     }
@@ -3065,12 +3070,13 @@ class Attendance extends BaseController
         }
 
         // output excel
-        $filename = "Real_Presensi_Harian_{$startDate}_sd_{$endDate}.xlsx";
+        ob_end_clean(); // penting
+        $filename = "Real_Presensi_Harian_{$startDate}_sd_{$endDate}.xls";
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment;filename=\"{$filename}\"");
         header('Cache-Control: max-age=0');
 
-        $writer = new Xlsx($spreadsheet);
+        $writer = new Xls($spreadsheet);
         $writer->save('php://output');
         exit();
     }
