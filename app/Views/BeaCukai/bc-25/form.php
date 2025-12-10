@@ -184,6 +184,7 @@
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select divisi_id" id="divisi_id" name="divisi_id">
                                         <option value=""></option>
+                                        <option value="ALL" selected>ALL</option>
                                         <?php foreach ($divisi as $d): ?>
                                             <option value="<?= $d['id'] ?>"><?= $d['divisi'] ?></option>
                                         <?php endforeach; ?>

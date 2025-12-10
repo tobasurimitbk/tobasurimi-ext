@@ -389,7 +389,7 @@
                         <div class="col-md-12">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control grade" name="grade" id="grade" placeholder="Grade (Opsional)">
-                                <label for="floatingInput">Grade</label>
+                                <label for="floatingInput">Grade (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-12">
@@ -481,7 +481,7 @@
                         </div>
                         <div class="col-sm-12">
                             <div class="form">
-                                <label class="mt-2 text-dark">
+                                <label class="mt-2">
                                     <b>Masukkan ke Penagihan Proforma Invoice,</b> (Jika Aktif Maka Akan Dijadikan Penagihan Proforma Invoice Ini)
                                 </label>
                                 <div class="form-control border-0 custom-toggle-switch" style="margin-top: -15px;">
@@ -915,9 +915,9 @@
 
         var validatorSizeBreakdown = $('.create-form-size-breakdown').validate({
             rules: {
-                grade: {
-                    required: true
-                },
+                // grade: {
+                //     required: true
+                // },
                 qty: {
                     required: true
                 },
@@ -929,9 +929,9 @@
                 }
             },
             messages: {
-                grade: {
-                    required: "Grade required"
-                },
+                // grade: {
+                //     required: "Grade required"
+                // },
                 qty: {
                     required: "Qty required"
                 },
@@ -1505,8 +1505,8 @@
             listSizeBreakdown.map(item => {
                 var newRow = $('<tr style="color:whitesmoke;">');
                 newRow.append($('<td style="text-align:center;">').text(no++));
-                newRow.append($('<td>').text(item.size));
                 newRow.append($('<td>').text(item.grade));
+                newRow.append($('<td>').text(item.size));
                 newRow.append($('<td>').text(item.packing_size));
                 newRow.append($('<td>').text(item.satuan_size_code));
                 newRow.append($('<td>').text(greatFormatRupiah(item.qty)));
