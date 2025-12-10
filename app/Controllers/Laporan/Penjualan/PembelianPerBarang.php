@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\BarangMasterSalesModel;
 use App\Models\CustomerModel;
 use App\Models\SalesFakturModel;
+use App\Models\SupplierLokalModel;
 use Dompdf\Dompdf;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -15,12 +16,14 @@ class PembelianPerBarang extends BaseController
     protected $this_company_id;
     protected $barangMasterSalesModel;
     protected $salesFakturModel;
+    protected $supplierLokalModel;
 
     public function __construct()
     {
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->barangMasterSalesModel = new BarangMasterSalesModel();
         $this->salesFakturModel = new SalesFakturModel();
+        $this->supplierLokalModel = new SupplierLokalModel();
     }
 
     public function index()
@@ -631,6 +634,235 @@ class PembelianPerBarang extends BaseController
 
         // Set judul file
         $filename = "Laporan Pembelian Per Barang (Kuantitas).xlsx";
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+
+    public function printPDFPemasok($tglAwal = "all", $tglAkhir = "now", $filter = "all", $search = "all")
+    {
+        $condition = [
+            "sales_faktur.deletedAt" => null,
+            "sales_faktur.tipe_sales_order" => 'LOKAL'
+        ];
+
+        $addCondition = [
+            "search" => $search != "all" ? $search : null,
+            "filter_barang" => $filter != "all" ? $filter : null,
+            "dateStart" => $tglAwal != "all" ? date("Y-m-d", strtotime($tglAwal)) : "",
+            "dateEnd" => $tglAkhir != "now" ? date("Y-m-d", strtotime($tglAkhir)) : "",
+        ];
+
+        // Ambil semua supplier yg punya transaksi
+        $listSupplier = $this->supplierLokalModel
+            ->select('supplier_lokals.id, supplier_lokals.name')
+            ->join('sales_faktur', 'sales_faktur.id_customer = supplier_lokals.id', 'left')
+            ->where('sales_faktur.deletedAt', null)
+            ->groupBy('supplier_lokals.id')
+            ->findAll();
+
+        // Ambil data pivot dari model baru
+        $rawData = $this->salesFakturModel
+            ->getSalesOrderPivotPerSupplier($condition, $addCondition);
+
+        // Pivoting manually
+        $result = [];
+        foreach ($rawData as $row) {
+
+            $barangId = $row->id_barang;
+
+            if (!isset($result[$barangId])) {
+                $result[$barangId] = [
+                    'barang_name' => $row->barang_name,
+                    'kode_barang' => $row->kode_barang,
+                    'kode_satuan' => $row->kode_satuan,
+                    'suppliers' => []
+                ];
+            }
+
+            $result[$barangId]['suppliers'][$row->supplier_id] = number_format(floatval($row->amount_supplier));
+        }
+
+        // Convert to final output array
+        $finalData = [];
+        $no = 1;
+
+        foreach ($result as $barangId => $barang) {
+
+            $row = [
+                'no' => $no++,
+                'barang_name' => $barang['barang_name'],
+                'kode_barang' => $barang['kode_barang'],
+                'kode_satuan' => $barang['kode_satuan'],
+            ];
+
+            // Tambahkan qty per supplier
+            foreach ($listSupplier as $sup) {
+                $row['sup_' . $sup['id']] =
+                    $barang['suppliers'][$sup['id']] ?? 0;
+            }
+
+            $finalData[] = $row;
+        }
+
+        // Data yang akan dikirim ke view
+        $data = [
+            "data" => $finalData,
+            "listSupplier" => $listSupplier,
+            "dateStart" => $tglAwal != "all" ? date("d/m/Y", strtotime($tglAwal)) : "All",
+            "dateEnd" => $tglAkhir != "now" ? date("d/m/Y", strtotime($tglAkhir)) : "Now",
+        ];
+
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml(view('Laporan/LaporanSales/LaporanPembelianPerBarang/print-pemasok', $data));
+        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->render();
+        $dompdf->stream("Laporan Pembelian Barang per Supplier.pdf", array("Attachment" => false));
+        exit(0);
+    }
+
+    public function printExcelPemasok($tglAwal = "all", $tglAkhir = "now", $filter = "all", $search = "all")
+    {
+        $condition = [
+            "sales_faktur.deletedAt" => null,
+            "sales_faktur.tipe_sales_order" => 'LOKAL'
+        ];
+
+        $addCondition = [
+            "search" => $search != "all" ? $search : null,
+            "filter_barang" => $filter != "all" ? $filter : null,
+            "dateStart" => $tglAwal != "all" ? date("Y-m-d", strtotime($tglAwal)) : "",
+            "dateEnd" => $tglAkhir != "now" ? date("Y-m-d", strtotime($tglAkhir)) : "",
+        ];
+
+        // Supplier dinamis (SAMA DGN PDF)
+        $listSupplier = $this->supplierLokalModel
+            ->select('supplier_lokals.id, supplier_lokals.name')
+            ->join('sales_faktur', 'sales_faktur.id_customer = supplier_lokals.id', 'left')
+            ->where('sales_faktur.deletedAt', null)
+            ->groupBy('supplier_lokals.id')
+            ->findAll();
+
+        // Ambil pivot data (SAMA DGN PDF)
+        $rawData = $this->salesFakturModel
+            ->getSalesOrderPivotPerSupplier($condition, $addCondition);
+
+        // Pivot manual (SAMA DGN PDF)
+        $result = [];
+        foreach ($rawData as $row) {
+
+            $barangId = $row->id_barang;
+
+            if (!isset($result[$barangId])) {
+                $result[$barangId] = [
+                    'barang_name' => $row->barang_name,
+                    'kode_barang' => $row->kode_barang,
+                    'kode_satuan' => $row->kode_satuan,
+                    'suppliers' => []
+                ];
+            }
+
+            $result[$barangId]['suppliers'][$row->supplier_id] =
+                number_format(floatval($row->amount_supplier));
+        }
+
+        // Convert ke bentuk final (SAMA DGN PDF)
+        $finalData = [];
+        $no = 1;
+
+        foreach ($result as $barangId => $barang) {
+
+            $row = [
+                'no' => $no++,
+                'barang_name' => $barang['barang_name'],
+                'kode_barang' => $barang['kode_barang'],
+                'kode_satuan' => $barang['kode_satuan'],
+            ];
+
+            foreach ($listSupplier as $sup) {
+                $row['sup_' . $sup['id']] =
+                    $barang['suppliers'][$sup['id']] ?? 0;
+            }
+
+            $finalData[] = $row;
+        }
+
+        // ===================================
+        //            MULAI EXCEL
+        // ===================================
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // HEADER TIDAK DIUBAH SESUAI PERMINTAAN
+        $sheet->setCellValue('A1', 'TOBA FISH');
+        $sheet->mergeCells('A1:E1');
+
+        $sheet->setCellValue('A2', 'Pembelian Barang per Pemasok');
+        $sheet->mergeCells('A2:E2');
+
+        $sheet->getStyle('A1:A2')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('A1:A2')->getAlignment()->setHorizontal(
+            \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER
+        );
+
+        $sheet->setCellValue(
+            'A3',
+            'Periode: ' .
+                ($tglAwal != "all" ? date("d/m/Y", strtotime($tglAwal)) : "All")
+                . ' - ' .
+                ($tglAkhir != "now" ? date("d/m/Y", strtotime($tglAkhir)) : "Now")
+        );
+        $sheet->mergeCells('A3:E3');
+        $sheet->getStyle('A3:A3')->getAlignment()->setHorizontal(
+            \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER
+        );
+
+        // Header tabel (MENYESUAIKAN PDF)
+        $col = 'A';
+        $sheet->setCellValue($col++ . '5', 'No');
+        $sheet->setCellValue($col++ . '5', 'Keterangan Barang');
+
+        // Supplier dinamis
+        foreach ($listSupplier as $s) {
+            $sheet->setCellValue($col++ . '5', $s['name']);
+        }
+
+        // STYLE HEADER (tidak diubah)
+        $sheet->getStyle('A5:' . chr(ord('A') + count($listSupplier) + 1) . '5')
+            ->getFont()->setBold(true);
+
+        // Isi data
+        $rowExcel = 6;
+        foreach ($finalData as $row) {
+
+            $col = 'A';
+
+            $sheet->setCellValue($col++ . $rowExcel, $row['no']);
+            $sheet->setCellValue($col++ . $rowExcel, $row['barang_name']);
+
+            foreach ($listSupplier as $s) {
+                $sheet->setCellValue(
+                    $col++ . $rowExcel,
+                    $row['sup_' . $s['id']]
+                );
+            }
+
+            $rowExcel++;
+        }
+
+        // Auto size
+        foreach (range('A', chr(ord('A') + count($listSupplier) + 1)) as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        // Output
+        $filename = "Laporan Pembelian Barang per Pemasok.xlsx";
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="' . $filename . '"');

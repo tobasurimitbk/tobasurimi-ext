@@ -30,7 +30,7 @@
             </li>
         </ul>
 
-        <button style="right: 280px;" class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+        <button style="right: 270px;" class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
             Export Kuantitas
         </button>
         <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
@@ -39,6 +39,18 @@
             </li>
             <li>
                 <button class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-sales/pembelian-per-barang/printExcelKuantitas"); ?>')">EXCEL</button>
+            </li>
+        </ul>
+
+        <button style="right: 440px;" class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+            Export Per Pemasok
+        </button>
+        <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+            <li>
+                <button class="dropdown-item" onclick="printPDF('<?= base_url("/laporan-sales/pembelian-per-barang/printPDFPemasok"); ?>')">PDF</button>
+            </li>
+            <li>
+                <button class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-sales/pembelian-per-barang/printExcelPemasok"); ?>')">EXCEL</button>
             </li>
         </ul>
     </div>

@@ -3029,6 +3029,8 @@ $routes->get('/laporan-sales/pembelian-per-barang/printPDFTotal/(:segment)/(:seg
 $routes->get('/laporan-sales/pembelian-per-barang/printExcelTotal/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\PembelianPerBarang::printExcelTotal/$1/$2/$3/$4', ['filter' => 'Auth']);
 $routes->get('/laporan-sales/pembelian-per-barang/printPDFKuantitas/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\PembelianPerBarang::printPDFKuantitas/$1/$2/$3/$4', ['filter' => 'Auth']);
 $routes->get('/laporan-sales/pembelian-per-barang/printExcelKuantitas/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\PembelianPerBarang::printExcelKuantitas/$1/$2/$3/$4', ['filter' => 'Auth']);
+$routes->get('/laporan-sales/pembelian-per-barang/printPDFPemasok/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\PembelianPerBarang::printPDFPemasok/$1/$2/$3/$4', ['filter' => 'Auth']);
+$routes->get('/laporan-sales/pembelian-per-barang/printExcelPemasok/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\PembelianPerBarang::printExcelPemasok/$1/$2/$3/$4', ['filter' => 'Auth']);
 
 $routes->get('/laporan-sales/rincian-sales-per-barang', 'Laporan\Penjualan\RincianPenjualanPerBarang::index', ['filter' => 'Auth']);
 $routes->get('/laporan-sales/rincian-sales-per-barang/all', 'Laporan\Penjualan\RincianPenjualanPerBarang::allTransaksi', ['filter' => 'Auth']);

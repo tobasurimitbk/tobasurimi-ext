@@ -251,6 +251,53 @@ class SalesFakturModel extends Model
         ];
     }
 
+    public function getSalesOrderPivotPerSupplier($condition, $addCondition)
+    {
+        $selectQry = "
+            sales_faktur_detail.id_barang,
+            barang_master_sales.barang_name,
+            barang_master_sales.kode_barang,
+            satuans.kode_satuan,
+            sales_faktur.id_customer AS supplier_id,
+            supplier_lokals.name AS supplier_name,
+            SUM(sales_faktur_detail.qty) AS qty_supplier,
+            SUM(sales_faktur_detail.amount) AS amount_supplier,
+        ";
+
+        $builder = $this->asObject()
+            ->select($selectQry)
+            ->join('supplier_lokals', 'supplier_lokals.id = sales_faktur.id_customer', 'left')
+            ->join('sales_faktur_detail', 'sales_faktur_detail.id_sales_order = sales_faktur.id', 'left')
+            ->join('barang_master_sales', 'barang_master_sales.id = sales_faktur_detail.id_barang', 'left')
+            ->join('satuans', 'satuans.id = barang_master_sales.satuan_id', 'left')
+            ->where($condition);
+
+        // Search (if needed)
+        if (!empty($addCondition['search'])) {
+            $builder->like('sales_faktur.no_sales_order', $addCondition['search']);
+        }
+
+        // Filter barang
+        if (!empty($addCondition['filter_barang'])) {
+            $builder->where('sales_faktur_detail.id_barang', $addCondition['filter_barang']);
+        }
+
+        // Date filter
+        if (!empty($addCondition['dateStart'])) {
+            $builder->where('sales_faktur.order_date >=', $addCondition['dateStart']);
+        }
+        if (!empty($addCondition['dateEnd'])) {
+            $builder->where('sales_faktur.order_date <=', $addCondition['dateEnd']);
+        }
+
+        $builder->groupBy('sales_faktur_detail.id_barang, sales_faktur.id_customer')
+            ->orderBy('barang_master_sales.barang_name', 'ASC');
+
+        $data = $builder->findAll();
+
+        return $data;
+    }
+
     public function getSalesOrderLokalById($id)
     {
         $selectQry = "sales_faktur.*,
