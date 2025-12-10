@@ -1613,6 +1613,7 @@
     function insertListPabean() {
         var typePengambilanStock = $('#type_pengambilan_stock option:selected').val();
         var typePengambilanStockBahanBaku = $('#type_pengambilan_stock_bahan_baku option:selected').val();
+        console.log('cek log', typePengambilanStock, typePengambilanStockBahanBaku, listStockAsal);
 
         if (typePengambilanStock != '') {
             // Bukan Bahan Baku
@@ -1648,7 +1649,6 @@
             var currentID = v.id;
 
             if (listStockAsal[i].type_barang == "bahan_baku") {
-                // console.log(currentID, dataIds);
 
                 if ($.inArray(currentID, dataIds) !== -1) {
                     var isIDSelected = $.grep(listStockSelectedBahanBaku, function(item) {
@@ -1672,10 +1672,11 @@
                     }
                 }
             } else if (listStockAsal[i].type_barang == "bahan_jadi") {
-                currentID = Number(currentID);
+                console.log(currentID, dataIds);
+                currentID = (currentID);
                 if ($.inArray(currentID, dataIds) !== -1) {
                     var isIDSelected = $.grep(listStockSelectedBahanJadi, function(item) {
-                        return item.id == Number(currentID);
+                        return item.id == (currentID);
                     }).length > 0;
 
                     if (!isIDSelected) {
@@ -1747,6 +1748,8 @@
                 }
             }
         });
+        console.log(listStockSelectedBahanJadi);
+        
         drawTableSelectedItemBahanBaku(listStockSelectedBahanBaku);
         drawTableSelectedItemBahan(listStockSelectedBahan);
         drawTableSelectedItemBahanSetengahJadi(listStockSelectedBahanSetengahJadi);
