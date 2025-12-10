@@ -933,7 +933,7 @@ class Barang extends BaseController
 
         $rules = [
             "file" => [
-                'rules' => 'uploaded[file]|ext_in[file,xlsx]',
+                'rules' => 'uploaded[file]|ext_in[file,xlsx,xlx]',
                 'errors' => [
                     'uploaded' => 'Tidak ada file yang di-upload.',
                     'ext_in' => 'File yang di-upload harus berupa file Excel (.xlsx).',

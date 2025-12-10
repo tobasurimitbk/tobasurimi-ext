@@ -248,7 +248,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard btn-discard-import-excel mr-2">Kembali</button>
-                <button type="submit" class="btn btn-submit-form btn-submit-excel">Simpan</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-excel" id="btn-submit-excel">Simpan</button>
             </div>
         </div>
     </div>
@@ -761,7 +761,7 @@
         })
     }
 
-    $('.btn-submit-excel').click(function() {
+    $('#btn-submit-excel').click(function() {
         if ($('.form-excel').valid()) {
             Swal.fire({
                 icon: 'question',
