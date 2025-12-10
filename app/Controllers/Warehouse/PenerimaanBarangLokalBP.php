@@ -404,6 +404,7 @@ class PenerimaanBarangLokalBP extends BaseController
                 ]);
             }
 
+            $formId = $this->request->getVar('form_id');
             $noPenerimaanBarang = $this->request->getVar('no_penerimaan_barang');
             $tanggal = $this->request->getVar("tanggal_penerimaan_lpb") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_penerimaan_lpb")), "Y-m-d") : "";
             $checkNoLpb = $this->checkLpbNo($noPenerimaanBarang);
@@ -414,6 +415,21 @@ class PenerimaanBarangLokalBP extends BaseController
                     "LOKAL",
                     "PENOLONG"
                 );
+            }
+
+            // Check Form Id
+            $firstFormId = $this->penerimaanBarangModel
+                ->where('form_id', $formId)
+                ->first();
+
+            if ($firstFormId != null) {
+                // lpb sudah dibuat
+                return response()->setJSON([
+                    'message' => "Penerimaan barang Lokal BP berhasil disimpan",
+                    'token' => csrf_hash(),
+                    'status' => true,
+                ]);
+                exit;
             }
 
             // $first = $this->penerimaanBarangModel->where('company_id', $this->this_company_id)
@@ -450,6 +466,8 @@ class PenerimaanBarangLokalBP extends BaseController
                 "status_post" => "WAITING",
                 "status_penerimaan" => "LOKAL",
                 "tanggal" => $tanggal,
+                "form_id" => $formId,
+                "createdBy" => $this->this_user_id
             ]);
 
             foreach (json_decode($barangs) as $b) {
@@ -1359,6 +1377,7 @@ class PenerimaanBarangLokalBP extends BaseController
     // Load Component
     public function loadComponent()
     {
+        $faker = \Faker\Factory::create();
         $id = $this->request->getVar('id');
         $form = $this->request->getVar('form');
         $dataAJU = $this->metadataModel->getBCUsed("po_lokal_bp");
@@ -1366,8 +1385,10 @@ class PenerimaanBarangLokalBP extends BaseController
         $dataSatuan = $this->satuanModel->asObject()->find();
         $dataDivisi = $this->divisiModel->getDivisiAccess();
         $dataKemasan = $this->kemasanModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', 'asc')->findAll();
+        $formId = $faker->uuid();
 
         $data = [
+            "formId" => $formId,
             "dataSatuan" => $dataSatuan,
             "dataWarehouse" => $dataWarehouse,
             "dataSupplier" => [],

@@ -39,6 +39,8 @@ class PenerimaanBarangModel extends Model
         'no_surat_jalan',
         'no_invoice',
         'ongkos_kirim',
+        'createdBy',
+        'form_id',
         'createdAt',
         'updatedAt',
         'deletedAt',
