@@ -329,7 +329,7 @@
             </tr>
         </table>
         <?php
-        $chunkedDetails = array_chunk($dataPODetail, 15);
+        $chunkedDetails = array_chunk($dataPODetail, 20);
         $no = 1;
         $totalPrice = 0;
         $totalDisc = 0;
