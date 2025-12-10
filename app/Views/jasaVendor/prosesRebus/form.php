@@ -628,8 +628,6 @@
             return $(this).data("id");
         }).get();
 
-        console.log(dataIds)
-
         var id_selected = getIDListDataSelected();
         var barangIn = $('#spesifikasi_hasil_rebus_id option:selected');
 
@@ -770,217 +768,267 @@
         if (listStockSelected.length == 0) {
             Swal.fire({
                 icon: 'error',
-                title: 'Barang yang akan direbus tidak boleh kosong !',
+                title: 'Barang yang akan direbus tidak boleh kosong!',
                 confirmButtonColor: '#4e73df',
                 confirmButtonText: 'Ok'
             });
+            return false;
         } else {
             var typePengambilanStock = $('#type_pengambilan_stock option:selected').val();
-            if ($('.create-form').valid()) {
-                var isValidRebus = true;
-                var isValidHasilRebus = true;
-                var dataErrorRebus = null;
-                var dataErrorHasilRebus = null;
+            
+            // Validasi form
+            if (!$('.create-form').valid()) {
+                return false;
+            }
+            
+            var isValidRebus = true;
+            var isValidHasilRebus = true;
+            var dataErrorRebus = null;
+            var dataErrorHasilRebus = null;
+            var errors = [];
 
-                if (typePengambilanStock == "PABEAN") {
-                    // Reset status validasi
-                    isValidRebus = true;
-                    isValidHasilRebus = true;
-                    dataErrorRebus = null;
-                    dataErrorHasilRebus = null;
-                    
-                    // Reset semua class error terlebih dahulu
-                    $('.qty-rebus-input, .qty-hasil-input, .total-hasil-input').removeClass('is-invalid');
-                    
-                    // Validasi per item
-                    $.each(listStockSelected, function(i, v) {
-                        var element_rebus = $('input.qty-rebus-input[data-id="' + v.id + '"]');
-                        var element_hasil_rebus = $('input.qty-hasil-input[data-id="' + v.id + '"]');
+            // Reset semua class error terlebih dahulu
+            $('.qty-rebus-input, .qty-hasil-input, .total-hasil-input').removeClass('is-invalid');
+            
+            if (typePengambilanStock == "PABEAN") {
+                // Validasi per item menggunakan originalIndex langsung dari listStockSelected
+                $.each(listStockSelected, function(i, v) {
+                    // Cari element berdasarkan originalIndex
+                    var element_rebus = $(`input.qty-rebus-input[data-index="${i}"]`);
+                    var element_hasil_rebus = $(`input.qty-hasil-input[data-original-index="${i}"]`);
+                    var element_total_hasil = $('.total-hasil-input');
 
-                        var input_user_rebus = destroyFormatRupiah(element_rebus.val()) || 0;
-                        var input_user_hasil_rebus = destroyFormatRupiah(element_hasil_rebus.val()) || 0;
-                        var stok_max = destroyFormatRupiah(element_rebus.data('stok_total')) || 0;
+                    var input_user_rebus = parseFloat(destroyFormatRupiah(element_rebus.val()) || 0);
+                    var input_user_hasil_rebus = parseFloat(destroyFormatRupiah(element_hasil_rebus.val()) || 0);
+                    var stok_max = parseFloat(destroyFormatRupiah(element_rebus.data('stok_total')) || 0);
+                    var input_total_hasil = parseFloat(element_total_hasil.val() || 0);
 
-                        // Validasi qty rebus - COMMENTED OUT
-                        /*
-                        if (input_user_rebus <= 0 || isNaN(input_user_rebus)) {
-                            element_rebus.addClass('is-invalid');
-                            if (isValidRebus) {
-                                dataErrorRebus = listStockSelected[i];
-                                isValidRebus = false;
-                            }
-                        } else if (input_user_rebus > stok_max) {
-                            element_rebus.addClass('is-invalid');
-                            if (isValidRebus) {
-                                dataErrorRebus = listStockSelected[i];
-                                isValidRebus = false;
-                            }
-                        } else {
-                            listStockSelected[i].qty = input_user_rebus;
+                    // VALIDASI QTY REBUS
+                    if (input_user_rebus <= 0 || isNaN(input_user_rebus)) {
+                        element_rebus.addClass('is-invalid');
+                        errors.push({
+                            type: 'rebus',
+                            message: `Qty rebus untuk barang "${v.barang}" harus lebih dari 0`,
+                            data: v
+                        });
+                        if (isValidRebus) {
+                            dataErrorRebus = v;
+                            isValidRebus = false;
                         }
-                        */
-                        
-                        // Always set the qty value regardless of validation
-                        listStockSelected[i].qty = input_user_rebus;
-
-                        // Validasi qty hasil rebus
-                        if (input_user_hasil_rebus <= 0 || isNaN(input_user_hasil_rebus)) {
-                            element_hasil_rebus.addClass('is-invalid');
-                            if (isValidHasilRebus) {
-                                dataErrorHasilRebus = listStockSelected[i];
-                                isValidHasilRebus = false;
-                            }
-                        } else {
-                            listStockSelected[i].output.qty = input_user_hasil_rebus;
+                    } else if (input_user_rebus > stok_max) {
+                        element_rebus.addClass('is-invalid');
+                        errors.push({
+                            type: 'rebus',
+                            message: `Qty rebus untuk barang "${v.barang}" melebihi stok maksimal (${stok_max})`,
+                            data: v
+                        });
+                        if (isValidRebus) {
+                            dataErrorRebus = v;
+                            isValidRebus = false;
                         }
-                    });
+                    } else {
+                        // Set value jika valid
+                        v.qty = input_user_rebus;
+                    }
 
-                    // Validasi total hasil rebus per grup
-                    $('.total-hasil-input').each(function() {
-                        const val = parseFloat($(this).val()) || 0;
-                        if (val <= 0 || isNaN(val)) {
-                            $(this).addClass('is-invalid');
+                    // VALIDASI QTY HASIL REBUS
+                    if (input_user_hasil_rebus <= 0 || isNaN(input_user_hasil_rebus)) {
+                        element_hasil_rebus.addClass('is-invalid');
+                        errors.push({
+                            type: 'hasil',
+                            message: `Qty hasil rebus untuk barang "${v.output?.barang || v.barang}" harus lebih dari 0`,
+                            data: v
+                        });
+                        if (isValidHasilRebus) {
+                            dataErrorHasilRebus = v;
                             isValidHasilRebus = false;
                         }
+                    } else {
+                        // Set value jika valid (sudah di-sync di event handler)
+                        v.output.qty = input_user_hasil_rebus;
+                    }
+                });
+
+                // VALIDASI TOTAL HASIL REBUS
+                $('.total-hasil-input').each(function() {
+                    const val = parseFloat($(this).val()) || 0;
+                    if (val <= 0 || isNaN(val)) {
+                        $(this).addClass('is-invalid');
+                        errors.push({
+                            type: 'total',
+                            message: 'Total hasil rebus harus lebih dari 0'
+                        });
+                        isValidHasilRebus = false;
+                    }
+                });
+
+                // TAMPILKAN PESAN ERROR JIKA ADA
+                if (errors.length > 0) {
+                    let errorHtml = '<div style="text-align: left; max-height: 200px; overflow-y: auto;">';
+                    errorHtml += '<strong>Terjadi kesalahan validasi:</strong><br><br>';
+                    
+                    let rebusErrors = errors.filter(e => e.type === 'rebus');
+                    let hasilErrors = errors.filter(e => e.type === 'hasil');
+                    let totalErrors = errors.filter(e => e.type === 'total');
+                    
+                    if (rebusErrors.length > 0) {
+                        errorHtml += '<strong>Qty Rebus:</strong><br>';
+                        rebusErrors.forEach((error, idx) => {
+                            const item = error.data;
+                            errorHtml += `${idx + 1}. ${error.message}<br>`;
+                            if (item) {
+                                errorHtml += `&nbsp;&nbsp;&nbsp;Dokumen: ${item.bc_type || '-'} / ${item.no_aju || '-'}<br>`;
+                            }
+                        });
+                        errorHtml += '<br>';
+                    }
+                    
+                    if (hasilErrors.length > 0) {
+                        errorHtml += '<strong>Qty Hasil Rebus:</strong><br>';
+                        hasilErrors.forEach((error, idx) => {
+                            const item = error.data;
+                            errorHtml += `${idx + 1}. ${error.message}<br>`;
+                            if (item) {
+                                errorHtml += `&nbsp;&nbsp;&nbsp;Dokumen: ${item.bc_type || '-'} / ${item.no_aju || '-'}<br>`;
+                            }
+                        });
+                        errorHtml += '<br>';
+                    }
+                    
+                    if (totalErrors.length > 0) {
+                        errorHtml += '<strong>Total Hasil Rebus:</strong><br>';
+                        totalErrors.forEach((error, idx) => {
+                            errorHtml += `${idx + 1}. ${error.message}<br>`;
+                        });
+                    }
+                    
+                    errorHtml += '</div>';
+                    
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Validasi Gagal',
+                        html: errorHtml,
+                        confirmButtonColor: '#4e73df',
+                        confirmButtonText: 'Perbaiki'
                     });
-
-                    // Tampilkan pesan error - COMMENTED OUT REBUS VALIDATION MESSAGE
-                    /*
-                    if (!isValidRebus) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Qty Rebus Tidak Valid',
-                            html: `Barang: <strong>${dataErrorRebus.barang}</strong><br>
-                                Dokumen: ${dataErrorRebus.bc_type || '-'} / ${dataErrorRebus.no_aju || '-'}<br>
-                                <span class="text-danger">Qty rebus harus lebih dari 0 dan tidak melebihi stok maksimal</span>`,
-                            confirmButtonColor: '#4e73df',
-                            confirmButtonText: 'Ok'
-                        });
-                        return false;
-                    }
-                    */
-
-                    if (!isValidHasilRebus) {
-                        const errorItem = dataErrorHasilRebus || listStockSelected[0];
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Qty Hasil Rebus Tidak Valid',
-                            html: `Barang: <strong>${errorItem.output?.barang || 'Tidak Diketahui'}</strong><br>
-                                Dokumen: ${errorItem.bc_type || '-'} / ${errorItem.no_aju || '-'}<br>
-                                <span class="text-danger">Qty hasil rebus harus lebih dari 0</span>`,
-                            confirmButtonColor: '#4e73df',
-                            confirmButtonText: 'Ok'
-                        });
-                        return false;
-                    }
+                    return false;
                 }
-
-                if (!isValidRebus) {
+            } else {
+                // Untuk type pengambilan stock selain PABEAN
+                // Validasi minimal
+                $.each(listStockSelected, function(i, v) {
+                    var element_rebus = $(`input.qty-rebus-input[data-index="${i}"]`);
+                    var input_user_rebus = parseFloat(destroyFormatRupiah(element_rebus.val()) || 0);
+                    
+                    if (input_user_rebus <= 0 || isNaN(input_user_rebus)) {
+                        element_rebus.addClass('is-invalid');
+                        errors.push({
+                            type: 'rebus',
+                            message: `Qty rebus untuk barang "${v.barang}" harus lebih dari 0`,
+                            data: v
+                        });
+                        isValidRebus = false;
+                    } else {
+                        v.qty = input_user_rebus;
+                    }
+                });
+                
+                if (errors.length > 0) {
+                    let errorHtml = '<div style="text-align: left;">';
+                    errorHtml += '<strong>Terjadi kesalahan validasi:</strong><br><br>';
+                    errors.forEach((error, idx) => {
+                        errorHtml += `${idx + 1}. ${error.message}<br>`;
+                    });
+                    errorHtml += '</div>';
+                    
                     Swal.fire({
                         icon: 'error',
-                        title: 'Qty Barang Rebus, barang ' + dataErrorRebus.barang + ' dengan dokumen ' + dataErrorRebus.bc_type + ' / ' + dataErrorRebus.no_aju + ' tidak valid!',
+                        title: 'Validasi Gagal',
+                        html: errorHtml,
                         confirmButtonColor: '#4e73df',
-                        confirmButtonText: 'Ok'
+                        confirmButtonText: 'Perbaiki'
                     });
-                } else if (!isValidHasilRebus) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Qty Barang Hasil Rebus, barang ' + dataErrorHasilRebus.output.barang + ' dengan dokumen ' + dataErrorHasilRebus.bc_type + ' / ' + dataErrorHasilRebus.no_aju + ' tidak valid!',
-                        confirmButtonColor: '#4e73df',
-                        confirmButtonText: 'Ok'
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'question',
-                        title: 'Simpan Data ?',
-                        confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        showCancelButton: true,
-                        reverseButtons: true,
-                        confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Kembali',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            let id = $('#id').val();
-                            let data = new FormData(document.querySelector(".create-form"));
-                            data.append('listBarang', JSON.stringify(listStockSelected));
+                    return false;
+                }
+            }
 
-                            if (id) {
-                                // UPDATE
-                                $.ajax({
-                                    url: "<?= base_url("proses-rebus/update"); ?>",
-                                    data: data,
-                                    beforeSend: function(xhr) {
-                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                        setLoading();
-                                    },
-                                    complete: function() {
-                                        stopLoading()
-                                    },
-                                    method: "POST",
-                                    dataType: "json",
-                                    processData: false,
-                                    contentType: false,
-                                    success: function(response) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                            confirmButtonText: 'Ok'
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                window.location.href = "<?= base_url("proses-rebus") ?>";
-                                            }
-                                        });
-                                    },
+            // JIKA SEMUA VALIDASI LULUS
+            Swal.fire({
+                icon: 'question',
+                title: 'Simpan Data?',
+                text: 'Apakah Anda yakin ingin menyimpan data ini?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Ya, Simpan',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let id = $('#id').val();
+                    let data = new FormData(document.querySelector(".create-form"));
+                    
+                    // Bersihkan originalIndex sebelum dikirim
+                    const dataToSend = listStockSelected.map(item => {
+                        const cleanItem = {...item};
+                        delete cleanItem.originalIndex;
+                        return cleanItem;
+                    });
+                    
+                    data.append('listBarang', JSON.stringify(dataToSend));
+
+                    const submitUrl = id ? "<?= base_url('proses-rebus/update'); ?>" : "<?= base_url('proses-rebus/save'); ?>";
+                    const successMessage = id ? 'Data berhasil diperbarui!' : 'Data berhasil disimpan!';
+
+                    $.ajax({
+                        url: submitUrl,
+                        data: data,
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            if (response.status == false) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Gagal!',
+                                    text: response.message || 'Terjadi kesalahan saat menyimpan data.',
+                                    confirmButtonColor: '#4e73df',
                                 });
                             } else {
-                                // INSERT
-                                $.ajax({
-                                    url: "<?= base_url("proses-rebus/save"); ?>",
-                                    data: data,
-                                    beforeSend: function(xhr) {
-                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                        setLoading();
-                                    },
-                                    complete: function() {
-                                        stopLoading()
-                                    },
-                                    method: "POST",
-                                    dataType: "json",
-                                    processData: false,
-                                    contentType: false,
-                                    success: function(response) {
-                                        if (response.status == false) {
-                                            Swal.fire({
-                                                icon: 'error',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                        } else {
-                                            Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                                confirmButtonText: 'Ok'
-                                            }).then((result) => {
-                                                if (result.isConfirmed) {
-                                                    window.location.href = "<?= base_url("proses-rebus") ?>";
-                                                }
-                                            });
-                                        }
-
-                                    },
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil!',
+                                    text: response.message || successMessage,
+                                    confirmButtonColor: '#4e73df',
+                                    confirmButtonText: 'Ok'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        window.location.href = "<?= base_url('proses-rebus'); ?>";
+                                    }
                                 });
                             }
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: 'Terjadi kesalahan koneksi. Silakan coba lagi.',
+                                confirmButtonColor: '#4e73df',
+                            });
                         }
                     });
                 }
-
-            }
+            });
         }
     });
-
 
     $("#vendor_id,#warehouse_id,#divisi_id,#type_barang,#spesifikasi_rebus_id,#spesifikasi_hasil_rebus_id,#type_pengambilan_stock,#supplier_id")
         .parent('div')
@@ -1187,41 +1235,32 @@
 
         // Group by stock_id hasil rebus
         const grouped = {};
-        data.forEach(item => {
+        data.forEach((item, index) => {
             const key = item.output?.stock_id || 'undefined';
             if (!grouped[key]) grouped[key] = [];
+            // Tambahkan originalIndex untuk tracking
+            item.originalIndex = index;
             grouped[key].push(item);
         });
 
         let rowIndex = 1;
-
-        let totalHasilGroup = 0;
 
         for (const stockID in grouped) {
             const group = grouped[stockID];
             const groupName = group[0].output?.barang || 'Tidak Diketahui';
             const satuan = group[0].output?.kode_satuan || '-';
 
-         
-
+            let totalHasilGroup = 0;
             group.forEach(item => {
                 const val = parseFloat((destroyFormatRupiah(item.output?.qty || 0)).toFixed(2));
                 totalHasilGroup += val;
             });
 
-            // 🔹 Bulatkan ke angka terdekat (tanpa desimal)
+            // Bulatkan dan format
             totalHasilGroup = Math.round(totalHasilGroup);
-
-            // // 🔹 Format ke tampilan "362.00"
-            // console.log(totalHasilGroup); // 362
-            // console.log(totalHasilGroup.toFixed(2)); // "362.00"
-
-
-            // Bulatkan ke 2 desimal
             totalHasilGroup = parseFloat(totalHasilGroup.toFixed(2));
 
-
-            // --- Tambah input total hasil rebus per group (diletakkan sebelum baris data) ---
+            // --- Tambah input total hasil rebus per group ---
             const groupRow = $(`
                 <tr class="group-row" data-stock-id="${stockID}" style="background-color: #fcf8e3;">
                     <td colspan="12" style="text-align: right; font-weight: bold;">
@@ -1242,8 +1281,9 @@
 
             // --- Baris Data ---
             group.forEach((item, i) => {
+                const uniqueId = `${item.id}_${item.originalIndex}`;
                 const tr = $(`
-                    <tr class="data-row" data-group="${stockID}" data-index="${i}">
+                    <tr class="data-row" data-group="${stockID}" data-index="${item.originalIndex}">
                         <td style="text-align: center;">${rowIndex++}</td>
                         <td>${item.reference_type || '-'}</td>
                         <td>${item.po_no || item.no_penerimaan_surat_jalan  ||'-'}</td>
@@ -1258,7 +1298,8 @@
                                 value="${item.qty || 0}" 
                                 onkeyup="this.value = greatFormatRupiah(this.value)"
                                 data-stok_total="${parseFloat(item.stok_total_diterima)}"
-                                data-index="${i}" data-id="${item.id}" />
+                                data-index="${item.originalIndex}" 
+                                data-unique-id="${uniqueId}" />
                         </td>
                         <td>${item.satuan || '-'}</td>
 
@@ -1267,8 +1308,8 @@
                             <input type="text" step="0.001" min="0" 
                                 class="form-control qty-hasil-input" 
                                 name="qty_hasil_rebus[]" 
-                                data-id="${item.id}"
-                                data-index="${i}"
+                                data-unique-id="${uniqueId}"
+                                data-original-index="${item.originalIndex}"
                                 value="${greatFormatRupiah(item.output?.qty) || 0}">
                         </td>
                         <td>${item.output?.kode_satuan || '-'}</td>
@@ -1289,17 +1330,17 @@
             
             // Jika input kosong atau tidak valid, set semua ke 0
             if (inputValue === "" || isNaN(totalQty) || totalQty <= 0) {
-                // Set semua qty hasil di grup ini ke 0
                 const groupRows = $(`tr.data-row[data-group="${stockID}"]`);
                 
-                groupRows.each(function() {
+                groupRows.each(function(index) {
                     $(this).find('.qty-hasil-input').val('0');
-                });
-                
-                // Update listStockSelected
-                listStockSelected.forEach(item => {
-                    if (item.output?.stock_id == stockID) {
-                        item.output.qty = 0;
+                    
+                    const uniqueId = $(this).find('.qty-hasil-input').data('unique-id');
+                    const originalIndex = $(this).find('.qty-hasil-input').data('original-index');
+                    
+                    // Update langsung ke listStockSelected berdasarkan originalIndex
+                    if (listStockSelected[originalIndex] && listStockSelected[originalIndex].output) {
+                        listStockSelected[originalIndex].output.qty = 0;
                     }
                 });
                 
@@ -1307,37 +1348,29 @@
                 return;
             }
             
-            // Jika input valid, bagi secara merata
             const groupRows = $(`tr.data-row[data-group="${stockID}"]`);
             const jumlahBaris = groupRows.length;
 
-            // Gunakan fungsi pembulatan yang konsisten
             function roundToDecimal(value, decimals = 3) {
                 return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
             }
 
             const qtyPerBaris = roundToDecimal(totalQty / jumlahBaris);
 
-            console.log(`Distribusi: ${totalQty} / ${jumlahBaris} = ${qtyPerBaris}`);
-
             groupRows.each(function(index) {
-                // Untuk memastikan total tepat, berikan nilai berbeda ke baris terakhir
                 let finalQty = qtyPerBaris;
                 if (index === jumlahBaris - 1) {
-                    // Hitung ulang untuk baris terakhir agar total tepat
                     const totalSebelumnya = qtyPerBaris * (jumlahBaris - 1);
                     finalQty = totalQty - totalSebelumnya;
                     finalQty = roundToDecimal(finalQty);
                 }
                 
-                console.log(`Baris ${index + 1}: ${finalQty}`);
                 $(this).find('.qty-hasil-input').val(greatFormatRupiah(finalQty));
-            });
-
-            // Sync ke listStockSelected
-            listStockSelected.forEach(item => {
-                if (item.output?.stock_id == stockID) {
-                    item.output.qty = parseFloat(qtyPerBaris);
+                
+                const originalIndex = $(this).find('.qty-hasil-input').data('original-index');
+                
+                if (listStockSelected[originalIndex] && listStockSelected[originalIndex].output) {
+                    listStockSelected[originalIndex].output.qty = finalQty;
                 }
             });
             
@@ -1353,6 +1386,13 @@
         $tbody.on('input', '.qty-hasil-input', function () {
             const $row = $(this).closest('tr');
             const stockID = $row.data('group');
+            const originalIndex = $(this).data('original-index');
+            const currentValue = destroyFormatRupiah($(this).val()) || 0;
+
+            // Update ke listStockSelected untuk item spesifik ini berdasarkan originalIndex
+            if (listStockSelected[originalIndex] && listStockSelected[originalIndex].output) {
+                listStockSelected[originalIndex].output.qty = currentValue;
+            }
 
             // Cari semua baris dalam grup yang sama
             const groupRows = $(`tr.data-row[data-group="${stockID}"]`);
@@ -1368,22 +1408,18 @@
             const formatted = greatFormatRupiah(newTotal);
             $(`.total-hasil-input[data-stock-id="${stockID}"]`).val(formatted);
 
-            // Update ke listStockSelected
-            listStockSelected.forEach(item => {
-                if (item.output?.stock_id == stockID) {
-                    // biarkan tiap baris pegang qty masing²
-                    const baris = groupRows.index($(`tr[data-id="${item.id}"]`));
-                    if (baris >= 0) {
-                        item.output.qty = destroyFormatRupiah(
-                            $(groupRows[baris]).find('.qty-hasil-input').val()
-                        );
-                    }
-                }
-            });
-
             updateTotalRow();
         });
 
+        // Update qty rebus ke listStockSelected
+        $tbody.on('input', '.qty-rebus-input', function () {
+            const originalIndex = $(this).data('index');
+            const currentValue = destroyFormatRupiah($(this).val()) || 0;
+            
+            if (listStockSelected[originalIndex]) {
+                listStockSelected[originalIndex].qty = currentValue;
+            }
+        });
 
         function updateTotalRow() {
             let totalQtyRebus = 0;
@@ -1414,30 +1450,33 @@
                     <td colspan="9" style="text-align: right;">GRAND TOTAL</td>
                     <td style="text-align: right;">${greatFormatRupiah(totalQtyRebus)}</td>
                     <td colspan="1"></td>
-                    <td colspan="2" style="text-align: right;">${greatFormatRupiah(totalHasilGroup)}</td>
+                    <td colspan="2" style="text-align: right;">${greatFormatRupiah(totalQtyHasilRebus)}</td>
                     <td colspan="2"></td>
                 </tr>
             `);
 
             $tbody.append(totalRow);
-
-            // validateRebusInputs();
         }
 
         // --- Tombol Hapus ---
         $('.btn-remove-row').click(function () {
             const $tr = $(this).closest('tr');
-            const index = $tr.data('index');
-            const stockID = $tr.data('group');
+            const originalIndex = $tr.data('index');
 
-            // Hapus dari list
-            listStockSelected.splice(index, 1);
+            // Hapus dari list berdasarkan originalIndex
+            if (originalIndex >= 0) {
+                listStockSelected.splice(originalIndex, 1);
+            }
 
-            // Redraw
+            // Redraw dengan mengupdate originalIndex untuk semua item
+            listStockSelected.forEach((item, index) => {
+                item.originalIndex = index;
+            });
+            
             drawTableSelectedItem(listStockSelected);
         });
     }
-  
+
 
     function deleteDetail(id) {
         var indexToRemove = -1;
