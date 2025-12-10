@@ -1697,10 +1697,10 @@
                     }
                 }
             } else if (listStockAsal[i].type_barang == "bahan_setengah_jadi") {
-                currentID = Number(currentID);
+                currentID = (currentID);
                 if ($.inArray(currentID, dataIds) == -1) {
                     var isIDSelected = $.grep(listStockSelectedBahanSetengahJadi, function(item) {
-                        return item.id == Number(currentID);
+                        return item.id == (currentID);
                     }).length > 0;
                     if (!isIDSelected && qtyMutasiFifo != 0 && parseFloat(listStockAsal[i].stok_total) != 0) {
                         var mutasiQty = Math.min(qtyMutasiFifo, parseFloat(listStockAsal[i].stok_total));
