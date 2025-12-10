@@ -1,7 +1,7 @@
 <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
     <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($dataPenerimaanBarang) ? encrypt($dataPenerimaanBarang['id']) : ""; ?>" />
     <?= csrf_field() ?>
-
+    <input type="hidden" class="form_id" name="form_id" id="form_id" value="<?= $formId ?>">
     <div class="row">
         <div class="col-md-4">
             <div class="form-floating mb-3" style="height: 50px;">
@@ -909,33 +909,35 @@
     }
 
     function changeStatus() {
-        let value = document.getElementById('auto_generate').checked ? true : false;
-        if (value) {
-            $.ajax({
-                url: `<?= base_url("/penerimaan-barang-lokal-bp/generate-lpb-no"); ?>`,
-                method: "GET",
-                dataType: "json",
-                data: {
-                    tanggal: $('#tanggal_penerimaan_lpb').val()
-                },
-                success: function(res) {
-                    if (res.status) {
-                        $(".no_penerimaan_barang").val(res.data);
-                        $(".no_penerimaan_barang").attr("readonly", true);
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: res.message,
-                            confirmButtonColor: '#4e73df',
-                        })
+        <?php if (empty($dataPenerimaanBarang)): ?>
+            let value = document.getElementById('auto_generate').checked ? true : false;
+            if (value) {
+                $.ajax({
+                    url: `<?= base_url("/penerimaan-barang-lokal-bp/generate-lpb-no"); ?>`,
+                    method: "GET",
+                    dataType: "json",
+                    data: {
+                        tanggal: $('#tanggal_penerimaan_lpb').val()
+                    },
+                    success: function(res) {
+                        if (res.status) {
+                            $(".no_penerimaan_barang").val(res.data);
+                            $(".no_penerimaan_barang").attr("readonly", true);
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: res.message,
+                                confirmButtonColor: '#4e73df',
+                            })
 
+                        }
                     }
-                }
-            })
-        } else {
-            $(".no_penerimaan_barang").attr("readonly", false);
-            $(".no_penerimaan_barang").val("");
-        }
+                })
+            } else {
+                $(".no_penerimaan_barang").attr("readonly", false);
+                $(".no_penerimaan_barang").val("");
+            }
+        <?php endif; ?>
     }
 </script>
 
