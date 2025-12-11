@@ -354,7 +354,7 @@ class SalesOrderModel extends Model
             barang_master_sales.barang_name AS barang_name,
             SUM(sales_order_detail.qty) AS qty_order,
             satuans.kode_satuan AS kode_satuan,
-            DATE_FORMAT(sales_order.order_date, '%d/%M/%Y') AS tanggal_order,
+            DATE_FORMAT(sales_order.order_date, '%d/%m/%Y') AS tanggal_order,
             customers.name AS nama_pelanggan,
             customers.kode AS kode_pelanggan,
             employees.name AS salesName,
