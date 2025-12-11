@@ -735,6 +735,138 @@ class AttendancesUnit extends BaseController
         return $result;
     }
 
+    public function testLogs($ip)
+    {
+        $tryXml = [
+            // MODE 1 → PIN kosong
+            "<GetAttLog>
+                <ArgComKey>0</ArgComKey>
+                <Arg><PIN></PIN></Arg>
+            </GetAttLog>",
+
+            // MODE 2 → ALL
+            "<GetAttLog>
+                <ArgComKey>0</ArgComKey>
+                <Arg><PIN>ALL</PIN></Arg>
+            </GetAttLog>",
+
+            // MODE 3 → pakai tanggal
+            "<GetAttLog>
+                <ArgComKey>0</ArgComKey>
+                <Arg>
+                    <PIN></PIN>
+                    <BeginTime>2025-12-01</BeginTime>
+                    <EndTime>2025-12-12</EndTime>
+                </Arg>
+            </GetAttLog>"
+        ];
+
+        foreach ($tryXml as $xml) {
+            echo "<h3>TRY:</h3><pre>$xml</pre>";
+
+            $conn = fsockopen($ip, 80);
+            $nl = "\r\n";
+            fputs($conn, "POST /iWsService HTTP/1.0$nl");
+            fputs($conn, "Content-Type: text/xml$nl");
+            fputs($conn, "Content-Length: " . strlen($xml) . "$nl$nl");
+            fputs($conn, $xml . $nl);
+
+            $res = "";
+            while ($l = fgets($conn, 2048)) {
+                $res .= $l;
+            }
+            fclose($conn);
+
+            echo "<pre>$res</pre><hr>";
+        }
+    }
+
+    public function getAttendanceFromDevice($ip, $unitKey = 0, $date = null)
+    {
+        try {
+            // Selalu ambil HARI INI saja
+            $today = date('Y-m-d');
+
+            $conn = @fsockopen($ip, 80, $errno, $errstr, 2);
+
+            if (!$conn) {
+                throw new \Exception("Koneksi gagal ke $ip: $errstr ($errno)");
+            }
+
+            // XML request (ambil semua log)
+            $xml = "<GetAttLog>
+                        <ArgComKey>$unitKey</ArgComKey>
+                        <Arg><PIN></PIN></Arg>
+                    </GetAttLog>";
+
+            $nl = "\r\n";
+
+            fputs($conn, "POST /iWsService HTTP/1.0" . $nl);
+            fputs($conn, "Content-Type: text/xml" . $nl);
+            fputs($conn, "Content-Length: " . strlen($xml) . $nl . $nl);
+            fputs($conn, $xml . $nl);
+
+            $response = "";
+            while ($line = fgets($conn, 4096)) {
+                $response .= $line;
+            }
+            fclose($conn);
+
+            // Parse semua log
+            $allLogs = $this->parseAttLogResponse($response);
+
+            // ================
+            // FILTER HARI INI
+            // ================
+            $filtered = array_filter($allLogs, function($row) use ($today) {
+                if (!isset($row['datetime'])) return false;
+
+                $dateOnly = substr($row['datetime'], 0, 10); // ambil yyyy-mm-dd
+
+                return $dateOnly === $today;
+            });
+
+            // Reset array index
+            return array_values($filtered);
+
+        } catch (\Exception $e) {
+            throw new \Exception("Error: " . $e->getMessage());
+        }
+    }
+
+
+    private function parseAttLogResponse($xml)
+    {
+        if (!preg_match('/<GetAttLogResponse>(.*)<\/GetAttLogResponse>/s', $xml, $matches)) {
+            return [];
+        }
+
+        $inner = $matches[1];
+        $rows = [];
+        preg_match_all('/<Row>(.*?)<\/Row>/s', $inner, $rowMatches);
+
+        foreach ($rowMatches[1] as $row) {
+            $rows[] = [
+                'pin'       => $this->getTagVal($row, 'PIN'),
+                'datetime'  => $this->getTagVal($row, 'DateTime'),
+                'verified'  => $this->getTagVal($row, 'Verified'),
+                'status'    => $this->getTagVal($row, 'Status'),
+                'workcode'  => $this->getTagVal($row, 'WorkCode')
+            ];
+        }
+
+        return $rows;
+    }
+
+    private function getTagVal($xml, $tag)
+    {
+        if (preg_match("/<$tag>(.*?)<\/$tag>/s", $xml, $match)) {
+            return trim($match[1]);
+        }
+        return null;
+    }
+
+
     private function parseFingerResponse($data)
     {
         $start = strpos($data, "<Information>");
