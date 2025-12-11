@@ -48,50 +48,50 @@
 
 <body>
   <h1 style="text-align: center;">TOBA FISH</h1>
-  <h2 style="text-align: center;">LAPORAN RINCIAN SALES PER BARANG</h2>
+  <h2 style="text-align: center;">Histori Pesanan Penjualan</h2>
   <p style="text-align: center;">Periode: <?= $dateStart ?> - <?= $dateEnd ?></p>
 
   <table>
     <thead>
       <tr>
-        <th>No. Faktur</th>
+        <th>Tipe Proses</th>
+        <th>No Faktur</th>
         <th>Tanggal Faktur</th>
-        <th>Keterangan</th>
+        <th>Qty Faktur</th>
+        <th>Nama Pelanggan</th>
+        <th>Nama Barang</th>
+        <th>Nama Penjual</th>
         <th>Kuantitas</th>
         <th>Satuan</th>
-        <th>Jumlah</th>
-        <th>Nilai HPP</th>
-        <th>Laba Kotor</th>
-        <th>Nama Pelanggan</th>
-        <th>Nama Penjual</th>
+        <th>Keterangan</th>
       </tr>
     </thead>
     <tbody>
       <?php foreach ($data as $row): ?>
         <?php if (isset($row['is_customer']) && $row['is_customer']): ?>
           <tr class="group-header">
-            <td colspan="10"><?= $row['kode_barang'] ?> - <?= $row['barang_name'] ?></td>
+            <td colspan="10"><?= $row['tipe_proses'] ?></td>
           </tr>
         <?php elseif (isset($row['is_total']) && $row['is_total']): ?>
           <tr class="total-row">
-            <td colspan="5">Total Invoice</td>
-            <td class="text-right"><?= $row['total_invoice'] ?></td>
-            <td class="text-right"><?= $row['total_hpp'] ?></td>
-            <td class="text-right"><?= $row['total_laba'] ?></td>
+            <td colspan="3">Total</td>
+            <td class="text-right"><?= $row['qty_faktur'] ?></td>
+            <td colspan="3"></td>
+            <td class="text-right"><?= $row['qty_order'] ?></td>
             <td colspan="2"></td>
           </tr>
         <?php else: ?>
           <tr>
+            <td><?= $row['tipe_proses'] ?></td>
             <td><?= $row['no_faktur'] ?></td>
             <td><?= $row['tanggal_faktur'] ?></td>
-            <td><?= $row['keterangan'] ?></td>
-            <td class="text-right"><?= $row['qty_invoice'] ?></td>
-            <td><?= $row['kode_satuan'] ?></td>
-            <td class="text-right"><?= $row['total_invoice'] ?></td>
-            <td class="text-right"><?= $row['amt_harga_pokok'] ?></td>
-            <td class="text-right"><?= $row['amt_laba'] ?></td>
+            <td class="text-right"><?= $row['qty_faktur'] ?></td>
             <td><?= $row['nama_pelanggan'] ?></td>
+            <td><?= $row['nama_barang'] ?></td>
             <td><?= $row['nama_sales'] ?></td>
+            <td class="text-right"><?= $row['qty_order'] ?></td>
+            <td><?= $row['satuan'] ?></td>
+            <td><?= $row['keterangan'] ?></td>
           </tr>
         <?php endif; ?>
       <?php endforeach; ?>
