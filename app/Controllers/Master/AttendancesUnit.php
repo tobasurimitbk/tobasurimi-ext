@@ -797,6 +797,8 @@ class AttendancesUnit extends BaseController
             $xml = "<GetAttLog>
                         <ArgComKey>$unitKey</ArgComKey>
                         <Arg><PIN></PIN></Arg>
+                        <Arg><sdate>2025-12-11</sdate></Arg>
+                        <Arg><edate>2025-12-11</edate></Arg>
                     </GetAttLog>";
 
             $nl = "\r\n";
