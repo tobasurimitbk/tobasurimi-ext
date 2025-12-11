@@ -93,6 +93,13 @@ class PayrollGajiConjunctionModel extends Model
         $companyId,
         $yearMonth
     ) {
+        // get map komponen gaji
+        $mapKomponenGajiHistory = $this->getMapKomponenGajiHistory(
+            $employeeIds,
+            $yearMonth,
+            $companyId
+        );
+
         // delete first
         $this->db->table('payroll_gaji_conjunction')
             ->whereIn('employee_id', $employeeIds)
@@ -101,7 +108,7 @@ class PayrollGajiConjunctionModel extends Model
 
         $gajiConjunctionModel = new GajiConjunctionModel();
         $gajiList = $gajiConjunctionModel
-            ->select('gaji_conjunction.*,tunjangan.name AS tunjangan_name')
+            ->select('gaji_conjunction.*,tunjangan.name AS tunjangan_name,tunjangan.tipe')
             ->join('tunjangan', 'tunjangan.id = gaji_conjunction.tunjangan_id', 'left')
             ->whereIn('employee_id', $employeeIds)
             ->findAll();
@@ -121,7 +128,16 @@ class PayrollGajiConjunctionModel extends Model
                     $nominal = $mapDendaAbsenHarian[$g['employee_id']] ?? 0;
                 }
             } else {
-                $nominal = $g['nominal'];
+                if ($g['tipe'] == "MINUS") {
+                    $gajiHistory = $mapKomponenGajiHistory[$g['employee_id']][$g['tunjangan_id']][$yearMonth] ?? 0;
+                    if ($gajiHistory == 0) {
+                        $nominal = $g['nominal'];
+                    } else {
+                        $nominal = $gajiHistory;
+                    }
+                } else {
+                    $nominal = $g['nominal'];
+                }
             }
             array_push($dataList, [
                 'company_id' => $companyId,
@@ -134,6 +150,29 @@ class PayrollGajiConjunctionModel extends Model
         }
 
         return $dataList;
+    }
+
+    public function getMapKomponenGajiHistory(
+        $employeeIds,
+        $yearMonth,
+        $companyId
+    ) {
+        $mapKomponenGajiHistory = array();
+        $dataQry = $this->asArray()
+            ->where('company_id', $companyId)
+            ->where('year_month', $yearMonth)
+            ->whereIn('employee_id', $employeeIds)
+            ->groupBy(['employee_id', 'tunjangan_id', 'year_month'])
+            ->findAll();
+
+        foreach ($dataQry as $d) {
+
+            if (!isset($mapKomponenGajiHistory[$d['employee_id']][$d['tunjangan_id']][$d['year_month']])) {
+                $mapKomponenGajiHistory[$d['employee_id']][$d['tunjangan_id']][$d['year_month']] = $d['nominal'];
+            }
+        }
+
+        return $mapKomponenGajiHistory;
     }
 
     public function getGajiHarianGajiCadanganAmt($payrollIds)
@@ -209,6 +248,7 @@ class PayrollGajiConjunctionModel extends Model
             ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
             ->where('tunjangan.is_gaji_harian !=', 1)
             ->where('tunjangan.is_cadangan !=', 1)
+            ->where('tunjangan.name !=', "UANG MAKAN") // semua komponen gaji get kecuali uang makan
             ->orderBy('tunjangan.name', "ASC")
             ->findAll();
 
@@ -243,6 +283,18 @@ class PayrollGajiConjunctionModel extends Model
         return $dataResult;
     }
 
+    public function getPayrollUangMakan($payrollID)
+    {
+        $gajiConjunction = $this->asArray()
+            ->select("payroll_gaji_conjunction.*, tunjangan.name, tunjangan.tipe")
+            ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id')
+            ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
+            ->where('tunjangan.name', "UANG MAKAN") // ambil uang makan
+            ->orderBy('tunjangan.name', "ASC")
+            ->first();
+
+        return $gajiConjunction == null ? 0 : $gajiConjunction['nominal'];
+    }
 
     public function getTotalKomponenGajiPayroll($payrollID)
     {

@@ -168,7 +168,11 @@
                                     <td>:</td>
                                     <td><?= "Rp " . number_format($payroll['nominal_uang_lembur'], 2, ',', '.') ?></td>
                                 </tr>
-
+                                <tr>
+                                    <td>Uang Makan</td>
+                                    <td>:</td>
+                                    <td><?= "Rp " . number_format($uangMakan, 2, ',', '.') ?></td>
+                                </tr>
                             </table>
 
                             <hr style="border: 0.5px dashed #000;">
@@ -177,7 +181,7 @@
                                 <tr>
                                     <td>Total Gaji & Lembur</td>
                                     <td>:</td>
-                                    <td><?= "Rp " . number_format($payroll['nominal_uang_gaji'] + $payroll['nominal_uang_lembur'], 2, ',', '.') ?></td>
+                                    <td><?= "Rp " . number_format($payroll['nominal_uang_gaji'] + $payroll['nominal_uang_lembur'] + $uangMakan, 2, ',', '.') ?></td>
                                 </tr>
                                 <tr>
                                     <td>Potongan Pinjaman</td>
