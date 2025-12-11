@@ -51,7 +51,7 @@ class PayrollsModel extends Model
     ];
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'createdAt';
     protected $updatedField  = 'updatedAt';
@@ -214,14 +214,8 @@ class PayrollsModel extends Model
 
         // GENERATE 
         // $result['nominal_uang_gaji'] = ($nominalGajiCadangan + $nominalGajiHarian) * $totalKehadiran;
-        $payroll = $this->asArray()->find($payrollID);
-        $nominalUangGaji = $payrollGajiHarianModel->generate(
-            $payrollID,
-            $payroll['company_id'],
-            $employeeID,
-            $yearMonth,
-        );
-        $result['nominal_uang_gaji'] = $nominalUangGaji;
+        $payroll = $this->asArray()->where('id', $payrollID)->first();
+        $result['nominal_uang_gaji'] = $payroll['nominal_uang_gaji'];
 
         // nominal pengurangan gaji ( keterlambatan absen + komponen gaji minus)
         // keterlambatan kehadiran
@@ -394,7 +388,6 @@ class PayrollsModel extends Model
         $payrollGajiModel = new PayrollGajiConjunctionModel();
         $attendanceTerlambatModel = new AttendanceKeterlambatanModel();
         $pinjamanKaryawanModel = new PinjamanKaryawanModel();
-        $payrollGajiHarianModel = new PayrollGajiHarianModel();
 
         $payroll = $this->asArray()->where('id', $payrollID)->first();
 
@@ -426,15 +419,7 @@ class PayrollsModel extends Model
             $result['nominal_pinjaman_karyawan'] = $pinjamanKaryawan['nominal'];
         }
 
-        // GENERATE 
-        // $result['nominal_uang_gaji'] = ($nominalGajiCadangan + $nominalGajiHarian) * $totalKehadiran;
-        $nominalUangGaji = $payrollGajiHarianModel->generate(
-            $payrollID,
-            $payroll['company_id'],
-            $payroll['employee_id'],
-            $payroll['year_month'],
-        );
-        $result['nominal_uang_gaji'] = $nominalUangGaji;
+        $result['nominal_uang_gaji'] = $payroll['nominal_uang_gaji'];
 
         // nominal pengurangan gaji ( keterlambatan absen + komponen gaji minus)
 

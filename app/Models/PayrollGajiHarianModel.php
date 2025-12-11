@@ -50,68 +50,6 @@ class PayrollGajiHarianModel extends Model
         return $result;
     }
 
-    public function generate($payrollID, $companyID, $employeeID, $yearMonth)
-    {
-        // declare model
-        $AttendancesModel = new AttendancesModel();
-        $payrollGajiModel = new PayrollGajiConjunctionModel();
-        $employeeJamKerjaModel = new EmployeeJamKerjaModel();
-        // delete first
-        $this->where('employee_id', $employeeID)
-            ->where('year_month', $yearMonth)
-            ->delete();
-
-        $attendancesInMonth = $AttendancesModel->where('employee_id', $employeeID)
-            ->where('year_month', $yearMonth)
-            ->findAll();
-
-        $totalNominalGajiDiterima = 0;
-        $gajiHarian = $payrollGajiModel->select('payroll_gaji_conjunction.nominal')
-            ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id')
-            ->where('tunjangan.is_gaji_harian', '1')
-            ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
-            ->first();
-
-        // get nominal uang cadangan
-        $gajiCadangan = $payrollGajiModel->select('payroll_gaji_conjunction.nominal')
-            ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id')
-            ->where('tunjangan.is_cadangan', '1')
-            ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
-            ->first();
-
-        foreach ($attendancesInMonth as $p) {
-            // if ($p['status'] == "HADIR_H") {
-            // set uang gaji (jmlh hadir x (gaji harian + uang cadangan))
-
-            $jamKerjaDetail = $employeeJamKerjaModel->getJamKerjaDetailByEmployeeId($p['periode'], $employeeID);
-            $totalJamKerja = static::totalJamKerja($p['id']);
-            $nominalDiterima = (($gajiHarian['nominal'] + $gajiCadangan['nominal']) / 7) * $totalJamKerja;
-
-
-            $this->insert([
-                'company_id' => $companyID,
-                'payroll_id' => $payrollID,
-                'employee_id' => $employeeID,
-                'jam_kerja_id' => $jamKerjaDetail['jam_kerja_id'],
-                'tanggal' => $p['periode'],
-                'year_month' => $yearMonth,
-                'jam_masuk' => $p['checkin'],
-                'jam_istirahat_mulai' => $jamKerjaDetail['jam_istirahat_mulai'],
-                'jam_istirahat_selesai' => $jamKerjaDetail['jam_istirahat_selesai'],
-                'jam_pulang' => $p['checkout'],
-                'total_jam' => $totalJamKerja,
-                'nominal_gaji_harian' => $gajiHarian['nominal'],
-                'nominal_cadangan' => $gajiCadangan['nominal'],
-                'nominal_diterima' => $nominalDiterima
-            ]);
-            // }
-            $totalNominalGajiDiterima += $nominalDiterima;
-        }
-
-        // SUM UANG GAJI
-        return $totalNominalGajiDiterima;
-    }
-
     public function generateAmt(
         $mapEmployeePayroll,
         $mapGajiHarian,

@@ -206,7 +206,7 @@
     <script src="<?= base_url() ?>assets/_vendor/bootstrap/js/bootstrap.min.js?v=<?= time(); ?>"></script>
     <script src="<?= base_url() ?>assets/js/pdfobject.min.js?v=<?= time(); ?>"></script>
     <!-- <script src="https://kit.fontawesome.com/6297a3e18a.js" crossorigin="anonymous"></script> -->
-    <script src="<?= base_url() ?>assets/js/tinymce-jquery.min.js?v=<?= time(); ?>"></script>
+    <script src="<?= base_url() ?>assets/_vendor/tinymce_6.8.3/tinymce/js/tinymce/tinymce.min.js?v=" <?= time() ?>></script>
 
     <div id="app">
         <!-- {% block content_2 %}{% endblock %} -->
@@ -338,10 +338,14 @@
         });
 
         $(document).ready(function() {
-            $('.tiny').tinymce({
-                height: 300,
-                api_key: '<?= $api_tiny ?>',
-                entity_encoding: 'raw'
+            // $('.tiny').tinymce({
+            //     height: 300,
+            //     api_key: '<?= $api_tiny ?>',
+            //     entity_encoding: 'raw'
+            // });
+
+            tinymce.init({
+                selector: '.tiny'
             });
         });
     </script>
