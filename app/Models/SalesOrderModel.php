@@ -336,7 +336,7 @@ class SalesOrderModel extends Model
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'sales_order.createdAt';
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'sales_order.order_date';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "
@@ -354,43 +354,45 @@ class SalesOrderModel extends Model
             barang_master_sales.barang_name AS barang_name,
             SUM(sales_order_detail.qty) AS qty_order,
             satuans.kode_satuan AS kode_satuan,
-            DATE_FORMAT(sales_order.order_date, '%d/%m/%Y') AS tanggal_order,
+            DATE_FORMAT(sales_order.order_date, '%d/%M/%Y') AS tanggal_order,
             customers.name AS nama_pelanggan,
             customers.kode AS kode_pelanggan,
             employees.name AS salesName,
             sales_order_invoice.id AS id_sales_order_invoice,
             surat_jalan_so.id AS id_surat_jalan_so,
-            IFNULL(sales_order_invoice.no_faktur, surat_jalan_so.no_surat_jalan) AS document_no,
-            DATE_FORMAT(IFNULL(sales_order_invoice.tanggal_faktur, surat_jalan_so.shipping_date), '%d/%m/%Y') AS tanggal_faktur,
-            IFNULL(sales_order_invoice_detail.qty_invoice, surat_jalan_so_detail.qty) AS qty_faktur
+            COALESCE(sales_order_invoice.no_faktur, surat_jalan_so.no_surat_jalan) AS document_no,
+            DATE_FORMAT(COALESCE(sales_order_invoice.tanggal_faktur, surat_jalan_so.shipping_date), '%d/%m/%Y') AS tanggal_faktur,
+            COALESCE(sales_order_invoice_detail.qty_invoice, surat_jalan_so_detail.qty) AS qty_faktur
         ";
 
         $salesOrderInvoiceLokal = $this->asObject()
             ->select($selectQry)
             ->join('customers', 'customers.id = sales_order.id_customer')
             ->join('employees', 'employees.id = customers.sales_id', 'left')
-            ->join(
-                'sales_order_invoice',
-                "FIND_IN_SET(
-                    sales_order.id,
-                    REPLACE(REPLACE(REPLACE(sales_order_invoice.document_id, '[', ''), ']', ''), CHAR(34), '')
-                )
-                AND sales_order_invoice.document_type = 'pesanan'",
-                'LEFT',
-                false
-            )
-            ->join('sales_order_invoice_detail', 'sales_order_invoice_detail.id_sales_order_invoice = sales_order_invoice.id', 'LEFT')
-            ->join(
-                'surat_jalan_so',
-                "FIND_IN_SET(
-                    sales_order.id,
-                    REPLACE(REPLACE(REPLACE(surat_jalan_so.multiple_id_so, '[', ''), ']', ''), CHAR(34), '')
-                )",
-                'LEFT',
-                false
-            )
-            ->join('surat_jalan_so_detail', 'surat_jalan_so_detail.id_surat_jalan = surat_jalan_so.id', 'LEFT')
+            // ->join(
+            //     'sales_order_invoice',
+            //     "FIND_IN_SET(
+            //         sales_order.id,
+            //         REPLACE(REPLACE(REPLACE(sales_order_invoice.document_id, '[', ''), ']', ''), CHAR(34), '')
+            //     )
+            //     AND sales_order_invoice.document_type = 'pesanan'",
+            //     'LEFT',
+            //     false
+            // )
+            // ->join(
+                //     'surat_jalan_so',
+            //     "FIND_IN_SET(
+            //         sales_order.id,
+            //         REPLACE(REPLACE(REPLACE(surat_jalan_so.multiple_id_so, '[', ''), ']', ''), CHAR(34), '')
+            //     )",
+            //     'LEFT',
+            //     false
+            // )
             ->join('sales_order_detail', 'sales_order_detail.id_sales_order = sales_order.id', 'RIGHT')
+            ->join('sales_order_invoice_detail', 'sales_order_invoice_detail.id_sales_order = sales_order.id AND sales_order_invoice_detail.id_barang_invoice = sales_order_detail.id_barang', 'LEFT')
+            ->join('sales_order_invoice', "sales_order_invoice.id = sales_order_invoice_detail.id_sales_order_invoice AND sales_order_invoice.document_type = 'pesanan'", 'LEFT')
+            ->join('surat_jalan_so_detail', 'surat_jalan_so_detail.id_sales_order_detail = sales_order_detail.id', 'LEFT')
+            ->join('surat_jalan_so', 'surat_jalan_so.id = surat_jalan_so_detail.id_surat_jalan', 'LEFT')
             ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail.id_barang')
             ->join('satuans', 'satuans.id = barang_master_sales.satuan_id')
             ->where($condition)

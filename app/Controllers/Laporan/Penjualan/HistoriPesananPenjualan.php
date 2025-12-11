@@ -71,8 +71,7 @@ class HistoriPesananPenjualan extends BaseController
         $dataAllSalesOrderInvoice = [];
         $currentSalesOrder = null;
         $totalPerBarang = 0;
-        $totalHppPerBarang = 0;
-        $totalLabaPerBarang = 0;
+        $qtyPerBarang = 0;
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($dataSalesOrder['data'] as $data) {
@@ -81,17 +80,21 @@ class HistoriPesananPenjualan extends BaseController
                     array_push($dataAllSalesOrderInvoice, [
                         "tipe_proses" => 'Total',
                         "qty_faktur" => number_format($totalPerBarang, 0, ',', '.'),
+                        "qty_order" => number_format($qtyPerBarang, 0, ',', '.'),
                         "is_total" => true,
                     ]);
                 }
+
+                $totalPerBarang = 0;
+                $qtyPerBarang = 0;
 
                 $currentSalesOrder = $data->id;
 
                 array_push($dataAllSalesOrderInvoice, [
                     "no" => '',
                     "id" => '',
-                    "tipe_proses" => $data->document_no,
-                    "no_faktur" => $data->tanggal_order,
+                    "tipe_proses" => $data->no_sales_order . "&nbsp;&nbsp;&nbsp;&nbsp;" . $data->tanggal_order . "&nbsp;&nbsp;&nbsp;&nbsp;" . $data->nama_pelanggan,
+                    "no_faktur" => '',
                     "tanggal_faktur" => '',
                     "qty_faktur" => '',
                     "nama_pelanggan" => '',
@@ -103,8 +106,6 @@ class HistoriPesananPenjualan extends BaseController
                     "is_customer" => true,
                 ]);
             }
-
-            $laba = floatval($data->sum_amount_invoice) - floatval($data->amt_harga_pokok);
 
             if ($data->jenis_penjualan == "1") {
                 $salesName = $data->salesName;
@@ -124,28 +125,28 @@ class HistoriPesananPenjualan extends BaseController
                 "nama_pelanggan" => $data->nama_pelanggan,
                 "nama_barang" => $data->barang_name,
                 "nama_sales" => $salesName,
-                "qty_order" => $data->qty_invoice,
-                "kode_satuan" => $data->kode_satuan,
+                "qty_order" => $data->qty_order,
+                "satuan" => $data->kode_satuan,
                 "keterangan" => $data->keterangan,
             ]);
 
-            $totalPerBarang += floatval($data->sum_amount_invoice);
-            $totalHppPerBarang += floatval($data->amt_harga_pokok);
-            $totalLabaPerBarang += floatval($laba);
+            $totalPerBarang += floatval($data->qty_faktur);
+            $qtyPerBarang += floatval($data->qty_order);
         }
 
         if ($currentSalesOrder !== null) {
             array_push($dataAllSalesOrderInvoice, [
                 "tipe_proses" => 'Total',
                 "qty_faktur" => number_format($totalPerBarang, 0, ',', '.'),
+                "qty_order" => number_format($qtyPerBarang, 0, ',', '.'),
                 "is_total" => true,
             ]);
         }
 
         $data = [
             "draw" => intval($this->request->getGet("draw")),
-            "recordsTotal" => $dataSalesOrderInvoice['totalData'],
-            "recordsFiltered" => $dataSalesOrderInvoice['totalFilteredData'],
+            "recordsTotal" => $dataSalesOrder['totalData'],
+            "recordsFiltered" => $dataSalesOrder['totalFilteredData'],
             "data" => $dataAllSalesOrderInvoice,
             "payload" => $payload
         ];
