@@ -50,7 +50,7 @@ class Attendance extends BaseController
             "company" => $this->hrOutSourcingCompanyModel->where('deletedAt', NULL)->findAll(),
         ];
        
-        return view('HROutsourcing/AttendancesUnit/index', $data);
+        return view('HROutsourcing/Attendance/index', $data);
     }
 
     public function allData()
