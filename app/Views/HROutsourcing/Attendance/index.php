@@ -86,8 +86,6 @@ $(document).ready(function() {
      $('#company_filter').select2({
         placeholder: "Pilih Perusahaan",
         theme: "bootstrap-5",
-        allowClear: true,
-        dropdownParent: $('.add-modal')
     })
 
     // =========================
