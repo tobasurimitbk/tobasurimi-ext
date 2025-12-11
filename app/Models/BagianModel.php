@@ -97,4 +97,16 @@ class BagianModel extends Model
         $query = $this->db->query($requete);
         return $query->getResultArray();
     }
+
+
+    public function getBagian($bagianId)
+    {
+        $selectQry = "bagian.*,divisis.divisi";
+        $dataResult = $this->asArray()->select($selectQry)
+            ->join('divisis', 'divisis.id = bagian.division_id', 'left')
+            ->where('bagian.id', $bagianId)
+            ->first();
+
+        return $dataResult;
+    }
 }

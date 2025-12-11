@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+<title>Payroll <?= $yearMonth ?>, Dept. <?= $bagian['divisi'] ?> Bag. <?= $bagian['nama_bagian'] ?></title>
 
 <head>
     <style>
@@ -171,6 +172,11 @@
                                                 <td>:</td>
                                                 <td><?= "Rp " . number_format($p['payroll']['nominal_uang_lembur'], 2, ',', '.') ?></td>
                                             </tr>
+                                            <tr>
+                                                <td>Uang Makan</td>
+                                                <td>:</td>
+                                                <td><?= "Rp " . number_format($p['uangMakan'], 2, ',', '.') ?></td>
+                                            </tr>
                                         </table>
 
                                         <hr style="border: 0.5px dashed #000;">
@@ -179,7 +185,7 @@
                                             <tr>
                                                 <td>Total Gaji & Lembur</td>
                                                 <td>:</td>
-                                                <td><?= "Rp " . number_format($p['payroll']['nominal_uang_gaji'] + $p['payroll']['nominal_uang_lembur'], 2, ',', '.') ?></td>
+                                                <td><?= "Rp " . number_format($p['payroll']['nominal_uang_gaji'] + $p['payroll']['nominal_uang_lembur'] + $p['uangMakan'], 2, ',', '.') ?></td>
                                             </tr>
                                             <tr>
                                                 <td>Potongan Pinjaman</td>

@@ -65,6 +65,12 @@ class PayrollGajiHarianModel extends Model
         $employeeJamKerjaModel = new EmployeeJamKerjaModel();
         $bigDaysModel = new BigDaysModel();
 
+        // Hapus dulu semua
+        $this->db->table('payroll_gaji_harian')
+            ->whereIn('employee_id', $employeeIds)
+            ->where('year_month', $yearMonth)
+            ->delete();
+
         // Ambil semua jam kerja detail untuk semua employee dalam range SEKALI (anti N+1)
         // diasumsikan method ini mengembalikan struktur: [employee_id => [tanggal => jamKerjaDetail]]
         $jamKerjaDetailMap = $employeeJamKerjaModel->getJamKerjaDetailByEmployeeIdAmt(

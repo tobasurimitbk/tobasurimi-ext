@@ -421,8 +421,6 @@ class PayrollsModel extends Model
 
         $result['nominal_uang_gaji'] = $payroll['nominal_uang_gaji'];
 
-        // nominal pengurangan gaji ( keterlambatan absen + komponen gaji minus)
-
         // keterlambatan kehadiran
         $attendanceTerlambat = $attendanceTerlambatModel->select("SUM(nominal_pengurangan) AS total")
             ->where('payroll_id', $payrollID)
@@ -554,11 +552,10 @@ class PayrollsModel extends Model
         $employeeModel = new EmployeesModel();
         $formLemburModel = new FormLemburModel();
         $payrollGajiModel = new PayrollGajiConjunctionModel();
-        $attendanceTerlambatModel = new AttendanceKeterlambatanModel();
-        $rekapPerizinanNotApprovedModel = new FormPerizinanNotApprovedModel();
         $companyModel = new CompaniesModel();
         $divisiModel = new DivisisModel();
         $pinjamanKaryawanModel = new PinjamanKaryawanModel();
+        $payrollGajiConjunctionModel = new PayrollGajiConjunctionModel();
 
         $employeePayroll = $this->asArray()->select('payrolls.*, employees.division_id')
             ->join('employees', 'employees.id = payrolls.employee_id')
@@ -581,17 +578,17 @@ class PayrollsModel extends Model
             );
             $payrollDetail['total_gaji_harian_plus_cadangan'] = $payrollDetail['nominal_gaji_harian'] + $payrollDetail['nominal_cadangan'];
             $totalPinjamanDiambil = $pinjamanKaryawanModel->getTotalPinjamanKaryawanDiambil($payrollDetail['employee_id'], $payrollDetail['year_month']);
+            $perhitunganGaji = $payrollGajiModel->getPerhitunganKomponenGajiPayrollPrint($ep['id']);
+            $uangMakan = $payrollGajiConjunctionModel->getPayrollUangMakan($payrollDetail['id']);
 
             $data[] = [
                 'payroll' => $payrollDetail,
                 'employee' => $employee,
-                'rekapLembur' => $formLemburModel->rekap($payrollDetail['employee_id'], $payrollDetail['year_month']),
                 'totalLemburJamPertama' => $splitJamLembur['jamPertama'],
                 'totalLemburJamKedua' => $splitJamLembur['jamKedua'],
-                'perhitunganGaji' => $payrollGajiModel->getPerhitunganKomponenGajiPayrollPrint($ep['id']),
-                'totalNominalKeterlambatanPresensi' => $attendanceTerlambatModel->getTotalRekap($ep['id']),
-                'totalNominalRekapPerizinanNotApproved' => $rekapPerizinanNotApprovedModel->getTotalRekap($ep['id']),
-                'totalPinjamanDiambil' => $totalPinjamanDiambil
+                'perhitunganGaji' => $perhitunganGaji,
+                'totalPinjamanDiambil' => $totalPinjamanDiambil,
+                'uangMakan' => $uangMakan
             ];
         }
 
@@ -906,5 +903,12 @@ class PayrollsModel extends Model
         }
 
         return $result;
+    }
+
+    public function getPayrollId()
+    {
+        $result = $this->asArray()->where('deletedAt', null)->findAll();
+        $payrollIds = array_column($result, 'id');
+        return $payrollIds;
     }
 }
