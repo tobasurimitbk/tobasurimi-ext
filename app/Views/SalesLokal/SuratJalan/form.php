@@ -1345,7 +1345,8 @@
                                             window.location.href = `<?= base_url("surat-jalan/print"); ?>/${response.id}`;
                                         } else if (result.isDenied) {
                                             // Buat baru
-                                            window.location.reload();
+                                            // window.location.reload();
+                                            window.location.href = `<?= base_url("surat-jalan/create"); ?>`;
                                         } else if (result.dismiss === Swal.DismissReason.cancel) {
                                             // Tutup - redirect to surat-jalan
                                             window.location.href = `<?= base_url("surat-jalan"); ?>`;

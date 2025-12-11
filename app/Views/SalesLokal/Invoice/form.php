@@ -1546,7 +1546,8 @@
                                                 window.location.href = `<?= base_url("invoice-penjualan-lokal/print"); ?>/${response.id}`;
                                             } else if (result.isDenied) {
                                                 // Buat baru
-                                                window.location.reload();
+                                                // window.location.reload();
+                                                window.location.href = `<?= base_url("invoice-penjualan-lokal/create"); ?>`;
                                             } else if (result.dismiss === Swal.DismissReason.cancel) {
                                                 // Tutup - redirect to invoice-penjualan-lokal
                                                 window.location.href = `<?= base_url("invoice-penjualan-lokal"); ?>`;
