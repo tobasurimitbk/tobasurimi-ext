@@ -1904,7 +1904,7 @@
                     grade: grade,
                     qty: qty,
                     harga: harga,
-                    total: harga * qty,
+                    total: (harga * qty).toFixed(2),
                     satuan_size_id: satuan_size_id,
                     satuan_size_code: satuan_size_code
                 }
