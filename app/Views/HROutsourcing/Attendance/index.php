@@ -50,14 +50,14 @@
                         </div>
                     </div>
 
-                    <div class="col-md-2">
+                    <!-- <div class="col-md-2">
                         <div class="form-group">
                             <label>&nbsp;</label>
                             <button type="button" class="btn btn-success btn-block" id="sync-btn" style="display:none;">
                                 <i class="fas fa-sync"></i> Sync to DB
                             </button>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
 
                 <!-- Status Alert -->
