@@ -64,6 +64,7 @@ class PayrollGajiHarianModel extends Model
         $AttendancesModel = new AttendancesModel();
         $employeeJamKerjaModel = new EmployeeJamKerjaModel();
         $bigDaysModel = new BigDaysModel();
+        $payrollCustomGajiHarianModel = new PayrollCustomGajiHarianModel();
 
         // Hapus dulu semua
         $this->db->table('payroll_gaji_harian')
@@ -92,6 +93,11 @@ class PayrollGajiHarianModel extends Model
 
         $insertRows = [];
         $totalNominalGajiDiterimaPerPayroll = []; // if you want to accumulate per payroll_id
+        $mapCustomGajiHarian = $payrollCustomGajiHarianModel->getMapPayrollCustomGajiHarian(
+            $employeeIds,
+            $startDate,
+            $endDate
+        );
 
         foreach ($attendancesInRange as $p) {
             $employeeID = $p['employee_id'];
@@ -145,7 +151,8 @@ class PayrollGajiHarianModel extends Model
             if ($p['isApproved'] && !in_array($p['status'], ["LIBUR_L", "ALPHA_A"]) && $statusLibur == false) {
                 // Di Approved Wajib Dibayar
                 // gaji harian + tambahan
-                $nominalDiterima = $nominalGajiHarian + $nominalGajiCadangan;
+                // $nominalDiterima = $nominalGajiHarian + $nominalGajiCadangan;
+                $nominalDiterima = $mapCustomGajiHarian[$employeeID][$tanggal] ?? $nominalGajiHarian + $nominalGajiCadangan;
             } else {
                 // ga di approve 
                 $nominalDiterima = 0;

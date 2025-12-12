@@ -797,8 +797,6 @@ class AttendancesUnit extends BaseController
             $xml = "<GetAttLog>
                         <ArgComKey>$unitKey</ArgComKey>
                         <Arg><PIN></PIN></Arg>
-                        <Arg><sdate>2025-12-10</sdate></Arg>
-                        <Arg><edate>2025-12-11</edate></Arg>
                     </GetAttLog>";
 
             $nl = "\r\n";
@@ -813,8 +811,6 @@ class AttendancesUnit extends BaseController
                 $response .= $line;
             }
             fclose($conn);
-
-            var_dump($response);
 
             // Parse semua log
             $allLogs = $this->parseAttLogResponse($response);
@@ -837,7 +833,6 @@ class AttendancesUnit extends BaseController
             throw new \Exception("Error: " . $e->getMessage());
         }
     }
-
 
     private function parseAttLogResponse($xml)
     {

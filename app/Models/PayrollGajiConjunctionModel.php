@@ -114,6 +114,15 @@ class PayrollGajiConjunctionModel extends Model
             ->findAll();
 
         $dataList = array();
+
+        //  elseif ($g['tunjangan_name'] == "DENDA") {
+        //         if (empty($mapDendaAbsenHarian[$g['employee_id']])) {
+        //             $nominal = $g['nominal'];
+        //         } else {
+        //             $nominal = $mapDendaAbsenHarian[$g['employee_id']] ?? 0;
+        //         }
+        //     }
+
         foreach ($gajiList as $g) {
             if ($g['tunjangan_name'] == "UANG MAKAN") {
                 if (empty($mapUangMakanHarian[$g['employee_id']])) {
@@ -121,16 +130,17 @@ class PayrollGajiConjunctionModel extends Model
                 } else {
                     $nominal = $mapUangMakanHarian[$g['employee_id']] ?? 0;
                 }
-            } elseif ($g['tunjangan_name'] == "DENDA") {
-                if (empty($mapDendaAbsenHarian[$g['employee_id']])) {
-                    $nominal = $g['nominal'];
-                } else {
-                    $nominal = $mapDendaAbsenHarian[$g['employee_id']] ?? 0;
-                }
             } else {
                 if ($g['tipe'] == "MINUS") {
                     $gajiHistory = $mapKomponenGajiHistory[$g['employee_id']][$g['tunjangan_id']][$yearMonth] ?? 0;
-                    if ($gajiHistory == 0) {
+                    if ($gajiHistory == 0 && $g['tunjangan_name'] == "DENDA") {
+                        // DENDA BELUM ADA DAN HARUS DI RECALCULATE
+                        if (empty($mapDendaAbsenHarian[$g['employee_id']])) {
+                            $nominal = $g['nominal'];
+                        } else {
+                            $nominal = $mapDendaAbsenHarian[$g['employee_id']] ?? 0;
+                        }
+                    } elseif ($gajiHistory == 0 && $g['tunjangan_name'] != "DENDA") {
                         $nominal = $g['nominal'];
                     } else {
                         $nominal = $gajiHistory;

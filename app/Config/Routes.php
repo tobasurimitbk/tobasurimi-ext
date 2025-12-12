@@ -2253,6 +2253,17 @@ $routes->get('/lembur/id/(:segment)', 'HR\FormLembur::getById/$1', ['filter' => 
 $routes->post('/lembur/employees', 'HR\FormLembur::getEmployeeByDivision', ['filter' => 'Auth']);
 $routes->get('/lembur/export-excel', 'HR\FormLembur::exportBulananLembur', ['filter' => 'Auth']);
 
+// custom gaji harian
+$routes->get('/custom-gaji-harian', 'HR\CustomGajiHarian::index', ['filter' => 'Auth']);
+$routes->get('/custom-gaji-harian/all', 'HR\CustomGajiHarian::all', ['filter' => 'Auth']);
+$routes->post('/custom-gaji-harian/save', 'HR\CustomGajiHarian::store', ['filter' => 'Auth']);
+$routes->post('/custom-gaji-harian/update', 'HR\CustomGajiHarian::update', ['filter' => 'Auth']);
+$routes->post('/custom-gaji-harian/delete', 'HR\CustomGajiHarian::destroy', ['filter' => 'Auth']);
+$routes->get('/custom-gaji-harian/like-employees', 'HR\Attendance::getEmployeesLike', ['filter' => 'Auth']);
+$routes->get('/custom-gaji-harian/create', 'HR\CustomGajiHarian::create', ['filter' => 'Auth']);
+$routes->get('/custom-gaji-harian/id/(:segment)', 'HR\CustomGajiHarian::detail/$1', ['filter' => 'Auth']);
+$routes->get('/custom-gaji-harian/get-attendance', 'HR\CustomGajiHarian::getAttendance', ['filter' => 'Auth']);
+
 // SETTINGS
 // USER
 $routes->get('/user', 'Setting\User::user', ['filter' => 'Auth']);
@@ -3168,6 +3179,7 @@ $routes->post('hr-outsourcing-finger-machine/attendances-unit/reset-data-finger'
 
 // HR outsourcing Attnendance
 $routes->get('hr-outsourcing-attendance', 'HROutsourcing\Attendance::index', ['filter' => 'Auth']);
+$routes->get('hr-outsourcing-attendance/listCompanyByDivisi/(:num)', 'HROutsourcing\Attendance::getCompanyByDivisi/$1', ['filter' => 'Auth']);
 $routes->post('hr-outsourcing-attendance/all', 'HROutsourcing\Attendance::allData', ['filter' => 'Auth']);
 
 //HR Ousourcing Scale 
