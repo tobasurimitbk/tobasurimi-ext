@@ -3164,6 +3164,9 @@ $routes->post('hr-outsourcing-finger-machine/attendances-unit/copy-to-finger', '
 $routes->post('hr-outsourcing-finger-machine/attendances-unit/ping', 'HROutsourcing\AttendancesUnit::pingFinger', ['filter' => 'Auth']);
 $routes->post('hr-outsourcing-finger-machine/attendances-unit/reset-data-finger', 'HROutsourcing\AttendancesUnit::resetDataFinger', ['filter' => 'Auth']);
 
+// HR outsourcing Attnendance
+$routes->get('hr-outsourcing-attendance', 'HROutsourcing\Attendance::index', ['filter' => 'Auth']);
+$routes->post('hr-outsourcing-attendance/all', 'HROutsourcing\Attendance::allData', ['filter' => 'Auth']);
 
 //HR Ousourcing Scale 
 $routes->get('/hr-outsourcing-scale', 'HROutsourcing\Scale::generateQrBarangView', ['filter' => 'Auth']);

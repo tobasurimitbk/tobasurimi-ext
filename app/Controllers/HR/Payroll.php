@@ -35,9 +35,8 @@ class Payroll extends BaseController
     protected $formPerizinanNotApprovedModel;
     protected $employeeModel;
     protected $attendanceKeterlambatanModel;
-    protected $payrollGajiModel;
+    protected $payrollGajiConjunctionModel;
     protected $formLemburModel;
-    protected $rekapPerizinanNotApprovedModel;
     protected $pinjamanKaryawanModel;
     protected $payrollGajiHarianModel;
     protected $companyModel;
@@ -59,9 +58,8 @@ class Payroll extends BaseController
         $this->employeeModel = new EmployeesModel();
         $this->formPerizinanNotApprovedModel = new FormPerizinanNotApprovedModel();
         $this->attendanceKeterlambatanModel = new AttendanceKeterlambatanModel();
-        $this->payrollGajiModel = new PayrollGajiConjunctionModel();
+        $this->payrollGajiConjunctionModel = new PayrollGajiConjunctionModel();
         $this->formLemburModel = new FormLemburModel();
-        $this->rekapPerizinanNotApprovedModel = new FormPerizinanNotApprovedModel();
         $this->pinjamanKaryawanModel = new PinjamanKaryawanModel();
         $this->payrollGajiHarianModel = new PayrollGajiHarianModel();
         $this->companyModel = new CompaniesModel();
@@ -156,8 +154,6 @@ class Payroll extends BaseController
             $employeeID = $this->request->getVar("employeeID");
             $startDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('startDate'))));
             $endDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('finishDate'))));
-
-
             // Cek absensi
             $dataAbsensiGeneratedQry = $this->attendanceModel->where('year_month', $yearMonth);
             $dataAbsensiGeneratedQry->where('company_id', $this->this_company_id);
@@ -341,7 +337,7 @@ class Payroll extends BaseController
                 $mapDendaAbsenHarian[$d['employee_id']] = $d['total_nominal'];
             }
 
-            $dataPayrollGajiConjunction = $this->payrollGajiModel->generateAmt(
+            $dataPayrollGajiConjunction = $this->payrollGajiConjunctionModel->generateAmt(
                 $mapEmployeePayroll,
                 $mapUangMakanHarian,
                 $mapDendaAbsenHarian,
@@ -350,13 +346,13 @@ class Payroll extends BaseController
                 $yearMonth
             );
             if (count($dataPayrollGajiConjunction) != 0) {
-                $this->payrollGajiModel->insertBatch($dataPayrollGajiConjunction);
+                $this->payrollGajiConjunctionModel->insertBatch($dataPayrollGajiConjunction);
             }
 
             //--------------------------------------
             // Perizinan Not Approved
             //---------------------------------------
-            $gajiHarian = $this->payrollGajiModel->getGajiHarianGajiCadanganAmt($payrollIds);
+            $gajiHarian = $this->payrollGajiConjunctionModel->getGajiHarianGajiCadanganAmt($payrollIds);
 
             $mapGajiHarian = [];
             foreach ($gajiHarian['gajiHarian'] as $g) {
@@ -681,7 +677,7 @@ class Payroll extends BaseController
             }
 
 
-            $dataPayrollGajiConjunction = $this->payrollGajiModel->generateAmt(
+            $dataPayrollGajiConjunction = $this->payrollGajiConjunctionModel->generateAmt(
                 $mapEmployeePayroll,
                 $mapUangMakanHarian,
                 $mapDendaAbsenHarian,
@@ -690,13 +686,13 @@ class Payroll extends BaseController
                 $yearMonth
             );
             if (count($dataPayrollGajiConjunction) != 0) {
-                $this->payrollGajiModel->insertBatch($dataPayrollGajiConjunction);
+                $this->payrollGajiConjunctionModel->insertBatch($dataPayrollGajiConjunction);
             }
 
             //--------------------------------------
             // Perizinan Not Approved
             //---------------------------------------
-            $gajiHarian = $this->payrollGajiModel->getGajiHarianGajiCadanganAmt($payrollIds);
+            $gajiHarian = $this->payrollGajiConjunctionModel->getGajiHarianGajiCadanganAmt($payrollIds);
 
             $mapGajiHarian = [];
             foreach ($gajiHarian['gajiHarian'] as $g) {
@@ -827,13 +823,13 @@ class Payroll extends BaseController
 
         $data = [
             'payrollDetail' => $this->payrollModel->detailPayroll($id),
-            'perhitunganGaji' => $this->payrollGajiModel->getPerhitunganKomponenGajiPayroll($id),
-            'totalPerhitunganGaji' => $this->payrollGajiModel->getTotalKomponenGajiPayroll($id),
+            'perhitunganGaji' => $this->payrollGajiConjunctionModel->getPerhitunganKomponenGajiPayroll($id),
+            'totalPerhitunganGaji' => $this->payrollGajiConjunctionModel->getTotalKomponenGajiPayroll($id),
             'rekapKeterlambatanPresensi' => $this->attendanceKeterlambatanModel->rekap($id),
             'totalNominalKeterlambatanPresensi' => $this->attendanceKeterlambatanModel->getTotalRekap($id),
             'rekapLembur' => $this->formLemburModel->rekapLemburDateRange($payroll['employee_id'], $payroll['start_date'], $payroll['end_date']),
-            'rekapPerizinanNotApproved' => $this->rekapPerizinanNotApprovedModel->rekap($id),
-            'totalNominalRekapPerizinanNotApproved' => $this->rekapPerizinanNotApprovedModel->getTotalRekap($id),
+            'rekapPerizinanNotApproved' => $this->formPerizinanNotApprovedModel->rekap($id),
+            'totalNominalRekapPerizinanNotApproved' => $this->formPerizinanNotApprovedModel->getTotalRekap($id),
             'rekapPinjaman' => $this->pinjamanKaryawanModel->getPinjamanKaryawanDiambil($payroll['employee_id'], $payroll['year_month']),
             'rekapGajiHarian' => $this->payrollGajiHarianModel->getList($id)
         ];
@@ -879,7 +875,7 @@ class Payroll extends BaseController
                 ]);
             }
 
-            $this->payrollGajiModel->updateBatch($mapKomponenGaji, 'id');
+            $this->payrollGajiConjunctionModel->updateBatch($mapKomponenGaji, 'id');
             $this->payrollModel->generateIfPayrollChanged($payrollId);
             $db->transCommit();
 
@@ -926,11 +922,11 @@ class Payroll extends BaseController
         $nominalGajiPerHari = $this->request->getVar('nominalGajiPerHari');
         $nominalCadangan = $this->request->getVar('nominalCadangan');
 
-        $this->payrollGajiModel->update($gajiPerHariID, [
+        $this->payrollGajiConjunctionModel->update($gajiPerHariID, [
             'nominal' => $nominalGajiPerHari
         ]);
 
-        $this->payrollGajiModel->update($cadanganID, [
+        $this->payrollGajiConjunctionModel->update($cadanganID, [
             'nominal' => $nominalCadangan
         ]);
 
@@ -991,6 +987,8 @@ class Payroll extends BaseController
         $tunjanganGajiPokok = $this->tunjanganModel->where('company_id', $this->this_company_id)->where('is_gaji_harian', 1)->where('deletedAt', null)->first();
         $tunjanganCadangan = $this->tunjanganModel->where('company_id', $this->this_company_id)->where('is_cadangan', 1)->where('deletedAt', null)->first();
         $totalPinjamanDiambil = $this->pinjamanKaryawanModel->getTotalPinjamanKaryawanDiambil($payrollDetail['employee_id'], $payrollDetail['year_month']);
+        $perhitunganGaji = $this->payrollGajiConjunctionModel->getPerhitunganKomponenGajiPayrollPrint($payrollID);
+        $uangMakan = $this->payrollGajiConjunctionModel->getPayrollUangMakan($payrollID);
         $payrollDetail['total_gaji_harian_plus_cadangan'] = $payrollDetail['nominal_gaji_harian'] + $payrollDetail['nominal_cadangan'];
 
         $data = [
@@ -998,13 +996,11 @@ class Payroll extends BaseController
             'employee' => $employee,
             'year' => explode("-", $payrollDetail['year_month'])[0],
             'month' => explode("-", $payrollDetail['year_month'])[1],
-            'rekapLembur' => $this->formLemburModel->rekapLemburDateRange($payrollDetail['employee_id'], $payrollDetail['start_date'], $payrollDetail['end_date']),
+            'uangMakan' => $uangMakan,
             'totalLemburJamPertama' => $splitJamLembur['jamPertama'],
             'totalLemburJamKedua' => $splitJamLembur['jamKedua'],
-            'perhitunganGaji' => $this->payrollGajiModel->getPerhitunganKomponenGajiPayrollPrint($payrollID),
+            'perhitunganGaji' => $perhitunganGaji,
             'company' => $company,
-            'totalNominalKeterlambatanPresensi' => $this->attendanceKeterlambatanModel->getTotalRekap($payrollID),
-            'totalNominalRekapPerizinanNotApproved' => $this->attendanceKeterlambatanModel->getTotalRekap($payrollID),
             'tunjanganGajiPokok' => $tunjanganGajiPokok,
             'tunjanganCadangan' => $tunjanganCadangan,
             'totalPinjamanDiambil' => $totalPinjamanDiambil
@@ -1067,6 +1063,7 @@ class Payroll extends BaseController
         $bagianID = $this->request->getVar('bagian_id');
         $tunjanganGajiPokok = $this->tunjanganModel->where('company_id', $this->this_company_id)->where('is_gaji_harian', 1)->where('deletedAt', null)->first();
         $tunjanganCadangan = $this->tunjanganModel->where('company_id', $this->this_company_id)->where('is_cadangan', 1)->where('deletedAt', null)->first();
+        $bagian = $this->bagianModel->getBagian($bagianID);
 
         $data = [
             'payrollData' => $this->payrollModel->getPayrollDetail(
@@ -1076,7 +1073,9 @@ class Payroll extends BaseController
                 $bagianID
             ),
             'tunjanganGajiPokok' => $tunjanganGajiPokok,
-            'tunjanganCadangan' => $tunjanganCadangan
+            'tunjanganCadangan' => $tunjanganCadangan,
+            'bagian' => $bagian,
+            'yearMonth' => $yearMonth
         ];
 
         $dompdf->loadHtml(view('hr/payroll/payroll_detail_division', $data));
