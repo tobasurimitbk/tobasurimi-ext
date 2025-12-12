@@ -245,7 +245,7 @@ class JasaVendorOut extends BaseController
                         'proses_rebus_id'     => $b->reference_type == "PROSES REBUS" ? $b->reference_id : null,
                         'jasa_vendor_out_id'  => $id,
                         'stock_out_detail_id' => $b->id,
-                        'bc_out_id'           => $b->bc_id,
+                        'bc_out_id'           => $b->bc_id ?? NULL,
                         'stock_dokumen'       => $stock_dokumen, // ✅ masukin hasil query
                         'satuan_id'           => $b->satuan_id,
                         'po_id'               => $b->po_id,
@@ -260,11 +260,11 @@ class JasaVendorOut extends BaseController
                     $this->jasaVendorOutDetailModel->insert([
                         'proses_rebus_id'     => $b->reference_type == "PROSES REBUS" ? $b->reference_id : null,
                         'jasa_vendor_out_id'  => $id,
-                        'stock_out_detail_id' => $b->id,
-                        'bc_out_id'           => $b->bc_id,
-                        'stock_dokumen'       => $stock_dokumen, // ✅ masukin hasil query
-                        'satuan_id'           => $b->satuan_id,
-                        'po_id'               => $b->po_id,
+                        'stock_out_detail_id' => $b->id ?? NULL,
+                        'bc_out_id'           => $b->bc_id ?? NULL,
+                        'stock_dokumen'       => $stock_dokumen ?? NULL, // ✅ masukin hasil query
+                        'satuan_id'           => $b->satuan_id ?? NULL,
+                        'po_id'               => $b->po_id ?? NULL,
                         'keterangan'          => $b->keterangan,
                         'qty'                 => $b->qty,
                         'qty_kotor'           => $b->qty,
