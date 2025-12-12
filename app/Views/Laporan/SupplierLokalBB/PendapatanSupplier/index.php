@@ -12,6 +12,13 @@
             <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-supplier-lokal-bb/pendapatan-supplier/print"); ?>')">PDF</button></li>
             <li><button class="dropdown-item excel" onclick="excel('<?= base_url("/laporan-supplier-lokal-bb/pendapatan-supplier/export-excel"); ?>')">Excel</button></li>
         </ul>
+        <button style="right: 255px;" class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+            Export per Spek
+        </button>
+        <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+            <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-supplier-lokal-bb/pendapatan-supplier-spek/print"); ?>')">PDF</button></li>
+            <li><button class="dropdown-item excel" onclick="excel('<?= base_url("/laporan-supplier-lokal-bb/pendapatan-supplier-spek/export-excel"); ?>')">Excel</button></li>
+        </ul>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("laporan-supplier-lokal-bb"); ?>">
                 Kembali

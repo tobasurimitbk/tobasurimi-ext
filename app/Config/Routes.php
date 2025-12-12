@@ -2899,6 +2899,8 @@ $routes->get('/laporan-supplier-lokal-bb/pendapatan-supplier', 'Laporan\Supplier
 $routes->get('/laporan-supplier-lokal-bb/pendapatan-supplier/all-pendapatan-supplier', 'Laporan\Supplier\LaporanSupplierLokalBB::allLaporanPendapatanSupplier', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/pendapatan-supplier/print', 'Laporan\Supplier\LaporanSupplierLokalBB::exportPDFPendapatanSupplier', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/pendapatan-supplier/export-excel', 'Laporan\Supplier\LaporanSupplierLokalBB::exportPendapatanSupplierLokalBBToExcel', ['filter' => 'Auth']);
+$routes->get('/laporan-supplier-lokal-bb/pendapatan-supplier-spek/print', 'Laporan\Supplier\LaporanSupplierLokalBB::exportPDFPendapatanSupplierSpek', ['filter' => 'Auth']);
+$routes->get('/laporan-supplier-lokal-bb/pendapatan-supplier-spek/export-excel', 'Laporan\Supplier\LaporanSupplierLokalBB::exportPendapatanSupplierLokalBBSpekToExcel', ['filter' => 'Auth']);
 
 $routes->get('/laporan-supplier-lokal-bb/pendapatan-supplier-pembelian', 'Laporan\Supplier\LaporanSupplierLokalBB::laporanPendapatanSupplierPembelian', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/pendapatan-supplier-pembelian/print', 'Laporan\Supplier\LaporanSupplierLokalBB::exportPDFPendapatanSupplierPembelian', ['filter' => 'Auth']);
