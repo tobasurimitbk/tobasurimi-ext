@@ -3179,6 +3179,7 @@ $routes->post('hr-outsourcing-finger-machine/attendances-unit/reset-data-finger'
 
 // HR outsourcing Attnendance
 $routes->get('hr-outsourcing-attendance', 'HROutsourcing\Attendance::index', ['filter' => 'Auth']);
+$routes->get('hr-outsourcing-attendance/listCompanyByDivisi/(:num)', 'HROutsourcing\Attendance::getCompanyByDivisi/$1', ['filter' => 'Auth']);
 $routes->post('hr-outsourcing-attendance/all', 'HROutsourcing\Attendance::allData', ['filter' => 'Auth']);
 
 //HR Ousourcing Scale 
