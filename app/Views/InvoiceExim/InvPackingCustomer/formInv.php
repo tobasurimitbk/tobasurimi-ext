@@ -444,7 +444,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control grade" name="grade" id="grade" placeholder="Grade (Opsional)">
-                                <label for="floatingInput">Grade</label>
+                                <label for="floatingInput">Grade (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -1495,9 +1495,9 @@
         // VALIDATOR SIZE & BREAKDOWN
         var validatorSizeBreakdown = $('.create-form-size-breakdown').validate({
             rules: {
-                grade: {
-                    required: true
-                },
+                // grade: {
+                //     required: true
+                // },
                 qty: {
                     required: true
                 },
@@ -1509,9 +1509,9 @@
                 }
             },
             messages: {
-                grade: {
-                    required: "Grade required"
-                },
+                // grade: {
+                //     required: "Grade required"
+                // },
                 qty: {
                     required: "Qty required"
                 },
