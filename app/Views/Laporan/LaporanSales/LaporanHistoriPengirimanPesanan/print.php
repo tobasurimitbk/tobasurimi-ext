@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Laporan Histori Pesanan Penjualan</title>
+  <title>Laporan Histori Pengiriman Pesanan</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -48,7 +48,7 @@
 
 <body>
   <h1 style="text-align: center;">TOBA FISH</h1>
-  <h2 style="text-align: center;">Histori Pesanan Penjualan</h2>
+  <h2 style="text-align: center;">Histori Pengiriman Pesanan</h2>
   <p style="text-align: center;">Periode: <?= $dateStart ?> - <?= $dateEnd ?></p>
 
   <table>
@@ -60,7 +60,7 @@
         <th>Qty Faktur</th>
         <th>Nama Pelanggan</th>
         <th>Nama Barang</th>
-        <th>Nama Penjual</th>
+        <th>Tgl DO</th>
         <th>Kuantitas</th>
         <th>Satuan</th>
         <th>Keterangan</th>
@@ -88,7 +88,7 @@
             <td class="text-right"><?= $row['qty_faktur'] ?></td>
             <td><?= $row['nama_pelanggan'] ?></td>
             <td><?= $row['nama_barang'] ?></td>
-            <td><?= $row['nama_sales'] ?></td>
+            <td><?= $row['tanggal_order'] ?></td>
             <td class="text-right"><?= $row['qty_order'] ?></td>
             <td><?= $row['satuan'] ?></td>
             <td><?= $row['keterangan'] ?></td>

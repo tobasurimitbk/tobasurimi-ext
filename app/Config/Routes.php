@@ -3056,6 +3056,11 @@ $routes->get('/laporan-sales/histori-pesanan-penjualan', 'Laporan\Penjualan\Hist
 $routes->get('/laporan-sales/histori-pesanan-penjualan/all', 'Laporan\Penjualan\HistoriPesananPenjualan::allTransaksi', ['filter' => 'Auth']);
 $routes->get('/laporan-sales/histori-pesanan-penjualan/printPDFAll/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\HistoriPesananPenjualan::printPDFAll/$1/$2/$3/$4', ['filter' => 'Auth']);
 $routes->get('/laporan-sales/histori-pesanan-penjualan/printExcelAll/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\HistoriPesananPenjualan::printExcelAll/$1/$2/$3/$4', ['filter' => 'Auth']);
+
+$routes->get('/laporan-sales/histori-pengiriman-pesanan', 'Laporan\Penjualan\HistoriPengirimanPesanan::index', ['filter' => 'Auth']);
+$routes->get('/laporan-sales/histori-pengiriman-pesanan/all', 'Laporan\Penjualan\HistoriPengirimanPesanan::allTransaksi', ['filter' => 'Auth']);
+$routes->get('/laporan-sales/histori-pengiriman-pesanan/printPDFAll/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\HistoriPengirimanPesanan::printPDFAll/$1/$2/$3/$4', ['filter' => 'Auth']);
+$routes->get('/laporan-sales/histori-pengiriman-pesanan/printExcelAll/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\HistoriPengirimanPesanan::printExcelAll/$1/$2/$3/$4', ['filter' => 'Auth']);
 // RETUR LOKAL BB
 $routes->get('/retur-po-lokal-bb', 'ReturPembelian\ReturPembelianLokalBB::index', ['filter' => 'Auth']);
 $routes->get('/retur-po-lokal-bb/all', 'ReturPembelian\ReturPembelianLokalBB::all', ['filter' => 'Auth']);

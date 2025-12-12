@@ -223,4 +223,89 @@ class SuratJalanModel extends Model
         // }
         return $number;
     }
+    
+    public function getAllSalesOrderLokalBarang($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'createdAt'          => 'surat_jalan_so.createdAt',
+            'updatedAt'          => 'surat_jalan_so.updatedAt',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'surat_jalan_so.shipping_date';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "
+            surat_jalan_so.id,
+            surat_jalan_so.no_surat_jalan as no_sales_order,
+            surat_jalan_so.note as keterangan,
+            surat_jalan_so.posting,
+            surat_jalan_so.counter_print,
+            surat_jalan_so_detail.id_barang AS id_barang,
+            barang_master_sales.kode_barang AS kode_barang,
+            barang_master_sales.barang_name AS barang_name,
+            SUM(surat_jalan_so_detail.qty) AS qty_order,
+            satuans.kode_satuan AS kode_satuan,
+            DATE_FORMAT(surat_jalan_so.shipping_date, '%d/%m/%Y') AS tanggal_order,
+            customers.name AS nama_pelanggan,
+            customers.kode AS kode_pelanggan,
+            employees.name AS salesName,
+            sales_order_invoice.id AS id_sales_order_invoice,
+            sales_order_invoice.no_faktur AS document_no,
+            DATE_FORMAT(sales_order_invoice.tanggal_faktur, '%d/%m/%Y') AS tanggal_faktur,
+            sales_order_invoice_detail.qty_invoice AS qty_faktur
+        ";
+
+        $salesOrderInvoiceLokal = $this->asObject()
+            ->select($selectQry)
+            ->join('customers', 'customers.id = surat_jalan_so.id_customer')
+            ->join('employees', 'employees.id = customers.sales_id', 'left')
+            ->join('surat_jalan_so_detail', 'surat_jalan_so_detail.id_surat_jalan = surat_jalan_so.id', 'RIGHT')
+            ->join('sales_order_invoice_detail', 'sales_order_invoice_detail.id_surat_jalan = surat_jalan_so.id AND sales_order_invoice_detail.id_barang_invoice = surat_jalan_so_detail.id_barang', 'LEFT')
+            ->join('sales_order_invoice', "sales_order_invoice.id = sales_order_invoice_detail.id_sales_order_invoice AND sales_order_invoice.document_type = 'pengiriman'", 'LEFT')
+            ->join('barang_master_sales', 'barang_master_sales.id = surat_jalan_so_detail.id_barang')
+            ->join('satuans', 'satuans.id = barang_master_sales.satuan_id')
+            ->where($condition)
+            ->groupBy('surat_jalan_so_detail.id')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $salesOrderInvoiceLokal->countAllResults(false);
+
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_jenis_dokumen'] || $addCondition['filter_barang']) {
+            $salesOrderInvoiceLokal->groupStart();
+        }
+
+        if ($addCondition['search']) {
+            $salesOrderInvoiceLokal
+                ->like('no_surat_jalan', $addCondition['search']);
+        }
+
+        if ($addCondition['filter_barang']) {
+            $salesOrderInvoiceLokal->where('surat_jalan_so_detail.id_barang', $addCondition['filter_customer']);
+        }
+
+        if ($addCondition['dateStart']) {
+            $salesOrderInvoiceLokal->where('surat_jalan_so.shipping_date >=',  $addCondition['dateStart']);
+        }
+        if ($addCondition['dateEnd']) {
+            $salesOrderInvoiceLokal->where('surat_jalan_so.shipping_date <=', $addCondition['dateEnd']);
+        }
+
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_jenis_dokumen'] || $addCondition['filter_barang']) {
+            $salesOrderInvoiceLokal->groupEnd();
+        }
+
+        $totalFilteredData = $salesOrderInvoiceLokal->countAllResults(false);
+        if ($limit !== null && $offset !== null) {
+            $data = $salesOrderInvoiceLokal->findAll((int)$limit, (int)$offset);
+        } else {
+            $data = $salesOrderInvoiceLokal->findAll();
+        }
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
+    }
 }
