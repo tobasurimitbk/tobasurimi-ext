@@ -196,18 +196,16 @@ class MaterialRequestPenolong extends BaseController
 
                 if ($dataMaterialRequestNotApprove) {
                     $value->is_requested = true;
-                    $value->stok_total = $this->stockDetail2Model->getStockListDetail(
-                        $value->stock_id,
-                        $value->bc_id,
-                        $value->no_aju,
-                        $value->stock_dokumen
-                    )['stok_total'];
-                    $value->realStok = $this->stockDetail2Model->getStockListDetail(
-                        $value->stock_id,
-                        $value->bc_id,
-                        $value->no_aju,
-                        $value->stock_dokumen
-                    )['stok_total'] - $dataMaterialRequestNotApprove['qty'];
+                    $datas = [
+                        'stock_revamp_detail.id' => $value->stock_detail_id,
+                    ];
+
+                    $stokTotal = $this->stockRevampDetailModel->getStockListWithCondition($datas)[0]['stok_total'];
+
+                    $selisih = $stokTotal - (float) $dataMaterialRequestNotApprove['qty'];
+
+                    $value->realStok = round(max(0, $selisih), 2);
+                    $value->stok_total = $stokTotal;
                 } else {
                     $value->is_requested = false;
                 }
