@@ -1698,12 +1698,13 @@
                 }
             } else if (listStockAsal[i].type_barang == "bahan_setengah_jadi") {
                 currentID = (currentID);
-                if ($.inArray(currentID, dataIds) == -1) {
+                console.log(currentID, dataIds, $.inArray(currentID, dataIds));
+                
+                if ($.inArray(currentID, dataIds) !== -1) {
                     var isIDSelected = $.grep(listStockSelectedBahanSetengahJadi, function(item) {
                         return item.id == (currentID);
                     }).length > 0;
-                    if (!isIDSelected && qtyMutasiFifo != 0 && parseFloat(listStockAsal[i].stok_total) != 0) {
-                        var mutasiQty = Math.min(qtyMutasiFifo, parseFloat(listStockAsal[i].stok_total));
+                    if (!isIDSelected && parseFloat(listStockAsal[i].stok_total) != 0) {
                         listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
                         listStockAsal[i].qty = 0;
                         listStockAsal[i].qty_isi = 0;
@@ -1716,19 +1717,17 @@
                         listStockAsal[i].departmentTujuanText = departmentTujuanText;
                         listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
                         listStockAsal[i].warehouseTujuanText = warehouseTujuanText;
-                        listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(2));
+                        listStockAsal[i].qty2 = parseFloat(0);
                         listStockSelectedBahanSetengahJadi.push(listStockAsal[i]);
-                        qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
                     }
                 }
             } else {
-                if ($.inArray(currentID, dataIds) == -1) {
+                if ($.inArray(currentID, dataIds) !== -1) {
                     currentID = Number(currentID);
                     var isIDSelected = $.grep(listStockSelectedBahan, function(item) {
                         return item.id == Number(currentID);
                     }).length > 0;
-                    if (!isIDSelected && qtyMutasiFifo != 0 && parseFloat(listStockAsal[i].stok_total) != 0) {
-                        var mutasiQty = Math.min(qtyMutasiFifo, parseFloat(listStockAsal[i].stok_total));
+                    if (!isIDSelected && parseFloat(listStockAsal[i].stok_total) != 0) {
                         listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
                         listStockAsal[i].qty = 0;
                         listStockAsal[i].qty_isi = 0;
@@ -1741,9 +1740,8 @@
                         listStockAsal[i].departmentTujuanText = departmentTujuanText;
                         listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
                         listStockAsal[i].warehouseTujuanText = warehouseTujuanText;
-                        listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(2));
+                        listStockAsal[i].qty2 = parseFloat(0);
                         listStockSelectedBahan.push(listStockAsal[i]);
-                        qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
                     }
                 }
             }
