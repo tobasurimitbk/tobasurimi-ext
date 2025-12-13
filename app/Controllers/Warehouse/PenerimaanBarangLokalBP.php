@@ -417,6 +417,15 @@ class PenerimaanBarangLokalBP extends BaseController
                 );
             }
 
+            if (!$this->checkLengthNoLpb($noPenerimaanBarang)) {
+                $noPenerimaanBarang = $this->penerimaanBarangModel->get_no(
+                    $tanggal,
+                    $this->this_company_id,
+                    "LOKAL",
+                    "PENOLONG"
+                );
+            }
+
             // Check Form Id
             $firstFormId = $this->penerimaanBarangModel
                 ->where('form_id', $formId)
@@ -431,20 +440,6 @@ class PenerimaanBarangLokalBP extends BaseController
                 ]);
                 exit;
             }
-
-            // $first = $this->penerimaanBarangModel->where('company_id', $this->this_company_id)
-            //     ->where('no_penerimaan_barang', $this->request->getVar('no_penerimaan_barang'))
-            //     ->where('status_penerimaan', "LOKAL")
-            //     ->where('tipe_bahan', "PENOLONG")
-            //     ->first();
-
-            // if ($first != null) {
-            //     return response()->setJSON([
-            //         'token' => csrf_hash(),
-            //         'message' => "No Penerimaan Barang Sudah Ada",
-            //         'status' => false
-            //     ]);
-            // }
 
             $penerimaanBarangID = $this->penerimaanBarangModel->insert([
                 'company_id' => $this->this_company_id,
@@ -1516,9 +1511,27 @@ class PenerimaanBarangLokalBP extends BaseController
             ->where('company_id', $this->this_company_id)
             ->where('deletedAt', null)
             ->first();
-
         return $penerimaanBarang == null ? true : false;
     }
+
+    private function checkLengthNoLpb($noLpb)
+    {
+        $length = strlen($noLpb);
+
+        if ($this->this_company_id == 1 || $this->this_company_id == 15) {
+            // LPB/F/1225, LPB/G/1225
+            return $length > 10;
+        }
+
+        if ($this->this_company_id == 2) {
+            // LPB/1225
+            return $length > 8;
+        }
+
+        // OCS
+        return true;
+    }
+
 
     private function updateMultipleSppColumn($id)
     {

@@ -422,7 +422,10 @@ class PPBKB extends BaseController
                 'tipe_mutasi' => "PPBKB",
                 'penerimaan_mutasi_no' => $penerimaanMutasiNo,
                 'multiple_mutasi_id' => "[$mutasi[id]]",
-                'multiple_no_mutasi' => '[' . $mutasi['no_mutasi'] . ']',
+                'multiple_no_mutasi' => json_encode(
+                    [$mutasi['no_mutasi']],
+                    JSON_UNESCAPED_SLASHES
+                ),
                 'tanggal' =>  $ppbkb['tanggal'],
                 'keterangan' => null,
                 'status_posting' => '1',

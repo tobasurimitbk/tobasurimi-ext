@@ -1255,7 +1255,7 @@
                                         confirmButtonText: 'Ok'
                                     }).then((result) => {
                                         if (result.isConfirmed) {
-                                            window.location.href = "<?= base_url("mutasi"); ?>";
+                                            window.location.href = "<?= base_url("mutasi/lokal"); ?>";
                                         }
                                     });
                                 } else {
@@ -1644,7 +1644,7 @@
                                 title: response.message,
                                 confirmButtonColor: '#4e73df',
                             }).then((result) => {
-                                window.location.href = "<?= base_url('mutasi') ?>"
+                                window.location.href = "<?= base_url('mutasi/lokal') ?>"
                             });
                         }
                     },
