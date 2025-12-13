@@ -111,8 +111,8 @@ class PenjualanPerBarang extends BaseController
 
         $addCondition = [
             "search" => $search != "all" ? $search : null,
-            "sort" => 'barang_master_sales.barang_name',
-            "sortType" => 'ASC',
+            "sort" => 'barang_name',
+            "sortType" => 'asc',
             "filter_jenis_dokumen" => $this->request->getGet("filter_jenis_dokumen") ?? null,
             "filter_barang" => $filter != "all" ? $filter : null,
             "dateStart" => $tglAwal != "all" ? date("Y-m-d", strtotime($tglAwal)) : "",
@@ -188,7 +188,7 @@ class PenjualanPerBarang extends BaseController
         $addCondition = [
             "search" => $search != "all" ? $search : null,
             "sort" => 'barang_name',
-            "sortType" => 'ASC',
+            "sortType" => 'asc',
             "filter_jenis_dokumen" => $this->request->getGet("filter_jenis_dokumen") ?? null,
             "filter_barang" => $filter != "all" ? $filter : null,
             "dateStart" => $tglAwal != "all" ? date("Y-m-d", strtotime($tglAwal)) : "",
@@ -321,6 +321,8 @@ class PenjualanPerBarang extends BaseController
 
         $addCondition = [
             "search" => $search != "all" ? $search : null,
+            "sort" => 'barang_name',
+            "sortType" => 'asc',
             "filter_jenis_dokumen" => $this->request->getGet("filter_jenis_dokumen") ?? null,
             "filter_barang" => $filter != "all" ? $filter : null,
             "dateStart" => $tglAwal != "all" ? date("Y-m-d", strtotime($tglAwal)) : "",
@@ -390,6 +392,8 @@ class PenjualanPerBarang extends BaseController
 
         $addCondition = [
             "search" => $search != "all" ? $search : null,
+            "sort" => 'barang_name',
+            "sortType" => 'asc',
             "filter_jenis_dokumen" => $this->request->getGet("filter_jenis_dokumen") ?? null,
             "filter_barang" => $filter != "all" ? $filter : null,
             "dateStart" => $tglAwal != "all" ? date("Y-m-d", strtotime($tglAwal)) : "",
@@ -508,6 +512,8 @@ class PenjualanPerBarang extends BaseController
 
         $addCondition = [
             "search" => $search != "all" ? $search : null,
+            "sort" => 'barang_name',
+            "sortType" => 'asc',
             "filter_jenis_dokumen" => $this->request->getGet("filter_jenis_dokumen") ?? null,
             "filter_barang" => $filter != "all" ? $filter : null,
             "dateStart" => $tglAwal != "all" ? date("Y-m-d", strtotime($tglAwal)) : "",
@@ -577,6 +583,8 @@ class PenjualanPerBarang extends BaseController
 
         $addCondition = [
             "search" => $search != "all" ? $search : null,
+            "sort" => 'barang_name',
+            "sortType" => 'asc',
             "filter_jenis_dokumen" => $this->request->getGet("filter_jenis_dokumen") ?? null,
             "filter_barang" => $filter != "all" ? $filter : null,
             "dateStart" => $tglAwal != "all" ? date("Y-m-d", strtotime($tglAwal)) : "",

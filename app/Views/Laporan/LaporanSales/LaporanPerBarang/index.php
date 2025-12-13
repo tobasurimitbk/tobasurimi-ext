@@ -120,8 +120,8 @@
 </section>
 
 <script>
-    let sort = "createdAt";
-    let sortType = "desc";
+    let sort = "barang_name";
+    let sortType = "asc";
 
     // Set default tanggal: awal bulan - hari ini
     const today = new Date();
