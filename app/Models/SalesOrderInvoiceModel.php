@@ -453,7 +453,7 @@ class SalesOrderInvoiceModel extends Model
     public function getSalesOrderInvoiceLokalPerBarang($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'no_faktur'          => 'sales_order_invoice.no_faktur',
+            'barang_name'          => 'barang_master_sales.barang_name',
             'nama_pelanggan'            => 'customers.name',
             'kode_pelanggan'             => 'customers.kode',
             'no_faktur'             => 'sales_order_invoice.no_faktur',
