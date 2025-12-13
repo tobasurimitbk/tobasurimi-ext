@@ -64,7 +64,7 @@
                         <tr>
                             <th>No</th>
                             <th onclick="changeSort('penerimaan_mutasi.penerimaan_mutasi_no')">No Penerimaan</th>
-                            <th onclick="changeSort('penerimaan_mutasi.divisi_id')">Dept</th>
+                            <th onclick="changeSort('penerimaan_mutasi.divisi_id')">Dept. Penerima</th>
                             <th onclick="changeSort('penerimaan_mutasi.tanggal')">Tanggal</th>
                             <th onclick="changeSort('penerimaan_mutasi.multiple_no_mutasi')">No Mutasi</th>
                             <th>No Ppbkb</th>
