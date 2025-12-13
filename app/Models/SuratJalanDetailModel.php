@@ -85,7 +85,8 @@ class SuratJalanDetailModel extends Model
                       surat_jalan_so_detail.keterangan AS keterangan,
                       surat_jalan_so_detail.*,
                       surat_jalan_so.id_company,
-                      sales_order.no_sales_order";
+                      sales_order.no_sales_order,
+                      surat_jalan_so.no_surat_jalan AS no_surat_jalan";
 
         $datas = $this->asObject()
             ->select($selectQry)

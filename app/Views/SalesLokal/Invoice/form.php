@@ -277,7 +277,6 @@
                         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-tambah-spp" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
-
                                     <th>Kode Barang</th>
                                     <th>Nama Barang</th>
                                     <th>Qty Awal</th>
@@ -287,6 +286,8 @@
                                     <th>Harga Satuan</th>
                                     <th>Discount</th>
                                     <th>Amount</th>
+                                    <th>No SO</th>
+                                    <th>No SJ</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -533,6 +534,14 @@
                 render: function(data, type, row) {
                     return greatFormatRupiah(destroyFormatRupiah(data));
                 }
+            },
+            {
+                data: "no_sales_order",
+                className: "text-center"
+            },
+            {
+                data: "no_surat_jalan",
+                className: "text-center"
             },
             {
                 data: "id",
@@ -1183,7 +1192,7 @@
                         success: function(res) {
                             $("#doc_id").empty();
                             res.data.forEach(function(item) {
-                                console.log(item);
+                                // console.log(item);
 
                                 $("#doc_id").append(`<option value="${item.id}" data-company="${item.id_company}" data-keterangan="${item.keterangan}" data-no_po="${item.no_po}" data-termin="${item.termin}" data-jenis_penjualan="${item.jenis_penjualan}" data-sales="${item.salesName}">${item.doc_no}</option>`);
                             });
@@ -1329,7 +1338,8 @@
                 tempItems = <?= json_encode($doc) ?>;
 
                 itemList = itemList.concat(tempItems); // Gabungkan item dari setiap dokumen
-            <?php endforeach; ?> table.rows.add(itemList).draw(false);
+            <?php endforeach; ?> 
+            table.rows.add(itemList).draw(false);
             itemList.forEach(function(item) {
                 list_items.push(item);
             });
@@ -1643,6 +1653,7 @@
 
         list_items = list_items.filter(item => selectedDocs.includes(item.id_sales_order));
 
+        console.log(list_items);
 
         // Clear and redraw DataTable with the updated item list
         table.clear().rows.add(list_items).draw(false);

@@ -478,9 +478,13 @@ class Invoice extends BaseController
                   sales_order_invoice_detail.discount_unit_invoice as discUnit,
                   sales_order_invoice_detail.harga_barang_invoice as harga_barang,
                   sales_order_invoice_detail.tax_invoice as tax,
-                  sales_order_invoice_detail.amount_invoice as amount,')
+                  sales_order_invoice_detail.amount_invoice as amount,
+                  surat_jalan_so.no_surat_jalan,
+                  sales_order.no_sales_order')
             ->join('barang_master_sales', 'barang_master_sales.id = sales_order_invoice_detail.id_barang_invoice', 'left')
             ->join('satuans', 'satuans.id = barang_master_sales.satuan_id', 'left')
+            ->join('surat_jalan_so', 'surat_jalan_so.id = sales_order_invoice_detail.id_surat_jalan', 'left')
+            ->join('sales_order', 'sales_order.id = sales_order_invoice_detail.id_sales_order', 'left')
             ->where('id_sales_order_invoice', $id)
             ->findAll();
 
