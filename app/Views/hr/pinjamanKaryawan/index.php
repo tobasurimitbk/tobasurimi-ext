@@ -306,13 +306,13 @@
     </div>
 </div>
 
-<div class="modal fade" id="updateStatusPinjamanModal">
+<div class="modal fade" id="updatePinjamanModal">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Update Status Pinjaman</h5>
+                <h5 class="modal-title">Update Pinjaman</h5>
             </div>
-            <form id="formUpdateStatusPinjaman" role="form" method="POST">
+            <form id="formUpdatePinjaman" role="form" method="POST">
                 <div class="modal-body">
                     <?= csrf_field() ?>
                     <div class="row mb-2">
@@ -329,7 +329,7 @@
                             </div>
                         </div>
                         <div class="col-md-6 mt-3">
-                            <div class="input-group mb-3">
+                            <div class="input-group">
                                 <div class="form-floating">
                                     <input readonly name="monthYear_StatusPinjaman" id="monthYear_StatusPinjaman" type="text" required class="form-control target input-picker" placeholder="Periode Pinjaman">
                                     <label>Periode Pinjaman</label>
@@ -342,7 +342,7 @@
                             </div>
                         </div>
                         <div class="col-md-6 mt-3">
-                            <div class="form-floating mb-3">
+                            <div class="form-floating">
                                 <select class="form-select" name="statusPinjaman" id="statusPinjaman">
                                     <option value="" selected></option>
                                     <option value="1">DIAMBIL</option>
@@ -351,12 +351,17 @@
                                 <label for="floatingInput">Status Pinjaman</label>
                             </div>
                         </div>
-
+                        <div class="col-md-6 mt-3">
+                            <div class="form-floating">
+                                <input id="nominal" type="text" class="form-control nominal" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                <label>Nominal Pinjaman</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-hide-form btn-discard mr-3" id="btnHideStatusPinjaman" data-bs-dismiss="modal">Kembali</button>
-                    <button type="submit" class="btn btn-submit-form" id="btnUpdateStatusPinjaman">Update Status</button>
+                    <button type="button" class="btn btn-hide-form btn-discard mr-3" id="btnHidePinjaman" data-bs-dismiss="modal">Kembali</button>
+                    <button type="submit" class="btn btn-submit-form" id="btnUpdatePinjaman">Update</button>
                 </div>
             </form>
         </div>
@@ -511,6 +516,8 @@
                     let tipeGol = row.tipeGol;
                     let is_boleh_minjam = row.isBolehMinjam;
                     let id = row.id;
+                    let nominal = row.nominalPinjaman;
+                    let statusPinjaman = row.statusPinjaman;
 
                     // escape nama biar aman saat ada tanda kutip
                     let safeEmployeeName = employeeName.replace(/'/g, "\\'");
@@ -524,17 +531,23 @@
                     `;
 
                     let updateBtn = `
-                        <button data-toggle="tooltip" title="Update Status"
-                            onclick="updateStatusPinjaman('${safeEmployeeName}', '${yearMonth}', '${tipeGol}', '${id}')"
+                        <button data-toggle="tooltip" title="Update"
+                            onclick="updateStatusPinjaman('${safeEmployeeName}', '${yearMonth}', '${tipeGol}', '${nominal}', '${statusPinjaman}', '${id}')"
                             class="btn btn-primary posting-spp">
                             <i class="fa-solid fa-pen-to-square"></i>
                         </button>
                     `;
 
+                    let deleteBtn = `
+                        <button data-toggle="tooltip" title="Hapus" onclick="destroy('${id}')" class="btn btn-danger delete-parent">
+                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                        </button>
+                    `;
+
                     if (is_boleh_minjam == 1) {
-                        return `<div class="mt-0">${generateBtn} ${updateBtn}</div>`;
+                        return `<div class="mt-0">${generateBtn} ${updateBtn} ${deleteBtn}</div>`;
                     } else {
-                        return `<div class="mt-0">${generateBtn}</div>`;
+                        return `<div class="mt-0">${generateBtn} ${deleteBtn}</div>`;
                     }
                 }
             }
@@ -636,7 +649,7 @@
         placeholder: "Pilih Status Pinjaman",
         theme: "bootstrap-5",
         allowClear: false,
-        dropdownParent: $('#updateStatusPinjamanModal')
+        dropdownParent: $('#updatePinjamanModal')
     });
 
     $("#divisiId_generate").select2({
@@ -741,13 +754,14 @@
         $('#generateSingleModal').modal('show');
     }
 
-    const updateStatusPinjaman = function(employeeName, yearMonth, tipeGol, id) {
+    const updateStatusPinjaman = function(employeeName, yearMonth, tipeGol, nominal, statusPinjaman, id) {
         $('#tipeGol_statusPinjaman').val(tipeGol);
         $('#employeeName_statusPinjaman').val(employeeName);
         $('#monthYear_StatusPinjaman').val(yearMonth);
         $('#id').val(id);
-        $('#statusPinjaman').val(null).change();
-        $('#updateStatusPinjamanModal').modal('show');
+        $('#nominal').val(greatFormatRupiah(nominal));
+        $('#statusPinjaman').val(statusPinjaman).change();
+        $('#updatePinjamanModal').modal('show');
     }
 
 
@@ -865,15 +879,21 @@
             },
         });
 
-        var validatorUpdateStatusPinjaman = $("#formUpdateStatusPinjaman").validate({
+        var validatorUpdateStatusPinjaman = $("#formUpdatePinjaman").validate({
             rules: {
                 statusPinjaman: {
+                    required: true
+                },
+                nominal: {
                     required: true
                 },
             },
             messages: {
                 statusPinjaman: {
                     required: "Pilih Status Pinjaman"
+                },
+                nominal: {
+                    required: "Nominal wajib diisi"
                 },
             },
             errorElement: 'span',
@@ -898,9 +918,9 @@
             },
         });
 
-        $('#btnHideStatusPinjaman').click(function(e) {
+        $('#btnHidePinjaman').click(function(e) {
             e.preventDefault();
-            $('#updateStatusPinjamanModal').modal('hide');
+            $('#updatePinjamanModal').modal('hide');
         });
 
         $('#generateModalBtn').click(function(e) {
@@ -1005,17 +1025,19 @@
     });
 
 
-    $('#btnUpdateStatusPinjaman').click(function(e) {
+    $('#btnUpdatePinjaman').click(function(e) {
         e.preventDefault();
-        if ($('#formUpdateStatusPinjaman').valid()) {
+        if ($('#formUpdatePinjaman').valid()) {
             var csrf = $(`[name="${csrfToken}"]`);
             var formData = new FormData();
             var id = $('#id').val();
             var statusPinjaman = $('#statusPinjaman option:selected').val();
+            var nominal = destroyFormatRupiah($('#nominal').val());
             formData.append("id", id);
             formData.append("status_pinjaman", statusPinjaman);
+            formData.append("nominal", nominal);
             $.ajax({
-                url: "<?= base_url("pinjaman-karyawan/update-status"); ?>",
+                url: "<?= base_url("pinjaman-karyawan/update"); ?>",
                 data: formData,
                 beforeSend: function(xhr) {
                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -1038,9 +1060,9 @@
                             })
                             .then(() => {
                                 table.ajax.reload();
-                                $("#updateStatusPinjamanModal").modal("hide");
+                                $("#updatePinjamanModal").modal("hide");
                             });
-                        $('#formUpdateStatusPinjaman')[0].reset();
+                        $('#formUpdatePinjaman')[0].reset();
                     } else {
                         Swal.fire({
                             icon: 'error',
@@ -1088,6 +1110,59 @@
             window.open(url, "_blank");
         }
     }
+
+    function destroy(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("pinjaman-karyawan/delete"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                    $(".add-modal").modal("hide")
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    },
+                });
+            }
+        })
+    }
+
 
     const changeSort = function(val) {
         if (sort !== val) {

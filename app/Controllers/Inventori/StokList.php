@@ -306,6 +306,7 @@ class StokList extends BaseController
                 $divisiFirst = $this->divisiModel
                     ->where('divisi', $divisi)
                     ->where('deletedAt', null)
+                    ->where('company_id', $this->this_company_id)
                     ->first();
 
                 $warehouseFirst = null;

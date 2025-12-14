@@ -16,6 +16,8 @@ use App\Models\PinjamanKaryawanModel;
 use Dompdf\Dompdf;
 use Exception;
 
+use function PHPUnit\Framework\returnSelf;
+
 class PinjamanKaryawan extends BaseController
 {
     protected $this_company_id, $userID;
@@ -193,7 +195,7 @@ class PinjamanKaryawan extends BaseController
                     if ($libur != null || date('l', strtotime($tgl)) == "Sunday") {
                         $tidakHadir++;
                     } elseif ($izin != null) {
-                        if (in_array($izin['status'], ["ALPHA_A", "POTONG GAJI_PG"])) {
+                        if (in_array($izin['status'], ["ALPHA_A", "POTONG GAJI_PG", "CUTI HAMIL_CHL", "CUTI MELAHIRKAN_CM"])) {
                             $tidakHadir++;
                         } else {
                             $hadir++;
@@ -344,7 +346,7 @@ class PinjamanKaryawan extends BaseController
                 if ($hariLibur != null || date('l', strtotime($dates)) == "Sunday") {
                     $tidakHadir++;
                 } elseif ($izin != null) {
-                    if (in_array($izin['status'], ["ALPHA_A", "POTONG GAJI_PG"])) {
+                    if (in_array($izin['status'], ["ALPHA_A", "POTONG GAJI_PG", "CUTI HAMIL_CHL", "CUTI MELAHIRKAN_CM"])) {
                         $tidakHadir++;
                     } else {
                         $hadir++;
@@ -448,7 +450,7 @@ class PinjamanKaryawan extends BaseController
                 "statusPinjaman" => $p->status_pinjaman,
                 "isBolehMinjam" => $p->is_boleh_minjam,
                 "isAmbil" => $p->is_ambil,
-                "nominalPinjaman" => number_format($p->nominal, 2),
+                "nominalPinjaman" => (float)$p->nominal,
                 // helper
                 "monthYear" => $p->month_year,
                 "employeeID" => $p->employee_id,
@@ -468,15 +470,39 @@ class PinjamanKaryawan extends BaseController
         return response()->setJSON($data);
     }
 
-    public function updateStatus()
+    public function update()
     {
         try {
             $id = $this->request->getVar('id');
             $statusPinjaman = $this->request->getVar('status_pinjaman');
-            $this->pinjamanKaryawanModel->update($id, ['status_pinjaman' => $statusPinjaman, 'is_ambil' => $statusPinjaman]);
+            $nominal = $this->request->getVar('nominal');
+            $this->pinjamanKaryawanModel->update($id, [
+                'status_pinjaman' => $statusPinjaman,
+                'is_ambil' => $statusPinjaman,
+                'nominal' => $nominal
+            ]);
             return response()->setJSON([
                 'token' => csrf_hash(),
                 'message' => "Data berhasil diupdate",
+                'status' => true
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'message' => $e->getMessage(),
+                'status' => false
+            ]);
+        }
+    }
+
+    public function delete()
+    {
+        try {
+            $id = $this->request->getVar('id');
+            $this->pinjamanKaryawanModel->delete($id);
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'message' => "Data terhapus",
                 'status' => true
             ]);
         } catch (Exception $e) {

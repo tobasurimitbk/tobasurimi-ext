@@ -2215,8 +2215,9 @@ $routes->post('/pinjaman-karyawan/generate-all', 'HR\PinjamanKaryawan::generateA
 $routes->post('/pinjaman-karyawan/employees', 'HR\Payroll::getEmployeeByDivision', ['filter' => 'Auth']);
 $routes->post('/pinjaman-karyawan/generate-single', 'HR\PinjamanKaryawan::generateSinglePinjaman', ['filter' => 'Auth']);
 $routes->get('/pinjaman-karyawan/print', 'HR\PinjamanKaryawan::exportPDF', ['filter' => 'Auth']);
-$routes->post('/pinjaman-karyawan/update-status', 'HR\PinjamanKaryawan::updateStatus', ['filter' => 'Auth']);
+$routes->post('/pinjaman-karyawan/update', 'HR\PinjamanKaryawan::update', ['filter' => 'Auth']);
 $routes->get('/pinjaman-karyawan/like-employees', 'HR\Attendance::getEmployeesLike', ['filter' => 'Auth']);
+$routes->post('/pinjaman-karyawan/delete', 'HR\PinjamanKaryawan::delete', ['filter' => 'Auth']);
 
 // Perijinan
 $routes->get('/form-perijinan', 'HR\Perijinan::perijinan', ['filter' => 'Auth']);

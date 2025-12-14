@@ -52,7 +52,7 @@ class PayrollCustomGajiHarianModel extends Model
             'payroll_custom_gaji_harian.keterangan' => 'payroll_custom_gaji_harian.keterangan',
             'payroll_custom_gaji_harian.checkin' => 'payroll_custom_gaji_harian.checkin',
             'payroll_custom_gaji_harian.checkout' => 'payroll_custom_gaji_harian.checkout',
-
+            'payroll_custom_gaji_harian.total_jam' => 'payroll_custom_gaji_harian.total_jam',
         ];
 
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];

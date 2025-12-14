@@ -65,7 +65,6 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Kembali</button>
                 <button type="submit" class="btn btn-submit-form btn-submit-parent">Simpan</button>
-                <button type="button" class="btn btn-discard delete-form delete-btn">Hapus</button>
             </div>
         </div>
     </div>
@@ -102,14 +101,15 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No.</th>
+                                <th>No</th>
                                 <th onclick="changeSort('kode')" class="sort">Kode</th>
                                 <th onclick="changeSort('name')" class="sort">Nama</th>
-                                <th onclick="changeSort('fax')" class="sort">Email Address</th>
-                                <th onclick="changeSort('address')" class="sort">Alamat</th>
+                                <th onclick="changeSort('fax')" class="sort">Email</th>
+                                <!-- <th onclick="changeSort('address')" class="sort">Alamat</th> -->
+                                <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
 
                         </tbody>
                     </table>
@@ -148,9 +148,6 @@
     let sortType = "desc";
     let trigger = true;
 
-    // Init changeStatus
-    changeStatus();
-
     const table = $('.dataTable').DataTable({
 
         processing: true,
@@ -185,25 +182,49 @@
         searching: false,
         columns: [{
             data: "no",
-            className: "text-center",
+            className: "text-left",
             sortable: false
         }, {
             data: "kode",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "name",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "fax",
-            className: "text-center"
+            className: "text-left"
         }, {
-            data: "address",
-            className: "text-center"
+            data: "id",
+            className: "text-center actions",
+            searchable: false,
+            sortable: false,
+            render: function(data, type, row) {
+                let id = row.id;
+                return `
+                    <?php if (can('Supplier', 'Internasional', 'u')) : ?>
+                        <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    <?php endif; ?>
+                    <?php if (can('Supplier', 'Internasional', 'd')) : ?>
+                        <button data-toggle="tooltip" title="Hapus" onclick="destroy('${id}')" class="btn btn-danger delete-parent">
+                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                        </button>
+                    <?php endif; ?>
+                       
+                    `;
+            }
         }],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
         }],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
         language: {
             emptyTable: "Tidak Ada Data",
             lengthMenu: "Show _MENU_ entries",
@@ -214,170 +235,116 @@
         }
     });
 
-    $(document).ready(function() {
-        var validator = $(".create-form").validate({
-            rules: {
-                kode: {
-                    required: true
-                },
-                name: {
-                    required: true
-                }
+    var validator = $(".create-form").validate({
+        rules: {
+            kode: {
+                required: true
             },
-            messages: {
-                kode: {
-                    required: "Kode wajib diisi"
-                },
-                name: {
-                    required: "Nama wajib diisi"
-                }
+            name: {
+                required: true
+            }
+        },
+        messages: {
+            kode: {
+                required: "Kode wajib diisi"
             },
-            errorElement: 'span',
-            errorClass: 'text-danger',
-            errorPlacement: function(error, element) {
-                var elem = $(element);
-                if (elem.hasClass("select2-hidden-accessible")) {
-                    element = $("#select2-" + elem.attr("id") + "-container").parent();
-                    error.insertAfter(element);
-                } else {
-                    error.insertAfter(element);
-                }
-            },
-            highlight: function(element) {
-                $(element).closest('.form-group').addClass('has-error');
-                $(element).addClass('select-class');
+            name: {
+                required: "Nama wajib diisi"
+            }
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
 
-            },
-            unhighlight: function(element) {
-                $(element).closest('.form-group').removeClass('has-error');
-                $(element).removeClass('select-class');
-            },
-        });
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
 
-        // $(".fax").mask("0000000000")
+    // $(".fax").mask("0000000000")
 
-        // $(".phone").mask("0000000000000")
+    // $(".phone").mask("0000000000000")
 
-        $(".search").keyup(function() {
-            table.ajax.reload();
-        })
+    $(".search").keyup(function() {
+        table.ajax.reload();
+    })
 
-        $(".dataTable_info").addClass("pt-0");
+    $(".dataTable_info").addClass("pt-0");
 
-        $(".btn-show-form").click(function() {
-            $(".id").val("");
-            $(".title-name").text("Tambah");
+    $(".btn-show-form").click(function() {
+        $(".id").val("");
+        $(".title-name").text("Tambah");
 
-            validator.resetForm();
-            validator.reset();
+        validator.resetForm();
+        validator.reset();
 
-            $(".create-form")[0].reset()
-            $(".delete-form").css('display', 'none');
+        $(".create-form")[0].reset()
+        $(".delete-form").css('display', 'none');
 
-            $.ajax({
-                url: "<?= base_url("supplier/generate/I"); ?>",
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    if (res.status) {
-                        $(".kode").val(res.data)
-                        $(".add-modal").modal("show");
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: res.message,
-                            confirmButtonColor: '#4e73df',
-                        })
-                    }
-                }
-            })
-        })
+        changeStatus();
+        $(".add-modal").modal("show");
 
-        $(".btn-hide-form").click(function() {
-            $(".add-modal").modal("hide")
-        })
+    })
 
-        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-            const data = table.row(this).data();
-            $(".create-form")[0].reset()
-            $(".delete-form").css('display', '');
-            let id = data.id;
-            $(".title-name").text("Update");
+    $(".btn-hide-form").click(function() {
+        $(".add-modal").modal("hide")
+    })
 
-            $.ajax({
-                url: "<?= base_url("supplier/id"); ?>" + "/" + id,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    if (res.status) {
-                        validator.resetForm();
-                        validator.reset();
-
-                        $(".id").val(id);
-                        $(".kode").val(res.data.kode);
-                        $(".name").val(res.data.name);
-                        $(".address").val(res.data.address);
-                        $(".fax").val(res.data.fax);
-                        $(".phone").val(res.data.phone);
-                        $(".contact_person").val(res.data.contact_person);
-                        $('#auto_generate').css('display', 'none');
-                        $("#kode").prop("readonly", false);
-                        $('.modal').on('hidden.bs.modal', function() {
-                            $('#auto_generate').css('display', '');
-
-                        });
-
-                        $(".add-modal").modal("show");
-
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: res.message,
-                            confirmButtonColor: '#4e73df',
-                        })
-                    }
-                }
-            })
-        })
-
-        // delete
-        $(".delete-form").click(function() {
+    $(".btn-submit-parent").click(function() {
+        if ($(".create-form").valid()) {
             Swal.fire({
                 icon: 'question',
-                title: 'Hapus Data?',
+                title: 'Simpan Data?',
                 confirmButtonColor: '#4e73df',
                 cancelButtonColor: '#d33',
                 showCancelButton: true,
                 reverseButtons: true,
-                confirmButtonText: 'Hapus',
+                confirmButtonText: 'Simpan',
                 cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
+                    let data = new FormData(document.querySelector(".create-form"));
                     let id = $(".id").val();
-                    setLoading()
+
                     $.ajax({
-                        url: "<?= base_url("supplier/delete"); ?>",
-                        data: {
-                            id: id
-                        },
+                        url: id ? "<?= base_url("supplier-internasional/update"); ?>" : "<?= base_url("supplier-internasional/save"); ?>",
+                        data: data,
                         beforeSend: function(xhr) {
+                            setLoading();
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        complete: function() {
+                            stopLoading();
                         },
                         method: "POST",
                         dataType: "json",
+                        processData: false,
+                        contentType: false,
                         success: function(response) {
                             csrf.val(response.token);
                             if (response.status) {
-                                stopLoading()
                                 Swal.fire({
                                         icon: 'success',
                                         title: response.message,
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        table.ajax.reload()
                                         $(".add-modal").modal("hide")
+                                        table.ajax.reload()
                                     })
                             } else {
                                 Swal.fire({
@@ -385,87 +352,107 @@
                                     title: response.message,
                                     confirmButtonColor: '#4e73df',
                                 })
-                                stopLoading()
                             }
                         },
-                        onError: function(response) {
-                            csrf.val(response.token);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Data Gagal Disimpan, coba Lagi',
-                                confirmButtonColor: '#4e73df',
-                            })
-                            stopLoading()
-                        }
                     });
                 }
             })
-        })
+        }
+    });
 
-        $(".btn-submit-parent").click(function() {
-            if ($(".create-form").valid()) {
-                Swal.fire({
-                    icon: 'question',
-                    title: 'Simpan Data?',
-                    confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Kembali',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const csrf = $(`[name="${csrfToken}"]`);
-                        let data = new FormData(document.querySelector(".create-form"));
-                        let id = $(".id").val();
-
-                        $.ajax({
-                            url: id ? "<?= base_url("supplier-internasional/update"); ?>" : "<?= base_url("supplier-internasional/save"); ?>",
-                            data: data,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    stopLoading()
-                                    Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            $(".add-modal").modal("hide")
-                                            table.ajax.reload()
-                                        })
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    stopLoading()
-                                }
-                            },
-                            onError: function(response) {
-                                csrf.val(response.token);
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Data Gagal Disimpan, coba Lagi',
+    function destroy(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("supplier/delete"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
                                     confirmButtonColor: '#4e73df',
                                 })
-                                stopLoading()
-                            }
-                        });
-                    }
-                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                    $(".add-modal").modal("hide")
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            });
+                        }
+                    },
+
+                });
             }
         })
-    })
+    }
+
+    function edit(id) {
+        $(".create-form")[0].reset()
+        $(".delete-form").css('display', '');
+        $(".title-name").text("Update");
+
+        $.ajax({
+            url: "<?= base_url("supplier/id"); ?>" + "/" + id,
+            method: "GET",
+            dataType: "json",
+            success: function(res) {
+                if (res.status) {
+                    validator.resetForm();
+                    validator.reset();
+
+                    $(".id").val(id);
+                    $(".kode").val(res.data.kode);
+                    $(".name").val(res.data.name);
+                    $(".address").val(res.data.address);
+                    $(".fax").val(res.data.fax);
+                    $(".phone").val(res.data.phone);
+                    $(".contact_person").val(res.data.contact_person);
+                    $('#auto_generate').css('display', 'none');
+                    $("#kode").prop("readonly", false);
+                    $('.modal').on('hidden.bs.modal', function() {
+                        $('#auto_generate').css('display', '');
+
+                    });
+
+                    $(".add-modal").modal("show");
+
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: res.message,
+                        confirmButtonColor: '#4e73df',
+                    })
+                }
+            }
+        })
+    }
 
     const changeSort = function(val) {
         if (sort !== val) {
