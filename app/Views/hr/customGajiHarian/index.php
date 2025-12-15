@@ -49,6 +49,7 @@
                                 <th onclick="changeSort('payroll_custom_gaji_harian.tanggal')" class="sort">Tgl</th>
                                 <th onclick="changeSort('payroll_custom_gaji_harian.checkin')" class="sort">Masuk</th>
                                 <th onclick="changeSort('payroll_custom_gaji_harian.checkout')" class="sort">Pulang</th>
+                                <th onclick="changeSort('payroll_custom_gaji_harian.total_jam')" class="sort">Total Jam</th>
                                 <th onclick="changeSort('payroll_custom_gaji_harian.nominal')" class="sort">Nominal</th>
                                 <th onclick="changeSort('payroll_custom_gaji_harian.keterangan')" class="sort">Keterangan</th>
                                 <th class="sort">Action</th>
@@ -125,6 +126,9 @@
             className: "text-left"
         }, {
             data: "checkout",
+            className: "text-left"
+        }, {
+            data: "total_jam",
             className: "text-left"
         }, {
             data: "nominal",

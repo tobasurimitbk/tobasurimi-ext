@@ -2347,6 +2347,7 @@ class Attendance extends BaseController
     {
         $startDate = formatDMYtoYMD($this->request->getVar('start_date'));
         $endDate   = formatDMYtoYMD($this->request->getVar('end_date'));
+        $employeeId = $this->request->getVar('employee_id');
 
         // ambil data employees
         $condition = [
@@ -2356,7 +2357,8 @@ class Attendance extends BaseController
         $addCondition = [
             "divisi_id" => $this->request->getVar('divisi_id'),
             "tipe"      => $this->request->getVar('tipe'),
-            "bagian_id" => $this->request->getVar("bagian_id")
+            "bagian_id" => $this->request->getVar("bagian_id"),
+            'employee_id' => $employeeId == 'null' || $employeeId == '' ? '' : $employeeId
         ];
 
         // ambil data jam kerja kantor & bulanan
@@ -2370,6 +2372,20 @@ class Attendance extends BaseController
         $employeeData = $employees['data'];
         $employeeIds  = array_column($employeeData, 'id');
 
+        // mapping keterangan 
+        $attendanceKeterangan = !empty($employeeIds) ? $this->AttendanceKeteranganModel->getKeteranganByDateRangeAmt(
+            $employeeIds,
+            $startDate,
+            $endDate
+        ) : [];
+
+        $mapAttendanceKeterangan = [];
+        foreach ($attendanceKeterangan as $d) {
+            $mapAttendanceKeterangan[$d['employee_id']][$d['tanggal']] = [
+                'reason' => $d['reason']
+            ];
+        }
+
         // log attendance
         $logData = !empty($employeeIds)
             ? $this->AttendanceModel->getAttendanceByDateRangeAmt($employeeIds, $startDate, $endDate)
@@ -2377,11 +2393,16 @@ class Attendance extends BaseController
 
         $mapLog = [];
         foreach ($logData as $l) {
+            $reason = $l['reason'];
+            if ($reason == '') {
+                $reason = $mapAttendanceKeterangan[$l['employee_id']][$l['periode']]['reason']  ?? '';
+            }
+
             $mapLog[$l['employee_id']][$l['periode']] = [
                 'in'     => $l['checkin'],
                 'out'    => $l['checkout'],
                 'status' => $l['status'],
-                'reason' => $l['reason']
+                'reason' => $reason
             ];
         }
 
@@ -2417,7 +2438,7 @@ class Attendance extends BaseController
         $row = 1;
 
         // Judul besar
-        $sheet->mergeCells("A$row:G$row");
+        $sheet->mergeCells("A$row:I$row");
         $sheet->setCellValue("A$row", "LAPORAN PRESENSI " . $startDate . " S.D " . $endDate);
         $sheet->getStyle("A$row")->applyFromArray([
             'font' => ['bold' => true, 'size' => 14],
@@ -2429,7 +2450,7 @@ class Attendance extends BaseController
         foreach ($employeeData as $e) {
 
             // Card info karyawan
-            $sheet->mergeCells("A$row:G$row");
+            $sheet->mergeCells("A$row:I$row");
             $sheet->setCellValue("A$row", "Nama: {$e['name']} | NIP: {$e['nip']} | Divisi: {$e['divisi']} | Bagian: {$e['bagian']}");
             $sheet->getStyle("A$row")->applyFromArray([
                 'font' => ['bold' => true],
@@ -2440,13 +2461,13 @@ class Attendance extends BaseController
             $row += 2;
 
             // Header
-            $headers = ['No', 'Tanggal', 'IN', 'OUT', 'DENDA', 'LEMBUR', 'UANG MAKAN'];
+            $headers = ['No', 'Tanggal', 'IN', 'OUT', 'DENDA', 'LEMBUR', 'UANG MAKAN', 'KET. IN', 'KET. OUT'];
             $col = 1;
             foreach ($headers as $h) {
                 $sheet->setCellValueByColumnAndRow($col++, $row, $h);
             }
 
-            $sheet->getStyle("A$row:G$row")->applyFromArray([
+            $sheet->getStyle("A$row:I$row")->applyFromArray([
                 'font' => ['bold' => true],
                 'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'D9E1F2']],
                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
@@ -2470,10 +2491,22 @@ class Attendance extends BaseController
                 $out = $dayLog['out'] ?? '';
                 $status = $dayLog['status'] ?? '';
                 $reason = $dayLog['reason'] ?? '';
+                $ketIn = "";
+                $ketOut = "";
 
                 if ($status != "HADIR_H" && !empty($status)) {
                     $val = explode("_", $status)[1];
                     $in = $out = $val;
+                }
+
+                if (isset($reason)) {
+                    $reason = trim($reason);
+                    if ($reason != '' && $reason != '-') {
+                        $parts = explode('-', $reason, 2);
+
+                        $ketIn  = trim($parts[0] ?? '');
+                        $ketOut = trim($parts[1] ?? '');
+                    }
                 }
 
                 // lembur
@@ -2494,7 +2527,7 @@ class Attendance extends BaseController
                 // uang makan
                 $uangMakan = (float)($mapUangMakanHarian[$e['id']][$tanggal]['nominal'] ?? 0);
                 if (in_array($e['divisi'], ["BULANAN", "KANTOR"])) {
-                    // khusus departemen kantor & bulanan aja
+                    // khusus departemen kantor & bulanan aja kasih tanda is_terlambat, yang lain mengabaikan keterlambatan
                     if (($reason == '' || $reason == '-') && $this->is_format_waktu($in) && $status == "HADIR_H") {
                         $isTerlambat =  $this->is_terlambat($jamKerjaTerlambat, $in);
                     } else {
@@ -2513,12 +2546,14 @@ class Attendance extends BaseController
                 $sheet->setCellValueByColumnAndRow($col++, $row, $denda);
                 $sheet->setCellValueByColumnAndRow($col++, $row, $lembur);
                 $sheet->setCellValueByColumnAndRow($col++, $row, $uangMakan);
+                $sheet->setCellValueByColumnAndRow($col++, $row, $ketIn);
+                $sheet->setCellValueByColumnAndRow($col++, $row, $ketOut);
 
                 // format angka + style row
                 $sheet->getStyle("E$row:G$row")->getNumberFormat()->setFormatCode('#,##0');
                 $sheet->getStyle("E$row:G$row")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
-                $sheet->getStyle("A$row:G$row")->applyFromArray([
+                $sheet->getStyle("A$row:I$row")->applyFromArray([
                     'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
                 ]);
 
@@ -2547,7 +2582,7 @@ class Attendance extends BaseController
         }
 
         // Auto width
-        foreach (range('A', 'G') as $col) {
+        foreach (range('A', 'I') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 

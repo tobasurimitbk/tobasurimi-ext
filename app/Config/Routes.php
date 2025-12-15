@@ -2123,7 +2123,7 @@ $routes->group('bea-cukai-bc-41', ['filter' => 'Auth'], function ($routes) {
     $routes->get('api/kirim-dokumen/(:segment)', 'BeaCukai\BC41::kirimCeisa/$1');
     // OUTSTANDING
     $routes->get('bc-41-outstanding-all', 'BeaCukai\BC25::allOutstanding');
-    $routes->get('bc-41-outstanding', 'BeaCukai\BC41::viewOutstanding');
+    $routes->get('bc-41-outstanding', 'BeaCukai\BC25::viewOutstanding');
     $routes->get('bc-41-outstanding-export', 'BeaCukai\BC25::OutstandingExcel');
 });
 
@@ -2215,8 +2215,9 @@ $routes->post('/pinjaman-karyawan/generate-all', 'HR\PinjamanKaryawan::generateA
 $routes->post('/pinjaman-karyawan/employees', 'HR\Payroll::getEmployeeByDivision', ['filter' => 'Auth']);
 $routes->post('/pinjaman-karyawan/generate-single', 'HR\PinjamanKaryawan::generateSinglePinjaman', ['filter' => 'Auth']);
 $routes->get('/pinjaman-karyawan/print', 'HR\PinjamanKaryawan::exportPDF', ['filter' => 'Auth']);
-$routes->post('/pinjaman-karyawan/update-status', 'HR\PinjamanKaryawan::updateStatus', ['filter' => 'Auth']);
+$routes->post('/pinjaman-karyawan/update', 'HR\PinjamanKaryawan::update', ['filter' => 'Auth']);
 $routes->get('/pinjaman-karyawan/like-employees', 'HR\Attendance::getEmployeesLike', ['filter' => 'Auth']);
+$routes->post('/pinjaman-karyawan/delete', 'HR\PinjamanKaryawan::delete', ['filter' => 'Auth']);
 
 // Perijinan
 $routes->get('/form-perijinan', 'HR\Perijinan::perijinan', ['filter' => 'Auth']);

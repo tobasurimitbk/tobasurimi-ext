@@ -127,7 +127,6 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Kembali</button>
                 <button type="submit" class="btn btn-submit-form btn-submit-parent">Simpan</button>
-                <button type="button" class="btn btn-discard delete-form delete-btn">Hapus</button>
             </div>
         </div>
     </div>
@@ -172,10 +171,10 @@
                                 <th onclick="changeSort('no_ktp')" class="sort">KTP</th>
                                 <th onclick="changeSort('address')" class="sort">No Telephone</th>
                                 <th onclick="changeSort('phone')" class="sort">Alamat</th>
-                                <th onclick="changeSort('phone')" class="sort">Histori</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
 
                         </tbody>
                     </table>
@@ -343,7 +342,6 @@
     })
 
     const table = $('.dataTable').DataTable({
-
         processing: true,
         serverSide: true,
         ordering: true,
@@ -376,38 +374,47 @@
         searching: false,
         columns: [{
             data: "no",
-            className: "text-center",
+            className: "text-left",
             sortable: false
         }, {
             data: "kode",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "name",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "no_npwp",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "no_ktp",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "phone",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "address",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "id",
             className: "text-center actions",
             searchable: false,
             sortable: false,
             render: function(data, type, row) {
+                let id = row.id;
                 return `
-                    <div class="mt-0 actions">
-                        <button onclick="displayHistory('${row.id}')" class="btn btn-success posting-spp actions">
-                            <i class="fa-solid fa-clock-rotate-left"></i>
+                    <?php if (can('Supplier', 'Bahan Penolong', 'u')) : ?>
+                        <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    <?php endif; ?>
+                    <?php if (can('Supplier', 'Bahan Penolong', 'd')) : ?>
+                        <button data-toggle="tooltip" title="Hapus" onclick="destroy('${id}')" class="btn btn-danger delete-parent">
+                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                         </button>
-                    </div>
+                    <?php endif; ?>
+                    <button data-toggle="tooltip" title="History" onclick="displayHistory('${row.id}')" class="btn btn-success posting-spp actions">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </button>
                 `
             }
         }],
@@ -415,6 +422,12 @@
             defaultContent: "-",
             targets: "_all"
         }],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
         language: {
             emptyTable: "Tidak Ada Data",
             lengthMenu: "Show _MENU_ entries",
@@ -460,42 +473,42 @@
             searching: false,
             columns: [{
                 data: "no",
-                className: "text-center",
+                className: "text-left",
                 sortable: false
             }, {
                 data: "spp_no",
-                className: "text-center"
+                className: "text-left"
             }, {
                 data: "po_no",
-                className: "text-center"
+                className: "text-left"
             }, {
                 data: "no_penerimaan_barang",
-                className: "text-center",
+                className: "text-left",
                 sortable: false
             }, {
                 data: "po_date",
-                className: "text-center"
+                className: "text-left"
             }, {
                 data: "nama_supplier",
-                className: "text-center"
+                className: "text-left"
             }, {
                 data: "nama_barang",
-                className: "text-center"
+                className: "text-left"
             }, {
                 data: "note",
-                className: "text-center"
+                className: "text-left"
             }, {
                 data: "divisi",
-                className: "text-center"
+                className: "text-left"
             }, {
                 data: "qty",
-                className: "text-center"
+                className: "text-left"
             }, {
                 data: "kode_satuan",
-                className: "text-center"
+                className: "text-left"
             }, {
                 data: "price",
-                className: "text-center"
+                className: "text-left"
             }],
             columnDefs: [{
                 defaultContent: "-",
@@ -535,192 +548,126 @@
         $('#historiModal').modal('show');
     }
 
-    $(document).ready(function() {
-        var validator = $(".create-form").validate({
-            rules: {
-                kode: {
-                    required: true
-                },
-                name: {
-                    required: true
-                },
-
+    var validator = $(".create-form").validate({
+        rules: {
+            kode: {
+                required: true
             },
-            messages: {
-                kode: {
-                    required: "Kode wajib diisi"
-                },
-                name: {
-                    required: "Nama wajib diisi"
-                },
-
+            name: {
+                required: true
             },
-            errorElement: 'span',
-            errorClass: 'text-danger',
-            errorPlacement: function(error, element) {
-                var elem = $(element);
-                if (elem.hasClass("select2-hidden-accessible")) {
-                    element = $("#select2-" + elem.attr("id") + "-container").parent();
-                    error.insertAfter(element);
+
+        },
+        messages: {
+            kode: {
+                required: "Kode wajib diisi"
+            },
+            name: {
+                required: "Nama wajib diisi"
+            },
+
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
+
+    $(".no_npwp").mask("000000000000000000000")
+
+    $(".search").keyup(function() {
+        table.ajax.reload();
+    })
+
+    $(".dataTable_info").addClass("pt-0");
+
+    $(".btn-show-form").click(function() {
+        $(".id").val("");
+        $(".title-name").text("Tambah");
+
+        validator.resetForm();
+        validator.reset();
+
+        $(".create-form")[0].reset()
+        $(".delete-form").css('display', 'none');
+
+        $(".province_parent_id").val('').change()
+        $(".city_parent_id").val('').change()
+        $(".city_parent_id").empty()
+        $(".city_parent_id").append(`<option value=""></option>`)
+        $(".country_code").val('').change()
+
+        $.ajax({
+            url: "<?= base_url("supplier/generate/BP"); ?>",
+            method: "GET",
+            dataType: "json",
+            success: function(res) {
+                if (res.status) {
+                    $(".kode").val(res.data)
+                    $(".add-modal").modal("show");
                 } else {
-                    error.insertAfter(element);
+                    Swal.fire({
+                        icon: 'error',
+                        title: res.message,
+                        confirmButtonColor: '#4e73df',
+                    })
                 }
-            },
-            highlight: function(element) {
-                $(element).closest('.form-group').addClass('has-error');
-                $(element).addClass('select-class');
-
-            },
-            unhighlight: function(element) {
-                $(element).closest('.form-group').removeClass('has-error');
-                $(element).removeClass('select-class');
-            },
-        });
-
-        $(".no_npwp").mask("000000000000000000000")
-
-        // $(".phone").mask("0000000000000")
-
-        $(".search").keyup(function() {
-            table.ajax.reload();
+            }
         })
+    })
 
-        $(".dataTable_info").addClass("pt-0");
+    $(".btn-hide-form").click(function() {
+        $(".add-modal").modal("hide")
+    })
 
-        $(".btn-show-form").click(function() {
-            $(".id").val("");
-            $(".title-name").text("Tambah");
+    $(".btn-hide-harga").click(function() {
+        $(".harga-modal").modal("hide")
+    })
 
-            validator.resetForm();
-            validator.reset();
 
-            $(".create-form")[0].reset()
-            $(".delete-form").css('display', 'none');
-
-            $(".province_parent_id").val('').change()
-            $(".city_parent_id").val('').change()
-            $(".city_parent_id").empty()
-            $(".city_parent_id").append(`<option value=""></option>`)
-            $(".country_code").val('').change()
-
-            $.ajax({
-                url: "<?= base_url("supplier/generate/BP"); ?>",
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    if (res.status) {
-                        $(".kode").val(res.data)
-                        $(".add-modal").modal("show");
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: res.message,
-                            confirmButtonColor: '#4e73df',
-                        })
-                    }
-                }
-            })
-        })
-
-        $(".btn-hide-form").click(function() {
-            $(".add-modal").modal("hide")
-        })
-
-        $(".btn-hide-harga").click(function() {
-            $(".harga-modal").modal("hide")
-        })
-
-        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-            const data = table.row(this).data();
-            $(".create-form")[0].reset()
-            $(".delete-form").css('display', '');
-            let id = data.id;
-            $(".title-name").text("Update");
-
-            $.ajax({
-                url: "<?= base_url("supplier/id"); ?>" + "/" + id,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    if (res.status) {
-                        validator.resetForm();
-                        validator.reset();
-
-                        $(".id").val(id);
-                        $(".kode").val(res.data.kode);
-                        $(".name").val(res.data.name);
-                        $(".address").val(res.data.address);
-                        $(".no_npwp").val(formatNpwp(res.data.no_npwp));
-                        $(".no_ktp").val(formatNpwp(res.data.no_ktp));
-                        $(".phone").val(res.data.phone);
-                        $(".contact_person").val(res.data.contact_person);
-                        $(".email").val(res.data.email);
-                        $(".province_parent_id").val(res.data.province_id).change();
-                        $(".country_code").val(res.data.country_code).change();
-                        $('#auto_generate').css('display', 'none');
-                        $("#kode").prop("readonly", false);
-                        $('.modal').on('hidden.bs.modal', function() {
-                            $('#auto_generate').css('display', '');
-
-                        });
-
-                        // AJAX GET CITY
-                        $.ajax({
-                            url: `<?= base_url("city"); ?>/${res.data.province_id}`,
-                            method: "GET",
-                            dataType: "json",
-                            success: function(result) {
-                                $(".city_parent_id").empty()
-                                $(".city_parent_id").val("").change()
-                                $(".city_parent_id").append(`<option value=""></option>`)
-                                result.data.forEach(function(item) {
-                                    $(".city_parent_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
-                                })
-
-                                $(".city_parent_id").val(res.data.city_id).change();
-                                $(".parent_postal_code").val(res.data.postal_code);
-                            }
-                        })
-
-                        $(".add-modal").modal("show");
-
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: res.message,
-                            confirmButtonColor: '#4e73df',
-                        })
-                    }
-                }
-            })
-        })
-
-        // delete
-        $(".delete-form").click(function() {
+    $(".btn-submit-parent").click(function() {
+        if ($(".create-form").valid()) {
             Swal.fire({
                 icon: 'question',
-                title: 'Hapus Data?',
+                title: 'Simpan Data?',
                 confirmButtonColor: '#4e73df',
                 cancelButtonColor: '#d33',
                 showCancelButton: true,
                 reverseButtons: true,
-                confirmButtonText: 'Hapus',
+                confirmButtonText: 'Simpan',
                 cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
+                    let data = new FormData(document.querySelector(".create-form"));
                     let id = $(".id").val();
-                    setLoading()
+
                     $.ajax({
-                        url: "<?= base_url("supplier/delete"); ?>",
-                        data: {
-                            id: id
-                        },
+                        url: id ? "<?= base_url("supplier-bahan-penolong/update"); ?>" : "<?= base_url("supplier-bahan-penolong/save"); ?>",
+                        data: data,
                         beforeSend: function(xhr) {
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
                         },
                         method: "POST",
                         dataType: "json",
+                        processData: false,
+                        contentType: false,
                         success: function(response) {
                             csrf.val(response.token);
                             if (response.status) {
@@ -731,8 +678,8 @@
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        table.ajax.reload()
                                         $(".add-modal").modal("hide")
+                                        table.ajax.reload()
                                     })
                             } else {
                                 Swal.fire({
@@ -755,72 +702,122 @@
                     });
                 }
             })
-        })
+        }
+    })
 
-        $(".btn-submit-parent").click(function() {
-            if ($(".create-form").valid()) {
-                Swal.fire({
-                    icon: 'question',
-                    title: 'Simpan Data?',
-                    confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Kembali',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const csrf = $(`[name="${csrfToken}"]`);
-                        let data = new FormData(document.querySelector(".create-form"));
-                        let id = $(".id").val();
+    function edit(id) {
+        $(".create-form")[0].reset()
+        $(".delete-form").css('display', '');
+        $(".title-name").text("Update");
+        $.ajax({
+            url: "<?= base_url("supplier/id"); ?>" + "/" + id,
+            method: "GET",
+            dataType: "json",
+            success: function(res) {
+                if (res.status) {
+                    validator.resetForm();
+                    validator.reset();
 
-                        $.ajax({
-                            url: id ? "<?= base_url("supplier-bahan-penolong/update"); ?>" : "<?= base_url("supplier-bahan-penolong/save"); ?>",
-                            data: data,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    stopLoading()
-                                    Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            $(".add-modal").modal("hide")
-                                            table.ajax.reload()
-                                        })
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    stopLoading()
-                                }
-                            },
-                            onError: function(response) {
-                                csrf.val(response.token);
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Data Gagal Disimpan, coba Lagi',
+                    $(".id").val(id);
+                    $(".kode").val(res.data.kode);
+                    $(".name").val(res.data.name);
+                    $(".address").val(res.data.address);
+                    $(".no_npwp").val(formatNpwp(res.data.no_npwp));
+                    $(".no_ktp").val(formatNpwp(res.data.no_ktp));
+                    $(".phone").val(res.data.phone);
+                    $(".contact_person").val(res.data.contact_person);
+                    $(".email").val(res.data.email);
+                    $(".province_parent_id").val(res.data.province_id).change();
+                    $(".country_code").val(res.data.country_code).change();
+                    $('#auto_generate').css('display', 'none');
+                    $("#kode").prop("readonly", false);
+                    $('.modal').on('hidden.bs.modal', function() {
+                        $('#auto_generate').css('display', '');
+
+                    });
+
+                    // AJAX GET CITY
+                    $.ajax({
+                        url: `<?= base_url("city"); ?>/${res.data.province_id}`,
+                        method: "GET",
+                        dataType: "json",
+                        success: function(result) {
+                            $(".city_parent_id").empty()
+                            $(".city_parent_id").val("").change()
+                            $(".city_parent_id").append(`<option value=""></option>`)
+                            result.data.forEach(function(item) {
+                                $(".city_parent_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
+                            })
+
+                            $(".city_parent_id").val(res.data.city_id).change();
+                            $(".parent_postal_code").val(res.data.postal_code);
+                        }
+                    })
+
+                    $(".add-modal").modal("show");
+
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: res.message,
+                        confirmButtonColor: '#4e73df',
+                    })
+                }
+            }
+        });
+    }
+
+    function destroy(id) {
+        // delete
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("supplier/delete"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
                                     confirmButtonColor: '#4e73df',
                                 })
-                                stopLoading()
-                            }
-                        });
-                    }
-                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    },
+                });
             }
         })
-    })
+    }
 
     const getCityParent = function() {
         const id = $(".province_parent_id option:selected").val()

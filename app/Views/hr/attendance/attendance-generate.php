@@ -1404,8 +1404,9 @@
             var end_date = $('#end_date_lap_karyawan').val();
             var divisiId = $('#divisi_id').val();
             var bagianId = $('#bagian_id').val();
+            var employeeId = $('#employee_id').val();
 
-            var url = "<?= base_url('list-attendance/export-bulanan-employee') ?>?start_date=" + start_date + "&end_date=" + end_date + "&divisi_id=" + divisiId + '&bagian_id=' + bagianId;
+            var url = "<?= base_url('list-attendance/export-bulanan-employee') ?>?start_date=" + start_date + "&end_date=" + end_date + "&divisi_id=" + divisiId + '&bagian_id=' + bagianId + '&employee_id=' + employeeId;
             window.location.href = url;
         }
     })

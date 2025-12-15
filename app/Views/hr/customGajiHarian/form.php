@@ -57,16 +57,22 @@
                         </div>
 
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input value="<?= (!empty($customGajiHarian)) ? $customGajiHarian['checkin'] : "" ?>" type="text" class="form-control checkin" id="checkin" name="checkin" placeholder="Check In" readonly>
                             <label for="floatingInput">Check In</label>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input value="<?= (!empty($customGajiHarian)) ? $customGajiHarian['checkout'] : "" ?>" type="text" class="form-control checkout" id="checkout" name="checkout" placeholder="Check Out" readonly>
                             <label for="floatingInput">Check Out</label>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input value="<?= (!empty($customGajiHarian)) ? $customGajiHarian['total_jam'] : "" ?>" type="text" class="form-control total_jam" id="total_jam" name="total_jam" placeholder="Total Jam" readonly>
+                            <label for="floatingInput">Total Jam</label>
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -77,12 +83,13 @@
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <textarea class="form-control keterangan text-area-all" id="keterangan" name="keterangan" placeholder="Keterangan"><?= (!empty($customGajiHarian) ? $customGajiHarian['keterangan'] : "") ?></textarea>
+                            <textarea style="height: 90px;" class="form-control keterangan text-area-all" id="keterangan" name="keterangan" placeholder="Keterangan"><?= (!empty($customGajiHarian) ? $customGajiHarian['keterangan'] : "") ?></textarea>
                             <label for="floatingInput">Keterangan (Opsional)</label>
                         </div>
                     </div>
                 </div>
             </form>
+            <br>
         </div>
     </div>
     </div>
@@ -241,6 +248,7 @@
                                 $('#nominal').val(null);
                                 $('#checkin').val(null);
                                 $('#checkout').val(null);
+                                $('#total_jam').val(null);
                                 $('#keterangan').val(null);
                             } else if (result.isDenied) {
                                 // Buat Baru Lagi
@@ -295,12 +303,15 @@
                         });
                         $('#checkout').val(null);
                         $('#checkin').val(null);
+                        $('#total_jam').val(null);
 
                         return;
                     } else {
                         var data = response.data;
+                        var totalJam = parseFloat(data.total_jam).toFixed(2);
                         $('#checkout').val(data.checkout);
                         $('#checkin').val(data.checkin);
+                        $('#total_jam').val(totalJam);
                         $('#nominal').val(greatFormatRupiah(data.nominal));
                     }
 

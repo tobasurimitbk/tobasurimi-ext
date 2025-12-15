@@ -109,20 +109,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control account_receivable" id="account_receivable" name="account_receivable" placeholder="Akun Receivable (Opsional)">
-                                <label for="floatingInput">Akun Receivable (Opsional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control account_payable" id="account_payable" name="account_payable" placeholder="Akun Payable (Opsional)">
-                                <label for="floatingInput">Akun Payable (Opsional)</label>
-                            </div>
-                        </div>
-                    </div> -->
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
@@ -142,383 +128,10 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-hide-parent btn-discard mr-2">Kembali</button>
                 <button type="submit" class="btn btn-submit-form btn-submit-parent">Simpan</button>
-                <button type="button" class="btn btn-discard delete-form delete-btn">Hapus</button>
             </div>
         </div>
     </div>
 </div>
-
-<div class="modal laporan-modal" id="laporan-modal">
-    <div class="modal-dialog" style="min-width: 500px;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Laporan</h5>
-            </div>
-            <div class="modal-body">
-                <form class="laporan-form" id="laporan-form" role="form" method="POST" enctype="multipart/form-data">
-                    <?= csrf_field() ?>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select laporan_id" name="laporan_id" id="laporan_id">
-                                    <option value="" data-code=""></option>
-                                    <option value="laporan-pendapatan-supplier" data-code="">Pendapatan Supplier</option>
-                                    <option value="laporan-rincian-per-barang" data-code="">Rincian Per Barang</option>
-                                    <option value="laporan-rekap-all-supplier" data-code="">Rekap All Supplier</option>
-                                    <option value="laporan-rekap-per-supplier" data-code="">Rekap Per Supplier</option>
-                                    <option value="laporan-rekap-all-barang" data-code="">Rekap All Barang</option>
-                                    <option value="laporan-rekap-per-barang" data-code="">Rekap Per Barang</option>
-                                </select>
-                                <label for="floatingInput">Pilih Laporan</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="laporan-pendapatan-supplier">
-                                <h6>Laporan Pendapatan Supplier</h6>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-floating mb-3">
-                                                    <input autocomplete="one-time-code" class="form-control input-picker awal_date" id="awal_date" name="awal_date" placeholder="Tanggal Awal" required>
-                                                    <label for="floatingInput">Tanggal Awal</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-floating mb-3">
-                                                    <input autocomplete="one-time-code" class="form-control input-picker akhir_date" id="akhir_date" name="akhir_date" placeholder="Tanggal Akhir" required>
-                                                    <label for="floatingInput">Tanggal Akhir</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="form-floating mb-3" style="height: 50px;">
-                                                    <select class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
-                                                        <option value=""></option>
-                                                        <?php
-                                                        if (!empty($dataSuppliers)) : ?>
-                                                            <?php foreach ($dataSuppliers as $supplier) : ?>
-                                                                <option value="<?= $supplier->id; ?>" data-name="<?= $supplier->name; ?>"><?= $supplier->name; ?></option>
-                                                            <?php endforeach; ?>
-                                                        <?php endif; ?>
-                                                    </select>
-                                                    <label for="floatingInput">Supplier</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="form-floating mb-3" style="height: 50px;">
-                                                    <select class="form-select barang_id" id="barang_id" name="barang_id" aria-label="Floating label select example">
-                                                        <option value=""></option>
-                                                        <?php
-                                                        if (!empty($dataBarangMasters)) : ?>
-                                                            <?php foreach ($dataBarangMasters as $barang) : ?>
-                                                                <option value="<?= $barang->id; ?>" data-name="<?= $barang->barang_name; ?>"><?= $barang->barang_name; ?></option>
-                                                            <?php endforeach; ?>
-                                                        <?php endif; ?>
-                                                    </select>
-                                                    <label for="floatingInput">Barang</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="form-floating mb-2" style="height: 50px;">
-                                                    <select class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
-                                                        <option value=""></option>
-                                                        <?php
-                                                        if (!empty($dataWarehouses)) : ?>
-                                                            <?php foreach ($dataWarehouses as $warehouses) : ?>
-                                                                <option value="<?= $warehouses->id; ?>" data-name="<?= $warehouses->warehouse_name; ?>"><?= $warehouses->warehouse_name; ?></option>
-                                                            <?php endforeach; ?>
-                                                        <?php endif; ?>
-                                                    </select>
-                                                    <label for="floatingInput">Warehouse</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="laporan-rincian-per-barang">
-                                <h6>Laporan Rincian Per Barang</h6>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-floating mb-3">
-                                                    <input autocomplete="one-time-code" class="form-control input-picker awal_date" id="awal_date_per_barang" name="awal_date_per_barang" placeholder="Tanggal Awal">
-                                                    <label for="floatingInput">Tanggal Awal</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-floating mb-3">
-                                                    <input autocomplete="one-time-code" class="form-control input-picker akhir_date" id="akhir_date_per_barang" name="akhir_date_per_barang" placeholder="Tanggal Akhir">
-                                                    <label for="floatingInput">Tanggal Akhir</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="form-floating mb-2" style="height: 50px;">
-                                                    <select class="form-select barang_id" id="barang_id_per_barang" name="barang_id_per_barang" aria-label="Floating label select example">
-                                                        <option value=""></option>
-                                                        <?php
-                                                        if (!empty($dataBarangMasters)) : ?>
-                                                            <?php foreach ($dataBarangMasters as $barang) : ?>
-                                                                <option value="<?= $barang->id; ?>" data-name="<?= $barang->barang_name; ?>"><?= $barang->barang_name; ?></option>
-                                                            <?php endforeach; ?>
-                                                        <?php endif; ?>
-                                                    </select>
-                                                    <label for="floatingInput">Barang</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="laporan-rekap-all-supplier">
-                                <h6>Laporan Rekap All Supplier</h6>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-floating mb-2">
-                                                    <input autocomplete="one-time-code" class="form-control input-picker awal_date" id="awal_date_all_supplier" name="awal_date_all_supplier" placeholder="Tanggal Awal">
-                                                    <label for="floatingInput">Tanggal Awal</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-floating mb-2">
-                                                    <input autocomplete="one-time-code" class="form-control input-picker akhir_date" id="akhir_date_all_supplier" name="akhir_date_all_supplier" placeholder="Tanggal Akhir">
-                                                    <label for="floatingInput">Tanggal Akhir</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="laporan-rekap-per-supplier">
-                                <h6>Laporan Rekap Per Supplier</h6>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-floating mb-3">
-                                                    <input autocomplete="one-time-code" class="form-control input-picker awal_date" id="awal_date_per_supplier" name="awal_date_per_supplier" placeholder="Tanggal Awal" required>
-                                                    <label for="floatingInput">Tanggal Awal</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-floating mb-3">
-                                                    <input autocomplete="one-time-code" class="form-control input-picker akhir_date" id="akhir_date_per_supplier" name="akhir_date_per_supplier" placeholder="Tanggal Akhir" required>
-                                                    <label for="floatingInput">Tanggal Akhir</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="form-floating mb-3" style="height: 50px;">
-                                                    <select class="form-select supplier_id" id="supplier_id_per_supplier" name="supplier_id_per_supplier" aria-label="Floating label select example">
-                                                        <option value=""></option>
-                                                        <?php
-                                                        if (!empty($dataSuppliers)) : ?>
-                                                            <?php foreach ($dataSuppliers as $supplier) : ?>
-                                                                <option value="<?= $supplier->id; ?>" data-name="<?= $supplier->name; ?>"><?= $supplier->name; ?></option>
-                                                            <?php endforeach; ?>
-                                                        <?php endif; ?>
-                                                    </select>
-                                                    <label for="floatingInput">Supplier</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="form-floating mb-3" style="height: 50px;">
-                                                    <select class="form-select barang_id" id="barang_id_per_supplier" name="barang_id_per_supplier" aria-label="Floating label select example">
-                                                        <option value=""></option>
-                                                        <?php
-                                                        if (!empty($dataBarangMasters)) : ?>
-                                                            <?php foreach ($dataBarangMasters as $barang) : ?>
-                                                                <option value="<?= $barang->id; ?>" data-name="<?= $barang->barang_name; ?>"><?= $barang->barang_name; ?></option>
-                                                            <?php endforeach; ?>
-                                                        <?php endif; ?>
-                                                    </select>
-                                                    <label for="floatingInput">Barang</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="form-floating mb-2" style="height: 50px;">
-                                                    <select class="form-select warehouse_id" id="warehouse_id_per_supplier" name="warehouse_id_per_supplier" aria-label="Floating label select example">
-                                                        <option value=""></option>
-                                                        <?php
-                                                        if (!empty($dataWarehouses)) : ?>
-                                                            <?php foreach ($dataWarehouses as $warehouses) : ?>
-                                                                <option value="<?= $warehouses->id; ?>" data-name="<?= $warehouses->warehouse_name; ?>"><?= $warehouses->warehouse_name; ?></option>
-                                                            <?php endforeach; ?>
-                                                        <?php endif; ?>
-                                                    </select>
-                                                    <label for="floatingInput">Warehouse</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="laporan-rekap-all-barang">
-                                <h6>Laporan Rekap All Barang</h6>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-floating mb-3">
-                                                    <input autocomplete="one-time-code" class="form-control input-picker awal_date" id="awal_date_rekap_all_barang" name="awal_date_rekap_all_barang" placeholder="Tanggal Awal" required>
-                                                    <label for="floatingInput">Tanggal Awal</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-floating mb-3">
-                                                    <input autocomplete="one-time-code" class="form-control input-picker akhir_date" id="akhir_date_rekap_all_barang" name="akhir_date_rekap_all_barang" placeholder="Tanggal Akhir" required>
-                                                    <label for="floatingInput">Tanggal Akhir</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="form-floating mb-2" style="height: 50px;">
-                                                    <select class="form-select warehouse_id" id="warehouse_id_rekap_all_barang" name="warehouse_id_rekap_all_barang" aria-label="Floating label select example">
-                                                        <option value=""></option>
-                                                        <?php
-                                                        if (!empty($dataWarehouses)) : ?>
-                                                            <?php foreach ($dataWarehouses as $warehouses) : ?>
-                                                                <option value="<?= $warehouses->id; ?>" data-name="<?= $warehouses->warehouse_name; ?>"><?= $warehouses->warehouse_name; ?></option>
-                                                            <?php endforeach; ?>
-                                                        <?php endif; ?>
-                                                    </select>
-                                                    <label for="floatingInput">Warehouse</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="laporan-rekap-per-barang">
-                                <h6>Laporan Rekap Per Barang</h6>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-floating mb-3">
-                                                    <input autocomplete="one-time-code" class="form-control input-picker awal_date" id="awal_date_rekap_per_barang" name="awal_date_rekap_per_barang" placeholder="Tanggal Awal" required>
-                                                    <label for="floatingInput">Tanggal Awal</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-floating mb-3">
-                                                    <input autocomplete="one-time-code" class="form-control input-picker akhir_date" id="akhir_date_rekap_per_barang" name="akhir_date_rekap_per_barang" placeholder="Tanggal Akhir" required>
-                                                    <label for="floatingInput">Tanggal Akhir</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="form-floating mb-3" style="height: 50px;">
-                                                    <select class="form-select barang_id" id="barang_id_rekap_per_barang" name="barang_id_rekap_per_barang" aria-label="Floating label select example">
-                                                        <option value=""></option>
-                                                        <?php
-                                                        if (!empty($dataBarangMasters)) : ?>
-                                                            <?php foreach ($dataBarangMasters as $barang) : ?>
-                                                                <option value="<?= $barang->id; ?>" data-name="<?= $barang->barang_name; ?>"><?= $barang->barang_name; ?></option>
-                                                            <?php endforeach; ?>
-                                                        <?php endif; ?>
-                                                    </select>
-                                                    <label for="floatingInput">Barang</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="form-floating mb-2" style="height: 50px;">
-                                                    <select class="form-select warehouse_id" id="warehouse_id_rekap_per_barang" name="warehouse_id_rekap_per_barang" aria-label="Floating label select example">
-                                                        <option value=""></option>
-                                                        <?php
-                                                        if (!empty($dataWarehouses)) : ?>
-                                                            <?php foreach ($dataWarehouses as $warehouses) : ?>
-                                                                <option value="<?= $warehouses->id; ?>" data-name="<?= $warehouses->warehouse_name; ?>"><?= $warehouses->warehouse_name; ?></option>
-                                                            <?php endforeach; ?>
-                                                        <?php endif; ?>
-                                                    </select>
-                                                    <label for="floatingInput">Warehouse</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="laporan-bukti-penerimaaan-barang">
-                                Laporan Bukti Penerimaan Barang
-                            </div>
-                            <div class="laporan-kwitansi-tb">
-                                Laporan Kwitansi TB
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <div id="laporan-buttons">
-
-                </div>
-                <button type="button" class="btn btn-hide-form btn-hide-laporan btn-discard mr-2">Kembali</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- <div class="modal harga-modal" id="harga_modal">
-    <div class="modal-dialog" style="min-width: 900px;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">History Bahan Baku</h5>
-            </div>
-            <div class="modal-body">
-                <div class="row justify-content-end mb-3">
-                    <div class="col-md-3">
-                        <input autocomplete="one-time-code" class="form-control search-harga form-out-search" placeholder="Cari Nama Barang" value="" />
-                    </div>
-                </div>
-                <div class="table-responsive mt-3 mb-3">
-                    <table class="table-inside table-borderd nowrap table-hover-tobasurimi secondDataTable" width="100%" cellspacing="0" id="secondDataTable">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th width="10">No</th>
-                                <th onclick="changeSortHarga('bahan_baku_name')" class="sort">Barang</th>
-                                <th onclick="changeSortHarga('createdAt')" class="sort">Tanggal</th>
-                                <th onclick="changeSortHarga('spesifikasi')" class="sort">Spesifikasi</th>
-                                <th onclick="changeSortHarga('bagian')" class="sort">Bagian</th>
-                                <th onclick="changeSortHarga('harga_umum')" class="sort">Umum</th>
-                                <th onclick="changeSortHarga('harga_harian')" class="sort">Harian</th>
-                                <th onclick="changeSortHarga('harga_bulanan')" class="sort">Bulanan</th>
-                            </tr>
-                        </thead>
-                        <tbody class="body-detail-table" id="body-detail-table">
-
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form btn-hide-harga btn-discard mr-2">Kembali</button>
-            </div>
-        </div>
-    </div>
-</div> -->
 
 <!-- Begin Page Content -->
 <section class="section">
@@ -552,7 +165,7 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable firstDataTable" id="firstDataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No.</th>
+                                <th>No</th>
                                 <th onclick="changeSort('kode')" class="sort">Kode</th>
                                 <th onclick="changeSort('name')" class="sort">Nama</th>
                                 <th onclick="changeSort('no_npwp')" class="sort">NPWP</th>
@@ -561,7 +174,7 @@
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
 
                         </tbody>
                     </table>
@@ -600,42 +213,6 @@
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "kode";
     let sortType = "desc";
-    let sortHarga = "createdAt";
-    let sortTypeHarga = "desc";
-    let trigger = true;
-    let id_supplier = "";
-
-    // Init changeStatus
-    changeStatus();
-
-    $(document).ready(function() {
-        $("#laporan_id").change(function() {
-            let selectedOption = $(this).val();
-            var dynamicButtons = $("#laporan-buttons");
-            var awalTanggal = $(".awal_date").val();
-            var akhirTanggal = $(".akhir_date").val();
-            var supplierId = $(".supplier_id").val();
-            var bahanBakuId = $(".barang_id").val();
-            var warehouseId = $(".warehouse_id").val();
-
-            dynamicButtons.empty();
-            console.log(selectedOption);
-
-            if (selectedOption) {
-                dynamicButtons.append(`<a onclick="printLaporan('${selectedOption}')" target="_blank" class="btn btn-submit-form btn-submit-${selectedOption} mr-2">Tampil</a>`);
-            }
-
-
-            // Sembunyikan semua div yang terkait dengan laporan
-            $(".col-md-12 > div[class^='laporan-']").hide();
-
-            // Tampilkan div yang sesuai dengan pilihan saat ini
-            if (selectedOption) {
-                $("." + selectedOption).show();
-                $(".btn-submit-" + selectedOption).show();
-            }
-        });
-    });
 
     $(".awal_date, .akhir_date").datepicker({
         todayHighlight: true,
@@ -754,23 +331,23 @@
         searching: false,
         columns: [{
             data: "no",
-            className: "text-center",
+            className: "text-left",
             sortable: false
         }, {
             data: "kode",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "name",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "no_npwp",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "no_ktp",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "address",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "id",
             className: "text-center actions",
@@ -779,17 +356,33 @@
             render: function(data, type, row) {
                 let id = row.id;
                 return `
+                    <?php if (can('Supplier', 'Bahan Baku', 'u')) : ?>
+                        <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    <?php endif; ?>
+                    <?php if (can('Supplier', 'Bahan Baku', 'd')) : ?>
+                        <button data-toggle="tooltip" title="Hapus" onclick="destroy('${id}')" class="btn btn-danger delete-parent">
+                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                        </button>
+                    <?php endif; ?>
                         <a class="btn btn-warning" href="<?= base_url(); ?>supplier-bahan-baku/harga/${id}" style="box-shadow: none !important;">
                             Set Harga
                         </a>
                        
-                    `
+                    `;
             }
         }],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
         }],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
         language: {
             emptyTable: "Tidak Ada Data",
             lengthMenu: "Show _MENU_ entries",
@@ -800,303 +393,115 @@
         }
     });
 
-    // let secondTable = $('#secondDataTable').DataTable({
-    //     
-    //     processing: true,
-    //     serverSide: true,
-    //     ordering: true,
-    //     order: [
-    //         [2, 'desc']
-    //     ],
-    //     fixedHeader: true,
-    //     lengthMenu: [
-    //         [25],
-    //         [25],
-    //     ],
-    //     pageLength: 25,
-    //     ajax: {
-    //         url: "<?= base_url("supplier-harga/all"); ?>",
-    //         dataSrc: "data",
-    //         data: function(data) {
-    //             data.id = id_supplier;
-    //             data.search = $(".search-harga").val();
-    //             data.sort = sortHarga;
-    //             data.sortType = sortTypeHarga;
-    //         }
-    //     },
-    //     // scrollX: true,
-    //     "initComplete": function(settings, json) {
-    //         $('.dataTables_length').empty();
-    //         $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-    //         $('.secondDataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-    //     },
-    //     //responsive: true,
-    //     display: "stripe",
-    //     searching: false,
-    //     columns: [{
-    //         data: "no",
-    //         className: "text-center",
-    //         sortable: false
-    //     }, {
-    //         data: "bahan_baku_name",
-    //         className: "text-center"
-    //     }, {
-    //         data: "createdAt",
-    //         className: "text-center"
-    //     }, {
-    //         data: "spesifikasi",
-    //         className: "text-center"
-    //     }, {
-    //         data: "bagian",
-    //         className: "text-center"
-    //     }, {
-    //         data: "harga_umum",
-    //         className: "text-center"
-    //     }, {
-    //         data: "harga_harian",
-    //         className: "text-center"
-    //     }, {
-    //         data: "harga_bulanan",
-    //         className: "text-center"
-    //     }],
-    //     columnDefs: [{
-    //         defaultContent: "-",
-    //         targets: "_all"
-    //     }],
-    //     language: {
-    //         emptyTable: "Tidak Ada Data",
-    //         lengthMenu: "Show _MENU_ entries",
-    //         paginate: {
-    //             previous: '<i class="fa fa-angle-left"></i>',
-    //             next: '<i class="fa fa-angle-right"></i>'
-    //         }
-    //     }
-    // });
 
-    $(document).ready(function() {
-        var validator = $(".create-form").validate({
-            rules: {
-                kode: {
-                    required: true
-                },
-                name: {
-                    required: true
-                },
-                // no_npwp: {
-                //     minlength: 15,
-                //     maxlength: 15,
-                // }
+    var validator = $(".create-form").validate({
+        rules: {
+            kode: {
+                required: true
             },
-            messages: {
-                kode: {
-                    required: "Kode wajib diisi"
-                },
-                name: {
-                    required: "Nama wajib diisi"
-                },
-                // no_npwp: {
-                //     minlength: "Nomor NPWP minimal 15 angka",
-                //     maxlength: "Nomor NPWP maksimal 15 angka",
-                // }
+            name: {
+                required: true
             },
-            errorElement: 'span',
-            errorClass: 'text-danger',
-            errorPlacement: function(error, element) {
-                var elem = $(element);
-                if (elem.hasClass("select2-hidden-accessible")) {
-                    element = $("#select2-" + elem.attr("id") + "-container").parent();
-                    error.insertAfter(element);
-                } else {
-                    error.insertAfter(element);
-                }
+        },
+        messages: {
+            kode: {
+                required: "Kode wajib diisi"
             },
-            highlight: function(element) {
-                $(element).closest('.form-group').addClass('has-error');
-                $(element).addClass('select-class');
-
+            name: {
+                required: "Nama wajib diisi"
             },
-            unhighlight: function(element) {
-                $(element).closest('.form-group').removeClass('has-error');
-                $(element).removeClass('select-class');
-            },
-        });
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
 
-        $(".no_npwp").mask("000000000000000000000")
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
 
-        // $(".phone").mask("0000000000000")
+    $(".no_npwp").mask("000000000000000000000")
 
-        $(".search").keyup(function() {
-            table.ajax.reload();
-        })
+    $(".search").keyup(function() {
+        table.ajax.reload();
+    });
 
-        $(".search-harga").keyup(function() {
-            secondTable.ajax.reload();
-        })
+    $(".dataTable_info").addClass("pt-0");
 
-        $(".dataTable_info").addClass("pt-0");
+    $(".btn-show-form").click(function() {
+        $(".id").val("");
+        $(".title-name").text("Tambah");
 
-        $(".btn-show-form-laporan").click(function() {
-            $(".laporan-modal").modal('show');
-            $(".col-md-12 > div[class^='laporan-']").hide();
-            // $(".modal-footer .btn-submit-form").hide();
-            // $('.laporan-rincian-per-barang').hide();
+        validator.resetForm();
+        validator.reset();
 
-        })
+        $(".create-form")[0].reset()
+        $(".delete-form").css('display', 'none');
 
+        $(".province_parent_id").val('').change()
+        $(".city_parent_id").val('').change()
+        $(".city_parent_id").empty()
+        $(".city_parent_id").append(`<option value=""></option>`)
+        $(".country_code").val('').change()
 
-        $(".btn-show-form").click(function() {
-            $(".id").val("");
-            $(".title-name").text("Tambah");
+        changeStatus();
+        $(".add-modal").modal("show");
+    })
 
-            validator.resetForm();
-            validator.reset();
+    $(".btn-hide-parent").click(function() {
+        $(".add-modal").modal("hide")
+    });
 
-            $(".create-form")[0].reset()
-            $(".delete-form").css('display', 'none');
-
-            $(".province_parent_id").val('').change()
-            $(".city_parent_id").val('').change()
-            $(".city_parent_id").empty()
-            $(".city_parent_id").append(`<option value=""></option>`)
-            $(".country_code").val('').change()
-
-            $.ajax({
-                url: "<?= base_url("supplier/generate/BB"); ?>",
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    if (res.status) {
-                        $(".kode").val(res.data)
-                        $(".add-modal").modal("show");
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: res.message,
-                            confirmButtonColor: '#4e73df',
-                        })
-                    }
-                }
-            })
-        })
-
-        $(".btn-hide-parent").click(function() {
-            $(".add-modal").modal("hide")
-        })
-
-        $(".btn-hide-harga").click(function() {
-            $(".harga-modal").modal("hide")
-        })
-
-        $(".btn-hide-laporan").click(function() {
-            $(".laporan-modal").modal('hide')
-            $(".laporan_id").val("").change()
-        })
-
-        $('#firstDataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-            const data = table.row(this).data();
-            $(".create-form")[0].reset()
-            $(".delete-form").css('display', '');
-            let id = data.id;
-            $(".title-name").text("Update");
-
-            $.ajax({
-                url: "<?= base_url("supplier/id"); ?>" + "/" + id,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    if (res.status) {
-                        validator.resetForm();
-                        validator.reset();
-
-                        $(".id").val(id);
-                        $(".kode").val(res.data.kode);
-                        $(".name").val(res.data.name);
-                        $(".address").val(res.data.address);
-                        $(".no_npwp").val(formatNpwp(res.data.no_npwp));
-                        $(".no_ktp").val(formatNpwp(res.data.no_ktp));
-                        $(".phone").val(res.data.phone);
-                        $(".contact_person").val(res.data.contact_person);
-                        $(".email").val(res.data.email);
-                        $(".province_parent_id").val(res.data.province_id).change();
-                        $(".country_code").val(res.data.country_code).change();
-                        $('#auto_generate').css('display', 'none');
-                        $("#kode").prop("readonly", false);
-                        // $(".account_receivable").val(res.data.account_receivable);
-                        // $(".account_payable").val(res.data.account_payable);
-                        $('.modal').on('hidden.bs.modal', function() {
-                            $('#auto_generate').css('display', '');
-
-                        });
-
-
-                        // AJAX GET CITY
-                        $.ajax({
-                            url: `<?= base_url("city"); ?>/${res.data.province_id}`,
-                            method: "GET",
-                            dataType: "json",
-                            success: function(result) {
-                                $(".city_parent_id").empty()
-                                $(".city_parent_id").val("").change()
-                                $(".city_parent_id").append(`<option value=""></option>`)
-                                result.data.forEach(function(item) {
-                                    $(".city_parent_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
-                                })
-
-                                $(".city_parent_id").val(res.data.city_id).change();
-                                $(".parent_postal_code").val(res.data.postal_code);
-                            }
-                        })
-
-                        $(".add-modal").modal("show");
-
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: res.message,
-                            confirmButtonColor: '#4e73df',
-                        })
-                    }
-                }
-            })
-        })
-
-        $(".delete-form").click(function() {
+    $(".btn-submit-parent").click(function() {
+        if ($(".create-form").valid()) {
             Swal.fire({
                 icon: 'question',
-                title: 'Hapus Data?',
+                title: 'Simpan Data?',
                 confirmButtonColor: '#4e73df',
                 cancelButtonColor: '#d33',
                 showCancelButton: true,
                 reverseButtons: true,
-                confirmButtonText: 'Hapus',
+                confirmButtonText: 'Simpan',
                 cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
+                    let data = new FormData(document.querySelector(".create-form"));
                     let id = $(".id").val();
-                    setLoading()
                     $.ajax({
-                        url: "<?= base_url("supplier/delete"); ?>",
-                        data: {
-                            id: id
-                        },
+                        url: id ? "<?= base_url("supplier-bahan-baku/update"); ?>" : "<?= base_url("supplier-bahan-baku/save"); ?>",
+                        data: data,
                         beforeSend: function(xhr) {
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
                         },
                         method: "POST",
                         dataType: "json",
+                        processData: false,
+                        contentType: false,
                         success: function(response) {
                             csrf.val(response.token);
                             if (response.status) {
-                                stopLoading()
                                 Swal.fire({
                                         icon: 'success',
                                         title: response.message,
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        table.ajax.reload()
                                         $(".add-modal").modal("hide")
+                                        table.ajax.reload()
                                     })
                             } else {
                                 Swal.fire({
@@ -1104,87 +509,131 @@
                                     title: response.message,
                                     confirmButtonColor: '#4e73df',
                                 })
-                                stopLoading()
                             }
                         },
-                        onError: function(response) {
-                            csrf.val(response.token);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Data Gagal Disimpan, coba Lagi',
-                                confirmButtonColor: '#4e73df',
-                            })
-                            stopLoading()
-                        }
                     });
                 }
             })
-        })
+        }
+    })
 
-        $(".btn-submit-parent").click(function() {
-            if ($(".create-form").valid()) {
-                Swal.fire({
-                    icon: 'question',
-                    title: 'Simpan Data?',
-                    confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Kembali',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const csrf = $(`[name="${csrfToken}"]`);
-                        let data = new FormData(document.querySelector(".create-form"));
-                        let id = $(".id").val();
+    function edit(id) {
+        $(".create-form")[0].reset()
+        $(".delete-form").css('display', '');
+        $(".title-name").text("Update");
 
-                        $.ajax({
-                            url: id ? "<?= base_url("supplier-bahan-baku/update"); ?>" : "<?= base_url("supplier-bahan-baku/save"); ?>",
-                            data: data,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    stopLoading()
-                                    Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            $(".add-modal").modal("hide")
-                                            table.ajax.reload()
-                                        })
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    stopLoading()
-                                }
-                            },
-                            onError: function(response) {
-                                csrf.val(response.token);
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Data Gagal Disimpan, coba Lagi',
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                stopLoading()
-                            }
-                        });
-                    }
-                })
+        $.ajax({
+            url: "<?= base_url("supplier/id"); ?>" + "/" + id,
+            method: "GET",
+            dataType: "json",
+            success: function(res) {
+                if (res.status) {
+                    validator.resetForm();
+                    validator.reset();
+
+                    $(".id").val(id);
+                    $(".kode").val(res.data.kode);
+                    $(".name").val(res.data.name);
+                    $(".address").val(res.data.address);
+                    $(".no_npwp").val(formatNpwp(res.data.no_npwp));
+                    $(".no_ktp").val(formatNpwp(res.data.no_ktp));
+                    $(".phone").val(res.data.phone);
+                    $(".contact_person").val(res.data.contact_person);
+                    $(".email").val(res.data.email);
+                    $(".province_parent_id").val(res.data.province_id).change();
+                    $(".country_code").val(res.data.country_code).change();
+                    $('#auto_generate').css('display', 'none');
+                    $("#kode").prop("readonly", false);
+                    // $(".account_receivable").val(res.data.account_receivable);
+                    // $(".account_payable").val(res.data.account_payable);
+                    $('.modal').on('hidden.bs.modal', function() {
+                        $('#auto_generate').css('display', '');
+
+                    });
+
+
+                    // AJAX GET CITY
+                    $.ajax({
+                        url: `<?= base_url("city"); ?>/${res.data.province_id}`,
+                        method: "GET",
+                        dataType: "json",
+                        success: function(result) {
+                            $(".city_parent_id").empty()
+                            $(".city_parent_id").val("").change()
+                            $(".city_parent_id").append(`<option value=""></option>`)
+                            result.data.forEach(function(item) {
+                                $(".city_parent_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name}</option>`)
+                            })
+
+                            $(".city_parent_id").val(res.data.city_id).change();
+                            $(".parent_postal_code").val(res.data.postal_code);
+                        }
+                    })
+
+                    $(".add-modal").modal("show");
+
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: res.message,
+                        confirmButtonColor: '#4e73df',
+                    })
+                }
             }
         })
-    })
+    }
+
+    function destroy(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("supplier/delete"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                    $(".add-modal").modal("hide")
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    },
+                });
+            }
+        })
+    }
 
     const getCityParent = function() {
         const id = $(".province_parent_id option:selected").val()
@@ -1219,192 +668,9 @@
         }
     }
 
-    const changeSortHarga = function(val) {
-        if (sortHarga !== val) {
-            sortTypeHarga = "asc";
-            sortHarga = val;
-        } else {
-            sortTypeHarga = sortTypeHarga === "asc" ? "desc" : "asc";
-        }
-    }
-
-    // let History = function(id) {
-    //     id_supplier = id;
-    //     $(".search-harga").val('')
-    //     sortHarga = "createdAt";
-    //     sortTypeHarga = "desc";
-    //     secondTable.ajax.reload()
-    //     $(".harga-modal").modal("show")
-    // }
-
     function formatNpwp(value) {
         if (typeof value === 'string') {
             return value.replace(/(\d{2})(\d{3})(\d{3})(\d{1})(\d{3})(\d{3})/, '$1.$2.$3.$4-$5.$6');
-        }
-    }
-
-    let printLaporan = function(val) {
-
-        var form = document.getElementById('laporan-form');
-        var newAction = "<?= base_url("/supplier-bahan-baku/print/"); ?>" + val; // Your new action URL
-        var validator = $(".laporan-form").validate({
-            errorElement: 'span',
-            errorClass: 'text-danger',
-            errorPlacement: function(error, element) {
-                var elem = $(element);
-                if (elem.hasClass("select2-hidden-accessible")) {
-                    element = $("#select2-" + elem.attr("id") + "-container").parent();
-                    error.insertAfter(element);
-                } else {
-                    error.insertAfter(element);
-                }
-            },
-            highlight: function(element) {
-                $(element).closest('.form-group').addClass('has-error');
-                $(element).addClass('select-class');
-
-            },
-            unhighlight: function(element) {
-                $(element).closest('.form-group').removeClass('has-error');
-                $(element).removeClass('select-class');
-            },
-        });
-        switch (val) {
-            case 'laporan-pendapatan-supplier':
-                validator.settings.rules = {
-                    awal_date: {
-                        required: true
-                    },
-                    akhir_date: {
-                        required: true
-                    }
-                };
-                validator.settings.messages = {
-                    awal_date: {
-                        required: "Tanggal Awal wajib diisi"
-                    },
-                    akhir_date: {
-                        required: "Tanggal Akhir wajib diisi"
-                    }
-                };
-                break;
-            case 'laporan-rincian-per-barang':
-                validator.settings.rules = {
-                    awal_date_per_barang: {
-                        required: true
-                    },
-                    akhir_date_per_barang: {
-                        required: true
-                    }
-                };
-                validator.settings.messages = {
-                    awal_date_per_barang: {
-                        required: "Tanggal Awal wajib diisi"
-                    },
-                    akhir_date_per_barang: {
-                        required: "Tanggal Akhir wajib diisi"
-                    }
-                };
-                break;
-            case 'laporan-rekap-all-supplier':
-                validator.settings.rules = {
-                    awal_date_all_supplier: {
-                        required: true
-                    },
-                    akhir_date_all_supplier: {
-                        required: true
-                    }
-                };
-                validator.settings.messages = {
-                    awal_date_all_supplier: {
-                        required: "Tanggal Awal wajib diisi"
-                    },
-                    akhir_date_all_supplier: {
-                        required: "Tanggal Akhir wajib diisi"
-                    }
-                };
-                break;
-            case 'laporan-rekap-per-supplier':
-                validator.settings.rules = {
-                    awal_date_per_supplier: {
-                        required: true
-                    },
-                    akhir_date_per_supplier: {
-                        required: true
-                    },
-                    supplier_id_per_supplier: {
-                        required: true
-                    }
-                };
-                validator.settings.messages = {
-                    awal_date_per_supplier: {
-                        required: "Tanggal Awal wajib diisi"
-                    },
-                    akhir_date_per_supplier: {
-                        required: "Tanggal Akhir wajib diisi"
-                    },
-                    supplier_id_per_supplier: {
-                        required: "Supplier wajib diisi"
-                    }
-                };
-                break;
-            case 'laporan-rekap-all-barang':
-                validator.settings.rules = {
-                    awal_date_rekap_all_barang: {
-                        required: true
-                    },
-                    akhir_date_rekap_all_barang: {
-                        required: true
-                    }
-                };
-                validator.settings.messages = {
-                    awal_date_rekap_all_barang: {
-                        required: "Tanggal Awal wajib diisi"
-                    },
-                    akhir_date_rekap_all_barang: {
-                        required: "Tanggal Akhir wajib diisi"
-                    }
-                };
-                break;
-            case 'laporan-rekap-per-barang':
-                validator.settings.rules = {
-                    awal_date_rekap_per_barang: {
-                        required: true
-                    },
-                    akhir_date_rekap_per_barang: {
-                        required: true
-                    },
-                    barang_id_rekap_per_barang: {
-                        required: true
-                    },
-                    warehouse_id_rekap_per_barang: {
-                        required: true
-                    }
-                };
-                validator.settings.messages = {
-                    awal_date_rekap_per_barang: {
-                        required: "Tanggal Awal wajib diisi"
-                    },
-                    akhir_date_rekap_per_barang: {
-                        required: "Tanggal Akhir wajib diisi"
-                    },
-                    barang_id_rekap_per_barang: {
-                        required: "Barang wajib diisi"
-                    },
-                    warehouse_id_rekap_per_barang: {
-                        required: "Warehouse wajib diisi"
-                    }
-                };
-
-                break;
-            case 'laporan-bukti-penerimaaan-barang':
-
-                break;
-        }
-        if ($(".laporan-form").valid()) {
-            form.target = '_blank';
-            form.action = newAction;
-            form.submit();
         }
     }
 

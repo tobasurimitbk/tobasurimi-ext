@@ -4,6 +4,7 @@ namespace App\Controllers\HR;
 
 use App\Controllers\BaseController;
 use App\Models\AttendancesModel;
+use App\Models\EmployeeJamKerjaModel;
 use App\Models\GajiConjunctionModel;
 use App\Models\PayrollCustomGajiHarianModel;
 use CodeIgniter\HTTP\Request;
@@ -15,6 +16,7 @@ class CustomGajiHarian extends BaseController
     protected $payrollCustomGajiHarianModel;
     protected $attendanceModel;
     protected $gajiConjunctionModel;
+    protected $employeeJamKerjaModel;
 
     public function __construct()
     {
@@ -22,6 +24,7 @@ class CustomGajiHarian extends BaseController
         $this->payrollCustomGajiHarianModel = new PayrollCustomGajiHarianModel();
         $this->attendanceModel = new AttendancesModel();
         $this->gajiConjunctionModel = new GajiConjunctionModel();
+        $this->employeeJamKerjaModel = new EmployeeJamKerjaModel();
     }
 
     public function index()
@@ -92,6 +95,7 @@ class CustomGajiHarian extends BaseController
                 "checkout" => $p->checkout,
                 "nominal" => (float)$p->nominal,
                 "keterangan" => $p->keterangan,
+                "total_jam" => (float)$p->total_jam
             ]);
         }
         $data = [
@@ -116,6 +120,7 @@ class CustomGajiHarian extends BaseController
             $nominal = $this->request->getVar('nominal');
             $checkIn = $this->request->getVar('checkin');
             $checkOut = $this->request->getVar('checkout');
+            $totalJam = $this->request->getVar('total_jam');
 
             $first = $this->payrollCustomGajiHarianModel
                 ->where('employee_id', $employeeId)
@@ -138,7 +143,8 @@ class CustomGajiHarian extends BaseController
                 'keterangan' => $keterangan,
                 'nominal' => $nominal,
                 'checkin' => $checkIn,
-                'checkout' => $checkOut
+                'checkout' => $checkOut,
+                'total_jam' => $totalJam
 
             ]);
             $db->transCommit();
@@ -169,6 +175,7 @@ class CustomGajiHarian extends BaseController
             $nominal = $this->request->getVar('nominal');
             $checkIn = $this->request->getVar('checkin');
             $checkOut = $this->request->getVar('checkout');
+            $totalJam = $this->request->getVar('total_jam');
 
             $first = $this->payrollCustomGajiHarianModel
                 ->where('employee_id', $employeeId)
@@ -192,7 +199,8 @@ class CustomGajiHarian extends BaseController
                 'keterangan' => $keterangan,
                 'nominal' => $nominal,
                 'checkin' => $checkIn,
-                'checkout' => $checkOut
+                'checkout' => $checkOut,
+                'total_jam' => $totalJam
 
             ]);
             $db->transCommit();
@@ -228,22 +236,40 @@ class CustomGajiHarian extends BaseController
             $employeeId = $this->request->getVar('employee_id');
             $tanggal    = formatDMYtoYMD($this->request->getVar('tanggal'));
 
-            // Ambil detail attendance
+            /* =======================
+         * Ambil detail absensi
+         * ======================= */
             $attendanceDetail = $this->attendanceModel
                 ->where('periode', $tanggal)
                 ->where('employee_id', $employeeId)
                 ->first();
 
             if ($attendanceDetail === null) {
-                return response()->setJSON([
-                    'message' => "Data absensi belum digenerate / tidak ada, silahkan generate data personal karyawan tersebut",
+                return $this->response->setJSON([
                     'status'  => false,
+                    'message' => 'Data absensi belum digenerate / tidak ada, silakan generate data personal karyawan tersebut',
                     'token'   => csrf_hash()
                 ]);
             }
 
-            // Ambil gaji harian & cadangan (gunakan grouping utk orWhere)
-            $gajiCadangan = $this->gajiConjunctionModel
+            /* =======================
+         * Cek jam kerja karyawan
+         * ======================= */
+            $jamKerja = $this->employeeJamKerjaModel
+                ->getJamKerjaDetailByEmployeeId($tanggal, $employeeId);
+
+            if ($jamKerja === null) {
+                return $this->response->setJSON([
+                    'status'  => false,
+                    'message' => 'Jam kerja belum dibuat untuk departemen karyawan ini',
+                    'token'   => csrf_hash()
+                ]);
+            }
+
+            /* =======================
+         * Ambil gaji harian & cadangan
+         * ======================= */
+            $gajiList = $this->gajiConjunctionModel
                 ->select('gaji_conjunction.nominal, tunjangan.is_cadangan, tunjangan.is_gaji_harian')
                 ->join('tunjangan', 'tunjangan.id = gaji_conjunction.tunjangan_id', 'left')
                 ->where('gaji_conjunction.employee_id', $employeeId)
@@ -253,38 +279,79 @@ class CustomGajiHarian extends BaseController
                 ->groupEnd()
                 ->findAll();
 
-            $gajiHarian = 0;
-            $cadangan   = 0;
+            $gajiHarian = 0.0;
+            $cadangan   = 0.0;
 
-            foreach ($gajiCadangan as $g) {
-                if ((int)$g['is_cadangan'] === 1) {
-                    $cadangan = (float)$g['nominal'];
+            foreach ($gajiList as $row) {
+                if ((int) $row['is_gaji_harian'] === 1) {
+                    $gajiHarian = (float) $row['nominal'];
                 }
-                if ((int)$g['is_gaji_harian'] === 1) {
-                    $gajiHarian = (float)$g['nominal'];
+
+                if ((int) $row['is_cadangan'] === 1) {
+                    $cadangan = (float) $row['nominal'];
                 }
             }
 
-            // Nominal yang dikembalikan
-            $nominal = $gajiHarian + $cadangan;
+            /* =======================
+         * Hitung jam kerja (support lintas hari)
+         * ======================= */
+            $checkIn  = $attendanceDetail['checkin'];   // contoh: 23:00
+            $checkOut = $attendanceDetail['checkout'];  // contoh: 03:00
 
-            $data = [
-                'checkin'  => $attendanceDetail['checkin'],
-                'checkout' => $attendanceDetail['checkout'],
-                'nominal'  => $nominal
-            ];
+            $totalJamKerja = $this->hitungTotalJam($checkIn, $checkOut);
 
-            return response()->setJSON([
-                'data'   => $data,
+            /* =======================
+         * Hitung nominal gaji
+         * ======================= */
+            $totalGajiCadangan = $gajiHarian + $cadangan;
+
+            // Potong 1 jam istirahat
+            $jamEfektif = max(0, $totalJamKerja - 1);
+
+            $nominal = ($totalGajiCadangan / 7) * $jamEfektif;
+
+            /* =======================
+         * Response
+         * ======================= */
+            return $this->response->setJSON([
                 'status' => true,
+                'data'   => [
+                    'checkin'   => $checkIn,
+                    'checkout'  => $checkOut,
+                    'total_jam' => $totalJamKerja,
+                    'nominal'   => round($nominal, 2),
+                ],
                 'token'  => csrf_hash()
             ]);
-        } catch (Exception $e) {
-            return response()->setJSON([
-                'token'   => csrf_hash(),
+        } catch (\Throwable $e) {
+            return $this->response->setJSON([
                 'status'  => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
+                'token'   => csrf_hash()
             ]);
         }
+    }
+
+    /**
+     * Helper hitung jam kerja (hari sama & lintas hari)
+     * Contoh:
+     *  - 08:00 → 17:30 = 9.5 jam
+     *  - 23:00 → 03:00 = 4 jam
+     */
+    private function hitungTotalJam(string $checkIn, string $checkOut): float
+    {
+        [$inH, $inM]   = explode(':', $checkIn);
+        [$outH, $outM] = explode(':', $checkOut);
+
+        $jamMasuk  = ((int) $inH) + ((int) $inM / 60);
+        $jamKeluar = ((int) $outH) + ((int) $outM / 60);
+
+        // Lintas hari
+        if ($jamKeluar < $jamMasuk) {
+            return (24 - $jamMasuk) + $jamKeluar;
+        }
+
+        // Hari yang sama
+        return $jamKeluar - $jamMasuk;
     }
 }
