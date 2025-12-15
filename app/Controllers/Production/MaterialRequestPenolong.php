@@ -909,7 +909,7 @@ class MaterialRequestPenolong extends BaseController
                 'stock_revamp.id' => $this->request->getVar('stock_id'),
             ];
 
-            $dataResult = $this->stockRevampDetailModel->getStockListWithCondition($datas);
+            $dataResult = $this->stockRevampDetailModel->getStockListPenolongWithCondition($datas);
 
             if (!is_array($dataResult)) {
                 $dataResult = []; // Ensure $dataResult is an array if the method does not return one

@@ -1720,4 +1720,79 @@ class StockRevampDetailModel extends Model
             ->orderBy('stock_revamp_detail.createdAt', 'ASC')
             ->findAll();
     }
+
+    public function getStockListPenolongWithCondition($condition)
+    {
+        $builder = $this->asArray()
+            ->select("
+                stock_revamp_detail.id AS id,
+                stock_revamp_detail.id AS stock_detail_id,
+                stock_revamp.spesifikasi_id,
+                stock_revamp.barang_master_id,
+                stock_revamp.unit_id,
+                stock_revamp.divisi_id,
+                stock_revamp.warehouse_id,
+                stock_revamp_detail.stock_id,
+                stock_revamp_detail.bc_id,
+                stock_revamp_detail.reference_type,
+                barang_master.barang_name,
+                barang_master_spesifikasi.spesifikasi,
+                CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS barang,
+                satuans.kode_satuan,
+                stock_revamp_detail.qty_bersih as stok_total,
+                stock_revamp_detail.qty_diterima as stok_total_diterima,
+                production_result_details.no_aju,
+                production_result_details.harga_umum as harga_umum,
+                production_result_details.harga_harian as harga_harian,
+                production_result_details.harga_bulanan as harga_bulanan,
+                CASE 
+                    WHEN stock_revamp_detail.reference_type = 'LPB' THEN concat(penerimaan_barang.no_penerimaan_barang, ' (', am_purchase_orders.po_no, ')')
+                    WHEN stock_revamp_detail.reference_type = 'HASIL PRODUKSI' THEN production_results.pr_no
+                    ELSE penerimaan_barang.no_penerimaan_barang
+                END AS stock_dokumen,
+                CASE 
+                    WHEN stock_revamp_detail.reference_type = 'LPB' THEN penerimaan_barang.tanggal
+                    WHEN stock_revamp_detail.reference_type = 'HASIL PRODUKSI' THEN production_results.receive_date
+                    ELSE penerimaan_barang.tanggal
+                END AS stock_date,
+                CASE 
+                    WHEN stock_revamp_detail.reference_type = 'LPB' THEN bc_purchase_order.no_daftar
+                    WHEN stock_revamp_detail.reference_type = 'HASIL PRODUKSI' THEN production_result_details.no_ref
+                    ELSE bc_purchase_order.no_daftar
+                END AS no_daftar,
+                stock_revamp_detail.type_bc as type_bc,
+                production_result_details.no_ref as no_daftar,
+                barang_master.type_barang,
+                COALESCE (UPPER(suppliers.name), '-') AS supplier_name
+
+            ")
+            ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
+            ->join('production_results', 'production_results.id = stock_revamp_detail.reference_id', 'left')
+            ->join('production_result_details', 'production_result_details.stock_detail_id = stock_revamp_detail.id', 'left')
+            ->join('penerimaan_barang', 'penerimaan_barang.id = stock_revamp_detail.reference_id', 'left')
+            
+            ->join('am_purchase_orders', 'am_purchase_orders.id = stock_revamp_detail.po_id', 'left')
+            ->join('am_purchase_order_details', 'am_purchase_order_details.am_purchase_order_id = am_purchase_orders.id', 'left')
+            ->join('bc_purchase_order_lpb', 'bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->join('bc_purchase_order', 'bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id', 'left')
+            
+            ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id', 'left')
+            ->join('barang_master', 'barang_master.id = stock_revamp.barang_master_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock_revamp.spesifikasi_id', 'left')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left');
+
+        // Kondisi dinamis
+        foreach ($condition as $field => $value) {
+            if (is_array($value)) {
+                $builder->whereIn($field, $value);
+            } else {
+                $builder->where($field, $value);
+            }
+        }
+
+        return $builder
+            ->groupBy('stock_revamp_detail.id')
+            ->orderBy('stock_revamp_detail.createdAt', 'ASC')
+            ->findAll();
+    }
 }
