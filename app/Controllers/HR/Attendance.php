@@ -2372,6 +2372,20 @@ class Attendance extends BaseController
         $employeeData = $employees['data'];
         $employeeIds  = array_column($employeeData, 'id');
 
+        // mapping keterangan 
+        $attendanceKeterangan = !empty($employeeIds) ? $this->AttendanceKeteranganModel->getKeteranganByDateRangeAmt(
+            $employeeIds,
+            $startDate,
+            $endDate
+        ) : [];
+
+        $mapAttendanceKeterangan = [];
+        foreach ($attendanceKeterangan as $d) {
+            $mapAttendanceKeterangan[$d['employee_id']][$d['tanggal']] = [
+                'reason' => $d['reason']
+            ];
+        }
+
         // log attendance
         $logData = !empty($employeeIds)
             ? $this->AttendanceModel->getAttendanceByDateRangeAmt($employeeIds, $startDate, $endDate)
@@ -2379,11 +2393,16 @@ class Attendance extends BaseController
 
         $mapLog = [];
         foreach ($logData as $l) {
+            $reason = $l['reason'];
+            if ($reason == '') {
+                $reason = $mapAttendanceKeterangan[$l['employee_id']][$l['periode']]['reason']  ?? '';
+            }
+
             $mapLog[$l['employee_id']][$l['periode']] = [
                 'in'     => $l['checkin'],
                 'out'    => $l['checkout'],
                 'status' => $l['status'],
-                'reason' => $l['reason']
+                'reason' => $reason
             ];
         }
 
