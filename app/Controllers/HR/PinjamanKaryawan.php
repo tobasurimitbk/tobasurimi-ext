@@ -220,10 +220,10 @@ class PinjamanKaryawan extends BaseController
                     'end_date'        => $endDate,
                     'tidak_hadir'     => $tidakHadir,
                     'hadir'           => $hadir,
-                    'is_boleh_minjam' => ($tidakHadir <= 6) ? '1' : '0',
-                    'status_pinjaman' => ($tidakHadir <= 6 && $e['tipe'] == "HARIAN TETAP") ? '1' : '0',
-                    'is_ambil'        => ($tidakHadir <= 6 && $e['tipe'] == "HARIAN TETAP") ? '1' : '0',
-                    'nominal'         => ($tidakHadir <= 6) ? $nominalPinjaman : null,
+                    'is_boleh_minjam' => ($hadir >= 10) ? '1' : '0',
+                    'status_pinjaman' => ($hadir >= 10 && $e['tipe'] == "HARIAN TETAP") ? '1' : '0',
+                    'is_ambil'        => ($hadir >= 10 && $e['tipe'] == "HARIAN TETAP") ? '1' : '0',
+                    'nominal'         => ($hadir >= 10) ? $nominalPinjaman : null,
                     'tanggal_ambil'   => $tanggalAmbil
                 ];
             }
@@ -374,9 +374,9 @@ class PinjamanKaryawan extends BaseController
                 'end_date'        => $endDate,
                 'tidak_hadir'     => $tidakHadir,
                 'hadir'           => $hadir,
-                'is_boleh_minjam' => ($tidakHadir <= 6) ? '1' : '0',
-                'status_pinjaman' => ($tidakHadir <= 6) ? '1' : '0',
-                'nominal'         => ($tidakHadir <= 6) ? $nominalPinjaman : null,
+                'is_boleh_minjam' => ($hadir >= 10) ? '1' : '0',
+                'status_pinjaman' => ($hadir >= 10) ? '1' : '0',
+                'nominal'         => ($hadir >= 10) ? $nominalPinjaman : null,
                 'tanggal_ambil'   => $tanggalAmbil
             ]);
 

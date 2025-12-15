@@ -2123,7 +2123,7 @@ $routes->group('bea-cukai-bc-41', ['filter' => 'Auth'], function ($routes) {
     $routes->get('api/kirim-dokumen/(:segment)', 'BeaCukai\BC41::kirimCeisa/$1');
     // OUTSTANDING
     $routes->get('bc-41-outstanding-all', 'BeaCukai\BC25::allOutstanding');
-    $routes->get('bc-41-outstanding', 'BeaCukai\BC41::viewOutstanding');
+    $routes->get('bc-41-outstanding', 'BeaCukai\BC25::viewOutstanding');
     $routes->get('bc-41-outstanding-export', 'BeaCukai\BC25::OutstandingExcel');
 });
 
