@@ -2077,23 +2077,23 @@ class MaterialRequest extends BaseController
 
         if ((!empty($this->request->getVar('stock_id')) || !empty($this->request->getVar('barang_master_id'))) || !empty($typeAsalBarang)) {
             $condition = [
-                "stock_revamp.company_id" => $this->this_company_id,
-                "stock_revamp.barang_master_id" => $barangMasterId,
-                "stock_revamp.divisi_id" => $divisiAsalId,
-                "stock_revamp.warehouse_id" => $warehouseAsalId,
+                "sr.company_id" => $this->this_company_id,
+                "sr.barang_master_id" => $barangMasterId,
+                "sr.divisi_id" => $divisiAsalId,
+                "sr.warehouse_id" => $warehouseAsalId,
             ];
 
             if ($typeAsalBarang == "SUPPLIER") {
                 if (!empty($supplierId)) {
                     $condition["rm_purchase_orders.supplier_id"] = $supplierId;
                 }
-                $condition["stock_revamp_detail.reference_type"] = ["LPB", "PROSES REBUS"];
-                $condition["stock_revamp_detail.po_id"] = "IS NOT NULL";
+                $condition["srd.reference_type"] = ["LPB", "PROSES REBUS", "PENERIMAAN MUTASI", "INISIASI"];
                 $dataResult = $this->stockRevampDetailModel->getStockListPOWithCondition($condition);
             } else {
                 if (!empty($vendorId)) {
                     $condition["jasa_vendor_in.vendor_id "] = $vendorId;
                 }
+                // $condition["stock_revamp_detail.reference_type "] = ["JASA VENDOR", "PROSES REBUS", "PENERIMAAN MUTASI"];
                 $condition["stock_revamp_detail.reference_type "] = ["JASA VENDOR", "PROSES REBUS"];
                 $dataResult = $this->stockRevampDetailModel->getStockListVendorWithCondition($condition);
             }

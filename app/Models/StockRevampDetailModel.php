@@ -1259,73 +1259,210 @@ class StockRevampDetailModel extends Model
     {
         $builder = $this->asArray()
             ->select("
-                stock_revamp_detail.id AS id,
-                stock_revamp_detail.id AS stock_detail_id,
-                stock_revamp.spesifikasi_id,
-                stock_revamp.barang_master_id,
-                stock_revamp.unit_id,
-                stock_revamp.divisi_id,
-                stock_revamp.warehouse_id,
-                stock_revamp_detail.stock_id,
-                stock_revamp_detail.bc_id,
-                stock_revamp_detail.keterangan,
-                rm_purchase_orders.supplier_id,
-                stock_revamp_detail.reference_type,
-                rm_purchase_orders.po_date,
-                rm_purchase_orders.po_no,
-                rm_purchase_orders.id as rm_purchase_order_id,
-                rm_purchase_order_details.id as rm_purchase_order_detail_id,
-                barang_master.barang_name,
-                barang_master_spesifikasi.spesifikasi,
-                CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS barang,
-                satuans.kode_satuan,
-                stock_revamp_detail.qty_bersih as stok_total,
-                stock_revamp_detail.qty_diterima as stok_total_diterima,
-                rm_purchase_orders.po_no AS stock_dokumen,
-                UPPER(suppliers.name) AS supplier_name,
-                bc_purchase_order.no_aju,
-                rm_purchase_order_details.general_price as harga_umum,
-                rm_purchase_order_details.daily_price as harga_harian,
-                rm_purchase_order_details.monthly_price as harga_bulanan,
-                CASE 
-                    WHEN stock_revamp_detail.reference_type = 'PROSES REBUS' THEN proses_rebus.tanggal
-                    ELSE penerimaan_barang.tanggal
+                srd.id,
+                srd.id AS stock_detail_id,
+                sr.spesifikasi_id,
+                sr.barang_master_id,
+                sr.unit_id,
+                sr.divisi_id,
+                sr.warehouse_id,
+                srd.stock_id,
+                srd.bc_id,
+                srd.keterangan,
+                srd.reference_type,
+
+                /* ========= PO ========= */
+                CASE
+                    WHEN srd2.reference_type = 'INISIASI'
+                        THEN srd2.createdAt
+                    WHEN srd.reference_type = 'INISIASI'
+                        THEN srd.createdAt
+                    ELSE COALESCE(
+                        rmpo.po_date,
+                        ripo.po_date,
+                        rmpo2.po_date,
+                        ripo2.po_date
+                    )
+                END AS po_date,
+
+                COALESCE(
+                    rmpo.po_no,
+                    ripo.po_no,
+                    rmpo2.po_no,
+                    ripo2.po_no
+                ) AS po_no,
+
+                CASE
+                    WHEN srd2.reference_type = 'INISIASI'
+                        THEN 'INISIASI'
+                    WHEN srd.reference_type = 'INISIASI'
+                        THEN 'INISIASI'
+                    ELSE COALESCE(
+                        rmpo.po_no,
+                        ripo.po_no,
+                        rmpo2.po_no,
+                        ripo2.po_no
+                    )
+                END AS stock_dokumen,
+
+                COALESCE(
+                    rmpo.id,
+                    ripo.id,
+                    rmpo2.id,
+                    ripo2.id
+                ) AS rm_purchase_order_id,
+
+                COALESCE(
+                    rmpod.id,
+                    ripod.id,
+                    rmpod2.id,
+                    ripod2.id
+                ) AS rm_purchase_order_detail_id,
+
+                bm.barang_name,
+                bms.spesifikasi,
+                CONCAT(bm.barang_name, ' ', bms.spesifikasi) AS barang,
+                s.kode_satuan,
+
+                srd.qty_bersih AS stok_total,
+                srd.qty_diterima AS stok_total_diterima,
+
+                UPPER(COALESCE(sup.name, sup2.name)) AS supplier_name,
+
+                /* ========= PENERIMAAN ========= */
+                COALESCE(
+                    pb_lokal.no_penerimaan_barang,
+                    pb_import.no_penerimaan_barang,
+                    pb_mutasi.no_penerimaan_barang
+                ) AS no_penerimaan_barang,
+
+                COALESCE(
+                    bc_lokal.no_aju,
+                    bc_import.no_aju,
+                    bc_mutasi.no_aju
+                ) AS no_aju,
+
+                /* ========= HARGA ========= */
+                COALESCE(
+                    rmpod.general_price,
+                    ripod.price,
+                    rmpod2.general_price,
+                    ripod2.price
+                ) AS harga_umum,
+
+                COALESCE(rmpod.daily_price, rmpod2.daily_price) AS harga_harian,
+                COALESCE(rmpod.monthly_price, rmpod2.monthly_price) AS harga_bulanan,
+
+                /* ========= TANGGAL STOCK ========= */
+                CASE
+                    WHEN srd.reference_type = 'PROSES REBUS'
+                        THEN pr.tanggal
+                    WHEN srd2.reference_type = 'PROSES REBUS'
+                        THEN pr2.tanggal
+                    WHEN srd2.reference_type = 'INISIASI'
+                        THEN srd2.createdAt
+                    WHEN srd.reference_type = 'INISIASI'
+                        THEN srd.createdAt
+                    ELSE COALESCE(
+                        pb_lokal.tanggal,
+                        pb_import.tanggal,
+                        pb_mutasi.tanggal
+                    )
                 END AS stock_date,
-                penerimaan_barang.no_penerimaan_barang as no_penerimaan_barang,
-                stock_revamp_detail.type_bc as type_bc,
-                bc_purchase_order.no_daftar
+
+                srd.type_bc,
+
+                COALESCE(
+                    bc_lokal.no_daftar,
+                    bc_import.no_daftar,
+                    bc_mutasi.no_daftar
+                ) AS no_daftar
             ")
-            ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
 
-            ->join('rm_purchase_orders', 'rm_purchase_orders.id = stock_revamp_detail.po_id', 'left')
-            ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
-            ->join('penerimaan_barang', 'penerimaan_barang.id = stock_revamp_detail.reference_id', 'left')
-            ->join('bc_purchase_order_lpb', 'bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id', 'left')
-            ->join('bc_purchase_order', 'bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id', 'left')
+            ->from('stock_revamp_detail srd')
+            ->join('stock_revamp sr', 'sr.id = srd.stock_id', 'left')
 
-            ->join('proses_rebus_detail', "proses_rebus_detail.stock_detail_hasil_rebus_id = stock_revamp_detail.id AND stock_revamp_detail.reference_type = 'PROSES REBUS' AND proses_rebus_detail.po_id IS NOT NULL", 'left')
-            ->join('proses_rebus', 'proses_rebus.id = proses_rebus_detail.proses_rebus_id', 'left')
+            /* ===================== PO DARI SRD ===================== */
+            ->join('rm_purchase_orders rmpo', "rmpo.id = srd.po_id AND srd.po_type = 'LOKAL BAKU'", 'left')
+            ->join('rm_purchase_order_details rmpod', 'rmpod.rm_purchase_order_id = rmpo.id', 'left')
+            ->join('suppliers sup', 'sup.id = rmpo.supplier_id', 'left')
 
-            ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
-            ->join('barang_master', 'barang_master.id = stock_revamp.barang_master_id', 'left')
-            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock_revamp.spesifikasi_id', 'left')
-            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left');
+            ->join('rm_import_pos ripo', "ripo.id = srd.po_id AND srd.po_type = 'IMPORT BAKU'", 'left')
+            ->join('rm_import_po_details ripod', 'ripod.rm_import_po_id = ripo.id', 'left')
 
-        // Kondisi dinamis
+            /* ===================== PROSES REBUS SRD ===================== */
+            ->join(
+                'proses_rebus_detail prd',
+                "prd.stock_detail_hasil_rebus_id = srd.id AND srd.reference_type = 'PROSES REBUS'",
+                'left'
+            )
+            ->join('proses_rebus pr', 'pr.id = prd.proses_rebus_id', 'left')
+
+            /* ===================== MUTASI ===================== */
+            ->join(
+                'penerimaan_mutasi_detail pmd',
+                "pmd.penerimaan_mutasi_id = srd.reference_id
+                AND srd.reference_type = 'PENERIMAAN MUTASI'",
+                'left'
+            )
+            ->join('mutasi_detail md', 'md.id = pmd.mutasi_detail_id', 'left')
+            ->join('stock_revamp_detail srd2', 'srd2.id = md.stock_detail_id', 'left')
+
+            /* ===================== PO DARI SRD2 ===================== */
+            ->join('rm_purchase_orders rmpo2', "rmpo2.id = srd2.po_id AND srd2.po_type = 'LOKAL BAKU'", 'left')
+            ->join('rm_purchase_order_details rmpod2', 'rmpod2.rm_purchase_order_id = rmpo2.id', 'left')
+            ->join('suppliers sup2', 'sup2.id = rmpo2.supplier_id', 'left')
+
+            ->join('rm_import_pos ripo2', "ripo2.id = srd2.po_id AND srd2.po_type = 'IMPORT BAKU'", 'left')
+            ->join('rm_import_po_details ripod2', 'ripod2.rm_import_po_id = ripo2.id', 'left')
+
+            /* ===================== PROSES REBUS SRD2 ===================== */
+            ->join(
+                'proses_rebus_detail prd2',
+                "prd2.stock_detail_hasil_rebus_id = srd2.id
+                AND srd2.reference_type = 'PROSES REBUS'",
+                'left'
+            )
+            ->join('proses_rebus pr2', 'pr2.id = prd2.proses_rebus_id', 'left')
+
+            /* ===================== PENERIMAAN BARANG ===================== */
+            ->join('penerimaan_barang pb_lokal', 'pb_lokal.id = srd.reference_id', 'left')
+            ->join('penerimaan_barang pb_import', 'pb_import.id = srd.reference_id', 'left')
+            ->join('penerimaan_barang pb_mutasi', 'pb_mutasi.id = srd2.reference_id', 'left')
+
+            ->join('bc_purchase_order_lpb bcl_lokal', 'bcl_lokal.penerimaan_barang_id = pb_lokal.id', 'left')
+            ->join('bc_purchase_order bc_lokal', 'bc_lokal.id = bcl_lokal.bc_purchase_order_id', 'left')
+
+            ->join('bc_purchase_order_lpb bcl_import', 'bcl_import.penerimaan_barang_id = pb_import.id', 'left')
+            ->join('bc_purchase_order bc_import', 'bc_import.id = bcl_import.bc_purchase_order_id', 'left')
+
+            ->join('bc_purchase_order_lpb bcl_mutasi', 'bcl_mutasi.penerimaan_barang_id = pb_mutasi.id', 'left')
+            ->join('bc_purchase_order bc_mutasi', 'bc_mutasi.id = bcl_mutasi.bc_purchase_order_id', 'left')
+
+            /* ===================== MASTER ===================== */
+            ->join('barang_master bm', 'bm.id = sr.barang_master_id', 'left')
+            ->join('barang_master_spesifikasi bms', 'bms.id = sr.spesifikasi_id', 'left')
+            ->join('satuans s', 's.id = bms.satuan_1', 'left');
+
         foreach ($condition as $field => $value) {
             if (is_array($value)) {
                 $builder->whereIn($field, $value);
             } elseif ($value === 'IS NOT NULL') {
-                // kondisi is not null
                 $builder->where("$field IS NOT NULL", null, false);
             } else {
                 $builder->where($field, $value);
             }
         }
 
+        $builder->groupStart()
+            ->where('srd.reference_type', 'PENERIMAAN MUTASI')
+            ->orWhere('srd.reference_type', 'INISIASI')
+            ->orWhere('srd.po_id IS NOT NULL', null, false)
+        ->groupEnd();
+
         return $builder
-            ->groupBy('stock_revamp_detail.id')
-            ->orderBy('stock_date, stock_dokumen', 'ASC')
+            ->groupBy('srd.id')
+            ->orderBy('stock_date, po_no', 'ASC')
             ->findAll();
     }
 
@@ -1393,6 +1530,7 @@ class StockRevampDetailModel extends Model
             // from Proses Rebus
             ->join('proses_rebus_detail', "proses_rebus_detail.stock_detail_hasil_rebus_id = stock_revamp_detail.id AND stock_revamp_detail.reference_type = 'PROSES REBUS'", 'left')
             ->join('proses_rebus', "proses_rebus.id = proses_rebus_detail.proses_rebus_id", 'left')
+            
             // from Proses Rebus -> JasVen
             ->join('jasa_vendor_in as jasa_vendor_in_rebus', "jasa_vendor_in_rebus.id = proses_rebus_detail.jasa_vendor_id  AND stock_revamp_detail.reference_type = 'PROSES REBUS'", 'left')
             ->join('vendors as vendors_rebus', 'vendors_rebus.id = jasa_vendor_in_rebus.vendor_id', 'left')
@@ -1406,8 +1544,17 @@ class StockRevampDetailModel extends Model
 
             //get asal po stock
             ->join('stock_revamp_detail as stock_revamp_detail2', 'stock_revamp_detail2.id = stock_revamp_history.stock_detail_asal', 'left')
+            
+            // case dari pembelian baku lokal
             ->join('rm_purchase_orders', 'rm_purchase_orders.id = stock_revamp_detail2.po_id', 'left')
             ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
+            ->join('penerimaan_barang', 'penerimaan_barang.id = stock_revamp_detail2.reference_id', 'left')
+            ->join('bc_purchase_order_lpb', 'bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->join('bc_purchase_order', 'bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id', 'left')
+
+            // case dari penerimaan mutasi ke pembelian baku import
+            ->join('rm_import_pos', "rm_import_pos.id = stock_revamp_detail2.po_id AND stock_revamp_detail2.reference_type = 'LPB' AND stock_revamp_detail2.po_type = 'IMPORT BAKU'", 'left')
+            ->join('rm_import_po_details', 'rm_import_po_details.rm_import_po_id = rm_import_pos.id', 'left')
             ->join('penerimaan_barang', 'penerimaan_barang.id = stock_revamp_detail2.reference_id', 'left')
             ->join('bc_purchase_order_lpb', 'bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id', 'left')
             ->join('bc_purchase_order', 'bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id', 'left')
