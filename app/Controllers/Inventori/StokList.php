@@ -2527,7 +2527,7 @@ class StokList extends BaseController
             if (!isset($dataMap[$stockId])) {
                 $dataMap[$stockId] = 0;
             }
-            $dataMap[$stockId] += floatval($d['qty_diterima']);
+            $dataMap[$stockId] += floatval($d['qty_keluar']);
         }
 
         return $dataMap;
@@ -2691,7 +2691,7 @@ class StokList extends BaseController
 
         $totalKeluar = 0;
         foreach ($dataTotal['data'] as $d) {
-            $totalKeluar += (float)$d['qty_diterima'];
+            $totalKeluar += (float)$d['qty_keluar'];
         }
 
         $data = $this->stockRevampLogModel->getKartuStockKeluar(
@@ -2714,7 +2714,7 @@ class StokList extends BaseController
                 'reference_no' => $d['reference_no'],
                 'tanggal_keluar' => !empty($d['tanggal_keluar']) && $d['tanggal_keluar'] != null ? date('d/m/Y', strtotime($d['tanggal_keluar'])) : "",
                 'keterangan' => $d['keterangan'],
-                'qty_diterima' => (float)$d['qty_diterima'],
+                'qty_diterima' => (float)$d['qty_keluar'],
                 'kode_satuan' => $d['kode_satuan'],
             ]);
         }
@@ -3080,7 +3080,7 @@ class StokList extends BaseController
             $sheet->setCellValue("E$rowNum", $r['reference_no']);
             $sheet->setCellValue("F$rowNum", $r['tanggal_keluar'] ? date('d/m/Y', strtotime($r['tanggal_keluar'])) : '');
             $sheet->setCellValue("G$rowNum", $r['keterangan']);
-            $sheet->setCellValue("H$rowNum", (float)$r['qty_diterima']);
+            $sheet->setCellValue("H$rowNum", (float)$r['qty_keluar']);
             $sheet->setCellValue("I$rowNum", $r['kode_satuan']);
             $rowNum++;
         }
