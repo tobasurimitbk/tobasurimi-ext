@@ -835,7 +835,7 @@ class RequestStock extends BaseController
                         # code...
                     }
                 }
-                $this->materialRequestModel->update($id, $data);
+                $this->materialRequestPenolongModel->update($id, $data);
 
                 $this->workOrdersModel->update($materialRequestData['work_order_id'], [
                     'is_posted' => 1
