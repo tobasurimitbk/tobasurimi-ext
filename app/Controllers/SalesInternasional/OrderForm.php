@@ -289,6 +289,20 @@ class OrderForm extends BaseController
                         // Konversinya
                         'satuan_convertion_id' => $sb->satuan_convertion_id,
                         'qty_convertion' => $sb->qty_convertion,
+                        // Custom
+                        'size' => $sb->size,
+                        'grade' => $sb->grade,
+                        'packing' => $sb->packing,
+                        'can' => $sb->can,
+                        'case' => $sb->case,
+                        'kg' => $sb->kg,
+                        'lb' => $sb->lb,
+                        'inner_box' => $sb->inner_box,
+                        'pc' => $sb->pc,
+                        'bag' => $sb->bag,
+                        'persen' => $sb->persen,
+                        'cup' => $sb->cup,
+                        'palet' => $sb->palet,
                         // Note
                         'note_size' => $sb->note_size,
                         'note_grade' => $sb->note_grade,
@@ -673,6 +687,20 @@ class OrderForm extends BaseController
                             // Konversinya
                             'satuan_convertion_id' => $sb->satuan_convertion_id,
                             'qty_convertion' => $sb->qty_convertion,
+                            // Custom
+                            'size' => $sb->size,
+                            'grade' => $sb->grade,
+                            'packing' => $sb->packing,
+                            'can' => $sb->can,
+                            'case' => $sb->case,
+                            'kg' => $sb->kg,
+                            'lb' => $sb->lb,
+                            'inner_box' => $sb->inner_box,
+                            'pc' => $sb->pc,
+                            'bag' => $sb->bag,
+                            'persen' => $sb->persen,
+                            'cup' => $sb->cup,
+                            'palet' => $sb->palet,
                             // Note
                             'note_size' => $sb->note_size,
                             'note_grade' => $sb->note_grade,
@@ -703,6 +731,20 @@ class OrderForm extends BaseController
                             // Konversinya
                             'satuan_convertion_id' => $sb->satuan_convertion_id,
                             'qty_convertion' => $sb->qty_convertion,
+                            // Custom
+                            'size' => $sb->size,
+                            'grade' => $sb->grade,
+                            'packing' => $sb->packing,
+                            'can' => $sb->can,
+                            'case' => $sb->case,
+                            'kg' => $sb->kg,
+                            'lb' => $sb->lb,
+                            'inner_box' => $sb->inner_box,
+                            'pc' => $sb->pc,
+                            'bag' => $sb->bag,
+                            'persen' => $sb->persen,
+                            'cup' => $sb->cup,
+                            'palet' => $sb->palet,
                             // Note
                             'note_size' => $sb->note_size,
                             'note_grade' => $sb->note_grade,

@@ -559,20 +559,20 @@
                     </div>
 
                     <ul class="nav nav-tabs mt-3" id="myTab" role="tablist">
-                        <li class="nav-item" role="presentation">
+                        <!-- <li class="nav-item" role="presentation">
                             <button class="nav-link active" id="home-tab" data-toggle="tab" data-target="#home1" type="button" role="tab" aria-controls="home" aria-selected="true">
                                 Add Note Size & Breakdown
                             </button>
-                        </li>
+                        </li> -->
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="profile-tab" data-toggle="tab" data-target="#profile1" type="button" role="tab" aria-controls="profile" aria-selected="false">
+                            <button class="nav-link active" id="profile-tab" data-toggle="tab" data-target="#profile1" type="button" role="tab" aria-controls="profile" aria-selected="false">
                                 Detail Size & Breakdown
                             </button>
                         </li>
                     </ul>
 
                     <div class="tab-content" id="myTabContent">
-                        <div class="tab-pane fade show active" id="home1" role="tabpanel" aria-labelledby="home-tab">
+                        <!-- <div class="tab-pane fade show active" id="home1" role="tabpanel" aria-labelledby="home-tab">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
@@ -653,8 +653,8 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="tab-pane fade" id="profile1" role="tabpanel" aria-labelledby="profile-tab">
+                        </div> -->
+                        <div class="tab-pane fade show active" id="profile1" role="tabpanel" aria-labelledby="profile-tab">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
@@ -1628,8 +1628,6 @@
             var document_required = $('#document_required').val();
             var payment_term = $('#payment_term').val();
 
-            console.log(listDataSalesKontrak);
-
             if (listDataSalesKontrak.length === 0) {
                 Swal.fire({
                     icon: 'error',
@@ -1839,34 +1837,34 @@
         // Detail Size
         $('#id_detail').val(itemSalesContractDetail.id);
         $('#id_detail_breakdown').val(itemSizeBreakdown.id_detail_breakdown);
-        $('#size').val(itemSizeBreakdown.size).attr('readonly', true);
-        $('#grade').val(itemSizeBreakdown.grade).attr('readonly', true);
-        $('#packing_size').val(itemSizeBreakdown.packing_size).attr('readonly', true);
-        $('#can').val(itemSizeBreakdown.can).attr('readonly', true);
-        $('#case').val(itemSizeBreakdown.cased).attr('readonly', true);
-        $('#kg').val(itemSizeBreakdown.kg).attr('readonly', true);
-        $('#lb').val(itemSizeBreakdown.lb).attr('readonly', true);
-        $('#inner_box').val(itemSizeBreakdown.inner_box).attr('readonly', true);
-        $('#pc').val(itemSizeBreakdown.pc).attr('readonly', true);
-        $('#bag').val(itemSizeBreakdown.bag).attr('readonly', true);
-        $('#persen').val(itemSizeBreakdown.persen).attr('readonly', true);
-        $('#cup').val(itemSizeBreakdown.cup).attr('readonly', true);
-        $('#palet').val(itemSizeBreakdown.palet).attr('readonly', true);
-        $('#remark').val(itemSizeBreakdown.remark).attr('readonly', true);
+        $('#size').val(itemSizeBreakdown.size);
+        $('#grade').val(itemSizeBreakdown.grade);
+        $('#packing_size').val(itemSizeBreakdown.packing);
+        $('#can').val(itemSizeBreakdown.can);
+        $('#case').val(itemSizeBreakdown.case);
+        $('#kg').val(itemSizeBreakdown.kg);
+        $('#lb').val(itemSizeBreakdown.lb);
+        $('#inner_box').val(itemSizeBreakdown.inner_box);
+        $('#pc').val(itemSizeBreakdown.pc);
+        $('#bag').val(itemSizeBreakdown.bag);
+        $('#persen').val(itemSizeBreakdown.persen);
+        $('#cup').val(itemSizeBreakdown.cup);
+        $('#palet').val(itemSizeBreakdown.palet);
+        $('#remark').val(itemSizeBreakdown.remark);
         // Note Size
-        $('#note_size').val(itemSizeBreakdown.note_size);
-        $('#note_grade').val(itemSizeBreakdown.note_grade);
-        $('#note_packing_size').val(itemSizeBreakdown.note_packing_size);
-        $('#note_can').val(itemSizeBreakdown.note_can);
-        $('#note_case').val(itemSizeBreakdown.note_case);
-        $('#note_kg').val(itemSizeBreakdown.note_kg);
-        $('#note_lb').val(itemSizeBreakdown.note_lb);
-        $('#note_inner_box').val(itemSizeBreakdown.note_inner_box);
-        $('#note_pc').val(itemSizeBreakdown.note_pc);
-        $('#note_bag').val(itemSizeBreakdown.note_bag);
-        $('#note_persen').val(itemSizeBreakdown.note_persen);
-        $('#note_cup').val(itemSizeBreakdown.note_cup);
-        $('#note_palet').val(itemSizeBreakdown.note_palet);
+        // $('#note_size').val(itemSizeBreakdown.note_size);
+        // $('#note_grade').val(itemSizeBreakdown.note_grade);
+        // $('#note_packing_size').val(itemSizeBreakdown.note_packing_size);
+        // $('#note_can').val(itemSizeBreakdown.note_can);
+        // $('#note_case').val(itemSizeBreakdown.note_case);
+        // $('#note_kg').val(itemSizeBreakdown.note_kg);
+        // $('#note_lb').val(itemSizeBreakdown.note_lb);
+        // $('#note_inner_box').val(itemSizeBreakdown.note_inner_box);
+        // $('#note_pc').val(itemSizeBreakdown.note_pc);
+        // $('#note_bag').val(itemSizeBreakdown.note_bag);
+        // $('#note_persen').val(itemSizeBreakdown.note_persen);
+        // $('#note_cup').val(itemSizeBreakdown.note_cup);
+        // $('#note_palet').val(itemSizeBreakdown.note_palet);
         // Qty
         $('#qty').data('max', itemSizeBreakdown.qty_sisa);
         $('#qty').val(itemSizeBreakdown.qty_input);
@@ -1921,34 +1919,62 @@
             listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].satuan_convertion_id = satuan_convertion_id;
             listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].satuan_convertion_kode = satuan_convertion_kode;
 
+            // declare size & breakdown
+            var size = $('#size').val();
+            var grade = $('#grade').val();
+            var packingSize = $('#packing_size').val();
+            var can = $('#can').val();
+            var cased = $('#case').val();
+            var kg = $('#kg').val();
+            var lb = $('#lb').val();
+            var innerBox = $('#inner_box').val();
+            var pc = $('#pc').val();
+            var bag = $('#bag').val();
+            var persen = $('#persen').val();
+            var cup = $('#cup').val();
+            var palet = $('#palet').val();
+            // Update size & breakdown
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].size = size;
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].grade = grade;
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].packing = packingSize;
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].can = can;
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].case = cased;
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].kg = kg;
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].lb = lb;
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].inner_box = innerBox;
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].pc = pc;
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].bag = bag;
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].persen = persen;
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].cup = cup;
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].palet = palet;
 
-            var noteSize = $('#note_size').val();
-            var noteGrade = $('#note_grade').val();
-            var notePackingSize = $('#note_packing_size').val();
-            var noteCan = $('#note_can').val();
-            var noteCase = $('#note_case').val();
-            var noteKg = $('#note_kg').val();
-            var noteLb = $('#note_lb').val();
-            var noteInnerBox = $('#note_inner_box').val();
-            var notePc = $('#note_pc').val();
-            var noteBag = $('#note_bag').val();
-            var notePersen = $('#note_persen').val();
-            var noteCup = $('#note_cup').val();
-            var notePalet = $('#note_palet').val();
-            // Update Note Size
-            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_size = noteSize;
-            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_grade = noteGrade;
-            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_packing_size = notePackingSize;
-            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_can = noteCan;
-            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_case = noteCase;
-            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_kg = noteKg;
-            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_lb = noteLb;
-            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_inner_box = noteInnerBox;
-            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_pc = notePc;
-            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_bag = noteBag;
-            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_persen = notePersen;
-            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_cup = noteCup;
-            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_palet = notePalet;
+            // var noteSize = $('#note_size').val();
+            // var noteGrade = $('#note_grade').val();
+            // var notePackingSize = $('#note_packing_size').val();
+            // var noteCan = $('#note_can').val();
+            // var noteCase = $('#note_case').val();
+            // var noteKg = $('#note_kg').val();
+            // var noteLb = $('#note_lb').val();
+            // var noteInnerBox = $('#note_inner_box').val();
+            // var notePc = $('#note_pc').val();
+            // var noteBag = $('#note_bag').val();
+            // var notePersen = $('#note_persen').val();
+            // var noteCup = $('#note_cup').val();
+            // var notePalet = $('#note_palet').val();
+            // // Update Note Size
+            // listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_size = noteSize;
+            // listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_grade = noteGrade;
+            // listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_packing_size = notePackingSize;
+            // listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_can = noteCan;
+            // listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_case = noteCase;
+            // listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_kg = noteKg;
+            // listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_lb = noteLb;
+            // listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_inner_box = noteInnerBox;
+            // listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_pc = notePc;
+            // listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_bag = noteBag;
+            // listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_persen = notePersen;
+            // listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_cup = noteCup;
+            // listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_palet = notePalet;
             drawTable(listDataSalesKontrak);
             recalculateGrandTotal();
             $('#updateQtyOrderFormModal').modal('hide');
@@ -2060,7 +2086,6 @@
     }
 
     function drawTable(listDataSalesKontrak) {
-        console.log(listDataSalesKontrak);
         const table = $('#dataTableBarang');
         const tbody = table.find('#body-detail-table-barang'); // tbody utama
         const tfoot = table.find('#foot-detail-table-barang');
@@ -2206,7 +2231,7 @@
                     <td>${size.grade || ''}</td>
                     <td>${size.packing || ''}</td>
                     <td>${size.can || ''}</td>
-                    <td>${size.cased || ''}</td>
+                    <td>${size.case || ''}</td>
                     <td>${size.kg || ''}</td>
                     <td>${size.lb || ''}</td>
                     <td>${size.inner_box || ''}</td>
