@@ -100,7 +100,7 @@
                                     <label for="floatingInput">Sales Kontrak No</label>
                                 </div>
                                 <div style="<?= !empty($dataSalesKontrak)  ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                    <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 20px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
                         </div>
@@ -1016,6 +1016,7 @@
             var palet = $('#palet').val();
             var persen = destroyFormatRupiah($('#persen').val() || 0);
             var qty = $('#qty').val();
+            var cup = $('#cup').val();
             var harga = destroyFormatRupiah($('#harga').val());
             var total = destroyFormatRupiah($('#total').val());
             var remark = $('#remark').val();
@@ -1036,6 +1037,7 @@
                 bag: bag,
                 palet: palet,
                 persen: persen,
+                cup: cup,
                 qty: qty,
                 harga: harga,
                 total: harga * qty,
@@ -1070,6 +1072,7 @@
                 listSizeBreakdown[index].pc = result.pc;
                 listSizeBreakdown[index].bag = result.bag;
                 listSizeBreakdown[index].persen = result.persen;
+                listSizeBreakdown[index].cup = result.cup;
                 listSizeBreakdown[index].qty = result.qty;
                 listSizeBreakdown[index].harga = result.harga;
                 listSizeBreakdown[index].total = result.total;
@@ -2081,6 +2084,7 @@
         $('#total').val(greatFormatRupiah(item.total));
         $('#remark').val(item.remark);
         $('#satuan_size_id').val(item.satuan_size_id).change();
+        $('#cup').val(item.cup);
 
         $('.title-size-breakdown').text("Update ");
         $('#addSizeBreakdownModal').modal('show');
@@ -2754,6 +2758,7 @@
         $('#remark').val(null);
         $('#total').val(null);
         $('#satuan_size_id').val(null).change();
+        $('#cup').val(null);
     }
 </script>
 <?= $this->endSection(); ?>

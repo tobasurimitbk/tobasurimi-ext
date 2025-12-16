@@ -407,6 +407,7 @@ class SalesKontrak extends BaseController
                     'harga' => $sb->harga,
                     'total' => $sb->total,
                     'palet' => $sb->palet,
+                    'cup' => $sb->cup,
                     'satuan_size_id' => $sb->satuan_size_id
                 ]);
             }
@@ -536,6 +537,7 @@ class SalesKontrak extends BaseController
                             'harga' => $sb->harga,
                             'total' => $sb->total,
                             'palet' => $sb->palet,
+                            'cup' => $sb->cup,
                             'satuan_size_id' => $sb->satuan_size_id
                         ]);
 
@@ -561,6 +563,7 @@ class SalesKontrak extends BaseController
                             'harga' => $sb->harga,
                             'total' => $sb->total,
                             'palet' => $sb->palet,
+                            'cup' => $sb->cup,
                             'satuan_size_id' => $sb->satuan_size_id
                         ]);
 

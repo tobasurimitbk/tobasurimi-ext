@@ -2084,7 +2084,7 @@ class JurnalUmum extends BaseController
                     'kredit'            => 0,
                     'valas'             => '30',
                     'kurs'              => 1,
-                    'keterangan'        => implode(', ', $dataPOdesc), // semua PO disatukan
+                    'keterangan'        => $POlocal->keterangan,
                     'id_inputer'        => session()->get("login")->user_id
                 ];
 
@@ -2100,7 +2100,7 @@ class JurnalUmum extends BaseController
                     'kredit'            => $totalNominal - ($POlocal->potongan_harga ?? 0 ?? 0),
                     'valas'             => '30',
                     'kurs'              => 1,
-                    'keterangan'        => implode(', ', $dataPOdesc),
+                    'keterangan'        => $POlocal->keterangan,
                     'id_inputer'        => session()->get("login")->user_id
                 ];
 

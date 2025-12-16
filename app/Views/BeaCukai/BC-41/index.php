@@ -24,7 +24,7 @@
         <?= csrf_field() ?>
         <div class="card-body">
             <div class="row justify-content-start row-col-spp">
-                <div class="col-md-2 mb-3">
+                <div class="col-md-3 mb-3">
                     <?= csrf_field() ?>
                     <div class="input-group input-group-password">
                         <input autocomplete="one-time-code" class="form-control input-picker mulaiTanggalBC41" id="mulaiTanggalBC41" name="mulaiTanggalBC41" placeholder="Mulai Tanggal">
@@ -33,7 +33,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2 mb-3">
+                <div class="col-md-3 mb-3">
                     <div class="input-group input-group-password">
                         <input autocomplete="one-time-code" class="form-control input-picker selesaiTanggalBC41" id="selesaiTanggalBC41" name="selesaiTanggalBC41" placeholder="Selesai Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
@@ -41,14 +41,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2 mb-3">
+                <div class="col-md-3 mb-3">
                     <select name="statusPosting" class="form-select statusPosting" id="statusPosting">
                         <option selected value="ALL">STATUS POSTING : SEMUA</option>
-                        <option value="SUDAH POSTING">STATUS POSTING : SUDAH POSTING</option>
-                        <option value="BELUM POSTING">STATUS POSTING : BELUM POSTING</option>
+                        <option value="SUDAH POSTING">SUDAH POSTING</option>
+                        <option value="BELUM POSTING">BELUM POSTING</option>
                     </select>
                 </div>
-                <div class="col-md-6 mb-3">
+                <div class="col-md-3 mb-3">
                     <input autocomplete="one-time-code" class="form-control noAju search form-out-search" placeholder="Cari Data" value="" />
                 </div>
             </div>
