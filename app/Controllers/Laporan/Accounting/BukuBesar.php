@@ -594,176 +594,310 @@ class BukuBesar extends BaseController
 
     public function exportPDF()
     {
-        if (!empty($this->request->getPost('dateStart')) && !empty($this->request->getPost('jenis_account')) && ($this->request->getPost('account_id') || $this->request->getPost('range_account_start_id'))) {
-            $dataJurnalUmum = $this->getDataBukuBesar();
+        // Ambil semua parameter GET
+        $getParams = $this->request->getGet();
+        
+        if (empty($getParams)) {
+            session()->setFlashdata('error', 'Silakan filter data terlebih dahulu');
+            return redirect()->to(base_url('laporan-accounting/bukubesar'));
+        }
+        
+        if (empty($this->request->getGet('dateStart')) || 
+            empty($this->request->getGet('jenis_account'))) {
+            session()->setFlashdata('error', 'Parameter tanggal dan jenis account wajib diisi');
+            return redirect()->to(base_url('laporan-accounting/bukubesar'));
+        }
+        
+        // Cek apakah ada account_id atau range_account_start_id
+        $account_id = $this->request->getGet('account_id');
+        $range_account_start_id = $this->request->getGet('range_account_start_id');
+        
+        $hasAccountId = false;
+        if (is_array($account_id)) {
+            $filtered = array_filter($account_id, function($val) {
+                return !empty($val);
+            });
+            $hasAccountId = !empty($filtered);
+        } else {
+            $hasAccountId = !empty($account_id);
+        }
+        
+        $hasRange = !empty($range_account_start_id);
+        
+        if (!$hasAccountId && !$hasRange) {
+            session()->setFlashdata('error', 'Pilih minimal satu akun atau range akun');
+            return redirect()->to(base_url('laporan-accounting/bukubesar'));
+        }
+        
+        // Get data
+        $dataJurnalUmum = $this->getDataBukuBesar();
+        
+        if (empty($dataJurnalUmum)) {
+            session()->setFlashdata('error', 'Tidak ada data untuk di-export');
+            return redirect()->to(base_url('laporan-accounting/bukubesar'));
         }
 
         $data = [
-            "jurnalUmum" => isset($dataJurnalUmum) ? $dataJurnalUmum : []
+            "jurnalUmum" => $dataJurnalUmum,
+            "dateStart" => $this->request->getGet('dateStart'),
+            "dateEnd" => $this->request->getGet('dateEnd')
         ];
 
         $dompdf = new Dompdf();
-
         $dompdf->loadHtml(view('Laporan/LaporanBukuBesar/print', $data));
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
-        $dompdf->stream("Laporan Jurnal Umum ", array("Attachment" => false));
+        
+        $filename = "Laporan_Buku_Besar_" . date('Ymd_His') . ".pdf";
+        $dompdf->stream($filename, array("Attachment" => false));
+        exit();
     }
 
     public function exportExcel()
     {
-        if (!empty($this->request->getPost('dateStart')) && !empty($this->request->getPost('jenis_account')) && ($this->request->getPost('account_id') || $this->request->getPost('range_account_start_id'))) {
-            
-            // Get data dari function yang sudah ada
-            $dataJurnalUmum = $this->getDataBukuBesar();
-            
-            if (empty($dataJurnalUmum)) {
-                return $this->response->setJSON(['success' => false, 'message' => 'Tidak ada data untuk di-export']);
-            }
+        // Ambil semua parameter GET
+        $getParams = $this->request->getGet();
+        
+        // Jika tidak ada parameter, redirect back
+        if (empty($getParams)) {
+            session()->setFlashdata('error', 'Silakan filter data terlebih dahulu');
+            return redirect()->to(base_url('laporan-accounting/bukubesar'));
+        }
+        
+        // Validasi parameter wajib
+        if (empty($this->request->getGet('dateStart')) || 
+            empty($this->request->getGet('jenis_account'))) {
+            session()->setFlashdata('error', 'Parameter tanggal dan jenis account wajib diisi');
+            return redirect()->to(base_url('laporan-accounting/bukubesar'));
+        }
+        
+        // Cek apakah ada account_id atau range_account_start_id
+        $account_id = $this->request->getGet('account_id');
+        $range_account_start_id = $this->request->getGet('range_account_start_id');
+        
+        $hasAccountId = false;
+        if (is_array($account_id)) {
+            $filtered = array_filter($account_id, function($val) {
+                return !empty($val);
+            });
+            $hasAccountId = !empty($filtered);
+        } else {
+            $hasAccountId = !empty($account_id);
+        }
+        
+        $hasRange = !empty($range_account_start_id);
+        
+        if (!$hasAccountId && !$hasRange) {
+            session()->setFlashdata('error', 'Pilih minimal satu akun atau range akun');
+            return redirect()->to(base_url('laporan-accounting/bukubesar'));
+        }
+        
+        // Get data dari function yang sudah ada
+        $dataJurnalUmum = $this->getDataBukuBesar();
+        
+        if (empty($dataJurnalUmum)) {
+            session()->setFlashdata('error', 'Tidak ada data untuk di-export');
+            return redirect()->to(base_url('laporan-accounting/bukubesar'));
+        }
 
-            try {
-                // Create new Spreadsheet
-                $spreadsheet = new Spreadsheet();
-                $sheet = $spreadsheet->getActiveSheet();
-                
-                // Set judul dan informasi header
-                $title = "LAPORAN BUKU BESAR";
-                $sheet->setCellValue('A1', $title);
-                $sheet->mergeCells('A1:H1');
-                
-                $periode = "Periode: " . $this->request->getPost('dateStart') . " s/d " . $this->request->getPost('dateEnd');
-                $sheet->setCellValue('A2', $periode);
-                $sheet->mergeCells('A2:H2');
-                
-                // Header tabel
-                $headers = [
-                    'No',
-                    'Tanggal',
-                    'No. Transaksi', 
-                    'Keterangan',
-                    'Jenis Transaksi',
-                    'Debit',
-                    'Kredit',
-                    'Saldo'
-                ];
-                
-                $sheet->fromArray($headers, NULL, 'A4');
-                
-                // Styling header
-                $headerStyle = [
-                    'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-                    'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '2C3E50']],
-                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+        try {
+            // Create new Spreadsheet
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            
+            // Set judul dan informasi header
+            $title = "LAPORAN BUKU BESAR";
+            $sheet->setCellValue('A1', $title);
+            $sheet->mergeCells('A1:K1');
+            
+            $sheet->setCellValue('A2', 'PT. TOBA SURIMI INDUSTRIES, Tbk');
+            $sheet->mergeCells('A2:K2');
+            
+            $periode = "Periode: " . $this->request->getGet('dateStart');
+            if ($this->request->getGet('dateEnd')) {
+                $periode .= " s/d " . $this->request->getGet('dateEnd');
+            }
+            $sheet->setCellValue('A3', $periode);
+            $sheet->mergeCells('A3:K3');
+            
+            // Header tabel (sesuaikan dengan struktur data Anda)
+            $headers = [
+                'No',
+                'Tanggal',
+                'No. Transaksi', 
+                'Company',
+                'Jenis Transaksi',
+                'Supplier',
+                'Keterangan',
+                'Currency',
+                'Exchange Rate',
+                'Debit',
+                'Kredit',
+                'Saldo'
+            ];
+            
+            $sheet->fromArray($headers, NULL, 'A5');
+            
+            // Styling header
+            $headerStyle = [
+                'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '2C3E50']],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
+            ];
+            
+            $sheet->getStyle('A5:L5')->applyFromArray($headerStyle);
+            
+            $row = 6;
+            $no = 1;
+            
+            // Loop melalui setiap account (sesuaikan dengan struktur data)
+            foreach ($dataJurnalUmum as $j) {
+                // Header untuk setiap account
+                $sheet->setCellValue('A' . $row, 'Account: ' . $j['number'] . ' - ' . $j['name']);
+                $sheet->mergeCells('A' . $row . ':L' . $row);
+                $sheet->getStyle('A' . $row . ':L' . $row)->applyFromArray([
+                    'font' => ['bold' => true],
+                    'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'E8F4FD']],
                     'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
-                ];
+                ]);
+                $row++;
                 
-                $sheet->getStyle('A4:H4')->applyFromArray($headerStyle);
+                // Tampilkan saldo awal
+                $sheet->setCellValue('A' . $row, '');
+                $sheet->setCellValue('B' . $row, '');
+                $sheet->setCellValue('C' . $row, '');
+                $sheet->setCellValue('D' . $row, '');
+                $sheet->setCellValue('E' . $row, '');
+                $sheet->setCellValue('F' . $row, '');
+                $sheet->setCellValue('G' . $row, 'SALDO AWAL');
+                $sheet->setCellValue('H' . $row, '');
+                $sheet->setCellValue('I' . $row, '');
+                $sheet->setCellValue('J' . $row, '');
+                $sheet->setCellValue('K' . $row, '');
+                $sheet->setCellValue('L' . $row, $j['saldo_lama']);
                 
-                $row = 5;
-                $no = 1;
+                $sheet->getStyle('A' . $row . ':L' . $row)->applyFromArray([
+                    'font' => ['bold' => true],
+                    'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'F0F0F0']]
+                ]);
+                $row++;
                 
-                // Loop melalui setiap account
-                foreach ($dataJurnalUmum as $accountNumber => $accountData) {
-                    // Header untuk setiap account
-                    $sheet->setCellValue('A' . $row, 'Account: ' . $accountNumber . ' - ' . $accountData['name']);
-                    $sheet->mergeCells('A' . $row . ':H' . $row);
-                    $sheet->getStyle('A' . $row . ':H' . $row)->applyFromArray([
-                        'font' => ['bold' => true],
-                        'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'E8F4FD']],
-                        'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
-                    ]);
-                    $row++;
-                    
-                    // Tampilkan saldo awal
-                    $sheet->setCellValue('A' . $row, '');
-                    $sheet->setCellValue('B' . $row, '');
-                    $sheet->setCellValue('C' . $row, '');
-                    $sheet->setCellValue('D' . $row, 'SALDO AWAL');
-                    $sheet->setCellValue('E' . $row, '');
-                    $sheet->setCellValue('F' . $row, '');
-                    $sheet->setCellValue('G' . $row, '');
-                    $sheet->setCellValue('H' . $row, $accountData['saldo_lama']);
-                    
-                    $sheet->getStyle('A' . $row . ':H' . $row)->applyFromArray([
-                        'font' => ['bold' => true],
-                        'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'F0F0F0']]
-                    ]);
-                    $row++;
-                    
-                    $runningBalance = $accountData['saldo_lama'];
-                    
-                    // Loop melalui setiap transaksi
-                    foreach ($accountData['result'] as $transaction) {
+                $runningBalance = $j['saldo_lama'];
+                
+                // Loop melalui setiap transaksi
+                if (!empty($j['result'])) {
+                    foreach ($j['result'] as $r) {
                         $sheet->setCellValue('A' . $row, $no++);
-                        $sheet->setCellValue('B' . $row, date('d/m/Y', strtotime($transaction['tanggal_jurnal'])));
-                        $sheet->setCellValue('C' . $row, $transaction['no_transaksi']);
-                        $sheet->setCellValue('D' . $row, $transaction['keterangan']);
-                        $sheet->setCellValue('E' . $row, $transaction['jenis_transaksi']);
-                        $sheet->setCellValue('F' . $row, (float)$transaction['debit']);
-                        $sheet->setCellValue('G' . $row, (float)$transaction['kredit']);
+                        $sheet->setCellValue('B' . $row, date('d/m/Y', strtotime($r['tanggal_jurnal'])));
+                        $sheet->setCellValue('C' . $row, $r['no_transaksi']);
+                        $sheet->setCellValue('D' . $row, $r['company'] ?? '');
+                        $sheet->setCellValue('E' . $row, $r['jenis_transaksi'] ?? '');
+                        $sheet->setCellValue('F' . $row, $r['supplier_name'] ?? '');
+                        $sheet->setCellValue('G' . $row, $r['keterangan']);
+                        
+                        // Currency dan Exchange Rate
+                        $amount = (float)$r['kurs'] != 1 ? ((float)$r['kredit'] != 0 ? $r['kredit'] : $r['debit']) : 0;
+                        $sheet->setCellValue('H' . $row, $r['valas'] . ' ' . $amount);
+                        $sheet->setCellValue('I' . $row, $r['kurs'] == "1" ? "" : $r['kurs']);
+                        
+                        // Debit dan Kredit
+                        $debitAmount = (float)$r['debit'] * (float)$r['kurs'];
+                        $kreditAmount = (float)$r['kredit'] * (float)$r['kurs'];
+                        $sheet->setCellValue('J' . $row, $debitAmount);
+                        $sheet->setCellValue('K' . $row, $kreditAmount);
                         
                         // Hitung running balance
-                        $runningBalance += (float)$transaction['debit'] - (float)$transaction['kredit'];
-                        $sheet->setCellValue('H' . $row, $runningBalance);
+                        $runningBalance += $debitAmount - $kreditAmount;
+                        $sheet->setCellValue('L' . $row, $runningBalance);
                         
                         $row++;
                     }
-                    
-                    // Tambahkan baris kosong antara account
-                    $row++;
                 }
                 
-                // Apply styling untuk data
-                $dataStyle = [
-                    'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
-                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT]
-                ];
+                // Tambahkan baris untuk subtotal
+                $sheet->setCellValue('A' . $row, '');
+                $sheet->setCellValue('B' . $row, '');
+                $sheet->setCellValue('C' . $row, '');
+                $sheet->setCellValue('D' . $row, '');
+                $sheet->setCellValue('E' . $row, '');
+                $sheet->setCellValue('F' . $row, '');
+                $sheet->setCellValue('G' . $row, 'SUB TOTAL');
+                $sheet->setCellValue('H' . $row, '');
+                $sheet->setCellValue('I' . $row, '');
+                $sheet->setCellValue('J' . $row, '=SUM(J' . ($row - count($j['result'])) . ':J' . ($row - 1) . ')');
+                $sheet->setCellValue('K' . $row, '=SUM(K' . ($row - count($j['result'])) . ':K' . ($row - 1) . ')');
+                $sheet->setCellValue('L' . $row, '');
                 
-                $lastRow = $row - 1;
-                $sheet->getStyle('A5:H' . $lastRow)->applyFromArray($dataStyle);
+                $row++;
                 
-                // Format number untuk kolom debit, kredit, saldo
-                $sheet->getStyle('F5:H' . $lastRow)
-                    ->getNumberFormat()
-                    ->setFormatCode('#,##0.00');
+                // Baris untuk total akhir
+                $sheet->setCellValue('A' . $row, '');
+                $sheet->setCellValue('B' . $row, '');
+                $sheet->setCellValue('C' . $row, '');
+                $sheet->setCellValue('D' . $row, '');
+                $sheet->setCellValue('E' . $row, '');
+                $sheet->setCellValue('F' . $row, '');
+                $sheet->setCellValue('G' . $row, 'TOTAL');
+                $sheet->setCellValue('H' . $row, '');
+                $sheet->setCellValue('I' . $row, '');
+                $sheet->setCellValue('J' . $row, '');
+                $sheet->setCellValue('K' . $row, '');
+                $sheet->setCellValue('L' . $row, $runningBalance);
                 
-                // Auto size columns
-                foreach (range('A', 'H') as $column) {
-                    $sheet->getColumnDimension($column)->setAutoSize(true);
-                }
+                $sheet->getStyle('G' . ($row-1) . ':G' . $row)->getFont()->setBold(true);
                 
-                // Center alignment untuk beberapa kolom
-                $sheet->getStyle('A:A')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-                $sheet->getStyle('B:B')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-                $sheet->getStyle('F:H')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-                
-                // Set judul utama
-                $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
-                $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-                $sheet->getStyle('A2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-                
-                // Prepare download
-                $filename = 'Buku_Besar_' . date('Y_m_d_His') . '.xlsx';
-                
-                header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-                header('Content-Disposition: attachment;filename="' . $filename . '"');
-                header('Cache-Control: max-age=0');
-                
-                $writer = new Xlsx($spreadsheet);
-                $writer->save('php://output');
-                exit();
-                
-            } catch (\Exception $e) {
-                return $this->response->setJSON([
-                    'success' => false, 
-                    'message' => 'Error generating Excel: ' . $e->getMessage()
-                ]);
+                $row += 2; // Spasi antar account
             }
-        } else {
-            return $this->response->setJSON([
-                'success' => false, 
-                'message' => 'Parameter tidak lengkap'
-            ]);
+            
+            // Apply styling untuk data
+            $dataStyle = [
+                'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT]
+            ];
+            
+            $lastRow = $row - 1;
+            $sheet->getStyle('A5:L' . $lastRow)->applyFromArray($dataStyle);
+            
+            // Format number untuk kolom numeric
+            $sheet->getStyle('J5:L' . $lastRow)
+                ->getNumberFormat()
+                ->setFormatCode('#,##0.00');
+            
+            // Auto size columns
+            foreach (range('A', 'L') as $column) {
+                $sheet->getColumnDimension($column)->setAutoSize(true);
+            }
+            
+            // Center alignment untuk beberapa kolom
+            $sheet->getStyle('A:A')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('B:B')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('J:L')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+            
+            // Set judul utama
+            $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
+            $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('A2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('A3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            
+            // Prepare download
+            $filename = 'Buku_Besar_' . date('Y_m_d_His') . '.xlsx';
+            
+            $writer = new Xlsx($spreadsheet);
+            
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="' . $filename . '"');
+            header('Cache-Control: max-age=0');
+            
+            $writer->save('php://output');
+            exit();
+            
+        } catch (\Exception $e) {
+            // Log error
+            log_message('error', 'Excel Export Error: ' . $e->getMessage());
+            
+            session()->setFlashdata('error', 'Terjadi kesalahan saat generate Excel: ' . $e->getMessage());
+            return redirect()->to(base_url('laporan-accounting/bukubesar'));
         }
     }
 }

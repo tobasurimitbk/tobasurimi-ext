@@ -48,7 +48,7 @@
 <body>
   <h5>Laporan Buku Besar</h5>
   <h6>PT. TOBA SURIMI INDUSTRIES, Tbk</h6>
-  <h6><b>Laporan Buku Besar</b> Periode <?= $_POST['dateStart'] ?> s.d <?= @$_POST['dateEnd'] ?></h6>
+  <h6><b>Laporan Buku Besar</b> Periode <?= $dateStart ?> s.d <?= $dateEnd ?></h6>
 
   <?php if (count($jurnalUmum) > 0): ?>
     <?php foreach ($jurnalUmum as $j): ?>
