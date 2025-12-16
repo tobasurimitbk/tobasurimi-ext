@@ -142,7 +142,7 @@ class BarangMasterModel extends Model
         }
 
         if ($addCondition['filter_coa']) {
-            $barangDataQry->join('account_barang', 'barang_master.id = account_barang.barang_master_id', 'left');
+            $barangDataQry->join('account_barang', 'barang_master.id = account_barang.barang_master_id AND barang_master_spesifikasi.id = account_barang.barang_master_spesifikasi_id', 'left');
 
             if ($addCondition['filter_coa'] == "belum") {
                 $barangDataQry->where('account_barang.ap_id', NULL);
