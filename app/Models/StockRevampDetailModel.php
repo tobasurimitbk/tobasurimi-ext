@@ -1273,18 +1273,22 @@ class StockRevampDetailModel extends Model
 
                 /* ========= PO ========= */
                 CASE
-                    WHEN srd2.reference_type = 'INISIASI'
-                        THEN srd2.createdAt
-                    WHEN srd.reference_type = 'INISIASI'
+                    WHEN srd2.reference_type = 'INISIASI' AND srd2.po_id IS NULL
+                        THEN COALESCE(
+                        m.tanggal,
+                        srd2.createdAt
+                    )
+                    WHEN srd.reference_type = 'INISIASI' AND srd.po_id IS NULL
                         THEN srd.createdAt
                     ELSE COALESCE(
                         rmpo.po_date,
                         ripo.po_date,
                         rmpo2.po_date,
-                        ripo2.po_date
+                        ripo2.po_date,
+                        m.tanggal
                     )
                 END AS po_date,
-
+m.tanggal,
                 COALESCE(
                     rmpo.po_no,
                     ripo.po_no,
@@ -1359,9 +1363,12 @@ class StockRevampDetailModel extends Model
                         THEN pr.tanggal
                     WHEN srd2.reference_type = 'PROSES REBUS'
                         THEN pr2.tanggal
-                    WHEN srd2.reference_type = 'INISIASI'
-                        THEN srd2.createdAt
-                    WHEN srd.reference_type = 'INISIASI'
+                    WHEN srd2.reference_type = 'INISIASI' AND srd2.po_id IS NULL
+                        THEN COALESCE(
+                        m.tanggal,
+                        srd2.createdAt
+                    )
+                    WHEN srd.reference_type = 'INISIASI' AND srd.po_id IS NULL
                         THEN srd.createdAt
                     ELSE COALESCE(
                         pb_lokal.tanggal,
@@ -1406,6 +1413,7 @@ class StockRevampDetailModel extends Model
                 'left'
             )
             ->join('mutasi_detail md', 'md.id = pmd.mutasi_detail_id', 'left')
+            ->join('mutasi m', 'm.id = md.mutasi_id', 'left')
             ->join('stock_revamp_detail srd2', 'srd2.id = md.stock_detail_id', 'left')
 
             /* ===================== PO DARI SRD2 ===================== */
