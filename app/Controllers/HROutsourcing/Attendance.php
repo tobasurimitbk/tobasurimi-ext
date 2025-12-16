@@ -55,234 +55,297 @@ class Attendance extends BaseController
         return view('HROutsourcing/Attendance/index', $data);
     }
 
-public function allData()
-{
-    // Cek input
-    $companyId = $this->request->getVar('company_id');
-    $date = $this->request->getVar('date');
-    
-    if (!$companyId || !$date) {
-        return $this->response->setJSON([
-            'success' => false,
-            'message' => 'Company ID dan Tanggal harus diisi',
-            'data' => [],
-            'total' => 0
-        ]);
-    }
-    
-    try {
-        // Get company data
-        $company = $this->hrOutSourcingCompanyModel
-            ->where('id', $companyId)
-            ->where('deletedAt', NULL)
-            ->first();
-            
-        if (!$company) {
+    public function allData()
+    {
+        // Cek input
+        $companyId = $this->request->getVar('company_id');
+        $date = $this->request->getVar('date');
+        
+        if (!$companyId || !$date) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'Perusahaan tidak ditemukan',
+                'message' => 'Company ID dan Tanggal harus diisi',
                 'data' => [],
                 'total' => 0
             ]);
         }
         
-        // Get device IP from AttendancesUnitOutsourceModel
-        $device = $this->AttendancesUnitOutsourceModel
-            ->where('id', $company['ip_finger'])
-            ->first();
+        try {
+            // Get company data
+            $company = $this->hrOutSourcingCompanyModel
+                ->where('id', $companyId)
+                ->where('deletedAt', NULL)
+                ->first();
+                
+            if (!$company) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Perusahaan tidak ditemukan',
+                    'data' => [],
+                    'total' => 0
+                ]);
+            }
             
-        if (!$device) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'Device fingerprint tidak ditemukan',
-                'data' => [],
-                'total' => 0
-            ]);
-        }
-        
-        // Get attendance data from device
-        $attendanceData = $this->Attendance->getAttendanceFromDevice(
-            $device['ip'],
-            0,
-            date('y-m-d')
-        );
-        
+            // Get device IP from AttendancesUnitOutsourceModel
+            $device = $this->AttendancesUnitOutsourceModel
+                ->where('id', $company['ip_finger'])
+                ->first();
+                
+            if (!$device) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Device fingerprint tidak ditemukan',
+                    'data' => [],
+                    'total' => 0
+                ]);
+            }
+            
+            // Parse tanggal dari input
+            $selectedDate = date('Y-m-d', strtotime($date));
+            
+            // Get attendance data from device dengan tanggal yang difilter
+            $attendanceData = $this->Attendance->getAttendanceFromDevice(
+                $device['ip'],
+                0,
+                $selectedDate // Gunakan tanggal dari input
+            );
 
-        if (empty($attendanceData)) {
-            return $this->response->setJSON([
-                'success' => true,
-                'message' => 'Tidak ada data attendance pada tanggal tersebut',
-                'data' => [],
-                'total' => 0,
-                'date' => $date
-            ]);
-        }
+            // var_dump($attendanceData);
+            // die;
 
-        // =============================
-        // 1. Kumpulkan semua PIN
-        // =============================
-        $pins = array_column($attendanceData, 'pin');
-
-        // =============================
-        // 2. Ambil employee berdasarkan company_id dan PIN
-        // =============================
-        $employees = $this->hrOutSourcingEmployeModel
-            ->where('company_id', $companyId)
-            ->whereIn('id', $pins)
-            ->findAll();
-
-        // =============================
-        // 3. Buat employee map untuk akses cepat
-        // =============================
-        $employeeMap = [];
-        foreach ($employees as $e) {
-            $employeeMap[$e['id']] = $e;
-        }
-
-        // =============================
-        // 4. Group attendance by employee untuk Check In/Check Out
-        // =============================
-        $employeeAttendanceMap = [];
-        
-        foreach ($attendanceData as $att) {
-            // hanya ambil log yang punya employee di company ini
-            if (!isset($employeeMap[$att['pin']])) {
-                continue; // skip
+            // =============================
+            // 1. Get semua karyawan perusahaan
+            // =============================
+            $allEmployees = $this->hrOutSourcingEmployeModel
+                ->where('company_id', $companyId)
+                ->findAll();
+            
+            if (empty($allEmployees)) {
+                return $this->response->setJSON([
+                    'success' => true,
+                    'message' => 'Tidak ada karyawan di perusahaan ini',
+                    'data' => [],
+                    'total' => 0,
+                    'date' => $date
+                ]);
             }
 
-            $pin = $att['pin'];
-            $type = $this->getAttendanceType($att['status']);
-            $datetime = $att['datetime'];
-            $datePart = date('d/m/Y', strtotime($datetime));
-            $timePart = date('H:i:s', strtotime($datetime));
+            // =============================
+            // 2. Filter attendance data berdasarkan tanggal yang dipilih
+            // =============================
+            $filteredAttendance = [];
+            
+            if (!empty($attendanceData)) {
+                foreach ($attendanceData as $att) {
+                    $attDate = date('Y-m-d', strtotime($att['datetime']));
+                    
+                    // Hanya ambil data pada tanggal yang dipilih
+                    if ($attDate === $selectedDate) {
+                        $filteredAttendance[] = $att;
+                    }
+                }
+            }
 
-            // Initialize jika belum ada
-            if (!isset($employeeAttendanceMap[$pin])) {
-                $employeeAttendanceMap[$pin] = [
-                    'user_id' => $pin,
-                    'name' => $employeeMap[$pin]['nama'],
-                    'badge_no' => $employeeMap[$pin]['badge'],
-                    'company_name' => $company['name'],
-                    'company_id' => $companyId,
-                    'check_in' => null,
-                    'check_in_time' => null,
-                    'check_out' => null,
-                    'check_out_time' => null,
-                    'verified_in' => 'Not Verified',
-                    'verified_out' => 'Not Verified',
-                    'status' => 'Belum Absen',
-                    'status_class' => 'danger'
+            // =============================
+            // 3. Group attendance by employee dan sort by time
+            // =============================
+            $employeeAttendanceMap = [];
+            
+            foreach ($filteredAttendance as $att) {
+                $pin = $att['pin'];
+                
+                // Initialize jika belum ada
+                if (!isset($employeeAttendanceMap[$pin])) {
+                    $employeeAttendanceMap[$pin] = [];
+                }
+                
+                $employeeAttendanceMap[$pin][] = [
+                    'datetime' => $att['datetime'],
+                    'timestamp' => strtotime($att['datetime']),
+                    'type' => $this->getAttendanceType($att['status']),
+                    'verified' => $att['verified']
                 ];
             }
-
-            // Update Check In atau Check Out
-            if ($type === 'Check In' || $type === 'Overtime In') {
-                $employeeAttendanceMap[$pin]['check_in'] = $datePart;
-                $employeeAttendanceMap[$pin]['check_in_time'] = $timePart;
-                $employeeAttendanceMap[$pin]['verified_in'] = $att['verified'] == '1' ? 'Verified' : 'Not Verified';
-            } else if ($type === 'Check Out' || $type === 'Overtime Out') {
-                $employeeAttendanceMap[$pin]['check_out'] = $datePart;
-                $employeeAttendanceMap[$pin]['check_out_time'] = $timePart;
-                $employeeAttendanceMap[$pin]['verified_out'] = $att['verified'] == '1' ? 'Verified' : 'Not Verified';
-            }
-        }
-
-        // =============================
-        // 5. Update status untuk setiap employee
-        // =============================
-        $processedData = [];
-        $counter = 1;
-        
-        foreach ($employeeAttendanceMap as $pin => $empData) {
-            // Determine status
-            if ($empData['check_in'] && $empData['check_out']) {
-                $empData['status'] = 'Complete';
-                $empData['status_class'] = 'success';
-            } else if ($empData['check_in']) {
-                $empData['status'] = 'Check In Only';
-                $empData['status_class'] = 'warning';
-            } else if ($empData['check_out']) {
-                $empData['status'] = 'Check Out Only';
-                $empData['status_class'] = 'info';
-            }
-
-            // Format untuk view
-            $processedData[] = [
-                'no' => $counter++,
-                'user_id' => $empData['user_id'],
-                'name' => $empData['name'],
-                'badge_no' => $empData['badge_no'],
-                'check_in' => $empData['check_in_time'],
-                'check_out' => $empData['check_out_time'],
-                'verified_in' => $empData['verified_in'],
-                'verified_out' => $empData['verified_out'],
-                'status' => $empData['status'],
-                'status_class' => $empData['status_class'],
-                'company_name' => $empData['company_name'],
-                'company_id' => $empData['company_id']
-            ];
-        }
-
-        // =============================
-        // 6. Sort by badge number
-        // =============================
-        usort($processedData, function($a, $b) {
-            return strcmp($a['badge_no'], $b['badge_no']);
-        });
-        
-        return $this->response->setJSON([
-            'success' => true,
-            'message' => 'Data berhasil diambil',
-            'data' => $processedData,
-            'total' => count($processedData),
-            'date' => $date
-        ]);
-        
-    } catch (\Exception $e) {
-        return $this->response->setJSON([
-            'success' => false,
-            'message' => 'Error: ' . $e->getMessage(),
-            'data' => [],
-            'total' => 0
-        ]);
-    }
-}
-
-private function getAttendanceType($status)
-{
-    $types = [
-        '0' => 'Check In',
-        '1' => 'Check Out',
-        '255' => 'Overtime In',
-        '256' => 'Overtime Out'
-    ];
-    
-    return isset($types[$status]) ? $types[$status] : 'Unknown';
-}
-
-// Function untuk mengambil semua karyawan dari perusahaan
-public function getAllEmployees($companyId)
-{
-    try {
-        $employees = $this->hrOutSourcingEmployeModel
-            ->where('company_id', $companyId)
-            ->where('deletedAt', NULL)
-            ->findAll();
             
-        return $this->response->setJSON([
-            'success' => true,
-            'data' => $employees,
-            'total' => count($employees)
-        ]);
-    } catch (\Exception $e) {
-        return $this->response->setJSON([
-            'success' => false,
-            'message' => 'Error: ' . $e->getMessage(),
-            'data' => [],
-            'total' => 0
-        ]);
+            // Sort attendance untuk setiap employee berdasarkan waktu
+            foreach ($employeeAttendanceMap as $pin => $attRecords) {
+                usort($employeeAttendanceMap[$pin], function($a, $b) {
+                    return $a['timestamp'] - $b['timestamp'];
+                });
+            }
+
+            // =============================
+            // 4. Process semua karyawan (termasuk yang tidak absen)
+            // =============================
+            $processedData = [];
+            $counter = 1;
+            
+            foreach ($allEmployees as $employee) {
+                $pin = $employee['id'];
+                $hasAttendance = isset($employeeAttendanceMap[$pin]);
+                
+                // Default data untuk karyawan yang tidak absen
+                $empData = [
+                    'no' => $counter++,
+                    'user_id' => $pin,
+                    'name' => $employee['nama'],
+                    'badge_no' => $employee['badge'],
+                    'check_in' => null,
+                    'check_out' => null,
+                    'verified_in' => 'Not Verified',
+                    'verified_out' => 'Not Verified',
+                    'status' => 'Tidak Masuk',
+                    'status_class' => 'danger',
+                    'company_name' => $company['name'],
+                    'company_id' => $companyId,
+                    'attendance_count' => 0
+                ];
+                
+                if ($hasAttendance) {
+                    $attRecords = $employeeAttendanceMap[$pin];
+                    $empData['attendance_count'] = count($attRecords);
+                    
+                    // Ambil check-in pertama
+                    $firstRecord = $attRecords[0];
+                    $empData['check_in'] = date('H:i:s', $firstRecord['timestamp']);
+                    $empData['verified_in'] = $firstRecord['verified'] == '1' ? 'Verified' : 'Not Verified';
+                    
+                    // Tentukan check-out berdasarkan beberapa skenario:
+                    // 1. Jika ada record check-out/Overtime Out
+                    // 2. Jika hanya ada 1 record, cek apakah sudah lebih dari 8 jam
+                    // 3. Ambil record terakhir jika ada multiple records
+                    
+                    $checkOutTime = null;
+                    
+                    // Cari record check-out/Overtime Out
+                    foreach ($attRecords as $record) {
+                        if ($record['type'] === 'Check Out' || $record['type'] === 'Overtime Out') {
+                            $checkOutTime = $record['timestamp'];
+                            $empData['verified_out'] = $record['verified'] == '1' ? 'Verified' : 'Not Verified';
+                            break;
+                        }
+                    }
+                    
+                    // Jika tidak ada check-out yang eksplisit
+                    if ($checkOutTime === null) {
+                        $lastRecord = end($attRecords);
+                        
+                        // Jika hanya ada 1 record dan sudah lebih dari 8 jam, anggap sudah check-out
+                        if (count($attRecords) === 1) {
+                            $hoursWorked = (time() - $firstRecord['timestamp']) / 3600;
+                            if ($hoursWorked >= 8) {
+                                $checkOutTime = $firstRecord['timestamp'] + (8 * 3600); // Tambah 8 jam
+                            }
+                        } else {
+                            // Ambil record terakhir sebagai check-out
+                            $checkOutTime = $lastRecord['timestamp'];
+                            $empData['verified_out'] = $lastRecord['verified'] == '1' ? 'Verified' : 'Not Verified';
+                        }
+                    }
+                    
+                    if ($checkOutTime) {
+                        $empData['check_out'] = date('H:i:s', $checkOutTime);
+                        
+                        // Tentukan status
+                        if ($empData['check_in'] && $empData['check_out']) {
+                            $empData['status'] = 'Complete';
+                            $empData['status_class'] = 'success';
+                        }
+                    } else {
+                        $empData['status'] = 'Check In Only';
+                        $empData['status_class'] = 'warning';
+                    }
+                    
+                    // Tambahkan informasi tambahan jika ada multiple records
+                    if (count($attRecords) > 2) {
+                        $empData['status'] = 'Multiple Records (' . count($attRecords) . ')';
+                        $empData['status_class'] = 'info';
+                    }
+                }
+                
+                $processedData[] = $empData;
+            }
+
+            // =============================
+            // 5. Sort by badge number
+            // =============================
+            usort($processedData, function($a, $b) {
+                return strcmp($a['badge_no'], $b['badge_no']);
+            });
+            
+            // Reset numbering setelah sort
+            foreach ($processedData as $key => $data) {
+                $processedData[$key]['no'] = $key + 1;
+            }
+            
+            // Hitung statistik
+            $stats = [
+                'total_employees' => count($allEmployees),
+                'present' => count(array_filter($processedData, function($item) {
+                    return $item['status'] !== 'Tidak Masuk';
+                })),
+                'absent' => count(array_filter($processedData, function($item) {
+                    return $item['status'] === 'Tidak Masuk';
+                })),
+                'complete' => count(array_filter($processedData, function($item) {
+                    return $item['status'] === 'Complete';
+                }))
+            ];
+            
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'Data berhasil diambil',
+                'data' => $processedData,
+                'total' => count($processedData),
+                'date' => $date,
+                'stats' => $stats
+            ]);
+            
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage(),
+                'data' => [],
+                'total' => 0
+            ]);
+        }
     }
-}
+
+    private function getAttendanceType($status)
+    {
+        $types = [
+            '0' => 'Check In',
+            '1' => 'Check Out',
+            '255' => 'Overtime In',
+            '256' => 'Overtime Out'
+        ];
+        
+        return isset($types[$status]) ? $types[$status] : 'Unknown';
+    }
+
+    // Function untuk mengambil semua karyawan dari perusahaan
+    public function getAllEmployees($companyId)
+    {
+        try {
+            $employees = $this->hrOutSourcingEmployeModel
+                ->where('company_id', $companyId)
+                ->where('deletedAt', NULL)
+                ->findAll();
+                
+            return $this->response->setJSON([
+                'success' => true,
+                'data' => $employees,
+                'total' => count($employees)
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage(),
+                'data' => [],
+                'total' => 0
+            ]);
+        }
+    }
 
     public function getCompanyByDivisi($divisiId) 
     {

@@ -342,7 +342,7 @@ $(document).ready(function() {
         const checkOutCount = data.filter(item => item.check_out !== null).length;
         
         // Count status untuk missing
-        const missingCount = data.filter(item => item.status === 'Belum Absen').length;
+        const missingCount = data.filter(item => item.status === 'Tidak Masuk').length;
 
         $('#total-employees').text(totalEmployees);
         $('#total-checkin').text(checkInCount);
