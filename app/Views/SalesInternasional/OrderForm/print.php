@@ -351,7 +351,7 @@
                                         'grade' => ['label' => 'GRADE', 'width' => '13%'],
                                         'packing' => ['label' => 'PACKING', 'width' => '8%'],
                                         'can' => ['label' => 'QTY (CAN)', 'width' => '7%'],
-                                        'cased' => ['label' => 'QTY (CASE)', 'width' => '7%'],
+                                        // 'case' => ['label' => 'QTY (CASE)', 'width' => '7%'],
                                         'case' => ['label' => 'QTY (CASE)', 'width' => '7%'],
                                         'kg' => ['label' => 'QTY (KG)', 'width' => '7%'],
                                         'lb' => ['label' => 'QTY (LB)', 'width' => '7%'],
@@ -377,7 +377,7 @@
 
                                     // Check if percentage column exists and should be shown
                                     $show_persen_column = isset($columns_to_show['persen']);
-                                    $show_cased_column = isset($columns_to_show['cased']);
+                                    $show_cased_column = isset($columns_to_show['case']);
 
                                     // Ini untuk mengetahui Qty Satuan apa yang dipakek (ambil paling utama)
                                     $satuanQty = "";
@@ -392,7 +392,7 @@
                                             <thead>
                                                 <tr style="background-color: #f3f4f6;">
                                                     <?php foreach ($columns_to_show as $col => $col_data): ?>
-                                                        <?php if ($col != 'persen' && $col != 'cased'): ?>
+                                                        <?php if ($col != 'persen' && $col != 'case'): ?>
                                                             <th style=" border: 1px solid #ddd; width: <?= $col_data['width'] ?>"><?= $col_data['label'] ?></th>
                                                         <?php endif; ?>
                                                     <?php endforeach; ?>
@@ -425,13 +425,13 @@
                                                         $breakdown_persen += $breakdown['persen'];
                                                         $total_persen += $breakdown['persen'];
                                                     }
-                                                    if (isset($breakdown['cased']) && is_numeric($breakdown['cased'])) {
-                                                        $breakdown_cased += $breakdown['cased'];
+                                                    if (isset($breakdown['case']) && is_numeric($breakdown['case'])) {
+                                                        $breakdown_cased += $breakdown['case'];
                                                     }
                                                 ?>
                                                     <tr>
                                                         <?php foreach ($columns_to_show as $col => $col_data): ?>
-                                                            <?php if ($col != 'persen' && $col != 'cased'): ?>
+                                                            <?php if ($col != 'persen' && $col != 'case'): ?>
                                                                 <td style=" border: 1px solid #ddd;">
                                                                     <?= $breakdown[$col] ?> <br>
                                                                     <?php if (!empty($breakdown["note_" . $col])): ?>
@@ -443,7 +443,7 @@
 
                                                         <?php if ($show_cased_column): ?>
                                                             <td style=" border: 1px solid #ddd; text-align: right;">
-                                                                <?= !empty($breakdown['cased']) ? number_format($breakdown['cased'], 2) : '' ?>
+                                                                <?= !empty($breakdown['case']) ? number_format($breakdown['case'], 2) : '' ?>
                                                             </td>
                                                         <?php endif; ?>
 

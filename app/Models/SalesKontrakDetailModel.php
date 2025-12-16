@@ -99,6 +99,7 @@ class SalesKontrakDetailModel extends Model
                     'remark' => $s['remark'],
                     'satuan_size_id' => $s['satuan_size_id'],
                     'satuan_size_code' => $s['kode_satuan'],
+                    'cup' => $s['cup'],
                     'palet' => $s['palet']
                 ]);
             }

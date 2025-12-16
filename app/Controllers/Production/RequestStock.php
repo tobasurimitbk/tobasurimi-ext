@@ -811,7 +811,7 @@ class RequestStock extends BaseController
                             if ($stockDetailId) {
                                 $getStockIdNew = $stockRevampDetailModel->find($stockDetailId);
 
-                                $this->materialRequestDetailsModel->update(
+                                $this->materialRequestPenolongDetailsModel->update(
                                     $value['id'],
                                     [
                                         'stock_tujuan_id' => $getStockIdNew['stock_id'],

@@ -1466,7 +1466,7 @@ m.tanggal,
             ->where('srd.reference_type', 'PENERIMAAN MUTASI')
             ->orWhere('srd.reference_type', 'INISIASI')
             ->orWhere('srd.po_id IS NOT NULL', null, false)
-        ->groupEnd();
+            ->groupEnd();
 
         return $builder
             ->groupBy('srd.id')
@@ -1538,7 +1538,7 @@ m.tanggal,
             // from Proses Rebus
             ->join('proses_rebus_detail', "proses_rebus_detail.stock_detail_hasil_rebus_id = stock_revamp_detail.id AND stock_revamp_detail.reference_type = 'PROSES REBUS'", 'left')
             ->join('proses_rebus', "proses_rebus.id = proses_rebus_detail.proses_rebus_id", 'left')
-            
+
             // from Proses Rebus -> JasVen
             ->join('jasa_vendor_in as jasa_vendor_in_rebus', "jasa_vendor_in_rebus.id = proses_rebus_detail.jasa_vendor_id  AND stock_revamp_detail.reference_type = 'PROSES REBUS'", 'left')
             ->join('vendors as vendors_rebus', 'vendors_rebus.id = jasa_vendor_in_rebus.vendor_id', 'left')
@@ -1552,7 +1552,7 @@ m.tanggal,
 
             //get asal po stock
             ->join('stock_revamp_detail as stock_revamp_detail2', 'stock_revamp_detail2.id = stock_revamp_history.stock_detail_asal', 'left')
-            
+
             // case dari pembelian baku lokal
             ->join('rm_purchase_orders', 'rm_purchase_orders.id = stock_revamp_detail2.po_id', 'left')
             ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
@@ -1772,18 +1772,17 @@ m.tanggal,
                 production_result_details.no_ref as no_daftar,
                 barang_master.type_barang,
                 COALESCE (UPPER(suppliers.name), '-') AS supplier_name
-
             ")
             ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
             ->join('production_results', 'production_results.id = stock_revamp_detail.reference_id', 'left')
             ->join('production_result_details', 'production_result_details.stock_detail_id = stock_revamp_detail.id', 'left')
             ->join('penerimaan_barang', 'penerimaan_barang.id = stock_revamp_detail.reference_id', 'left')
-            
+
             ->join('am_purchase_orders', 'am_purchase_orders.id = stock_revamp_detail.po_id', 'left')
             ->join('am_purchase_order_details', 'am_purchase_order_details.am_purchase_order_id = am_purchase_orders.id', 'left')
             ->join('bc_purchase_order_lpb', 'bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id', 'left')
             ->join('bc_purchase_order', 'bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id', 'left')
-            
+
             ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id', 'left')
             ->join('barang_master', 'barang_master.id = stock_revamp.barang_master_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock_revamp.spesifikasi_id', 'left')
