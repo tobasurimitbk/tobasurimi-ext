@@ -2063,17 +2063,19 @@
         let totalQty = 0;
         let poNo = '';
         let barang = '';
+        let supplier = $('#supplier_id option:selected').text().trim();
 
         $.each(data, function(i, v) {
             totalQty += parseFloat(v.total_qty_diterima);
-            poNo = v.no_po;      // ambil terakhir / asumsi sama
-            barang = v.barang;  // DG.KEPITING KUKUS
+            poNo = v.no_po;     
+            barang = v.barang;
         });
 
-        let keterangan = `Pembayaran ${barang} sebanyak ${totalQty.toFixed(2)} KGM (No: ${poNo})`;
+        let keterangan = `Pembayaran ${barang} ${supplier} sebanyak ${totalQty.toFixed(2)} KGM (No: ${poNo})`;
 
         $('#keterangan').val(keterangan);
     }
+
 
 
 
