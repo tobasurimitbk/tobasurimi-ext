@@ -230,7 +230,7 @@
                                         <option value="<?= $s['id'] ?>"><?= $s['name']  ?></option>
                                     <?php endforeach; ?>
                                 </select>
-                                <label for="floatingInput" style="z-index: 1;">Supplier (Opsional)</label>
+                                <label for="floatingInput" style="z-index: 1;">Filter Supplier (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-4" id="vendor_barang_id_select">
@@ -241,9 +241,27 @@
                                         <option value="<?= $v['id'] ?>"> <?= strtoupper($v['name']); ?></option>
                                     <?php endforeach; ?>
                                 </select>
-                                <label for="floatingInput" style="z-index: 1;">Vendor (Opsional)</label>
+                                <label for="floatingInput" style="z-index: 1;">Filter Vendor (Opsional)</label>
                             </div>
                         </div>
+
+                        <div class="col-md-4 mb-3">
+                            <div class="input-group input-group-password">
+                                <input autocomplete="one-time-code" class="form-control input-picker dateStartRequest" id="dateStartRequest" name="dateStartRequest" placeholder="Filter Tanggal Awal Barang (Opsional)">
+                                <div class="input-group-prepend group-prepend-password align-items-center">
+                                    <i style="cursor: pointer; z-index: 99; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="input-group input-group-password">
+                                <input autocomplete="one-time-code" class="form-control input-picker dateEndRequest" id="dateEndRequest" name="dateEndRequest" placeholder="Filter Tanggal Akhir Barang (Opsional)">
+                                <div class="input-group-prepend group-prepend-password align-items-center">
+                                    <i style="cursor: pointer; z-index: 99; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select spesifikasi_id" id="spesifikasi_id" name="spesifikasi_id">
@@ -265,7 +283,7 @@
                         </div>
                         <div class="col-md-4 form-fifo">
                             <div class="form-floating" style="height: 50px;">
-                                <input placeholder="Qty" oninput="preventNegativeInput(this)" class="form-control qty_keluar_fifo" id="qty_keluar_fifo" name="qty_keluar_fifo" />
+                                <input readonly placeholder="Qty" oninput="preventNegativeInput(this)" class="form-control qty_keluar_fifo" id="qty_keluar_fifo" name="qty_keluar_fifo" />
                                 <label for="floatingInput" style="z-index: 1;">Qty Dikeluarkan</label>
                             </div>
                         </div>
@@ -619,7 +637,7 @@
     let sortTypeDataBarang = "DESC";
 
     $('#vendor_barang_id_select').hide();
-    $('.form-fifo').hide();
+    // $('.form-fifo').hide();
     updateBarangJadi();
 
     <?php if (!empty($dataMaterialRequestDetailsBahanBaku)): ?>
@@ -713,6 +731,28 @@
         drawTableSelectedItemBahanSetengahJadi(listStockSelectedBahanSetengahJadi);
         drawTableSelectedItemBahanJadi(listStockSelectedBahanJadi);
     <?php endif; ?>
+
+    $(".dateStartRequest").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    })
+
+    $(".dateEndRequest").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    })
+
+    $('.icon-dateStart').click(function() {
+        $(".dateStartRequest").focus();
+    });
+
+    $('.icon-dateEnd').click(function() {
+        $(".dateEndRequest").focus();
+    });
 
     $('#type_pengambilan_stock').select2({
         placeholder: "Pilih Tipe Ambil Stok",
@@ -931,11 +971,17 @@
     }).change(function() {
         var typePengambilanStock = $('#type_pengambilan_stock_bahan_baku option:selected').val();
         if (typePengambilanStock == "PABEAN") {
-            $('.form-fifo').hide();
+            // $('.form-fifo').hide();
+            $('.qty_keluar_fifo').val(null).change();
+            $('.qty_keluar_fifo').attr('readonly', 'readonly');
         } else if (typePengambilanStock == "FIFO") {
-            $('.form-fifo').show();
+            // $('.form-fifo').show();
+            $('.qty_keluar_fifo').val(null).change();
+            $('.qty_keluar_fifo').removeAttr('readonly');
         } else {
-            $('.form-fifo').hide();
+            // $('.form-fifo').hide();
+            $('.qty_keluar_fifo').val(null).change();
+            $('.qty_keluar_fifo').attr('readonly', 'readonly');
 
         }
 
@@ -1699,7 +1745,7 @@
             } else if (listStockAsal[i].type_barang == "bahan_setengah_jadi") {
                 currentID = (currentID);
                 console.log(currentID, dataIds, $.inArray(currentID, dataIds));
-                
+
                 if ($.inArray(currentID, dataIds) !== -1) {
                     var isIDSelected = $.grep(listStockSelectedBahanSetengahJadi, function(item) {
                         return item.id == (currentID);
@@ -1747,7 +1793,7 @@
             }
         });
         console.log(listStockSelectedBahanJadi);
-        
+
         drawTableSelectedItemBahanBaku(listStockSelectedBahanBaku);
         drawTableSelectedItemBahan(listStockSelectedBahan);
         drawTableSelectedItemBahanSetengahJadi(listStockSelectedBahanSetengahJadi);
@@ -2751,34 +2797,48 @@
 
     function getListDokumenPabeanBahanBaku() {
         // GET LIST STOCK PER DOKUMEN PABEAN
-        $.ajax({
-            url: `<?= base_url('material-request/list-stock-dokumen-bc-bahan-baku'); ?>`,
-            method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            data: {
-                barang_master_id: $(".spesifikasi_id option:selected").data('barang_master_id'),
-                stock_id: $(".spesifikasi_id option:selected").data('stock_id'),
-                supplier_id: $(".supplier_id option:selected").val(),
-                vendor_id: $('.vendor_barang_id option:selected').val(),
-                divisi_asal_bahan_baku_id: $(".divisi_asal_bahan_baku_id option:selected").val(),
-                warehouse_asal_bahan_baku_id: $(".warehouse_asal_bahan_baku_id option:selected").val(),
-                type_asal_barang: $(".type_asal_barang option:selected").val()
-            },
-            dataType: "json",
-            success: function(res) {
-                // LIST STOK PER BC
-                listStockAsal = [];
-                listStockAsal = res.data;
-                console.log(res.data);
+        let barang_master_id = $(".spesifikasi_id option:selected").data('barang_master_id');
+        let stock_id = $(".spesifikasi_id option:selected").data('stock_id');
+        let supplier_id = $(".supplier_id option:selected").val();
+        let vendor_id = $('.vendor_barang_id option:selected').val();
+        let divisi_asal_bahan_baku_id = $(".divisi_asal_bahan_baku_id option:selected").val();
+        let warehouse_asal_bahan_baku_id = $(".warehouse_asal_bahan_baku_id option:selected").val();
+        let type_asal_barang = $(".type_asal_barang option:selected").val();
+        let startDate = $(".dateStartRequest").val();
+        let endDate = $(".dateEndRequest").val();
 
-                drawTableAsalBarang(res.data);
-            }
-        });
+        if (barang_master_id && divisi_asal_bahan_baku_id && warehouse_asal_bahan_baku_id && type_asal_barang) {
+            $.ajax({
+                url: `<?= base_url('material-request/list-stock-dokumen-bc-bahan-baku'); ?>`,
+                method: "GET",
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                data: {
+                    barang_master_id: $(".spesifikasi_id option:selected").data('barang_master_id'),
+                    stock_id: $(".spesifikasi_id option:selected").data('stock_id'),
+                    supplier_id: $(".supplier_id option:selected").val(),
+                    vendor_id: $('.vendor_barang_id option:selected').val(),
+                    divisi_asal_bahan_baku_id: $(".divisi_asal_bahan_baku_id option:selected").val(),
+                    warehouse_asal_bahan_baku_id: $(".warehouse_asal_bahan_baku_id option:selected").val(),
+                    type_asal_barang: $(".type_asal_barang option:selected").val(),
+                    startDate: $(".dateStartRequest").val(),
+                    endDate: $(".dateEndRequest").val()
+                },
+                dataType: "json",
+                success: function(res) {
+                    // LIST STOK PER BC
+                    listStockAsal = [];
+                    listStockAsal = res.data;
+                    console.log(res.data);
+
+                    drawTableAsalBarang(res.data);
+                }
+            });
+        }
     }
 
     function pindahTab(type) {
