@@ -2060,16 +2060,21 @@
     }
 
     function generateKeteranganPembayaran(data) {
-        var keterangan = "";
-        var supplierName = $('#supplier_id option:selected').text();
-        var poNoText = "";
+        let totalQty = 0;
+        let poNo = '';
+        let barang = '';
+
         $.each(data, function(i, v) {
-            poNoText += `${v.no_po} ${v.barang} Sebanyak ${v.total_qty_diterima} Kg, `;
+            totalQty += parseFloat(v.total_qty_diterima);
+            poNo = v.no_po;      // ambil terakhir / asumsi sama
+            barang = v.barang;  // DG.KEPITING KUKUS
         });
 
-        keterangan = "Pembayaran " + supplierName + " " + poNoText;
+        let keterangan = `Pembayaran ${barang} sebanyak ${totalQty.toFixed(2)} KGM (No: ${poNo})`;
+
         $('#keterangan').val(keterangan);
     }
+
 
 
     function generatePaymentNumber() {
