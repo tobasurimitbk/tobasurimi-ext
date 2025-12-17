@@ -1452,12 +1452,41 @@ m.tanggal,
             ->join('barang_master_spesifikasi bms', 'bms.id = sr.spesifikasi_id', 'left')
             ->join('satuans s', 's.id = bms.satuan_1', 'left');
 
+        if (!empty($condition['stock_date_between'])) {
+            [$startDate, $endDate] = $condition['stock_date_between'];
+
+            if ($startDate && $endDate) {
+                $builder->where("
+            (
+                CASE
+                    WHEN srd.reference_type = 'PROSES REBUS'
+                        THEN pr.tanggal
+                    WHEN srd2.reference_type = 'PROSES REBUS'
+                        THEN pr2.tanggal
+                    WHEN srd2.reference_type = 'INISIASI' AND srd2.po_id IS NULL
+                        THEN COALESCE(m.tanggal, srd2.createdAt)
+                    WHEN srd.reference_type = 'INISIASI' AND srd.po_id IS NULL
+                        THEN srd.createdAt
+                    ELSE COALESCE(
+                        pb_lokal.tanggal,
+                        pb_import.tanggal,
+                        pb_mutasi.tanggal
+                    )
+                END
+            ) BETWEEN '{$startDate}' AND '{$endDate}'
+        ", null, false);
+            }
+
+            // PENTING: hapus supaya tidak ikut foreach
+            unset($condition['stock_date_between']);
+        }
+
         foreach ($condition as $field => $value) {
             if (is_array($value)) {
                 $builder->whereIn($field, $value);
             } elseif ($value === 'IS NOT NULL') {
                 $builder->where("$field IS NOT NULL", null, false);
-            } else {
+            } elseif ($value !== null && $value !== '') {
                 $builder->where($field, $value);
             }
         }

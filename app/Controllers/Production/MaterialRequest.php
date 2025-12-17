@@ -2074,6 +2074,8 @@ class MaterialRequest extends BaseController
         $divisiAsalId = $this->request->getVar('divisi_asal_bahan_baku_id');
         $warehouseAsalId = $this->request->getVar('warehouse_asal_bahan_baku_id');
         $typeAsalBarang = $this->request->getVar('type_asal_barang');
+        $startDate = $this->request->getVar('startDate') ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("startDate")))) : "";
+        $endDate = $this->request->getVar('endDate') ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("endDate")))) : "";
 
         if ((!empty($this->request->getVar('stock_id')) || !empty($this->request->getVar('barang_master_id'))) || !empty($typeAsalBarang)) {
             $condition = [
@@ -2088,6 +2090,8 @@ class MaterialRequest extends BaseController
                     $condition["rm_purchase_orders.supplier_id"] = $supplierId;
                 }
                 $condition["srd.reference_type"] = ["LPB", "PROSES REBUS", "PENERIMAAN MUTASI", "INISIASI"];
+                $condition['stock_date_between'] = [$startDate, $endDate];
+
                 $dataResult = $this->stockRevampDetailModel->getStockListPOWithCondition($condition);
             } else {
                 if (!empty($vendorId)) {
