@@ -298,6 +298,14 @@ class CustomGajiHarian extends BaseController
             $checkIn  = $attendanceDetail['checkin'];   // contoh: 23:00
             $checkOut = $attendanceDetail['checkout'];  // contoh: 03:00
 
+            if ($checkIn == null && $checkOut == null) {
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "Pegawai tidak scan finger di tanggal tersebut",
+                    'token' => csrf_hash()
+                ]);
+            }
+
             $totalJamKerja = $this->hitungTotalJam($checkIn, $checkOut);
 
             /* =======================
