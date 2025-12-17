@@ -2865,8 +2865,8 @@ $routes->get('/laporan-accounting/labarugi/printExcel/(:segment)/(:segment)', 'L
 
 $routes->get('/laporan-accounting/bukubesar', 'Laporan\Accounting\BukuBesar::index', ['filter' => 'Auth']);
 // $routes->post('/laporan-accounting/bukubesarData', 'Laporan\Accounting\BukuBesar::index', ['filter' => 'Auth']);
-$routes->post('/laporan-accounting/bukubesar/printPDF', 'Laporan\Accounting\BukuBesar::exportPDF', ['filter' => 'Auth']);
-$routes->post('/laporan-accounting/bukubesar/printExcel', 'Laporan\Accounting\BukuBesar::exportExcel', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/bukubesar/printPDF', 'Laporan\Accounting\BukuBesar::exportPDF', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/bukubesar/printExcel', 'Laporan\Accounting\BukuBesar::exportExcel', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/bukubesar/dropdown-account', 'Laporan\Accounting\BukuBesar::dropdownAccount', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/bukubesar/get-sub-akun', 'Laporan\Accounting\BukuBesar::searchAccountsBukuBesar', ['filter' => 'Auth']);
 
@@ -3139,6 +3139,10 @@ $routes->post('/hr-outsourcing-company/save', 'HROutsourcing\Company::store', ['
 $routes->post('/hr-outsourcing-company/update', 'HROutsourcing\Company::update', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-company/delete', 'HROutsourcing\Company::destroy', ['filter' => 'Auth']);
 $routes->get('/hr-outsourcing-company/id/(:segment)', 'HROutsourcing\Company::get/$1', ['filter' => 'Auth']);
+$routes->post('/hr-outsourcing-company/save-tipe-karyawan', 'HROutsourcing\Company::storeTipeKaryawan', ['filter' => 'Auth']);
+$routes->post('/hr-outsourcing-company/update-tipe-karyawan', 'HROutsourcing\Company::updateTipeKaryawan', ['filter' => 'Auth']);
+$routes->post('/hr-outsourcing-company/delete-tipe-karyawan', 'HROutsourcing\Company::destroyTipeKaryawan', ['filter' => 'Auth']);
+$routes->get('/hr-outsourcing-company/all-tipe-karyawan', 'HROutsourcing\Company::allTipeKaryawan', ['filter' => 'Auth']);
 $routes->get('/hr-outsourcing-company/employee/id/(:segment)', 'HROutsourcing\Employee::create/$1', ['filter' => 'Auth']);
 $routes->get('/hr-outsourcing-company/employee/getByCompany', 'HROutsourcing\Employee::getAllEmployeeByCompany', ['filter' => 'Auth']);
 $routes->post('hr-outsourcing-company/employee/generateQrCode/(:segment)', 'HROutsourcing\Employee::generateQrCode/$1', ['filter' => 'Auth']);

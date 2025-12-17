@@ -575,7 +575,7 @@
         dropdownParent: $('#supplier_id_select')
     }).change(function() {
         // GET LIST BARANG
-        // getListBarang();
+        getListBarang();
         listStockAsal = [];
         drawTableAsalBarang(listStockAsal);
         getListDokumenPabean();

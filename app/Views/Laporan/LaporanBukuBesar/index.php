@@ -10,8 +10,16 @@
                 Export
             </button>
             <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-                <li><button class="dropdown-item" onclick="printPDF('<?= base_url("laporan-accounting/bukubesar/printPDF"); ?>')">PDF</button></li>
-                <li><button class="dropdown-item" onclick="printExcel('<?= base_url("laporan-accounting/bukubesar/printExcel"); ?>')">Excel</button></li>
+                <li>
+                    <a class="dropdown-item" href="<?= base_url("laporan-accounting/bukubesar/printPDF") . '?' . http_build_query($_GET) ?>" target="_blank">
+                        PDF
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="<?= base_url("laporan-accounting/bukubesar/printExcel") . '?' . http_build_query($_GET) ?>" target="_blank">
+                        Excel
+                    </a>
+                </li>
             </ul>
         <?php endif; ?>
     </div>
@@ -330,13 +338,17 @@
 
     function printPDF(url) {
         const formData = $('.create-form').serializeArray();
-
+        
+        // Untuk field multiple select, kita perlu format ulang
+        const accountIds = $('#account_id').val(); // Ini akan array
+        
         const $form = $('<form>', {
             action: url,
-            method: 'POST',
+            method: 'GET',
             target: '_blank',
         });
 
+        // Tambahkan semua field dari form
         $.each(formData, function(index, field) {
             $('<input>')
                 .attr({
@@ -346,16 +358,30 @@
                 })
                 .appendTo($form);
         });
+        
+        // Tambahkan account_id[] jika ada
+        if (accountIds && accountIds.length > 0) {
+            $.each(accountIds, function(index, value) {
+                $('<input>')
+                    .attr({
+                        type: 'hidden',
+                        name: 'account_id[]',
+                        value: value,
+                    })
+                    .appendTo($form);
+            });
+        }
 
         $form.appendTo('body').submit().remove();
     };
 
     function printExcel(url) {
         const formData = $('.create-form').serializeArray();
-
+        const accountIds = $('#account_id').val();
+        
         const $form = $('<form>', {
             action: url,
-            method: 'POST',
+            method: 'GET',
             target: '_blank',
         });
 
@@ -368,6 +394,19 @@
                 })
                 .appendTo($form);
         });
+        
+        // Tambahkan account_id[] jika ada
+        if (accountIds && accountIds.length > 0) {
+            $.each(accountIds, function(index, value) {
+                $('<input>')
+                    .attr({
+                        type: 'hidden',
+                        name: 'account_id[]',
+                        value: value,
+                    })
+                    .appendTo($form);
+            });
+        }
 
         $form.appendTo('body').submit().remove();
     };
