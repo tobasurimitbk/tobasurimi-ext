@@ -1950,9 +1950,9 @@
             var footerRow = `
                 <tr style="font-weight: bold;">
                     <td colspan="5"></td>
-                    <td>${greatFormatRupiah(totalQtyHasil.toFixed(2))}</td>
-                    <td>${greatFormatRupiah(totalBeratIsi.toFixed(3))}</td>
-                    <td>${greatFormatRupiah(totalQtyKg.toFixed(2))}</td>
+                    <td>${(totalQtyHasil.toFixed(2))}</td>
+                    <td>${(totalBeratIsi.toFixed(3))}</td>
+                    <td>${(totalQtyKg.toFixed(2))}</td>
                     <td></td>
                 </tr>
             `;
@@ -2000,11 +2000,12 @@
 
                 <?php if (isset($data)) : ?>
                     totalQtyDigunakan += parseFloat(item.qty || 0);
+                    totalQtyRequest += parseFloat((item.qty) || 0);
                 <?php else: ?>
                     totalQtyDigunakan += parseFloat(qty || 0);
+                    totalQtyRequest += parseFloat((item.qty_now ?? item.qty) || 0);
                 <?php endif; ?>
 
-                totalQtyRequest += parseFloat((item.qty_now ?? item.qty) || 0);
 
                 row += '<tr style="color:whitesmoke;">';
                 row += '<td>' + no + '</td>';
