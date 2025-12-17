@@ -1481,6 +1481,17 @@ m.tanggal,
             unset($condition['stock_date_between']);
         }
 
+        if (!empty($condition['supplier_filter'])) {
+            $supplierId = $condition['supplier_filter'];
+
+            $builder->groupStart()
+                ->where('rmpo.supplier_id', $supplierId)
+                // ->orWhere('rmpo2.supplier_id', $supplierId)
+                ->groupEnd();
+
+            unset($condition['supplier_filter']); // penting
+        }
+
         foreach ($condition as $field => $value) {
             if (is_array($value)) {
                 $builder->whereIn($field, $value);

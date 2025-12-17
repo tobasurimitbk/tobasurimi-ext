@@ -2087,7 +2087,7 @@ class MaterialRequest extends BaseController
 
             if ($typeAsalBarang == "SUPPLIER") {
                 if (!empty($supplierId)) {
-                    $condition["rm_purchase_orders.supplier_id"] = $supplierId;
+                    $condition['supplier_filter'] = $supplierId;
                 }
                 $condition["srd.reference_type"] = ["LPB", "PROSES REBUS", "PENERIMAAN MUTASI", "INISIASI"];
                 $condition['stock_date_between'] = [$startDate, $endDate];
