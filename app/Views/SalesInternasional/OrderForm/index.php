@@ -268,11 +268,6 @@
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
                             <?php endif; ?>
-                            <?php if (can('Penjualan Ekspor', 'Order Form', 'ua')): ?>
-                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('${id}')" style="box-shadow: none !important;">
-                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                            </button>
-                            <?php endif; ?>
                             <?php if (can('Penjualan Ekspor', 'Order Form', 'c')) : ?>
                             <button data-toggle="tooltip" title="Duplicate" onclick="duplicate('${id}')" class="btn duplicate-btn text-white" style="background-color:#B8522A">
                                 <i class="fa fa-copy fa-sm" aria-hidden="true"></i>
@@ -288,7 +283,7 @@
                                 <i class="fa fa-ban" aria-hidden="true"></i>
                             </button>
                             <?php endif; ?>
-                            <?php if (can('Penjualan Ekspor', 'Order Form', 'ua')): ?>
+                            <?php if (can('Penjualan Ekspor', 'Order Form', 'p')): ?>
                             <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
@@ -302,11 +297,6 @@
                     } else {
                         return `
                             <?php if (can('Penjualan Ekspor', 'Order Form', 'p')): ?>
-                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('${id}')" style="box-shadow: none !important;">
-                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                            </button>
-                            <?php endif; ?>
-                            <?php if (can('Penjualan Ekspor', 'Order Form', 'ua')): ?>
                             <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
