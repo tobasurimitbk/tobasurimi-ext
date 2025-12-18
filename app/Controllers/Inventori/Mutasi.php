@@ -513,6 +513,14 @@ class Mutasi extends BaseController
                     $this->stockRevampModel->update($stock['id'], ['qty_bersih' => $qtyNow, 'qty_diterima' => $qtyNow]);
                 }
 
+                if ($stockDetail) {
+                    $qtyNow = $stockDetail['qty_diterima'] + $m['qty_konversi'];
+                    $this->stockRevampDetailModel->update($stockDetail['id'], [
+                        'qty_bersih' => $qtyNow,
+                        'qty_diterima' => $qtyNow
+                    ]);
+                }
+
                 $this->stockRevampLogModel
                     ->where('stock_detail_id', $stockDetail['id'])
                     ->where('reference_tujuan_id', $mutasiId)
