@@ -17,7 +17,7 @@ class BC30Model extends Model
     protected $allowedFields    = [];
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'createdAt';
     protected $updatedField  = 'updatedAt';
@@ -40,83 +40,326 @@ class BC30Model extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getList($condition, $addCondition, $limit = 10, $offset = 0)
-    {
-        $availableSort = [
-            'bc_30.tipe_pengeluaran' => 'bc_30.tipe_sales_order',
-            'bc_30.sales_order_id' => 'bc_30.sales_order_id',
-            'bc_30.no_aju' => 'bc_30.no_aju',
-            'bc_30.createdAt' => 'bc_30.createdAt',
-            'bc_30.status_posting' => 'bc_30.status_posting',
-        ];
-        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+    public function getList(
+        $condition,
+        $orderColumnIndex,
+        $orderDir,
+        $limit = 10,
+        $offset = 0
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'bc_30.createdAt';
-        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+    ) {
+        $db = \Config\Database::connect();
+        $where = [];
+        $whereDate = "";
+        $searchOrderForm = "";
 
-        $selectQry = "bc_30.*";
-
-        $bcDataQry = $this->asObject()
-            ->select($selectQry)
-            ->where($condition)
-            ->orderBy($sort, $sortType);
-
-        $totalData = $bcDataQry->countAllResults(false);
-
-        if ($addCondition['statusPosting'] || $addCondition['noAju'] || $addCondition['tipeSalesOrder'] && (empty($addCondition['mulaiTanggalBC30']) && empty($addCondition['selesaiTanggalBC30']))) {
-            $bcDataQry->groupStart();
+        if (!empty($condition['company_id'])) {
+            $where[] = "bc_30.company_id ='$condition[company_id]'";
         }
 
-        if ($addCondition['statusPosting']) {
-            if ($addCondition['statusPosting'] == "ALL") {
-                $bcDataQry->whereIn('bc_30.status_posting', ['1', '0']);
-            } elseif ($addCondition['statusPosting'] == "SUDAH POSTING") {
-                $bcDataQry->where('bc_30.status_posting', "1");
-            } else if ($addCondition['statusPosting'] == "BELUM POSTING") {
-                $bcDataQry->where('bc_30.status_POSTING', "0");
-            }
+        if (!empty($condition['dateStart']) && !empty($condition['dateEnd'])) {
+            $whereDate = "AND bc_30.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
         }
 
-        if ($addCondition['tipeSalesOrder']) {
-            if ($addCondition['tipeSalesOrder'] == "ALL") {
-                $bcDataQry->whereIn('bc_30.tipe_sales_order', ['RETUR PEMBELIAN', 'ORDER FORM LAIN', 'ORDER FORM EKSPOR']);
+        if (!empty($condition['status_posting'])) {
+            if ($condition['status_posting'] == "ALL") {
+                $where[] = "(bc_30.status_posting='1' OR bc_30.status_posting='0')";
+            } elseif ($condition['status_posting'] == "SUDAH POSTING") {
+                $where[] = "bc_30.status_posting='1'";
             } else {
-                $bcDataQry->whereIn('bc_30.tipe_sales_order', [$addCondition['tipeSalesOrder']]);
+                $where[] = "bc_30.status_posting='0'";
             }
         }
 
-        if ($addCondition['noAju']) {
-            $bcDataQry->like('no_aju', $addCondition['noAju'])->orLike('no_daftar', $addCondition['noAju']);
+        if (!empty($condition['search'])) {
+            $search = $db->escapeLikeString(trim($condition['search']));
+            $searchOrderForm = "
+              AND (
+                    customers.name LIKE '%{$search}%'
+                    OR bc_30.no_daftar LIKE '%{$search}%'
+                    OR bc_30.no_aju LIKE '%{$search}%'     
+                    OR bc_30.multiple_reference_no LIKE '%{$search}%'   
+                )
+            ";
         }
 
-        if ($addCondition['statusPosting'] || $addCondition['noAju'] || $addCondition['tipeSalesOrder'] && (empty($addCondition['mulaiTanggalBC30']) && empty($addCondition['selesaiTanggalBC30']))) {
-            $bcDataQry->groupEnd();
+
+        $filterCondition = !empty($where) ? " AND " . implode(" AND ", $where) : "";
+
+        $columns = [
+            'id',
+            'jenis_pengeluaran',
+            'reference_penerima',
+            'reference_pengeluaran_id',
+            'multiple_reference_no',
+            'no_aju',
+            'tanggal',
+            'status_posting',
+        ];
+
+        $orderBy = "";
+        if ($orderColumnIndex !== null && isset($columns[$orderColumnIndex])) {
+            $col = $columns[$orderColumnIndex];
+            $dir = strtoupper($orderDir) === 'DESC' ? 'DESC' : 'ASC';
+            $orderBy = " ORDER BY $col $dir ";
         }
 
-        if ($addCondition['mulaiTanggalBC30'] && $addCondition['selesaiTanggalBC30']) {
-            $bcDataQry->groupStart();
-            $mulaiTanggalBC30Timestamp = date_format(date_create_from_format("d/m/Y", $addCondition['mulaiTanggalBC30']), "Y-m-d");
-            $selesaiTanggalBC30Timestamp = date_format(date_create_from_format("d/m/Y", $addCondition['selesaiTanggalBC30']), "Y-m-d");
+        $baseQuery = "
+        (
+            -- BC 30
+            SELECT
+                bc_30.*,
+                customers.name AS reference_penerima
+            FROM bc_30
+            LEFT JOIN customers ON customers.id = bc_30.reference_penerima_id
+            WHERE bc_30.deletedAt IS NULL
+            $filterCondition
+            $whereDate
+            $searchOrderForm
+        )
+        ";
+        // ============================
+        // 📊 COUNT + PAGINATION
+        // ============================
+        $countQuery = "SELECT COUNT(*) AS cnt FROM ($baseQuery) AS x";
+        $totalFiltered = (int) $db->query($countQuery)->getRow()->cnt;
 
-            if ($addCondition['mulaiTanggalBC30']) {
-                $bcDataQry->where('bc_30.createdAt >=', $mulaiTanggalBC30Timestamp);
-            }
+        $mainQuery = "
+            SELECT * FROM ($baseQuery) AS x
+            $orderBy
+            LIMIT $limit OFFSET $offset
+        ";
 
-            if ($addCondition['selesaiTanggalBC30']) {
-                $bcDataQry->where('bc_30.createdAt <=', $selesaiTanggalBC30Timestamp);
-            }
+        $data = $db->query($mainQuery)->getResultArray();
 
-            $bcDataQry->groupEnd();
-        }
-
-        $totalFilteredData = $bcDataQry->countAllResults(false);
-        $data = $bcDataQry->findAll($limit, $offset);
+        // ============================
+        // 📦 RETURN RESULT
+        // ============================
 
         return [
             'data'              => $data,
-            'totalData'         => $totalData,
-            'totalFilteredData' => $totalFilteredData,
+            'totalData'         => $totalFiltered,
+            'totalFilteredData' => $totalFiltered,
+            'sort'              => $orderColumnIndex,
+            'sortType'          => $orderDir,
         ];
+    }
+
+    public function getListOutstanding(
+        $condition,
+        $orderColumnIndex,
+        $orderDir,
+        $limit = 10,
+        $offset = 0
+    ) {
+
+        $bc30All = $this->where('jenis_pengeluaran', "ORDER FORM EKSPOR")->where('deletedAt', null)->findAll();
+        $multipleRefBc30 = array_column($bc30All, 'multiple_reference_id');
+
+        $idUsed = array();
+        foreach ($multipleRefBc30 as $m) {
+            if (is_array(json_decode($m))) {
+                foreach (json_decode($m) as $mx) {
+                    array_push($idUsed, $mx);
+                }
+            }
+        }
+
+        $notIn = "";
+        if (!empty($idUsed)) {
+            $idUsedEscaped = implode(",", array_map('intval', $idUsed));
+            $notIn = " AND sales_order_export.sales_order_export_id NOT IN ($idUsedEscaped) ";
+        }
+
+        $db = \Config\Database::connect();
+        $where = [];
+        $whereDateSalesOrder = "";
+        $searchSalesOrder = "";
+
+        // DARI BC 30
+        if (!empty($condition['company_id'])) {
+            $where[] = "sales_order_export.company_id = '$condition[company_id]'";
+        }
+
+        if (!empty($condition['dateStart']) && !empty($condition['dateEnd'])) {
+            $whereDateSalesOrder = "AND sales_order_export.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
+        }
+
+        if (!empty($condition['search'])) {
+            $search = $db->escapeLikeString(trim($condition['search']));
+            $searchSalesOrder = "
+                AND(
+                    barang_master_sales.kode_barang LIKE '%{$search}%'
+                    OR barang_master_sales.barang_name LIKE '%{$search}%'
+                    OR customers.name LIKE '%{$search}%'
+                    OR sales_order_export.sales_order_export_no LIKE '%{$search}%'
+                )
+            ";
+        }
+
+        $filterCondition = !empty($where) ? " AND " . implode(" AND ", $where) : "";
+
+        $columns = [
+            'sales_order_export_id',
+            'tujuan_pengeluaran',
+            'tanggal',
+            'reference_no',
+            'customer_name',
+            'kode_barang',
+            'barang_name',
+            'qty',
+            'kode_satuan',
+            'valas_name',
+            'total_harga_barang'
+        ];
+
+        $orderBy = "";
+        if ($orderColumnIndex !== null && isset($columns[$orderColumnIndex])) {
+            $col = $columns[$orderColumnIndex];
+            $dir = strtoupper($orderDir) === 'DESC' ? 'DESC' : 'ASC';
+            $orderBy = " ORDER BY $col $dir ";
+        }
+
+        $baseQuery = "
+            SELECT
+                sales_order_detail_export.sales_order_export_id,
+                'ORDER FORM EKSPOR' AS tujuan_pengeluaran,
+                sales_order_export.tanggal,
+                sales_order_export.sales_order_export_no AS reference_no,
+                customers.name AS customer_name,
+                barang_master_sales.kode_barang,
+                barang_master_sales.barang_name,
+                sales_order_detail_export.qty,
+                satuans.kode_satuan,
+                metadata.value AS valas_name,
+                sales_order_detail_export.total_harga_barang
+            FROM
+                sales_order_detail_export
+            LEFT JOIN sales_order_export ON sales_order_export.sales_order_export_id = sales_order_detail_export.sales_order_export_id
+            LEFT JOIN sales_contract_detail ON sales_contract_detail.id = sales_order_detail_export.sales_contract_detail_id
+            LEFT JOIN barang_master_sales ON barang_master_sales.id = sales_contract_detail.barang_master_sales_id
+            LEFT JOIN satuans ON satuans.id = sales_order_detail_export.satuan_id 
+            LEFT JOIN sales_contract ON sales_contract.id = sales_order_export.sales_contract_id
+            LEFT JOIN customers ON customers.id = sales_contract.customer_id
+            LEFT JOIN metadata ON metadata.id = sales_contract.currency
+            WHERE sales_order_detail_export.deletedAt IS NULL
+            AND sales_order_detail_export.qty != 0
+            $notIn
+            $filterCondition
+            $whereDateSalesOrder
+            $searchSalesOrder
+        ";
+
+        $countQuery = "SELECT COUNT(*) AS cnt FROM ($baseQuery) AS x";
+        $totalFiltered = (int) $db->query($countQuery)->getRow()->cnt;
+
+        $mainQuery = "
+            SELECT * FROM ($baseQuery) AS x
+            $orderBy
+            LIMIT $limit OFFSET $offset
+        ";
+
+        $data = $db->query($mainQuery)->getResultArray();
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalFiltered,
+            'totalFilteredData' => $totalFiltered,
+            'sort'              => $orderColumnIndex,
+            'sortType'          => $orderDir,
+        ];
+    }
+
+    public function getReferencePengeluaran(
+        $customerId,
+        $companyId
+    ) {
+        $salesOrderExportModel = new SalesOrderExportModel();
+
+        $dataBc30All = $this->asArray()->where('company_id', $companyId)->where('deletedAt', null)->findAll();
+        $multipleReferenceId = array_column($dataBc30All, 'multiple_reference_id');
+        $idUsed = [];
+        foreach ($multipleReferenceId as $m) {
+            if (is_array(json_decode($m))) {
+                foreach (json_decode($m) as $id) {
+                    array_push($idUsed, $id);
+                }
+            }
+        }
+
+        $selectQry = "
+            sales_order_export.*
+        ";
+        $dataQry = $salesOrderExportModel
+            ->select($selectQry)
+            ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
+            ->where('sales_contract.customer_id', $customerId)
+            ->where('sales_order_export.company_id', $companyId);
+        if (count($idUsed) > 0) {
+            $dataQry->whereNotIn('sales_order_export_id', $idUsed);
+        }
+        $dataResult = $dataQry->where('sales_order_export.deletedAt', null)->findAll();
+        return $dataResult;
+    }
+
+    public function getReferencePengeluaranSelected(
+        $bc30Id,
+        $companyId
+    ) {
+        $salesOrderExportModel = new SalesOrderExportModel();
+
+        $dataBc30All = $this->asArray()->where('id', $bc30Id)->findAll();
+        $multipleReferenceId = array_column($dataBc30All, 'multiple_reference_id');
+
+        $idUsed = [];
+        foreach ($multipleReferenceId as $m) {
+            if (is_array(json_decode($m))) {
+                foreach (json_decode($m) as $id) {
+                    array_push($idUsed, $id);
+                }
+            }
+        }
+
+        $selectQry = "
+            sales_order_export.*
+        ";
+        $dataQry = $salesOrderExportModel
+            ->select($selectQry)
+            ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
+            ->where('sales_order_export.company_id', $companyId);
+        if (count($idUsed) > 0) {
+            $dataQry->whereIn('sales_order_export_id', $idUsed);
+        }
+        $dataResult = $dataQry->where('sales_order_export.deletedAt', null)->findAll();
+        return $dataResult;
+    }
+
+
+    public function getListBarangSalesEkspor($multipleReferenceIds)
+    {
+        $salesOrderExportDetailModel = new SalesOrderExportDetailModel();
+
+        $selectQry = "
+            sales_order_detail_export.sales_order_export_id,
+            barang_master_sales.barang_name,
+            SUM(sales_order_detail_export.qty) AS qty,
+            satuans.kode_satuan,
+            metadata.value AS valas_name,
+            SUM(sales_order_detail_export.total_harga_barang) AS total_harga_barang
+        ";
+
+        $dataResult = $salesOrderExportDetailModel->select($selectQry)
+            ->join('sales_order_export', 'sales_order_export.sales_order_export_id = sales_order_detail_export.sales_order_export_id', 'left')
+            ->join('sales_contract_detail', 'sales_contract_detail.id = sales_order_detail_export.sales_contract_detail_id', 'left')
+            ->join('barang_master_sales', 'barang_master_sales.id = sales_contract_detail.barang_master_sales_id', 'left')
+            ->join('satuans', 'satuans.id = sales_order_detail_export.satuan_id', 'left')
+            ->join('metadata', 'metadata.id = sales_order_export.valas_id', 'left')
+            ->where('sales_order_detail_export.deletedAt', null)
+            ->whereIn('sales_order_detail_export.sales_order_export_id', $multipleReferenceIds)
+            ->groupBy(['barang_name', 'kode_satuan', 'metadata.value'])
+            ->findAll();
+
+        return $dataResult;
     }
 
     public function getListBarang($referenceId, $typeReference)
@@ -456,64 +699,15 @@ class BC30Model extends Model
 
     public function detail($id)
     {
-
-        $first = $this->find($id);
-
-        if ($first == null) {
-            return null;
-        }
-
-        if ($first['sales_order_id'] != null) {
-            $selectQry = "
-                bc_30.*,
-                sales_order_export.sales_order_export_no AS no_sales_order,
-                stuffing_internasional.no_stuffing,
-                customers.name AS nama_customer,
-                customers.address AS alamat,
-                country.country_name,
-            ";
-            $result = $this->select($selectQry)
-                ->join('sales_order_export', 'sales_order_export.sales_order_export_id = bc_30.sales_order_id', 'left')
-                ->join('stuffing_internasional', 'stuffing_internasional.sales_order_export_id = sales_order_export.sales_order_export_id', 'left')
-                ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
-                ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
-                ->join('country', 'country.id = customers.country_id', 'left')
-                ->where('bc_30.id', $id)
-                ->first();
-        } elseif ($first['pengembalian_barang_id'] != null) {
-            $selectQry = "
-                bc_30.*,
-                pengembalian_barang.no_surat_jalan AS no_sales_order,
-                suppliers.name AS nama_customer,
-                suppliers.address AS alamat,
-            ";
-            $result = $this->select($selectQry)
-                ->join('pengembalian_barang', 'pengembalian_barang.id = bc_30.pengembalian_barang_id', 'left')
-                ->join('penerimaan_barang', 'penerimaan_barang.id = pengembalian_barang.penerimaan_barang_id', 'left')
-                ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
-                ->where('bc_30.id', $id)
-                ->first();
-
-            //  Tidak Ada Country
-            $result['country_name'] = null;
-        } elseif ($first['sales_order_lain_id'] != null) {
-            $selectQry = "
-                bc_30.*,
-                sales_order_lain.no_sales_order AS no_sales_order,
-                customers.name AS nama_customer,
-                customers.address AS alamat,
-                country.country_name,
-            ";
-            $result = $this->select($selectQry)
-                ->join('sales_order_lain', 'sales_order_lain.id = bc_30.sales_order_lain_id', 'left')
-                ->join('customers', 'customers.id = sales_order_lain.customer_id', 'left')
-                ->join('country', 'country.id = customers.country_id', 'left')
-                ->where('bc_30.id', $id)
-                ->first();
-        }
-
-        $result['country_name'] = $result['country_name'] == null ? "-" : $result['country_name'];
-        return $result;
+        $selectQry = "
+            bc_30.*,
+            customers.name AS customer_name
+        ";
+        $dataResult = $this->asArray()->select($selectQry)
+            ->join('customers', 'customers.id = bc_30.reference_penerima_id', 'left')
+            ->where('bc_30.id', $id)
+            ->first();
+        return $dataResult;
     }
 
     public function detailBarang($bcId, $kodeBarang)

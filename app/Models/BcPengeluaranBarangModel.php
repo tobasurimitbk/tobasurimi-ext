@@ -214,6 +214,17 @@ class BcPengeluaranBarangModel extends Model
         return json_encode($salesOrderNoArr, JSON_UNESCAPED_SLASHES);
     }
 
+    public function getReferensiNoPengeluaranOrderFormEkspor($salesOrderExportIds)
+    {
+        $salesOrderExportModel = new SalesOrderExportModel();
+        $result = $salesOrderExportModel->whereIn('sales_order_export_id', $salesOrderExportIds)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        $salesOrderNoArr = array_column($result, 'sales_order_export_no');
+        return json_encode($salesOrderNoArr, JSON_UNESCAPED_SLASHES);
+    }
+
     public function getDetailBarang(
         $bcPengeluaranId,
         $tipeBc

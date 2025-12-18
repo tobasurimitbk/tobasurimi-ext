@@ -43,7 +43,7 @@ $routes->get('/403', function () {
     return view('errors/html/error_403');
 });
 
-$routes->get('/update-consigne', 'Warehouse\Penomoran_::updateConsigne');
+$routes->get('/repair-stock-mutasi', 'Warehouse\Penomoran_::repairStockMutasi');
 // $routes->get('/generate-stock-revamp-nonpabean', 'Warehouse\Penomoran_::generateStokRevampNonPabean');
 // $routes->get('/generate-stock-revamp-pabean', 'Warehouse\Penomoran_::generateStokRevampPabean');
 // $routes->get('/generate-stock-detail-id-lpb-non-pabean', 'Warehouse\Penomoran_::generateStockDetailIdPenerimaanBarangDetailNonPabean');
@@ -1887,19 +1887,16 @@ $routes->group('bea-cukai-bc-27', ['filter' => 'Auth'], function ($routes) {
 $routes->group('bea-cukai-bc-30', ['filter' => 'Auth'], function ($routes) {
     $routes->get('/', 'BeaCukai\BC30::index');
     $routes->get('all', 'BeaCukai\BC30::all');
-    $routes->get('online', 'BeaCukai\BC30::online');
     $routes->get('download-response', 'BeaCukai\BC40::downloadResponPdf');
-    $routes->get('all-online', 'BeaCukai\BC30::allOnline');
-    $routes->get('create', 'BeaCukai\BC30::create');
     $routes->get('id/(:segment)', 'BeaCukai\BC30::detail/$1');
     $routes->post('save', 'BeaCukai\BC30::createAction');
-    $routes->post('update', 'BeaCukai\BC30::updateAction');
+    $routes->post('update', 'BeaCukai\BC30::updateDetail');
     $routes->post('delete', 'BeaCukai\BC30::delete');
     $routes->post('posting', 'BeaCukai\BC30::posting');
-    $routes->get('check-no-aju', 'BeaCukai\BC30::checkNoAju');
-
-    $routes->get('list-barang', 'BeaCukai\BC30::getListBarang');
-    $routes->get('list-sales-order', 'BeaCukai\BC30::dropdownSalesOrder');
+    $routes->get('all-stock-list', 'Inventori\StokAdjusment::allStockList');
+    $routes->get('list-barang-sales-ekspor', 'BeaCukai\BC30::getListBarangSalesEkspor');
+    $routes->post('update-no-aju', 'BeaCukai\BC30::updateNoAju');
+    $routes->get('list-satuan-konversi', 'Inventori\StokAdjusment::getSatuanKonversi');
 
     //HEADER
     $routes->get('id/header/(:segment)', 'BeaCukai\BC30::header/$1');
@@ -1963,7 +1960,7 @@ $routes->group('bea-cukai-bc-30', ['filter' => 'Auth'], function ($routes) {
     // OUTSTANDING
     $routes->get('bc-30-outstanding-all', 'BeaCukai\BC30::allOutstanding');
     $routes->get('bc-30-outstanding', 'BeaCukai\BC30::viewOutstanding');
-    $routes->get('bc-30-outstanding-export', 'BeaCukai\BC30::OutstandingSheet');
+    $routes->get('bc-30-outstanding-export', 'BeaCukai\BC30::OutstandingExcel');
 });
 
 // PPBKB

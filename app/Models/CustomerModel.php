@@ -536,4 +536,15 @@ class CustomerModel extends Model
             ->findAll();
         return $resQry;
     }
+
+    public function getCustomerByCompany($companyId, $tipeCustomer)
+    {
+        $resQry = $this->asArray()
+            ->where('tipe_customer', $tipeCustomer)
+            ->where('company_id', $companyId)
+            ->where('deletedAt', null)
+            ->orderBy('name', "asc")
+            ->findAll();
+        return $resQry;
+    }
 }

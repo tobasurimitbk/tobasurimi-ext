@@ -356,18 +356,7 @@ class BC41 extends BaseController
     public function posting()
     {
         $id = decrypt($this->request->getVar('id'));
-        $db = \Config\Database::connect();
-        $db->transStart();
-
         $this->bc41Model->update($id, ['status_posting' => '1']);
-        $db->transComplete();
-
-        if ($db->transStatus() == false) {
-            $db->transRollback();
-        }
-
-        $db->transCommit();
-
         return response()->setJSON([
             'token'  => csrf_hash(),
             'status' => true,

@@ -463,23 +463,11 @@ class BC25 extends BaseController
     public function posting()
     {
         $id = decrypt($this->request->getVar('id'));
-        $bc25 = $this->bc25Model->find($id);
-
-        $db = \Config\Database::connect();
-        $db->transStart();
-
         $this->bc25Model->update($id, ['status_posting' => '1']);
-        $db->transComplete();
-
-        if ($db->transStatus() == false) {
-            $db->transRollback();
-        }
-
-        $db->transCommit();
-
         return response()->setJSON([
             'status' => true,
-            'message' => "Dokumen BC 2.5 Berhasil Diposting"
+            'message' => "Dokumen BC 2.5 Berhasil Diposting",
+            'token' => csrf_hash()
         ]);
     }
 

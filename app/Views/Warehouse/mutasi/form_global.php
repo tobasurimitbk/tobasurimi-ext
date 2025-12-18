@@ -652,6 +652,15 @@
         }
     });
 
+    $('.table-inventori').on('preXhr.dt', function(e, settings, data) {
+        if (data.order[0].column === 10) {
+            data.order[0].column = 13;
+        }
+        if (data.order[0].column === 12) {
+            data.order[0].column = 15;
+        }
+    });
+
     $('#type_pengambilan_stock').select2({
         placeholder: "Pilih Tipe Ambil Stok",
         theme: "bootstrap-5",

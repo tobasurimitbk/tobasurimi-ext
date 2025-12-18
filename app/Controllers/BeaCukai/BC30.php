@@ -18,8 +18,10 @@ use App\Models\SalesOrderExportDetailModel;
 use App\Models\KantorBeaCukaiModel;
 use App\Models\PengusahaTPBModel;
 use App\Models\BarangMasterSpesifikasiModel;
+use App\Models\BcPengeluaranBarangModel;
 use App\Models\CountryModel;
 use App\Models\CustomerModel;
+use App\Models\DivisisModel;
 use App\Models\HsCodesModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\PengembalianBarangDetailModel;
@@ -27,10 +29,15 @@ use App\Models\PengembalianBarangModel;
 use App\Models\RMImportPOModel;
 use App\Models\SalesOrderLainDetailModel;
 use App\Models\SalesOrderLainModel;
+use App\Models\SatuansModel;
 use App\Models\StockDetailModel;
 use App\Models\StockModel;
-use App\Models\SupplierModel;
+use App\Models\StockRevampDetailModel;
+use Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 
@@ -72,6 +79,11 @@ class BC30 extends BaseController
     protected $penerimaanBarangModel;
     protected $stockModel;
     protected $stockDetailModel;
+    protected $customerModel;
+    protected $divisiModel;
+    protected $satuanModel;
+    protected $bcPengeluaranBarangModel;
+    protected $stockRevampDetailModel;
 
     public function __construct()
     {
@@ -99,214 +111,226 @@ class BC30 extends BaseController
         $this->penerimaanBarangModel = new PenerimaanBarangModel();
         $this->stockModel = new StockModel();
         $this->stockDetailModel = new StockDetailModel();
+        $this->customerModel = new CustomerModel();
+        $this->divisiModel = new DivisisModel();
+        $this->satuanModel = new SatuansModel();
+        $this->bcPengeluaranBarangModel = new BcPengeluaranBarangModel();
+        $this->stockRevampDetailModel = new StockRevampDetailModel();
 
         $this->this_user_id = session()->get("login")->user_id;
         $this->this_company_id = session()->get("login")->this_company_id;
-        $this->akunCeisa = $this->ceisaSettingModel->where('company_id', $this->this_company_id)->first();
     }
 
     public function index()
     {
+        $akunCeisa = $this->ceisaSettingModel->where('company_id', $this->this_company_id)->first();
+        $customer = $this->customerModel->getCustomerByCompany($this->this_company_id, "INTERNASIONAL");
         $data = [
-            'akunCeisa' => $this->ceisaSettingModel->where('company_id', $this->this_company_id)->first(),
+            'akunCeisa' => $akunCeisa,
+            'customer' => $customer
         ];
 
         return view('BeaCukai/bc-30/index', $data);
     }
 
-
-    public function online()
-    {
-        $data = [
-            'baseUrl' => $this->metaDataModel->where('name', "Base Url BC")->first()['value']
-        ];
-
-        return view('BeaCukai/bc-30/online', $data);
-    }
-
-    public function allOnline()
-    {
-        $username = ($this->akunCeisa == null ? "" : $this->akunCeisa['username']);
-        $password = ($this->akunCeisa == null ? "" : $this->akunCeisa['password']);
-
-        $beacukaiApi = new BeaCukaiApi($username, $password);
-        $dataOnline = $beacukaiApi->getListStatusResponseAll();
-
-        $newDataResult = [];
-        foreach ($dataOnline->dataRespon as $d) {
-            if ($d->kodeDokumen == "30") {
-                $newDataResult[] = $d;
-            }
-        }
-        $dataOnline->dataRespon = $newDataResult;
-
-        if ($dataOnline->status == false) {
-            return response()->setJSON($dataOnline);
-        } else {
-            return response()->setJSON([
-                'data' => $dataOnline,
-                'status' => true
-            ]);
-        }
-    }
-
     public function all()
     {
-        $payload = [
-            "pageSize"      => $this->request->getGet("length"),
-            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search"        => $this->request->getGet("search"),
-            "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType"),
-            "company_id"    => $this->this_company_id,
-            "type"          => "BC 3.0"
-        ];
+        $draw = $this->request->getGet('draw');
+        $start = (int)$this->request->getGet('start');
+        $length = (int)$this->request->getGet('length');
+        $orderDir = $this->request->getGet('order')[0]['dir'] ?? 'asc';
+        $orderColumnIndex = $this->request->getGet('order')[0]['column'] ?? null;
+
+        $dateStart = $this->request->getVar("dateStart")
+            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart"))))
+            : null;
+
+        $dateEnd = $this->request->getVar("dateEnd")
+            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd"))))
+            : null;
+
+        $statusPosting = $this->request->getGet('status_posting');
+        $search = $this->request->getGet('search');
 
         $condition = [
-            "bc_30.company_id"  => $this->this_company_id,
-            "bc_30.deletedAt" => null,
+            'company_id'        => $this->this_company_id,
+            'dateStart'         => $dateStart,
+            'dateEnd'           => $dateEnd,
+            'status_posting'    => $statusPosting,
+            'search'            => $search
         ];
 
-        $addCondition = [
-            "sort" => $this->request->getGet("sort"),
-            "sortType" => $this->request->getGet("sortType"),
-            "statusPosting" => $this->request->getGet("statusPosting"),
-            "mulaiTanggalBC30" => $this->request->getGet("mulaiTanggalBC30"),
-            "selesaiTanggalBC30" => $this->request->getGet('selesaiTanggalBC30'),
-            "noAju" => $this->request->getGet('noAju'),
-            "tipeSalesOrder" => $this->request->getGet('tipeSalesOrder')
-        ];
+        $data = $this->bc30Model->getList(
+            $condition,
+            $orderColumnIndex,
+            $orderDir,
+            $length,
+            $start
+        );
 
-        $limit = $this->request->getGet("length");
-        $offset = $this->request->getGet("start");
-
-        $beaCukaiData = $this->bc30Model->getList($condition, $addCondition, $limit, $offset);
-
-        $dataBeaCukai = [];
-
-        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
-
-        foreach ($beaCukaiData['data'] as $data) {
-            $detail = $this->bc30Model->detail($data->id);
-            if ($data->tipe_sales_order == "ORDER FORM EKSPOR" || $data->tipe_sales_order == "ORDER FORM LAIN") {
-                // CUSTOMER EKSPOR
-                $tipe_penerima = "CUSTOMER";
-            } else {
-                // SUPPLIER
-                $tipe_penerima = "SUPPLIER";
-            }
-
-            array_push($dataBeaCukai, [
-                "no"                    => $no++,
-                "id"                    => encrypt($data->id),
-                "tipe_sales_order"      => $data->tipe_sales_order,
-                "no_order_form"         => $detail != null ? $detail['no_sales_order'] : "-",
-                "customer_name"         => $detail != null ? $detail['nama_customer'] : "-",
-                "no_aju"                => $data->no_aju . " / " . $data->no_daftar,
-                "tanggal_bc_30"         => $data->createdAt == null ? '-' : date('d/m/Y', strtotime($data->createdAt)),
-                "status_posting"        => $data->status_posting,
-                "tipe_penerima"         => $tipe_penerima
+        $dataResult = array();
+        $no = $start + 1;
+        foreach ($data['data'] as $d) {
+            array_push($dataResult, [
+                'no' => $no++,
+                'id' => encrypt($d['id']),
+                'jenis_pengeluaran' => $d['jenis_pengeluaran'],
+                'reference_penerima' => $d['reference_penerima'],
+                'multiple_reference_no' => str_replace(['"', ']', '['], " ",  $d['multiple_reference_no']),
+                "no_aju" => ($d['no_aju'] == "" ? "-" : $d['no_aju']) . " / " . ($d['no_daftar'] == "" ? "-" : $d['no_daftar']),
+                'tanggal' => !empty($d['tanggal']) && $d['tanggal'] != null ? date('d/m/Y', strtotime($d['tanggal'])) : "",
+                'status_posting' => $d['status_posting'],
             ]);
         }
 
-        $data = [
-            "draw"              => intval($this->request->getGet("draw")),
-            "recordsTotal"      => $beaCukaiData['totalData'],
-            "recordsFiltered"   => $beaCukaiData['totalFilteredData'],
-            "data"              => $dataBeaCukai,
-            "payload"           => $payload
-        ];
-
-        return response()->setJSON($data);
-    }
-
-    public function create()
-    {
-        $data = [
-            'noAju' => $this->generateNomorAju()
-        ];
-        return view('BeaCukai/bc-30/form', $data);
+        return $this->response->setJSON([
+            'draw' => intval($draw),
+            'recordsTotal' => intval($data['totalData'] ?? 0),
+            'recordsFiltered' => intval($data['totalFilteredData'] ?? 0),
+            'data' => $dataResult,
+        ]);
     }
 
     public function createAction()
     {
+        $db = \Config\Database::connect();
+        try {
+            $db->transBegin();
+            $tanggal = formatDMYtoYMD($this->request->getVar('tanggal'));
+            $jenisPengeluaran = $this->request->getVar('jenis_pengeluaran');
+            $referencePenerimaId = $this->request->getVar('reference_penerima_id');
 
-        $typeReference = $this->request->getVar('type_reference');
-        if ($typeReference == "ORDER FORM EKSPOR") {
-            $salesOrderId = $this->request->getVar('reference_id');
-            $pengembalianBarangId = null;
-            $salesOrderLainId = null;
-        } elseif ($typeReference == "RETUR PEMBELIAN") {
-            $salesOrderId = null;
-            $pengembalianBarangId = $this->request->getVar('reference_id');
-            $salesOrderLainId = null;
-            // Update bc_pengeluaran_id
-            $this->pengembalianBarangModel->update($pengembalianBarangId, [
-                'bc_pengeluaran_id' => 1445
+            $noAju = $this->generateNomorAju($tanggal);
+            $payload = $this->get_payload();
+
+            $payload = json_decode($payload);
+            $payload->nomorAju = $noAju;
+            $payload->tanggalAju = $tanggal;
+            $payload->idPengguna = "NPWP";
+
+            $payloadUpdate = json_encode($payload);
+
+            $id = $this->bc30Model->insert([
+                'company_id' => $this->this_company_id,
+                'reference_penerima_id' => $referencePenerimaId,
+                'tanggal' => $tanggal,
+                'jenis_pengeluaran' => $jenisPengeluaran,
+                'no_aju' => $noAju,
+                'no_daftar' => null,
+                'multiple_reference_id' => null,
+                'multiple_reference_no' => null,
+                'status_dokumen' => "Belum Lengkap",
+                'payload' => $payloadUpdate,
+                'status_posting' => 0
             ]);
-        } elseif ($typeReference == "ORDER FORM LAIN") {
-            $salesOrderId = null;
-            $pengembalianBarangId = null;
-            $salesOrderLainId = $this->request->getVar('reference_id');
+
+            $db->transCommit();
+            return response()->setJSON([
+                'message' => 'Dokumen berhasil dibuat',
+                'id' => encrypt($id),
+                'status' => true
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'message' => $e->getMessage(),
+                'status' => false
+            ]);
         }
-
-        $tanggal = $this->request->getVar("tanggal") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal")))) : "";
-
-        $this->bc30Model->insert([
-            'company_id' => $this->this_company_id,
-            'sales_order_id' => $salesOrderId,
-            'pengembalian_barang_id' => $pengembalianBarangId,
-            'sales_order_lain_id' => $salesOrderLainId,
-            'tipe_sales_order' => $this->request->getVar('type_reference'),
-            'no_aju' => $this->request->getVar('no_aju'),
-            'no_daftar' => $this->request->getVar('no_daftar'),
-            'createdAt' => $tanggal . " " . date('H:i:s'),
-            'status_posting' => '0',
-        ]);
-
-        return response()->setJSON([
-            'status' => true,
-            'message' => "Dokumen BC 3.0 Berhasil Disimpan"
-        ]);
     }
 
-    public function updateAction()
+    public function updateNoAju()
     {
-        $id = decrypt($this->request->getVar('id'));
-
-        $typeReference = $this->request->getVar('type_reference');
-        if ($typeReference == "ORDER FORM EKSPOR") {
-            $salesOrderId = $this->request->getVar('reference_id');
-            $pengembalianBarangId = null;
-            $salesOrderLainId = null;
-        } elseif ($typeReference == "RETUR PEMBELIAN") {
-            $salesOrderId = null;
-            $pengembalianBarangId = $this->request->getVar('reference_id');
-            $salesOrderLainId = null;
-        } elseif ($typeReference == "ORDER FORM LAIN") {
-            $salesOrderId = null;
-            $pengembalianBarangId = null;
-            $salesOrderLainId = $this->request->getVar('reference_id');
+        try {
+            $id = decrypt($this->request->getVar('id'));
+            $noAju = $this->request->getVar('no_pengajuan');
+            $this->bc30Model->update($id, ['no_aju' => $noAju]);
+            return response()->setJSON([
+                'status' => true,
+                'token' => csrf_hash(),
+                'message' => "no aju berhasil diupdate"
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'message' => $e->getMessage(),
+                'token' => csrf_hash(),
+                'status' => false
+            ]);
         }
+    }
 
-        $tanggal = $this->request->getVar("tanggal") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal")))) : "";
+    public function updateDetail()
+    {
+        // return response()->setJSON([
+        //     'token' => csrf_hash(),
+        //     '$_POST' => $_POST,
+        //     'listStock' => json_decode($_POST['listStock']),
+        //     'status' => false
+        // ]);
+        $db = \Config\Database::connect();
+        $db->transBegin();
+        try {
+            $id = decrypt($this->request->getVar('id'));
+            $tanggal = formatDMYtoYMD($this->request->getVar('tanggal'));
+            $noAju = $this->request->getVar('no_pengajuan');
+            $noDaftar = $this->request->getVar('no_daftar');
+            $multipleReferenceIdArr = $this->request->getVar('multiple_reference_id');
+            $multipleReferenceNo = null;
+            $multipleReferenceId = null;
 
-        $this->bc30Model->update($id, [
-            'company_id' => $this->this_company_id,
-            'sales_order_id' => $salesOrderId,
-            'pengembalian_barang_id' => $pengembalianBarangId,
-            'sales_order_lain_id' => $salesOrderLainId,
-            'tipe_sales_order' => $this->request->getVar('type_reference'),
-            'no_aju' => $this->request->getVar('no_aju'),
-            'no_daftar' => $this->request->getVar('no_daftar'),
-            'createdAt' => $tanggal . " " . date('H:i:s'),
-            'status_posting' => '0',
-        ]);
+            if (!empty($multipleReferenceIdArr) && count($multipleReferenceIdArr) != 0) {
+                $multipleReferenceNo = $this->bcPengeluaranBarangModel->getReferensiNoPengeluaranOrderFormEkspor($multipleReferenceIdArr);
+                $multipleReferenceId = "[" . implode(",", $multipleReferenceIdArr) . "]";
+            }
 
-        return response()->setJSON([
-            'status' => true,
-            'message' => "Dokumen BC 3.0 Berhasil Diupdate"
-        ]);
+
+            $this->bc30Model->update($id, [
+                'tanggal' => $tanggal,
+                'no_aju' => $noAju,
+                'no_daftar' => $noDaftar,
+                'multiple_reference_id' => $multipleReferenceId,
+                'multiple_reference_no' => $multipleReferenceNo,
+            ]);
+
+            $listStock = json_decode($this->request->getVar('listStock'));
+            $this->bcPengeluaranBarangModel->where('bc_pengeluaran_id', $id)->where('tipe_bc', "BC 2.5")->delete(null, true);
+            foreach ($listStock as $l) {
+                $stock = $this->stockRevampDetailModel
+                    ->select('stock_revamp_detail.*,stock_revamp.barang_master_id')
+                    ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
+                    ->where('stock_revamp_detail.id', $l->id)
+                    ->first();
+
+                $this->bcPengeluaranBarangModel->insert([
+                    'stock_detail_id'    => $l->id,
+                    'barang_master_id'   => $stock['barang_master_id'],
+                    'bc_pengeluaran_id'  => $id,
+                    'unit_id_konversi'   => $l->keluar->unit_id_konversi,
+                    'unit_id_keluar'     => $l->keluar->unit_id_keluar,
+                    'valas_id'           => $l->keluar->valas_id,
+                    'tipe_bc'            => "BC 3.0",
+                    'harga_satuan'       => $l->keluar->harga_satuan,
+                    'nilai_tukar'        => $l->keluar->nilai_tukar,
+                    'sub_total'          => $l->keluar->sub_total,
+                    'qty_keluar'         => $l->keluar->qty_keluar,
+                    'qty_konversi'       => $l->keluar->qty_konversi,
+                ]);
+            }
+
+            $db->transCommit();
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'message' => "Berhasil update",
+                'status' => true
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 
     public function detail($id)
@@ -318,244 +342,90 @@ class BC30 extends BaseController
             return redirect()->to('bea-cukai-bc-30');
         }
 
-        if ($bc30['sales_order_id'] != null) {
-            $bc30['reference_id'] = $bc30['sales_order_id'];
-            $bc30['type_reference'] = "ORDER FORM EKSPOR";
-        } elseif ($bc30['pengembalian_barang_id'] != null) {
-            $bc30['reference_id'] = $bc30['pengembalian_barang_id'];
-            $bc30['type_reference'] = "RETUR PEMBELIAN";
-        } elseif ($bc30['sales_order_lain_id'] != null) {
-            $bc30['reference_id'] = $bc30['sales_order_lain_id'];
-            $bc30['type_reference'] = "ORDER FORM LAIN";
+        $dataTipeBarang = $this->metaDataModel
+            ->where('deletedAt', null)
+            ->where('name', "Kategori Barang")
+            ->where('description !=', "kemasan")
+            ->findAll();
+
+        $divisi = $this->divisiModel->getDivisiAccess();
+        $satuan = $this->satuanModel->where('deletedAt', null)->findAll();
+        $dataValuta = $this->metaDataModel->where('name', "Valuta")->where('deletedAt', null)->findAll();
+        $dataCustomer = $this->customerModel->where('id', $bc30['reference_penerima_id'])->findAll();
+        $dataBarang = $this->bcPengeluaranBarangModel->getDetailBarang(
+            $id,
+            "BC 3.0"
+        );
+        $dataReferencePengeluaran = [];
+        $dataBarangSalesEkspor = [];
+        $multipleReferenceIds = json_decode($bc30['multiple_reference_id'], true);
+
+        if ($bc30['jenis_pengeluaran'] == "ORDER FORM EKSPOR") {
+            $dataReferencePengeluaranNotUsed = $this->bc30Model->getReferencePengeluaran(
+                $bc30['reference_penerima_id'],
+                $bc30['company_id']
+            );
+            $dataReferencePengeluaranUsed = $this->bc30Model->getReferencePengeluaranSelected(
+                $bc30['id'],
+                $bc30['company_id']
+            );
+            $dataReferencePengeluaran = array_merge(
+                $dataReferencePengeluaranNotUsed,
+                $dataReferencePengeluaranUsed
+            );
+
+            if (count($multipleReferenceIds) != 0) {
+                $dataBarangSalesEkspor = $this->bc30Model->getListBarangSalesEkspor(
+                    $multipleReferenceIds
+                );
+            }
         }
 
         $data = [
-            'noAju' => $this->generateNomorAju(),
-            'bc30' => $bc30
+            'bc30' => $bc30,
+            'dataCustomer' => $dataCustomer,
+            'tipeBarang' => $dataTipeBarang,
+            'dataReferencePengeluaran' => $dataReferencePengeluaran,
+            'divisi' => $divisi,
+            'dataSatuan' => $satuan,
+            'dataValuta' => $dataValuta,
+            'noAju' => $bc30 == null ? $this->generateNomorAju($bc30['tanggal']) : $bc30['no_aju'],
+            'dataBarang' => $dataBarang,
+            'dataBarangSalesEkspor' => $dataBarangSalesEkspor,
+            'multipleReferenceIds' => $multipleReferenceIds
         ];
 
         return view('BeaCukai/bc-30/form', $data);
     }
 
-    public function checkNoAju()
-    {
-        $id = decrypt($this->request->getVar('id'));
-        $noAju = $this->request->getVar('no_aju');
-        $isUsed = true;
-
-        if (!empty($this->request->getVar('id'))) {
-            // UPDATE
-            $first = $this->bc30Model
-                ->where('company_id', $this->this_company_id)
-                ->where(
-                    'no_aju',
-                    $noAju
-                )
-                ->where('id != ', $id)
-                ->first();
-
-            if ($first != null) {
-                $isUsed = false;
-            }
-        } else {
-            // CREATE
-            $first = $this->bc30Model
-                ->where('company_id', $this->this_company_id)
-                ->where(
-                    'no_aju',
-                    $noAju
-                )
-                ->first();
-
-            if ($first != null) {
-                $isUsed = false;
-            }
-        }
-
-        if (!$isUsed) {
-            return response()->setJSON([
-                'status' => false,
-                'message' => "No aju sudah digunakan"
-            ]);
-        } else {
-            return response()->setJSON([
-                'status' => true,
-                'message' => "No aju tersedia"
-            ]);
-        }
-    }
-
     public function delete()
     {
-        $id = decrypt($this->request->getVar('id'));
-        $bc30 = $this->bc30Model->where('id', $id)->first();
-        // Hapus Reference di Pengembalian Barang
-        if ($bc30['pengembalian_barang_id'] != null) {
-            $this->pengembalianBarangModel->where('id', $bc30['pengembalian_barang_id'])->update([
-                'bc_pengeluaran_id' => $bc30['pengembalian_barang_id']
+        try {
+            $id = decrypt($this->request->getVar('id'));
+            $this->bc30Model->delete($id);
+            $this->bcPengeluaranBarangModel->where('bc_pengeluaran_id', $id)->where('tipe_bc', "2.5")->delete(null, false);
+            return response()->setJSON([
+                'status' => true,
+                'token' => csrf_hash(),
+                'message' => "Dokumen BC 3.0 Berhasil Dihapus"
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'message' => $e->getMessage(),
+                'token' => csrf_hash(),
+                'status' => false
             ]);
         }
-
-        $this->bc30Model->delete($id);
-        return response()->setJSON([
-            'status' => true,
-            'message' => "Dokumen BC 3.0 Berhasil Dihapus"
-        ]);
     }
 
     public function posting()
     {
         $id = decrypt($this->request->getVar('id'));
-        $bc30 = $this->bc30Model->where('id', $id)->first();
-
-        $db = \Config\Database::connect();
-        $db->transStart();
-
-        if ($bc30['tipe_sales_order'] == "RETUR PEMBELIAN") {
-            // RETUR PEMBELIAN
-            $pengembalianBarang = $this->pengembalianBarangModel->find($bc30['pengembalian_barang_id']);
-            $penerimaanBarang = $this->penerimaanBarangModel->find($pengembalianBarang['penerimaan_barang_id']);
-
-            if ($penerimaanBarang == null) {
-                return response()->setJSON([
-                    'status' => true,
-                    'message' => "Gagal Posting, Terjadi Kesalahan Saat Menambahkan Stok"
-                ]);
-            } else {
-                $pengembalianBarangDetail =  $this->pengembalianBarangModel->getReturBeaCukaiDetail($bc30['pengembalian_barang_id']);
-                foreach ($pengembalianBarangDetail as $p) {
-                    $stock = $this->stockModel->find($p['stock_id']);
-                    $qty = $p['qty_konversi'];
-
-                    if ($stock['tipe_barang'] == "kemasan") {
-                        $barang2_id = $stock['kemasan_id'];
-                    } else {
-                        $barang2_id = $stock['barang2_id'];
-                    }
-
-                    // BARANG LAMA
-                    $stockOldDetail = $this->stockDetail2Model->getStockListDetail(
-                        $p['stock_id'],
-                        $p['bc_id'],
-                        $p['no_aju'],
-                        $p['stock_dokumen']
-                    );
-
-                    $stok = $this->stockModel->insertStok(
-                        $penerimaanBarang['company_id'],
-                        $penerimaanBarang['warehouse_id'],
-                        $penerimaanBarang['divisi_id'],
-                        $stock['tipe_barang'],
-                        $stock['barang1_id'],
-                        $barang2_id,
-                        ($qty * -1),
-                    );
-
-                    // DETAIL
-                    $stokDetail = $this->stockDetailModel->insertStokDetail(
-                        $stok,
-                        $qty,
-                        "Out",
-                        date('Y-m-d'),
-                        $this->this_user_id,
-                        "RETUR",
-                        $pengembalianBarang['no_surat_jalan'],
-                        $pengembalianBarang['keterangan'],
-                    );
-
-                    // SUB DETAIL
-                    $this->stockDetail2Model->insertStokDetail2(
-                        $p['bc_id'],
-                        $stok,
-                        $stokDetail,
-                        $qty,
-                        $p['no_aju'],
-                        $pengembalianBarang['no_surat_jalan'],
-                        $p['stock_dokumen'],
-                        $stockOldDetail['supplier_id'],
-                        $p['total_harga'],
-                        null,
-                        null,
-                        $stockOldDetail['no_po']
-                    );
-                }
-            }
-        } elseif ($bc30['tipe_sales_order'] == "ORDER FORM LAIN") {
-            // ORDER FORM LAIN
-            // KURANGIN STOK NYA
-            $salesOrderLain = $this->salesOrderLainModel->find($bc30['sales_order_lain_id']);
-            $salesOrderLainList = $this->salesOrderLainDetailModel->where('sales_order_lain_id', $bc30['sales_order_lain_id'])->findAll();
-
-            foreach ($salesOrderLainList as $s) {
-                $stock = $this->stockModel->find($s['stock_id']);
-                $qty = $s['qty_konversi'];
-
-                if ($stock['tipe_barang'] == "kemasan") {
-                    $barang2_id = $stock['kemasan_id'];
-                } else {
-                    $barang2_id = $stock['barang2_id'];
-                }
-
-                // BARANG LAMA
-                $stockOldDetail = $this->stockDetail2Model->getStockListDetail(
-                    $s['stock_id'],
-                    $s['bc_id'],
-                    $s['no_aju'],
-                    $s['stock_dokumen']
-                );
-
-                $stok = $this->stockModel->insertStok(
-                    $salesOrderLain['company_id'],
-                    $salesOrderLain['warehouse_id'],
-                    $salesOrderLain['divisi_id'],
-                    $stock['tipe_barang'],
-                    $stock['barang1_id'],
-                    $barang2_id,
-                    ($qty * -1),
-                );
-
-                // DETAIL
-                $stokDetail = $this->stockDetailModel->insertStokDetail(
-                    $stok,
-                    $qty,
-                    "Out",
-                    date('Y-m-d'),
-                    $this->this_user_id,
-                    "PENJUALAN",
-                    $salesOrderLain['no_sales_order'],
-                    $salesOrderLain['keterangan'],
-                );
-
-                // SUB DETAIL
-                $this->stockDetail2Model->insertStokDetail2(
-                    $s['bc_id'],
-                    $stok,
-                    $stokDetail,
-                    $qty,
-                    $s['no_aju'],
-                    $salesOrderLain['no_sales_order'],
-                    $s['stock_dokumen'],
-                    $stockOldDetail['supplier_id'],
-                    $s['total_harga'],
-                    null,
-                    null,
-                    $stockOldDetail['no_po']
-                );
-            }
-        }
-
         $this->bc30Model->update($id, ['status_posting' => '1']);
-        $db->transComplete();
-
-        if ($db->transStatus() == false) {
-            $db->transRollback();
-        }
-
-        $db->transCommit();
-
         return response()->setJSON([
             'status' => true,
-            'message' => "Dokumen BC 3.0 Berhasil Diposting"
+            'message' => "Dokumen BC 3.0 Berhasil Diposting",
+            'token' => csrf_hash()
         ]);
     }
 
@@ -594,8 +464,35 @@ class BC30 extends BaseController
         ]);
     }
 
-    public function getListBarang()
+    public function getListBarangSalesEkspor()
     {
+        try {
+            $multipleReferenceId = $this->request->getVar('multiple_reference_id');
+            $multipleReferenceIdArr = json_decode($multipleReferenceId);
+            if (count($multipleReferenceIdArr) == 0) {
+                return response()->setJSON([
+                    'token' => csrf_hash(),
+                    'status' => true,
+                    'data' => []
+                ]);
+            }
+
+            $dataResult = $this->bc30Model->getListBarangSalesEkspor(
+                $multipleReferenceIdArr
+            );
+
+            return response()->setJSON([
+                'data' => $dataResult,
+                'token' => csrf_hash(),
+                'status' => true
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'message' => $e->getMessage(),
+                'status' => false
+            ]);
+        }
         $typeReference = $this->request->getVar('type_reference');
         $referenceId = $this->request->getVar('reference_id');
 
@@ -629,34 +526,65 @@ class BC30 extends BaseController
         ]);
     }
 
-    public function generateNomorAju()
+    public function generateNomorAju($tanggalDokumen)
     {
-        $ceisaSetting = $this->ceisaSettingModel->where('company_id', $this->this_company_id)->first();
-        $kodeDokumenbc30Static = $this->metaDataModel->where('name', "Kode BC30 Static")->first();
-
-        $kodeKantorStatic = $ceisaSetting['kode_kantor_pabean'];
-        $tanggalAju = date('Ymd');
-        $sequenceNoUrutPengajuan = "";
-
-        $bc30Last = $this->bc30Model->orderBy('createdAt', "DESC")->limit(1)->first();
-
-        if ($bc30Last == null) {
-            $sequenceNoUrutPengajuan = "000001";
+        if ($this->this_company_id == 1 || $this->this_company_id == 2) {
+            $company_id_arr = [1, 2];
         } else {
-            if ($bc30Last['no_aju'] == null) {
-                $sequenceNoUrutPengajuan = "000001";
-            } else {
-                // Buatkan auto increment
-                $arrNo = explode('-', $bc30Last['no_aju']);
+            $company_id_arr = [$this->this_company_id];
+        }
+        $ceisaSetting = $this->ceisaSettingModel
+            ->where('company_id', $this->this_company_id)
+            ->first();
+
+        $kodeDokumenbc30Static = $this->metaDataModel
+            ->where('name', "Kode BC30 Static")
+            ->first();
+
+        $kodeKantorStatic = $ceisaSetting['kode_unik']
+            ? $ceisaSetting['kode_unik']
+            : $ceisaSetting['kode_kantor_pabean'];
+
+        $tanggalAju = date('Ymd', strtotime($tanggalDokumen));
+        $tahunAjuSekarang = date('Y', strtotime($tanggalDokumen));
+
+        // Ambil BC40 terakhir berdasarkan urutan no_aju terbaru
+        $bc30Last = $this->bc30Model
+            ->whereIn('company_id', $company_id_arr)
+            ->orderBy('tanggal', "DESC")
+            ->limit(1)
+            ->first();
+
+        // Default urutan
+        $sequenceNoUrutPengajuan = "000001";
+
+        if ($bc30Last && $bc30Last['no_aju']) {
+            $arrNo = explode('-', $bc30Last['no_aju']);
+
+            // Pastikan format sesuai: DOC-KANTOR-YYYYMMDD-NOMOR
+            if (count($arrNo) === 4) {
+                $tanggalTerakhir = $arrNo[2];
+                $tahunTerakhir = substr($tanggalTerakhir, 0, 4);
                 $lastNomor = $arrNo[3];
-                // lakukan increment
-                $nextNomor = str_pad((int)$lastNomor + 1, strlen($lastNomor), '0', STR_PAD_LEFT);
-                $sequenceNoUrutPengajuan = $nextNomor;
+
+                if ($tahunTerakhir === $tahunAjuSekarang) {
+                    // Masih tahun yang sama → lanjutkan nomor urut
+                    $nextNomor = str_pad((int)$lastNomor + 1, strlen($lastNomor), '0', STR_PAD_LEFT);
+
+                    $sequenceNoUrutPengajuan = $nextNomor;
+                } else {
+                    // Tahun baru → reset ke 000001
+                    $sequenceNoUrutPengajuan = "000001";
+                }
             }
         }
 
-        return $kodeDokumenbc30Static['value'] . '-' . $kodeKantorStatic . '-' . $tanggalAju . '-' . $sequenceNoUrutPengajuan;
+        return $kodeDokumenbc30Static['value']
+            . '-' . $kodeKantorStatic
+            . '-' . $tanggalAju
+            . '-' . $sequenceNoUrutPengajuan;
     }
+
     public function viewOutstanding()
     {
         return view('BeaCukai/bc-30/bc30outstanding');
@@ -664,262 +592,146 @@ class BC30 extends BaseController
 
     public function allOutstanding()
     {
-        $bc30Data = $this->bc30Model
-            ->where('company_id', $this->this_company_id)
-            ->where('deletedAt', null)
-            ->findAll();
-        $salesOrderExportData = $this->salesOrderExportModel
-            ->where('company_id', $this->this_company_id)
-            ->where('deletedAt', null)
-            ->where('used', "USED")
-            ->findAll();
-        $pengembalianBarangData = $this->pengembalianBarangModel
-            ->select('pengembalian_barang.*')
-            ->join('penerimaan_barang', 'penerimaan_barang.id = pengembalian_barang.penerimaan_barang_id', 'left')
-            ->where('penerimaan_barang.status_penerimaan', "IMPORT")
-            ->where('pengembalian_barang.company_id', $this->this_company_id)
-            ->where('pengembalian_barang.bc_pengeluaran_id', NULL)
-            ->where('pengembalian_barang.deletedAt', null)
-            ->findAll();
-        $salesOrderLainData = $this->salesOrderLainModel->where('company_id', $this->this_company_id)
-            ->where('deletedAt', null)
-            ->where('bc_id', 1445)
-            ->findAll();
+        $draw = $this->request->getGet('draw');
+        $start = (int)$this->request->getGet('start');
+        $length = (int)$this->request->getGet('length');
+        $orderDir = $this->request->getGet('order')[0]['dir'] ?? 'asc';
+        $orderColumnIndex = $this->request->getGet('order')[0]['column'] ?? null;
 
-        // Sales Order Export
-        $salesOrderExportIdUse = [];
-        $salesOrderExportIdNotUse = [];
-        $allSalesOrderExportId = [];
+        $condition = [
+            'company_id' => $this->this_company_id,
+            "search" => $this->request->getVar("search"),
+            "dateStart" => $this->request->getVar("dateStart")
+                ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart"))))
+                : null,
+            "dateEnd" => $this->request->getVar("dateEnd")
+                ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd"))))
+                : null,
+        ];
 
-        // Pengembalian Barang
-        $pengembalianBarangIdUse = [];
-        $pengembalianBarangIdNotUse = [];
-        $allPengembalianBarangId = [];
+        $dataQry = $this->bc30Model->getListOutstanding(
+            $condition,
+            $orderColumnIndex,
+            $orderDir,
+            $length,
+            $start
+        );
 
-        // Sales Order Lain
-        $salesOrderLainIdUse = [];
-        $salesOrderLainIdNotUse = [];
-        $allSalesOrderLainId = [];
-
-        // Sales Order Export
-        foreach ($salesOrderExportData as $e) {
-            array_push($allSalesOrderExportId, $e['sales_order_export_id']);
+        $dataResult = [];
+        $no = $start + 1;
+        foreach ($dataQry['data'] as $d) {
+            array_push($dataResult, [
+                'no' => $no++,
+                'sales_order_export_id' => encrypt($d['sales_order_export_id']),
+                'tujuan_pengeluaran' => $d['tujuan_pengeluaran'],
+                'tanggal' => date('d/m/Y', strtotime($d['tanggal'])),
+                'reference_no' => $d['reference_no'],
+                'customer_name' => $d['customer_name'],
+                'kode_barang' => $d['kode_barang'],
+                'barang_name' => $d['barang_name'],
+                'qty' => (float)$d['qty'],
+                'kode_satuan' => $d['kode_satuan'],
+                'valas_name' => $d['valas_name'],
+                'total_harga_barang' => (float)$d['total_harga_barang'],
+            ]);
         }
 
-        // Pengembalian Barang
-        foreach ($pengembalianBarangData as $p) {
-            array_push($allPengembalianBarangId, $p['id']);
-        }
-
-        // Sales Order Lain
-        foreach ($salesOrderLainData as $s) {
-            array_push($allSalesOrderLainId, $s['id']);
-        }
-
-        foreach ($bc30Data as $b) {
-            if ($b['tipe_sales_order'] == "ORDER FORM EKSPOR") {
-                array_push($salesOrderExportIdUse, $b['sales_order_id']);
-            } elseif ($b['tipe_sales_order'] == "ORDER FORM LAIN") {
-                array_push($salesOrderLainIdUse, $b['sales_order_lain_id']);
-            } elseif ($b['tipe_sales_order'] == "RETUR PEMBELIAN") {
-                array_push($pengembalianBarangIdUse, $b['pengembalian_barang_id']);
-            }
-        }
-
-        $salesOrderExportIdNotUse = array_diff($allSalesOrderExportId, $salesOrderExportIdUse);
-        $pengembalianBarangIdNotUse = array_diff($allPengembalianBarangId, $pengembalianBarangIdUse);
-        $salesOrderLainIdNotUse = array_diff($allSalesOrderLainId, $salesOrderLainIdUse);
-
-        $list = [];
-
-        // Sales Order Ekspor
-        foreach ($salesOrderExportIdNotUse as $idExport) {
-            $soe = $this->salesOrderExportModel
-                ->select('
-                    sales_order_export.sales_order_export_id,
-                    sales_order_export_no,
-                    customers.name as customer_name,
-                    customers.address,
-                    metadata.value as valas_name,
-                    ')
-                ->join('stuffing_internasional', 'stuffing_internasional.sales_order_export_id = sales_order_export.sales_order_export_id')
-                ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
-                ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
-                ->join('metadata', 'metadata.id = sales_contract.currency', 'left')
-                ->where('sales_order_export.sales_order_export_id', $idExport)
-                ->first();
-
-            $soed = $this->salesOrderExportDetailModel
-                ->select('count(*) as jumlah_barang, sum(harga_barang) as total_harga')
-                ->where('sales_order_export_id', $idExport)
-                ->first();
-
-            if ($soe != null) {
-                array_push($list, [
-                    'id' => $soe['sales_order_export_id'],
-                    'form_pengeluaran' => 'ORDER FORM EKSPOR',
-                    'no_order' => $soe['sales_order_export_no'],
-                    'penerima' => $soe['customer_name'],
-                    'alamat' => $soe['address'],
-                    'jumlah_barang' => $soed['jumlah_barang'],
-                    'nilai_barang' => number_format($soed['total_harga'], 2),
-                    'valas' => $soe['valas_name'],
-                ]);
-            }
-        }
-
-        // Pengembalian Barang
-        foreach ($pengembalianBarangIdNotUse as $p) {
-            // Ambil data pengembalian barang
-            $pengembalianBarang = $this->pengembalianBarangModel
-                ->select('
-            pengembalian_barang.id,
-            pengembalian_barang.no_surat_jalan,
-            suppliers.name as customer_name,
-            suppliers.address,
-            penerimaan_barang.status_penerimaan,
-            penerimaan_barang.tipe_bahan
-        ')
-                ->join('penerimaan_barang', 'penerimaan_barang.id = pengembalian_barang.penerimaan_barang_id', 'left')
-                ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
-                ->where('pengembalian_barang.id', $p)
-                ->where('bc_pengeluaran_id', null)
-                ->first();
-
-            if ($pengembalianBarang != null) {
-                // Ambil detail pengembalian barang
-                $pengembalianBarangDetail = $this->pengembalianBarangDetailModel
-                    ->select('
-                penerimaan_barang_detail.purchase_order_id,
-                COUNT(*) as jumlah_barang, 
-                SUM(jumlah_return) as sum_jumlah_return,
-                SUM(
-                    penerimaan_barang_detail.harga + 
-                    penerimaan_barang_detail.harga_harian + 
-                    penerimaan_barang_detail.harga_bulanan
-                ) as sum_total_harga
-            ')
-                    ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.id = pengembalian_barang_detail.penerimaan_barang_detail_id', 'left')
-                    ->where('pengembalian_barang_detail.pengembalian_barang_id', $p)
-                    ->first();
-
-                // Tentukan valuta berdasarkan status penerimaan dan tipe bahan
-                if ($pengembalianBarang['status_penerimaan'] === "IMPORT" && $pengembalianBarang['tipe_bahan'] === "BAKU") {
-                    $poValuta = $this->rmImportPosModel
-                        ->select('metadata.value as valas_name')
-                        ->join('metadata', 'metadata.id = rm_import_pos.currency', 'left')
-                        ->where('rm_import_pos.id', $pengembalianBarangDetail['purchase_order_id'])
-                        ->first();
-                } else {
-                    $poValuta = $this->amPurchaseOrderModel
-                        ->select('metadata.value as valas_name')
-                        ->join('metadata', 'metadata.id = am_purchase_orders.currency', 'left')
-                        ->where('am_purchase_orders.id', $pengembalianBarangDetail['purchase_order_id'])
-                        ->first();
-                }
-
-                // Tambahkan ke daftar
-                array_push($list, [
-                    'id' => $pengembalianBarang['id'],
-                    'form_pengeluaran' => 'RETUR PEMBELIAN',
-                    'no_order' => $pengembalianBarang['no_surat_jalan'],
-                    'penerima' => $pengembalianBarang['customer_name'],
-                    'alamat' => $pengembalianBarang['address'],
-                    'jumlah_barang' => $pengembalianBarangDetail['jumlah_barang'],
-                    'nilai_barang' => number_format(
-                        $pengembalianBarangDetail['sum_jumlah_return'] * $pengembalianBarangDetail['sum_total_harga'],
-                        2
-                    ),
-                    'valas' => $poValuta != null ? $poValuta['valas_name'] : "-",
-                ]);
-            }
-        }
-
-        // Sales Order Lain
-        foreach ($salesOrderLainIdNotUse as $s) {
-            $sol = $this->salesOrderLainModel
-                ->select('
-                    sales_order_lain.id,
-                    sales_order_lain.no_sales_order,
-                    customers.name as customer_name,
-                    customers.address,
-                    metadata.value as valas_name
-                    ')
-                ->join('customers', 'customers.id = sales_order_lain.customer_id', 'left')
-                ->join('metadata', 'metadata.id = customers.currency', 'left')
-                ->where('sales_order_lain.id', $s)
-                ->first();
-
-            $sold = $this->salesOrderLainDetailModel
-                ->select('count(*) as jumlah_barang, sum(total_harga) as sum_total_harga')
-                ->where('sales_order_lain_id', $s)
-                ->first();
-
-            if ($sol != null) {
-                array_push($list, [
-                    'id' => $sol['id'],
-                    'form_pengeluaran' => 'ORDER FORM LAIN',
-                    'no_order' => $sol['no_sales_order'],
-                    'penerima' => $sol['customer_name'],
-                    'alamat' => $sol['address'],
-                    'jumlah_barang' => $sold['jumlah_barang'],
-                    'nilai_barang' => number_format($sold['sum_total_harga'], 2),
-                    'valas' => $sol['valas_name'] == null ? "IDR" : $sol['valas_name'],
-                ]);
-            }
-        }
-
-
-        return json_encode($list);
+        return $this->response->setJSON([
+            'draw' => intval($draw),
+            'recordsTotal' => intval($dataQry['totalData'] ?? 0),
+            'recordsFiltered' => intval($dataQry['totalFilteredData'] ?? 0),
+            'data' => $dataResult,
+        ]);
     }
 
 
-    public function OutstandingSheet()
+    public function OutstandingExcel()
     {
-        $list = json_decode($this->allOutstanding());
+        $condition = [
+            'company_id' => $this->this_company_id,
+            "dateStart" => $this->request->getVar("dateStart")
+                ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart"))))
+                : null,
+            "dateEnd" => $this->request->getVar("dateEnd")
+                ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd"))))
+                : null,
+        ];
+
+        $dataQry = $this->bc30Model->getListOutstanding(
+            $condition,
+            2,
+            "desc",
+            100000000000,
+            0
+        );
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        $spreadsheet->setActiveSheetIndex(0)
-            ->setCellValue('A1', 'No.')
-            ->setCellValue('B1', 'Tujuan Pengiriman')
-            ->setCellValue('C1', 'No Order')
-            ->setCellValue('D1', 'Penerima')
-            ->setCellValue('E1', 'Alamat')
-            ->setCellValue('F1', 'Jumlah Barang')
-            ->setCellValue('G1', 'Nilai Barang')
-            ->setCellValue('H1', 'Valas');
+        // ================================
+        // Rentang tanggal di atas
+        $sheet->setCellValue('A1', 'Tanggal: ' .
+            ($condition['dateStart'] ?? '-') . ' s/d ' . ($condition['dateEnd'] ?? '-'));
+        $sheet->mergeCells('A1:K1');
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+
+        // ================================
+        // Header kolom
+        $headers = ['No', 'Tujuan Pengeluaran', 'Tanggal', 'Reference No', 'Customer', 'Kode Barang', 'Barang', 'Qty', 'Satuan', 'Valas', 'Nilai Barang'];
+        $col = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($col . '2', $header);
+            $sheet->getStyle($col . '2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle($col . '2')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+            $col++;
+        }
+
+        // ================================
+        // Isi data
+        $row = 3;
         $no = 1;
-        $column = 2;
+        foreach ($dataQry['data'] as $d) {
+            $sheet->setCellValue('A' . $row, $no++);
+            $sheet->setCellValue('B' . $row, $d['tujuan_pengeluaran']);
+            $sheet->setCellValue('C' . $row, date('d/m/Y', strtotime($d['tanggal'])));
+            $sheet->setCellValue('D' . $row, $d['reference_no']);
+            $sheet->setCellValue('E' . $row, $d['customer_name']);
+            $sheet->setCellValue('F' . $row, $d['kode_barang']);
+            $sheet->setCellValue('G' . $row, $d['barang_name']);
+            $sheet->setCellValue('H' . $row, (float)$d['qty']);
+            $sheet->setCellValue('I' . $row, $d['kode_satuan']);
+            $sheet->setCellValue('J' . $row, $d['valas_name']);
+            $sheet->setCellValue('K' . $row, (float)$d['total_harga_barang']);
 
-        foreach ($list as $l) {
-            $spreadsheet->setActiveSheetIndex(0)
-                ->setCellValue('A' . $column, $no++)
-                ->setCellValue('B' . $column,  $l->form_pengeluaran)
-                ->setCellValue('C' . $column,  $l->no_order)
-                ->setCellValue('D' . $column,  $l->penerima)
-                ->setCellValue('E' . $column,  $l->alamat)
-                ->setCellValue('F' . $column,  $l->jumlah_barang)
-                ->setCellValue('G' . $column,  $l->nilai_barang)
-                ->setCellValue('H' . $column,  $l->valas);
-            $column++;
+            // Rata kanan & format angka
+            $sheet->getStyle('K' . $row)
+                ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+            $sheet->getStyle('K' . $row)
+                ->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+
+            // Border untuk setiap sel
+            foreach (range('A', 'K') as $c) {
+                $sheet->getStyle($c . $row)
+                    ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+            }
+
+            $row++;
         }
-        $writer = new Xlsx($spreadsheet);
-        $filename = 'Rekap BC30';
-        foreach (range('A', 'K') as $columnID) {
-            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+
+        // ================================
+        // Auto width kolom
+        foreach (range('A', 'K') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
+        // ================================
+        // Export
         $writer = new Xlsx($spreadsheet);
-        $filename = 'Laporan-Outstanding-BC-3.0';
-
+        $fileName = 'Outstanding_Ekspor_' . date('Ymd_His') . '.xlsx';
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename=' . $filename . '.xlsx');
-        header('Cache-Control: max-age=0');
-
+        header('Content-Disposition: attachment; filename="' . $fileName . '"');
         $writer->save('php://output');
-        die;
+        exit;
     }
 
     //kirim ceisa
@@ -1003,7 +815,7 @@ class BC30 extends BaseController
 
         $data = [
             'bc30' => $bc30,
-            'noAju' => $bc30 == null ? $this->generateNomorAju() : $bc30['no_aju'],
+            'noAju' => $bc30 == null ? $this->generateNomorAju($bc30['tanggal']) : $bc30['no_aju'],
             'kodeKantor' => $this->kantorBeaCukaiModel->findAll(),
             'kodeLokasiBayar' => $this->metaDataModel->where('name', "KODE LOKASI BAYAR")->findAll(),
             'kodeTujuanTpb' => $this->metaDataModel->where('name', "Jenis TPB")->findAll(),
@@ -2226,5 +2038,67 @@ class BC30 extends BaseController
             'status' => true,
             'message' => "kesiapan Barang berhasil diupdate"
         ]);
+    }
+
+    public function get_payload()
+    {
+        $payloadArr = [
+            "asalData" => "S",
+            "asuransi" => 0,
+            "bruto" => 0,
+            "cif" => 0,
+            "disclaimer" => "1",
+            "flagCurah" => "",
+            "flagMigas" => "",
+            "fob" => 0,
+            "freight" => 0,
+            "idPengguna" => "",
+            "jabatanTtd" => "",
+            "jumlahKontainer" => 0,
+            "kodeAsuransi" => "",
+            "kodeCaraBayar" => "",
+            "kodeCaraDagang" => "",
+            "kodeDokumen" => "30",
+            "kodeIncoterm" => "",
+            "kodeJenisEkspor" => "",
+            "kodeJenisNilai" => "",
+            "kodeJenisProsedur" => "",
+            "kodeKantor" => "",
+            "kodeKantorEkspor" => "",
+            "kodeKantorMuat" => "",
+            "kodeKantorPeriksa" => "",
+            "kodeKategoriEkspor" => "",
+            "kodeLokasi" => "",
+            "kodeNegaraTujuan" => "",
+            "kodePelBongkar" => "",
+            "kodePelEkspor" => "",
+            "kodePelMuat" => "",
+            "kodePelTujuan" => "",
+            "kodePembayar" => "",
+            "kodeTps" => "",
+            "kodeValuta" => "",
+            "kotaTtd" => "",
+            "namaTtd" => "",
+            "ndpbm" => 0,
+            "netto" => 0,
+            "nilaiMaklon" => 0,
+            "nomorAju" => "",
+            "seri" => 1,
+            "tanggalAju" => "",
+            "tanggalEkspor" => "",
+            "tanggalPeriksa" => "",
+            "tanggalTtd" => "",
+            "totalDanaSawit" => 0,
+            "barang" => [],
+            "entitas" => [],
+            "kemasan" => [],
+            "kontainer" => [],
+            "dokumen" => [],
+            "pengangkut" => [],
+            "bankDevisa" => [],
+            "kesiapanBarang" => []
+        ];
+
+        return json_encode($payloadArr, JSON_UNESCAPED_SLASHES);
     }
 }

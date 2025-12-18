@@ -27,7 +27,7 @@
                 <div class="col-md-3 mb-3">
                     <?= csrf_field() ?>
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker mulaiTanggalBC41" id="mulaiTanggalBC41" name="mulaiTanggalBC41" placeholder="Mulai Tanggal">
+                        <input autocomplete="one-time-code" class="form-control input-picker mulaiTanggalBC41" id="mulaiTanggalBC41" name="mulaiTanggalBC41" placeholder="Mulai Tanggal" value="<?= date('d/m/Y') ?>">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-mulaiTanggalBC41"></i>
                         </div>
