@@ -2078,27 +2078,51 @@ class MaterialRequest extends BaseController
         $endDate = $this->request->getVar('endDate') ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("endDate")))) : "";
 
         if ((!empty($this->request->getVar('stock_id')) || !empty($this->request->getVar('barang_master_id'))) || !empty($typeAsalBarang)) {
-            $condition = [
-                "sr.company_id" => $this->this_company_id,
-                "sr.barang_master_id" => $barangMasterId,
-                "sr.divisi_id" => $divisiAsalId,
-                "sr.warehouse_id" => $warehouseAsalId,
-            ];
 
             if ($typeAsalBarang == "SUPPLIER") {
+                $condition = [
+                    "sr.company_id" => $this->this_company_id,
+                    "sr.barang_master_id" => $barangMasterId,
+                    "sr.divisi_id" => $divisiAsalId,
+                    "sr.warehouse_id" => $warehouseAsalId,
+                ];
+
                 if (!empty($supplierId)) {
                     $condition['supplier_filter'] = $supplierId;
                 }
-                $condition["srd.reference_type"] = ["LPB", "PROSES REBUS", "PENERIMAAN MUTASI", "INISIASI"];
+                $condition["srd.reference_type"] = ["LPB", "PENERIMAAN MUTASI"];
+                // $condition["srd2.reference_type"] = ["LPB"];
                 $condition['stock_date_between'] = [$startDate, $endDate];
 
                 $dataResult = $this->stockRevampDetailModel->getStockListPOWithCondition($condition);
-            } else {
+            } elseif ($typeAsalBarang == "PROSES REBUS") {
+                $condition = [
+                    "sr.company_id" => $this->this_company_id,
+                    "sr.barang_master_id" => $barangMasterId,
+                    "sr.divisi_id" => $divisiAsalId,
+                    "sr.warehouse_id" => $warehouseAsalId,
+                ];
+
+                if (!empty($supplierId)) {
+                    $condition['supplier_filter'] = $supplierId;
+                }
+                $condition["srd.reference_type"] = ["PROSES REBUS", "PENERIMAAN MUTASI"];
+                $condition['stock_date_between'] = [$startDate, $endDate];
+
+                $dataResult = $this->stockRevampDetailModel->getStockListProsesRebusWithCondition($condition);
+            }else {
+                $condition = [
+                    "stock_revamp.company_id" => $this->this_company_id,
+                    "stock_revamp.barang_master_id" => $barangMasterId,
+                    "stock_revamp.divisi_id" => $divisiAsalId,
+                    "stock_revamp.warehouse_id" => $warehouseAsalId,
+                ];
+
                 if (!empty($vendorId)) {
                     $condition["jasa_vendor_in.vendor_id "] = $vendorId;
                 }
                 // $condition["stock_revamp_detail.reference_type "] = ["JASA VENDOR", "PROSES REBUS", "PENERIMAAN MUTASI"];
-                $condition["stock_revamp_detail.reference_type "] = ["JASA VENDOR", "PROSES REBUS"];
+                $condition["stock_revamp_detail.reference_type "] = ["JASA VENDOR"];
                 $dataResult = $this->stockRevampDetailModel->getStockListVendorWithCondition($condition);
             }
 
@@ -2117,7 +2141,7 @@ class MaterialRequest extends BaseController
                     $noDaftar = $dataResult[$i]['no_daftar_ppbkb'];
                 }
 
-                if ($typeAsalBarang != "SUPPLIER") {
+                if ($typeAsalBarang == "VENDOR") {
                     $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
                     $dataResult[$i]['supplier_name'] = $dataResult[$i]['supplier_name'] == null ? ($dataResult[$i]['vendor_name'] == null ? "-" : $dataResult[$i]['vendor_name']) : $dataResult[$i]['supplier_name'];
                     $dataResult[$i]['id'] = encrypt($dataResult[$i]['stock_id']) . '-' . encrypt($dataResult[$i]['id']);

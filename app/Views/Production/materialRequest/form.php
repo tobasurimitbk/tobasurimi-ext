@@ -171,6 +171,7 @@
                                 <select class="form-select type_asal_barang" id="type_asal_barang" name="type_asal_barang">
                                     <option value=""></option>
                                     <option value="SUPPLIER" selected>SUPPLIER</option>
+                                    <option value="PROSES REBUS">PROSES REBUS</option>
                                     <option value="VENDOR">VENDOR</option>
                                 </select>
                                 <label for="floatingInput" style="z-index: 1;">Asal Barang</label>
@@ -2683,6 +2684,9 @@
     function getDropdownAsalBarang() {
         var typeAsalBarang = $('#type_asal_barang option:selected').val();
         if (typeAsalBarang == 'SUPPLIER') {
+            $('#supplier_id_select').show();
+            $('#vendor_barang_id_select').hide();
+        } else if (typeAsalBarang == 'PROSES REBUS') {
             $('#supplier_id_select').show();
             $('#vendor_barang_id_select').hide();
         } else {
