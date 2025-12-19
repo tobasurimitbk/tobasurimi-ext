@@ -47,6 +47,7 @@ class Penjualan extends BaseController
         ];
         return view('Laporan/LaporanPenjualan/index', $data);
     }
+
     public function allTransaksi()
     {
         $tipePenjualan  = $this->request->getGet("tipe_penjualan");
@@ -157,7 +158,6 @@ class Penjualan extends BaseController
                     "nominal_idr"           => (floatval($nominalTransaksiIdr)),
                 ]);
             }
-            
         }
 
         $data = [
@@ -174,42 +174,95 @@ class Penjualan extends BaseController
     public function LaporanPenjualanPrint($tglAwal, $tglAkhir, $filter, $search)
     {
         $dompdf = new Dompdf();
-        $condition = ['sales_order_invoice.deletedAt' => null, 'sales_order_invoice.id_company' => $this->this_company_id];
-
+        $tipePenjualan  = $filter;
+        
         $addCondition = [
             "search"        => $search != "all" ? $search : "",
-            "filter"        => $filter != "all" ? $filter : "",
+            "filter"        => "",
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
             "startdate" => $tglAwal != "all" ? $tglAwal : "",
             "lastdate" => $tglAkhir != "now" ? $tglAkhir : "",
         ];
-
-        $res = $this->SalesOrderInvoiceModel->getAllSalesOrderInvoiceReport($condition, $addCondition, 100000000, 0);
+        
+        if ($this->is_admin == '1') {
+            if ($tipePenjualan == "LOKAL") {
+                $condition = [
+                    "sales_order_invoice.deletedAt" => null,
+                ];
+            }else{
+                $condition = [
+                    "sales_order_export.deletedAt" => null,
+                    "sales_order_export.status" => 'POSTED'
+                ];
+            }
+        } elseif ($this->is_admin == '0') {
+            if ($tipePenjualan == "LOKAL") {
+                $condition = [
+                    "sales_order_invoice.deletedAt" => null,
+                    'sales_order_invoice.id_user' => $this->userId
+                ];
+            } else {
+                $condition = [
+                    "sales_order_export.deletedAt" => null,
+                    'sales_order_export.id_user' => $this->userId,
+                    "sales_order_export.status" => 'POSTED'
+                ];
+            }
+        }
+        
+        if ($tipePenjualan == "LOKAL") {
+            $res = $this->SalesOrderInvoiceModel->getAllSalesOrderInvoiceReport($condition, $addCondition, null, null);
+        }else{
+            $res = $this->salesOrderExportModel->getAllSalesOrderInvoiceReport($condition, $addCondition,  null, null);
+        }
+        
         $rdata = [];
 
         $no = 1;
 
         foreach ($res['data'] as $data) {
-            $exchangeTransaksi = 1.00;
-            $nominalTransaksi = $data->total_invoice;
-            $nominalTransaksiIdr = $nominalTransaksi * $exchangeTransaksi;
-            array_push($rdata, [
-                "no"                    => $no++,
-                "id"                    => encrypt($data->id),
-                "po_date"               => $data->tanggal_faktur,
-                "dokumen_num"           => "-",
-                "evidance_num"          => $data->document_no != null ? implode(",", json_decode($data->document_no)) : "",
-                "invoice_num"           => $data->no_faktur,
-                "invoice_date"          => $data->tanggal_faktur,
-                "tax_invoice"           => (floatval($data->ppn)),
-                "po_num"                => $data->document_no != null ? implode(",", json_decode($data->document_no)) : "",
-                "supplier_name"         => $data->kode_pelanggan . " - " . $data->nama_pelanggan,
-                "valas"                 => "IDR",
-                "exchange"              => (floatval($exchangeTransaksi)),
-                "nominal"               => (floatval($nominalTransaksi)),
-                "nominal_idr"           => (floatval($nominalTransaksiIdr)),
-            ]);
+            if ($tipePenjualan == "LOKAL") {
+                $exchangeTransaksi = 1.00;
+                $nominalTransaksi = $data->total_invoice;
+                $nominalTransaksiIdr = $nominalTransaksi * $exchangeTransaksi;
+                array_push($rdata, [
+                    "no"                    => $no++,
+                    "id"                    => encrypt($data->id),
+                    "po_date"               => $data->tanggal_faktur,
+                    "dokumen_num"           => "-",
+                    "evidance_num"          => $data->document_no != null ? implode(",", json_decode($data->document_no)) : "",
+                    "invoice_num"           => $data->no_faktur,
+                    "invoice_date"          => $data->tanggal_faktur,
+                    "tax_invoice"           => $data->ppn,
+                    "po_num"                => $data->document_no != null ? implode(",", json_decode($data->document_no)) : "",
+                    "supplier_name"         => $data->kode_pelanggan . " - " . $data->nama_pelanggan,
+                    "valas"                 => "IDR",
+                    "exchange"              => (floatval($exchangeTransaksi)),
+                    "nominal"               => (floatval($nominalTransaksi)),
+                    "nominal_idr"           => (floatval($nominalTransaksiIdr)),
+                ]);
+            } else {
+                $exchangeTransaksi = $this->kursModel->getKursCurrent($data->valas_id, $data->tanggal)->nilai_kurs ?? 1.00;
+                $nominalTransaksi = $data->shipment_value_net;
+                $nominalTransaksiIdr = $nominalTransaksi * $exchangeTransaksi;
+                array_push($rdata, [
+                    "no"                    => $no++,
+                    "id"                    => encrypt($data->sales_order_export_id),
+                    "po_date"               => $data->tanggal,
+                    "dokumen_num"           => "-",
+                    "evidance_num"          => $data->sales_order_export_no != null ? $data->sales_order_export_no : "",
+                    "invoice_num"           => $data->no_invoice,
+                    "invoice_date"          => $data->tanggal,
+                    "tax_invoice"           => $data->ppn ?? 0,
+                    "po_num"                => $data->sales_order_export_no != null ? $data->sales_order_export_no : "",
+                    "supplier_name"         => $data->customer_name,
+                    "valas"                 => $data->valas_name,
+                    "exchange"              => (floatval($exchangeTransaksi)),
+                    "nominal"               => (floatval($nominalTransaksi)),
+                    "nominal_idr"           => (floatval($nominalTransaksiIdr)),
+                ]);
+            }
         }
 
 
@@ -228,21 +281,17 @@ class Penjualan extends BaseController
 
     public function exportExcel($tglAwal, $tglAkhir, $filter, $search)
     {
-
         $spreadsheet = new Spreadsheet();
-
-
-        $condition = ['sales_order_invoice.deletedAt' => null, 'sales_order_invoice.id_company' => $this->this_company_id];
+        $tipePenjualan  = $filter;
 
         $addCondition = [
             "search"        => $search != "all" ? $search : "",
-            "filter"        => $filter != "all" ? $filter : "",
+            "filter"        => "",
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
             "startdate" => $tglAwal != "all" ? $tglAwal : "",
             "lastdate" => $tglAkhir != "now" ? $tglAkhir : "",
         ];
-
 
         $spreadsheet->setActiveSheetIndex(0)
             ->setCellValue('A1', 'No.')
@@ -258,32 +307,85 @@ class Penjualan extends BaseController
             ->setCellValue('K1', 'Exchange Rate')
             ->setCellValue('L1', 'Nominal Value')
             ->setCellValue('M1', 'Nominal Value(IDR)');
-
-        $res = $this->SalesOrderInvoiceModel->getAllSalesOrderInvoiceReport($condition, $addCondition, 100000000, 0);
+            
+       if ($this->is_admin == '1') {
+            if ($tipePenjualan == "LOKAL") {
+                $condition = [
+                    "sales_order_invoice.deletedAt" => null,
+                ];
+            }else{
+                $condition = [
+                    "sales_order_export.deletedAt" => null,
+                    "sales_order_export.status" => 'POSTED'
+                ];
+            }
+        } elseif ($this->is_admin == '0') {
+            if ($tipePenjualan == "LOKAL") {
+                $condition = [
+                    "sales_order_invoice.deletedAt" => null,
+                    'sales_order_invoice.id_user' => $this->userId
+                ];
+            } else {
+                $condition = [
+                    "sales_order_export.deletedAt" => null,
+                    'sales_order_export.id_user' => $this->userId,
+                    "sales_order_export.status" => 'POSTED'
+                ];
+            }
+        }
+        
+        if ($tipePenjualan == "LOKAL") {
+            $res = $this->SalesOrderInvoiceModel->getAllSalesOrderInvoiceReport($condition, $addCondition,  null, null);
+        }else{
+            $res = $this->salesOrderExportModel->getAllSalesOrderInvoiceReport($condition, $addCondition,  null, null);
+        }
+        
         $rdata = [];
 
         $no = 1;
 
         foreach ($res['data'] as $data) {
-            $exchangeTransaksi = 1.00;
-            $nominalTransaksi = $data->total_invoice;
-            $nominalTransaksiIdr = $nominalTransaksi * $exchangeTransaksi;
-            array_push($rdata, [
-                "no"                    => $no++,
-                "id"                    => encrypt($data->id),
-                "po_date"               => $data->tanggal_faktur,
-                "dokumen_num"           => "-",
-                "evidance_num"          => $data->document_no != null ? implode(",", json_decode($data->document_no)) : "",
-                "invoice_num"           => $data->no_faktur,
-                "invoice_date"          => $data->tanggal_faktur,
-                "tax_invoice"           => (floatval($data->ppn)),
-                "po_num"                => $data->document_no != null ? implode(",", json_decode($data->document_no)) : "",
-                "supplier_name"         => $data->kode_pelanggan . " - " . $data->nama_pelanggan,
-                "valas"                 => "IDR",
-                "exchange"              => (floatval($exchangeTransaksi)),
-                "nominal"               => (floatval($nominalTransaksi)),
-                "nominal_idr"           => (floatval($nominalTransaksiIdr)),
-            ]);
+            if ($tipePenjualan == "LOKAL") {
+                $exchangeTransaksi = 1.00;
+                $nominalTransaksi = $data->total_invoice;
+                $nominalTransaksiIdr = $nominalTransaksi * $exchangeTransaksi;
+                array_push($rdata, [
+                    "no"                    => $no++,
+                    "id"                    => encrypt($data->id),
+                    "po_date"               => $data->tanggal_faktur,
+                    "dokumen_num"           => "-",
+                    "evidance_num"          => $data->document_no != null ? implode(",", json_decode($data->document_no)) : "",
+                    "invoice_num"           => $data->no_faktur,
+                    "invoice_date"          => $data->tanggal_faktur,
+                    "tax_invoice"           => $data->ppn,
+                    "po_num"                => $data->document_no != null ? implode(",", json_decode($data->document_no)) : "",
+                    "supplier_name"         => $data->kode_pelanggan . " - " . $data->nama_pelanggan,
+                    "valas"                 => "IDR",
+                    "exchange"              => (floatval($exchangeTransaksi)),
+                    "nominal"               => (floatval($nominalTransaksi)),
+                    "nominal_idr"           => (floatval($nominalTransaksiIdr)),
+                ]);
+            } else {
+                $exchangeTransaksi = $this->kursModel->getKursCurrent($data->valas_id, $data->tanggal)->nilai_kurs ?? 1.00;
+                $nominalTransaksi = $data->shipment_value_net;
+                $nominalTransaksiIdr = $nominalTransaksi * $exchangeTransaksi;
+                array_push($rdata, [
+                    "no"                    => $no++,
+                    "id"                    => encrypt($data->sales_order_export_id),
+                    "po_date"               => $data->tanggal,
+                    "dokumen_num"           => "-",
+                    "evidance_num"          => $data->sales_order_export_no != null ? $data->sales_order_export_no : "",
+                    "invoice_num"           => $data->no_invoice,
+                    "invoice_date"          => $data->tanggal,
+                    "tax_invoice"           => $data->ppn ?? 0,
+                    "po_num"                => $data->sales_order_export_no != null ? $data->sales_order_export_no : "",
+                    "supplier_name"         => $data->customer_name,
+                    "valas"                 => $data->valas_name,
+                    "exchange"              => (floatval($exchangeTransaksi)),
+                    "nominal"               => (floatval($nominalTransaksi)),
+                    "nominal_idr"           => (floatval($nominalTransaksiIdr)),
+                ]);
+            }
         }
 
         $no = 1;

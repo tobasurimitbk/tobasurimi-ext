@@ -297,7 +297,7 @@
         var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "all";
         var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
         var search = $(".search").val() ? $(".search").val() : "all";
-        var filter = $(".list_supplier").val() ? $(".list_supplier").val() : "all";
+        var filter = $(".tipe_penjualan").val() ? $(".tipe_penjualan").val() : "all";
         url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter + "/" + search;
         // console.log(url2);
         window.open(url2, "_blank");
@@ -306,7 +306,7 @@
         var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "all";
         var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
         var search = $(".search").val() ? $(".search").val() : "all";
-        var filter = $(".list_supplier").val() ? $(".list_supplier").val() : "all";
+        var filter = $(".tipe_penjualan").val() ? $(".tipe_penjualan").val() : "all";
         url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter + "/" + search;
         // console.log(url2);
         window.open(url2, "_blank");

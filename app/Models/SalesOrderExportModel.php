@@ -1688,7 +1688,13 @@ class SalesOrderExportModel extends Model
 
 
         $totalFilteredData = $salesDataQry->countAllResults(false);
-        $data = $salesDataQry->findAll($limit, $offset);
+        
+        if ($limit == null && $offset == null) {
+            $data = $salesDataQry->findAll();
+        } else {
+            $data = $salesDataQry->findAll($limit, $offset);
+        }
+        
         return [
             'data'              => $data,
             'totalData'         => $totalData,
