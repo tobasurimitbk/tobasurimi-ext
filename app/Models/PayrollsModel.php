@@ -621,16 +621,16 @@ class PayrollsModel extends Model
         $db = \Config\Database::connect();
 
         /* =====================================================
-     * MASTER DATA
-     * ===================================================== */
+        * MASTER DATA
+        * ===================================================== */
         $bagianData = $db->table('bagian')
             ->where('division_id', $divisionID)
             ->where('deletedAt', null)
             ->get()->getResultArray();
 
         /* =====================================================
-     * PAYROLL + EMPLOYEE (1 QUERY)
-     * ===================================================== */
+        * PAYROLL + EMPLOYEE (1 QUERY)
+        * ===================================================== */
         $builder = $db->table('payrolls');
         $builder->select("
             payrolls.id AS payroll_id,
@@ -640,7 +640,7 @@ class PayrollsModel extends Model
             employees.nip,
             employees.bagian_id
        ");
-        $builder->join('employees', 'employees.id = payrolls.employee_id');
+        $builder->join('employees', 'employees.id = payrolls.employee_id', 'left');
         $builder->where('employees.division_id', $divisionID);
         $builder->where('payrolls.year_month', $yearMonth);
 
@@ -648,11 +648,11 @@ class PayrollsModel extends Model
             $builder->whereIn('employees.tipe', $tipes);
         }
 
-        $payrollRows = $builder->get()->getResultArray();
+        $payrollRows = $builder->orderBy('employees.nip', 'asc')->get()->getResultArray();
 
         /* =====================================================
-     * POTONGAN AGGREGATE (1 QUERY)
-     * ===================================================== */
+        * POTONGAN AGGREGATE (1 QUERY)
+        * ===================================================== */
         $payrollIds = array_column($payrollRows, 'payroll_id');
 
         $potonganRows = [];
@@ -670,24 +670,24 @@ class PayrollsModel extends Model
         }
 
         /* =====================================================
-     * MAP POTONGAN
-     * ===================================================== */
+        * MAP POTONGAN
+        * ===================================================== */
         $potMap = [];
         foreach ($potonganRows as $p) {
             $potMap[$p['payroll_id']][$p['name']] = (float)$p['total'];
         }
 
         /* =====================================================
-     * INDEX PAYROLL BY BAGIAN
-     * ===================================================== */
+        * INDEX PAYROLL BY BAGIAN
+        * ===================================================== */
         $payrollByBagian = [];
         foreach ($payrollRows as $p) {
             $payrollByBagian[$p['bagian_id']][] = $p;
         }
 
         /* =====================================================
-     * BUILD RESULT (SAMA PLEK)
-     * ===================================================== */
+        * BUILD RESULT (SAMA PLEK)
+        * ===================================================== */
         $res = [];
         $potonganRes = [
             'totPotBonKoperasi' => 0,
@@ -797,8 +797,6 @@ class PayrollsModel extends Model
             'divisi' => $db->table('divisis')->where('id', $divisionID)->get()->getRowArray()
         ];
     }
-
-
 
     public function getPotonganPayroll(
         $yearMonth,
