@@ -44,6 +44,9 @@ $routes->get('/403', function () {
 });
 
 $routes->get('/repair-stock-mutasi', 'Warehouse\Penomoran_::repairStockMutasi');
+$routes->get('/stock-bp', 'Warehouse\Penomoran_::stockBpView');
+$routes->post('/stock-bp', 'Warehouse\Penomoran_::stockBpAction');
+
 // $routes->get('/generate-stock-revamp-nonpabean', 'Warehouse\Penomoran_::generateStokRevampNonPabean');
 // $routes->get('/generate-stock-revamp-pabean', 'Warehouse\Penomoran_::generateStokRevampPabean');
 // $routes->get('/generate-stock-detail-id-lpb-non-pabean', 'Warehouse\Penomoran_::generateStockDetailIdPenerimaanBarangDetailNonPabean');
@@ -2198,8 +2201,8 @@ $routes->post('/payroll/update/nominal-keterlambatan-presensi', 'HR\Payroll::upd
 $routes->post('/payroll/update/nominal-gaji-cadangan', 'HR\Payroll::updateNominalGajiPerHariAndCadangan', ['filter' => 'Auth']);
 $routes->post('/payroll/employees', 'HR\Payroll::getEmployeeByDivision', ['filter' => 'Auth']);
 $routes->get('/payroll/print/single/(:segment)', 'HR\Payroll::exportPdfPayrollSingle/$1', ['filter' => 'Auth']);
-$routes->get('/payroll/print/division', 'HR\Payroll::exportPdfPayrollDivision', ['filter' => 'Auth']);
-$routes->get('/payroll/print/detail', 'HR\Payroll::exportPdfPayrollDivisionDetail', ['filter' => 'Auth']);
+$routes->get('/payroll/print/daftar-upah', 'HR\Payroll::exportPdfDaftarUpah', ['filter' => 'Auth']);
+$routes->get('/payroll/print/slip-gaji-all', 'HR\Payroll::exportPdfSlipGajiAll', ['filter' => 'Auth']);
 $routes->get('/payroll/print/summary', 'HR\Payroll::exportPdfSummary', ['filter' => 'Auth']);
 $routes->get('/payroll/print/potongan', 'HR\Payroll::exportPdfPotongan', ['filter' => 'Auth']);
 $routes->post('/payroll/employees-by-bagian', 'HR\Payroll::getEmployeeByBagian', ['filter' => 'Auth']);

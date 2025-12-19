@@ -94,13 +94,15 @@ class PenerimaanBarangModel extends Model
                     warehouses.warehouse_name,
                     divisis.divisi,
                     metadata.value AS bc_type_name,
-                    bc_purchase_order_lpb.bc_purchase_order_id
+                    bc_purchase_order_lpb.bc_purchase_order_id,
+                    bc_purchase_order.status_posting AS status_posting_bc
                   ')
             ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
             ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
             ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
             ->join('metadata', 'metadata.id = penerimaan_barang.bc_type', 'left')
             ->join('bc_purchase_order_lpb', 'bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->join('bc_purchase_order', 'bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id', 'left')
             ->where($condition)
             ->groupBy('penerimaan_barang.id');
 

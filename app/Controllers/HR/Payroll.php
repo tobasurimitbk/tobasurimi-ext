@@ -75,6 +75,7 @@ class Payroll extends BaseController
             'divisi' => $this->divisiModel->getDivisiAccess(),
             'bagian' => [],
             'golongan' => $this->golonganModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll(),
+            'laporan' => ["DAFTAR UPAH", "SLIP GAJI", "SUMMARY", "DAFTAR POTONGAN"]
         ];
 
         return view('hr/payroll/index', $data);
@@ -99,7 +100,7 @@ class Payroll extends BaseController
             "divisi_id"          => $this->request->getGet("divisi_id"),
             "bagian_id"          => $this->request->getGet("bagian_id"),
             "employee_id"        => $this->request->getGet("employee_id"),
-            "tipe"               => $this->request->getGet("golongan"),
+            "tipe"               => json_decode($this->request->getGet("golongan"), true) ?? [],
             "sort"               => $this->request->getGet("sort"),
             "sortType"           => $this->request->getGet("sortType")
         ];
@@ -1014,17 +1015,26 @@ class Payroll extends BaseController
         exit(0);
     }
 
-    public function exportPdfPayrollDivision()
+    public function exportPdfDaftarUpah()
     {
         $dompdf = new Dompdf();
         $yearMonth = $this->request->getVar('month');
         $divisionID = $this->request->getVar('divisi_id');
+        $tipe = json_decode($this->request->getVar('tipe'), true) ?? [];
 
         // set variable
         $divisi = $this->divisiModel->where('id', $divisionID)->first();
         $year = explode("-", $yearMonth)[0];
         $month = explode("-", $yearMonth)[1];
-        $payrollData = $this->payrollModel->getListPrintPayrollByDivision($divisionID, $this->userID, $year, $month, $this->this_company_id);
+        $payrollData = $this->payrollModel->getListPrintPayrollByDivision(
+            $divisionID,
+            $this->userID,
+            $year,
+            $month,
+            $this->this_company_id,
+            $tipe
+        );
+        $tipeStr = $this->getTipeStr($tipe);
 
         // get limit 1 untuk label periode
         $payrollLimit = $this->payrollModel->where('year_month', $yearMonth)->where('division_id', $divisionID)->first();
@@ -1044,10 +1054,11 @@ class Payroll extends BaseController
             'payrollData' => $payrollData,
             'komponenGaji' => $this->gajiDivisiModel->getGajiByDivision($divisionID, $this->this_company_id),
             'startDate' => $startDate,
-            'endDate' => $endDate
+            'endDate' => $endDate,
+            'tipe' => $tipeStr
         ];
 
-        $dompdf->loadHtml(view('hr/payroll/payroll_division_print', $data));
+        $dompdf->loadHtml(view('hr/payroll/payroll_daftar_upah_print', $data));
         $dompdf->setPaper('A4', 'landscape');
         $dompdf->render();
         $dompdf->stream("Daftar Upah Karyawan ", array("Attachment" => false));
@@ -1055,7 +1066,7 @@ class Payroll extends BaseController
         exit(0);
     }
 
-    public function exportPdfPayrollDivisionDetail()
+    public function exportPdfSlipGajiAll()
     {
         $dompdf = new Dompdf();
         $yearMonth = $this->request->getVar('month');
@@ -1064,21 +1075,23 @@ class Payroll extends BaseController
         $tunjanganGajiPokok = $this->tunjanganModel->where('company_id', $this->this_company_id)->where('is_gaji_harian', 1)->where('deletedAt', null)->first();
         $tunjanganCadangan = $this->tunjanganModel->where('company_id', $this->this_company_id)->where('is_cadangan', 1)->where('deletedAt', null)->first();
         $bagian = $this->bagianModel->getBagian($bagianID);
+        $tipe = json_decode($this->request->getVar('tipe'), true) ?? [];
 
         $data = [
             'payrollData' => $this->payrollModel->getPayrollDetail(
                 $yearMonth,
                 $divisionID,
                 $this->this_company_id,
-                $bagianID
+                $bagianID,
+                $tipe
             ),
             'tunjanganGajiPokok' => $tunjanganGajiPokok,
             'tunjanganCadangan' => $tunjanganCadangan,
             'bagian' => $bagian,
-            'yearMonth' => $yearMonth
+            'yearMonth' => $yearMonth,
         ];
 
-        $dompdf->loadHtml(view('hr/payroll/payroll_detail_division', $data));
+        $dompdf->loadHtml(view('hr/payroll/payroll_slip_gaji_all_print', $data));
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
         $dompdf->stream("Detail Payroll Berdasarkan Divisi ", array("Attachment" => false));
@@ -1091,6 +1104,7 @@ class Payroll extends BaseController
         $dompdf = new Dompdf();
         $yearMonth = $this->request->getVar('month');
         $divisionID = $this->request->getVar('divisi_id');
+        $tipe = json_decode($this->request->getVar('tipe'), true) ?? [];
 
         $year = explode("-", $yearMonth)[0];
         $month = explode("-", $yearMonth)[1];
@@ -1100,13 +1114,21 @@ class Payroll extends BaseController
 
         $startDate = date('d/m/Y', strtotime($payrollLimit['start_date']));
         $endDate = date('d/m/Y', strtotime($payrollLimit['end_date']));
+        $data = $this->payrollModel->getSummaryPayroll(
+            $yearMonth,
+            $this->this_company_id,
+            $divisionID,
+            $tipe
+        );
+        $tipeStr = $this->getTipeStr($tipe);
 
         $data = [
             'year' => $year,
             'month' => $month,
             'startDate' => $startDate,
             'endDate' => $endDate,
-            'data' => $this->payrollModel->getSummaryPayroll($yearMonth, $this->this_company_id, $divisionID)
+            'data' => $data,
+            'tipe' => $tipeStr
         ];
 
         $dompdf->loadHtml(view('hr/payroll/payroll_summary_print', $data));
@@ -1122,20 +1144,31 @@ class Payroll extends BaseController
         $dompdf = new Dompdf();
         $yearMonth = $this->request->getVar('month');
         $divisionID = $this->request->getVar('divisi_id');
+        $tipe = json_decode($this->request->getVar('tipe'), true) ?? [];
 
         $year = explode("-", $yearMonth)[0];
         $month = explode("-", $yearMonth)[1];
+        $payrollData = $this->payrollModel->getPotonganPayrollRevamp(
+            $yearMonth,
+            $this->this_company_id,
+            $divisionID,
+            $tipe
+        );
+
+        // dd($payrollData);
+        $tipeStr = $this->getTipeStr($tipe);
 
         $data = [
             'year' => $year,
             'month' => $month,
-            'payrollData' => $this->payrollModel->getPotonganPayroll($yearMonth, $this->this_company_id, $divisionID)
+            'payrollData' => $payrollData,
+            'tipe' => $tipeStr
         ];
 
-        $dompdf->loadHtml(view('hr/payroll/payroll_potongan_print', $data));
+        $dompdf->loadHtml(view('hr/payroll/payroll_daftar_potongan_print', $data));
         $dompdf->setPaper('A4', 'landscape');
         $dompdf->render();
-        $dompdf->stream("Daftar Potongan ", array("Attachment" => false));
+        $dompdf->stream("Daftar Potongan " . $yearMonth, array("Attachment" => false));
 
         exit(0);
     }
@@ -1154,5 +1187,12 @@ class Payroll extends BaseController
             'data' => $data,
             'status' => true
         ]);
+    }
+
+    // helper
+    private function getTipeStr($tipes)
+    {
+        $tipeStr = count($tipes) == 0 ? "ALL" : implode(',', $tipes);
+        return $tipeStr;
     }
 }
