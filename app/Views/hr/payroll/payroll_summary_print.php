@@ -7,9 +7,16 @@
     <title>Sumarry Jumlah Upah dan Jam Kerja</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            letter-spacing: 2px;
-            font-size: 10px;
+            height: 100%;
+            font-family: 'Times New Roman', Times, serif;
+            letter-spacing: 1px;
+            font-size: 8;
+        }
+
+        @page {
+            size: 9.5in 11in landscape;
+            margin: 25px;
+            padding: 25px;
         }
 
         h4 {
@@ -75,7 +82,7 @@
             <td>Pembayaran dari tanggal <?= $startDate ?> s/d tanggal <?= $endDate ?> </td>
         </tr>
         <tr align="center" style=" font-size:12px">
-            <td>Unit <?= $data['unit']['company'] ?> - Departemen <?= $data['divisi']['divisi'] ?></td>
+            <td>Unit <?= $data['unit']['company'] ?> - Departemen <?= $data['divisi']['divisi'] ?> - Tipe / Gol : <?= $tipe ?></td>
         </tr>
     </table>
 

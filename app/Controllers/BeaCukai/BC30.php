@@ -358,9 +358,9 @@ class BC30 extends BaseController
         );
         $dataReferencePengeluaran = [];
         $dataBarangSalesEkspor = [];
-        $multipleReferenceIds = json_decode($bc30['multiple_reference_id'], true);
+        $multipleReferenceIds = json_decode($bc30['multiple_reference_id'], true) ?? [];
 
-        if ($bc30['jenis_pengeluaran'] == "ORDER FORM EKSPOR" && $multipleReferenceIds != null) {
+        if ($bc30['jenis_pengeluaran'] == "ORDER FORM EKSPOR") {
             $dataReferencePengeluaranNotUsed = $this->bc30Model->getReferencePengeluaran(
                 $bc30['reference_penerima_id'],
                 $bc30['company_id']

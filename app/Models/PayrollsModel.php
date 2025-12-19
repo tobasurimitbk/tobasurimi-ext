@@ -129,8 +129,8 @@ class PayrollsModel extends Model
             $dataQry->like('employees.division_id', $addCondition['divisi_id']);
         }
 
-        if ($addCondition['tipe']) {
-            $dataQry->where('employees.tipe', $addCondition['tipe']);
+        if (count($addCondition['tipe']) > 0) {
+            $dataQry->whereIn('employees.tipe', $addCondition['tipe']);
         }
 
         if ($addCondition['employee_id'] || $addCondition['divisi_id'] || $addCondition['tipe'] ||  $addCondition['bagian_id']) {
@@ -465,8 +465,14 @@ class PayrollsModel extends Model
         ]);
     }
 
-    public function getListPrintPayrollByDivision($divisionID, $adminID, $year, $month, $companyID)
-    {
+    public function getListPrintPayrollByDivision(
+        $divisionID,
+        $adminID,
+        $year,
+        $month,
+        $companyID,
+        $tipes
+    ) {
         $bagianModel = new BagianModel();
 
         $condition = [
@@ -489,9 +495,12 @@ class PayrollsModel extends Model
         $dataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->join('employees', 'employees.id = payrolls.employee_id', 'INNER')
-            ->join('divisis', 'divisis.id = employees.division_id', 'LEFT') // Corrected the join condition
-            ->findAll();
+            ->join('employees', 'employees.id = payrolls.employee_id', 'left')
+            ->join('divisis', 'divisis.id = employees.division_id', 'left'); // Corrected the join condition
+
+        if (count($tipes) > 0) {
+            $dataQry->whereIn('tipe', $tipes);
+        }
 
         $no = 1;
         // set variable
@@ -502,7 +511,7 @@ class PayrollsModel extends Model
         $potongan = 0;
         $jumlahUpah = 0;
 
-        foreach ($dataQry as $p) {
+        foreach ($dataQry->findAll() as $p) {
             $upahPokok += $p->nominal_uang_gaji;
             $upahLembur += $p->nominal_uang_lembur;
             $totalUpah += ($p->nominal_uang_gaji + $p->nominal_uang_lembur);
@@ -545,9 +554,9 @@ class PayrollsModel extends Model
         $yearMonth,
         $divisionID,
         $companyID,
-        $bagianID
+        $bagianID,
+        $tipes
     ) {
-
         $payrollModel = new PayrollsModel();
         $employeeModel = new EmployeesModel();
         $formLemburModel = new FormLemburModel();
@@ -558,17 +567,19 @@ class PayrollsModel extends Model
         $payrollGajiConjunctionModel = new PayrollGajiConjunctionModel();
 
         $employeePayroll = $this->asArray()->select('payrolls.*, employees.division_id')
-            ->join('employees', 'employees.id = payrolls.employee_id')
+            ->join('employees', 'employees.id = payrolls.employee_id', 'left')
             ->where('payrolls.year_month', $yearMonth)
             ->where('employees.company_id', $companyID)
             ->where('employees.division_id', $divisionID)
-            ->where('employees.bagian_id', $bagianID)
-            ->orderBy('employees.nip', "asc")
-            ->findAll();
+            ->where('employees.bagian_id', $bagianID);
 
+        if (count($tipes) > 0) {
+            $employeePayroll->whereIn('employees.tipe', $tipes);
+        }
+        $employeePayroll->orderBy('employees.nip', "asc");
         $data = [];
 
-        foreach ($employeePayroll as $ep) {
+        foreach ($employeePayroll->findAll() as $ep) {
             $payrollDetail = $payrollModel->where('id', $ep['id'])->first();
             $employee = $employeeModel->getSingleEmployee($ep['employee_id']);
             $splitJamLembur = $formLemburModel->getTotalLemburJamPertamaKeduaByDateRange(
@@ -601,8 +612,200 @@ class PayrollsModel extends Model
         ];
     }
 
-    public function getPotonganPayroll($yearMonth, $companyID, $divisionID)
-    {
+    public function getPotonganPayrollRevamp(
+        $yearMonth,
+        $companyID,
+        $divisionID,
+        $tipes
+    ) {
+        $db = \Config\Database::connect();
+
+        /* =====================================================
+     * MASTER DATA
+     * ===================================================== */
+        $bagianData = $db->table('bagian')
+            ->where('division_id', $divisionID)
+            ->where('deletedAt', null)
+            ->get()->getResultArray();
+
+        /* =====================================================
+     * PAYROLL + EMPLOYEE (1 QUERY)
+     * ===================================================== */
+        $builder = $db->table('payrolls');
+        $builder->select("
+            payrolls.id AS payroll_id,
+            payrolls.*,
+            employees.id AS employeeID,
+            employees.name,
+            employees.nip,
+            employees.bagian_id
+       ");
+        $builder->join('employees', 'employees.id = payrolls.employee_id');
+        $builder->where('employees.division_id', $divisionID);
+        $builder->where('payrolls.year_month', $yearMonth);
+
+        if (!empty($tipes)) {
+            $builder->whereIn('employees.tipe', $tipes);
+        }
+
+        $payrollRows = $builder->get()->getResultArray();
+
+        /* =====================================================
+     * POTONGAN AGGREGATE (1 QUERY)
+     * ===================================================== */
+        $payrollIds = array_column($payrollRows, 'payroll_id');
+
+        $potonganRows = [];
+        if (!empty($payrollIds)) {
+            $potonganRows = $db->table('payroll_gaji_conjunction pgc')
+                ->select('
+                pgc.payroll_id,
+                tunjangan.name,
+                SUM(pgc.nominal) AS total
+            ')
+                ->join('tunjangan', 'tunjangan.id = pgc.tunjangan_id')
+                ->whereIn('pgc.payroll_id', $payrollIds)
+                ->groupBy('pgc.payroll_id, tunjangan.name')
+                ->get()->getResultArray();
+        }
+
+        /* =====================================================
+     * MAP POTONGAN
+     * ===================================================== */
+        $potMap = [];
+        foreach ($potonganRows as $p) {
+            $potMap[$p['payroll_id']][$p['name']] = (float)$p['total'];
+        }
+
+        /* =====================================================
+     * INDEX PAYROLL BY BAGIAN
+     * ===================================================== */
+        $payrollByBagian = [];
+        foreach ($payrollRows as $p) {
+            $payrollByBagian[$p['bagian_id']][] = $p;
+        }
+
+        /* =====================================================
+     * BUILD RESULT (SAMA PLEK)
+     * ===================================================== */
+        $res = [];
+        $potonganRes = [
+            'totPotBonKoperasi' => 0,
+            'totPotBpjs' => 0,
+            'totPotDenda' => 0,
+            'totPotIuranKoperasi' => 0,
+            'totPotKantin' => 0,
+            'totPinjamanKoperasi' => 0,
+            'totPotPinjamanLainLain' => 0,
+            'totPotBajuSeragam' => 0,
+            'totPotSepatuCelanaTopi' => 0,
+            'totPotTutupMulut' => 0,
+            'totPotSpm' => 0,
+            'totPotStm' => 0,
+            'totPotAstek' => 0,
+            'totPotUangMakan' => 0,
+            'totPotPinjaman' => 0,
+            'totPotongan' => 0
+        ];
+
+        foreach ($bagianData as $b) {
+
+            $detail = [];
+            $potonganSingle = [
+                'totPotBonKoperasi' => 0,
+                'totPotBpjs' => 0,
+                'totPotDenda' => 0,
+                'totPotIuranKoperasi' => 0,
+                'totPotKantin' => 0,
+                'totPinjamanKoperasi' => 0,
+                'totPotPinjamanLainLain' => 0,
+                'totPotBajuSeragam' => 0,
+                'totPotSepatuCelanaTopi' => 0,
+                'totPotTutupMulut' => 0,
+                'totPotSpm' => 0,
+                'totPotStm' => 0,
+                'totPotAstek' => 0,
+                'totPotUangMakan' => 0,
+                'totPotPinjaman' => 0,
+                'totPotongan' => 0
+            ];
+
+            foreach ($payrollByBagian[$b['id']] ?? [] as $ep) {
+                $pid = $ep['payroll_id'];
+                $pots = $potMap[$pid] ?? [];
+
+                $dp = [
+                    'employee' => $ep,
+                    'potBonKoperasi' => $pots['BON KOPERASI'] ?? 0,
+                    'potBpjs' => $pots['BPJS'] ?? 0,
+                    'potDenda' => $pots['DENDA'] ?? 0,
+                    'potIuranKoperasi' => $pots['IURAN KOPERASI'] ?? 0,
+                    'potKantin' => $pots['KANTIN'] ?? 0,
+                    'potPinjamanKoperasi' => $pots['PINJAMAN KOPERASI'] ?? 0,
+                    'potPinjamanLainLain' => $pots['PINJAMAN LAIN LAIN'] ?? 0,
+                    'potBajuSeragam' => $pots['POTONGAN BAJU SERAGAM'] ?? 0,
+                    'potSepatuCelanaTopi' => $pots['POTONGAN SEPATU, CELANA, TOPI'] ?? 0,
+                    'potTutupMulut' => $pots['POTONGAN TUTUP MULUT'] ?? 0,
+                    'potSpm' => $pots['SPM'] ?? 0,
+                    'potStm' => $pots['STM'] ?? 0,
+                    'potUangMakan' => $pots['UANG MAKAN'] ?? 0,
+                    'potPinjaman' => (float)$ep['nominal_pinjaman_karyawan'],
+                    'totPotongan' => 0
+                ];
+
+                $dp['totPotongan'] =
+                    $dp['potBonKoperasi'] +
+                    $dp['potBpjs'] +
+                    $dp['potDenda'] +
+                    $dp['potIuranKoperasi'] +
+                    $dp['potKantin'] +
+                    $dp['potPinjamanKoperasi'] +
+                    $dp['potPinjamanLainLain'] +
+                    $dp['potBajuSeragam'] +
+                    $dp['potSepatuCelanaTopi'] +
+                    $dp['potTutupMulut'] +
+                    $dp['potSpm'] +
+                    $dp['potStm'] +
+                    $dp['potUangMakan'] +
+                    $dp['potPinjaman'];
+
+                foreach ($potonganSingle as $k => $v) {
+                    if ($k !== 'totPotongan') {
+                        $potonganSingle[$k] += $dp[str_replace('tot', 'pot', $k)] ?? 0;
+                    }
+                }
+                $potonganSingle['totPotongan'] += $dp['totPotongan'];
+
+                $detail[] = $dp;
+            }
+
+            foreach ($potonganSingle as $k => $v) {
+                $potonganRes[$k] += $v;
+            }
+
+            $res[] = [
+                'bagian' => $b['nama_bagian'],
+                'detail' => $detail,
+                'totPotonganSingle' => $potonganSingle
+            ];
+        }
+
+        return [
+            'res' => $res,
+            'potAll' => $potonganRes,
+            'unit' => $db->table('companies')->where('id', $companyID)->get()->getRowArray(),
+            'divisi' => $db->table('divisis')->where('id', $divisionID)->get()->getRowArray()
+        ];
+    }
+
+
+
+    public function getPotonganPayroll(
+        $yearMonth,
+        $companyID,
+        $divisionID,
+        $tipes
+    ) {
         $divisiModel = new DivisisModel();
         $payrollModel = new PayrollsModel();
         $companyModel = new CompaniesModel();
@@ -617,23 +820,33 @@ class PayrollsModel extends Model
             'totPotDenda' => 0,
             'totPotIuranKoperasi' => 0,
             'totPotKantin' => 0,
-            'totPerlengkapanKerja' => 0,
-            'totPotPinjaman' => 0,
+            'totPinjamanKoperasi' => 0,
+            'totPotPinjamanLainLain' => 0,
+            'totPotBajuSeragam' => 0,
+            'totPotSepatuCelanaTopi' => 0,
+            'totPotTutupMulut' => 0,
             'totPotSpm' => 0,
             'totPotStm' => 0,
             'totPotAstek' => 0,
             'totPotUangMakan' => 0,
+            'totPotPinjaman' => 0,
             'totPotongan' => 0
+
         ];
 
         foreach ($bagianData as $b) {
-            $employeePayroll = $employeePayroll = $payrollModel
+            $employeePayrollQry = $employeePayroll = $payrollModel
                 ->select('employees.name, employees.id AS employeeID, payrolls.*')
-                ->join('employees', 'payrolls.employee_id = employees.id')
+                ->join('employees', 'payrolls.employee_id = employees.id', 'left')
                 ->where('employees.bagian_id', $b['id'])
                 ->where('employees.division_id', $divisionID)
-                ->where('year_month', $yearMonth)
-                ->findAll();
+                ->where('year_month', $yearMonth);
+
+            if (count($tipes) > 0) {
+                $employeePayrollQry->whereIn('employees.tipe', $tipes);
+            }
+
+            $employeePayroll =  $employeePayrollQry->findAll();
 
             $detail = array();
             $potonganSingle = [
@@ -642,12 +855,16 @@ class PayrollsModel extends Model
                 'totPotDenda' => 0,
                 'totPotIuranKoperasi' => 0,
                 'totPotKantin' => 0,
-                'totPerlengkapanKerja' => 0,
-                'totPotPinjaman' => 0,
+                'totPinjamanKoperasi' => 0,
+                'totPotPinjamanLainLain' => 0,
+                'totPotBajuSeragam' => 0,
+                'totPotSepatuCelanaTopi' => 0,
+                'totPotTutupMulut' => 0,
                 'totPotSpm' => 0,
                 'totPotStm' => 0,
                 'totPotAstek' => 0,
                 'totPotUangMakan' => 0,
+                'totPotPinjaman' => 0,
                 'totPotongan' => 0
             ];
             foreach ($employeePayroll as $ep) {
@@ -659,12 +876,15 @@ class PayrollsModel extends Model
                 $potonganSingle['totPotDenda'] += $dp['potDenda'];
                 $potonganSingle['totPotIuranKoperasi'] += $dp['potIuranKoperasi'];
                 $potonganSingle['totPotKantin'] += $dp['potKantin'];
-                $potonganSingle['totPerlengkapanKerja'] += $dp['potPerlengkapanKerja'];
-                $potonganSingle['totPotPinjaman'] += $dp['potPinjaman'];
+                $potonganSingle['totPinjamanKoperasi'] += $dp['potPinjamanKoperasi'];
+                $potonganSingle['totPotPinjamanLainLain'] += $dp['potPinjamanLainLain'];
+                $potonganSingle['totPotBajuSeragam'] += $dp['potBajuSeragam'];
+                $potonganSingle['totPotSepatuCelanaTopi'] += $dp['potSepatuCelanaTopi'];
+                $potonganSingle['totPotTutupMulut'] += $dp['potTutupMulut'];
                 $potonganSingle['totPotSpm'] += $dp['potSpm'];
                 $potonganSingle['totPotStm'] += $dp['potStm'];
-                $potonganSingle['totPotAstek'] += $dp['potAstek'];
                 $potonganSingle['totPotUangMakan'] += $dp['potUangMakan'];
+                $potonganSingle['totPotPinjaman'] += $dp['potPinjaman'];
                 $potonganSingle['totPotongan'] += $dp['totPotongan'];
             }
 
@@ -673,12 +893,15 @@ class PayrollsModel extends Model
             $potonganRes['totPotDenda'] += $potonganSingle['totPotDenda'];
             $potonganRes['totPotIuranKoperasi'] += $potonganSingle['totPotIuranKoperasi'];
             $potonganRes['totPotKantin'] += $potonganSingle['totPotKantin'];
-            $potonganRes['totPerlengkapanKerja'] += $potonganSingle['totPerlengkapanKerja'];
-            $potonganRes['totPotPinjaman'] += $potonganSingle['totPotPinjaman'];
+            $potonganRes['totPinjamanKoperasi'] += $potonganSingle['totPinjamanKoperasi'];
+            $potonganRes['totPotPinjamanLainLain'] += $potonganSingle['totPotPinjamanLainLain'];
+            $potonganRes['totPotBajuSeragam'] += $potonganSingle['totPotBajuSeragam'];
+            $potonganRes['totPotSepatuCelanaTopi'] += $potonganSingle['totPotSepatuCelanaTopi'];
+            $potonganRes['totPotTutupMulut'] += $potonganSingle['totPotTutupMulut'];
             $potonganRes['totPotSpm'] += $potonganSingle['totPotSpm'];
             $potonganRes['totPotStm'] += $potonganSingle['totPotStm'];
-            $potonganRes['totPotAstek'] += $potonganSingle['totPotAstek'];
             $potonganRes['totPotUangMakan'] += $potonganSingle['totPotUangMakan'];
+            $potonganRes['totPotPinjaman'] += $potonganSingle['totPotPinjaman'];
             $potonganRes['totPotongan'] += $potonganSingle['totPotongan'];
 
             $res[] = [
@@ -696,8 +919,12 @@ class PayrollsModel extends Model
         ];
     }
 
-    public function getSummaryPayroll($yearMonth, $companyID, $divisionID)
-    {
+    public function getSummaryPayroll(
+        $yearMonth,
+        $companyID,
+        $divisionID,
+        $tipes
+    ) {
         $divisiModel = new DivisisModel();
         $companyModel = new CompaniesModel();
         $bagianModel = new BagianModel();
@@ -725,12 +952,16 @@ class PayrollsModel extends Model
                 SUM(nominal_gaji_diterima) AS total_upah,
                 SUM(nominal_pengurangan_gaji + nominal_pinjaman_karyawan) AS potongan
             ";
-            $employeePayrollTotal = $this->asArray()->select($selectQry)
-                ->join('employees', 'employees.id = payrolls.employee_id')
+            $employeePayrolQry = $this->asArray()->select($selectQry)
+                ->join('employees', 'employees.id = payrolls.employee_id', 'left')
                 ->where('payrolls.year_month', $yearMonth)
                 ->where('employees.company_id', $companyID)
-                ->where('employees.bagian_id', $b['id'])
-                ->findAll();
+                ->where('employees.bagian_id', $b['id']);
+
+            if (count($tipes) > 0) {
+                $employeePayrolQry->whereIn('employees.tipe', $tipes);
+            }
+            $employeePayrollTotal =  $employeePayrolQry->findAll();
 
             // set total
             $upahPokok += $employeePayrollTotal[0]['upahBersih'];
@@ -792,18 +1023,15 @@ class PayrollsModel extends Model
             'potDenda' => ($employeePayroll == null) ? 0 : static::getPotonganLikeStr('DENDA', $employeePayroll['id']),
             'potIuranKoperasi' => ($employeePayroll == null) ? 0 : static::getPotonganLikeStr("IURAN KOPERASI", $employeePayroll['id']),
             'potKantin' => ($employeePayroll == null) ? 0 : static::getPotonganLikeStr("KANTIN", $employeePayroll['id']),
-            'potPerlengkapanKerja' => ($employeePayroll == null) ? 0 :  static::getPotonganLikeStr('PERLENGKAPAN KERJA', $employeePayroll['id']),
-            'potPinjaman' => ($employeePayroll == null) ? 0 : $employeePayroll['nominal_pinjaman_karyawan'],
+            'potPinjamanKoperasi' => ($employeePayroll == null) ? 0 : static::getPotonganLikeStr("PINJAMAN KOPERASI", $employeePayroll['id']),
+            'potPinjamanLainLain' => ($employeePayroll == null) ? 0 :  static::getPotonganLikeStr('PINJAMAN LAIN LAIN', $employeePayroll['id']),
+            'potBajuSeragam' => ($employeePayroll == null) ? 0 :  static::getPotonganLikeStr('POTONGAN BAJU SERAGAM', $employeePayroll['id']),
+            'potSepatuCelanaTopi' => ($employeePayroll == null) ? 0 :  static::getPotonganLikeStr('POTONGAN SEPATU, CELANA, TOPI', $employeePayroll['id']),
+            'potTutupMulut' => ($employeePayroll == null) ? 0 :  static::getPotonganLikeStr('POTONGAN TUTUP MULUT', $employeePayroll['id']),
             'potSpm' => ($employeePayroll == null) ? 0 :  static::getPotonganLikeStr('SPM', $employeePayroll['id']),
             'potStm' => ($employeePayroll == null) ? 0 :  static::getPotonganLikeStr('STM', $employeePayroll['id']),
-            'potAstek' => ($employeePayroll == null) ? 0 :  static::getPotonganLikeStr('ASTEK', $employeePayroll['id']),
             'potUangMakan' => ($employeePayroll == null) ? 0 :  static::getPotonganLikeStr('UANG MAKAN', $employeePayroll['id']),
-            // 'potTutupMulut' => ($employeePayroll == null) ? 0 : static::getPotonganLikeStr('TUTUP MULUT', $employeePayroll['id']),
-            // 'potBajuSeragam' => ($employeePayroll == null) ? 0 : static::getPotonganLikeStr('Potongan Baju Seragam', $employeePayroll['id']),
-            // 'potSepatuCelanaTopi' => ($employeePayroll == null) ? 0 : static::getPotonganLikeStr('Potongan Sepatu Celana Topi', $employeePayroll['id']),
-            // 'potDenda' => ($employeePayroll == null) ? 0 : ($employeePayroll['nominal_pengurangan_gaji'] - $employeePayroll['nominal_pinjaman_karyawan']),
-            // 'potKartu' => ($employeePayroll == null) ? 0 :  static::getPotonganLikeStr('Potongan Kartu', $employeePayroll['id']),
-            // 'potPinjamanKoperasi' => ($employeePayroll == null) ? 0 :  static::getPotonganLikeStr('Potongan Pinjaman Koperasi', $employeePayroll['id']),
+            'potPinjaman' => ($employeePayroll == null) ? 0 : $employeePayroll['nominal_pinjaman_karyawan'],
             'totPotongan' => 0
         ];
 
@@ -812,19 +1040,22 @@ class PayrollsModel extends Model
             $res['potDenda'] +
             $res['potIuranKoperasi'] +
             $res['potKantin'] +
-            $res['potPerlengkapanKerja'] +
-            $res['potPinjaman'] +
+            $res['potPinjamanKoperasi'] +
+            $res['potPinjamanLainLain'] +
+            $res['potBajuSeragam'] +
+            $res['potSepatuCelanaTopi'] +
+            $res['potTutupMulut'] +
             $res['potSpm'] +
             $res['potStm'] +
-            $res['potAstek'] +
-            $res['potUangMakan'];
+            $res['potUangMakan'] +
+            $res['potPinjaman'];
         return $res;
     }
 
     static function getPotonganLikeStr($str, $payrollID)
     {
         $payrollGajiModel = new PayrollGajiConjunctionModel();
-        $res = $payrollGajiModel->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id')
+        $res = $payrollGajiModel->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id', 'left')
             ->where('payroll_id', $payrollID)
             ->where('tunjangan.name', $str)
             ->first();

@@ -7,11 +7,17 @@
     <title>Daftar Upah Karyawan</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            letter-spacing: 2px;
-            font-size: 10px;
+            height: 100%;
+            font-family: 'Times New Roman', Times, serif;
+            letter-spacing: 1px;
+            font-size: 8;
         }
 
+        @page {
+            size: 9.5in 11in landscape;
+            margin: 25px;
+            padding: 25px;
+        }
 
         hr {
             border: none;
@@ -75,6 +81,11 @@
             <td>Departemen</td>
             <td>:</td>
             <td><?= $divisi['divisi'] ?></td>
+        </tr>
+        <tr>
+            <td>Tipe / Gol</td>
+            <td>:</td>
+            <td><?= $tipe ?></td>
         </tr>
     </table>
 

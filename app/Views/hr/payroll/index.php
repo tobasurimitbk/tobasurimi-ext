@@ -1,6 +1,14 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
+<style>
+    .form-add-spp .form-floating .form-floating-custom .select2 .selection .select2-selection {
+        height: 90px !important;
+    }
 
+    .form-add-spp .form-floating .form-floating-custom .select2 .selection .select2-selection__rendered {
+        height: 60px !important;
+    }
+</style>
 <div class="modal fade" id="generateModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -192,8 +200,8 @@
                     <i class="fa fa-download"></i> Export
                 </button>
                 <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-                    <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/division') ?>')">Daftar Upah</button></li>
-                    <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/detail') ?>')">Slip Gaji</button></li>
+                    <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/daftar-upah') ?>')">Daftar Upah</button></li>
+                    <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/slip-gaji-all') ?>')">Slip Gaji</button></li>
                     <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/summary') ?>')">Summary</button></li>
                     <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/potongan') ?>')">Daftar Potongan</button></li>
                 </ul>
@@ -203,71 +211,77 @@
 
     <div class="card">
         <div class="card-body">
-            <div class="row justify-content-start mb-3">
-                <div class="col-sm-2 mt-3">
-                    <div class="input-group">
-                        <div class="form-floating" style="height: 50px;">
-                            <input placeholder="" value="<?= date('Y-m') ?>" class="form-control month" id="month" name="month" />
-                            <label style="z-index: 1;" style="z-index: 1;">Pilih Bulan</label>
+            <div class="form-add-spp">
+                <div class="row justify-content-start mb-3">
+                    <div class="col-sm-3 mt-3">
+                        <div class="input-group">
+                            <div class="form-floating" style="height: 50px;">
+                                <input placeholder="" value="<?= date('Y-m') ?>" class="form-control month" id="month" name="month" />
+                                <label style="z-index: 1;" style="z-index: 1;">Pilih Bulan</label>
+                            </div>
+                            <div class="input-group-append" style="height:50px;">
+                                <button disabled class="btn btn-secondary" type="button">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="input-group-append" style="height:50px;">
-                            <button disabled class="btn btn-secondary" type="button">
-                                <i class="fas fa-calendar-alt"></i>
-                            </button>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-floating mt-3">
+                            <select class="form-select" name="filterDivisiID" id="filterDivisiID">
+                                <option value="">
+                                    Cari Departemen
+                                </option>
+                                <?php foreach ($divisi as $d) : ?>
+                                    <option value="<?= $d['id'] ?>">
+                                        <?= $d['divisi']; ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Cari Departemen</label>
                         </div>
                     </div>
-                </div>
-                <div class="col-sm-2">
-                    <div class="form-floating mt-3">
-                        <select class="form-select" name="filterDivisiID" id="filterDivisiID">
-                            <option value="">
-                                Cari Departemen
-                            </option>
-                            <?php foreach ($divisi as $d) : ?>
-                                <option value="<?= $d['id'] ?>">
-                                    <?= $d['divisi']; ?>
+                    <div class="col-sm-3">
+                        <div class="form-floating mt-3">
+                            <select class="form-select" name="filterBagianID" id="filterBagianID">
+                                <option value="">
+                                    Cari Bagian
                                 </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <label for="floatingInput">Cari Departemen</label>
+                            </select>
+                            <label for="floatingInput">Cari Bagian</label>
+                        </div>
                     </div>
-                </div>
-                <div class="col-sm-2">
-                    <div class="form-floating mt-3">
-                        <select class="form-select" name="filterBagianID" id="filterBagianID">
-                            <option value="">
-                                Cari Bagian
-                            </option>
-                        </select>
-                        <label for="floatingInput">Cari Bagian</label>
-                    </div>
-                </div>
-                <div class="col-sm-3">
-                    <div class="form-floating mt-3">
-                        <select class="form-select" name="filterGolongan">
-                            <option value="">
-                                Cari Tipe / Golongan
-                            </option>
-                            <?php foreach ($golongan as $g) : ?>
-                                <option <?= @$_GET['golongan'] == $g['golongan_name'] ? "selected" : "" ?> value="<?= $g['golongan_name'] ?>">
-                                    <?= $g['golongan_name']; ?>
+                    <div class="col-sm-3">
+                        <div class="form-floating mt-3">
+                            <select class="form-select" name="filterEmployeeID" id="filterEmployeeID">
+                                <option value="">
+                                    Cari Karyawan
                                 </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <label for="floatingInput">Cari Tipe / Golongan</label>
+                            </select>
+                            <label for="floatingInput">Cari Karyawan</label>
+                        </div>
                     </div>
-                </div>
-                <div class="col-sm-3">
-                    <div class="form-floating mt-3">
-                        <select class="form-select" name="filterEmployeeID" id="filterEmployeeID">
-                            <option value="">
-                                Cari Karyawan
-                            </option>
-                        </select>
-                        <label for="floatingInput">Cari Karyawan</label>
+                    <div class="col-sm-3">
+                        <div class="form-floating mt-3" style="height: 90px;">
+                            <div class="form-floating-custom">
+                                <select class="form-select" name="filterGolongan" multiple>
+                                    <option value="">
+                                        Cari Tipe / Golongan
+                                    </option>
+                                    <?php foreach ($golongan as $g) : ?>
+                                        <option <?= @$_GET['golongan'] == $g['golongan_name'] ? "selected" : "" ?> value="<?= $g['golongan_name'] ?>">
+                                            <?= $g['golongan_name']; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput"></label>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
             </div>
+
             <div class="row">
                 <div class="table-responsive">
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
@@ -323,7 +337,7 @@
                 data.divisi_id = $("#filterDivisiID").val();
                 data.employee_id = $("#filterEmployeeID").val();
                 data.bagian_id = $("#filterBagianID").val();
-                data.golongan = $("select[name='filterGolongan']").val();
+                data.golongan = JSON.stringify($("select[name='filterGolongan']").val());
                 data.month = $('#month').val();
                 data.sort = sort;
                 data.sortType = sortType;
@@ -488,7 +502,7 @@
     $("select[name='filterGolongan']").select2({
         placeholder: "Cari Tipe/Golongan Pegawai",
         theme: "bootstrap-5",
-        allowClear: true,
+        allowClear: false,
     });
 
     $("#employeeID").select2({
@@ -941,6 +955,7 @@
         var divisionID = $("#filterDivisiID").val();
         var month = $('#month').val();
         var bagianId = $('#filterBagianID').val();
+        var tipe = JSON.stringify($("select[name='filterGolongan']").val());
         if (month == "") {
             Swal.fire({
                 icon: 'error',
@@ -956,7 +971,7 @@
             });
             return;
         } else {
-            var newUrl = url + '?divisi_id=' + divisionID + '&month=' + month + '&bagian_id=' + bagianId;
+            var newUrl = url + '?divisi_id=' + divisionID + '&month=' + month + '&bagian_id=' + bagianId + '&tipe=' + tipe;
             window.open(newUrl, "_blank");
         }
     }
