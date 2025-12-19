@@ -57,8 +57,7 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select tipe_penjualan" name="tipe_penjualan" id="tipe_penjualan">
                                     <option value="">Pilih Tipe Penjualan</option>
-                                    <option value="semua">Semua</option>
-                                    <option value="LOKAL">Penjualan Lokal</option>
+                                    <option value="LOKAL" selected>Penjualan Lokal</option>
                                     <option value="EXPORT">Penjualan Internasional</option>
                                 </select>
                                 <label for="floatingInput">Tipe Penjualan</label>
@@ -103,6 +102,22 @@
 <script>
     let sort = "createdAt";
     let sortType = "desc";
+
+    // Set default tanggal: awal bulan - hari ini
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    function formatDate(date) {
+        // Format dd/mm/yyyy
+        let dd = String(date.getDate()).padStart(2, '0');
+        let mm = String(date.getMonth() + 1).padStart(2, '0'); // Januari = 0
+        let yyyy = date.getFullYear();
+        return dd + '/' + mm + '/' + yyyy;
+    }
+
+    $(".dateStart").val(formatDate(firstDay));
+    $(".dateEnd").val(formatDate(today));
+
     $(document).ready(function() {
         const csrfToken = '<?= csrf_token() ?>';
         const table = $('.dataTable').DataTable({
@@ -215,8 +230,7 @@
 
         $('.tipe_penjualan').select2({
             placeholder: "Filter Tipe Penjualan",
-            theme: "bootstrap-5",
-            allowClear: true
+            theme: "bootstrap-5"
         });
 
         $('.list_supplier, .dokumen, .tipe_penjualan')

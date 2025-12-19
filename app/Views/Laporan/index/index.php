@@ -20,7 +20,7 @@
                 </div>
             </a>
         </div>
-        <!-- <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+        <div class="col-lg-3 col-md-6 col-sm-6 col-12">
             <a href="<?= base_url('laporan-accounting/penjualan') ?>">
                 <div class="card card-statistic-1">
                     <div class="card-icon bg-danger">
@@ -33,7 +33,7 @@
                     </div>
                 </div>
             </a>
-        </div> -->
+        </div>
         <div class="col-lg-3 col-md-6 col-sm-6 col-12">
             <a href="<?= base_url('laporan-accounting/hutang') ?>">
                 <div class="card card-statistic-1">

@@ -118,8 +118,8 @@ class SalesOrderExportModel extends Model
             'data'              => $data,
             'totalData'         => $totalData,
             'totalFilteredData' => $totalFilteredData,
-            'sort'  => $sort,
-            'sortType'  => $sortType
+            'sort'              => $sort,
+            'sortType'          => $sortType
         ];
     }
 
@@ -1620,6 +1620,81 @@ class SalesOrderExportModel extends Model
             'data'              => $data,
             'totalData'         => $totalData,
             'totalFilteredData' => $totalFilteredData
+        ];
+    }
+
+    public function getAllSalesOrderInvoiceReport($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'sales_order_export_no' => 'sales_order_export.sales_order_export_no',
+            'customer_name'         => 'customers.name',
+            'due_date'              => 'sales_contract.due_date',
+            'shipment_date'         => 'sales_contract.shipment_date',
+            'tanggal'               => 'sales_order_export.tanggal',
+            'divisi_id'             => 'sales_order_export.divisi_id',
+            'po_no'                 => 'sales_order_export.po_no',
+            'deadline'              => 'sales_order_export.deadline',
+            "consigne"              => 'sales_order_export.consigne'
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'sales_order_export.tanggal'] ?? 'sales_order_export.tanggal';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "sales_order_export.*, 
+                        sales_contract.customer_po_no,
+                        sales_contract.dicharge_port,
+                        sales_contract.shipment_date,
+                        customers.name AS customer_name,
+                        companies.company,
+                        divisis.divisi,
+                        valas.value as valas_name";
+        $salesDataQry = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
+            ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
+            ->join('divisis', 'divisis.id = sales_order_export.divisi_id', 'left')
+            ->join('companies', 'companies.id = sales_order_export.user_id', 'left')
+            ->join('metadata as valas', 'valas.id = sales_order_export.valas_id', 'left')
+            ->orderBy($sort, $sortType)
+            ->orderBy('sales_order_export.updatedAt', 'desc');
+
+        $totalData = $salesDataQry->countAllResults(false);
+
+
+        if ($addCondition['search']) {
+            $salesDataQry
+                ->groupStart()
+                ->like('sales_order_export.sales_order_export_no', $addCondition['search'])
+                ->orLike('sales_contract.customer_po_no', $addCondition['search'])
+                ->orLike('sales_order_export.consigne', $addCondition['search'])
+                ->orLike('sales_order_export.destination', $addCondition['search'])
+                ->orLike('sales_order_export.deadline', $addCondition['search'])
+                ->groupEnd();
+        }
+
+        if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
+            $salesDataQry->groupStart(); //
+            if (!empty($addCondition['dateStart'])) {
+                $salesDataQry->where('DATE(sales_order_export.tanggal) >=', $addCondition['dateStart']);
+            }
+            if (!empty($addCondition['dateEnd'])) {
+                $salesDataQry->where('DATE(sales_order_export.tanggal) <=', $addCondition['dateEnd']);
+            }
+            $salesDataQry->groupEnd();
+        }
+
+
+        $totalFilteredData = $salesDataQry->countAllResults(false);
+        $data = $salesDataQry->findAll($limit, $offset);
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'              => $sort,
+            'sortType'          => $sortType
         ];
     }
 }
