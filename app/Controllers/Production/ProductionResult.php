@@ -744,15 +744,52 @@ class ProductionResult extends BaseController
             }
 
             foreach ($barangDigunakan as $bd) {
-                $qty = (float) $bd->qty;
-                $qty2 = isset($bd->qty2) ? (float) $bd->qty2 : 0;
-                $qtySisa = $qty - $qty2;
-                $datasbd = [
-                    "qty" => isset($bd->qty2) ? $qty2 : $qty,
-                ];
-                $this->productionResultDetailModel->update($bd->production_result_detail_id, $datasbd);
+                if (isset($bd->production_result_detail_id)) {
+                    $qty = (float) $bd->qty;
+                    $qty2 = isset($bd->qty2) ? (float) $bd->qty2 : 0;
+                    $qtySisa = $qty - $qty2;
+                    $datasbd = [
+                        "qty" => isset($bd->qty2) ? $qty2 : $qty,
+                    ];
+                    $this->productionResultDetailModel->update($bd->production_result_detail_id, $datasbd);
 
-                if (isset($bd->divisi_id) && isset($bd->barang1_id) && isset($bd->barang2_id)) {
+                    if (isset($bd->divisi_id) && isset($bd->barang1_id) && isset($bd->barang2_id)) {
+                        $this->accountBarangModel->insertAccountBarang(
+                            $this->this_company_id,
+                            $bd->divisi_id,
+                            $bd->barang1_id,
+                            $bd->barang2_id
+                        );
+                    }
+                } else {
+                    $qty = (float) $bd->qty;
+                    $qty2 = isset($bd->qty2) ? (float) $bd->qty2 : 0;
+                    $qtySisa = $qty - $qty2;
+                    $datasbd = [
+                        "production_result_id" => $productionResID,
+                        "material_request_detail_id" => $bd->material_request_detail_id,
+                        "material_request_id" => $bd->material_request_id,
+                        "barang1_id" => $bd->barang1_id,
+                        "barang2_id" => $bd->barang2_id,
+                        "warehouse_id" => $bd->warehouse_id,
+                        "divisi_id" => $bd->divisi_id,
+                        "bc_id" => $bd->bc_id ?? 0,
+                        "stock_dokumen" => $bd->stock_dokumen,
+                        "stock_date" => $bd->stock_date,
+                        "stock_id" => $bd->stock_id ?? 0,
+                        "stock_detail_id" => $bd->stock_detail_id ?? 0,
+                        "no_aju" => $bd->no_aju == "-" ? "-" : $bd->no_aju,
+                        "barang_type" => $bd->type_barang,
+                        "type" => "DIGUNAKAN",
+                        "no_ref" => $bd->ref_no,
+                        "qty" => isset($bd->qty2) ? $qty2 : $qty,
+                        "kondisi_barang" => $bd->kondisi_barang,
+                        "harga_umum" => (float) isset($bd->harga_umum) ? $bd->harga_umum :  0,
+                        "harga_harian" => (float) isset($bd->harga_harian) ? $bd->harga_harian : 0,
+                        "harga_bulanan" => (float) isset($bd->harga_bulanan) ? $bd->harga_bulanan : 0,
+                    ];
+                    $this->productionResultDetailModel->insert($datasbd);
+
                     $this->accountBarangModel->insertAccountBarang(
                         $this->this_company_id,
                         $bd->divisi_id,
@@ -763,50 +800,146 @@ class ProductionResult extends BaseController
             }
 
             foreach ($barangDigunakanPenolong as $bdp) {
-                $qty = (float) $bdp->qty;
-                $qty2 = isset($bdp->qty2) ? (float) $bdp->qty2 : 0;
-                $qtySisa = $qty - $qty2;
-                $datasbdp = [
-                    "qty" => isset($bdp->qty2) ? $qty2 : $qty,
-                ];
-                $this->productionResultDetailModel->update($bdp->production_result_detail_id, $datasbdp);
+                if (isset($bdp->production_result_detail_id)) {
+                    $qty = (float) $bdp->qty;
+                    $qty2 = isset($bdp->qty2) ? (float) $bdp->qty2 : 0;
+                    $qtySisa = $qty - $qty2;
+                    $datasbdp = [
+                        "qty" => isset($bdp->qty2) ? $qty2 : $qty,
+                    ];
+                    $this->productionResultDetailModel->update($bdp->production_result_detail_id, $datasbdp);
 
-                $this->accountBarangModel->insertAccountBarang(
-                    $this->this_company_id,
-                    $bdp->divisi_id,
-                    $bdp->barang1_id,
-                    $bdp->barang2_id
-                );
+                    $this->accountBarangModel->insertAccountBarang(
+                        $this->this_company_id,
+                        $bdp->divisi_id,
+                        $bdp->barang1_id,
+                        $bdp->barang2_id
+                    );
+                } else {
+                    $qty = (float) $bdp->qty;
+                    $qty2 = isset($bdp->qty2) ? (float) $bdp->qty2 : 0;
+                    $qtySisa = $qty - $qty2;
+                    $datasbdp = [
+                        "production_result_id" => $productionResID,
+                        "material_request_detail_id" => $bdp->material_request_detail_id,
+                        "material_request_id" => $bdp->material_request_id,
+                        "barang1_id" => $bdp->barang1_id,
+                        "barang2_id" => $bdp->barang2_id,
+                        "warehouse_id" => $bdp->warehouse_id,
+                        "divisi_id" => $bdp->divisi_id,
+                        "bc_id" => $bdp->bc_id ?? 0,
+                        "stock_dokumen" => $bdp->stock_dokumen,
+                        "stock_date" => $bdp->stock_date,
+                        "stock_id" => $bdp->stock_id ?? 0,
+                        "stock_detail_id" => $bdp->stock_detail_id ?? 0,
+                        "no_aju" => $bdp->no_aju == "-" ? "-" : $bdp->no_aju,
+                        "barang_type" => $bdp->type_barang,
+                        "type" => "DIGUNAKAN",
+                        "no_ref" => $bdp->ref_no,
+                        "qty" => isset($bdp->qty2) ? $qty2 : $qty,
+                        "kondisi_barang" => $bdp->kondisi_barang,
+                        "harga_umum" => (float) isset($bdp->harga_umum) ? $bdp->harga_umum :  0,
+                        "harga_harian" => (float) isset($bdp->harga_harian) ? $bdp->harga_harian : 0,
+                        "harga_bulanan" => (float) isset($bdp->harga_bulanan) ? $bdp->harga_bulanan : 0,
+                    ];
+                    $this->productionResultDetailModel->insert($datasbdp);
+
+                    $this->accountBarangModel->insertAccountBarang(
+                        $this->this_company_id,
+                        $bdp->divisi_id,
+                        $bdp->barang1_id,
+                        $bdp->barang2_id
+                    );
+                }
             }
 
             foreach ($barangScrap as $bs) {
-                $datasbs = [
-                    "qty" => (float) $bs->qty,
-                ];
-                $this->productionResultDetailModel->update($bs->production_result_detail_id, $datasbs);
+                if (isset($bs->production_result_detail_id)) {
+                    $datasbs = [
+                        "qty" => (float) $bs->qty,
+                    ];
+                    $this->productionResultDetailModel->update($bs->production_result_detail_id, $datasbs);
 
-                if (isset($bs->divisi_id) && isset($bs->barang1_id) && isset($bs->barang2_id)) {
+                    if (isset($bs->divisi_id) && isset($bs->barang1_id) && isset($bs->barang2_id)) {
+                        $this->accountBarangModel->insertAccountBarang(
+                            $this->this_company_id,
+                            $bs->divisi_id,
+                            $bs->barang1_id,
+                            $bs->barang2_id
+                        );
+                    }
+                } else {
+                    $datasbs = [
+                        "production_result_id" => $productionResID,
+                        "barang1_id" => decrypt($bs->barang_id),
+                        "barang2_id" => decrypt($bs->barang_spesifikasi_id),
+                        "warehouse_id" => $bs->warehouse_id,
+                        "divisi_id" => $bs->divisi_id,
+                        "bc_id" => 0,
+                        "stock_dokumen" => $productionResData['pr_no'],
+                        "stock_id" => 0,
+                        "stock_detail_id" => 0,
+                        "no_aju" => "-",
+                        "barang_type" => "bahan_scrap",
+                        "type" => "SCRAP",
+                        "no_ref" => "NON PABEAN",
+                        "qty" => (float) $bs->qty,
+                        "harga_umum" => (float) isset($bs->harga_umum) ? $bs->harga_umum :  0,
+                        "harga_harian" => (float) isset($bs->harga_harian) ? $bs->harga_harian : 0,
+                        "harga_bulanan" => (float) isset($bs->harga_bulanan) ? $bs->harga_bulanan : 0,
+                    ];
+                    $this->productionResultDetailModel->insert($datasbs);
                     $this->accountBarangModel->insertAccountBarang(
                         $this->this_company_id,
                         $bs->divisi_id,
-                        $bs->barang1_id,
-                        $bs->barang2_id
+                        decrypt($bs->barang_id),
+                        decrypt($bs->barang_spesifikasi_id)
                     );
                 }
             }
 
             foreach ($barangFilling as $bf) {
-                $datasbf = [
-                    "qty" => (float) $bf->qty,
-                ];
-                $this->productionResultDetailModel->update($bf->production_result_detail_id, $datasbf);
+                if (isset($bf->production_result_detail_id)) {
+                    $datasbf = [
+                        "qty" => (float) $bf->qty,
+                    ];
+                    $this->productionResultDetailModel->update($bf->production_result_detail_id, $datasbf);
 
-                if (isset($bf->divisi_id) && isset($bf->barang1_id) && isset($bf->barang2_id)) {
+                    if (isset($bf->divisi_id) && isset($bf->barang1_id) && isset($bf->barang2_id)) {
+                        $this->accountBarangModel->insertAccountBarang(
+                            $this->this_company_id,
+                            $bf->divisi_id,
+                            $bf->barang1_id,
+                            $bf->barang2_id
+                        );
+                    }
+                } else {
+                    $datasbf = [
+                        "production_result_id" => $productionResID,
+                        "barang1_id" => decrypt($bf->barang1_id),
+                        "barang2_id" => decrypt($bf->barang2_id),
+                        "warehouse_id" => $bf->warehouse_id,
+                        "divisi_id" => $bf->divisi_id,
+                        "bc_id" => 0,
+                        "stock_dokumen" => $productionResData['pr_no'],
+                        "stock_id" => 0,
+                        "stock_detail_id" => 0,
+                        "no_aju" => "-",
+                        "barang_type" => "bahan_setengah_jadi",
+                        "type" => "RETURN",
+                        "no_ref" => "NON PABEAN",
+                        "qty" => (float) $bf->qty,
+                        "harga_umum" => (float) isset($bf->harga_umum) ? $bf->harga_umum :  0,
+                        "harga_harian" => (float) isset($bf->harga_harian) ? $bf->harga_harian : 0,
+                        "harga_bulanan" => (float) isset($bf->harga_bulanan) ? $bf->harga_bulanan : 0,
+                    ];
+                    $this->productionResultDetailModel->insert($datasbf);
+
                     $this->accountBarangModel->insertAccountBarang(
                         $this->this_company_id,
                         $bf->divisi_id,
-                        $bf->barang1_id,
-                        $bf->barang2_id
+                        decrypt($bf->barang1_id),
+                        decrypt($bf->barang2_id)
                     );
                 }
             }

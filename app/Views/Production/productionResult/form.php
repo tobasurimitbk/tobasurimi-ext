@@ -179,7 +179,6 @@
                                 </div>
                             </div>
                             <div class="tab-pane fade" id="nav-scrap" role="tabpanel" aria-labelledby="nav-contact-tab">
-                                <?php if (!isset($data)) : ?>
                                     <form class="formBarangScrap" id="formBarangScrap">
                                         <div class="row">
                                             <div class="col-md-6">
@@ -225,7 +224,6 @@
                                             </div>
                                         </div>
                                     </form>
-                                <?php endif; ?>
                                 <div class="table-responsive">
                                     <table class="table nowrap table-hover-tobasurimi tableBarangScrap dataTable" id="tableBarangScrap" width="100%" cellspacing="0">
                                         <thead class="thead-dark text-center">
@@ -250,7 +248,6 @@
                                 </div>
                             </div>
                             <div class="tab-pane fade" id="nav-filling" role="tabpanel" aria-labelledby="nav-filling-tab">
-                                <?php if (!isset($data)) : ?>
                                     <form class="formBarangFilling" id="formBarangFilling">
                                         <div class="row">
                                             <div class="col-md-4">
@@ -306,7 +303,6 @@
                                             </div>
                                         </div>
                                     </form>
-                                <?php endif; ?>
                                 <div class="table-responsive">
                                     <table class="table nowrap table-hover-tobasurimi tableBarangFilling dataTable" id="tableBarangFilling" width="100%" cellspacing="0">
                                         <thead class="thead-dark text-center">
@@ -1616,7 +1612,7 @@
                     dataType: "json",
                     success: function(res) {
                         list_items_barang_digunakan_penolong = [];
-                        <?php if (!isset($data)) : ?>
+                        <?php if (!isset($data) || empty(json_decode($data->material_request_penolong_id, true))): ?>
                             res.data.forEach(function(item) {
                                 // console.log(item);
                                 if (item.ref_no == "NON PABEAN") {

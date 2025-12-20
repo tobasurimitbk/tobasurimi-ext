@@ -54,7 +54,11 @@ class MaterialRequestPenolongDetailsModel extends Model
             ->select($selectQry)
             ->join('barang_master', 'barang_master.id = material_request_penolong_details.barang1_id')
             ->join('satuans', 'satuans.kode_satuan = material_request_penolong_details.satuan', 'left')
-            ->where('material_request_penolong_details.material_request_id', $mrID)
+            ->whereIn('material_request_penolong_details.material_request_id', $mrID)
+            ->where('material_request_penolong_details.qty_now >', 0)
+            ->where('material_request_penolong_details.deletedAt', null)
+            ->where('barang_master.deletedAt', null)
+            ->where('satuans.deletedAt', null)
             ->findAll();
 
         return $dataQry;
