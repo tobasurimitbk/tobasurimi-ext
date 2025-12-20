@@ -505,31 +505,33 @@ function decrypt2($encrypted)
 }
 
 
-function weakEncrypt($plain) {
-    // tambahin salt biar kelihatan random
-    $saltPrefix = substr(md5('prefix_salt'), 0, 4); // contoh: "9a1f"
-    $saltSuffix = substr(md5('suffix_salt'), 0, 4); // contoh: "c3e2"
+function weakEncrypt($plain)
+{
+   // tambahin salt biar kelihatan random
+   $saltPrefix = substr(md5('prefix_salt'), 0, 4); // contoh: "9a1f"
+   $saltSuffix = substr(md5('suffix_salt'), 0, 4); // contoh: "c3e2"
 
-    // gabungkan jadi string palsu
-    $combined = $saltPrefix . $plain . $saltSuffix;
+   // gabungkan jadi string palsu
+   $combined = $saltPrefix . $plain . $saltSuffix;
 
-    // base64 encode
-    $b64 = base64_encode(strrev($combined)); // dibalik dulu biar makin nyamar
-    return rtrim(strtr($b64, '+/', '-_'), '=');
+   // base64 encode
+   $b64 = base64_encode(strrev($combined)); // dibalik dulu biar makin nyamar
+   return rtrim(strtr($b64, '+/', '-_'), '=');
 }
 
-function weakDecrypt($safeValue) {
-    // balik ke base64 standar
-    $b64 = strtr($safeValue, '-_', '+/');
-    $pad = strlen($b64) % 4;
-    if ($pad) $b64 .= str_repeat('=', 4 - $pad);
+function weakDecrypt($safeValue)
+{
+   // balik ke base64 standar
+   $b64 = strtr($safeValue, '-_', '+/');
+   $pad = strlen($b64) % 4;
+   if ($pad) $b64 .= str_repeat('=', 4 - $pad);
 
-    // decode dan reverse balik
-    $decoded = strrev(base64_decode($b64));
+   // decode dan reverse balik
+   $decoded = strrev(base64_decode($b64));
 
-    // hapus prefix & suffix
-    $plain = substr($decoded, 4, -4);
-    return $plain;
+   // hapus prefix & suffix
+   $plain = substr($decoded, 4, -4);
+   return $plain;
 }
 
 
@@ -644,4 +646,24 @@ function icmpPing($ip, $timeout = 5)
    exec($command, $output, $resultCode);
 
    return $resultCode === 0;
+}
+
+function convertMonthIndo($month)
+{
+   static $bulanIndo = [
+      1  => 'Januari',
+      2  => 'Februari',
+      3  => 'Maret',
+      4  => 'April',
+      5  => 'Mei',
+      6  => 'Juni',
+      7  => 'Juli',
+      8  => 'Agustus',
+      9  => 'September',
+      10 => 'Oktober',
+      11 => 'November',
+      12 => 'Desember',
+   ];
+
+   return $bulanIndo[$month] ?? '';
 }
