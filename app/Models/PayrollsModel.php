@@ -470,7 +470,8 @@ class PayrollsModel extends Model
         $year,
         $month,
         $companyID,
-        $tipes
+        $tipes,
+        $bagianId
     ) {
         $payrollGajiConjunctionModel = new PayrollGajiConjunctionModel();
 
@@ -502,6 +503,10 @@ class PayrollsModel extends Model
 
         if (!empty($tipes)) {
             $dataQry->whereIn('tipe', $tipes);
+        }
+
+        if (!empty($bagianId)) {
+            $dataQry->where('employees.bagian_id', $bagianId);
         }
 
         $dataQry->where('payrolls.deletedAt', null);
@@ -690,7 +695,8 @@ class PayrollsModel extends Model
         $yearMonth,
         $companyID,
         $divisionID,
-        $tipes
+        $tipes,
+        $bagianId
     ) {
         $db = \Config\Database::connect();
 
@@ -720,6 +726,10 @@ class PayrollsModel extends Model
 
         if (!empty($tipes)) {
             $builder->whereIn('employees.tipe', $tipes);
+        }
+
+        if (!empty($bagianId)) {
+            $builder->where('employees.bagian_id', $bagianId);
         }
 
         $payrollRows = $builder->orderBy('employees.nip', 'asc')->get()->getResultArray();
