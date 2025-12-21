@@ -255,7 +255,9 @@
                         <?php endif; ?>
                     } else {
                         htmlRes += `
-
+                                <button data-toggle="tooltip" title="Unpost" class="btn btn-danger btn-print" onclick="unPostingAction('${row.id}')" style="box-shadow: none !important;">
+                                    <i class="fa fa-ban fa-sm" aria-hidden="true"></i>
+                                </button>
                             `;
                     }
 
@@ -510,6 +512,52 @@
                 formData.append("id", id);
                 $.ajax({
                     url: `<?= base_url("bea-cukai-bc-30/posting"); ?>`,
+                    method: "POST",
+                    data: formData,
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    processData: false,
+                    contentType: false,
+                    success: function(res) {
+                        if (res.status) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: res.message,
+                                confirmButtonColor: '#4e73df',
+                                confirmButtonText: 'Ok'
+                            }).then((result) => {
+                                table.ajax.reload();
+                            });
+                        }
+                    }
+                })
+            }
+        })
+    }
+
+    function unPostingAction(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Un Posting Dokumen BC 2.5 ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var formData = new FormData();
+                formData.append("id", id);
+                $.ajax({
+                    url: `<?= base_url("bea-cukai-bc-30/unposting"); ?>`,
                     method: "POST",
                     data: formData,
                     beforeSend: function(xhr) {

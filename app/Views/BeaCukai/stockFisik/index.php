@@ -3,7 +3,7 @@
 
 <section class="section">
     <div class="section-header">
-        <h1>Stok Fisik</h1>
+        <h1>Stok Fisik Bea Cukai</h1>
 
         <div class="col-button-tambah-spp">
             <?php if (can('Bea Cukai', 'Stok Fisik', 'p')) : ?>

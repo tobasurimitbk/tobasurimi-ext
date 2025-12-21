@@ -364,6 +364,17 @@ class BC41 extends BaseController
         ]);
     }
 
+    public function unposting()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $this->bc41Model->update($id, ['status_posting' => '0']);
+        return response()->setJSON([
+            'token'  => csrf_hash(),
+            'status' => true,
+            'message' => "Dokumen BC 4.1 Berhasil Diunposting"
+        ]);
+    }
+
 
     public function generateNomorAju($tanggalDokumen)
     {

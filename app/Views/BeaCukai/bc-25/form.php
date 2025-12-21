@@ -16,9 +16,9 @@
             <a class="btn btn-hide-form btn-discard float-right root-form-view" href="<?= base_url("bea-cukai-bc-25"); ?>">
                 Kembali
             </a>
-            <a class="btn btn-info btn-print float-right text-white" href="<?= base_url('bea-cukai-bc-25/id/header/' . encrypt($bc25['id'])) ?>">
-                Form Ceisa
-            </a>
+            <button disabled class="btn btn-info btn-print float-right text-white" href="<?= base_url('bea-cukai-bc-25/id/header/' . encrypt($bc25['id'])) ?>">
+                Form Ceisa (Tahap Pengembangan)
+            </button>
             <?php if ($bc25['status_posting'] == 0) : ?>
                 <button class="btn btn-hapus delete-parent float-right" onclick="deleteAction()">
                     Hapus

@@ -1896,6 +1896,7 @@ $routes->group('bea-cukai-bc-30', ['filter' => 'Auth'], function ($routes) {
     $routes->post('update', 'BeaCukai\BC30::updateDetail');
     $routes->post('delete', 'BeaCukai\BC30::delete');
     $routes->post('posting', 'BeaCukai\BC30::posting');
+    $routes->post('unposting', 'BeaCukai\BC30::unposting');
     $routes->get('all-stock-list', 'Inventori\StokAdjusment::allStockList');
     $routes->get('list-barang-sales-ekspor', 'BeaCukai\BC30::getListBarangSalesEkspor');
     $routes->post('update-no-aju', 'BeaCukai\BC30::updateNoAju');
@@ -1996,6 +1997,8 @@ $routes->get('stock-fisik/export-excel', 'BeaCukai\StockFisik::exportExcel', ['f
 $routes->get('stock-fisik/id/(:segment)', 'BeaCukai\StockFisik::detail/$1', ['filter' => 'Auth']);
 $routes->get('stock-fisik/all-masuk', 'BeaCukai\StockFisik::allPemasukkan', ['filter' => 'Auth']);
 $routes->get('stock-fisik/all-masuk-produksi', 'BeaCukai\StockFisik::allPemasukkanProduksi', ['filter' => 'Auth']);
+$routes->get('stock-fisik/all-keluar-produksi', 'BeaCukai\StockFisik::allPengeluaranProduksi', ['filter' => 'Auth']);
+$routes->get('stock-fisik/all-keluar', 'BeaCukai\StockFisik::allPengeluaranPerDokumen', ['filter' => 'Auth']);
 
 // BC 2.5
 $routes->group('bea-cukai-bc-25', ['filter' => 'Auth'], function ($routes) {
@@ -2013,6 +2016,8 @@ $routes->group('bea-cukai-bc-25', ['filter' => 'Auth'], function ($routes) {
     $routes->get('list-satuan-konversi', 'Inventori\StokAdjusment::getSatuanKonversi');
     $routes->post('update', 'BeaCukai\BC25::updateDetail');
     $routes->post('update-no-aju', 'BeaCukai\BC25::updateNoAju');
+    $routes->post('posting', 'BeaCukai\BC25::posting');
+    $routes->post('unposting', 'BeaCukai\BC25::unposting');
 
     // HEADER
     $routes->get('id/header/(:segment)', 'BeaCukai\BC25::header/$1');
@@ -2078,6 +2083,7 @@ $routes->group('bea-cukai-bc-41', ['filter' => 'Auth'], function ($routes) {
     $routes->post('update', 'BeaCukai\BC41::updateDetail');
     $routes->post('delete', 'BeaCukai\BC41::delete');
     $routes->post('posting', 'BeaCukai\BC41::posting');
+    $routes->post('unposting', 'BeaCukai\BC41::unposting');
     $routes->get('all-stock-list', 'Inventori\StokAdjusment::allStockList');
     $routes->get('list-satuan-konversi', 'Inventori\StokAdjusment::getSatuanKonversi');
     $routes->get('get-referensi', 'BeaCukai\BC25::getReferensiPengeluaran');
@@ -2829,17 +2835,17 @@ $routes->get('/laporan-accounting', 'Laporan\Accounting\Accounting::index', ['fi
 
 $routes->get('/laporan-accounting/pembelian', 'Laporan\Accounting\Pembelian::index', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/pembelian/all', 'Laporan\Accounting\Pembelian::allTransaksi', ['filter' => 'Auth']);
-$routes->get('/laporan-accounting/pembelian/printPDF/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Pembelian::LaporanPembelianPrint/$1/$2/$3/$4/$5/$6', ['filter' => 'Auth']);
-$routes->get('/laporan-accounting/pembelian/printExcel/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Pembelian::exportExcel/$1/$2/$3/$4/$5/$6', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/pembelian/printPDF/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Pembelian::LaporanPembelianPrint/$1/$2/$3/$4', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/pembelian/printExcel/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Pembelian::exportExcel/$1/$2/$3/$4', ['filter' => 'Auth']);
 
 $routes->get('/laporan-accounting/penjualan', 'Laporan\Accounting\Penjualan::index', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/penjualan/all', 'Laporan\Accounting\Penjualan::allTransaksi', ['filter' => 'Auth']);
-$routes->get('/laporan-accounting/penjualan/printPDF/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Penjualan::LaporanPenjualanPrint/$1/$2/$3/$4/$5', ['filter' => 'Auth']);
-$routes->get('/laporan-accounting/penjualan/printExcel/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Penjualan::exportExcel/$1/$2/$3/$4/$5', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/penjualan/printPDF/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Penjualan::LaporanPenjualanPrint/$1/$2/$3/$4', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/penjualan/printExcel/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Penjualan::exportExcel/$1/$2/$3/$4', ['filter' => 'Auth']);
 
 $routes->get('/laporan-accounting/hutang', 'Laporan\Accounting\Hutang::index', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/hutang/all', 'Laporan\Accounting\Hutang::allHutang', ['filter' => 'Auth']);
-$routes->get('/laporan-accounting/hutang/details/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Hutang::detail/$1/$2/$3/$4/$5/$6/$7', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/hutang/details/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Hutang::detail/$1/$2/$3/$4/$5/$6', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/hutang/details/invoice/(:segment)', 'Laporan\Accounting\Hutang::allDetailsInvoice/$1', ['filter' => 'Auth']);
 $routes->get('laporan-accounting/hutang/print', 'Laporan\Accounting\Hutang::printHutang');
 $routes->get('laporan-accounting/hutang/export-excel', 'Laporan\Accounting\Hutang::exportExcelHutang');

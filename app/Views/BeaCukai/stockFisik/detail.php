@@ -63,7 +63,7 @@
             </div>
             <div class="row">
                 <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable stok-dokumen-supplier-table" id="dataTableMasuk" width="100%" cellspacing="0">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable " id="dataTableMasuk" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
                                 <th style="width: 10px;">No</th>
@@ -118,7 +118,7 @@
             </div>
             <div class="row">
                 <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable stok-dokumen-supplier-table" id="dataTableMasukProduksi" width="100%" cellspacing="0">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable " id="dataTableMasukProduksi" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
                                 <th style="width: 10px;">No</th>
@@ -140,6 +140,110 @@
                                 <th colspan="8" class="text-right">TOTAL</th>
                                 <th id="total_qty_masuk_produksi"></th>
                                 <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col mb-3">
+                    <div class="alert alert-secondary">
+                        <label class="form-label font-weight-bold text-black lable-title">DATA PENGELUARAN BARANG KE PRODUKSI</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row justify-content-end">
+                <div class="col-md-3 mb-3">
+
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="form-floating" style="height: 50px;">
+                        <input placeholder="Cari Data" class="form-control search_keluar_produksi" id="search_keluar_produksi" name="search_keluar_produksi" />
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Data</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable " id="dataTableKeluarProduksi" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th style="width: 10px;">No</th>
+                                <th>Dept</th>
+                                <th>Warehouse</th>
+                                <th>Supplier</th>
+                                <th>Nomor MR</th>
+                                <th>Tgl Produksi</th>
+                                <th>Tgl Dokumen</th>
+                                <th>Doc</th>
+                                <th>No Aju</th>
+                                <th>No Daftar</th>
+                                <th>Kode Barang</th>
+                                <th>Barang</th>
+                                <th>Spesifikasi</th>
+                                <th>Qty</th>
+                                <th>Unit</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-detail-table" id="body-detail-table">
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="13" class="text-right">TOTAL</th>
+                                <th id="total_qty_keluar_produksi"></th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col mb-3">
+                    <div class="alert alert-secondary">
+                        <label class="form-label font-weight-bold text-black lable-title">DATA PENGELUARAN BARANG PER DOKUMEN</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row justify-content-end">
+                <div class="col-md-3 mb-3">
+
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="form-floating" style="height: 50px;">
+                        <input placeholder="Cari Data" class="form-control search_keluar" id="search_keluar" name="search_keluar" />
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Data</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable " id="dataTableKeluar" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th style="width: 10px;">No</th>
+                                <th>Dept</th>
+                                <th>Warehouse</th>
+                                <th>Ref No</th>
+                                <th>Kode Barang</th>
+                                <th>Barang</th>
+                                <th>Spesifikasi</th>
+                                <th>Tgl Dokumen</th>
+                                <th>Doc</th>
+                                <th>No Aju</th>
+                                <th>No Daftar</th>
+                                <th>Qty</th>
+                                <th>Unit</th>
+                                <th>Valas</th>
+                                <th>Harga</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-detail-table" id="body-detail-table">
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="11" class="text-right">TOTAL</th>
+                                <th id="total_qty_keluar"></th>
+                                <th colspan="3"></th>
                             </tr>
                         </tfoot>
                     </table>
@@ -351,6 +455,216 @@
         },
     });
 
+    var tableKeluarProduksi = $('#dataTableKeluarProduksi').DataTable({
+        processing: true,
+        serverSide: true,
+        ordering: true,
+        order: [],
+        fixedHeader: true,
+        lengthMenu: [
+            [25],
+            [25],
+        ],
+        pageLength: 25,
+        ajax: {
+            url: "<?= base_url('stock-fisik/all-keluar-produksi') ?>",
+            type: "GET",
+            data: function(d) {
+                d.search = $('#search_keluar_produksi').val();
+                d.barang_master_id = "<?= ($barangMaster['id']) ?>"
+            }
+        },
+        order: [
+            [4, 'desc']
+        ],
+        columns: [{
+                data: 'no',
+                orderable: false
+            },
+            {
+                data: 'divisi'
+            },
+            {
+                data: 'warehouse_name'
+            },
+            {
+                data: 'supplier_name'
+            },
+            {
+                data: 'req_no'
+            },
+            {
+                data: 'request_date'
+            },
+            {
+                data: 'tanggal_dokumen'
+            },
+            {
+                data: 'type_bc'
+            },
+            {
+                data: 'no_aju'
+            },
+            {
+                data: 'no_daftar'
+            },
+            {
+                data: 'kode_barang'
+            },
+            {
+                data: 'barang_name'
+            },
+            {
+                data: 'spesifikasi'
+            },
+            {
+                data: 'qty_diterima',
+                render: function(data) {
+                    if (data != "") {
+                        return greatFormatRupiah(parseFloat(data).toFixed(2));
+                    }
+                    return "";
+                }
+            },
+            {
+                data: 'kode_satuan'
+            },
+        ],
+        display: "stripe",
+        searching: false,
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
+        language: {
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        },
+        footerCallback: function(row, data, start, end, display) {
+            const api = this.api();
+            const total = api.ajax.json().footerTotals || 0;
+
+            if (total) {
+                $('#total_qty_keluar_produksi').html(greatFormatRupiah(total.toFixed(2)));
+            } else {
+                $('#total_qty_keluar_produksi').html(greatFormatRupiah(0));
+
+            }
+        },
+    });
+
+    var tableKeluar = $('#dataTableKeluar').DataTable({
+        processing: true,
+        serverSide: true,
+        ordering: true,
+        order: [],
+        fixedHeader: true,
+        lengthMenu: [
+            [25],
+            [25],
+        ],
+        pageLength: 25,
+        ajax: {
+            url: "<?= base_url('stock-fisik/all-keluar') ?>",
+            type: "GET",
+            data: function(d) {
+                d.search = $('#search_keluar').val();
+                d.barang_master_id = "<?= ($barangMaster['id']) ?>"
+            }
+        },
+        order: [
+            [4, 'desc']
+        ],
+        columns: [{
+                data: 'no',
+                orderable: false
+            },
+            {
+                data: 'divisi_asal'
+            },
+            {
+                data: 'warehouse_asal'
+            },
+            {
+                data: 'reference_no'
+            },
+            {
+                data: 'kode_barang'
+            },
+            {
+                data: 'barang_name'
+            },
+            {
+                data: 'spesifikasi'
+            },
+            {
+                data: 'tanggal_dokumen'
+            },
+            {
+                data: 'type_bc'
+            },
+            {
+                data: 'no_aju'
+            },
+            {
+                data: 'no_daftar'
+            },
+            {
+                data: 'qty_diterima',
+                render: function(data) {
+                    if (data != "") {
+                        return greatFormatRupiah(parseFloat(data).toFixed(2));
+                    }
+                    return "";
+                }
+            },
+            {
+                data: 'kode_satuan'
+            },
+            {
+                data: 'valas_name'
+            },
+            {
+                data: 'sub_total',
+                render: function(data) {
+                    if (data != "") {
+                        return greatFormatRupiah(parseFloat(data).toFixed(2));
+                    }
+                    return "";
+                }
+            },
+        ],
+        display: "stripe",
+        searching: false,
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
+        language: {
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        },
+        footerCallback: function(row, data, start, end, display) {
+            const api = this.api();
+            const total = api.ajax.json().footerTotals || 0;
+
+            if (total) {
+                $('#total_qty_keluar').html(greatFormatRupiah(total.toFixed(2)));
+            } else {
+                $('#total_qty_keluar').html(greatFormatRupiah(0));
+
+            }
+        },
+    });
+
     $('#search_masuk').keyup(function(e) {
         e.preventDefault();
         tableMasuk.ajax.reload();
@@ -359,6 +673,16 @@
     $('#search_masuk_produksi').keyup(function(e) {
         e.preventDefault();
         tableMasukProduksi.ajax.reload();
+    });
+
+    $('#search_keluar_produksi').keyup(function(e) {
+        e.preventDefault();
+        tableKeluarProduksi.ajax.reload();
+    });
+
+    $('#search_keluar').keyup(function(e) {
+        e.preventDefault();
+        tableKeluar.ajax.reload();
     });
 </script>
 <?= $this->endSection(); ?>
