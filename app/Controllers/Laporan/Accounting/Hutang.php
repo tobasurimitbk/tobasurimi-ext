@@ -92,7 +92,7 @@ class Hutang extends BaseController
         return view('Laporan/LaporanHutang/index', $data);
     }
 
-    public function detail($id, $tanggalAwal, $tanggalAkhir, $filter, $filterDivisi, $search)
+    public function detail($id, $tanggalAwal, $tanggalAkhir, $filter, $filterDivisi, $search, $tipeBarang)
     {
         $data = [
             'id'            => $id,
@@ -100,7 +100,8 @@ class Hutang extends BaseController
             'tanggalAkhir'  => $tanggalAkhir != "all" ? date("d/m/Y", strtotime($tanggalAkhir)) : "",
             'filter'        => $filter,
             "filterDivisi"  => $filterDivisi,
-            "search"        => $search
+            "search"        => $search,
+            "tipeBarang"    => $tipeBarang,
         ];
         return view('Laporan/LaporanHutang/detail', $data);
     }
@@ -109,6 +110,7 @@ class Hutang extends BaseController
     {
         $rawFilter = $this->request->getGet("filter");
         $filter = [];
+        $type_barang   = $this->request->getGet("type_barang");
 
         if ($rawFilter) {
             $filter = explode(',', $rawFilter);
@@ -135,11 +137,11 @@ class Hutang extends BaseController
             "search"        => $this->request->getGet("search"),
             "filter"        => $filter,
             "divisi"        => $this->request->getGet("divisi"),
-            "type_barang"   => $this->request->getGet("type_barang"),
             "sort"          => $this->request->getGet("sort"),
+            "summary"       => "summary",
             "sortType"      => $this->request->getGet("sortType"),
-            "startdate"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
-            "lastdate"      => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"      => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
         if ($this->this_company_id != "16" && $this->this_company_id != "15") {
@@ -155,29 +157,42 @@ class Hutang extends BaseController
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        $allData = $this->getAllHutangSummary($condition, $addCondition);
+        $allData = [];
 
-        $totalData = count($allData);
-        $pagedData = array_slice($allData, $offset, $limit);
+        if ($type_barang == "BAHAN BAKU LOKAL") {
+            $condition['rm_purchase_orders.deletedAt'] = NULL;
+            $allData = $this->rMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, $limit, $offset);
+        } else if ($type_barang == "BAHAN PENOLONG LOKAL") {
+            $condition['am_purchase_orders.deletedAt'] = NULL;
+            $condition['am_purchase_orders.po_type'] = "Lokal";
+            $allData = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
+        } else if ($type_barang == "BAHAN BAKU INTERNASIONAL") {
+            $condition['rm_import_pos.deletedAt'] = NULL;
+            $allData = $this->rMImportPOModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
+        } else if ($type_barang == "BAHAN PENOLONG INTERNASIONAL") {
+            $condition['am_purchase_orders.deletedAt'] = NULL;
+            $condition['am_purchase_orders.po_type'] = "Import";
+            $allData = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
+        }
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         $rdata = [];
-        foreach ($pagedData as $d) {
+        foreach ($allData['data'] as $d) {
             $rdata[] = [
                 'no' => $no++,
-                'id' => $d['id'],
-                'supplier' => $d['supplier'],
-                'no_penerimaan_barang' => $d['no_penerimaan_barang'],
-                'nominal_idr' => $d['nominal_idr'],
-                'remaining_idr' => $d['remaining_idr'],
+                'id' => $d->id,
+                'supplier' => $d->supplier_name,
+                'no_penerimaan_barang' => $d->list_no_penerimaan_barang,
+                'nominal_idr' => $d->sum_total,
+                'remaining_idr' => $d->sum_remaining ?? $d->sum_total,
             ];
         }
 
         return response()->setJSON([
             "draw" => intval($this->request->getGet("draw")),
-            "recordsTotal" => $totalData,
-            "recordsFiltered" => $totalData,
+            "recordsTotal" => $allData['totalData'],
+            "recordsFiltered" => $allData['totalFilteredData'],
             "data" => $rdata,
             "payload" => $payload,
         ]);
@@ -233,19 +248,35 @@ class Hutang extends BaseController
         $offset = $this->request->getGet("start");
 
         $checkSupplier = $this->supplierModel->find($id);
+        $type_barang   = $this->request->getGet("tipe_barang");
 
-        // var_dump($condition, $addCondition, $limit, $offset);
-        // exit;
+        // if ($checkSupplier['type'] == "BAHAN PENOLONG") {
+        //     $res = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, $limit, $offset);
+        // } else if ($checkSupplier['type'] == "BAHAN BAKU") {
+        //     $res = $this->rMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, $limit, $offset);
+        // } else {
+        //     $res = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, $limit, $offset);
+        //     if (!$res) {
+        //         $res = $this->rMImportPOModel->getPOByIdSupplierWithInvoice($condition, $addCondition, $limit, $offset);
+        //     }
+        // }
 
-        if ($checkSupplier['type'] == "BAHAN PENOLONG") {
-            $res = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, $limit, $offset);
-        } else if ($checkSupplier['type'] == "BAHAN BAKU") {
+        if ($type_barang == "BAHAN BAKU LOKAL") {
+            $condition['rm_purchase_orders.deletedAt'] = NULL;
             $res = $this->rMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, $limit, $offset);
-        } else {
+            var_dump($condition, $addCondition, $limit, $offset, $type_barang, $res);
+            exit;
+        } else if ($type_barang == "BAHAN PENOLONG LOKAL") {
+            $condition['am_purchase_orders.deletedAt'] = NULL;
+            $condition['am_purchase_orders.po_type'] = "Lokal";
             $res = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, $limit, $offset);
-            if (!$res) {
-                $res = $this->rMImportPOModel->getPOByIdSupplierWithInvoice($condition, $addCondition, $limit, $offset);
-            }
+        } else if ($type_barang == "BAHAN BAKU INTERNASIONAL") {
+            $condition['rm_import_pos.deletedAt'] = NULL;
+            $res = $this->rMImportPOModel->getPOByIdSupplierWithInvoice($condition, $addCondition, $limit, $offset);
+        } else if ($type_barang == "BAHAN PENOLONG INTERNASIONAL") {
+            $condition['am_purchase_orders.deletedAt'] = NULL;
+            $condition['am_purchase_orders.po_type'] = "Import";
+            $res = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, $limit, $offset);
         }
 
         $rdata = [];
@@ -275,54 +306,6 @@ class Hutang extends BaseController
         ];
 
         return response()->setJSON($data);
-    }
-
-    public function getAllHutangSummary($condition, $addCondition)
-    {
-        $res = [];
-
-        $data = [];
-
-        $dataBB = $this->rMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
-        $dataBP = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
-        $dataIMP = $this->rMImportPOModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
-
-        $all = array_merge($dataBB['data'], $dataBP['data'], $dataIMP['data']);
-
-        foreach ($all as $item) {
-            $supplierId = $item->supplier_id;
-            $supplierName = $item->supplier_name;
-
-            if (!isset($data[$supplierId])) {
-                $data[$supplierId] = [
-                    'id' => $supplierId,
-                    'supplier' => $supplierName,
-                    'no_penerimaan_barang' => [],
-                    'nominal_idr' => 0,
-                    'remaining_idr' => 0
-                ];
-            }
-
-            $data[$supplierId]['nominal_idr'] += floatval($item->total ?? 0);
-            $data[$supplierId]['remaining_idr'] += floatval($item->total ?? 0) - floatval($item->remaining ?? 0);
-
-            if (!empty($item->no_penerimaan_barang)) {
-                $data[$supplierId]['no_penerimaan_barang'][] = $item->no_penerimaan_barang;
-            }
-        }
-
-        // Format hasil akhir
-        foreach ($data as $supplier) {
-            $res[] = [
-                'id' => $supplier['id'],
-                'supplier' => $supplier['supplier'],
-                'no_penerimaan_barang' => implode(', ', array_unique($supplier['no_penerimaan_barang'])),
-                'nominal_idr' => number_format($supplier['nominal_idr'], 2, '.', ''),
-                'remaining_idr' => number_format($supplier['remaining_idr'], 2, '.', ''),
-            ];
-        }
-
-        return $res;
     }
 
     public function printHutang()

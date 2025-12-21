@@ -2829,17 +2829,17 @@ $routes->get('/laporan-accounting', 'Laporan\Accounting\Accounting::index', ['fi
 
 $routes->get('/laporan-accounting/pembelian', 'Laporan\Accounting\Pembelian::index', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/pembelian/all', 'Laporan\Accounting\Pembelian::allTransaksi', ['filter' => 'Auth']);
-$routes->get('/laporan-accounting/pembelian/printPDF/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Pembelian::LaporanPembelianPrint/$1/$2/$3/$4', ['filter' => 'Auth']);
-$routes->get('/laporan-accounting/pembelian/printExcel/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Pembelian::exportExcel/$1/$2/$3/$4', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/pembelian/printPDF/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Pembelian::LaporanPembelianPrint/$1/$2/$3/$4/$5/$6', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/pembelian/printExcel/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Pembelian::exportExcel/$1/$2/$3/$4/$5/$6', ['filter' => 'Auth']);
 
 $routes->get('/laporan-accounting/penjualan', 'Laporan\Accounting\Penjualan::index', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/penjualan/all', 'Laporan\Accounting\Penjualan::allTransaksi', ['filter' => 'Auth']);
-$routes->get('/laporan-accounting/penjualan/printPDF/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Penjualan::LaporanPenjualanPrint/$1/$2/$3/$4', ['filter' => 'Auth']);
-$routes->get('/laporan-accounting/penjualan/printExcel/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Penjualan::exportExcel/$1/$2/$3/$4', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/penjualan/printPDF/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Penjualan::LaporanPenjualanPrint/$1/$2/$3/$4/$5', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/penjualan/printExcel/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Penjualan::exportExcel/$1/$2/$3/$4/$5', ['filter' => 'Auth']);
 
 $routes->get('/laporan-accounting/hutang', 'Laporan\Accounting\Hutang::index', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/hutang/all', 'Laporan\Accounting\Hutang::allHutang', ['filter' => 'Auth']);
-$routes->get('/laporan-accounting/hutang/details/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Hutang::detail/$1/$2/$3/$4/$5/$6', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/hutang/details/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Hutang::detail/$1/$2/$3/$4/$5/$6/$7', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/hutang/details/invoice/(:segment)', 'Laporan\Accounting\Hutang::allDetailsInvoice/$1', ['filter' => 'Auth']);
 $routes->get('laporan-accounting/hutang/print', 'Laporan\Accounting\Hutang::printHutang');
 $routes->get('laporan-accounting/hutang/export-excel', 'Laporan\Accounting\Hutang::exportExcelHutang');

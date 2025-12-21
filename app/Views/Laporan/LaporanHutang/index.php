@@ -77,9 +77,10 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select list_type_barang" name="list_type_barang" id="list_type_barang">
                                     <option value=""></option>
-                                    <option value="BAHAN PENOLONG">Bahan Penolong</option>
-                                    <option value="BAHAN BAKU">Bahan Baku</option>
-                                    <option value="INTERNASIONAL">Internasional</option>
+                                    <option value="BAHAN BAKU LOKAL" selected>Bahan Baku Lokal</option>
+                                    <option value="BAHAN PENOLONG LOKAL">Bahan Penolong Lokal</option>
+                                    <option value="BAHAN BAKU INTERNASIONAL">Bahan Baku Internasional</option>
+                                    <option value="BAHAN PENOLONG INTERNASIONAL">Bahan Penolong Internasional</option>
                                 </select>
                                 <label for="floatingInput">Tipe Supplier</label>
                             </div>
@@ -222,8 +223,7 @@
         });
         $('.list_type_barang').select2({
             placeholder: "Filter Tipe Bahan",
-            theme: "bootstrap-5",
-            allowClear: true
+            theme: "bootstrap-5"
         });
         $('.list_supplier, .list_divisi, .list_type_barang')
             .parent('div')
@@ -279,12 +279,13 @@
             const data = table.row(this).data();
             var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "all";
             var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "all";
-            var filter = $(".list_supplier").val() ? $(".list_supplier").val() : "all";
-            var filter_divisi = $(".list_divisi").val() ? $(".list_divisi").val() : "all";
+            var filter = $(".list_supplier option:selected").val() ? $(".list_supplier").val() : "all";
+            var filter_divisi = $(".list_divisi option:selected").val() ? $(".list_divisi").val() : "all";
+            var type_barang = $(".list_type_barang option:selected").val() ? $(".list_type_barang").val() : "all";
             var search = $(".search").val() ? $(".search").val() : "all";
             if (data) {
                 window.open(
-                    `<?= base_url("laporan-accounting/hutang/details/"); ?>${data.id}/${tanggal_awal}/${tanggal_akhir}/${filter}/${filter_divisi}/${search}`,
+                    `<?= base_url("laporan-accounting/hutang/details/"); ?>${data.id}/${tanggal_awal}/${tanggal_akhir}/${filter}/${filter_divisi}/${search}/${type_barang}`,
                     '_blank',
                     'width=1000,height=700,scrollbars=yes,resizable=yes'
                 );

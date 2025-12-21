@@ -7,6 +7,7 @@ use App\Models\CustomerModel;
 use App\Models\SalesOrderInvoiceModel;
 use App\Models\SalesOrderExportModel;
 use App\Models\KursModel;
+use App\Models\DivisisModel;
 use Dompdf\Dompdf;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -28,6 +29,7 @@ class Penjualan extends BaseController
     protected $salesOrderExportModel;
     protected $is_admin;
     private $userId;
+    protected $divisisModel;
 
     public function __construct()
     {
@@ -36,6 +38,7 @@ class Penjualan extends BaseController
         $this->SalesOrderInvoiceModel = new SalesOrderInvoiceModel();
         $this->salesOrderExportModel = new SalesOrderExportModel();
         $this->kursModel = new KursModel();
+        $this->divisisModel = new DivisisModel();
         $this->userId = session()->get("login")->user_id;
         $this->is_admin = session()->get("login")->is_admin;
     }
@@ -43,6 +46,7 @@ class Penjualan extends BaseController
     {
         $customerData = $this->customerModel->asObject()->where('company_id', $this->this_company_id)->findAll();
         $data = [
+            'divisis' => $this->divisisModel->getDivisiAccess(),
             'customer' => $customerData
         ];
         return view('Laporan/LaporanPenjualan/index', $data);
@@ -71,6 +75,7 @@ class Penjualan extends BaseController
         $addCondition = [
             "search"        => $this->request->getGet("search"),
             "filter"        => $this->request->getGet("filter"),
+            "filter_divisi"         => $this->request->getGet("filter_divisi"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
             "startdate" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
@@ -171,7 +176,7 @@ class Penjualan extends BaseController
         return response()->setJSON($data);
     }
 
-    public function LaporanPenjualanPrint($tglAwal, $tglAkhir, $filter, $search)
+    public function LaporanPenjualanPrint($tglAwal, $tglAkhir, $filter, $search, $divisi)
     {
         $dompdf = new Dompdf();
         $tipePenjualan  = $filter;
@@ -179,6 +184,7 @@ class Penjualan extends BaseController
         $addCondition = [
             "search"        => $search != "all" ? $search : "",
             "filter"        => "",
+            "filter_divisi" => $divisi != "all" ? $divisi : "",
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
             "startdate" => $tglAwal != "all" ? $tglAwal : "",
@@ -287,6 +293,7 @@ class Penjualan extends BaseController
         $addCondition = [
             "search"        => $search != "all" ? $search : "",
             "filter"        => "",
+            "filter_divisi" => $divisi != "all" ? $divisi : "",
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
             "startdate" => $tglAwal != "all" ? $tglAwal : "",

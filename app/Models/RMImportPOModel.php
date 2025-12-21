@@ -366,7 +366,10 @@ class RMImportPOModel extends Model
                     COUNT(rm_import_po_details.id) AS itemCount,
                     penerimaan_barang_detail.sub_total AS total, 
                     local_po_payments.amount AS remaining,
-                    penerimaan_barang.no_penerimaan_barang AS no_penerimaan_barang";
+                    SUM(penerimaan_barang_detail.sub_total) AS sum_total, 
+                    SUM(local_po_payments.amount) AS sum_remaining,
+                    penerimaan_barang.no_penerimaan_barang AS no_penerimaan_barang,
+                    GROUP_CONCAT(penerimaan_barang.no_penerimaan_barang SEPARATOR ', ') AS list_no_penerimaan_barang";
 
         $poDataQry = $this->asObject()
             ->select($selectQry)
@@ -377,9 +380,13 @@ class RMImportPOModel extends Model
             ->join('rm_import_po_details', 'rm_import_pos.id = rm_import_po_details.rm_import_po_id', 'left')
             ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_id = rm_import_pos.id AND penerimaan_barang_detail.purchase_order_details_id = rm_import_po_details.id', 'right')
             ->join('penerimaan_barang', "penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id AND penerimaan_barang.status_penerimaan = 'IMPORT' AND penerimaan_barang.tipe_bahan = 'BAKU'", 'right')
-            ->join('local_po_payments', 'FIND_IN_SET(rm_import_pos.id, REPLACE(REPLACE(local_po_payments.multiple_po_id, "[", ""), "]", ""))', 'left') // Menyesuaikan jika multiple_po_id berbentuk JSON atau array sebagai string
-            ->groupBy('rm_import_pos.id')
-            ->orderBy($sort, $sortType);
+            ->join('local_po_payments', 'FIND_IN_SET(rm_import_pos.id, REPLACE(REPLACE(local_po_payments.multiple_po_id, "[", ""), "]", ""))', 'left');
+            if (isset($addCondition['summary']) && $addCondition['summary'] == "summary") {
+                $poDataQry->groupBy('rm_import_pos.id, rm_import_pos.supplier_id');
+            } else {
+                $poDataQry->groupBy('rm_import_pos.id');
+            }
+            $poDataQry->orderBy($sort, $sortType);
 
         $totalData = $poDataQry->countAllResults(false);
 

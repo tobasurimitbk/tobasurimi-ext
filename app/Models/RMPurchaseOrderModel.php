@@ -2178,7 +2178,10 @@ class RMPurchaseOrderModel extends Model
                     COUNT(rm_purchase_order_details.id) AS itemCount,
                     penerimaan_barang_detail.sub_total AS total, 
                     local_po_payments.amount AS remaining,
-                    penerimaan_barang.no_penerimaan_barang AS no_penerimaan_barang";
+                    SUM(penerimaan_barang_detail.sub_total) AS sum_total, 
+                    SUM(local_po_payments.amount) AS sum_remaining,
+                    penerimaan_barang.no_penerimaan_barang AS no_penerimaan_barang,
+                    GROUP_CONCAT(penerimaan_barang.no_penerimaan_barang SEPARATOR ', ') AS list_no_penerimaan_barang";
 
         $poDataQry = $this->asObject()
             ->select($selectQry)
@@ -2189,9 +2192,13 @@ class RMPurchaseOrderModel extends Model
             ->join('rm_purchase_order_details', 'rm_purchase_orders.id = rm_purchase_order_details.rm_purchase_order_id', 'left')
             ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_id = rm_purchase_orders.id AND penerimaan_barang_detail.purchase_order_details_id = rm_purchase_order_details.id', 'right')
             ->join('penerimaan_barang', "penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id AND penerimaan_barang.status_penerimaan = 'LOKAL' AND penerimaan_barang.tipe_bahan = 'BAKU'", 'right')
-            ->join('local_po_payments', 'FIND_IN_SET(rm_purchase_orders.id, REPLACE(REPLACE(local_po_payments.multiple_po_id, "[", ""), "]", ""))', 'left') // Menyesuaikan jika multiple_po_id berbentuk JSON atau array sebagai string
-            ->groupBy('rm_purchase_orders.id')
-            ->orderBy($sort, $sortType);
+            ->join('local_po_payments', 'FIND_IN_SET(rm_purchase_orders.id, REPLACE(REPLACE(local_po_payments.multiple_po_id, "[", ""), "]", ""))', 'left');
+            if (isset($addCondition['summary']) && $addCondition['summary'] == "summary") {
+                $poDataQry->groupBy('suppliers.id');
+            } else {
+                $poDataQry->groupBy('rm_purchase_orders.id');
+            }
+            $poDataQry->orderBy($sort, $sortType);
 
         $totalData = $poDataQry->countAllResults(false);
 

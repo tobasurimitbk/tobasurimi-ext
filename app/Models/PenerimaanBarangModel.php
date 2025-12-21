@@ -358,7 +358,7 @@ class PenerimaanBarangModel extends Model
 
         $totalData = $penerimaanBarangDataQry->countAllResults(false);
 
-        if ($addCondition['search'] || $addCondition['filter'] || $addCondition['startdate'] || $addCondition['lastdate']) {
+        if ($addCondition['search'] || $addCondition['filter'] || $addCondition['filter_type_barang'] || $addCondition['filter_divisi'] || $addCondition['startdate'] || $addCondition['lastdate']) {
             $penerimaanBarangDataQry->groupStart();
         }
 
@@ -372,6 +372,26 @@ class PenerimaanBarangModel extends Model
             $penerimaanBarangDataQry->whereIn('suppliers.id', $addCondition['filter']);
         }
 
+        if ($addCondition['filter_divisi']) {
+            $penerimaanBarangDataQry->where('penerimaan_barang.divisi_id', $addCondition['filter_divisi']);
+        }
+
+        if ($addCondition['filter_type_barang']) {
+            if ($addCondition['filter_type_barang'] == 'BAHAN BAKU LOKAL') {
+                $penerimaanBarangDataQry->where('penerimaan_barang.status_penerimaan', 'LOKAL')
+                    ->where('penerimaan_barang.tipe_bahan', 'BAKU');
+            } else if ($addCondition['filter_type_barang'] == 'BAHAN PENOLONG LOKAL') {
+                $penerimaanBarangDataQry->where('penerimaan_barang.status_penerimaan', 'LOKAL')
+                    ->where('penerimaan_barang.tipe_bahan', 'PENOLONG');
+            } else if ($addCondition['filter_type_barang'] == 'BAHAN BAKU INTERNASIONAL') {
+                $penerimaanBarangDataQry->where('penerimaan_barang.status_penerimaan', 'IMPORT')
+                    ->where('penerimaan_barang.tipe_bahan', 'BAKU');
+            } else if ($addCondition['filter_type_barang'] == 'BAHAN PENOLONG INTERNASIONAL') {
+                $penerimaanBarangDataQry->where('penerimaan_barang.status_penerimaan', 'IMPORT')
+                    ->where('penerimaan_barang.tipe_bahan', 'PENOLONG');
+            }
+        }
+
         if ($addCondition['startdate']) {
             $penerimaanBarangDataQry->where('penerimaan_barang.tanggal >=', $addCondition['startdate']);
         }
@@ -380,7 +400,7 @@ class PenerimaanBarangModel extends Model
             $penerimaanBarangDataQry->where('penerimaan_barang.tanggal <=', $addCondition['lastdate']);
         }
 
-        if ($addCondition['search'] || $addCondition['filter'] || $addCondition['startdate'] || $addCondition['lastdate']) {
+        if ($addCondition['search'] || $addCondition['filter'] || $addCondition['filter_type_barang'] || $addCondition['filter_divisi'] || $addCondition['startdate'] || $addCondition['lastdate']) {
             $penerimaanBarangDataQry->groupEnd();
         }
 

@@ -22,7 +22,7 @@
                     <div class="row">
                         <div class="col-md-4 mb-3">
                             <div class="input-group" style="height: 50px;">
-                                <input style="height: auto;" autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Mulai Tanggal Transaksi" value="<?php $tanggalAwal == "" ? "" : date('d/m/Y', strtotime($tanggalAwal)); ?>" />
+                                <input style="height: auto;" autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Mulai Tanggal Transaksi" value="<?= $tanggalAwal; ?>" />
                                 <div class="input-group-prepend group-prepend-password align-items-center">
                                     <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
                                 </div>
@@ -30,7 +30,7 @@
                         </div>
                         <div class="col-md-4 mb-3">
                             <div class="input-group" style="height: 50px;">
-                                <input style="height: auto;" autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Selesai Tanggal Transaksi" value="<?php $tanggalAkhir == "" ? "" : date('d/m/Y', strtotime($tanggalAkhir)); ?>">
+                                <input style="height: auto;" autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Selesai Tanggal Transaksi" value="<?= $tanggalAkhir; ?>">
                                 <div class="input-group-prepend group-prepend-password align-items-center">
                                     <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                                 </div>
@@ -93,6 +93,7 @@
                     data.dateEnd = $(".dateEnd").val();
                     data.filter = <?php echo json_encode($filter); ?>;
                     data.filter_divisi = <?php echo json_encode($filterDivisi); ?>;
+                    data.tipe_barang = <?php echo json_encode($tipeBarang); ?>;
                     data.sort = sort;
                     data.sortType = sortType;
                 }

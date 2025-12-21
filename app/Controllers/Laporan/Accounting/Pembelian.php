@@ -15,6 +15,7 @@ use App\Models\AMPurchaseOrderDetailModel;
 use App\Models\BCPurchaseOrderModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\PenerimaanBarangDetailModel;
+use App\Models\DivisisModel;
 use Dompdf\Dompdf;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -33,6 +34,7 @@ class Pembelian extends BaseController
     protected $penerimaanBarangModel;
     protected $penerimaanBarangDetailModel;
     protected $bcPurchaseOrderModel;
+    protected $divisisModel;
 
     public function __construct()
     {
@@ -47,6 +49,7 @@ class Pembelian extends BaseController
         $this->penerimaanBarangModel = new PenerimaanBarangModel();
         $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
         $this->bcPurchaseOrderModel = new BCPurchaseOrderModel();
+        $this->divisisModel = new DivisisModel();
     }
 
     public function index()
@@ -67,6 +70,7 @@ class Pembelian extends BaseController
             ->groupBy('suppliers.name')
             ->findAll();
         $data = [
+            'divisis' => $this->divisisModel->getDivisiAccess(),
             'suppliers' => $supplierData
         ];
         return view('Laporan/LaporanPembelian/index', $data);
@@ -106,22 +110,24 @@ class Pembelian extends BaseController
         ];
 
         $addCondition = [
-            "search"        => $this->request->getGet("search"),
-            "filter"        => $filter,
-            "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType"),
-            "startdate"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : date("Y-m-d"),
-            "lastdate"      => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : date("Y-m-d"),
+            "search"                => $this->request->getGet("search"),
+            "filter_type_barang"    => $this->request->getGet("filter_type_barang"),
+            "filter_divisi"         => $this->request->getGet("filter_divisi"),
+            "filter"                => $filter,
+            "sort"                  => $this->request->getGet("sort"),
+            "sortType"              => $this->request->getGet("sortType"),
+            "startdate"             => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : date("Y-m-d"),
+            "lastdate"              => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : date("Y-m-d"),
         ];
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
         // $res = $this->transaksiPembelianModel->getList($condition, $addCondition, $limit, $offset);
-        $res = $this->penerimaanBarangModel->getPenerimaanBarangListForAccounting($condition, $addCondition, $limit, $offset);
-        $metaValuta = $this->metadataModel->get_by_name('Valuta');
         // var_dump($condition, $addCondition, $limit, $offset);
         // exit;
+        $res = $this->penerimaanBarangModel->getPenerimaanBarangListForAccounting($condition, $addCondition, $limit, $offset);
+        $metaValuta = $this->metadataModel->get_by_name('Valuta');
         $rdata = [];
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
@@ -274,7 +280,7 @@ class Pembelian extends BaseController
         return response()->setJSON($data);
     }
 
-    public function LaporanPembelianPrint($tglAwal, $tglAkhir, $rawFilter, $search)
+    public function LaporanPembelianPrint($tglAwal, $tglAkhir, $rawFilter, $search, $divisi, $typeBarang)
     {
         ini_set('memory_limit', '-1');
         set_time_limit(0);
@@ -302,12 +308,14 @@ class Pembelian extends BaseController
         ];
 
         $addCondition = [
-            "search"        => $search == "all" ? "" : $search,
-            "filter"        => $filter[0] == "all" ? [] : $filter,
-            "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType"),
-            "startdate"     => $tglAwal ? date("Y-m-d", strtotime(str_replace("/", "-", $tglAwal))) : date("Y-m-d"),
-            "lastdate"      => $tglAkhir ? date("Y-m-d", strtotime(str_replace("/", "-", $tglAkhir))) : date("Y-m-d"),
+            "search"                => $search == "all" ? "" : $search,
+            "filter"                => $filter[0] == "all" ? [] : $filter,
+            "sort"                  => $this->request->getGet("sort"),
+            "sortType"              => $this->request->getGet("sortType"),
+            "filter_type_barang"    => $typeBarang == "all" ? "" : $typeBarang,
+            "filter_divisi"         => $divisi == "all" ? "" : $divisi,
+            "startdate"             => $tglAwal ? date("Y-m-d", strtotime(str_replace("/", "-", $tglAwal))) : date("Y-m-d"),
+            "lastdate"              => $tglAkhir ? date("Y-m-d", strtotime(str_replace("/", "-", $tglAkhir))) : date("Y-m-d"),
         ];
 
         // $res = $this->transaksiPembelianModel->getList($condition, $addCondition, $limit, $offset);
@@ -452,7 +460,7 @@ class Pembelian extends BaseController
         exit(0);
     }
 
-    public function exportExcel($tglAwal, $tglAkhir, $rawFilter, $search)
+    public function exportExcel($tglAwal, $tglAkhir, $rawFilter, $search, $divisi, $typeBarang)
     {
         ini_set('memory_limit', '-1');
         set_time_limit(0);
@@ -480,12 +488,14 @@ class Pembelian extends BaseController
         ];
 
         $addCondition = [
-            "search"        => $search == "all" ? "" : $search,
-            "filter"        => $filter[0] == "all" ? [] : $filter,
-            "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType"),
-            "startdate"     => $tglAwal ? date("Y-m-d", strtotime(str_replace("/", "-", $tglAwal))) : date("Y-m-d"),
-            "lastdate"      => $tglAkhir ? date("Y-m-d", strtotime(str_replace("/", "-", $tglAkhir))) : date("Y-m-d"),
+            "search"                => $search == "all" ? "" : $search,
+            "filter"                => $filter[0] == "all" ? [] : $filter,
+            "sort"                  => $this->request->getGet("sort"),
+            "sortType"              => $this->request->getGet("sortType"),
+            "filter_type_barang"    => $typeBarang == "all" ? "" : $typeBarang,
+            "filter_divisi"         => $divisi == "all" ? "" : $divisi,
+            "startdate"             => $tglAwal ? date("Y-m-d", strtotime(str_replace("/", "-", $tglAwal))) : date("Y-m-d"),
+            "lastdate"              => $tglAkhir ? date("Y-m-d", strtotime(str_replace("/", "-", $tglAkhir))) : date("Y-m-d"),
         ];
 
         // Menggabungkan sel dari A1 hingga N1 dan mengisi dengan teks "Purchase Order"
