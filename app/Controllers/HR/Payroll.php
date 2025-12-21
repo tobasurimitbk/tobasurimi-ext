@@ -1020,6 +1020,7 @@ class Payroll extends BaseController
         $dompdf = new Dompdf();
         $yearMonth = $this->request->getVar('month');
         $divisionID = $this->request->getVar('divisi_id');
+        $bagianId = $this->request->getVar('bagian_id');
         $tipe = json_decode($this->request->getVar('tipe'), true) ?? [];
 
         // set variable
@@ -1032,7 +1033,8 @@ class Payroll extends BaseController
             $year,
             $month,
             $this->this_company_id,
-            $tipe
+            $tipe,
+            $bagianId
         );
         $tipeStr = $this->getTipeStr($tipe);
 
@@ -1145,6 +1147,7 @@ class Payroll extends BaseController
         $yearMonth = $this->request->getVar('month');
         $divisionID = $this->request->getVar('divisi_id');
         $tipe = json_decode($this->request->getVar('tipe'), true) ?? [];
+        $bagianId = $this->request->getVar('bagian_id');
 
         $year = explode("-", $yearMonth)[0];
         $month = explode("-", $yearMonth)[1];
@@ -1152,7 +1155,8 @@ class Payroll extends BaseController
             $yearMonth,
             $this->this_company_id,
             $divisionID,
-            $tipe
+            $tipe,
+            $bagianId
         );
 
         // dd($payrollData);

@@ -464,90 +464,169 @@ class PayrollsModel extends Model
             'nominal_penambahan_gaji' => $gajiPlus[0]['total']
         ]);
     }
-
     public function getListPrintPayrollByDivision(
         $divisionID,
         $adminID,
         $year,
         $month,
         $companyID,
-        $tipes
+        $tipes,
+        $bagianId
     ) {
-        $bagianModel = new BagianModel();
+        $payrollGajiConjunctionModel = new PayrollGajiConjunctionModel();
 
+        // Kondisi dasar
         $condition = [
             'employees.company_id' => $companyID,
             "employees.deletedAt" => null,
-            "employees.company_id" => $companyID,
             "employees.division_id" => $divisionID,
-            "employees.id != " => $adminID, // kecualikan admin yg akses
+            // "employees.id !=" => $adminID, // kecualikan admin yg akses
             "year_month" => $year . "-" . $month,
         ];
 
+        // Query utama payroll
         $selectQry = "
-        payrolls.*,
-        employees.name AS employeesName,
-        employees.nip AS employeesNIP,
-        divisis.divisi AS divisiName,
-        employees.bagian_id 
+            payrolls.*,
+            employees.name AS employeesName,
+            employees.nip AS employeesNIP,
+            divisis.divisi AS divisiName,
+            employees.bagian_id,
+            bagian.nama_bagian
         ";
 
         $dataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
             ->join('employees', 'employees.id = payrolls.employee_id', 'left')
-            ->join('divisis', 'divisis.id = employees.division_id', 'left'); // Corrected the join condition
+            ->join('bagian', 'bagian.id = employees.bagian_id', 'left')
+            ->join('divisis', 'divisis.id = employees.division_id', 'left');
 
-        if (count($tipes) > 0) {
+        if (!empty($tipes)) {
             $dataQry->whereIn('tipe', $tipes);
         }
 
+        if (!empty($bagianId)) {
+            $dataQry->where('employees.bagian_id', $bagianId);
+        }
+
+        $dataQry->where('payrolls.deletedAt', null);
+
+        // Ambil semua payroll dulu
+        $payrolls = $dataQry->orderBy('employees.nip', 'asc')->findAll();
+
+        // Ambil semua payroll_id untuk map uang makan sekaligus
+        $payrollIds = array_map(fn($p) => $p->id, $payrolls);
+
+        $uangMakanList = [];
+        if (!empty($payrollIds)) {
+            $map = $payrollGajiConjunctionModel
+                ->select('payroll_id, nominal')
+                ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id', 'left')
+                ->where('tunjangan.name', 'UANG MAKAN')
+                ->whereIn('payroll_id', $payrollIds)
+                ->findAll();
+
+            foreach ($map as $u) {
+                $uangMakanList[$u['payroll_id']] = $u['nominal'];
+            }
+        }
+
+        // Proses data & total
         $no = 1;
-        // set variable
         $dataPayRolls = [];
-        $upahPokok = 0;
-        $upahLembur = 0;
-        $totalUpah = 0;
-        $potongan = 0;
-        $jumlahUpah = 0;
+        $subTotalUpah = $subTotalUangMakan = 0;
+        $subTotalUpahPokok = $subTotalLemburKerja = 0;
+        $subTotalTunjanganKesejahteraan = $subTotalPotongan = 0;
+        $subTotalJumlahUpah = 0;
 
-        foreach ($dataQry->findAll() as $p) {
-            $upahPokok += $p->nominal_uang_gaji;
-            $upahLembur += $p->nominal_uang_lembur;
-            $totalUpah += ($p->nominal_uang_gaji + $p->nominal_uang_lembur);
-            $potongan += ($p->nominal_pengurangan_gaji + $p->nominal_pinjaman_karyawan);
-            $jumlahUpah += $p->nominal_gaji_diterima;
+        foreach ($payrolls as $p) {
+            $totalUpah = $p->nominal_gaji_diterima;
+            $uangMakan = $uangMakanList[$p->id] ?? 0;
+            // $upahPokok = ($p->nominal_gaji_harian + $p->nominal_cadangan) * $p->hadir_final;
+            $upahPokok = $p->nominal_uang_gaji;
+            $lemburKerja = $p->nominal_uang_lembur;
+            $tunjanganKesejahteraan = 0;
+            $potongan = $p->nominal_pengurangan_gaji;
+            $jumlahUpah = $p->nominal_gaji_diterima;
 
-            $bagian = $bagianModel->where('id', $p->bagian_id)->first();
+            // sum
+            $subTotalUpah += $totalUpah;
+            $subTotalUangMakan += $uangMakan;
+            $subTotalUpahPokok += $upahPokok;
+            $subTotalLemburKerja += $lemburKerja;
+            $subTotalTunjanganKesejahteraan += $tunjanganKesejahteraan;
+            $subTotalPotongan += $potongan;
+            $subTotalJumlahUpah += $jumlahUpah;
 
-            array_push($dataPayRolls, [
-                "no" => $no++,
+            $dataPayRolls[] = [
                 "id" => $p->id,
                 "employee_id" => $p->employee_id,
                 "nip" => $p->employeesNIP,
                 "name"  => $p->employeesName,
-                "namaBagian" => $bagian == null ? "-" : $bagian['nama_bagian'],
+                "namaBagian" => $p->nama_bagian,
                 "divisi" => $p->divisiName,
-                "hariKerja" => $p->hadir_final . "",
-                "upahPokok" => number_format($p->nominal_uang_gaji, 2, ',', '.'),
-                "upahLembur" => number_format($p->nominal_uang_lembur, 2, ',', '.'),
-                "totalUpah" => number_format($p->nominal_uang_gaji + $p->nominal_uang_lembur, 2, ',', '.'),
-                "potongan" => number_format($p->nominal_pengurangan_gaji +  $p->nominal_pinjaman_karyawan,  2, ',', '.'),
-                "jumlahUpah" => number_format($p->nominal_gaji_diterima,  2, ',', '.'),
-            ]);
+                "hariKerja" => $p->hadir_final,
+                "totalUpah" => $totalUpah,
+                "uangMakan" => $uangMakan,
+                "upahPokok" => $upahPokok,
+                "lemburKerja" => $lemburKerja,
+                "tunjanganKesejahteraan" => $tunjanganKesejahteraan,
+                "potongan" => $potongan,
+                "jumlahUpah" => $jumlahUpah,
+            ];
         }
 
+
+        $grouped = [];
+
+        foreach ($dataPayRolls as $d) {
+            $bagian = $d['namaBagian'];
+
+            if (!isset($grouped[$bagian])) {
+                // Inisialisasi
+                $grouped[$bagian] = [
+                    "namaBagian" => $bagian,
+                    "totalTotalUpah" => 0,
+                    "totalUangMakan" => 0,
+                    "totalUpahPokok" => 0,
+                    "totalLemburKerja" => 0,
+                    "totalTunjanganKesejahteraan" => 0,
+                    "totalPotongan" => 0,
+                    "totalJumlahUpah" => 0,
+                    "employees" => [],
+                ];
+            }
+
+            // Sum per field
+            $grouped[$bagian]['totalTotalUpah'] += $d['totalUpah'];
+            $grouped[$bagian]['totalUangMakan'] += $d['uangMakan'];
+            $grouped[$bagian]['totalUpahPokok'] += $d['upahPokok'];
+            $grouped[$bagian]['totalLemburKerja'] += $d['lemburKerja'];
+            $grouped[$bagian]['totalTunjanganKesejahteraan'] += $d['tunjanganKesejahteraan'];
+            $grouped[$bagian]['totalPotongan'] += $d['potongan'];
+            $grouped[$bagian]['totalJumlahUpah'] += $d['jumlahUpah'];
+
+            // Simpan detail pegawai (opsional)
+            $grouped[$bagian]['employees'][] = $d;
+        }
+
+        // Jika mau hasil sebagai array numerik
+        $groupedResult = array_values($grouped);
+
         return [
-            'dataPayroll' => $dataPayRolls,
+            'dataPayroll' => $groupedResult,
             'total' => [
-                'upahPokok' => $upahPokok,
-                'upahLembur' => $upahLembur,
-                'totalUpah' => $totalUpah,
-                'potongan' => $potongan,
-                'jumlahUpah' => $jumlahUpah,
+                'subTotalUpah' => $subTotalUpah,
+                'subTotalUangMakan' => $subTotalUangMakan,
+                'subTotalUpahPokok' => $subTotalUpahPokok,
+                'subTotalLemburKerja' => $subTotalLemburKerja,
+                'subTotalTunjanganKesejahteraan' => $subTotalTunjanganKesejahteraan,
+                'subTotalPotongan' => $subTotalPotongan,
+                'subTotalJumlahUpah' => $subTotalJumlahUpah
             ]
         ];
     }
+
 
 
     public function getPayrollDetail(
@@ -616,7 +695,8 @@ class PayrollsModel extends Model
         $yearMonth,
         $companyID,
         $divisionID,
-        $tipes
+        $tipes,
+        $bagianId
     ) {
         $db = \Config\Database::connect();
 
@@ -646,6 +726,10 @@ class PayrollsModel extends Model
 
         if (!empty($tipes)) {
             $builder->whereIn('employees.tipe', $tipes);
+        }
+
+        if (!empty($bagianId)) {
+            $builder->where('employees.bagian_id', $bagianId);
         }
 
         $payrollRows = $builder->orderBy('employees.nip', 'asc')->get()->getResultArray();
