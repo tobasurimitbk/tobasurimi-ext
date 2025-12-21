@@ -1750,7 +1750,7 @@ class BCPurchaseOrderModel extends Model
         (
             -- BC 2.7 IN
             SELECT
-                '' AS barang_id,
+                stock_revamp.barang_master_id AS barang_id,
                 'BC 2.7 In' AS jenis_doc,
                 bc_27.no_aju,
                 bc_27.no_daftar,
@@ -1792,7 +1792,7 @@ class BCPurchaseOrderModel extends Model
         (
             -- PPBKB IN
             SELECT
-                '' AS barang_id,
+                stock_revamp.barang_master_id AS barang_id,
                 'PPBKB In' AS jenis_doc,
                 ppbkb.no_ppbkb AS no_aju,
                 '' AS no_daftar,

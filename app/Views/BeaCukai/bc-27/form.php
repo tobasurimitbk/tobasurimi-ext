@@ -431,7 +431,7 @@
             data: function(params) {
                 return {
                     q: params.term,
-                    company_tujuan_id: "<?= session()->get('login')->this_company_id ?>"
+                    company_tujuan_id: $('#company_tujuan_id option:selected').val()
                 };
             },
             processResults: function(data) {
