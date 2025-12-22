@@ -471,6 +471,17 @@ class BC25 extends BaseController
         ]);
     }
 
+    public function unposting()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $this->bc25Model->update($id, ['status_posting' => '0']);
+        return response()->setJSON([
+            'status' => true,
+            'message' => "Dokumen BC 2.5 Berhasil Diunposting",
+            'token' => csrf_hash()
+        ]);
+    }
+
     public function generateNomorAju($tanggalDokumen)
     {
         if ($this->this_company_id == 1 || $this->this_company_id == 2) {

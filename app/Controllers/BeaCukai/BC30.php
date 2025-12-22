@@ -429,6 +429,17 @@ class BC30 extends BaseController
         ]);
     }
 
+    public function unposting()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $this->bc30Model->update($id, ['status_posting' => '0']);
+        return response()->setJSON([
+            'status' => true,
+            'message' => "Dokumen BC 3.0 Berhasil Diunposting",
+            'token' => csrf_hash()
+        ]);
+    }
+
     public function dropdownSalesOrder()
     {
         $typeReference = $this->request->getVar('type_reference');
