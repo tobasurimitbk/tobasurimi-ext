@@ -3,22 +3,8 @@
 namespace App\Controllers\Laporan\Accounting;
 
 use App\Controllers\BaseController;
-use App\Controllers\Master\Kurs;
-use App\Models\DivisisModel;
-use App\Models\SupplierModel;
-use App\Models\TransaksiPembelianModel;
-use App\Models\LocalPOPaymentModel;
-use App\Models\MetadataModel;
-use App\Models\KursModel;
-use App\Models\RMImportPOModel;
-use App\Models\RMImportPODetailModel;
-use App\Models\RMPurchaseOrderModel;
-use App\Models\RMPurchaseOrderDetailModel;
-use App\Models\AMPurchaseOrderModel;
-use App\Models\AMPurchaseOrderDetailModel;
-use App\Models\PenerimaanBarangModel;
-use App\Models\PenerimaanBarangDetailModel;
-use App\Models\TransaksiJurnalModel;
+use App\Models\CustomerModel;
+use App\Models\SalesOrderInvoiceModel;
 use Dompdf\Dompdf;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -27,37 +13,14 @@ use Exception;
 class Piutang extends BaseController
 {
     protected $this_company_id;
-    protected $supplierModel;
-    protected $transaksiPembelianModel;
-    protected $metadataModel;
-    protected $kursModel;
-    protected $rMImportPOModel;
-    protected $rMImportPODetailModel;
-    protected $rMPurchaseOrderModel;
-    protected $rMPurchaseOrderDetailModel;
-    protected $aMPurchaseOrderModel;
-    protected $aMPurchaseOrderDetailModel;
-    protected $penerimaanBarangModel;
-    protected $penerimaanBarangDetailModel;
-    protected $transaksiJurnalModel;
+    protected $customerModel;
+    protected $salesOrderInvoiceModel;
 
     public function __construct()
     {
         $this->this_company_id = session()->get("login")->this_company_id;
-        $this->supplierModel = new SupplierModel();
-        $this->divisisModel = new DivisisModel();
-        $this->transaksiPembelianModel = new TransaksiPembelianModel();
-        $this->metadataModel = new MetadataModel();
-        $this->kursModel = new KursModel();
-        $this->rMImportPOModel = new RMImportPOModel();
-        $this->rMImportPODetailModel = new RMImportPODetailModel();
-        $this->rMPurchaseOrderModel = new RMPurchaseOrderModel();
-        $this->rMPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
-        $this->aMPurchaseOrderModel = new AMPurchaseOrderModel();
-        $this->aMPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
-        $this->penerimaanBarangModel = new PenerimaanBarangModel();
-        $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
-        $this->transaksiJurnalModel = new TransaksiJurnalModel();
+        $this->customerModel = new CustomerModel();
+        $this->salesOrderInvoiceModel = new SalesOrderInvoiceModel();
     }
     public function index()
     {
@@ -69,32 +32,17 @@ class Piutang extends BaseController
             $companyId = [16];
         }
         
-        $supplierData = $this->supplierModel
-            ->select('suppliers.id, suppliers.name, companies.company')
-            ->join('companies', 'companies.id = suppliers.company_id')
+        $customerData = $this->customerModel
+            ->select('GROUP_CONCAT(customers.id) AS id, customers.name ')
             ->whereIn('company_id', $companyId)
             ->asObject()
+            ->groupBy('customers.name')
             ->findAll();
-
-        $divisiData = $this->divisisModel
-            ->select('divisis.id, divisis.divisi, companies.company')
-            ->join('companies', 'companies.id = divisis.company_id')
-            ->whereIn('company_id', $companyId)
-            ->asObject()
-            ->findAll();
+            
         $data = [
-            'suppliers' => $supplierData,
-            'divisis' => $divisiData,
+            'customer' => $customerData
         ];
         return view('Laporan/LaporanPiutang/index', $data);
-    }
-
-    public function detail($id)
-    {
-        $data = [
-            'id' => $id
-        ];
-        return view('Laporan/LaporanPiutang/detail', $data);
     }
 
     public function allPiutang()
@@ -109,17 +57,9 @@ class Piutang extends BaseController
             "startdate"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "lastdate"      => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
-        
-        if ($this->this_company_id != 16 && $this->this_company_id != 15) {
-            $companyId = [1, 2];
-        } else if ($this->this_company_id == 15) {
-            $companyId = [15];
-        } else {
-            $companyId = [16];
-        }
 
         $condition = [
-            "suppliers.deletedAt" => NULL
+            "customers.deletedAt" => NULL
         ];
 
         $addCondition = [
@@ -127,19 +67,33 @@ class Piutang extends BaseController
             "filter"        => $this->request->getGet("filter"),
             "divisi"        => $this->request->getGet("divisi"),
             "type_barang"   => $this->request->getGet("type_barang"),
+            "summary"       => "summary",
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-            "startdate"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
-            "lastdate"      => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"      => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
+        
+        if ($this->this_company_id != 16 && $this->this_company_id != 15) {
+            $addCondition['companyId'] = [1, 2];
+        } else if ($this->this_company_id == 15) {
+            $addCondition['companyId'] = [15];
+        } else {
+            $addCondition['companyId'] = [16];
+        }
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        $res = $this->supplierModel->getSupplierPiutangList($condition, $addCondition, $limit, $offset, $companyId);
+        if ($addCondition['type_barang'] == 'LOKAL') {
+            $res = $this->salesOrderInvoiceModel->getDataInvoiceReportAccounting($condition, $addCondition, $limit, $offset);
+        } else {
+            $res = $this->salesOrderInvoiceModel->getDataInvoiceReportAccounting($condition, $addCondition, $limit, $offset);
+        }
 
-        // var_dump($res['data']);
-        // exit;
+        var_dump($condition, $addCondition, $limit, $offset, $res['data']);
+        exit;
+
 
         $rdata = [];
 
@@ -165,6 +119,14 @@ class Piutang extends BaseController
         ];
 
         return response()->setJSON($data);
+    }
+
+    public function detail($id)
+    {
+        $data = [
+            'id' => $id
+        ];
+        return view('Laporan/LaporanPiutang/detail', $data);
     }
 
     public function allDetailsInvoice($id)

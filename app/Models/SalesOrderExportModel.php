@@ -1703,4 +1703,107 @@ class SalesOrderExportModel extends Model
             'sortType'          => $sortType
         ];
     }
+
+    public function getDataInvoiceReportAccounting($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'createdAt'         => 'sales_order_export.createdAt',
+            'updatedAt'         => 'sales_order_export.updatedAt'
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'sales_order_export.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        if (isset($addCondition['summary']) && $addCondition['summary'] == "summary") {
+            $selectQry = "
+                GROUP_CONCAT(
+                    DISTINCT customers.id
+                    ORDER BY customers.id
+                    SEPARATOR ', '
+                ) AS id,
+                customers.name AS customer_name,
+
+                SUM(DISTINCT sales_order_invoice_detail.amount_invoice) AS sum_amount_invoice, 
+                SUM(DISTINCT pembayaran_invoice_detail.harga_dibayar) AS sum_harga_dibayar
+            ";
+        }else{
+            $selectQry = " 
+                    rm_purchase_orders.po_date AS tanggal_invoice, 
+                    rm_purchase_orders.po_no AS no_invoice, 
+                    rm_purchase_orders.company_id, 
+                    suppliers.id AS supplier_id, 
+                    suppliers.name AS supplier_name,
+                    divisis.divisi AS divisi,
+                    COUNT(rm_purchase_order_details.id) AS itemCount,
+                    penerimaan_barang_detail.sub_total AS total, 
+                    local_po_payments.amount AS remaining,
+                    SUM(DISTINCT penerimaan_barang_detail.sub_total) AS sum_total, 
+                    SUM(DISTINCT local_po_payments.amount) AS sum_remaining,
+                    penerimaan_barang.no_penerimaan_barang AS no_penerimaan_barang,
+                    GROUP_CONCAT(DISTINCT penerimaan_barang.no_penerimaan_barang SEPARATOR ', ') AS list_no_penerimaan_barang";
+        }
+        $poDataQry = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->where('sales_order_export.status_posting', 1)
+            ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
+            ->join('customers', 'customers.id = sales_contract.customer_id')
+            ->join('pembayaran_invoice_detail', "pembayaran_invoice_detail.sales_order_invoice_id = sales_order_export.id AND pembayaran_invoice_detail.sales_order_invoice_detail_id = sales_order_invoice_detail.id AND pembayaran_invoice_detail.type_invoice = 'EKSPOR'", 'left')
+            ->join('pembayaran_invoice', "pembayaran_invoice.id = pembayaran_invoice_detail.pembayaran_invoice_id AND pembayaran_invoice.type_invoice = 'LOKAL'", 'left');
+            if (isset($addCondition['summary']) && $addCondition['summary'] == "summary") {
+                $poDataQry->groupBy('customers.name');
+            } else {
+                $poDataQry->groupBy('sales_order_export.id');
+            }
+            $poDataQry->orderBy($sort, $sortType);
+
+        $totalData = $poDataQry->countAllResults(false);
+
+        if (!empty($addCondition['search']) || !empty($addCondition['dateStart']) || !empty($addCondition['dateEnd']) || !empty($addCondition['filter']) || !empty($addCondition['divisi']) || !empty($addCondition['companyId'])) {
+            $poDataQry->groupStart();
+        }
+
+        if (!empty($addCondition['companyId']) && $addCondition['companyId'] != []) {
+            $poDataQry->whereIn('sales_order_export.id_company', $addCondition['companyId']);
+        }
+
+        if (!empty($addCondition['search'])) {
+            $poDataQry->like('sales_order_export.no_faktur', $addCondition['search'])
+                ->orLike('customers.name', $addCondition['search']);
+        }
+
+        if (!empty($addCondition['dateStart'])) {
+            $poDataQry->where('sales_order_export.tanggal_faktur >=', $addCondition['dateStart']);
+        }
+
+        if (!empty($addCondition['dateEnd'])) {
+            $poDataQry->where('sales_order_export.tanggal_faktur <=', $addCondition['dateEnd']);
+        }
+
+        if (!empty($addCondition['filter'])) {
+            $poDataQry->whereIn('customers.id', $addCondition['filter']);
+        }
+
+        if (!empty($addCondition['search']) || !empty($addCondition['dateStart']) || !empty($addCondition['dateEnd']) || !empty($addCondition['filter']) || !empty($addCondition['divisi']) || !empty($addCondition['companyId'])) {
+            $poDataQry->groupEnd();
+        }
+
+        $totalFilteredData = $poDataQry->countAllResults(false);
+
+        if ($limit != null && $offset != null) {
+            $data = $poDataQry->findAll($limit, $offset);
+        } else {
+            $data = $poDataQry->findAll();
+        }
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'  => $sort,
+            'sortType'  => $sortType
+        ];
+    }
 }
