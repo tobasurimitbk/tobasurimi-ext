@@ -1173,27 +1173,34 @@ class BCPurchaseOrderModel extends Model
     ) {
         $db = \Config\Database::connect();
         $where = [];
+        $whereBc27In = [];
+        $wherePpbkbIn = [];
 
-        $where = [];
         if (!empty($condition['dateStart']) && !empty($condition['dateEnd'])) {
             $where[] = "DATE(bc_purchase_order.createdAt) BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
+            $whereBc27In[] = "DATE(bc_27.createdAt) BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
+            $wherePpbkbIn[] = "mutasi.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
         }
 
         if (!empty($condition['dateStartLpb']) && !empty($condition['dateEndLpb'])) {
             $where[] = "penerimaan_barang.tanggal BETWEEN '$condition[dateStartLpb]' AND '$condition[dateEndLpb]'";
         }
 
-        if ($condition['bc_id'] != "") {
-            $where[] = "penerimaan_barang.bc_type = '$condition[bc_id]'";
-            $where[] = "bc_purchase_order.no_daftar IS NOT NULL AND bc_purchase_order.no_aju IS NOT NULL";
-        }
+        // if ($condition['bc_id'] != "") {
+        //     $where[] = "penerimaan_barang.bc_type = '$condition[bc_id]'";
+        //     $where[] = "bc_purchase_order.no_daftar IS NOT NULL AND bc_purchase_order.no_aju IS NOT NULL";
+        // }
 
         if (!empty($condition['barang_master_id'])) {
             $where[] = "penerimaan_barang_detail.barang_id = '$condition[barang_master_id]'";
+            $whereBc27In[] = "stock_revamp.barang_master_id = '$condition[barang_master_id]'";
+            $wherePpbkbIn[] = "stock_revamp.barang_master_id = '$condition[barang_master_id]'";
         }
 
         if (!empty($condition['company_id'])) {
             $where[] = "penerimaan_barang.company_id = '$condition[company_id]' AND barang_master.company_id = '$condition[company_id]'";
+            $whereBc27In[] = "penerimaan_mutasi_global.company_penerima_id = '$condition[company_id]'";
+            $wherePpbkbIn[] = "penerimaan_mutasi.company_id = '$condition[company_id]'";
         }
         if (!empty($condition['divisi_id'])) {
             $where[] = "penerimaan_barang.divisi_id = '$condition[divisi_id]'";
@@ -1208,6 +1215,8 @@ class BCPurchaseOrderModel extends Model
             $where[] = "penerimaan_barang.status_penerimaan = '$statusPenerimaan' AND penerimaan_barang.tipe_bahan = '$tipeBahan'";
         }
 
+        $searchBc27In = "";
+        $searchPpbkbIn = "";
         $search = $db->escapeLikeString($condition['search']);
         if (!empty($condition['search'])) {
             $where[] = "(
@@ -1217,9 +1226,28 @@ class BCPurchaseOrderModel extends Model
                 OR barang_master.kode_barang LIKE '%{$search}%' 
                 OR CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) LIKE '%{$search}%'
             )";
+
+            $searchBc27In = "AND (
+                bc_27.no_daftar LIKE '%{$search}%' 
+                OR bc_27.no_aju LIKE '%{$search}%' 
+                OR barang_master.kode_barang LIKE '%{$search}%' 
+                OR CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) LIKE '%{$search}%'
+                OR penerimaan_mutasi_global.penerimaan_mutasi_no LIKE '%{$search}%' 
+                OR mutasi_global.no_mutasi LIKE '%{$search}%' 
+            )";
+
+            $searchPpbkbIn = "AND (
+                ppbkb.no_ppbkb LIKE '%{$search}%' 
+                OR barang_master.kode_barang LIKE '%{$search}%' 
+                OR CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) LIKE '%{$search}%'
+                OR penerimaan_mutasi.penerimaan_mutasi_no LIKE '%{$search}%' 
+                OR mutasi.no_mutasi LIKE '%{$search}%' 
+            )";
         }
 
         $filterCondition = !empty($where) ? " AND " . implode(" AND ", $where) : "";
+        $filterConditionBc27In = !empty($whereBc27In) ? " AND " . implode(" AND ", $whereBc27In) : "";
+        $filterConditionBcPpbkbIn = !empty($wherePpbkbIn) ? " AND " . implode(" AND ", $wherePpbkbIn) : "";
 
         $columns = [
             'id',
@@ -1252,191 +1280,607 @@ class BCPurchaseOrderModel extends Model
         }
 
         $baseQuery = "
-            (
-                -- BAHAN BAKU LOKAL
-                SELECT 
-                    metadata.value AS jenis_doc,
-                    bc_purchase_order.no_aju,
-                    bc_purchase_order.no_daftar,
-                    DATE(bc_purchase_order.createdAt) AS tanggal_daftar,
-                    penerimaan_barang.no_penerimaan_barang,
-                    penerimaan_barang.tanggal AS tanggal_lpb,
-                    rm_purchase_orders.po_no AS no_order,
-                    divisis.divisi AS divisi,
-                    warehouses.warehouse_name,
-                    suppliers.name AS supplier_name,
-                    barang_master.kode_barang,
-                    barang_master.barang_name,
-                    IFNULL(GROUP_CONCAT(DISTINCT barang_master_spesifikasi.spesifikasi SEPARATOR ', '), '') AS spesifikasi,
-                    SUM(penerimaan_barang_detail.qty) AS qty_order,
-                    SUM(penerimaan_barang_detail.jml_masuk) AS qty_diterima,
-                    satuans.kode_satuan,
-                    'IDR' AS valas,
-                    rm_purchase_orders.total_before_pph AS total_harga,
-                    '' AS keterangan
-                FROM penerimaan_barang
-                JOIN penerimaan_barang_detail ON penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id AND penerimaan_barang_detail.deletedAt IS NULL
-                LEFT JOIN metadata ON metadata.id = penerimaan_barang.bc_type
-                LEFT JOIN bc_purchase_order_lpb ON bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id
-                LEFT JOIN bc_purchase_order ON bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id
-                LEFT JOIN divisis ON divisis.id = penerimaan_barang.divisi_id 
-                LEFT JOIN warehouses ON warehouses.id = penerimaan_barang.warehouse_id
-                LEFT JOIN suppliers ON suppliers.id = penerimaan_barang.supplier_id
-                LEFT JOIN barang_master ON barang_master.id = penerimaan_barang_detail.barang_id
-                LEFT JOIN barang_master_spesifikasi ON barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id
-                LEFT JOIN satuans ON satuans.id = penerimaan_barang_detail.unit_konversi
-                LEFT JOIN rm_purchase_orders ON rm_purchase_orders.id = penerimaan_barang_detail.purchase_order_id
-                WHERE penerimaan_barang.deletedAt IS NULL
-                AND penerimaan_barang_detail.deletedAt IS NULL
-                AND penerimaan_barang.status_post = 'FINISH'
-                AND penerimaan_barang.status_penerimaan='LOKAL'
-                AND penerimaan_barang.tipe_bahan='BAKU'
-                AND bc_purchase_order.status_posting='1'
-                $filterCondition
-                GROUP BY penerimaan_barang.id, penerimaan_barang_detail.barang_id
-            )
-            UNION ALL
-            (
-                -- BAHAN PENOLONG LOKAL
-                SELECT
-                    metadata_jenisdoc.value AS jenis_doc,
-                    bc_purchase_order.no_aju,
-                    bc_purchase_order.no_daftar,
-                    DATE(bc_purchase_order.createdAt) AS tanggal_daftar,
-                    penerimaan_barang.no_penerimaan_barang,
-                    penerimaan_barang.tanggal AS tanggal_lpb,
-                    am_purchase_orders.po_no AS no_order,
-                    divisis.divisi AS divisi,
-                    warehouses.warehouse_name,
-                    suppliers.name AS supplier_name,
-                    barang_master.kode_barang,
-                    barang_master.barang_name,
-                    IFNULL(GROUP_CONCAT(DISTINCT barang_master_spesifikasi.spesifikasi SEPARATOR ', '), '') AS spesifikasi,
-                    SUM(penerimaan_barang_detail.qty) AS qty_order,
-                    SUM(penerimaan_barang_detail.jml_masuk) AS qty_diterima,
-                    satuans.kode_satuan,
-                    'IDR' AS valas,
-                    SUM(penerimaan_barang_detail.sub_total) AS total_harga,
-                    penerimaan_barang_detail.keterangan
-                FROM penerimaan_barang
-                JOIN penerimaan_barang_detail ON penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id AND penerimaan_barang_detail.deletedAt IS NULL
-                LEFT JOIN metadata AS metadata_jenisdoc ON metadata_jenisdoc.id = penerimaan_barang.bc_type
-                LEFT JOIN bc_purchase_order_lpb ON bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id
-                LEFT JOIN bc_purchase_order ON bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id
-                LEFT JOIN divisis ON divisis.id = penerimaan_barang.divisi_id 
-                LEFT JOIN warehouses ON warehouses.id = penerimaan_barang.warehouse_id
-                LEFT JOIN suppliers ON suppliers.id = penerimaan_barang.supplier_id
-                LEFT JOIN barang_master ON barang_master.id = penerimaan_barang_detail.barang_id
-                LEFT JOIN barang_master_spesifikasi ON barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id
-                LEFT JOIN satuans ON satuans.id = penerimaan_barang_detail.unit_konversi
-                LEFT JOIN am_purchase_orders ON am_purchase_orders.id = penerimaan_barang_detail.purchase_order_id
-                LEFT JOIN metadata AS  metadata_valas ON metadata_valas.id = am_purchase_orders.currency
-                WHERE penerimaan_barang.deletedAt IS NULL
-                AND penerimaan_barang_detail.deletedAt IS NULL
-                AND penerimaan_barang.status_post = 'FINISH'       
-                AND penerimaan_barang.tipe_bahan='PENOLONG'
-                AND penerimaan_barang.status_penerimaan='LOKAL'  
-                AND bc_purchase_order.status_posting='1'
-                $filterCondition
-                GROUP BY penerimaan_barang_detail.id
-            )
-            UNION ALL
-            (
-                -- BAHAN PENOLONG IMPORT
-                SELECT
-                    metadata_jenisdoc.value AS jenis_doc,
-                    bc_purchase_order.no_aju,
-                    bc_purchase_order.no_daftar,
-                    DATE(bc_purchase_order.createdAt) AS tanggal_daftar,
-                    penerimaan_barang.no_penerimaan_barang,
-                    penerimaan_barang.tanggal AS tanggal_lpb,
-                    am_purchase_orders.po_no AS no_order,
-                    divisis.divisi AS divisi,
-                    warehouses.warehouse_name,
-                    suppliers.name AS supplier_name,
-                    barang_master.kode_barang,
-                    barang_master.barang_name,
-                    IFNULL(GROUP_CONCAT(DISTINCT barang_master_spesifikasi.spesifikasi SEPARATOR ', '), '') AS spesifikasi,
-                    SUM(penerimaan_barang_detail.qty) AS qty_order,
-                    SUM(penerimaan_barang_detail.jml_masuk) AS qty_diterima,
-                    satuans.kode_satuan,
-                    metadata_valas.value AS valas,
-                    SUM(penerimaan_barang_detail.sub_total) AS total_harga,
-                    penerimaan_barang_detail.keterangan
-                FROM penerimaan_barang
-                JOIN penerimaan_barang_detail ON penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id AND penerimaan_barang_detail.deletedAt IS NULL
-                LEFT JOIN metadata AS metadata_jenisdoc ON metadata_jenisdoc.id = penerimaan_barang.bc_type
-                LEFT JOIN bc_purchase_order_lpb ON bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id
-                LEFT JOIN bc_purchase_order ON bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id
-                LEFT JOIN divisis ON divisis.id = penerimaan_barang.divisi_id 
-                LEFT JOIN warehouses ON warehouses.id = penerimaan_barang.warehouse_id
-                LEFT JOIN suppliers ON suppliers.id = penerimaan_barang.supplier_id
-                LEFT JOIN barang_master ON barang_master.id = penerimaan_barang_detail.barang_id
-                LEFT JOIN barang_master_spesifikasi ON barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id
-                LEFT JOIN satuans ON satuans.id = penerimaan_barang_detail.unit_konversi
-                LEFT JOIN am_purchase_orders ON am_purchase_orders.id = penerimaan_barang_detail.purchase_order_id
-                LEFT JOIN metadata AS  metadata_valas ON metadata_valas.id = am_purchase_orders.currency
-                WHERE penerimaan_barang.deletedAt IS NULL
-                AND penerimaan_barang_detail.deletedAt IS NULL
-                AND penerimaan_barang.status_post = 'FINISH'    
-                AND penerimaan_barang.tipe_bahan='PENOLONG'
-                AND penerimaan_barang.status_penerimaan='IMPORT'     
-                AND bc_purchase_order.status_posting='1'  
-                $filterCondition
-                GROUP BY penerimaan_barang_detail.id
-            )
-            UNION ALL
-            (
-                -- BAHAN BAKU IMPORT
-                SELECT
-                    metadata_jenisdoc.value AS jenis_doc,
-                    bc_purchase_order.no_aju,
-                    bc_purchase_order.no_daftar,
-                    DATE(bc_purchase_order.createdAt) AS tanggal_daftar,
-                    penerimaan_barang.no_penerimaan_barang,
-                    penerimaan_barang.tanggal AS tanggal_lpb,
-                    rm_import_pos.po_no AS no_order,
-                    divisis.divisi AS divisi,
-                    warehouses.warehouse_name,
-                    suppliers.name AS supplier_name,
-                    barang_master.kode_barang,
-                    barang_master.barang_name,
-                    IFNULL(GROUP_CONCAT(DISTINCT barang_master_spesifikasi.spesifikasi SEPARATOR ', '), '') AS spesifikasi,
-                    SUM(penerimaan_barang_detail.qty) AS qty_order,
-                    SUM(penerimaan_barang_detail.jml_masuk) AS qty_diterima,
-                    satuans.kode_satuan,
-                    metadata_valas.value AS valas,
-                    SUM(penerimaan_barang_detail.sub_total) AS total_harga,
-                    penerimaan_barang_detail.keterangan
-                FROM penerimaan_barang
-                JOIN penerimaan_barang_detail ON penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id AND penerimaan_barang_detail.deletedAt IS NULL
-                LEFT JOIN metadata AS metadata_jenisdoc ON metadata_jenisdoc.id = penerimaan_barang.bc_type
-                LEFT JOIN bc_purchase_order_lpb ON bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id
-                LEFT JOIN bc_purchase_order ON bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id
-                LEFT JOIN divisis ON divisis.id = penerimaan_barang.divisi_id 
-                LEFT JOIN warehouses ON warehouses.id = penerimaan_barang.warehouse_id
-                LEFT JOIN suppliers ON suppliers.id = penerimaan_barang.supplier_id
-                LEFT JOIN barang_master ON barang_master.id = penerimaan_barang_detail.barang_id
-                LEFT JOIN barang_master_spesifikasi ON barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id
-                LEFT JOIN satuans ON satuans.id = penerimaan_barang_detail.unit_konversi
-                LEFT JOIN rm_import_pos ON rm_import_pos.id = penerimaan_barang_detail.purchase_order_id
-                LEFT JOIN metadata AS metadata_valas ON metadata_valas.id = rm_import_pos.currency
-                WHERE penerimaan_barang.deletedAt IS NULL
-                AND penerimaan_barang_detail.deletedAt IS NULL
-                AND penerimaan_barang.status_post = 'FINISH'   
-                AND penerimaan_barang.status_penerimaan='IMPORT'
-                AND penerimaan_barang.tipe_bahan='BAKU'
-                AND bc_purchase_order.status_posting='1'      
-                $filterCondition
-                GROUP BY penerimaan_barang_detail.id
-            )
+        SELECT *
+            FROM (
+                (
+                    SELECT 
+                        penerimaan_barang.bc_type AS bc_type,
+                        metadata.value AS jenis_doc,
+                        bc_purchase_order.no_aju,
+                        bc_purchase_order.no_daftar,
+                        DATE(bc_purchase_order.createdAt) AS tanggal_daftar,
+                        penerimaan_barang.no_penerimaan_barang,
+                        penerimaan_barang.tanggal AS tanggal_lpb,
+                        rm_purchase_orders.po_no AS no_order,
+                        divisis.divisi AS divisi,
+                        warehouses.warehouse_name,
+                        suppliers.name AS supplier_name,
+                        barang_master.kode_barang,
+                        barang_master.barang_name,
+                        IFNULL(GROUP_CONCAT(DISTINCT barang_master_spesifikasi.spesifikasi SEPARATOR ', '), '') AS spesifikasi,
+                        SUM(penerimaan_barang_detail.qty) AS qty_order,
+                        SUM(penerimaan_barang_detail.jml_masuk) AS qty_diterima,
+                        satuans.kode_satuan,
+                        'IDR' AS valas,
+                        rm_purchase_orders.total_before_pph AS total_harga,
+                        '' AS keterangan
+                    FROM penerimaan_barang
+                    JOIN penerimaan_barang_detail ON penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id AND penerimaan_barang_detail.deletedAt IS NULL
+                    LEFT JOIN metadata ON metadata.id = penerimaan_barang.bc_type
+                    LEFT JOIN bc_purchase_order_lpb ON bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id
+                    LEFT JOIN bc_purchase_order ON bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id
+                    LEFT JOIN divisis ON divisis.id = penerimaan_barang.divisi_id 
+                    LEFT JOIN warehouses ON warehouses.id = penerimaan_barang.warehouse_id
+                    LEFT JOIN suppliers ON suppliers.id = penerimaan_barang.supplier_id
+                    LEFT JOIN barang_master ON barang_master.id = penerimaan_barang_detail.barang_id
+                    LEFT JOIN barang_master_spesifikasi ON barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id
+                    LEFT JOIN satuans ON satuans.id = penerimaan_barang_detail.unit_konversi
+                    LEFT JOIN rm_purchase_orders ON rm_purchase_orders.id = penerimaan_barang_detail.purchase_order_id
+                    WHERE penerimaan_barang.deletedAt IS NULL
+                    AND penerimaan_barang_detail.deletedAt IS NULL
+                    AND penerimaan_barang.status_post = 'FINISH'
+                    AND penerimaan_barang.status_penerimaan='LOKAL'
+                    AND penerimaan_barang.tipe_bahan='BAKU'
+                    AND bc_purchase_order.status_posting='1'
+                    $filterCondition
+                    GROUP BY penerimaan_barang.id, penerimaan_barang_detail.barang_id
+                )
+                UNION ALL
+                (
+                    SELECT
+                        penerimaan_barang.bc_type AS bc_type,
+                        metadata_jenisdoc.value AS jenis_doc,
+                        bc_purchase_order.no_aju,
+                        bc_purchase_order.no_daftar,
+                        DATE(bc_purchase_order.createdAt) AS tanggal_daftar,
+                        penerimaan_barang.no_penerimaan_barang,
+                        penerimaan_barang.tanggal AS tanggal_lpb,
+                        am_purchase_orders.po_no AS no_order,
+                        divisis.divisi AS divisi,
+                        warehouses.warehouse_name,
+                        suppliers.name AS supplier_name,
+                        barang_master.kode_barang,
+                        barang_master.barang_name,
+                        IFNULL(GROUP_CONCAT(DISTINCT barang_master_spesifikasi.spesifikasi SEPARATOR ', '), '') AS spesifikasi,
+                        SUM(penerimaan_barang_detail.qty) AS qty_order,
+                        SUM(penerimaan_barang_detail.jml_masuk) AS qty_diterima,
+                        satuans.kode_satuan,
+                        'IDR' AS valas,
+                        SUM(penerimaan_barang_detail.sub_total) AS total_harga,
+                        penerimaan_barang_detail.keterangan
+                    FROM penerimaan_barang
+                    JOIN penerimaan_barang_detail ON penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id AND penerimaan_barang_detail.deletedAt IS NULL
+                    LEFT JOIN metadata AS metadata_jenisdoc ON metadata_jenisdoc.id = penerimaan_barang.bc_type
+                    LEFT JOIN bc_purchase_order_lpb ON bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id
+                    LEFT JOIN bc_purchase_order ON bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id
+                    LEFT JOIN divisis ON divisis.id = penerimaan_barang.divisi_id 
+                    LEFT JOIN warehouses ON warehouses.id = penerimaan_barang.warehouse_id
+                    LEFT JOIN suppliers ON suppliers.id = penerimaan_barang.supplier_id
+                    LEFT JOIN barang_master ON barang_master.id = penerimaan_barang_detail.barang_id
+                    LEFT JOIN barang_master_spesifikasi ON barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id
+                    LEFT JOIN satuans ON satuans.id = penerimaan_barang_detail.unit_konversi
+                    LEFT JOIN am_purchase_orders ON am_purchase_orders.id = penerimaan_barang_detail.purchase_order_id
+                    LEFT JOIN metadata AS  metadata_valas ON metadata_valas.id = am_purchase_orders.currency
+                    WHERE penerimaan_barang.deletedAt IS NULL
+                    AND penerimaan_barang_detail.deletedAt IS NULL
+                    AND penerimaan_barang.status_post = 'FINISH'       
+                    AND penerimaan_barang.tipe_bahan='PENOLONG'
+                    AND penerimaan_barang.status_penerimaan='LOKAL'  
+                    AND bc_purchase_order.status_posting='1'
+                    $filterCondition
+                    GROUP BY penerimaan_barang_detail.id
+                )
+                UNION ALL
+                (
+                    SELECT
+                        penerimaan_barang.bc_type AS bc_type,
+                        metadata_jenisdoc.value AS jenis_doc,
+                        bc_purchase_order.no_aju,
+                        bc_purchase_order.no_daftar,
+                        DATE(bc_purchase_order.createdAt) AS tanggal_daftar,
+                        penerimaan_barang.no_penerimaan_barang,
+                        penerimaan_barang.tanggal AS tanggal_lpb,
+                        am_purchase_orders.po_no AS no_order,
+                        divisis.divisi AS divisi,
+                        warehouses.warehouse_name,
+                        suppliers.name AS supplier_name,
+                        barang_master.kode_barang,
+                        barang_master.barang_name,
+                        IFNULL(GROUP_CONCAT(DISTINCT barang_master_spesifikasi.spesifikasi SEPARATOR ', '), '') AS spesifikasi,
+                        SUM(penerimaan_barang_detail.qty) AS qty_order,
+                        SUM(penerimaan_barang_detail.jml_masuk) AS qty_diterima,
+                        satuans.kode_satuan,
+                        metadata_valas.value AS valas,
+                        SUM(penerimaan_barang_detail.sub_total) AS total_harga,
+                        penerimaan_barang_detail.keterangan
+                    FROM penerimaan_barang
+                    JOIN penerimaan_barang_detail ON penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id AND penerimaan_barang_detail.deletedAt IS NULL
+                    LEFT JOIN metadata AS metadata_jenisdoc ON metadata_jenisdoc.id = penerimaan_barang.bc_type
+                    LEFT JOIN bc_purchase_order_lpb ON bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id
+                    LEFT JOIN bc_purchase_order ON bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id
+                    LEFT JOIN divisis ON divisis.id = penerimaan_barang.divisi_id 
+                    LEFT JOIN warehouses ON warehouses.id = penerimaan_barang.warehouse_id
+                    LEFT JOIN suppliers ON suppliers.id = penerimaan_barang.supplier_id
+                    LEFT JOIN barang_master ON barang_master.id = penerimaan_barang_detail.barang_id
+                    LEFT JOIN barang_master_spesifikasi ON barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id
+                    LEFT JOIN satuans ON satuans.id = penerimaan_barang_detail.unit_konversi
+                    LEFT JOIN am_purchase_orders ON am_purchase_orders.id = penerimaan_barang_detail.purchase_order_id
+                    LEFT JOIN metadata AS  metadata_valas ON metadata_valas.id = am_purchase_orders.currency
+                    WHERE penerimaan_barang.deletedAt IS NULL
+                    AND penerimaan_barang_detail.deletedAt IS NULL
+                    AND penerimaan_barang.status_post = 'FINISH'    
+                    AND penerimaan_barang.tipe_bahan='PENOLONG'
+                    AND penerimaan_barang.status_penerimaan='IMPORT'     
+                    AND bc_purchase_order.status_posting='1'  
+                    $filterCondition
+                    GROUP BY penerimaan_barang_detail.id
+                )
+                UNION ALL
+                (
+                    SELECT
+                        penerimaan_barang.bc_type AS bc_type,
+                        metadata_jenisdoc.value AS jenis_doc,
+                        bc_purchase_order.no_aju,
+                        bc_purchase_order.no_daftar,
+                        DATE(bc_purchase_order.createdAt) AS tanggal_daftar,
+                        penerimaan_barang.no_penerimaan_barang,
+                        penerimaan_barang.tanggal AS tanggal_lpb,
+                        rm_import_pos.po_no AS no_order,
+                        divisis.divisi AS divisi,
+                        warehouses.warehouse_name,
+                        suppliers.name AS supplier_name,
+                        barang_master.kode_barang,
+                        barang_master.barang_name,
+                        IFNULL(GROUP_CONCAT(DISTINCT barang_master_spesifikasi.spesifikasi SEPARATOR ', '), '') AS spesifikasi,
+                        SUM(penerimaan_barang_detail.qty) AS qty_order,
+                        SUM(penerimaan_barang_detail.jml_masuk) AS qty_diterima,
+                        satuans.kode_satuan,
+                        metadata_valas.value AS valas,
+                        SUM(penerimaan_barang_detail.sub_total) AS total_harga,
+                        penerimaan_barang_detail.keterangan
+                    FROM penerimaan_barang
+                    JOIN penerimaan_barang_detail ON penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id AND penerimaan_barang_detail.deletedAt IS NULL
+                    LEFT JOIN metadata AS metadata_jenisdoc ON metadata_jenisdoc.id = penerimaan_barang.bc_type
+                    LEFT JOIN bc_purchase_order_lpb ON bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id
+                    LEFT JOIN bc_purchase_order ON bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id
+                    LEFT JOIN divisis ON divisis.id = penerimaan_barang.divisi_id 
+                    LEFT JOIN warehouses ON warehouses.id = penerimaan_barang.warehouse_id
+                    LEFT JOIN suppliers ON suppliers.id = penerimaan_barang.supplier_id
+                    LEFT JOIN barang_master ON barang_master.id = penerimaan_barang_detail.barang_id
+                    LEFT JOIN barang_master_spesifikasi ON barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id
+                    LEFT JOIN satuans ON satuans.id = penerimaan_barang_detail.unit_konversi
+                    LEFT JOIN rm_import_pos ON rm_import_pos.id = penerimaan_barang_detail.purchase_order_id
+                    LEFT JOIN metadata AS metadata_valas ON metadata_valas.id = rm_import_pos.currency
+                    WHERE penerimaan_barang.deletedAt IS NULL
+                    AND penerimaan_barang_detail.deletedAt IS NULL
+                    AND penerimaan_barang.status_post = 'FINISH'   
+                    AND penerimaan_barang.status_penerimaan='IMPORT'
+                    AND penerimaan_barang.tipe_bahan='BAKU'
+                    AND bc_purchase_order.status_posting='1'      
+                    $filterCondition
+                    GROUP BY penerimaan_barang_detail.id
+                )
+                UNION ALL
+                (
+                    SELECT
+                        52 AS bc_type,
+                        'BC 2.7 In' AS jenis_doc,
+                        bc_27.no_aju,
+                        bc_27.no_daftar,
+                        DATE(bc_27.createdAt) AS tanggal_daftar,
+                        penerimaan_mutasi_global.penerimaan_mutasi_no AS no_penerimaan_barang,
+                        DATE(bc_27.createdAt) AS tanggal_lpb,
+                        '' AS no_order,
+                        divisis.divisi AS divisi,
+                        warehouses.warehouse_name,
+                        '' AS supplier_name,
+                        barang_master.kode_barang,
+                        barang_master.barang_name,
+                        barang_master_spesifikasi.spesifikasi,
+                        '' AS qty_order,
+                        penerimaan_mutasi_global_detail.qty AS qty_diterima,
+                        satuans.kode_satuan,
+                        metadata.value AS valas,
+                        mutasi_global_detail.sub_total AS total_harga,
+                        '' AS keterangan
+                    FROM penerimaan_mutasi_global_detail
+                    LEFT JOIN penerimaan_mutasi_global ON penerimaan_mutasi_global.id = penerimaan_mutasi_global_detail.penerimaan_mutasi_global_id
+                    LEFT JOIN bc_27 ON bc_27.id = penerimaan_mutasi_global.bc27_id
+                    LEFT JOIN mutasi_global ON mutasi_global.id = penerimaan_mutasi_global_detail.mutasi_global_id
+                    LEFT JOIN divisis ON divisis.id = penerimaan_mutasi_global.divisi_penerima_id 
+                    LEFT JOIN warehouses ON warehouses.id = penerimaan_mutasi_global.warehouse_penerima_id
+                    LEFT JOIN satuans ON satuans.id = penerimaan_mutasi_global_detail.unit_hasil_id
+                    LEFT JOIN stock_revamp_detail ON stock_revamp_detail.id = penerimaan_mutasi_global_detail.stock_detail_id
+                    LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
+                    LEFT JOIN barang_master ON barang_master.id = stock_revamp.barang_master_id
+                    LEFT JOIN barang_master_spesifikasi ON barang_master_spesifikasi.id = stock_revamp.spesifikasi_id
+                    LEFT JOIN mutasi_global_detail ON mutasi_global_detail.id = penerimaan_mutasi_global_detail.mutasi_global_detail_id
+                    LEFT JOIN metadata ON metadata.id = mutasi_global_detail.valas_id
+                    WHERE penerimaan_mutasi_global_detail.deletedAt IS NULL
+                    AND bc_27.status_posting='1'
+                    $filterConditionBc27In
+                    $searchBc27In
+                )
+                UNION ALL
+                (
+                    SELECT
+                        1426 AS bc_type,
+                        'PPBKB In' AS jenis_doc,
+                        ppbkb.no_ppbkb AS no_aju,
+                        '' AS no_daftar,
+                        ppbkb.tanggal AS tanggal_daftar,
+                        penerimaan_mutasi.penerimaan_mutasi_no AS no_penerimaan_barang,
+                        ppbkb.tanggal AS tanggal_lpb,
+                        '' AS no_order,
+                        divisis.divisi AS divisi,
+                        warehouses.warehouse_name,
+                        '' AS supplier_name,
+                        barang_master.kode_barang,
+                        barang_master.barang_name,
+                        barang_master_spesifikasi.spesifikasi,
+                        '' AS qty_order,
+                        penerimaan_mutasi_detail.qty AS qty_diterima,
+                        satuans.kode_satuan,
+                        '' AS valas,
+                        '' AS total_harga,
+                        '' AS keterangan
+                    FROM penerimaan_mutasi_detail
+                    LEFT JOIN penerimaan_mutasi ON penerimaan_mutasi.id = penerimaan_mutasi_detail.penerimaan_mutasi_id
+                    LEFT JOIN ppbkb ON ppbkb.id = penerimaan_mutasi.ppbkb_id
+                    LEFT JOIN mutasi ON mutasi.id = penerimaan_mutasi_detail.mutasi_id
+                    LEFT JOIN divisis ON divisis.id = mutasi.divisi_tujuan_id 
+                    LEFT JOIN warehouses ON warehouses.id = mutasi.warehouse_tujuan_id
+                    LEFT JOIN stock_revamp_detail ON stock_revamp_detail.id = penerimaan_mutasi_detail.stock_detail_id
+                    LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
+                    LEFT JOIN barang_master ON barang_master.id = stock_revamp.barang_master_id
+                    LEFT JOIN barang_master_spesifikasi ON barang_master_spesifikasi.id = stock_revamp.spesifikasi_id
+                    LEFT JOIN satuans ON satuans.id = stock_revamp.unit_id
+                    WHERE penerimaan_mutasi_detail.deletedAt IS NULL
+                    AND ppbkb.status_posting='1'
+                    $filterConditionBcPpbkbIn
+                    $searchPpbkbIn
+                )
+            ) x
         ";
 
-        $countQuery = "SELECT COUNT(*) AS cnt FROM ($baseQuery) AS x";
+        if (!empty($condition['bc_id'])) {
+            $baseQuery .= " WHERE x.bc_type = " . (int)$condition['bc_id'];
+        }
+
+        $countQuery = "SELECT COUNT(*) AS cnt FROM ($baseQuery) AS t";
+        $totalFiltered = (int) $db->query($countQuery)->getRow()->cnt;
+        $data = $db->query(
+            $baseQuery . $orderBy . " LIMIT $limit OFFSET $offset"
+        )->getResultArray();
+        return [
+            'data'              => $data,
+            'totalData'         => $totalFiltered,
+            'totalFilteredData' => $totalFiltered,
+            'sort'              => $orderColumnIndex,
+            'sortType'          => $orderDir,
+        ];
+    }
+
+    public function getListLapPengeluaranBarang(
+        $condition,
+        $orderColumnIndex,
+        $orderDir,
+        $limit = 10,
+        $offset = 0
+    ) {
+        $db = \Config\Database::connect();
+
+        $searchBc27Out = "";
+        $searchPpbkbOut = "";
+        $searchBc41 = "";
+        $searchBc25 = "";
+        $searchBc30 = "";
+
+        $whereBc27Out = [];
+        $wherePpbkbOut = [];
+        $whereBc41 = [];
+        $whereBc25 = [];
+        $whereBc30 = [];
+
+        /* ================= DATE FILTER ================= */
+        if (!empty($condition['dateStart']) && !empty($condition['dateEnd'])) {
+            $whereBc27Out[] = "DATE(bc_27.createdAt) BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
+            $wherePpbkbOut[] = "ppbkb.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
+            $whereBc41[] = "bc_41.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
+            $whereBc25[] = "bc_25.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
+            $whereBc30[] = "bc_30.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
+        }
+
+        /* ================= COMPANY FILTER ================= */
+        if (!empty($condition['company_id'])) {
+            $whereBc27Out[] = "bc_27.company_asal_id='$condition[company_id]'";
+            $wherePpbkbOut[] = "ppbkb.company_id='$condition[company_id]'";
+            $whereBc41[] = "bc_41.company_id='$condition[company_id]'";
+            $whereBc25[] = "bc_25.company_id='$condition[company_id]'";
+            $whereBc30[] = "bc_30.company_id='$condition[company_id]'";
+        }
+
+        if (!empty($condition['divisi_id'])) {
+            $whereBc27Out[] = "mutasi_global.divisi_asal_id='$condition[divisi_id]'";
+            $wherePpbkbOut[] = "mutasi.divisi_asal_id='$condition[divisi_id]'";
+            $whereBc41[] = "stock_revamp.divisi_id='$condition[divisi_id]'";
+            $whereBc25[] = "stock_revamp.divisi_id='$condition[divisi_id]'";
+            $whereBc30[] = "stock_revamp.divisi_id='$condition[divisi_id]'";
+        }
+
+        if (!empty($condition['warehouse_id'])) {
+            $whereBc27Out[] = "mutasi_global.warehouse_asal_id='$condition[warehouse_id]'";
+            $wherePpbkbOut[] = "mutasi.warehouse_asal_id='$condition[warehouse_id]'";
+            $whereBc41[] = "stock_revamp.warehouse_id='$condition[warehouse_id]'";
+            $whereBc25[] = "stock_revamp.warehouse_id='$condition[warehouse_id]'";
+            $whereBc30[] = "stock_revamp.warehouse_id='$condition[warehouse_id]'";
+        }
+
+        /* ================= SEARCH ================= */
+        if (!empty($condition['search'])) {
+            $search = $db->escapeLikeString($condition['search']);
+
+            $searchBc27Out = "AND (
+                bc_27.no_aju LIKE '%{$search}%'
+                OR bc_27.no_daftar LIKE '%{$search}%'
+                OR barang_master.kode_barang LIKE '%{$search}%'
+                OR barang_master.barang_name LIKE '%{$search}%'
+                OR barang_master_spesifikasi.spesifikasi LIKE '%{$search}%'
+                OR divisis.divisi LIKE '%{$search}%'
+                OR warehouses.warehouse_name LIKE '%{$search}%'
+            )";
+
+            $searchPpbkbOut = "AND (
+                ppbkb.no_ppbkb LIKE '%{$search}%'
+                OR barang_master.kode_barang LIKE '%{$search}%'
+                OR barang_master.barang_name LIKE '%{$search}%'
+                OR barang_master_spesifikasi.spesifikasi LIKE '%{$search}%'
+                OR divisis.divisi LIKE '%{$search}%'
+                OR warehouses.warehouse_name LIKE '%{$search}%'
+            )";
+
+            $searchBc41 = $searchBc27Out;
+            $searchBc25 = $searchBc27Out;
+            $searchBc30 = $searchBc27Out;
+        }
+
+        $filterConditionBc27Out = !empty($whereBc27Out) ? " AND " . implode(" AND ", $whereBc27Out) : "";
+        $filterConditionPpkbOut = !empty($wherePpbkbOut) ? " AND " . implode(" AND ", $wherePpbkbOut) : "";
+        $filterConditionBc41 = !empty($whereBc41) ? " AND " . implode(" AND ", $whereBc41) : "";
+        $filterConditionBc25 = !empty($whereBc25) ? " AND " . implode(" AND ", $whereBc25) : "";
+        $filterConditionBc30 = !empty($whereBc30) ? " AND " . implode(" AND ", $whereBc30) : "";
+
+        /* ================= ORDER ================= */
+        $columns = [
+            'id',
+            'jenis_doc',
+            'no_aju',
+            'no_daftar',
+            'tanggal_dokumen',
+            'no_keluar',
+            'tanggal_keluar',
+            'divisi',
+            'warehouse_name',
+            'customer_name',
+            'kode_barang',
+            'barang_name',
+            'spesifikasi',
+            'jml_pengeluaran',
+            'kode_satuan',
+            'valas_name',
+            'sub_total',
+        ];
+
+        $orderBy = "";
+        if ($orderColumnIndex !== null && isset($columns[$orderColumnIndex])) {
+            $dir = strtoupper($orderDir) === 'DESC' ? 'DESC' : 'ASC';
+            $orderBy = " ORDER BY {$columns[$orderColumnIndex]} $dir ";
+        }
+
+        /* ================= MAIN QUERY ================= */
+        $baseQuery = "
+        SELECT *
+            FROM (
+                (
+                    SELECT 
+                        mutasi_global_detail.id,
+                        52 AS bc_id,
+                        'BC 2.7 Out' AS jenis_doc,
+                        bc_27.no_aju,
+                        bc_27.no_daftar,
+                        DATE(bc_27.createdAt) AS tanggal_dokumen,
+                        mutasi_global.no_mutasi AS no_keluar,
+                        DATE(bc_27.createdAt) AS tanggal_keluar,
+                        divisis.divisi,
+                        warehouses.warehouse_name,
+                        companies.company AS customer_name,
+                        barang_master.kode_barang,
+                        barang_master.barang_name,
+                        barang_master_spesifikasi.spesifikasi,
+                        mutasi_global_detail.qty_mutasi AS jml_pengeluaran,
+                        satuans.kode_satuan,
+                        metadata.value AS valas_name,
+                        mutasi_global_detail.sub_total
+                    FROM mutasi_global_detail
+                    LEFT JOIN mutasi_global ON mutasi_global.id = mutasi_global_detail.mutasi_global_id
+                    LEFT JOIN stock_revamp_detail ON stock_revamp_detail.id = mutasi_global_detail.stock_detail_id
+                    LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
+                    LEFT JOIN barang_master ON barang_master.id = stock_revamp.barang_master_id
+                    LEFT JOIN barang_master_spesifikasi ON barang_master_spesifikasi.id = stock_revamp.spesifikasi_id
+                    LEFT JOIN bc_27 ON bc_27.mutasi_global_id = mutasi_global.id
+                    LEFT JOIN satuans ON satuans.id = mutasi_global_detail.unit_id_mutasi
+                    LEFT JOIN metadata ON metadata.id = mutasi_global_detail.valas_id
+                    LEFT JOIN divisis ON divisis.id = mutasi_global.divisi_asal_id
+                    LEFT JOIN warehouses ON warehouses.id = mutasi_global.warehouse_asal_id
+                    LEFT JOIN companies ON companies.id = bc_27.company_tujuan_id
+                    WHERE mutasi_global_detail.deletedAt IS NULL
+                    AND bc_27.status_posting = '1'
+                    $filterConditionBc27Out
+                    $searchBc27Out
+                )
+                UNION ALL
+                (
+                    SELECT 
+                        mutasi_detail.id,
+                        1426 AS bc_id,
+                        'PPBKB Out' AS jenis_doc,
+                        ppbkb.no_ppbkb,
+                        '' AS no_daftar,
+                        ppbkb.tanggal,
+                        mutasi.no_mutasi,
+                        mutasi.tanggal,
+                        divisis.divisi,
+                        warehouses.warehouse_name,
+                        companies.company,
+                        barang_master.kode_barang,
+                        barang_master.barang_name,
+                        barang_master_spesifikasi.spesifikasi,
+                        mutasi_detail.qty_mutasi,
+                        satuans.kode_satuan,
+                        '' AS valas_name,
+                        '' AS sub_total
+                    FROM mutasi_detail
+                    LEFT JOIN mutasi ON mutasi.id = mutasi_detail.mutasi_id
+                    LEFT JOIN stock_revamp_detail ON stock_revamp_detail.id = mutasi_detail.stock_detail_id
+                    LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
+                    LEFT JOIN barang_master ON barang_master.id = stock_revamp.barang_master_id
+                    LEFT JOIN barang_master_spesifikasi ON barang_master_spesifikasi.id = stock_revamp.spesifikasi_id
+                    LEFT JOIN ppbkb_mutasi ON ppbkb_mutasi.mutasi_id = mutasi.id
+                    LEFT JOIN ppbkb ON ppbkb.id = ppbkb_mutasi.ppbkb_id
+                    LEFT JOIN satuans ON satuans.id = mutasi_detail.unit_id_mutasi
+                    LEFT JOIN divisis ON divisis.id = mutasi.divisi_asal_id
+                    LEFT JOIN warehouses ON warehouses.id = mutasi.warehouse_asal_id
+                    LEFT JOIN companies ON companies.id = ppbkb.company_id
+                    WHERE mutasi_detail.deletedAt IS NULL
+                    AND ppbkb.status_posting = '1'
+                    $filterConditionPpkbOut
+                    $searchPpbkbOut
+                )
+                UNION ALL
+                (
+                    SELECT 
+                        bc_pengeluaran_barang.id,
+                        54 AS bc_id,
+                        'BC 4.1',
+                        bc_41.no_aju,
+                        bc_41.no_daftar,
+                        bc_41.tanggal,
+                        bc_41.multiple_reference_no,
+                        bc_41.tanggal,
+                        divisis.divisi,
+                        warehouses.warehouse_name,
+                        customers.name,
+                        barang_master.kode_barang,
+                        barang_master.barang_name,
+                        barang_master_spesifikasi.spesifikasi,
+                        bc_pengeluaran_barang.qty_keluar,
+                        satuans.kode_satuan,
+                        metadata.value AS valas_name,
+                        bc_pengeluaran_barang.sub_total
+                    FROM bc_pengeluaran_barang
+                    LEFT JOIN bc_41 ON bc_41.id = bc_pengeluaran_barang.bc_pengeluaran_id
+                    LEFT JOIN stock_revamp_detail ON stock_revamp_detail.id = bc_pengeluaran_barang.stock_detail_id
+                    LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
+                    LEFT JOIN barang_master ON barang_master.id = stock_revamp.barang_master_id
+                    LEFT JOIN barang_master_spesifikasi ON barang_master_spesifikasi.id = stock_revamp.spesifikasi_id
+                    LEFT JOIN satuans ON satuans.id = bc_pengeluaran_barang.unit_id_keluar
+                    LEFT JOIN metadata ON metadata.id = bc_pengeluaran_barang.valas_id
+                    LEFT JOIN divisis ON divisis.id = stock_revamp.divisi_id
+                    LEFT JOIN warehouses ON warehouses.id = stock_revamp.warehouse_id
+                    LEFT JOIN customers ON customers.id = bc_41.reference_penerima_id
+                    WHERE bc_pengeluaran_barang.deletedAt IS NULL
+                    AND bc_41.status_posting = '1'
+                    $filterConditionBc41
+                    $searchBc41
+                )
+                UNION ALL
+                (
+                    SELECT 
+                        bc_pengeluaran_barang.id,
+                        49 AS bc_id,
+                        'BC 2.5',
+                        bc_25.no_aju,
+                        bc_25.no_daftar,
+                        bc_25.tanggal,
+                        bc_25.multiple_reference_no,
+                        bc_25.tanggal,
+                        divisis.divisi,
+                        warehouses.warehouse_name,
+                        customers.name,
+                        barang_master.kode_barang,
+                        barang_master.barang_name,
+                        barang_master_spesifikasi.spesifikasi,
+                        bc_pengeluaran_barang.qty_keluar,
+                        satuans.kode_satuan,
+                        metadata.value AS valas_name,
+                        bc_pengeluaran_barang.sub_total
+                    FROM bc_pengeluaran_barang
+                    LEFT JOIN bc_25 ON bc_25.id = bc_pengeluaran_barang.bc_pengeluaran_id
+                    LEFT JOIN stock_revamp_detail ON stock_revamp_detail.id = bc_pengeluaran_barang.stock_detail_id
+                    LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
+                    LEFT JOIN barang_master ON barang_master.id = stock_revamp.barang_master_id
+                    LEFT JOIN barang_master_spesifikasi ON barang_master_spesifikasi.id = stock_revamp.spesifikasi_id
+                    LEFT JOIN satuans ON satuans.id = bc_pengeluaran_barang.unit_id_keluar
+                    LEFT JOIN metadata ON metadata.id = bc_pengeluaran_barang.valas_id
+                    LEFT JOIN divisis ON divisis.id = stock_revamp.divisi_id
+                    LEFT JOIN warehouses ON warehouses.id = stock_revamp.warehouse_id
+                    LEFT JOIN customers ON customers.id = bc_25.reference_penerima_id
+                    WHERE bc_pengeluaran_barang.deletedAt IS NULL
+                    AND bc_25.status_posting = '1'
+                    $filterConditionBc25
+                    $searchBc25
+                )
+                UNION ALL
+                (
+                    SELECT 
+                        bc_pengeluaran_barang.id,
+                        1445 AS bc_id,
+                        'BC 3.0',
+                        bc_30.no_aju,
+                        bc_30.no_daftar,
+                        bc_30.tanggal,
+                        bc_30.multiple_reference_no,
+                        bc_30.tanggal,
+                        divisis.divisi,
+                        warehouses.warehouse_name,
+                        customers.name,
+                        barang_master.kode_barang,
+                        barang_master.barang_name,
+                        barang_master_spesifikasi.spesifikasi,
+                        bc_pengeluaran_barang.qty_keluar,
+                        satuans.kode_satuan,
+                        metadata.value AS valas_name,
+                        bc_pengeluaran_barang.sub_total
+                    FROM bc_pengeluaran_barang
+                    LEFT JOIN bc_30 ON bc_30.id = bc_pengeluaran_barang.bc_pengeluaran_id
+                    LEFT JOIN stock_revamp_detail ON stock_revamp_detail.id = bc_pengeluaran_barang.stock_detail_id
+                    LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
+                    LEFT JOIN barang_master ON barang_master.id = stock_revamp.barang_master_id
+                    LEFT JOIN barang_master_spesifikasi ON barang_master_spesifikasi.id = stock_revamp.spesifikasi_id
+                    LEFT JOIN satuans ON satuans.id = bc_pengeluaran_barang.unit_id_keluar
+                    LEFT JOIN metadata ON metadata.id = bc_pengeluaran_barang.valas_id
+                    LEFT JOIN divisis ON divisis.id = stock_revamp.divisi_id
+                    LEFT JOIN warehouses ON warehouses.id = stock_revamp.warehouse_id
+                    LEFT JOIN customers ON customers.id = bc_30.reference_penerima_id
+                    WHERE bc_pengeluaran_barang.deletedAt IS NULL
+                    AND bc_30.status_posting = '1'
+                    $filterConditionBc30
+                    $searchBc30
+                )
+            ) x
+        ";
+
+        /* ================= FILTER bc_id (OUTER) ================= */
+        if (!empty($condition['bc_id'])) {
+            $baseQuery .= " WHERE x.bc_id = " . (int)$condition['bc_id'];
+        }
+
+        $countQuery = "SELECT COUNT(*) cnt FROM ($baseQuery) t";
         $totalFiltered = (int) $db->query($countQuery)->getRow()->cnt;
 
-        $mainQuery = $baseQuery . $orderBy . " LIMIT $limit OFFSET $offset";
-        $data = $db->query($mainQuery)->getResultArray();
+        $data = $db->query(
+            $baseQuery . $orderBy . " LIMIT $limit OFFSET $offset"
+        )->getResultArray();
 
         return [
             'data'              => $data,
@@ -1446,6 +1890,7 @@ class BCPurchaseOrderModel extends Model
             'sortType'          => $orderDir,
         ];
     }
+
 
     public function getFisikPemasukkanBarang(
         $condition,
@@ -1754,7 +2199,7 @@ class BCPurchaseOrderModel extends Model
                 'BC 2.7 In' AS jenis_doc,
                 bc_27.no_aju,
                 bc_27.no_daftar,
-                mutasi_global.tanggal AS tanggal_daftar,
+                penerimaan_mutasi_global.tanggal AS tanggal_daftar,
                 penerimaan_mutasi_global.penerimaan_mutasi_no AS no_penerimaan_barang,
                 mutasi_global.tanggal AS tanggal_lpb,
                 '' AS no_order,
@@ -1796,9 +2241,9 @@ class BCPurchaseOrderModel extends Model
                 'PPBKB In' AS jenis_doc,
                 ppbkb.no_ppbkb AS no_aju,
                 '' AS no_daftar,
-                mutasi.tanggal AS tanggal_daftar,
+                ppbkb.tanggal AS tanggal_daftar,
                 penerimaan_mutasi.penerimaan_mutasi_no AS no_penerimaan_barang,
-                mutasi.tanggal AS tanggal_lpb,
+                ppbkb.tanggal AS tanggal_lpb,
                 '' AS no_order,
                 divisis.divisi AS divisi,
                 warehouses.warehouse_name,

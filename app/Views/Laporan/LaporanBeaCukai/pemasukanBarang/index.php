@@ -6,9 +6,11 @@
     <div class="section-header">
         <h1>Laporan Pemasukan Barang</h1>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-warning btn-print float-right" href="#" id="btnExport">
-                <i class="fa fa-download"></i> Export
-            </a>
+            <?php if (can('Laporan', 'Bea Cukai', 'p')): ?>
+                <a class="btn btn-warning btn-print float-right" href="#" id="btnExport">
+                    <i class="fa fa-download"></i> Export
+                </a>
+            <?php endif; ?>
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("laporan-bea-cukai"); ?>">
                 Kembali
             </a>
