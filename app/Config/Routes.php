@@ -2845,7 +2845,7 @@ $routes->get('/laporan-accounting/penjualan/printExcel/(:segment)/(:segment)/(:s
 
 $routes->get('/laporan-accounting/hutang', 'Laporan\Accounting\Hutang::index', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/hutang/all', 'Laporan\Accounting\Hutang::allHutang', ['filter' => 'Auth']);
-$routes->get('/laporan-accounting/hutang/details/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Hutang::detail/$1/$2/$3/$4/$5/$6', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/hutang/details/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Hutang::detail/$1/$2/$3/$4/$5/$6/$7', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/hutang/details/invoice/(:segment)', 'Laporan\Accounting\Hutang::allDetailsInvoice/$1', ['filter' => 'Auth']);
 $routes->get('laporan-accounting/hutang/print', 'Laporan\Accounting\Hutang::printHutang');
 $routes->get('laporan-accounting/hutang/export-excel', 'Laporan\Accounting\Hutang::exportExcelHutang');
