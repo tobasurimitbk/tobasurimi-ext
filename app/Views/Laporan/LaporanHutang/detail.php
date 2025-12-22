@@ -10,7 +10,7 @@
                 Export
             </button>
             <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-                <!-- <li><button class="dropdown-item" onclick="exportToPDF()">PDF</button></li> -->
+                <li><button class="dropdown-item" onclick="exportToPDF()">PDF</button></li>
                 <li><button class="dropdown-item" onclick="exportToExcel()">EXCEL</button></li>
             </ul>
         <?php endif; ?>
@@ -195,6 +195,7 @@
             search: $(".search").val(),
             filter: <?php echo json_encode($filter); ?>,
             filter_divisi: <?php echo json_encode($filterDivisi); ?>,
+            tipe_barang: <?php echo json_encode($tipeBarang); ?>,
             supplierId: <?= json_encode($id) ?>,
             dateStart: $(".dateStart").val(),
             dateEnd: $(".dateEnd").val(),

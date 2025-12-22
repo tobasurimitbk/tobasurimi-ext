@@ -55,10 +55,10 @@
             <?php foreach ($data as $item): ?>
                 <tr>
                     <td><?= $no++ ?></td>
-                    <td class="text-left"><?= $item->no_penerimaan_barang ?></td>
-                    <td><?= $item->name ?></td>
-                    <td><?= number_format($item->total, 2, ',', '.') ?></td>
-                    <td><?= number_format($item->total - $item->remaining, 2, ',', '.') ?></td>
+                    <td class="text-left"><?= $item->list_no_penerimaan_barang ?></td>
+                    <td><?= $item->supplier_name ?></td>
+                    <td><?= number_format($item->sum_total, 2, ',', '.') ?></td>
+                    <td><?= number_format($item->sum_total - $item->sum_remaining, 2, ',', '.') ?></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>

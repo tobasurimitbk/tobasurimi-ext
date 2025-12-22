@@ -2168,7 +2168,25 @@ class RMPurchaseOrderModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'rm_purchase_orders.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "rm_purchase_orders.id AS id, 
+        if (isset($addCondition['summary']) && $addCondition['summary'] == "summary") {
+            $selectQry = "
+                GROUP_CONCAT(
+                    DISTINCT suppliers.id
+                    ORDER BY suppliers.id
+                    SEPARATOR ', '
+                ) AS id,
+                suppliers.name AS supplier_name,
+                GROUP_CONCAT(
+                    DISTINCT penerimaan_barang.no_penerimaan_barang
+                    ORDER BY penerimaan_barang.no_penerimaan_barang
+                    SEPARATOR ', '
+                ) AS list_no_penerimaan_barang,
+
+                SUM(DISTINCT penerimaan_barang_detail.sub_total) AS sum_total, 
+                SUM(DISTINCT local_po_payments.amount) AS sum_remaining
+            ";
+        }else{
+            $selectQry = "rm_purchase_orders.id AS id, 
                     rm_purchase_orders.po_date AS tanggal_invoice, 
                     rm_purchase_orders.po_no AS no_invoice, 
                     rm_purchase_orders.company_id, 
@@ -2178,11 +2196,11 @@ class RMPurchaseOrderModel extends Model
                     COUNT(rm_purchase_order_details.id) AS itemCount,
                     penerimaan_barang_detail.sub_total AS total, 
                     local_po_payments.amount AS remaining,
-                    SUM(penerimaan_barang_detail.sub_total) AS sum_total, 
-                    SUM(local_po_payments.amount) AS sum_remaining,
+                    SUM(DISTINCT penerimaan_barang_detail.sub_total) AS sum_total, 
+                    SUM(DISTINCT local_po_payments.amount) AS sum_remaining,
                     penerimaan_barang.no_penerimaan_barang AS no_penerimaan_barang,
-                    GROUP_CONCAT(penerimaan_barang.no_penerimaan_barang SEPARATOR ', ') AS list_no_penerimaan_barang";
-
+                    GROUP_CONCAT(DISTINCT penerimaan_barang.no_penerimaan_barang SEPARATOR ', ') AS list_no_penerimaan_barang";
+        }
         $poDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
@@ -2191,10 +2209,10 @@ class RMPurchaseOrderModel extends Model
             ->join('divisis', 'divisis.id = rm_purchase_orders.divisi_id', 'left')
             ->join('rm_purchase_order_details', 'rm_purchase_orders.id = rm_purchase_order_details.rm_purchase_order_id', 'left')
             ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_id = rm_purchase_orders.id AND penerimaan_barang_detail.purchase_order_details_id = rm_purchase_order_details.id', 'right')
-            ->join('penerimaan_barang', "penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id AND penerimaan_barang.status_penerimaan = 'LOKAL' AND penerimaan_barang.tipe_bahan = 'BAKU'", 'right')
+            ->join('penerimaan_barang', "penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id AND penerimaan_barang.status_penerimaan = 'LOKAL' AND penerimaan_barang.tipe_bahan = 'BAKU'")
             ->join('local_po_payments', 'FIND_IN_SET(rm_purchase_orders.id, REPLACE(REPLACE(local_po_payments.multiple_po_id, "[", ""), "]", ""))', 'left');
             if (isset($addCondition['summary']) && $addCondition['summary'] == "summary") {
-                $poDataQry->groupBy('suppliers.id');
+                $poDataQry->groupBy('suppliers.name');
             } else {
                 $poDataQry->groupBy('rm_purchase_orders.id');
             }
@@ -2216,11 +2234,11 @@ class RMPurchaseOrderModel extends Model
         }
 
         if (!empty($addCondition['dateStart'])) {
-            $poDataQry->where('rm_purchase_orders.po_date >=', $addCondition['dateStart']);
+            $poDataQry->where('penerimaan_barang.tanggal >=', $addCondition['dateStart']);
         }
 
         if (!empty($addCondition['dateEnd'])) {
-            $poDataQry->where('rm_purchase_orders.po_date <=', $addCondition['dateEnd']);
+            $poDataQry->where('penerimaan_barang.tanggal <=', $addCondition['dateEnd']);
         }
 
         if ($addCondition['filter'] && $addCondition['divisi']) {

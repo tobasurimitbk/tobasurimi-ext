@@ -356,7 +356,27 @@ class RMImportPOModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'rm_import_pos.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "rm_import_pos.id AS id, 
+        if (isset($addCondition['summary']) && $addCondition['summary'] == "summary") {
+            $selectQry = "
+                GROUP_CONCAT(
+                    DISTINCT suppliers.id
+                    ORDER BY suppliers.id
+                    SEPARATOR ', '
+                ) AS id,
+                suppliers.name AS supplier_name,
+                divisis.divisi AS divisi,
+
+                GROUP_CONCAT(
+                    DISTINCT penerimaan_barang.no_penerimaan_barang
+                    ORDER BY penerimaan_barang.no_penerimaan_barang
+                    SEPARATOR ', '
+                ) AS list_no_penerimaan_barang,
+
+                SUM(DISTINCT penerimaan_barang_detail.sub_total) AS sum_total, 
+                SUM(DISTINCT local_po_payments.amount) AS sum_remaining
+            ";
+        }else{
+            $selectQry = "rm_import_pos.id AS id, 
                     rm_import_pos.po_date AS tanggal_invoice, 
                     rm_import_pos.po_no AS no_invoice, 
                     rm_import_pos.company_id, 
@@ -366,10 +386,11 @@ class RMImportPOModel extends Model
                     COUNT(rm_import_po_details.id) AS itemCount,
                     penerimaan_barang_detail.sub_total AS total, 
                     local_po_payments.amount AS remaining,
-                    SUM(penerimaan_barang_detail.sub_total) AS sum_total, 
-                    SUM(local_po_payments.amount) AS sum_remaining,
+                    SUM(DISTINCT penerimaan_barang_detail.sub_total) AS sum_total, 
+                    SUM(DISTINCT local_po_payments.amount) AS sum_remaining,
                     penerimaan_barang.no_penerimaan_barang AS no_penerimaan_barang,
-                    GROUP_CONCAT(penerimaan_barang.no_penerimaan_barang SEPARATOR ', ') AS list_no_penerimaan_barang";
+                    GROUP_CONCAT(DISTINCT penerimaan_barang.no_penerimaan_barang SEPARATOR ', ') AS list_no_penerimaan_barang";
+        }
 
         $poDataQry = $this->asObject()
             ->select($selectQry)
@@ -382,7 +403,7 @@ class RMImportPOModel extends Model
             ->join('penerimaan_barang', "penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id AND penerimaan_barang.status_penerimaan = 'IMPORT' AND penerimaan_barang.tipe_bahan = 'BAKU'", 'right')
             ->join('local_po_payments', 'FIND_IN_SET(rm_import_pos.id, REPLACE(REPLACE(local_po_payments.multiple_po_id, "[", ""), "]", ""))', 'left');
             if (isset($addCondition['summary']) && $addCondition['summary'] == "summary") {
-                $poDataQry->groupBy('rm_import_pos.id, rm_import_pos.supplier_id');
+                $poDataQry->groupBy('suppliers.name');
             } else {
                 $poDataQry->groupBy('rm_import_pos.id');
             }

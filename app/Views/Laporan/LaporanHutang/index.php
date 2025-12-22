@@ -314,9 +314,9 @@
     function getFilterQuery() {
         return {
             search: $(".search").val(),
-            filter: $(".list_supplier").val(),
-            divisi: $(".list_divisi").val(),
-            type_barang: $(".list_type_barang").val(),
+            filter: $(".list_supplier option:selected").val(),
+            divisi: $(".list_divisi option:selected").val(),
+            type_barang: $(".list_type_barang option:selected").val(),
             dateStart: $(".dateStart").val(),
             dateEnd: $(".dateEnd").val(),
             sort: sort,

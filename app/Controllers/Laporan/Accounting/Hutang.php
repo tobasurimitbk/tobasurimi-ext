@@ -141,7 +141,7 @@ class Hutang extends BaseController
             "summary"       => "summary",
             "sortType"      => $this->request->getGet("sortType"),
             "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
-            "dateEnd"      => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+            "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
         if ($this->this_company_id != "16" && $this->this_company_id != "15") {
@@ -161,31 +161,34 @@ class Hutang extends BaseController
 
         if ($type_barang == "BAHAN BAKU LOKAL") {
             $condition['rm_purchase_orders.deletedAt'] = NULL;
+            // var_dump($condition, $addCondition, $limit, $offset);
+            // exit;
             $allData = $this->rMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, $limit, $offset);
         } else if ($type_barang == "BAHAN PENOLONG LOKAL") {
             $condition['am_purchase_orders.deletedAt'] = NULL;
             $condition['am_purchase_orders.po_type'] = "Lokal";
-            $allData = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
+            $allData = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, $limit, $offset);
         } else if ($type_barang == "BAHAN BAKU INTERNASIONAL") {
             $condition['rm_import_pos.deletedAt'] = NULL;
-            $allData = $this->rMImportPOModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
+            $allData = $this->rMImportPOModel->getPOByIdSupplierWithInvoice($condition, $addCondition, $limit, $offset);
         } else if ($type_barang == "BAHAN PENOLONG INTERNASIONAL") {
             $condition['am_purchase_orders.deletedAt'] = NULL;
             $condition['am_purchase_orders.po_type'] = "Import";
-            $allData = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
+            $allData = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, $limit, $offset);
         }
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         $rdata = [];
         foreach ($allData['data'] as $d) {
+            $totalRemaining = $d->sum_total - $d->sum_remaining;
             $rdata[] = [
                 'no' => $no++,
                 'id' => $d->id,
                 'supplier' => $d->supplier_name,
                 'no_penerimaan_barang' => $d->list_no_penerimaan_barang,
                 'nominal_idr' => $d->sum_total,
-                'remaining_idr' => $d->sum_remaining ?? $d->sum_total,
+                'remaining_idr' => $totalRemaining,
             ];
         }
 
@@ -207,11 +210,18 @@ class Hutang extends BaseController
         } else {
             $filter = "";
         }
+
+        if ($id) {
+            $filterId = explode(',', $id);
+        } else {
+            $filterId = "";
+        }
+
         $payload = [
             "pageSize"      => $this->request->getGet("length"),
             "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
             "search"        => $this->request->getGet("search"),
-            "filter"        => $filter,
+            "filter"        => $filter ?? $filterId,
             "divisi"        => $this->request->getGet("filter_divisi") == "all" ? "" : $this->request->getGet("filter_divisi"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
@@ -220,13 +230,13 @@ class Hutang extends BaseController
         ];
 
         $condition = [
-            "suppliers.id"  => $id,
+            // "suppliers.id"  => $id,
             "suppliers.deletedAt" => NULL
         ];
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
-            "filter"        => $filter,
+            "filter"        => !empty($filter) ? $filter : $filterId,
             "divisi"        => $this->request->getGet("filter_divisi") == "all" ? "" : $this->request->getGet("filter_divisi"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
@@ -250,22 +260,9 @@ class Hutang extends BaseController
         $checkSupplier = $this->supplierModel->find($id);
         $type_barang   = $this->request->getGet("tipe_barang");
 
-        // if ($checkSupplier['type'] == "BAHAN PENOLONG") {
-        //     $res = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, $limit, $offset);
-        // } else if ($checkSupplier['type'] == "BAHAN BAKU") {
-        //     $res = $this->rMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, $limit, $offset);
-        // } else {
-        //     $res = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, $limit, $offset);
-        //     if (!$res) {
-        //         $res = $this->rMImportPOModel->getPOByIdSupplierWithInvoice($condition, $addCondition, $limit, $offset);
-        //     }
-        // }
-
         if ($type_barang == "BAHAN BAKU LOKAL") {
             $condition['rm_purchase_orders.deletedAt'] = NULL;
             $res = $this->rMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, $limit, $offset);
-            var_dump($condition, $addCondition, $limit, $offset, $type_barang, $res);
-            exit;
         } else if ($type_barang == "BAHAN PENOLONG LOKAL") {
             $condition['am_purchase_orders.deletedAt'] = NULL;
             $condition['am_purchase_orders.po_type'] = "Lokal";
@@ -284,15 +281,15 @@ class Hutang extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($res['data'] as $data) {
-            $totalRemaining = $data->total - $data->remaining;
+            $totalRemaining = $data->sum_total - $data->sum_remaining;
             array_push($rdata, [
                 "no"                    => $no++,
                 "id"                    => $data->id,
-                "tanggal_invoice"       => $data->tanggal_invoice,
+                "tanggal_invoice"       => date("d/m/Y", strtotime($data->tanggal_invoice)),
                 "no_invoice"            => $data->no_invoice,
                 "no_penerimaan_barang"  => $data->no_penerimaan_barang,
                 "divisi_invoice"        => $data->divisi,
-                "nominal_invoice"       => number_format($data->total, 2, '.', ''),
+                "nominal_invoice"       => number_format($data->sum_total, 2, '.', ''),
                 "remaining_invoice"     => number_format($totalRemaining, 2, '.', ''),
             ]);
         }
@@ -310,20 +307,21 @@ class Hutang extends BaseController
 
     public function printHutang()
     {
-        $filterRaw = $this->request->getGet("filter");
-        $filter = ($filterRaw) ? array_filter(explode(',', $filterRaw)) : [];
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
+        ob_end_clean();
+        ob_start();
+
+        $rawFilter = $this->request->getGet("filter");
+        $filter = [];
+        $type_barang   = $this->request->getGet("type_barang");
+
+        if ($rawFilter) {
+            $filter = explode(',', $rawFilter);
+        }
+        
         $startDate = $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "";
         $endDate = $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "";
-
-        if ($this->this_company_id != "16" && $this->this_company_id != "15") {
-            $companyId = [1, 2];
-        } else if ($this->this_company_id == "15") {
-            $companyId = [15];
-        } else if ($this->this_company_id == "16") {
-            $companyId = [16];
-        } else {
-            $companyId = [];
-        }
 
         $condition = [
             "suppliers.deletedAt" => NULL
@@ -333,17 +331,45 @@ class Hutang extends BaseController
             "search"        => $this->request->getGet("search"),
             "filter"        => $filter,
             "divisi"        => $this->request->getGet("divisi"),
-            "type_barang"   => $this->request->getGet("type_barang"),
             "sort"          => $this->request->getGet("sort"),
+            "summary"       => "summary",
             "sortType"      => $this->request->getGet("sortType"),
-            "startdate"     => $startDate,
-            "lastdate"      => $endDate,
+            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
-        $res = $this->supplierModel->getSupplierHutangList($condition, $addCondition, null, null, $companyId);
+        if ($this->this_company_id != "16" && $this->this_company_id != "15") {
+            $addCondition['companyId'] = [1, 2];
+        } else if ($this->this_company_id == "15") {
+            $addCondition['companyId'] = [15];
+        } else if ($this->this_company_id == "16") {
+            $addCondition['companyId'] = [16];
+        } else {
+            $addCondition['companyId'] = [];
+        }
+
+        $allData = [];
+
+        if ($type_barang == "BAHAN BAKU LOKAL") {
+            $condition['rm_purchase_orders.deletedAt'] = NULL;
+            // var_dump($condition, $addCondition);
+            // exit;
+            $allData = $this->rMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
+        } else if ($type_barang == "BAHAN PENOLONG LOKAL") {
+            $condition['am_purchase_orders.deletedAt'] = NULL;
+            $condition['am_purchase_orders.po_type'] = "Lokal";
+            $allData = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
+        } else if ($type_barang == "BAHAN BAKU INTERNASIONAL") {
+            $condition['rm_import_pos.deletedAt'] = NULL;
+            $allData = $this->rMImportPOModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
+        } else if ($type_barang == "BAHAN PENOLONG INTERNASIONAL") {
+            $condition['am_purchase_orders.deletedAt'] = NULL;
+            $condition['am_purchase_orders.po_type'] = "Import";
+            $allData = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
+        }
 
         $data = [
-            'data' => $res['data'],
+            'data' => $allData['data'],
             'title' => 'Laporan Hutang Supplier',
             'date_range' => ($startDate && $endDate) ? date("d/m/Y", strtotime($startDate)) . " - " . date("d/m/Y", strtotime($endDate)) : "Semua Periode"
         ];
@@ -365,20 +391,21 @@ class Hutang extends BaseController
 
     public function exportExcelHutang()
     {
-        $filterRaw = $this->request->getGet("filter");
-        $filter = ($filterRaw) ? array_filter(explode(',', $filterRaw)) : [];
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
+        ob_end_clean();
+        ob_start();
+
+        $rawFilter = $this->request->getGet("filter");
+        $filter = [];
+        $type_barang   = $this->request->getGet("type_barang");
+
+        if ($rawFilter) {
+            $filter = explode(',', $rawFilter);
+        }
+        
         $startDate = $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "";
         $endDate = $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "";
-
-        if ($this->this_company_id != "16" && $this->this_company_id != "15") {
-            $companyId = [1, 2];
-        } else if ($this->this_company_id == "15") {
-            $companyId = [15];
-        } else if ($this->this_company_id == "16") {
-            $companyId = [16];
-        } else {
-            $companyId = [];
-        }
 
         $condition = [
             "suppliers.deletedAt" => NULL
@@ -388,14 +415,42 @@ class Hutang extends BaseController
             "search"        => $this->request->getGet("search"),
             "filter"        => $filter,
             "divisi"        => $this->request->getGet("divisi"),
-            "type_barang"   => $this->request->getGet("type_barang"),
             "sort"          => $this->request->getGet("sort"),
+            "summary"       => "summary",
             "sortType"      => $this->request->getGet("sortType"),
-            "startdate"     => $startDate,
-            "lastdate"      => $endDate,
+            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
-        $res = $this->supplierModel->getSupplierHutangList($condition, $addCondition, null, null, $companyId);
+        if ($this->this_company_id != "16" && $this->this_company_id != "15") {
+            $addCondition['companyId'] = [1, 2];
+        } else if ($this->this_company_id == "15") {
+            $addCondition['companyId'] = [15];
+        } else if ($this->this_company_id == "16") {
+            $addCondition['companyId'] = [16];
+        } else {
+            $addCondition['companyId'] = [];
+        }
+
+        $allData = [];
+
+        if ($type_barang == "BAHAN BAKU LOKAL") {
+            $condition['rm_purchase_orders.deletedAt'] = NULL;
+            // var_dump($condition, $addCondition);
+            // exit;
+            $allData = $this->rMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
+        } else if ($type_barang == "BAHAN PENOLONG LOKAL") {
+            $condition['am_purchase_orders.deletedAt'] = NULL;
+            $condition['am_purchase_orders.po_type'] = "Lokal";
+            $allData = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
+        } else if ($type_barang == "BAHAN BAKU INTERNASIONAL") {
+            $condition['rm_import_pos.deletedAt'] = NULL;
+            $allData = $this->rMImportPOModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
+        } else if ($type_barang == "BAHAN PENOLONG INTERNASIONAL") {
+            $condition['am_purchase_orders.deletedAt'] = NULL;
+            $condition['am_purchase_orders.po_type'] = "Import";
+            $allData = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
+        }
 
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -409,12 +464,13 @@ class Hutang extends BaseController
 
         $no = 1;
         $row = 2;
-        foreach ($res['data'] as $item) {
+        foreach ($allData['data'] as $item) {
+            $totalRemaining = $item->sum_total - $item->sum_remaining;
             $sheet->setCellValue("A$row", $no++);
-            $sheet->setCellValue("B$row", $item['no_penerimaan_barang']);
-            $sheet->setCellValue("C$row", $item['supplier']);
-            $sheet->setCellValue("D$row", $item['nominal_idr']);
-            $sheet->setCellValue("E$row", $item['remaining_idr']);
+            $sheet->setCellValue("B$row", $item->list_no_penerimaan_barang);
+            $sheet->setCellValue("C$row", $item->supplier_name);
+            $sheet->setCellValue("D$row", $item->sum_total);
+            $sheet->setCellValue("E$row", $totalRemaining);
             $row++;
         }
 
@@ -430,18 +486,27 @@ class Hutang extends BaseController
 
     public function printHutangDetail()
     {
-        $filterRaw = $this->request->getGet("filter");
-        $filter = ($filterRaw) ? array_filter(explode(',', $filterRaw)) : [];
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
+        ob_end_clean();
+        ob_start();
+
+        $rawFilter = $this->request->getGet("filter");
+        $filter = [];
+        $filterId = [];
+        $type_barang   = $this->request->getGet("tipe_barang");
+        $id = $this->request->getGet("supplierId");
+        
+        if ($rawFilter != "all") {
+            $filter = explode(',', $rawFilter);
+        }
+
+        if ($id) {
+            $filterId = explode(',', $id);
+        }
+        
         $startDate = $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "";
         $endDate = $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "";
-
-        if ($this->this_company_id != 16 && $this->this_company_id != 15) {
-            $companyId = [1, 2];
-        } else if ($this->this_company_id == 15) {
-            $companyId = [15];
-        } else {
-            $companyId = [16];
-        }
 
         $condition = [
             "suppliers.deletedAt" => NULL
@@ -449,19 +514,44 @@ class Hutang extends BaseController
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
-            "filter"        => $filter,
+            "filter"        => !empty($filter) ? $filter : $filterId,
             "divisi"        => $this->request->getGet("divisi"),
-            "type_barang"   => $this->request->getGet("type_barang"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-            "startdate"     => $startDate,
-            "lastdate"      => $endDate,
+            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
-        $res = $this->supplierModel->getSupplierHutangList($condition, $addCondition, null, null, $companyId);
+        if ($this->this_company_id != "16" && $this->this_company_id != "15") {
+            $addCondition['companyId'] = [1, 2];
+        } else if ($this->this_company_id == "15") {
+            $addCondition['companyId'] = [15];
+        } else if ($this->this_company_id == "16") {
+            $addCondition['companyId'] = [16];
+        } else {
+            $addCondition['companyId'] = [];
+        }
 
+        $allData = [];
+
+        if ($type_barang == "BAHAN BAKU LOKAL") {
+            $condition['rm_purchase_orders.deletedAt'] = NULL;
+            $allData = $this->rMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
+        } else if ($type_barang == "BAHAN PENOLONG LOKAL") {
+            $condition['am_purchase_orders.deletedAt'] = NULL;
+            $condition['am_purchase_orders.po_type'] = "Lokal";
+            $allData = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
+        } else if ($type_barang == "BAHAN BAKU INTERNASIONAL") {
+            $condition['rm_import_pos.deletedAt'] = NULL;
+            $allData = $this->rMImportPOModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
+        } else if ($type_barang == "BAHAN PENOLONG INTERNASIONAL") {
+            $condition['am_purchase_orders.deletedAt'] = NULL;
+            $condition['am_purchase_orders.po_type'] = "Import";
+            $allData = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
+        }
+        
         $data = [
-            'data' => $res['data'],
+            'data' => $allData['data'],
             'title' => 'Laporan Hutang Supplier',
             'date_range' => ($startDate && $endDate) ? date("d/m/Y", strtotime($startDate)) . " - " . date("d/m/Y", strtotime($endDate)) : "Semua Periode"
         ];
@@ -483,40 +573,68 @@ class Hutang extends BaseController
 
     public function exportExcelHutangDetail()
     {
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
+        ob_end_clean();
+        ob_start();
+
+        $rawFilter = $this->request->getGet("filter");
+        $filter = [];
+        $filterId = [];
+        $type_barang   = $this->request->getGet("tipe_barang");
         $id = $this->request->getGet("supplierId");
-        $rawFilter = $this->request->getGet("filter") == "all" ? "" : $this->request->getGet("filter");
+        
+        if ($rawFilter != "all") {
+            $filter = explode(',', $rawFilter);
+        }
 
-        $filter = $rawFilter ? explode(',', $rawFilter) : [];
-
-        $dateStart = $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "";
-        $dateEnd = $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "";
+        if ($id) {
+            $filterId = explode(',', $id);
+        }
+        
+        $startDate = $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "";
+        $endDate = $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "";
 
         $condition = [
-            "suppliers.id" => $id,
             "suppliers.deletedAt" => NULL
         ];
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
-            "filter"        => $filter,
-            "divisi"        => $this->request->getGet("filter_divisi") == "all" ? "" : $this->request->getGet("filter_divisi"),
+            "filter"        => !empty($filter) ? $filter : $filterId,
+            "divisi"        => $this->request->getGet("divisi"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-            "dateStart"     => $dateStart,
-            "dateEnd"       => $dateEnd,
+            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
-        $checkSupplier = $this->supplierModel->find($id);
-
-        if ($checkSupplier['type'] == "BAHAN PENOLONG") {
-            $res = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
-        } else if ($checkSupplier['type'] == "BAHAN BAKU") {
-            $res = $this->rMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
+        if ($this->this_company_id != "16" && $this->this_company_id != "15") {
+            $addCondition['companyId'] = [1, 2];
+        } else if ($this->this_company_id == "15") {
+            $addCondition['companyId'] = [15];
+        } else if ($this->this_company_id == "16") {
+            $addCondition['companyId'] = [16];
         } else {
-            $res = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
-            if (!$res) {
-                $res = $this->rMImportPOModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
-            }
+            $addCondition['companyId'] = [];
+        }
+
+        $allData = [];
+
+        if ($type_barang == "BAHAN BAKU LOKAL") {
+            $condition['rm_purchase_orders.deletedAt'] = NULL;
+            $allData = $this->rMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
+        } else if ($type_barang == "BAHAN PENOLONG LOKAL") {
+            $condition['am_purchase_orders.deletedAt'] = NULL;
+            $condition['am_purchase_orders.po_type'] = "Lokal";
+            $allData = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
+        } else if ($type_barang == "BAHAN BAKU INTERNASIONAL") {
+            $condition['rm_import_pos.deletedAt'] = NULL;
+            $allData = $this->rMImportPOModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
+        } else if ($type_barang == "BAHAN PENOLONG INTERNASIONAL") {
+            $condition['am_purchase_orders.deletedAt'] = NULL;
+            $condition['am_purchase_orders.po_type'] = "Import";
+            $allData = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, null, null);
         }
 
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
@@ -534,15 +652,15 @@ class Hutang extends BaseController
         $no = 1;
         $row = 2;
 
-        foreach ($res['data'] as $item) {
-            $remaining = $item->total - $item->remaining;
+        foreach ($allData['data'] as $item) {
+            $remaining = $item->sum_total - $item->sum_remaining;
 
             $sheet->setCellValue("A$row", $no++);
             $sheet->setCellValue("B$row", $item->tanggal_invoice);
             $sheet->setCellValue("C$row", $item->no_invoice);
             $sheet->setCellValue("D$row", $item->no_penerimaan_barang);
             $sheet->setCellValue("E$row", $item->divisi);
-            $sheet->setCellValue("F$row", $item->total);
+            $sheet->setCellValue("F$row", $item->sum_total);
             $sheet->setCellValue("G$row", $remaining);
             $row++;
         }
