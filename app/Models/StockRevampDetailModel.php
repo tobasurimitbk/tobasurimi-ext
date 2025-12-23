@@ -1560,19 +1560,19 @@ class StockRevampDetailModel extends Model
                 bc.no_daftar
             ")
             ->join('stock_revamp sr', 'sr.id = srd.stock_id')
-            ->join('rm_purchase_orders rmpo', 'rmpo.id = srd.po_id')
+            ->join('rm_purchase_orders rmpo', 'rmpo.id = srd.po_id', 'left')
             ->join('rm_purchase_order_details rmpod', '
                 rmpod.rm_purchase_order_id = rmpo.id
                 AND rmpod.barang1_id = sr.barang_master_id
                 AND rmpod.barang2_id = sr.spesifikasi_id
-            ')
-            ->join('suppliers sup', 'sup.id = rmpo.supplier_id')
-            ->join('penerimaan_barang pb', 'pb.id = srd.reference_id')
+            ', 'left')
+            ->join('suppliers sup', 'sup.id = rmpo.supplier_id', 'left')
+            ->join('penerimaan_barang pb', 'pb.id = srd.reference_id', 'left')
             ->join('bc_purchase_order_lpb bcl', 'bcl.penerimaan_barang_id = pb.id', 'left')
             ->join('bc_purchase_order bc', 'bc.id = bcl.bc_purchase_order_id', 'left')
-            ->join('barang_master bm', 'bm.id = sr.barang_master_id')
-            ->join('barang_master_spesifikasi bms', 'bms.id = sr.spesifikasi_id')
-            ->join('satuans s', 's.id = bms.satuan_1')
+            ->join('barang_master bm', 'bm.id = sr.barang_master_id', 'left')
+            ->join('barang_master_spesifikasi bms', 'bms.id = sr.spesifikasi_id', 'left')
+            ->join('satuans s', 's.id = bms.satuan_1', 'left')
             ->where('srd.po_type', 'LOKAL BAKU')
             ->where('srd.reference_type', 'PROSES REBUS');
 
@@ -1622,19 +1622,19 @@ class StockRevampDetailModel extends Model
                 bc.no_daftar
             ")
             ->join('stock_revamp sr', 'sr.id = srd.stock_id')
-            ->join('rm_import_pos ripo', 'ripo.id = srd.po_id')
+            ->join('rm_import_pos ripo', 'ripo.id = srd.po_id', 'left')
             ->join('rm_import_po_details ripod', '
                 ripod.rm_import_po_id = ripo.id
                 AND ripod.barang_id = sr.barang_master_id
                 AND ripod.spesifikasi_id = sr.spesifikasi_id
-            ')
+            ', 'left')
             ->join('suppliers sup', 'sup.id = ripo.supplier_id', 'left')
-            ->join('penerimaan_barang pb', 'pb.id = srd.reference_id')
+            ->join('penerimaan_barang pb', 'pb.id = srd.reference_id', 'left')
             ->join('bc_purchase_order_lpb bcl', 'bcl.penerimaan_barang_id = pb.id', 'left')
             ->join('bc_purchase_order bc', 'bc.id = bcl.bc_purchase_order_id', 'left')
-            ->join('barang_master bm', 'bm.id = sr.barang_master_id')
-            ->join('barang_master_spesifikasi bms', 'bms.id = sr.spesifikasi_id')
-            ->join('satuans s', 's.id = bms.satuan_1')
+            ->join('barang_master bm', 'bm.id = sr.barang_master_id', 'left')
+            ->join('barang_master_spesifikasi bms', 'bms.id = sr.spesifikasi_id', 'left')
+            ->join('satuans s', 's.id = bms.satuan_1', 'left')
             ->where('srd.po_type', 'IMPORT BAKU')
             ->where('srd.reference_type', 'PROSES REBUS');
 
@@ -1684,11 +1684,11 @@ class StockRevampDetailModel extends Model
                 NULL AS no_daftar
             ")
             ->join('stock_revamp sr', 'sr.id = srd.stock_id')
-            ->join('proses_rebus_detail prd', 'prd.stock_detail_hasil_rebus_id = srd.id')
-            ->join('proses_rebus pr', 'pr.id = prd.proses_rebus_id')
-            ->join('barang_master bm', 'bm.id = sr.barang_master_id')
-            ->join('barang_master_spesifikasi bms', 'bms.id = sr.spesifikasi_id')
-            ->join('satuans s', 's.id = bms.satuan_1')
+            ->join('proses_rebus_detail prd', 'prd.stock_detail_hasil_rebus_id = srd.id', 'left')
+            ->join('proses_rebus pr', 'pr.id = prd.proses_rebus_id', 'left')
+            ->join('barang_master bm', 'bm.id = sr.barang_master_id', 'left')
+            ->join('barang_master_spesifikasi bms', 'bms.id = sr.spesifikasi_id', 'left')
+            ->join('satuans s', 's.id = bms.satuan_1', 'left')
             ->where('srd.po_id', NULL)
             ->where('srd.reference_type', 'PROSES REBUS');
 
@@ -1964,22 +1964,22 @@ class StockRevampDetailModel extends Model
                 srd.type_bc,
                 bc.no_daftar
             ")
-            ->join('penerimaan_mutasi_detail pmd', 'pmd.penerimaan_mutasi_id = srd.reference_id')
-            ->join('mutasi_detail md', 'md.id = pmd.mutasi_detail_id')
-            ->join('stock_revamp_detail srd2', "srd2.id = md.stock_detail_id AND srd2.reference_type = 'LPB'")
-            ->join('stock_revamp sr', 'sr.id = srd.stock_id')
+            ->join('penerimaan_mutasi_detail pmd', 'pmd.penerimaan_mutasi_id = srd.reference_id', 'left')
+            ->join('mutasi_detail md', 'md.id = pmd.mutasi_detail_id', 'left')
+            ->join('stock_revamp_detail srd2', "srd2.id = md.stock_detail_id AND srd2.reference_type = 'LPB'", 'left')
+            ->join('stock_revamp sr', 'sr.id = srd.stock_id', 'left')
 
-            ->join('rm_purchase_orders rmpo', "rmpo.id = srd2.po_id AND srd2.po_type = 'LOKAL BAKU'")
-            ->join('rm_purchase_order_details rmpod', 'rmpod.rm_purchase_order_id = rmpo.id')
-            ->join('suppliers sup', 'sup.id = rmpo.supplier_id')
+            ->join('rm_purchase_orders rmpo', "rmpo.id = srd2.po_id AND srd2.po_type = 'LOKAL BAKU'", 'left')
+            ->join('rm_purchase_order_details rmpod', 'rmpod.rm_purchase_order_id = rmpo.id', 'left')
+            ->join('suppliers sup', 'sup.id = rmpo.supplier_id', 'left')
 
-            ->join('penerimaan_barang pb', 'pb.id = srd2.reference_id')
+            ->join('penerimaan_barang pb', 'pb.id = srd2.reference_id', 'left')
             ->join('bc_purchase_order_lpb bcl', 'bcl.penerimaan_barang_id = pb.id', 'left')
             ->join('bc_purchase_order bc', 'bc.id = bcl.bc_purchase_order_id', 'left')
 
-            ->join('barang_master bm', 'bm.id = sr.barang_master_id')
-            ->join('barang_master_spesifikasi bms', 'bms.id = sr.spesifikasi_id')
-            ->join('satuans s', 's.id = bms.satuan_1')
+            ->join('barang_master bm', 'bm.id = sr.barang_master_id', 'left')
+            ->join('barang_master_spesifikasi bms', 'bms.id = sr.spesifikasi_id', 'left')
+            ->join('satuans s', 's.id = bms.satuan_1', 'left')
 
             ->where('srd.reference_type', 'PENERIMAAN MUTASI');
 
@@ -2028,22 +2028,22 @@ class StockRevampDetailModel extends Model
                 srd.type_bc,
                 bc.no_daftar
             ")
-            ->join('penerimaan_mutasi_detail pmd', 'pmd.penerimaan_mutasi_id = srd.reference_id')
-            ->join('mutasi_detail md', 'md.id = pmd.mutasi_detail_id')
-            ->join('stock_revamp_detail srd2', "srd2.id = md.stock_detail_id AND srd2.reference_type = 'LPB'")
-            ->join('stock_revamp sr', 'sr.id = srd.stock_id')
+            ->join('penerimaan_mutasi_detail pmd', 'pmd.penerimaan_mutasi_id = srd.reference_id', 'left')
+            ->join('mutasi_detail md', 'md.id = pmd.mutasi_detail_id', 'left')
+            ->join('stock_revamp_detail srd2', "srd2.id = md.stock_detail_id AND srd2.reference_type = 'LPB'", 'left')
+            ->join('stock_revamp sr', 'sr.id = srd.stock_id', 'left')
 
-            ->join('rm_import_pos ripo', "ripo.id = srd2.po_id AND srd2.po_type = 'IMPORT BAKU'")
-            ->join('rm_import_po_details ripod', 'ripod.rm_import_po_id = ripo.id')
-            ->join('suppliers sup', 'sup.id = ripo.supplier_id')
+            ->join('rm_import_pos ripo', "ripo.id = srd2.po_id AND srd2.po_type = 'IMPORT BAKU'", 'left')
+            ->join('rm_import_po_details ripod', 'ripod.rm_import_po_id = ripo.id', 'left')
+            ->join('suppliers sup', 'sup.id = ripo.supplier_id', 'left')
 
-            ->join('penerimaan_barang pb', 'pb.id = srd2.reference_id')
+            ->join('penerimaan_barang pb', 'pb.id = srd2.reference_id', 'left')
             ->join('bc_purchase_order_lpb bcl', 'bcl.penerimaan_barang_id = pb.id', 'left')
             ->join('bc_purchase_order bc', 'bc.id = bcl.bc_purchase_order_id', 'left')
 
-            ->join('barang_master bm', 'bm.id = sr.barang_master_id')
-            ->join('barang_master_spesifikasi bms', 'bms.id = sr.spesifikasi_id')
-            ->join('satuans s', 's.id = bms.satuan_1')
+            ->join('barang_master bm', 'bm.id = sr.barang_master_id', 'left')
+            ->join('barang_master_spesifikasi bms', 'bms.id = sr.spesifikasi_id', 'left')
+            ->join('satuans s', 's.id = bms.satuan_1', 'left')
 
             ->where('srd.reference_type', 'PENERIMAAN MUTASI');
 
@@ -2092,21 +2092,21 @@ class StockRevampDetailModel extends Model
                 srd.type_bc,
                 NULL AS no_daftar
             ")
-            ->join('penerimaan_mutasi_detail pmd', 'pmd.penerimaan_mutasi_id = srd.reference_id')
-            ->join('mutasi_detail md', 'md.id = pmd.mutasi_detail_id')
+            ->join('penerimaan_mutasi_detail pmd', 'pmd.penerimaan_mutasi_id = srd.reference_id', 'left')
+            ->join('mutasi_detail md', 'md.id = pmd.mutasi_detail_id', 'left')
             ->join('stock_revamp_detail srd2', "
                 srd2.id = md.stock_detail_id
                 AND srd2.reference_type = 'PROSES REBUS'
                 AND srd2.po_id IS NOT NULL
-            ")
-            ->join('proses_rebus_detail prd', 'prd.stock_detail_hasil_rebus_id = srd2.id')
-            ->join('proses_rebus pr', 'pr.id = prd.proses_rebus_id')
+            ", 'left')
+            ->join('proses_rebus_detail prd', 'prd.stock_detail_hasil_rebus_id = srd2.id', 'left')
+            ->join('proses_rebus pr', 'pr.id = prd.proses_rebus_id', 'left')
             ->join('rm_purchase_orders rmpo', 'rmpo.id = srd2.po_id', 'left')
             ->join('suppliers sup', 'sup.id = rmpo.supplier_id', 'left')
-            ->join('stock_revamp sr', 'sr.id = srd.stock_id')
-            ->join('barang_master bm', 'bm.id = sr.barang_master_id')
-            ->join('barang_master_spesifikasi bms', 'bms.id = sr.spesifikasi_id')
-            ->join('satuans s', 's.id = bms.satuan_1')
+            ->join('stock_revamp sr', 'sr.id = srd.stock_id', 'left')
+            ->join('barang_master bm', 'bm.id = sr.barang_master_id', 'left')
+            ->join('barang_master_spesifikasi bms', 'bms.id = sr.spesifikasi_id', 'left')
+            ->join('satuans s', 's.id = bms.satuan_1', 'left')
             ->where('srd.reference_type', 'PENERIMAAN MUTASI');
 
         /*
@@ -2154,17 +2154,17 @@ class StockRevampDetailModel extends Model
                 srd.type_bc,
                 NULL AS no_daftar
             ")
-            ->join('penerimaan_mutasi_detail pmd', 'pmd.penerimaan_mutasi_id = srd.reference_id')
-            ->join('mutasi_detail md', 'md.id = pmd.mutasi_detail_id')
+            ->join('penerimaan_mutasi_detail pmd', 'pmd.penerimaan_mutasi_id = srd.reference_id', 'left')
+            ->join('mutasi_detail md', 'md.id = pmd.mutasi_detail_id', 'left')
             ->join('stock_revamp_detail srd2', "
                 srd2.id = md.stock_detail_id
                 AND srd2.reference_type = 'INISIASI'
                 AND srd2.po_id IS NULL
-            ")
-            ->join('stock_revamp sr', 'sr.id = srd.stock_id')
-            ->join('barang_master bm', 'bm.id = sr.barang_master_id')
-            ->join('barang_master_spesifikasi bms', 'bms.id = sr.spesifikasi_id')
-            ->join('satuans s', 's.id = bms.satuan_1')
+            ", 'left')
+            ->join('stock_revamp sr', 'sr.id = srd.stock_id', 'left')
+            ->join('barang_master bm', 'bm.id = sr.barang_master_id', 'left')
+            ->join('barang_master_spesifikasi bms', 'bms.id = sr.spesifikasi_id', 'left')
+            ->join('satuans s', 's.id = bms.satuan_1', 'left')
             ->where('srd.reference_type', 'PENERIMAAN MUTASI');
 
         /*
