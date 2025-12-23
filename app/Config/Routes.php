@@ -2971,19 +2971,20 @@ $routes->get('/laporan-warehouse/stock-kartu', 'Laporan\Warehouse\LaporanWarehou
 $routes->get('/laporan-warehouse/stock-kartu/all-stock-kartu', 'Laporan\Warehouse\LaporanWarehouse::allLaporanKartuStock', ['filter' => 'Auth']);
 $routes->get('/laporan-warehouse/stock-kartu/print', 'Laporan\Warehouse\LaporanWarehouse::exportSheetLaporanKartuStock', ['filter' => 'Auth']);
 // LAPORAN 
+// Pemasukkan
 $routes->get('/laporan-bea-cukai', 'Laporan\BeaCukai\LaporanBeaCukai::index', ['filter' => 'Auth']);
 $routes->get('/laporan-bea-cukai/laporan-pemasukan-barang', 'Laporan\BeaCukai\LaporanBeaCukai::laporanPemasukanBarang', ['filter' => 'Auth']);
 $routes->get('/laporan-bea-cukai/all-masuk', 'Laporan\BeaCukai\LaporanBeaCukai::allPemasukkan', ['filter' => 'Auth']);
 $routes->get('/laporan-bea-cukai/all-masuk/excel', 'Laporan\BeaCukai\LaporanBeaCukai::exportExcelPemasukkan', ['filter' => 'Auth']);
-
+// Pengeluaran
 $routes->get('/laporan-bea-cukai/laporan-pengeluaran-barang', 'Laporan\BeaCukai\LaporanBeaCukai::laporanPengeluaranBarang', ['filter' => 'Auth']);
 $routes->get('/laporan-bea-cukai/all-keluar', 'Laporan\BeaCukai\LaporanBeaCukai::allKeluarBarang', ['filter' => 'Auth']);
 $routes->get('/laporan-bea-cukai/all-keluar/excel', 'Laporan\BeaCukai\LaporanBeaCukai::exportExcelLaporanKeluarBarang', ['filter' => 'Auth']);
-
+// Wip
 $routes->get('/laporan-bea-cukai/laporan-wip', 'Laporan\BeaCukai\LaporanBeaCukai::laporanWip', ['filter' => 'Auth']);
 $routes->get('/laporan-bea-cukai/all-wip', 'Laporan\BeaCukai\LaporanBeaCukai::allWip', ['filter' => 'Auth']);
-$routes->get('/laporan-bea-cukai/laporan-wip/print', 'Laporan\BeaCukai\LaporanBeaCukai::exportPDFLaporanWip', ['filter' => 'Auth']);
-$routes->get('/laporan-bea-cukai/laporan-wip/excel', 'Laporan\BeaCukai\LaporanBeaCukai::exportExcelLaporanWip', ['filter' => 'Auth']);
+$routes->get('/laporan-bea-cukai/all-wip/excel', 'Laporan\BeaCukai\LaporanBeaCukai::exportExcelWip', ['filter' => 'Auth']);
+
 $routes->get('/laporan-bea-cukai/laporan-mutasi-bahan-baku-penolong', 'Laporan\BeaCukai\LaporanBeaCukai::laporanMutasiBahanBakuPenolong', ['filter' => 'Auth']);
 $routes->get('/laporan-bea-cukai/laporan-mutasi-barang-jadi', 'Laporan\BeaCukai\LaporanBeaCukai::laporanMutasiBarangJadi');
 $routes->get('/laporan-bea-cukai/laporan-mutasi-barang-scrap', 'Laporan\BeaCukai\LaporanBeaCukai::laporanMutasiBarangScrap', ['filter' => 'Auth']);
