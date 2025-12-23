@@ -6,6 +6,9 @@
 <section class="section">
     <div class="section-header">
         <h1>List Company Outsourcing</h1>
+        <button class="btn btn-primary btn-add float-right" style="margin-right: 150px;" data-toggle="modal" data-target="#modalTipeKaryawan">
+            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah Tipe Karyawan
+        </button>
         <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </button>
@@ -103,6 +106,81 @@
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Kembali</button>
                 <button type="submit" class="btn btn-submit-form">Simpan</button>
                 <button type="button" class="btn btn-discard delete-btn">Hapus</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modalTipeKaryawan" tabindex="-1" role="dialog" aria-labelledby="modalTipeKaryawanLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTipeKaryawanLabel">Manajemen Tipe Karyawan</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                
+                <!-- Form Tambah Tipe Karyawan -->
+                <div class="card mb-4">
+                    <div class="card-header bg-warning text-white">
+                        <h6 class="mb-0"><i class="fa fa-plus mr-2"></i>Tambah Tipe Karyawan Baru</h6>
+                    </div>
+                    <div class="card-body">
+                        <form id="formTambahTipeKaryawan">
+                            <div class="form-group">
+                                <label for="namaTipe">Nama Tipe Karyawan</label>
+                                <input type="text" class="form-control" id="namaTipe" name="nama_tipe" required placeholder="Contoh: Kontrak, Tetap, Magang">
+                                <div class="invalid-feedback" id="namaTipeError"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="keterangan">Keterangan</label>
+                                <textarea class="form-control" id="keterangan" name="keterangan" rows="2" placeholder="Deskripsi singkat tipe karyawan"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-warning" id="btnSimpan">
+                                <i class="fa fa-save mr-2"></i>Simpan
+                            </button>
+                            <button type="button" class="btn btn-secondary" id="btnReset">
+                                <i class="fa fa-refresh mr-2"></i>Reset
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Tabel Daftar Tipe Karyawan -->
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0"><i class="fa fa-list mr-2"></i>Daftar Tipe Karyawan</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-sm" id="tableTipeKaryawan">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th width="5%">No</th>
+                                        <th>Nama Tipe</th>
+                                        <th>Keterangan</th>
+                                        <th width="15%">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbodyTipeKaryawan">
+                                    <!-- Data akan dimuat via AJAX -->
+                                    <tr>
+                                        <td colspan="4" class="text-center">Memuat data...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fa fa-times mr-2"></i>Tutup
+                </button>
             </div>
         </div>
     </div>
@@ -231,6 +309,189 @@
         .css('margin-top', '22px').css('margin-left', '-7px');
 
     $(document).ready(function() {
+
+
+        // Variabel global untuk edit mode
+        let editMode = false;
+        let currentEditId = null;
+
+        // Load data saat modal dibuka
+        $('#modalTipeKaryawan').on('shown.bs.modal', function() {
+            loadDataTipeKaryawan();
+        });
+
+        // Fungsi load data
+        function loadDataTipeKaryawan() {
+            $.ajax({
+                url: 'api/all-tipe-karyawan', // Sesuaikan endpoint
+                type: 'GET',
+                dataType: 'json',
+                beforeSend: function() {
+                    $('#tbodyTipeKaryawan').html('<tr><td colspan="4" class="text-center">Memuat data...</td></tr>');
+                },
+                success: function(response) {
+                    if(response.status === 'success' && response.data.length > 0) {
+                        let html = '';
+                        $.each(response.data, function(index, item) {
+                            html += `
+                                <tr id="row-${item.id}">
+                                    <td>${index + 1}</td>
+                                    <td>${item.nama_tipe}</td>
+                                    <td>${item.keterangan || '-'}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary btn-edit" data-id="${item.id}" data-nama="${item.nama_tipe}" data-keterangan="${item.keterangan || ''}">
+                                            <i class="fa fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger btn-hapus" data-id="${item.id}">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                        $('#tbodyTipeKaryawan').html(html);
+                    } else {
+                        $('#tbodyTipeKaryawan').html('<tr><td colspan="4" class="text-center">Belum ada data</td></tr>');
+                    }
+                },
+                error: function(xhr) {
+                    $('#tbodyTipeKaryawan').html('<tr><td colspan="4" class="text-center text-danger">Gagal memuat data</td></tr>');
+                    console.error(xhr.responseText);
+                }
+            });
+        }
+
+        // Submit form (Create/Update)
+        $('#formTambahTipeKaryawan').submit(function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                nama_tipe: $('#namaTipe').val(),
+                keterangan: $('#keterangan').val()
+            };
+
+            // Clear previous errors
+            $('.is-invalid').removeClass('is-invalid');
+            $('.invalid-feedback').text('');
+
+            const url = editMode ? 
+                `api/tipe-karyawan/${currentEditId}` : 
+                'api/tipe-karyawan';
+            const method = editMode ? 'PUT' : 'POST';
+
+            $.ajax({
+                url: url,
+                type: method,
+                data: formData,
+                dataType: 'json',
+                beforeSend: function() {
+                    $('#btnSimpan').prop('disabled', true).html('<i class="fa fa-spinner fa-spin mr-2"></i>Menyimpan...');
+                },
+                success: function(response) {
+                    if(response.status === 'success') {
+                        // Reset form
+                        resetForm();
+                        
+                        // Reload data
+                        loadDataTipeKaryawan();
+                        
+                        // Show success message
+                        alert(response.message || 'Data berhasil disimpan!');
+                        
+                        // If not edit mode, you might want to stay in modal
+                        if(!editMode) {
+                            $('#namaTipe').focus();
+                        }
+                    }
+                },
+                error: function(xhr) {
+                    if(xhr.status === 422) {
+                        // Validation errors
+                        const errors = xhr.responseJSON.errors;
+                        $.each(errors, function(key, value) {
+                            $(`#${key}`).addClass('is-invalid');
+                            $(`#${key}Error`).text(value[0]);
+                        });
+                    } else {
+                        alert('Terjadi kesalahan: ' + (xhr.responseJSON?.message || 'Server error'));
+                    }
+                },
+                complete: function() {
+                    $('#btnSimpan').prop('disabled', false).html('<i class="fa fa-save mr-2"></i>Simpan');
+                }
+            });
+        });
+
+        // Edit button click
+        $(document).on('click', '.btn-edit', function() {
+            const id = $(this).data('id');
+            const nama = $(this).data('nama');
+            const keterangan = $(this).data('keterangan');
+            
+            // Set form values
+            $('#namaTipe').val(nama);
+            $('#keterangan').val(keterangan);
+            
+            // Change mode
+            editMode = true;
+            currentEditId = id;
+            
+            // Change button text and focus
+            $('#btnSimpan').html('<i class="fa fa-edit mr-2"></i>Update');
+            $('#namaTipe').focus();
+            
+            // Scroll to form
+            $('.modal-body').animate({
+                scrollTop: 0
+            }, 500);
+        });
+
+        // Delete button click
+        $(document).on('click', '.btn-hapus', function() {
+            if(!confirm('Apakah Anda yakin ingin menghapus data ini?')) return;
+            
+            const id = $(this).data('id');
+            
+            $.ajax({
+                url: `api/tipe-karyawan/${id}`,
+                type: 'DELETE',
+                dataType: 'json',
+                success: function(response) {
+                    if(response.status === 'success') {
+                        // Remove row from table
+                        $(`#row-${id}`).fadeOut(300, function() {
+                            $(this).remove();
+                            // Reload data to reorder numbers
+                            loadDataTipeKaryawan();
+                        });
+                        alert(response.message || 'Data berhasil dihapus!');
+                    }
+                },
+                error: function(xhr) {
+                    alert('Gagal menghapus data: ' + (xhr.responseJSON?.message || 'Server error'));
+                }
+            });
+        });
+
+        // Reset form button
+        $('#btnReset').click(function() {
+            resetForm();
+        });
+
+        // Reset form function
+        function resetForm() {
+            $('#formTambahTipeKaryawan')[0].reset();
+            $('.is-invalid').removeClass('is-invalid');
+            $('.invalid-feedback').text('');
+            editMode = false;
+            currentEditId = null;
+            $('#btnSimpan').html('<i class="fa fa-save mr-2"></i>Simpan');
+        }
+
+        // Reset form when modal is closed
+        $('#modalTipeKaryawan').on('hidden.bs.modal', function() {
+            resetForm();
+        });
 
         var validator = $(".create-form").validate({
             rules: {
