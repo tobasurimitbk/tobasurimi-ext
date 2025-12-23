@@ -2099,6 +2099,7 @@ class BCPurchaseOrderModel extends Model
             AND penerimaan_barang.status_post = 'FINISH'
             AND penerimaan_barang.status_penerimaan='LOKAL'
             AND penerimaan_barang.tipe_bahan='BAKU'
+            AND bc_purchase_order.status_posting='1'
             $filterCondition
             $searchPoLokalBahanBaku
             GROUP BY penerimaan_barang.id, penerimaan_barang_detail.barang_id
@@ -2146,6 +2147,7 @@ class BCPurchaseOrderModel extends Model
             AND penerimaan_barang.status_post = 'FINISH'       
             AND penerimaan_barang.tipe_bahan='PENOLONG'
             AND penerimaan_barang.status_penerimaan='LOKAL'  
+            AND bc_purchase_order.status_posting='1'
             $filterCondition
             $searchPoBahanPenolong
             GROUP BY penerimaan_barang_detail.id
@@ -2192,7 +2194,8 @@ class BCPurchaseOrderModel extends Model
             AND penerimaan_barang_detail.deletedAt IS NULL
             AND penerimaan_barang.status_post = 'FINISH'    
             AND penerimaan_barang.tipe_bahan='PENOLONG'
-            AND penerimaan_barang.status_penerimaan='IMPORT'     
+            AND penerimaan_barang.status_penerimaan='IMPORT'    
+            AND bc_purchase_order.status_posting='1'
             $filterCondition
             $searchPoBahanPenolong
             GROUP BY penerimaan_barang_detail.id
@@ -2240,6 +2243,7 @@ class BCPurchaseOrderModel extends Model
             AND penerimaan_barang.status_post = 'FINISH'   
             AND penerimaan_barang.status_penerimaan='IMPORT'
             AND penerimaan_barang.tipe_bahan='BAKU'
+            AND bc_purchase_order.status_posting='1'
             $filterCondition
             $searchPoImportBahanBaku
             GROUP BY penerimaan_barang_detail.id
