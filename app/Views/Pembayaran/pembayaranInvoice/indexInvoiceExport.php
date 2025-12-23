@@ -12,7 +12,7 @@
 <section class="section">
     <div class="section-header">
         <h1>Pembayaran Invoice Export</h1>
-        <?php if (can('Pembayaran', 'Pembayaran Invoice', 'c')) : ?>
+        <?php if (can('Transaksi Internasional', 'Pembayaran Invoice Export', 'c')) : ?>
             <button class="btn btn-discard float-right" 
                     type="button" 
                     id="dropdownMenuButtonExport"
@@ -104,18 +104,16 @@
             </div>
             <div class="modal-body">
                 <div class="table-responsive">
-                    <table class="table table-responsive table-bordered nowrap table-hover-tobasurimi" width="100%" cellspacing="0">
-                        <thead class="thead-dark">
+                    <table class="table table-bordered table-hover table-sm nowrap" width="100%">
+                        <thead class="thead-light">
                             <tr>
-                                <th width="5%">No</th>
-                                <th width="25%">Customer / No. Faktur</th>
-                                <th width="15%">Tgl Faktur</th>
-                                <th width="20%">Nilai Faktur</th>
+                                <th width="5%" class="text-center">No</th>
+                                <th width="35%">Customer / No. Faktur</th>
+                                <th width="15%" class="text-center">Tgl Faktur</th>
+                                <th width="20%" class="text-right">Nilai Faktur</th>
                             </tr>
                         </thead>
-                        <tbody class="body-table-invoice" id="body-table-invoice" style="cursor: pointer;">
-                            <!-- Data will be inserted here by JavaScript -->
-                        </tbody>
+                        <tbody id="body-table-invoice" style="cursor: pointer;"></tbody>
                     </table>
                 </div>
             </div>
@@ -148,7 +146,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("pembayaran-invoice/all"); ?>",
+            url: "<?= base_url("pembayaran-invoice-export/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
@@ -215,7 +213,7 @@
                     form += ` <div class="mt-0">`;
                     if (status_posting == '0') {
                         form += `
-                            <?php if (can('Pembayaran', 'Pembayaran Invoice', 'd')) : ?>
+                            <?php if (can('Transaksi Internasional', 'Pembayaran Invoice Export', 'd')) : ?>
                                 <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
                                     <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                                 </button>
@@ -223,7 +221,7 @@
                         `;
 
                         form += `
-                            <?php if (can('Pembayaran', 'Pembayaran Invoice', 'a')) : ?>
+                            <?php if (can('Transaksi Internasional', 'Pembayaran Invoice Export', 'a')) : ?>
                                 <button data-toggle="tooltip" title="Posting" onclick="posting('${id}', 1)" class="btn btn-success posting-spp">
                                     <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
                                 </button>
@@ -231,7 +229,7 @@
                         `;
                     } else {
                         form += `
-                            <?php if (can('Pembayaran', 'Pembayaran Invoice', 'a')) : ?>
+                            <?php if (can('Transaksi Internasional', 'Pembayaran Invoice Export', 'a')) : ?>
                                 <button data-toggle="tooltip" title="Unposting" onclick="unposting('${id}', 1)" class="btn btn-warning unposting-spp">
                                     <i class="fa fa-undo fa-sm" aria-hidden="true"></i>
                                 </button>
@@ -313,7 +311,7 @@
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
-            location.replace(`<?= base_url("pembayaran-invoice/id/"); ?>${data.id}`);
+            location.replace(`<?= base_url("pembayaran-invoice-export/id/"); ?>${data.id}`);
         })
     });
 
@@ -486,11 +484,10 @@
             },
             success: function(response) {
                 let html = '';
-                let currentCustomer = '';
-                let customerRowCount = 0;
+                let no = 1;
 
-                // Group invoices by customer first
                 const customers = {};
+
                 response.data.forEach(item => {
                     if (!customers[item.nama_pelanggan]) {
                         customers[item.nama_pelanggan] = {
@@ -499,37 +496,37 @@
                         };
                     }
 
-                    // Convert string to number (remove commas and parse)
                     const amount = parseFloat(item.total_invoice.replace(/,/g, ''));
                     customers[item.nama_pelanggan].total += amount;
                     customers[item.nama_pelanggan].invoices.push(item);
                 });
 
-                // Generate table rows
-                Object.keys(customers).forEach((customerName, index) => {
-                    const customerData = customers[customerName];
-                    customerRowCount++;
+                Object.keys(customers).forEach(customerName => {
+                    const customer = customers[customerName];
+                    const totalFormatted = customer.total.toLocaleString('id-ID');
 
-                    // Format total with thousand separators
-                    const formattedTotal = customerData.total.toLocaleString('id-ID');
-
-                    // Add customer summary row
+                    // CUSTOMER HEADER
                     html += `
-                    <tr style="background-color: #f8f9fa; font-weight: bold;">
-                        <td>${customerRowCount}</td>
-                        <td colspan="2">${customerName}</td>
-                        <td class="text-right">${formattedTotal}</td>
-                    </tr>`;
+                        <tr class="invoice-customer-row">
+                            <td class="text-center">${no++}</td>
+                            <td colspan="2">${customerName}</td>
+                            <td class="text-right invoice-total">${totalFormatted}</td>
+                        </tr>
+                    `;
 
-                    // Add invoice detail rows
-                    customerData.invoices.forEach(invoice => {
+                    // INVOICE DETAIL
+                    customer.invoices.forEach(inv => {
                         html += `
-                        <tr>
-                            <td></td>
-                            <td style="padding-left: 30px;">${invoice.no_faktur}</td>
-                            <td>${invoice.tanggal_faktur}</td>
-                            <td class="text-right">${invoice.total_invoice}</td>
-                        </tr>`;
+                            <tr class="invoice-detail-row">
+                                <td></td>
+                                <td class="invoice-no">
+                                    <i class="fa fa-file-text-o mr-1 text-muted"></i>
+                                    ${inv.no_faktur}
+                                </td>
+                                <td class="text-center">${inv.tanggal_faktur}</td>
+                                <td class="text-right">${inv.total_invoice}</td>
+                            </tr>
+                        `;
                     });
                 });
 

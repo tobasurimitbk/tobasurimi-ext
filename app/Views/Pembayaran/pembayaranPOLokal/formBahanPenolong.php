@@ -11,24 +11,24 @@
             </a>
 
             <?php if (!empty($detail)) : ?>
-                <?php if (can('Pembayaran', 'Lokal BP', 'p')) : ?>
+                <?php if (can('Transaksi Lokal', 'Lokal BP', 'p')) : ?>
                     <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('pembayaran-po-lokal-bp/print/' . encrypt($detail['id']) ?? '') ?>">
                         Print
                     </a>
                 <?php endif; ?>
 
                 <?php if ($detail['status_posting'] == "0") : ?>
-                    <?php if (can('Pembayaran', 'Lokal BP', 'd')) : ?>
+                    <?php if (can('Transaksi Lokal', 'Lokal BP', 'd')) : ?>
                         <button onclick="remove('<?= encrypt($detail['id']) ?>')" class="btn btn-hapus delete-parent float-right">
                             Hapus
                         </button>
                     <?php endif; ?>
-                    <?php if (can('Pembayaran', 'Lokal BP', 'a')) : ?>
+                    <?php if (can('Transaksi Lokal', 'Lokal BP', 'a')) : ?>
                         <button onclick="posting('<?= encrypt($detail['id']) ?>')" class="btn btn-success posting-spp float-right posting">
                             Posting
                         </button>
                     <?php endif; ?>
-                    <?php if (can('Pembayaran', 'Lokal BP', 'u')) : ?>
+                    <?php if (can('Transaksi Lokal', 'Lokal BP', 'u')) : ?>
                         <button class="btn btn-show-form btn-save float-right btn-submit-form">
                             Simpan
                         </button>
@@ -36,7 +36,7 @@
                 <?php endif; ?>
 
             <?php else : ?>
-                <?php if (can('Pembayaran', 'Lokal BP', 'c')) : ?>
+                <?php if (can('Transaksi Lokal', 'Lokal BP', 'c')) : ?>
                     <button class="btn btn-show-form btn-save float-right btn-submit-form">
                         Simpan
                     </button>
@@ -1060,43 +1060,42 @@
     }
 
     function generateKeteranganPembayaran(data) {
-    let keterangan = "";
+        let keterangan = "";
 
-    // Ambil nama supplier
-    const supplierName = $('#supplier_id option:selected').text().trim() || '-';
+        // Ambil nama supplier
+        const supplierName = $('#supplier_id option:selected').text().trim() || '-';
 
-    // Ambil semua teks tanda terima (bisa multiple)
-    const noTandaTerimaArr = $('#tanda_terima_supplier option:selected').map(function () {
-        return $(this).text().trim();
-    }).get();
+        // Ambil semua teks tanda terima (bisa multiple)
+        const noTandaTerimaArr = $('#tanda_terima_supplier option:selected').map(function () {
+            return $(this).text().trim();
+        }).get();
 
-    // Buat jadi satu string, pisahkan dengan koma
-    const noTandaTerimaText = noTandaTerimaArr.join(", ") || '-';
+        // Buat jadi satu string, pisahkan dengan koma
+        const noTandaTerimaText = noTandaTerimaArr.join(", ") || '-';
 
-    // Ambil semua LPB unik (kalau dalam data ada duplikat)
-    let lpbList = [];
-    $.each(data, function (i, v) {
-        if (v.list_lpb) {
-            // Pecah kalau ada lebih dari satu LPB di field (misal "LPB-01, LPB-02")
-            const lpbItems = v.list_lpb.split(',').map(l => l.trim());
-            lpbItems.forEach(lpb => {
-                if (lpb && !lpbList.includes(lpb)) {
-                    lpbList.push(lpb);
-                }
-            });
-        }
-    });
+        // Ambil semua LPB unik (kalau dalam data ada duplikat)
+        let lpbList = [];
+        $.each(data, function (i, v) {
+            if (v.list_lpb) {
+                // Pecah kalau ada lebih dari satu LPB di field (misal "LPB-01, LPB-02")
+                const lpbItems = v.list_lpb.split(',').map(l => l.trim());
+                lpbItems.forEach(lpb => {
+                    if (lpb && !lpbList.includes(lpb)) {
+                        lpbList.push(lpb);
+                    }
+                });
+            }
+        });
 
-    // Gabungkan LPB jadi string
-    const lpbText = lpbList.length > 0 ? lpbList.join(", ") : '-';
+        // Gabungkan LPB jadi string
+        const lpbText = lpbList.length > 0 ? lpbList.join(", ") : '-';
 
-    // Susun keterangan pembayaran
-    keterangan = `Pembayaran ${supplierName}; No TTS: ${noTandaTerimaText}; LPB: ${lpbText}`;
+        // Susun keterangan pembayaran
+        keterangan = `Pembayaran ${supplierName}; No TTS: ${noTandaTerimaText}; LPB: ${lpbText}`;
 
-    // Set ke input keterangan
-    $('#keterangan').val(keterangan);
-}
-
+        // Set ke input keterangan
+        $('#keterangan').val(keterangan);
+    }
 
     function generatePaymentNumber() {
         const csrfToken = '<?= csrf_token() ?>';

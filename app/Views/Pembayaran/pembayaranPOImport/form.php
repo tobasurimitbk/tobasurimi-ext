@@ -9,35 +9,35 @@
                 Kembali
             </a>
             <?php if (empty($paymentData)) : ?>
-                <?php if (can('Pembayaran', 'Internasional', 'c')) : ?>
+                <?php if (can('Transaksi Internasional', 'Internasional', 'c')) : ?>
                     <button class="btn btn-show-form btn-save float-right btn-submit-form">
                         Simpan
                     </button>
                 <?php endif; ?>
             <?php else : ?>
                 <?php if ($paymentData['status_posting'] == "0") : ?>
-                    <?php if (can('Pembayaran', 'Internasional', 'd')) : ?>
+                    <?php if (can('Transaksi Internasional', 'Internasional', 'd')) : ?>
                         <button onclick="remove('<?= encrypt($paymentData['id']) ?>')" class="btn btn-hapus delete-parent float-right">
                             Hapus
                         </button>
                     <?php endif; ?>
-                    <?php if (can('Pembayaran', 'Internasional', 'p')) : ?>
+                    <?php if (can('Transaksi Internasional', 'Internasional', 'p')) : ?>
                         <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('pembayaran-po-import/print/' . encrypt($paymentData['id']) ?? '') ?>">
                             Print
                         </a>
                     <?php endif; ?>
-                    <?php if (can('Pembayaran', 'Internasional', 'a')) : ?>
+                    <?php if (can('Transaksi Internasional', 'Internasional', 'a')) : ?>
                         <button onclick="posting('<?= encrypt($paymentData['id']) ?>')" class="btn btn-success posting-spp float-right posting">
                             Posting
                         </button>
                     <?php endif; ?>
-                    <?php if (can('Pembayaran', 'Internasional', 'u')) : ?>
+                    <?php if (can('Transaksi Internasional', 'Internasional', 'u')) : ?>
                         <button class="btn btn-show-form btn-save float-right btn-submit-form">
                             Update
                         </button>
                     <?php endif; ?>
                 <?php else : ?>
-                    <?php if (can('Pembayaran', 'Internasional', 'p')) : ?>
+                    <?php if (can('Transaksi Internasional', 'Internasional', 'p')) : ?>
                         <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('pembayaran-po-import/print/' . encrypt($paymentData['id']) ?? '') ?>">
                             Print
                         </a>
@@ -63,7 +63,7 @@
                                     <label for="floatingInput">No. Pembayaran</label>
                                 </div>
                                 <div class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 25px; margin-left: -30px; <?= !empty($paymentData) ? 'display:none;' : '' ?>" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 25px; margin-left: -30px; <?= !empty($paymentData) ? 'display:none;' : '' ?>" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="generatePaymentNumber()">
                                 </div>
                             </div>
                         </div>
@@ -183,6 +183,33 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select class="form-select" 
+                                    <?= !empty($paymentData) && $paymentData['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '' ?> 
+                                    name="jenis_pembayaran" 
+                                    id="jenis_pembayaran"
+                                    required>
+                                <?php if (empty($paymentData['pembayaranDetail']['jenis_bayar'])): ?>
+                                    <option value="" selected disabled>Pilih Jenis Pembayaran</option>
+                                <?php endif; ?>
+                                <option value="MERAH" <?= !empty($paymentData['pembayaranDetail']['jenis_bayar']) && $paymentData['pembayaranDetail']['jenis_bayar'] == 'MERAH' ? 'selected' : '' ?>>MERAH</option>
+                                <option value="PUTIH" <?= !empty($paymentData['pembayaranDetail']['jenis_bayar']) && $paymentData['pembayaranDetail']['jenis_bayar'] == 'PUTIH' ? 'selected' : '' ?>>PUTIH</option>
+                            </select>
+                            <label  for="floatingInput" style="z-index: 1;">Jenis Pembayaran</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select class="form-select" <?= !empty($paymentData) ? ($paymentData['status_posting'] == 1 ? 'disabled' : '') : ""; ?> name="bank_id" id="bank_id">
+                                <option disabled selected value=""></option>
+                                <?php foreach ($bankList as $b) : ?>
+                                    <option <?= !empty($paymentData) ? ($paymentData['bank_id'] == $b->id ? 'selected' : '') : '' ?> value="<?= $b->id ?>"><?= strtoupper($b->kode_bank) ?></option>
+                                <?php endforeach ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Kode Bank (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "disabled" : '')  : "" ?> class="form-select status_pph" name="status_pph" id="status_pph">
                                 <option <?= !empty($paymentData) ? ($paymentData['status_pph'] == "1" ? 'selected' : '') : '' ?> value="1">PPH 2.5 %</option>
@@ -221,7 +248,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <textarea <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "readonly" : '')  : "" ?> autocomplete="one-time-code" name="note" class="form-control information text-area-all"><?= !empty($paymentData) ? $paymentData['note'] : '-' ?></textarea>
+                            <textarea <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "readonly" : '')  : "" ?> autocomplete="one-time-code" id="note" name="note" class="form-control information text-area-all"><?= !empty($paymentData) ? $paymentData['note'] : '-' ?></textarea>
                             <label for="floatingInput">Note</label>
                         </div>
                     </div>
@@ -356,15 +383,28 @@
         var valas = selectedOptionData.data('valas');
         var kurs = selectedOptionData.data('kurs');
 
+
         $('#currency').val(valas);
         $('#payment_amt').val(sisaBayar);
         $('#sisa_bayar').val(sisaBayar);
         $('#current_exchange_rate').val(kurs);
-
         drawTable(valas);
 
         // detailBarang.ajax.reload();
         // riwayatBayar.ajax.reload();
+    });
+
+    $('#bank_id').select2({
+            placeholder: "Pilih Bank",
+            theme: "bootstrap-5"
+    }).change(function() {
+            let value = document.getElementById('auto_generate').checked ? true : false;
+            if (value) {
+                generatePaymentNumber();
+            } else {
+                $(".no_bukti_pembayaran").attr("readonly", false);
+                $(".no_bukti_pembayaran").val("");
+            }
     });
 
     $('#tipe_pembayaran').select2({
@@ -377,6 +417,14 @@
         placeholder: "Pilih Metode Pembayaran",
         theme: "bootstrap-5",
         allowClear: true
+    }).change(function() {
+            let value = document.getElementById('auto_generate').checked ? true : false;
+            if (value) {
+                generatePaymentNumber();
+            } else {
+                $(".no_bukti_pembayaran").attr("readonly", false);
+                $(".no_bukti_pembayaran").val("");
+            }
     });
 
     $('#po_type').select2({
@@ -391,10 +439,31 @@
         allowClear: true
     });
 
+    $('#jenis_pembayaran').select2({
+        placeholder: "Pilih Jenis Pembayaran",
+        theme: "bootstrap-5"
+    }).change(function() {
+            let value = document.getElementById('auto_generate').checked ? true : false;
+            if (value) {
+                generatePaymentNumber();
+            } else {
+                $(".no_bukti_pembayaran").attr("readonly", false);
+                $(".no_bukti_pembayaran").val("");
+            }
+    });
+
     $('#divisi_id').select2({
         placeholder: "Pilih Departemen",
         theme: "bootstrap-5",
         allowClear: true
+    }).change(function() {
+            let value = document.getElementById('auto_generate').checked ? true : false;
+            if (value) {
+                generatePaymentNumber();
+            } else {
+                $(".no_bukti_pembayaran").attr("readonly", false);
+                $(".no_bukti_pembayaran").val("");
+            }
     });
 
     $('#akun_kas').select2({
@@ -826,6 +895,78 @@
         }
     }
 
+    function generateKeteranganPembayaran(data) {
+        let totalQty = 0;
+        let poNo = '';
+        let barang = '';
+        let supplier = $('#supplier_id option:selected').text().trim();
+
+        $.each(data, function(i, v) {
+            totalQty += parseFloat(v.qty_order || 0);
+            poNo = v.no_po || poNo;     
+            barang = v.nama_barang || barang;
+        });
+
+        let keterangan = `Pembayaran ${barang} ${supplier} sebanyak ${totalQty.toFixed(2)} KGM (No: ${poNo})`;
+
+        // Isi ke field note jika kosong atau masih default
+        if (!$('#note').val() || $('#note').val() === '-' || $('#note').val() === '') {
+            $('#note').val(keterangan);
+        }
+    }
+
+    function generatePaymentNumber() {
+            // Get selected divisi and bank values
+            let id = $("#id").val();
+            let noTransaksi = $("#no_pembayaran").val();
+            let jenisPembayaran = $("#jenis_pembayaran option:selected").text();;
+            let divisiId = $("#divisi_id option:selected").text();
+            let divisiIdInt = $("#divisi_id option:selected").val();
+            let bankId = $("#bank_id option:selected").val();
+            let paymentMethod = $("#payment_method option:selected").val();
+            let tanggalPembayaran = $("#payment_date").val();
+
+            // Only generate if this is a new record (empty detail)
+                const csrfToken = '<?= csrf_token() ?>';
+                const csrf = $(`[name="${csrfToken}"]`);
+
+                // Build URL with query parameters
+                let url = "<?= base_url('pembayaran-po-lokal-bb/generate-no-pembayaran'); ?>";
+                url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&paymentMethod=${encodeURIComponent(paymentMethod)}&divisiId=${encodeURIComponent(divisiId)}&bankId=${encodeURIComponent(bankId)}&tanggalPembayaran=${encodeURIComponent(tanggalPembayaran)}&id=${encodeURIComponent(id)}&noTransaksi=${encodeURIComponent(noTransaksi)}&divisiIdInt=${encodeURIComponent(divisiIdInt)}`;
+
+                // Additional data if needed
+                var formData = new FormData();
+                formData.append("type", "Bahan Penolong");
+                formData.append("payment_date", $("#payment_date").val());
+
+                $(".no_pembayaran").attr("readonly", true);
+
+                $.ajax({
+                    url: url,
+                    method: "GET",
+                    data: formData,
+                    dataType: "json",
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        csrf.val(response.token);
+                        $(".no_pembayaran").val(response.paymentNo);
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Terjadi kesalahan pada sistem',
+                            text: 'Gagal menghasilkan nomor pembayaran otomatis',
+                            confirmButtonColor: '#4e73df',
+                        });
+                        $(".no_pembayaran").attr("readonly", false);
+                    }
+                });
+    }
+
     function remove(id) {
         const csrfToken = '<?= csrf_token() ?>';
         const csrf = $(`[name="${csrfToken}"]`);
@@ -836,7 +977,7 @@
             cancelButtonColor: '#d33',
             showCancelButton: true,
             reverseButtons: true,
-            confirmButtonText: 'Simpan',
+            confirmButtonText: 'Hapus',
             cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
@@ -874,48 +1015,43 @@
     const posting = function(id) {
         Swal.fire({
             icon: 'question',
-            title: 'Posting Pembayaran ?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
+            title: 'Konfirmasi',
+            text: 'Sistem akan otomatis melakukan Posting / Unposting.',
             showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Posting',
-            cancelButtonText: 'Kembali',
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#4e73df',
         }).then((result) => {
             if (result.isConfirmed) {
+
                 const csrf = $(`[name="${csrfToken}"]`);
+
                 $.ajax({
-                    url: "<?= base_url("pembayaran-po-import/posting"); ?>",
-                    data: {
-                        id: id,
-                    },
+                    url: "<?= base_url('pembayaran-po-import/posting'); ?>",
+                    method: "POST",
+                    dataType: "json",
+                    data: { id: id },
                     beforeSend: function(xhr) {
-                        setLoading();
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
                     },
                     complete: function() {
                         stopLoading();
                     },
-                    method: "POST",
-                    dataType: "json",
                     success: function(response) {
                         csrf.val(response.token);
-                        if (response.status) {
-                            Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    location.reload()
-                                })
-                        }
-                    },
 
+                        Swal.fire({
+                            icon: response.status ? 'success' : 'error',
+                            title: response.message,
+                        }).then(() => {
+                            table.ajax.reload(null, false);
+                        });
+                    }
                 });
             }
-        })
-    }
+        });
+    };
 
 
     $('#supplier_id').change(function() {
@@ -1054,10 +1190,10 @@
         var total_harga_semua = 0;
         var total_input_user = 0;
         var total_sisa_pembayaran = 0;
-
         var total_bayar_panjar = res.panjar_paid;
 
-
+        // TAMBAHKAN INI: Generate keterangan dari data
+        generateKeteranganPembayaran(res.data);
 
         $.each(res.data, function(i, v) {
             var newRow = $('<tr style="color: white;">');
@@ -1089,11 +1225,11 @@
         newRow1.append($('<td>').text(greatFormatRupiah(total_sisa_pembayaran)));
         newRow1.append($('<td>').html(
             `
-                <div class="input-group d-flex align-items-center">
-                    <input autocomplete="one-time-code" data-id=""  class="form-control total-pembayaran trigger-input" type="text" value="  ${greatFormatRupiah(total_input_user)}"  name = "total_pembayaran"  readonly>
-                    <span class="input-group-text">${res.currency}</span>
-                </div>
-                `
+            <div class="input-group d-flex align-items-center">
+                <input autocomplete="one-time-code" data-id=""  class="form-control total-pembayaran trigger-input" type="text" value="  ${greatFormatRupiah(total_input_user)}"  name = "total_pembayaran"  readonly>
+                <span class="input-group-text">${res.currency}</span>
+            </div>
+            `
         ));
         table.find('tbody').append(newRow1);
 
@@ -1113,11 +1249,11 @@
 
         newRow3.append($('<td>').html(
             `
-                <div class="input-group d-flex align-items-center">
-                    <input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-panjar trigger-input" type="text" value=" ${greatFormatRupiah(total_bayar_panjar)}" name = "total_pembayaran_panjar" readonly>
-                    <span class="input-group-text">${res.currency}</span>
-                </div>
-                `
+            <div class="input-group d-flex align-items-center">
+                <input autocomplete="one-time-code" data-id=""  class="form-control total-bayar-panjar trigger-input" type="text" value=" ${greatFormatRupiah(total_bayar_panjar)}" name = "total_pembayaran_panjar" readonly>
+                <span class="input-group-text">${res.currency}</span>
+            </div>
+            `
         ));
 
         table.find('tbody').append(newRow3);
@@ -1138,14 +1274,13 @@
 
         newRow4.append($('<td>').html(
             `
-                <div class="input-group d-flex align-items-center">
-                    <input autocomplete="one-time-code" data-id=""   class="form-control grand-total" type="text" value="${greatFormatRupiah(grand_total)}" name = "grand_total"  readonly>
-                    <span class="input-group-text">${res.currency}</span>
-                </div>
-                `
+            <div class="input-group d-flex align-items-center">
+                <input autocomplete="one-time-code" data-id=""   class="form-control grand-total" type="text" value="${greatFormatRupiah(grand_total)}" name = "grand_total"  readonly>
+                <span class="input-group-text">${res.currency}</span>
+            </div>
+            `
         ));
         table.find('tbody').append(newRow4);
-
     }
 
     function drawTable(valas) {
@@ -1176,6 +1311,8 @@
                 listPembayaran = res;
                 var total_sisa_pembayaran = 0;
 
+                // TAMBAHKAN INI: Generate keterangan dari data
+                generateKeteranganPembayaran(res);
 
                 $.each(res, function(i, v) {
 
@@ -1189,7 +1326,7 @@
                     newRow.append($('<td>').html(
                         `
                         <div class="input-group d-flex align-items-center">
-                             <input onchange="this.value = greatFormatRupiah(this.value)"  class="form-control input_user" oninput="limitInputBayar(this, ${v.sisa_pembayaran})" autocomplete="one-time-code" data-id="${v.detail_id}"  class="form-control" type="text" value="" name = "input_user" style="height:40px">
+                            <input onchange="this.value = greatFormatRupiah(this.value)"  class="form-control input_user" oninput="limitInputBayar(this, ${v.sisa_pembayaran})" autocomplete="one-time-code" data-id="${v.detail_id}"  class="form-control" type="text" value="" name = "input_user" style="height:40px">
                             <span class="input-group-text" style="height:40px;">${valas}</span>
                         </div>
                         `
@@ -1204,11 +1341,11 @@
                 newRow1.append($('<td>').text(greatFormatRupiah(total_sisa_pembayaran)));
                 newRow1.append($('<td>').html(
                     `
-                        <div class="input-group d-flex align-items-center">
-                            <input autocomplete="one-time-code"  class="form-control total-pembayaran trigger-input" type="text" value="" name = "total_pembayaran"  readonly>
-                            <span class="input-group-text" >${valas}</span>
-                        </div>
-                        `
+                    <div class="input-group d-flex align-items-center">
+                        <input autocomplete="one-time-code"  class="form-control total-pembayaran trigger-input" type="text" value="" name = "total_pembayaran"  readonly>
+                        <span class="input-group-text" >${valas}</span>
+                    </div>
+                    `
                 ));
                 table.find('tbody').append(newRow1);
 
@@ -1221,11 +1358,11 @@
                 newRow3.append($('<td style="text-align:right;" colspan="5"><b>TOTAL PEMBAYARAN PANJAR</b></td>'));
                 newRow3.append($('<td>').html(
                     `
-                        <div class="input-group d-flex align-items-center">
-                            <input autocomplete="one-time-code"   class="form-control total-bayar-panjar trigger-input" type="text" value="" name = "total_pembayaran_panjar" readonly>
-                            <span class="input-group-text">${valas}</span>
-                        </div>
-                        `
+                    <div class="input-group d-flex align-items-center">
+                        <input autocomplete="one-time-code"   class="form-control total-bayar-panjar trigger-input" type="text" value="" name = "total_pembayaran_panjar" readonly>
+                        <span class="input-group-text">${valas}</span>
+                    </div>
+                    `
                 ));
                 table.find('tbody').append(newRow3);
 
@@ -1233,16 +1370,36 @@
                 newRow4.append($('<td style="text-align:right;" colspan="5"><b>TOTAL PEMBAYARAN</b></td>'));
                 newRow4.append($('<td>').html(
                     `
-                        <div class="input-group d-flex align-items-center">
-                            <input autocomplete="one-time-code"    class="form-control grand-total" type="text" value="" name = "grand_total"  readonly>
-                            <span class="input-group-text" >${valas}</span>
-                        </div>
-                        `
+                    <div class="input-group d-flex align-items-center">
+                        <input autocomplete="one-time-code"    class="form-control grand-total" type="text" value="" name = "grand_total"  readonly>
+                        <span class="input-group-text" >${valas}</span>
+                    </div>
+                    `
                 ));
 
                 table.find('tbody').append(newRow4);
             }
         })
+    }
+
+    function generateKeteranganPembayaran(data) {
+        let totalQty = 0;
+        let poNo = '';
+        let barang = '';
+        let supplier = $('#supplier_id option:selected').text().trim();
+
+        $.each(data, function(i, v) {
+            totalQty += parseFloat(v.qty_order || 0);
+            poNo = v.no_po || poNo;     
+            barang = v.nama_barang || barang;
+        });
+
+        let keterangan = `Pembayaran ${barang} ${supplier} sebanyak ${totalQty.toFixed(2)} KGM (No: ${poNo})`;
+
+        // Isi ke field note jika kosong atau masih default
+        if (!$('#note').val() || $('#note').val() === '-' || $('#note').val() === '') {
+            $('#note').val(keterangan);
+        }
     }
 
 

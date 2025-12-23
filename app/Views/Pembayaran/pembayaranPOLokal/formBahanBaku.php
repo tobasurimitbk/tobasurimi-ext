@@ -10,17 +10,17 @@
             </a>
             <?php if (!empty($detail)) : ?>
                 <?php if ($detail['pembayaranDetail']['status_posting'] == "0") : ?>
-                    <?php if (can('Pembayaran', 'Lokal BB', 'd')) : ?>
+                    <?php if (can('Transaksi Lokal', 'Lokal BB', 'd')) : ?>
                         <button onclick="remove('<?= encrypt($detail['pembayaranDetail']['id']) ?>')" class="btn btn-hapus delete-parent float-right">
                             Hapus
                         </button>
                     <?php endif; ?>
-                    <?php if (can('Pembayaran', 'Lokal BB', 'a')) : ?>
+                    <?php if (can('Transaksi Lokal', 'Lokal BB', 'a')) : ?>
                         <button onclick="posting('<?= encrypt($detail['pembayaranDetail']['id']) ?>')" class="btn btn-success posting-spp float-right posting">
                             Posting
                         </button>
                     <?php endif; ?>
-                    <?php if (can('Pembayaran', 'Lokal BB', 'u')) : ?>
+                    <?php if (can('Transaksi Lokal', 'Lokal BB', 'u')) : ?>
                         <button class="btn btn-show-form btn-save float-right btn-submit-form">
                             Simpan
                         </button>
@@ -28,14 +28,14 @@
                 <?php endif; ?>
 
 
-                <?php if (can('Pembayaran', 'Lokal BB', 'p')) : ?>
+                <?php if (can('Transaksi Lokal', 'Lokal BB', 'p')) : ?>
                     <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('pembayaran-po-lokal-bb/print/' . encrypt($detail['pembayaranDetail']['id']) ?? '') ?>">
                         Print
                     </a>
                 <?php endif; ?>
 
             <?php else : ?>
-                <?php if (can('Pembayaran', 'Lokal BB', 'c')) : ?>
+                <?php if (can('Transaksi Lokal', 'Lokal BB', 'c')) : ?>
                     <button class="btn btn-show-form btn-save float-right btn-submit-form">
                         Simpan
                     </button>

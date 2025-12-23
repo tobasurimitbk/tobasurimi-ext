@@ -12,17 +12,17 @@
 
             <?php if (!empty($detail)) : ?>
                 <?php if ($detail['status_posting'] == "0") : ?>
-                    <?php if (can('Pembayaran', 'Pembayaran Invoice', 'd')) : ?>
+                    <?php if (can('Transaksi Lokal', 'Pembayaran Invoice', 'd')) : ?>
                         <button onclick="remove('<?= encrypt($detail['id']) ?>')" class="btn btn-hapus delete-parent float-right">
                             Hapus
                         </button>
                     <?php endif; ?>
-                    <?php if (can('Pembayaran', 'Pembayaran Invoice', 'a')) : ?>
+                    <?php if (can('Transaksi Lokal', 'Pembayaran Invoice', 'a')) : ?>
                         <button onclick="posting('<?= encrypt($detail['id']) ?>')" class="btn btn-success posting-spp float-right posting">
                             Posting
                         </button>
                     <?php endif; ?>
-                    <?php if (can('Pembayaran', 'Pembayaran Invoice', 'u')) : ?>
+                    <?php if (can('Transaksi Lokal', 'Pembayaran Invoice', 'u')) : ?>
                         <button class="btn btn-show-form btn-save float-right btn-submit-form">
                             Update
                         </button>
@@ -30,7 +30,7 @@
                 <?php endif; ?>
 
             <?php else : ?>
-                <?php if (can('Pembayaran', 'Lokal BP', 'c')) : ?>
+                <?php if (can('Transaksi Lokal', 'Lokal BP', 'c')) : ?>
                     <button class="btn btn-show-form btn-save float-right btn-submit-form">
                         Simpan
                     </button>
@@ -776,7 +776,6 @@
         }
     }
 
-
     function generatePaymentNumber() {
             // Get selected divisi and bank values
             let id = $("#id").val();
@@ -828,8 +827,6 @@
                     }
                 });
     }
-
-
 
     function getNoDokumen() {
         var jenisDokumen = $('#jenis_dokumen').val();

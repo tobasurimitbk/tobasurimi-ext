@@ -12,7 +12,7 @@
 <section class="section">
     <div class="section-header">
         <h1>Pembayaran Proforma Invoice</h1>
-        <?php if (can('Pembayaran', 'Pembayaran Invoice', 'c')) : ?>
+        <?php if (can('Transaksi Internasional', 'Pembayaran Proforma Invoice', 'c')) : ?>
             <button class="btn btn-discard float-right" 
                     type="button" 
                     id="dropdownMenuButtonExport"
@@ -109,11 +109,8 @@
                             <tr>
                                 <th width="5%">No</th>
                                 <th width="25%">Customer / No. Faktur</th>
-                                <th width="15%">Termin</th>
                                 <th width="15%">Tgl Faktur</th>
-                                <th width="15%">Jatuh Tempo</th>
                                 <th width="20%">Nilai Faktur</th>
-                                <th width="20%">Status</th>
                             </tr>
                         </thead>
                         <tbody class="body-table-invoice" id="body-table-invoice" style="cursor: pointer;">
@@ -151,7 +148,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("pembayaran-invoice/all"); ?>",
+            url: "<?= base_url("pembayaran-proforma-invoice/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
@@ -218,7 +215,7 @@
                     form += ` <div class="mt-0">`;
                     if (status_posting == '0') {
                         form += `
-                            <?php if (can('Pembayaran', 'Pembayaran Invoice', 'd')) : ?>
+                            <?php if (can('Transaksi Internasional', 'Pembayaran Proforma Invoice', 'd')) : ?>
                                 <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
                                     <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                                 </button>
@@ -226,7 +223,7 @@
                         `;
 
                         form += `
-                            <?php if (can('Pembayaran', 'Pembayaran Invoice', 'a')) : ?>
+                            <?php if (can('Transaksi Internasional', 'Pembayaran Proforma Invoice', 'a')) : ?>
                                 <button data-toggle="tooltip" title="Posting" onclick="posting('${id}', 1)" class="btn btn-success posting-spp">
                                     <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
                                 </button>
@@ -234,7 +231,7 @@
                         `;
                     } else {
                         form += `
-                            <?php if (can('Pembayaran', 'Pembayaran Invoice', 'a')) : ?>
+                            <?php if (can('Transaksi Internasional', 'Pembayaran Proforma Invoice', 'a')) : ?>
                                 <button data-toggle="tooltip" title="Unposting" onclick="unposting('${id}', 1)" class="btn btn-warning unposting-spp">
                                     <i class="fa fa-undo fa-sm" aria-hidden="true"></i>
                                 </button>
@@ -316,7 +313,7 @@
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
-            location.replace(`<?= base_url("pembayaran-invoice/id/"); ?>${data.id}`);
+            location.replace(`<?= base_url("pembayaran-proforma-invoice/id/"); ?>${data.id}`);
         })
     });
 
@@ -344,7 +341,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("pembayaran-invoice/posting"); ?>",
+                    url: "<?= base_url("pembayaran-proforma-invoice/posting"); ?>",
                     data: {
                         id: id,
                     },
@@ -389,7 +386,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("pembayaran-invoice/unposting"); ?>",
+                    url: "<?= base_url("pembayaran-proforma-invoice/unpostingPI"); ?>",
                     data: {
                         id: id,
                     },
@@ -521,9 +518,7 @@
                     <tr style="background-color: #f8f9fa; font-weight: bold;">
                         <td>${customerRowCount}</td>
                         <td colspan="2">${customerName}</td>
-                        <td></td>
                         <td class="text-right">${formattedTotal}</td>
-                        <td></td>
                     </tr>`;
 
                     // Add invoice detail rows
@@ -532,11 +527,8 @@
                         <tr>
                             <td></td>
                             <td style="padding-left: 30px;">${invoice.no_faktur}</td>
-                            <td>${invoice.terms}</td>
                             <td>${invoice.tanggal_faktur}</td>
-                            <td>${invoice.tanggal_jatuh_tempo}</td>
                             <td class="text-right">${invoice.total_invoice}</td>
-                            <td>${invoice.status_pembayaran}</td>
                         </tr>`;
                     });
                 });

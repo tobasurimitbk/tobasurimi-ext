@@ -5,7 +5,7 @@
 <section class="section">
     <div class="section-header">
         <h1>Pembayaran PO Lokal Bahan Penolong</h1>
-        <?php if (can('Pembayaran', 'Lokal BP', 'c')) : ?>
+        <?php if (can('Transaksi Lokal', 'Lokal BP', 'c')) : ?>
             <a class="btn btn-show-form btn-add float-right" href="<?= base_url("pembayaran-po-lokal-bp/create"); ?>">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </a>
@@ -150,7 +150,7 @@
                     buttons += `<div class="btn-group" role="group">`;
                     
                     // Print button (always visible if has permission)
-                    <?php if (can('Pembayaran', 'Lokal BP', 'p')) : ?>
+                    <?php if (can('Transaksi Lokal', 'Lokal BP', 'p')) : ?>
                         buttons += `
                             <button class="btn btn-warning btn-print" 
                                     onclick="print('<?= base_url("pembayaran-po-lokal-bp/print/"); ?>${id}')"
@@ -163,7 +163,7 @@
                     // Conditional buttons based on posting status
                     if (status_posting == '0') {
                         // Unposted state - show delete and post buttons
-                        <?php if (can('Pembayaran', 'Lokal BP', 'd')) : ?>
+                        <?php if (can('Transaksi Lokal', 'Lokal BP', 'd')) : ?>
                             buttons += `
                                 <button onclick="remove('${id}')" 
                                         class="btn btn-danger delete-parent"
@@ -172,7 +172,7 @@
                                 </button>`;
                         <?php endif; ?>
                         
-                        <?php if (can('Pembayaran', 'Lokal BP', 'a')) : ?>
+                        <?php if (can('Transaksi Lokal', 'Lokal BP', 'a')) : ?>
                             buttons += `
                                 <button onclick="posting('${id}', '${divisi_id}', '1')" 
                                         class="btn btn-success posting-spp"
@@ -182,7 +182,7 @@
                         <?php endif; ?>
                     } else {
                         // Posted state - show unpost button
-                        <?php if (can('Pembayaran', 'Lokal BP', 'a')) : ?>
+                        <?php if (can('Transaksi Lokal', 'Lokal BP', 'a')) : ?>
                             buttons += `
                                 <button onclick="posting('${id}', '${divisi_id}', '0')" 
                                         class="btn btn-danger"

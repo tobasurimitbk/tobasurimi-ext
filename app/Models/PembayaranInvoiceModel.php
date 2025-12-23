@@ -186,8 +186,8 @@ class PembayaranInvoiceModel extends Model
         } elseif ($detail['type_invoice'] == "PROFORMA INVOICE") {
             $namaCustomer =  $proformaInvoiceModel
                 ->select('customers.*')
-                ->join('sales_order_export', 'sales_order_export.sales_order_export_id = proforma_invoice.sales_order_export_id')
-                ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
+                ->join('sales_contract', 'sales_contract.id = proforma_invoice.sales_contract_id')
+                ->join('sales_order_export', 'sales_order_export.sales_contract_id = sales_contract.id')
                 ->join('customers', 'customers.id = sales_contract.customer_id')
                 ->where('proforma_invoice.id', $detail['invoice_id'])
                 ->first();
@@ -219,7 +219,7 @@ class PembayaranInvoiceModel extends Model
         return $detail;
     }
 
-    public function get_new_no(
+      public function get_new_no(
         $id = null,
         $jenis,
         $divisi,
@@ -315,6 +315,7 @@ class PembayaranInvoiceModel extends Model
                     'local_po_payments' => 'payment_no',
                     'local_po_payment_bp' => 'payment_no',
                     'panjar_pinjaman_transaction' => 'no_transaction',
+                    'import_po_payments' => 'payment_no',
                     'pembayaran_invoice' => 'no_pembayaran',
                 ];
 
@@ -361,6 +362,7 @@ class PembayaranInvoiceModel extends Model
             'local_po_payments' => ['payment_no', 'payment_date', 'deletedAt'],
             'local_po_payment_bp' => ['payment_no', 'payment_date', 'deletedAt'],
             'panjar_pinjaman_transaction' => ['no_transaction', 'tanggal', 'deletedAt'],
+            'import_po_payments' => ['payment_no', 'payment_date', 'deletedAt'],
             'pembayaran_invoice' => ['no_pembayaran', 'tanggal', 'deletedAt'],
         ];
 
