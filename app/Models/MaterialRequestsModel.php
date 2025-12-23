@@ -71,8 +71,6 @@ class MaterialRequestsModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "material_requests.*,
-            material_request_details.satuan,
-            material_request_details.kimia,
             SUM(material_request_details.qty) as total,
             GROUP_CONCAT(DISTINCT work_orders.wo_no ORDER BY work_orders.wo_no SEPARATOR ', ') AS wo_no,
             GROUP_CONCAT(DISTINCT work_order_details.nama_barang ORDER BY work_order_details.nama_barang SEPARATOR ', ') AS barangName
