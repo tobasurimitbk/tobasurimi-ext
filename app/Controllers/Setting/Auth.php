@@ -9,6 +9,7 @@ use App\Models\RolesModel;
 use App\Models\AccessListsModel;
 use App\Models\DivisisModel;
 use App\Models\MenuUrlsModel;
+use Exception;
 
 use DateTime;
 
@@ -224,5 +225,40 @@ class Auth extends BaseController
         session()->destroy();
 
         return redirect()->to("/");
+    }
+
+    public function updatePassword()
+    {
+        try {
+            $userId = session()->get("login")->user_id;
+            $passwordLama = $this->request->getVar('password_lama');
+            $passwordBaru = $this->request->getVar('password_baru');
+
+            $user = $this->userModel->where('id', $userId)->first();
+            $passwordHashLama = $user['user_pass'];
+
+            if (!password_verify($passwordLama, $passwordHashLama)) {
+                // password salah
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "password lama anda salah",
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            $passwordHashBaru = password_hash($passwordBaru, PASSWORD_BCRYPT);
+            $this->userModel->update($user['id'], ['user_pass' => $passwordHashBaru]);
+            return response()->setJSON([
+                'status' => true,
+                'message' => "password berhasil diupdate",
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => $e->getMessage(),
+                'token' => csrf_hash()
+            ]);
+        }
     }
 }

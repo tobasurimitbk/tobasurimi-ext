@@ -34,6 +34,7 @@ $routes->set404Override();
 $routes->get('/', 'Setting\Auth::login');
 $routes->post('/login', 'Setting\Auth::doLogin');
 $routes->get('/logout', 'Setting\Auth::doLogout');
+$routes->post('/update-password', 'Setting\Auth::updatePassword');
 
 
 $routes->get('/change-company', 'Setting\User::changeCompany');

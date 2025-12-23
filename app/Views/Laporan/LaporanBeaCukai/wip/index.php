@@ -175,14 +175,15 @@
                 data: 'req_no'
             },
             {
+                data: 'tanggal_daftar'
+            },
+            {
                 data: 'no_aju'
             },
             {
                 data: 'no_daftar'
             },
-            {
-                data: 'tanggal_daftar'
-            },
+
             {
                 data: 'kode_barang'
             },
