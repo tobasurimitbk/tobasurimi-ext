@@ -5,7 +5,7 @@
 <section class="section">
     <div class="section-header">
         <h1>Pembayaran PO Import</h1>
-        <?php if (can('Pembayaran', 'Internasional', 'c')) : ?>
+        <?php if (can('Transaksi Internasional', 'Internasional', 'c')) : ?>
             <a class="btn btn-show-form btn-add float-right" href="<?= base_url("pembayaran-po-import/create"); ?>">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </a>
@@ -148,46 +148,68 @@
                     let form = '';
                     let status_posting = row.status_posting;
 
-                    form += ` <div class="mt-0">`;
+                    form += `<div class="mt-0">`;
+
                     if (status_posting == '0') {
-                        form += `
-                            <?php if (can('Pembayaran', 'Internasional', 'd')) : ?>
-                                <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
-                                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                                </button>
-                            <?php endif; ?>
-                        `;
 
+                        <?php if (can('Transaksi Internasional', 'Internasional', 'd')) : ?>
                         form += `
-                            <?php if (can('Pembayaran', 'Internasional', 'p')) : ?>
-                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("pembayaran-po-import/print/"); ?>${id}')" style="box-shadow: none !important;">
-                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                                </button>
-                            <?php endif; ?>
+                            <button title="Hapus"
+                                onclick="remove('${id}')"
+                                class="btn btn-danger delete-parent">
+                                <i class="fa fa-trash fa-sm"></i>
+                            </button>
                         `;
+                        <?php endif; ?>
 
+                        <?php if (can('Transaksi Internasional', 'Internasional', 'p')) : ?>
                         form += `
-                            <?php if (can('Pembayaran', 'Internasional', 'a')) : ?>
-                                <button data-toggle="tooltip" title="Posting" onclick="posting('${id}', 1)" class="btn btn-success posting-spp">
-                                    <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
-                                </button>
-                            <?php endif; ?>
+                            <button title="Print"
+                                class="btn btn-warning btn-print"
+                                onclick="print('<?= base_url("pembayaran-po-import/print/"); ?>${id}')">
+                                <i class="fa fa-print fa-sm"></i>
+                            </button>
                         `;
+                        <?php endif; ?>
+
+                        <?php if (can('Transaksi Internasional', 'Internasional', 'a')) : ?>
+                        form += `
+                            <button title="Posting"
+                                onclick="posting('${id}')"
+                                class="btn btn-success posting-spp">
+                                <i class="fa fa-paper-plane fa-sm"></i>
+                            </button>
+                        `;
+                        <?php endif; ?>
+
                     } else {
+
+                        <?php if (can('Transaksi Internasional', 'Internasional', 'p')) : ?>
                         form += `
-                            <?php if (can('Pembayaran', 'Internasional', 'p')) : ?>
-                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("pembayaran-po-import/print/"); ?>${id}')" style="box-shadow: none !important;">
-                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                                </button>
-                            <?php endif; ?>
+                            <button title="Print"
+                                class="btn btn-warning btn-print"
+                                onclick="print('<?= base_url("pembayaran-po-import/print/"); ?>${id}')">
+                                <i class="fa fa-print fa-sm"></i>
+                            </button>
                         `;
+                        <?php endif; ?>
+
+                        <?php if (can('Transaksi Internasional', 'Internasional', 'a')) : ?>
+                        form += `
+                            <button title="Unposting"
+                                onclick="posting('${id}')"
+                                class="btn btn-danger">
+                                <i class="fa fa-undo fa-sm"></i>
+                            </button>
+                        `;
+                        <?php endif; ?>
                     }
 
-                    form += ` </div>`;
-
+                    form += `</div>`;
                     return form;
                 }
             }
+
         ],
         "drawCallback": function(settings) {
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
@@ -265,21 +287,22 @@
     const posting = function(id) {
         Swal.fire({
             icon: 'question',
-            title: 'Posting Pembayaran ?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
+            title: 'Konfirmasi',
+            text: 'Sistem akan otomatis melakukan Posting / Unposting.',
             showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Simpan',
-            cancelButtonText: 'Kembali',
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#4e73df',
         }).then((result) => {
             if (result.isConfirmed) {
+
                 const csrf = $(`[name="${csrfToken}"]`);
+
                 $.ajax({
-                    url: "<?= base_url("pembayaran-po-import/posting"); ?>",
-                    data: {
-                        id: id,
-                    },
+                    url: "<?= base_url('pembayaran-po-import/posting'); ?>",
+                    method: "POST",
+                    dataType: "json",
+                    data: { id: id },
                     beforeSend: function(xhr) {
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
                         setLoading();
@@ -287,25 +310,21 @@
                     complete: function() {
                         stopLoading();
                     },
-                    method: "POST",
-                    dataType: "json",
                     success: function(response) {
                         csrf.val(response.token);
-                        if (response.status) {
-                            Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    table.ajax.reload()
-                                })
-                        }
-                    },
+
+                        Swal.fire({
+                            icon: response.status ? 'success' : 'error',
+                            title: response.message,
+                        }).then(() => {
+                            table.ajax.reload(null, false);
+                        });
+                    }
                 });
             }
-        })
-    }
+        });
+    };
+
 
     const print = function(url) {
         window.open(url, "_blank");

@@ -92,11 +92,11 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Kembali</button>
-                <?php if (can('Pembayaran', 'Pinjaman Supplier', 'c')) : ?>
+                <?php if (can('Transaksi Lokal', 'Pinjaman Supplier', 'c')) : ?>
                     <button type="submit" class="btn btn-submit-form btn-submit-parent">Simpan</button>
                 <?php endif; ?>
                 <?php ?>
-                <?php if (can('Pembayaran', 'Pinjaman Supplier', 'd')) : ?>
+                <?php if (can('Transaksi Lokal', 'Pinjaman Supplier', 'd')) : ?>
                     <button type="button" class="btn btn-discard delete-form delete-btn">Hapus</button>
                 <?php endif; ?>
             </div>

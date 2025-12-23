@@ -427,6 +427,9 @@
 
 
 </section>
+<script>
+    var csrfToken = '<?= csrf_token() ?>';
+</script>
 <!-- <script>
     document.addEventListener("DOMContentLoaded", function() {
         document.body.style.zoom = "70%";

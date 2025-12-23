@@ -220,7 +220,7 @@ class LocalPOPaymentBPModel extends Model
         return $payments;
     }
 
-    public function get_new_no(
+      public function get_new_no(
         $id = null,
         $jenis,
         $divisi,
@@ -316,6 +316,7 @@ class LocalPOPaymentBPModel extends Model
                     'local_po_payments' => 'payment_no',
                     'local_po_payment_bp' => 'payment_no',
                     'panjar_pinjaman_transaction' => 'no_transaction',
+                    'import_po_payments' => 'payment_no',
                     'pembayaran_invoice' => 'no_pembayaran',
                 ];
 
@@ -362,6 +363,7 @@ class LocalPOPaymentBPModel extends Model
             'local_po_payments' => ['payment_no', 'payment_date', 'deletedAt'],
             'local_po_payment_bp' => ['payment_no', 'payment_date', 'deletedAt'],
             'panjar_pinjaman_transaction' => ['no_transaction', 'tanggal', 'deletedAt'],
+            'import_po_payments' => ['payment_no', 'payment_date', 'deletedAt'],
             'pembayaran_invoice' => ['no_pembayaran', 'tanggal', 'deletedAt'],
         ];
 

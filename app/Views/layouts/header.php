@@ -74,6 +74,9 @@
                 <label class="form-label font-weight-bold"><?= session()->get("login")->name; ?></label>
             </a>
             <div class="dropdown-menu dropdown-menu-right">
+                <a onclick="showUbahPasswordForm()" href="#" class="dropdown-item has-icon">
+                    <i class="fas fa-solid fa-key"></i> Ubah Password
+                </a>
                 <a onclick="showLogoutForm()" href="#" class="dropdown-item has-icon">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </a>
@@ -102,13 +105,98 @@
     </div>
 </div>
 
+<!-- Ganti Password -->
+<div class="modal ubah-password-modal" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary">Ganti Password</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <form id="form-update-password">
+                <?= csrf_field() ?>
+                <div class="modal-body mb-1">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3">
+                                <input name="password_lama" id="password_lama" type="text" class="form-control">
+                                <label for="floatingInput">Password Lama</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3">
+                                <input name="password_baru" id="password_baru" type="text" class="form-control">
+                                <label for="floatingInput">Password Baru</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-discard" onclick="hideUbahPasswordForm()">Kembali</button>
+                    <button type="button" class="btn btn-submit-form" id="btnSubmitGantiPassword">Update Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
+    var formUpdatePassword = $("#form-update-password").validate({
+        rules: {
+            password_lama: {
+                required: true
+            },
+            password_baru: {
+                required: true
+            },
+        },
+        messages: {
+            password_lama: {
+                required: "Password lama wajib diisi"
+            },
+            password_baru: {
+                required: "Password baru wajib diisi"
+            },
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
+
     const showLogoutForm = function(e) {
         $(".logout-modal").modal("show")
     }
 
     const hideLogoutForm = function(e) {
         $(".logout-modal").modal("hide")
+    }
+
+    const showUbahPasswordForm = function(e) {
+        $('#password_lama,#password_baru').val(null).change();
+        $(".ubah-password-modal").modal("show")
+    }
+
+    const hideUbahPasswordForm = function(e) {
+        $(".ubah-password-modal").modal("hide")
     }
 
     const changeCompanyAccount = function(dropdownCompanyId) {
@@ -141,6 +229,61 @@
             }
         })
     }
+
+    $('#btnSubmitGantiPassword').click(function(e) {
+        e.preventDefault();
+        if ($('#form-update-password').valid()) {
+            Swal.fire({
+                icon: 'question',
+                title: 'Update Password ?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Save',
+                cancelButtonText: 'Back',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const csrf = $(`[name="${csrfToken}"]`);
+                    let data = new FormData(document.querySelector("#form-update-password"));
+                    let url = "<?= base_url('update-password') ?>";
+                    $.ajax({
+                        url: url,
+                        data: data,
+                        beforeSend: function(xhr) {
+                            setLoading();
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            if (response.status) {
+                                Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        $(".ubah-password-modal").modal("hide");
+                                    });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                });
+                            }
+                        }
+                    });
+                }
+            })
+        }
+    })
 
 
     $('a[data-toggle="sidebar"]').on('click', function() {

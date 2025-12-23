@@ -5,6 +5,7 @@ namespace App\Controllers\Pembayaran;
 use Illuminate\Support\Collection;
 use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
 use App\Controllers\BaseController;
+use App\Helpers\helperWithQuery;
 use App\Models\PayrollsModel;
 use App\Models\EmployeesModel;
 use App\Models\DivisisModel;
@@ -26,6 +27,9 @@ use App\Models\SalesOrderExportDetailModel;
 use App\Models\SalesOrderExportAdditionalModel;
 use App\Models\MetadataModel;
 use App\Models\PembayaranInvoiceDetailModel;
+use App\Models\ProformaInvoiceBiayaModel;
+use App\Models\ProformaInvoiceSizeBreakdownModel;
+use App\Models\ProformaInvoiceTermModel;
 use App\Models\SalesOrderReturnDetailModel;
 use App\Models\SalesOrderReturnModel;
 use DateTime;
@@ -56,6 +60,9 @@ class PembayaranInvoice extends BaseController
     protected $metaDataModel;
     protected $jurnalController;
     protected $banksModel;
+    protected $proformaInvoiceBiayaModel;
+    protected $proformaInvoiceTermModel;
+    protected $proformaInvoiceSizeBreakdownModel;
 
 
     public function __construct()
@@ -78,6 +85,9 @@ class PembayaranInvoice extends BaseController
         $this->salesOrderInvoiceModel = new SalesOrderInvoiceModel();
         $this->proformaInvoiceModel = new ProformaInvoiceModel();
         $this->proformaInvoiceBarangModel = new ProformaInvoiceBarangModel();
+        $this->proformaInvoiceBiayaModel = new ProformaInvoiceBiayaModel();
+        $this->proformaInvoiceTermModel = new ProformaInvoiceTermModel();
+        $this->proformaInvoiceSizeBreakdownModel = new ProformaInvoiceSizeBreakdownModel();
         $this->salesOrderInvoiceDetailModel = new SalesOrderInvoiceDetailModel();
         $this->salesOrderReturnModel = new SalesOrderReturnModel();
         $this->salesOrderReturnDetailModel = new SalesOrderReturnDetailModel();
@@ -120,6 +130,12 @@ class PembayaranInvoice extends BaseController
             ->groupBy('sales_order_detail_export.sales_order_export_id')
             ->findAll();
 
+        $bankList = $this->banksModel->asObject()
+            ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
+            ->orderBy('name', "ASC")
+            ->findAll();
+
         foreach ($salesOrderExportData as $s) {
             $totalPembayaran = 0;
             $pembayaranInvoiceData = $this->pembayaranInvoiceModel
@@ -141,6 +157,7 @@ class PembayaranInvoice extends BaseController
             "subsAkuns" => $subAkunsModel,
             "dokumenList" => $dokumenList,
             "detail" => "",
+            "bankList" => $bankList,
             'divisi' => $this->divisiModel->getDivisiAccess()
         ];
         return view('Pembayaran/pembayaranInvoice/formEkspor', $data);
@@ -156,12 +173,18 @@ class PembayaranInvoice extends BaseController
         $customers = $this->customerModel->getCustomerLokal($this->user_id, $this->this_company_id);
         $divisi = $this->divisiModel->getDivisiAccess();
 
+        $bankList = $this->banksModel->asObject()
+                ->where('company_id', $this->this_company_id)
+                ->where('deletedAt', null)
+                ->orderBy('name', "ASC")
+                ->findAll();
+
         $proformaInvoiceData = $this->proformaInvoiceModel
-            ->select('proforma_invoice.*, SUM(proforma_invoice_barang.total_harga) AS total_invoice')
+            // ->select('proforma_invoice.*, SUM(proforma_invoice_barang.total_harga) AS total_invoice')
             ->join('proforma_invoice_barang', 'proforma_invoice_barang.proforma_invoice_id = proforma_invoice.id', 'left')
             ->where('proforma_invoice.deletedAt', null)
             ->where('proforma_invoice_barang.deletedAt', null)
-            ->where('proforma_invoice.status_posting', 0)
+            ->where('proforma_invoice.status_posting', 1)
             ->where('proforma_invoice.company_id', $this->this_company_id)
             ->groupBy('proforma_invoice_barang.proforma_invoice_id')
             ->findAll();
@@ -173,7 +196,7 @@ class PembayaranInvoice extends BaseController
                 ->where('pembayaran_invoice.company_id', $this->this_company_id)
                 ->where('pembayaran_invoice.invoice_id', $s['id'])
                 ->where('pembayaran_invoice.deletedAt', null)
-                ->where('pembayaran_invoice.type_invoice', "PROFORMA-INVOICE")
+                ->where('pembayaran_invoice.type_invoice', "PROFORMA INVOICE")
                 ->findAll();
             foreach ($pembayaranInvoiceData as $ss) {
                 $totalPembayaran += $ss['total_bayar'];
@@ -188,6 +211,7 @@ class PembayaranInvoice extends BaseController
             "divisi" => $divisi,
             "subsAkuns" => $subAkunsModel,
             "dokumenList" => $dokumenList,
+            "bankList" => $bankList,
             "detail" => "",
             'divisi' => $this->divisiModel->getDivisiAccess()
         ];
@@ -538,7 +562,6 @@ class PembayaranInvoice extends BaseController
         ]);
     }
 
-
     public function generateNoPembayaranInvoice()
     {
         $pembayaranInvoiceModel = new PembayaranInvoiceModel();
@@ -664,7 +687,7 @@ class PembayaranInvoice extends BaseController
                 $customer_name = $salesOrderExportData['name'];
             } elseif ($p['type_invoice'] == "PROFORMA INVOICE") {
                 $salesOrderExportData = $this->proformaInvoiceModel
-                    ->join('sales_order_export', 'sales_order_export.sales_order_export_id = proforma_invoice.sales_order_export_id')
+                    ->join('sales_order_export', 'sales_order_export.sales_contract_id = proforma_invoice.sales_contract_id')
                     ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
                     ->join('customers', 'customers.id = sales_contract.customer_id')
                     ->where('proforma_invoice.id', $p['invoice_id'])
@@ -871,7 +894,7 @@ class PembayaranInvoice extends BaseController
             $customer_name = "";
             
             $salesOrderExportData = $this->proformaInvoiceModel
-                    ->join('sales_order_export', 'sales_order_export.sales_order_export_id = proforma_invoice.sales_order_export_id')
+                    ->join('sales_order_export', 'sales_order_export.sales_contract_id = proforma_invoice.sales_contract_id')
                     ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
                     ->join('customers', 'customers.id = sales_contract.customer_id')
                     ->where('proforma_invoice.id', $p['invoice_id'])
@@ -910,9 +933,6 @@ class PembayaranInvoice extends BaseController
     {
         $dataSalesOrderInvoice = $this->salesOrderInvoiceModel
             ->getAllSalesOrderInvoiceLokalForPembayaran($this->this_company_id);
-        
-        // var_dump($dataSalesOrderInvoice);
-        // die;
 
         $dataAllSalesOrderInvoice = [];
 
@@ -1014,28 +1034,148 @@ class PembayaranInvoice extends BaseController
             ->getAllSalesOrderProformaInvoice($this->this_company_id);
 
         $dataAllProformaInvoice = [];
-
         $no = 1;
+
         foreach ($dataProformaInvoice['data'] as $data) {
-            array_push($dataAllSalesOrderExport, [
-                "no"                => $no++,
-                "no_faktur"         => $data->no_faktur,
-                "tanggal_faktur"    => $data->tanggal_faktur,
-                "total_invoice"     => number_format(floatval($data->total_invoice)),
-                "nama_pelanggan"    => $data->customer_name,
-                "nama_sales"        => $data->acc_holder,
-            ]);
+            $dataAllProformaInvoice[] = [
+                "no"             => $no++,
+                "no_faktur"      => $data->no_faktur,
+                "tanggal_faktur" => $data->tanggal_faktur,
+                "total_invoice"  => number_format((float) $data->total_invoice),
+                "nama_pelanggan" => $data->customer_name,
+                "nama_sales"     => $data->acc_holder,
+            ];
         }
 
-        $data = [
-            "draw"            => intval($this->request->getGet("draw")),
+        return $this->response->setJSON([
+            "draw"            => (int) $this->request->getGet("draw"),
             "recordsTotal"    => $dataProformaInvoice['totalData'],
             "recordsFiltered" => $dataProformaInvoice['totalFilteredData'],
-            "data" => $dataAllProformaInvoice,
-        ];
+            "data"            => $dataAllProformaInvoice,
+        ]);
+    }
 
-        echo json_encode($data);
-        return;
+
+    public function getAllDataProformaInvoiceTerm($id)
+    {
+        $dataProformaTerms = $this->proformaInvoiceTermModel->select('id, payment_term')
+                                ->where('proforma_invoice_id', decrypt($id))
+                                ->where('deletedAt', NULL)
+                                ->findAll();
+
+        return $this->response->setJSON([
+            "data"  => $dataProformaTerms,
+        ]);
+    }
+
+    public function getDataDetailProformaInvoice($id)
+    {
+        $id = decrypt($id);
+
+        /* ===============================
+        * DATA TERMS
+        * =============================== */
+        $dataProformaTerms = $this->proformaInvoiceTermModel
+            ->select('id, payment_term')
+            ->where('proforma_invoice_id', $id)
+            ->where('deletedAt', null)
+            ->first();
+
+        /* ===============================
+        * DATA PROFORMA INVOICE
+        * =============================== */
+        $selectQry = "
+            proforma_invoice.*,
+            metadata.value AS valas_name,
+            banks.kode_bank,
+            banks.name AS nama_bank,
+            banks.atas_nama,
+            banks.no_rekening
+        ";
+
+        $dataPI = $this->proformaInvoiceModel
+            ->select($selectQry)
+            ->join('metadata', 'metadata.id = proforma_invoice.valas_id', 'left')
+            ->join('banks', 'banks.id = proforma_invoice.bank_id', 'left')
+            ->where('proforma_invoice.id', $id)
+            ->first();
+
+        /* ===============================
+        * TOTAL BAYAR (FIXED – NO ×100)
+        * =============================== */
+        $totalBayarResult = $this->pembayaranInvoiceModel
+            ->select("
+                SUM(
+                    CAST(
+                        REPLACE(total_bayar, ',', '')
+                    AS DECIMAL(15,2))
+                ) AS total_bayar
+            ")
+            ->where('invoice_id', $id)
+            ->where('type_invoice', 'PROFORMA INVOICE')
+            ->where('deletedAt', null)
+            ->first();
+
+        $totalBayar = 0;
+        if ($totalBayarResult && $totalBayarResult['total_bayar'] !== null) {
+            $totalBayar = (float) $totalBayarResult['total_bayar'];
+        }
+
+        // inject ke data PI
+        $dataPI['total_bayar'] = $totalBayar;
+
+        /* ===============================
+        * DATA BARANG
+        * =============================== */
+        $dataPIBarang = $this->proformaInvoiceBarangModel->getBarang($id);
+
+        /* ===============================
+        * HITUNG TOTAL AMOUNT (USD)
+        * =============================== */
+        $totalAmount = 0;
+        if (!empty($dataPIBarang)) {
+            foreach ($dataPIBarang as $barang) {
+                if (!empty($barang['size_breakdown'])) {
+                    foreach ($barang['size_breakdown'] as $detail) {
+                        $totalAmount += (float) ($detail['total'] ?? 0);
+                    }
+                }
+            }
+        }
+
+        /* ===============================
+        * DATA PAYMENT TERM & BIAYA
+        * =============================== */
+        $dataPIPaymentTerm = $this->proformaInvoiceTermModel
+            ->where('proforma_invoice_id', $id)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        $dataPIBiaya = $this->proformaInvoiceBiayaModel
+            ->where('proforma_invoice_id', $id)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        /* ===============================
+        * REMAINING (FIXED)
+        * =============================== */
+        $remaining = max($totalAmount - $totalBayar, 0);
+
+        /* ===============================
+        * RESPONSE
+        * =============================== */
+        return $this->response->setJSON([
+            'data' => [
+                'dataPI' => $dataPI,
+                'dataPIBarang' => $dataPIBarang,
+                'dataPIPaymentTerm' => $dataPIPaymentTerm,
+                'dataPIBiaya' => $dataPIBiaya,
+                'dataProformaTerms' => $dataProformaTerms,
+            ],
+            'total_amount' => $totalAmount,
+            'total_paid'   => $totalBayar,
+            'remaining'    => $remaining
+        ]);
     }
 
     public function checkUnpaidInvoice()
@@ -1064,17 +1204,27 @@ class PembayaranInvoice extends BaseController
 
     public function checkUnpaidProformaInvoice()
     {
-
         $count = $this->proformaInvoiceModel
-            ->select('proforma_invoice.*')
+            ->select('proforma_invoice.id')
+            ->join(
+                'pembayaran_invoice',
+                'proforma_invoice.id = pembayaran_invoice.invoice_id 
+                AND pembayaran_invoice.deletedAt IS NULL',
+                'left'
+            )
             ->where('proforma_invoice.deletedAt', null)
-            ->where('proforma_invoice.status_posting', 1)
-            ->where('proforma_invoice.status_bayar', 0)
             ->where('proforma_invoice.company_id', $this->this_company_id)
+            ->groupStart()
+                ->where('pembayaran_invoice.id', null) // belum ada pembayaran
+                ->orWhere('pembayaran_invoice.status_posting !=', 1) // ada tapi belum posting
+            ->groupEnd()
             ->countAllResults();
 
-        return $this->response->setJSON(['total_unpaid' => $count]);
+        return $this->response->setJSON([
+            'total_unpaid' => $count
+        ]);
     }
+
 
     public function getDokumenList()
     {
@@ -1112,8 +1262,6 @@ class PembayaranInvoice extends BaseController
         $isImport = false;
         $totalPembayaran = 0;
         if (!empty($idArray)) {
-
-
 
             $idArray = array_map('intval', $idArray);
             // ambil dulu tipe dokumennya
@@ -1297,7 +1445,6 @@ class PembayaranInvoice extends BaseController
         ]);
     }
 
-
     public function getBarangSalesLokalNew()
     {
         $idArray = json_decode($this->request->getVar('id'), true);
@@ -1460,102 +1607,92 @@ class PembayaranInvoice extends BaseController
         ]);
     }
 
+    // public function getBarangSalesProformaInvoice()
+    // {
+    //     $idArray = json_decode(decrypt($this->request->getVar('id')), true); // Decode array dari JSON
+    //     $pembayaranInvoiceId = decrypt($this->request->getVar('pembayaran_invoice_id'));
+
+    //     $dataBarang = [];
+    //     $isImport = false;
+    //     $totalPembayaran = 0;
+
+    //     // $idArray = array_map('intval', $idArray);
+
+    //     if (!empty($idArray)) {
+    //         // Ambil data invoice berdasarkan ID jika tidak ada pembayaran_invoice_id
+    //         if (empty($pembayaranInvoiceId)) {
+    //             $proformaInvoiceBarangData = $this->proformaInvoiceBarangModel
+    //                 ->select('proforma_invoice.no_pi, proforma_invoice_barang.id as proforma_invoice_barang_id, proforma_invoice_barang.id as proforma_invoice_id, qty_barang, harga_satuan, total_harga, nama_barang')
+    //                 ->join('proforma_invoice', 'proforma_invoice_barang.proforma_invoice_id = proforma_invoice.id', 'left')
+    //                 ->where('proforma_invoice_id', $idArray)
+    //                 ->where('proforma_invoice_barang.deletedAt', null)
+    //                 ->findAll();
+    //             foreach ($proformaInvoiceBarangData as $s) {
+    //                 array_push($dataBarang, $s);
+    //             }
+    //         }
+
+    //         // Ambil data pembayaran jika pembayaran_invoice_id tersedia
+    //         if (!empty($pembayaranInvoiceId) && $pembayaranInvoiceId != 0) {
+    //             $pembayaranInvoiceDetail = $this->pembayaranInvoiceDetailModel
+    //                 ->join('sub_akuns as akun_kas', 'pembayaran_invoice_detail.akun_kredit = akun_kas.id', 'left')
+    //                 ->join('sub_akuns as akun_selisih', 'pembayaran_invoice_detail.akun_debit = akun_selisih.id', 'left')
+    //                 ->join('proforma_invoice_barang', 'pembayaran_invoice_detail.proforma_invoice_barang_id = proforma_invoice_barang.id', 'left')
+    //                 ->join('proforma_invoice', 'proforma_invoice_barang.proforma_invoice_id = proforma_invoice.id', 'left')
+    //                 ->select('barang_master_sales.nama_barang, barang_master_sales.kode_barang, proforma_invoice.no_faktur, proforma_invoice_barang.id as proforma_invoice_barang_id, proforma_invoice_barang.id as proforma_invoice_id, akun_kas.id as id_akun_kas, akun_selisih.id as id_akun_selisih, akun_kas.nama_sub as nama_sub_kas, akun_kas.no_sub as no_sub_kas, akun_selisih.nama_sub as nama_sub_selisih, akun_selisih.no_sub as no_sub_selisih, pembayaran_invoice_detail.*')
+    //                 ->where('pembayaran_invoice_id', $pembayaranInvoiceId)
+    //                 ->findAll();
+
+    //             foreach ($pembayaranInvoiceDetail as $p) {
+    //                 array_push($dataBarang, [
+    //                     "proforma_invoice_barang_id" => $p['proforma_invoice_barang_id'],
+    //                     "proforma_invoice_id" => $p['proforma_invoice_id'],
+    //                     "no_faktur" => $p['no_pi'],
+    //                     "qty_invoice" => $p['qty_barang'],
+    //                     "harga_barang_invoice" => $p['harga_satuan'],
+    //                     "amount_invoice" => $p['total_harga'],
+    //                     "barang_name" => $p['nama_barang'],
+    //                     "keterangan" => $p['keterangan'],
+    //                     // "keterangan_pajak" => $p['keterangan_pajak'],
+    //                     // "nominal_pajak" => $p['nominal_pajak'],
+    //                     "id_akun_kredit" => $p['id_akun_kas'],
+    //                     "id_akun_debit" => $p['id_akun_selisih'],
+    //                     "akun_kredit" => $p['no_sub_kas'] . ' - ' . $p['nama_sub_kas'],
+    //                     "akun_debit" => $p['no_sub_selisih'] . ' - ' . $p['nama_sub_selisih'],
+    //                 ]);
+    //             }
+
+    //             $pembayaranInvoiceData = $this->pembayaranInvoiceModel
+    //                 ->select('total_bayar, jenis_data')
+    //                 ->where('id', $pembayaranInvoiceId)
+    //                 ->first();
 
 
+    //             if ($pembayaranInvoiceData["jenis_data"] == "import") {
+    //                 $isImport = true;
+    //             }
+    //         }
+
+    //         if (empty($dataBarang)) {
+
+    //             $dataBarang = $this->salesOrderInvoiceModel->whereIn("id", $idArray)
+    //                 ->select('id as sales_order_invoice_id, no_faktur, tanggal_faktur, total_invoice as amount_invoice, document_type')
+    //                 ->findAll();
+
+    //             $dataBarang = $dataBarang;
+
+    //             $isImport = true;
+    //         }
+    //     }
 
 
-    public function getBarangSalesProformaInvoice()
-    {
-        $idArray = json_decode(decrypt($this->request->getVar('id')), true); // Decode array dari JSON
-        $pembayaranInvoiceId = decrypt($this->request->getVar('pembayaran_invoice_id'));
-
-        $dataBarang = [];
-        $isImport = false;
-        $totalPembayaran = 0;
-
-        // var_dump($idArray);
-        // die;
-
-        // $idArray = array_map('intval', $idArray);
-
-        if (!empty($idArray)) {
-            // Ambil data invoice berdasarkan ID jika tidak ada pembayaran_invoice_id
-            if (empty($pembayaranInvoiceId)) {
-                $proformaInvoiceBarangData = $this->proformaInvoiceBarangModel
-                    ->select('proforma_invoice.no_pi, proforma_invoice_barang.id as proforma_invoice_barang_id, proforma_invoice_barang.id as proforma_invoice_id, qty_barang, harga_satuan, total_harga, nama_barang')
-                    ->join('proforma_invoice', 'proforma_invoice_barang.proforma_invoice_id = proforma_invoice.id', 'left')
-                    ->where('proforma_invoice_id', $idArray)
-                    ->where('proforma_invoice_barang.deletedAt', null)
-                    ->findAll();
-                foreach ($proformaInvoiceBarangData as $s) {
-                    array_push($dataBarang, $s);
-                }
-
-                // var_dump($proformaInvoiceBarangData);
-                // die;
-            }
-
-            // Ambil data pembayaran jika pembayaran_invoice_id tersedia
-            if (!empty($pembayaranInvoiceId)) {
-                $pembayaranInvoiceDetail = $this->pembayaranInvoiceDetailModel
-                    ->join('sub_akuns as akun_kas', 'pembayaran_invoice_detail.akun_kredit = akun_kas.id', 'left')
-                    ->join('sub_akuns as akun_selisih', 'pembayaran_invoice_detail.akun_debit = akun_selisih.id', 'left')
-                    ->join('proforma_invoice_barang', 'pembayaran_invoice_detail.proforma_invoice_barang_id = proforma_invoice_barang.id', 'left')
-                    ->join('proforma_invoice', 'proforma_invoice_barang.proforma_invoice_id = proforma_invoice.id', 'left')
-                    ->select('barang_master_sales.nama_barang, barang_master_sales.kode_barang, proforma_invoice.no_faktur, proforma_invoice_barang.id as proforma_invoice_barang_id, proforma_invoice_barang.id as proforma_invoice_id, akun_kas.id as id_akun_kas, akun_selisih.id as id_akun_selisih, akun_kas.nama_sub as nama_sub_kas, akun_kas.no_sub as no_sub_kas, akun_selisih.nama_sub as nama_sub_selisih, akun_selisih.no_sub as no_sub_selisih, pembayaran_invoice_detail.*')
-                    ->where('pembayaran_invoice_id', $pembayaranInvoiceId)
-                    ->findAll();
-
-                foreach ($pembayaranInvoiceDetail as $p) {
-                    array_push($dataBarang, [
-                        "proforma_invoice_barang_id" => $p['proforma_invoice_barang_id'],
-                        "proforma_invoice_id" => $p['proforma_invoice_id'],
-                        "no_faktur" => $p['no_pi'],
-                        "qty_invoice" => $p['qty_barang'],
-                        "harga_barang_invoice" => $p['harga_satuan'],
-                        "amount_invoice" => $p['total_harga'],
-                        "barang_name" => $p['nama_barang'],
-                        "keterangan" => $p['keterangan'],
-                        // "keterangan_pajak" => $p['keterangan_pajak'],
-                        // "nominal_pajak" => $p['nominal_pajak'],
-                        "id_akun_kredit" => $p['id_akun_kas'],
-                        "id_akun_debit" => $p['id_akun_selisih'],
-                        "akun_kredit" => $p['no_sub_kas'] . ' - ' . $p['nama_sub_kas'],
-                        "akun_debit" => $p['no_sub_selisih'] . ' - ' . $p['nama_sub_selisih'],
-                    ]);
-                }
-
-                $pembayaranInvoiceData = $this->pembayaranInvoiceModel
-                    ->select('total_bayar, jenis_data')
-                    ->where('id', $pembayaranInvoiceId)
-                    ->first();
-
-
-                if ($pembayaranInvoiceData["jenis_data"] == "import") {
-                    $isImport = true;
-                }
-            }
-
-            if (empty($dataBarang)) {
-
-                $dataBarang = $this->salesOrderInvoiceModel->whereIn("id", $idArray)
-                    ->select('id as sales_order_invoice_id, no_faktur, tanggal_faktur, total_invoice as amount_invoice, document_type')
-                    ->findAll();
-
-                $dataBarang = $dataBarang;
-
-                $isImport = true;
-            }
-        }
-
-
-        return $this->response->setJSON([
-            'data' => $dataBarang,
-            'totalPembayaran' => $pembayaranInvoiceData['total_bayar'] ?? 0,
-            'status' => true,
-            'isImport' => $isImport,
-        ]);
-    }
+    //     return $this->response->setJSON([
+    //         'data' => $dataBarang,
+    //         'totalPembayaran' => $pembayaranInvoiceData['total_bayar'] ?? 0,
+    //         'status' => true,
+    //         'isImport' => $isImport,
+    //     ]);
+    // }
 
     public function getBarangSalesReturn()
     {
@@ -1748,8 +1885,6 @@ class PembayaranInvoice extends BaseController
         return response()->setJSON($data);
     }
 
-
-
     public function saveLokalInvoice()
     {
         try {
@@ -1915,7 +2050,14 @@ class PembayaranInvoice extends BaseController
                 $currency = $this->salesOrderExportModel
                     ->select('currency')
                     ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
-                    ->where('sales_order_export.id', decrypt($this->request->getVar('no_dokumen')))
+                    ->where('sales_order_export.sales_order_export_id', decrypt($this->request->getVar('no_dokumen')))
+                    ->first();
+
+                $dataSalesOrder = $this->salesOrderExportModel
+                    ->select('sales_contract.customer_id as customer_id, sales_order_export.shipment_value, customers.name as customer_name')
+                    ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
+                    ->join('customers', 'customers.id = sales_contract.customer_id')
+                    ->where('sales_order_export.sales_order_export_id', decrypt($this->request->getVar('no_dokumen')))
                     ->first();
                 
                 $valas = $this->metaDataModel->where('id', $currency)->where('deletedAt', null)->first();
@@ -1927,36 +2069,21 @@ class PembayaranInvoice extends BaseController
                     'invoice_id' => decrypt($this->request->getVar('no_dokumen')),
                     'divisi_id' => $this->request->getVar('divisi_id'),
                     'valas_id' => $valas['id'],
+                    'bank_id'          => $this->request->getVar('bank_id'),
                     'no_pembayaran' => $this->request->getVar('no_bukti_pembayaran'),
                     'keterangan' =>  $this->request->getVar('keterangan'),
+                    'customer_id' => $dataSalesOrder['customer_id'],
                     'type_invoice' => "EKSPOR",
                     'tanggal' => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('payment_date')))),
-                    'total_invoice' => $this->request->getVar('total_amount_invoice'),
+                    'total_invoice' => $dataSalesOrder['shipment_value'] ?? 0,
                     'potongan' => $this->request->getVar('potongan') ? $this->request->getVar('potongan'): 0,
                     'total_bayar' => $this->request->getVar('total_bayar'),
                     'akun_kas' => $this->request->getVar('akun_kas'),
                     'akun_selisih' => $this->request->getVar('akun_selisih'),
-                    'status_posting' => '0'
+                    'status_posting' => '0',
+                    'pembayaran_dari' => $dataSalesOrder['customer_id'],
+                    'pembayaran_oleh' => $this->request->getVar('pembayaran_oleh'),
                 ]);
-
-                $salesOrderExportData = $this->salesOrderExportModel
-                    ->select('
-                        sales_order_export_id,
-                        commision,
-                        palet_fumigation,
-                        palet_fumigation_price,
-                        freight,
-                        additional,
-                        additional_2,
-                        rebate_price,
-                        royalty_price,
-                        can_deduction_price,
-                        estimated_freight_price,
-                        others_type,
-                        others_price,
-                    ')
-                    ->where('sales_order_export_id', $id)
-                    ->first();
 
                 return response()->setJSON([
                     'id' => encrypt($id),
@@ -2017,7 +2144,7 @@ class PembayaranInvoice extends BaseController
             } elseif ($tipe_invoice == "PROFORMA INVOICE") {
                 $customer = $this->proformaInvoiceModel
                     ->select('customers.*')
-                    ->join('sales_order_export', 'sales_order_export.sales_contract_id = proforma_invoice.sales_order_export_id')
+                    ->join('sales_order_export', 'sales_order_export.sales_contract_id = proforma_invoice.sales_contract_id')
                     ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
                     ->join('customers', 'customers.id = sales_contract.customer_id')
                     ->where('proforma_invoice.id', decrypt($this->request->getVar('no_dokumen')))
@@ -2025,7 +2152,7 @@ class PembayaranInvoice extends BaseController
 
                 $currency = $this->proformaInvoiceModel
                     ->select('currency')
-                    ->join('sales_order_export', 'sales_order_export.sales_contract_id = proforma_invoice.sales_order_export_id')
+                    ->join('sales_order_export', 'sales_order_export.sales_contract_id = proforma_invoice.sales_contract_id')
                     ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
                     ->where('proforma_invoice.id', decrypt($this->request->getVar('no_dokumen')))
                     ->first();
@@ -2044,12 +2171,15 @@ class PembayaranInvoice extends BaseController
                     'no_pembayaran' => $this->request->getVar('no_bukti_pembayaran'),
                     'keterangan' =>  $this->request->getVar('keterangan'),
                     'type_invoice' => "PROFORMA INVOICE",
+                    'pembayaran_oleh' => $this->request->getVar('pembayaran_oleh'),
                     'tanggal' => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('payment_date')))),
-                    'total_invoice' => $this->request->getVar('total_amount_invoice'),
-                    'potongan' => $this->request->getVar('potongan') ? $this->request->getVar('potongan'): 0,
-                    'total_bayar' => $this->request->getVar('total_bayar'),
+                    'total_invoice' => preg_replace('/[^0-9]/', '', $this->request->getVar('total_amount_invoice')),
+                    'potongan'      => preg_replace('/[^0-9]/', '', $this->request->getVar('potongan') ?? 0),
+                    'total_bayar'   => preg_replace('/[^0-9]/', '', $this->request->getVar('total_bayar')),
                     'akun_kas' => $this->request->getVar('akun_kas'),
                     'akun_selisih' => $this->request->getVar('akun_selisih'),
+                    'bank_id' => $this->request->getVar('bank_id'),
+                    'pembayaran_dari' => $this->request->getVar('customer'),
                     'status_posting' => '0'
                 ]);
 
@@ -2172,7 +2302,6 @@ class PembayaranInvoice extends BaseController
         }
     }
 
-
     public function updateReturn()
     {
         $no_dokumen_req = $this->request->getVar("no_dokumen");
@@ -2260,6 +2389,156 @@ class PembayaranInvoice extends BaseController
         }
     }
 
+    public function updateExport()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $bayar    = round((float) $this->request->getVar('total_bayar'), 2);
+        $potongan = round((float) $this->request->getVar('potongan'), 2);
+
+
+        $pembayaran = $this->pembayaranInvoiceModel->find($id);
+        if (!$pembayaran) {
+            return response()->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => 'Data pembayaran tidak ditemukan'
+            ]);
+        }
+
+        // hitung sisa di BE
+        $sisa = round(
+            $pembayaran['total_invoice']
+            - $pembayaran['total_bayar']
+            - $pembayaran['potongan'],
+            2
+        );
+
+        if ($bayar > $sisa) {
+            return response()->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => 'Jumlah bayar melebihi sisa pembayaran'
+            ]);
+        }
+
+        $this->pembayaranInvoiceModel->update($id, [
+            'payment_method' => $this->request->getVar('payment_methods'),
+            'divisi_id'      => $this->request->getVar('divisi_id'),
+            'no_pembayaran'  => $this->request->getVar('no_bukti_pembayaran'),
+            'keterangan'     => $this->request->getVar('keterangan'),
+            'tanggal'        => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('payment_date')))),
+            'potongan'       => $potongan,
+            'total_bayar'    => $pembayaran['total_bayar'] + $bayar,
+            'akun_kas'       => $this->request->getVar('akun_kas'),
+            'akun_selisih'   => $this->request->getVar('akun_selisih'),
+            'pembayaran_oleh'=> $this->request->getVar('pembayaran_oleh'),
+            'bank_id'        => $this->request->getVar('bank_id'),
+        ]);
+
+        return response()->setJSON([
+            'status' => true,
+            'token' => csrf_hash(),
+            'message' => 'Pembayaran berhasil diperbarui'
+        ]);
+    }
+
+    public function updatePI()
+    {
+        $paymentId = decrypt($this->request->getVar('id'));
+        $invoiceId = decrypt($this->request->getVar('no_dokumen'));
+
+        /* ===============================
+        * DATA PAYMENT LAMA (SOURCE OF TRUTH)
+        * =============================== */
+        $paymentLama = $this->pembayaranInvoiceModel->where('id', $paymentId)->where('deletedAt', NULL)->first();
+
+        if (!$paymentLama) {
+            return response()->setJSON([
+                'status' => false,
+                'message'=> 'Data pembayaran tidak ditemukan',
+                'token'  => csrf_hash()
+            ]);
+        }
+
+        // AMBIL DARI DB, BUKAN FORM
+        $totalInvoice    = (float) $paymentLama['total_invoice'];
+        $potongan        = (float) $paymentLama['potongan'];
+        $totalBayarLama  = (float) $paymentLama['total_bayar'];
+
+        /* ===============================
+        * INPUT BARU (YANG BOLEH BERUBAH)
+        * =============================== */
+        $totalBayarBaru = preg_replace(
+            '/[^0-9.]/',
+            '',
+            $this->request->getVar('total_bayar') ?? $totalBayarLama
+        );
+
+        var_dump($totalBayarBaru);
+        die;
+
+        /* ===============================
+        * TOTAL BAYAR PAYMENT LAIN
+        * =============================== */
+        $totalBayarInvoiceLain = (float) (
+            $this->pembayaranInvoiceModel
+                ->selectSum('total_bayar')
+                ->where('invoice_id', $invoiceId)
+                ->where('type_invoice', 'PROFORMA INVOICE')
+                ->where('id !=', $paymentId)
+                ->where('deletedAt', null)
+                ->first()['total_bayar'] ?? 0
+        );
+
+        /* ===============================
+        * HITUNG ULANG
+        * =============================== */
+        $totalBayarAkhir = $totalBayarInvoiceLain + $totalBayarBaru;
+        $maksInvoice    = $totalInvoice - $potongan;
+
+
+        if ($totalBayarAkhir > $maksInvoice) {
+            return response()->setJSON([
+                'status' => false,
+                'message'=> 'Total pembayaran melebihi nilai invoice',
+                'token'  => csrf_hash()
+            ]);
+        }
+
+        /* ===============================
+        * UPDATE PAYMENT
+        * =============================== */
+        $this->pembayaranInvoiceModel->update($paymentId, [
+            'payment_method'  => $this->request->getVar('payment_methods'),
+            'divisi_id'       => $this->request->getVar('divisi_id'),
+            'total_bayar'     => $totalBayarBaru,
+            'pembayaran_oleh' => $this->request->getVar('pembayaran_oleh'),
+            'keterangan'      => $this->request->getVar('keterangan'),
+            'tanggal'         => date(
+                'Y-m-d',
+                strtotime(str_replace('/', '-', $this->request->getVar('payment_date')))
+            ),
+            'akun_kas'        => $this->request->getVar('akun_kas'),
+            'akun_selisih'    => $this->request->getVar('akun_selisih'),
+            'bank_id'         => $this->request->getVar('bank_id'),
+            'status_posting'  => 0,
+            'updatedAt'       => date('Y-m-d H:i:s'),
+        ]);
+
+        /* ===============================
+        * UPDATE STATUS INVOICE
+        * =============================== */
+        // $this->proformaInvoiceModel->update($invoiceId, [
+        //     'status_bayar' => $statusBayar,
+        //     'updatedAt'    => date('Y-m-d H:i:s')
+        // ]);
+
+        return response()->setJSON([
+            'status' => true,
+            'message'=> 'Pembayaran Proforma Invoice berhasil diperbarui',
+            'token'  => csrf_hash()
+        ]);
+    }
 
     public function getValas()
     {
@@ -2277,14 +2556,13 @@ class PembayaranInvoice extends BaseController
         return json_encode($valas['value']);
     }
 
-
     public function getValasPI()
     {
         $id = decrypt($this->request->getVar('id'));
         $selectQry = "currency";
         $currency = $this->proformaInvoiceModel
                 ->select($selectQry)
-                ->join('sales_order_export', 'sales_order_export.sales_contract_id = proforma_invoice.sales_order_export_id')
+                ->join('sales_order_export', 'sales_order_export.sales_contract_id = proforma_invoice.sales_contract_id')
                 ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
                 ->where('proforma_invoice.id', $id)
                 ->first();
@@ -2293,7 +2571,6 @@ class PembayaranInvoice extends BaseController
 
         return json_encode($valas['value']);
     }
-
 
     public function getById($id)
     {
@@ -2339,6 +2616,11 @@ class PembayaranInvoice extends BaseController
 
             return view('Pembayaran/pembayaranInvoice/formLokal', $data);
         } elseif ($tipe_invoice == "EKSPOR") {
+            $bankList = $this->banksModel->asObject()
+                ->where('company_id', $this->this_company_id)
+                ->where('deletedAt', null)
+                ->orderBy('name', "ASC")
+                ->findAll();
             $salesOrderExportData = $this->salesOrderExportModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->findAll();
             foreach ($salesOrderExportData as $s) {
                 array_push($dokumenList, $s);
@@ -2348,10 +2630,19 @@ class PembayaranInvoice extends BaseController
                 "divisi" => $divisi,
                 "subsAkuns" => $subAkunsModel,
                 "dokumenList" => $dokumenList,
+                "bankList" => $bankList,
                 "detail" => $this->pembayaranInvoiceModel->getPembayaranInvoiceDetail($id),
             ];
+
+            // dd($data['detail']);
+
             return view('Pembayaran/pembayaranInvoice/formEkspor', $data);
         } elseif ($tipe_invoice == "PROFORMA INVOICE") {
+            $bankList = $this->banksModel->asObject()
+                ->where('company_id', $this->this_company_id)
+                ->where('deletedAt', null)
+                ->orderBy('name', "ASC")
+                ->findAll();
             $salesOrderExportData = $this->proformaInvoiceModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->findAll();
             foreach ($salesOrderExportData as $s) {
                 array_push($dokumenList, $s);
@@ -2361,6 +2652,7 @@ class PembayaranInvoice extends BaseController
                 "divisi" => $divisi,
                 "subsAkuns" => $subAkunsModel,
                 "dokumenList" => $dokumenList,
+                "bankList" => $bankList,
                 "detail" => $this->pembayaranInvoiceModel->getPembayaranInvoiceDetail($id),
             ];
             return view('Pembayaran/pembayaranInvoice/formPI', $data);
@@ -2413,7 +2705,6 @@ class PembayaranInvoice extends BaseController
 
     public function getCustomer()
     {
-
         $invoice_id =  decrypt($this->request->getVar('invoice_id'));
         $tipe_invoice = $this->request->getVar('type_invoice');
 
@@ -2434,7 +2725,7 @@ class PembayaranInvoice extends BaseController
         } elseif ($tipe_invoice == "PROFORMA INVOICE") {
             $salesOrderExportData = $this->proformaInvoiceModel
                 ->select('customers.*')
-                ->join('sales_order_export', 'sales_order_export.sales_order_export_id = proforma_invoice.sales_order_export_id')
+                ->join('sales_order_export', 'sales_order_export.sales_contract_id = proforma_invoice.sales_contract_id')
                 ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
                 ->join('customers', 'customers.id = sales_contract.customer_id')
                 ->where('proforma_invoice.id', $invoice_id)
@@ -2534,21 +2825,40 @@ class PembayaranInvoice extends BaseController
         }
     }
 
-
     public function posting()
     {
-
         $id = decrypt($this->request->getVar('id'));
         $data = $this->pembayaranInvoiceModel->where('id', $id)->first();
 
-        if ($data['type_invoice'] == "PROFORMA INVOICE") {
+        if ($data) {
+            $this->salesOrderExportModel->update(
+                $data['invoice_id'],
+                ['already_paid' => 1]
+            );
+        }
+
+        if (!$data) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => false,
+                'message' => 'Data pembayaran tidak ditemukan.'
+            ]);
+        }
+
+        if ($data['type_invoice'] === "PROFORMA INVOICE") {
             $result = $this->jurnalController->insertDataPembayaranInvoiceInternasional($id);
         } else {
             $result = $this->jurnalController->insertDataPembayaranInvoice($id);
         }
 
         if ($result) {
-            $this->pembayaranInvoiceModel->update($id, ['status_posting' => 1]);
+            $this->pembayaranInvoiceModel
+                ->where('id', $id)
+                ->set([
+                    'status_posting' => 1,
+                    'payment_date' => date('Y-m-d H:i:s')
+                ])
+                ->update();
         }
 
         return response()->setJSON([
@@ -2558,26 +2868,112 @@ class PembayaranInvoice extends BaseController
         ]);
     }
 
-
     public function unposting()
     {
         $id = decrypt($this->request->getVar('id'));
         $data = $this->pembayaranInvoiceModel->where('id', $id)->first();
 
-        if ($data['type_invoice'] == "PROFORMA INVOICE") {
-            $result = $this->jurnalController->unpostDataPembayaranInvoice($id);
-        } else {
-            $result = $this->jurnalController->unpostDataPembayaranInvoice($id);
+        if ($data) {
+            $this->salesOrderExportModel->update(
+                $data['invoice_id'],
+                ['already_paid' => 0]
+            );
         }
 
+        if (!$data) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => false,
+                'message' => 'Data pembayaran tidak ditemukan.'
+            ]);
+        }
+
+        // unposting tetap pakai fungsi yang sama (bisa disesuaikan kalau ada versi khusus)
+        $result = $this->jurnalController->unpostDataPembayaranInvoice($id);
+
         if ($result) {
-            $this->pembayaranInvoiceModel->update($id, ['status_posting' => 0]);
+            $this->pembayaranInvoiceModel
+                ->where('id', $id)
+                ->set([
+                    'status_posting' => 0,
+                    'payment_date' => date('Y-m-d H:i:s')
+                ])
+                ->update();
         }
 
         return response()->setJSON([
             'token' => csrf_hash(),
             'status' => $result,
-            'message' => $result ? "Pembayaran berhasil di unposting" : "Terjadi Kesalahan Saat Input Data Transaksi Ke Jurnal Umum"
+            'message' => $result ? "Pembayaran berhasil di-unposting" : "Terjadi Kesalahan Saat Input Data Transaksi Ke Jurnal Umum"
         ]);
     }
+
+
+    public function postingPI()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $data = $this->pembayaranInvoiceModel->where('id', $id)->first();
+
+        if (!$data) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => false,
+                'message' => 'Data pembayaran tidak ditemukan.'
+            ]);
+        }
+
+      
+        $result = $this->jurnalController->insertDataPembayaranInvoiceInternasional($id);
+    
+
+        if ($result) {
+            $this->pembayaranInvoiceModel
+                ->where('id', $id)
+                ->set([
+                    'status_posting' => 1,
+                    'payment_date' => date('Y-m-d H:i:s')
+                ])
+                ->update();
+        }
+
+        return response()->setJSON([
+            'token' => csrf_hash(),
+            'status' => $result,
+            'message' => $result ? "Pembayaran berhasil diposting" : "Terjadi Kesalahan Saat Input Data Transaksi Ke Jurnal Umum"
+        ]);
+    }
+
+    public function unpostingPI()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $data = $this->pembayaranInvoiceModel->where('id', $id)->first();
+
+        if (!$data) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => false,
+                'message' => 'Data pembayaran tidak ditemukan.'
+            ]);
+        }
+
+        // unposting tetap pakai fungsi yang sama (bisa disesuaikan kalau ada versi khusus)
+        $result = $this->jurnalController->unpostDataPembayaranInvoice($id);
+
+        if ($result) {
+            $this->pembayaranInvoiceModel
+                ->where('id', $id)
+                ->set([
+                    'status_posting' => 0,
+                    'payment_date' => date('Y-m-d H:i:s')
+                ])
+                ->update();
+        }
+
+        return response()->setJSON([
+            'token' => csrf_hash(),
+            'status' => $result,
+            'message' => $result ? "Pembayaran berhasil di-unposting" : "Terjadi Kesalahan Saat Input Data Transaksi Ke Jurnal Umum"
+        ]);
+    }
+
 }

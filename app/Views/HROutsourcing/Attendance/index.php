@@ -50,6 +50,25 @@
                         </div>
                     </div>
 
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <button type="button" class="btn btn-success btn-block" id="print-btn" onclick="printPayrollPDF()">
+                                <i class="fas fa-file-pdf"></i> Print PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label>Jenis Gaji</label>
+                            <select class="form-control" id="payroll_type">
+                                <option value="harian">Harian</option>
+                                <option value="minggu">Mingguan</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <!-- <div class="col-md-2">
                         <div class="form-group">
                             <label>&nbsp;</label>
@@ -133,52 +152,347 @@
 </section>
 
 <script>
-$(document).ready(function() {
-    // Initialize Select2
-    $('#company_filter, #divisi_filter').select2();
+    $(document).ready(function() {
+        // Initialize Select2
+        $('#company_filter, #divisi_filter').select2();
 
-    // =========================
-    // LOAD COMPANY BY DIVISI
-    // =========================
-    $('#divisi_filter').on('change', function() {
-        const divisiId = $(this).val();
-        const $companySelect = $('#company_filter');
-        
-        $companySelect.html('<option value="">Loading...</option>').prop('disabled', true);
-        
-        if (!divisiId) {
-            $companySelect.html('<option value="">Semua Perusahaan</option>').prop('disabled', false);
-            return;
+        // =========================
+        // LOAD COMPANY BY DIVISI
+        // =========================
+        $('#divisi_filter').on('change', function() {
+            const divisiId = $(this).val();
+            const $companySelect = $('#company_filter');
+            
+            $companySelect.html('<option value="">Loading...</option>').prop('disabled', true);
+            
+            if (!divisiId) {
+                $companySelect.html('<option value="">Semua Perusahaan</option>').prop('disabled', false);
+                return;
+            }
+
+            $.ajax({
+                url: '<?= base_url("hr-outsourcing-attendance/listCompanyByDivisi") ?>/' + divisiId,
+                type: 'GET',
+                dataType: 'json',
+                success: function(res) {
+                    $companySelect.html('<option value="">Semua Perusahaan</option>');
+                    
+                    if (res && res.length > 0) {
+                        $.each(res, function(i, item) {
+                            $companySelect.append(`<option value="${item.id}">${item.name}</option>`);
+                        });
+                    }
+                    
+                    $companySelect.prop('disabled', false);
+                },
+                error: function() {
+                    $companySelect.html('<option value="">Error loading</option>').prop('disabled', false);
+                }
+            });
+        });
+
+        // =========================
+        // LOAD ATTENDANCE DATA
+        // =========================
+        $('#load-btn').on('click', function() {
+            const companyId = $('#company_filter').val();
+            const date = $('#date_filter').val();
+
+            if (!companyId) {
+                showAlert('warning', 'Pilih perusahaan terlebih dahulu!', 3000);
+                return;
+            }
+
+            if (!date) {
+                showAlert('warning', 'Pilih tanggal terlebih dahulu!', 3000);
+                return;
+            }
+
+            // Show loading
+            $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Loading...');
+            $('#status-alert').hide();
+            $('#summary-stats').hide();
+            $('#sync-btn').hide();
+
+            $.ajax({
+                url: '<?= base_url("hr-outsourcing-attendance/all") ?>',
+                type: 'POST',
+                data: {
+                    company_id: companyId,
+                    date: date,
+                    '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
+                },
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        showAlert('success', `Berhasil memuat ${response.total} data`, 5000);
+                        renderTable(response.data);
+                        updateSummaryStats(response.data);
+                        $('#summary-stats').show();
+                        $('#sync-btn').show();
+                    } else {
+                        showAlert('danger', response.message || 'Gagal memuat data', 5000);
+                        clearTable();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    showAlert('danger', 'Error: ' + (xhr.responseJSON?.message || error), 5000);
+                    clearTable();
+                },
+                complete: function() {
+                    $('#load-btn').prop('disabled', false).html('<i class="fas fa-search"></i> Load');
+                }
+            });
+        });
+
+        // =========================
+        // RENDER TABLE FUNCTION
+        // =========================
+        // =========================
+        function renderTable(data) {
+            const tbody = $('#table-body');
+            tbody.empty();
+
+            if (!data || data.length === 0) {
+                tbody.html(`
+                    <tr>
+                        <td colspan="8" class="text-center py-4">
+                            <i class="fas fa-database fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Tidak ada data presensi</h5>
+                            <p class="text-muted small">Coba pilih tanggal atau perusahaan lain</p>
+                        </td>
+                    </tr>
+                `);
+                return;
+            }
+
+            // Render table rows langsung dari data (tidak perlu grouping lagi)
+            let no = 1;
+            $.each(data, function(index, emp) {
+                // Format Check In dengan Verified badge
+                const checkInDisplay = emp.check_in 
+                    ? `<div>
+                        <strong class="text-success">${emp.check_in}</strong>
+                        <div><small class="${emp.verified_in === 'Verified' ? 'text-success' : 'text-danger'}">
+                            <i class="fas ${emp.verified_in === 'Verified' ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                            ${emp.verified_in}
+                        </small></div>
+                    </div>`
+                    : '<span class="text-muted">-</span>';
+                
+                // Format Check Out dengan Verified badge
+                const checkOutDisplay = emp.check_out 
+                    ? `<div>
+                        <strong class="text-warning">${emp.check_out}</strong>
+                        <div><small class="${emp.verified_out === 'Verified' ? 'text-success' : 'text-danger'}">
+                            <i class="fas ${emp.verified_out === 'Verified' ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                            ${emp.verified_out}
+                        </small></div>
+                    </div>`
+                    : '<span class="text-muted">-</span>';
+
+                // Badge color berdasarkan verified status
+                const badgeColor = emp.badge_no ? 'info' : 'secondary';
+                const badgeText = emp.badge_no || '-';
+
+                tbody.append(`
+                    <tr>
+                        <td class="text-center">${no++}</td>
+                        <td class="text-center">
+                            <span class="badge badge-${badgeColor}" style="font-size: 1em; padding: 5px 10px;">
+                                <i class="fas fa-id-badge mr-1"></i>${badgeText}
+                            </span>
+                        </td>
+                        <td>
+                            <strong>${emp.name}</strong>
+                            <div class="small text-muted">User ID: ${emp.user_id}</div>
+                        </td>
+                        <td class="text-center">${checkInDisplay}</td>
+                        <td class="text-center">${checkOutDisplay}</td>
+                        <td class="text-center">
+                            <span class="badge badge-${emp.status_class}">
+                                ${emp.status}
+                            </span>
+                        </td>
+                        <td>${emp.company_name}</td>
+                        <td class="text-center">
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-info view-btn" 
+                                    data-user-id="${emp.user_id}"
+                                    data-name="${emp.name}"
+                                    data-badge="${emp.badge_no}"
+                                    data-checkin="${emp.check_in || ''}"
+                                    data-checkout="${emp.check_out || ''}"
+                                    data-status="${emp.status}"
+                                    title="Detail">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-warning edit-btn" 
+                                    data-user-id="${emp.user_id}"
+                                    data-date="${$('#date_filter').val()}"
+                                    title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `);
+            });
         }
 
-        $.ajax({
-            url: '<?= base_url("hr-outsourcing-attendance/listCompanyByDivisi") ?>/' + divisiId,
-            type: 'GET',
-            dataType: 'json',
-            success: function(res) {
-                $companySelect.html('<option value="">Semua Perusahaan</option>');
-                
-                if (res && res.length > 0) {
-                    $.each(res, function(i, item) {
-                        $companySelect.append(`<option value="${item.id}">${item.name}</option>`);
-                    });
-                }
-                
-                $companySelect.prop('disabled', false);
-            },
-            error: function() {
-                $companySelect.html('<option value="">Error loading</option>').prop('disabled', false);
+        // =========================
+        // UPDATE SUMMARY STATS - PERBAIKAN
+        // =========================
+        function updateSummaryStats(data) {
+            if (!data || data.length === 0) {
+                $('#total-employees').text('0');
+                $('#total-checkin').text('0');
+                $('#total-checkout').text('0');
+                $('#total-missing').text('0');
+                return;
             }
+
+            const totalEmployees = data.length;
+            
+            // Count check in dan check out dari data baru
+            const checkInCount = data.filter(item => item.check_in !== null).length;
+            const checkOutCount = data.filter(item => item.check_out !== null).length;
+            
+            // Count status untuk missing
+            const missingCount = data.filter(item => item.status === 'Tidak Masuk').length;
+
+            $('#total-employees').text(totalEmployees);
+            $('#total-checkin').text(checkInCount);
+            $('#total-checkout').text(checkOutCount);
+            $('#total-missing').text(missingCount);
+        }
+
+        // =========================
+        // TAMBAHKAN EVENT UNTUK VIEW BUTTON
+        // =========================
+        $(document).on('click', '.view-btn', function() {
+            const userId = $(this).data('user-id');
+            const name = $(this).data('name');
+            const badge = $(this).data('badge');
+            const checkin = $(this).data('checkin');
+            const checkout = $(this).data('checkout');
+            const status = $(this).data('status');
+            
+            const content = `
+                <div class="attendance-detail">
+                    <div class="row mb-3">
+                        <div class="col-4"><strong>User ID:</strong></div>
+                        <div class="col-8">${userId}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-4"><strong>Nama:</strong></div>
+                        <div class="col-8">${name}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-4"><strong>Badge No:</strong></div>
+                        <div class="col-8">${badge || '-'}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-4"><strong>Check In:</strong></div>
+                        <div class="col-8">${checkin || '<span class="text-muted">-</span>'}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-4"><strong>Check Out:</strong></div>
+                        <div class="col-8">${checkout || '<span class="text-muted">-</span>'}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-4"><strong>Status:</strong></div>
+                        <div class="col-8"><span class="badge badge-${getStatusClass(status)}">${status}</span></div>
+                    </div>
+                </div>
+            `;
+            
+            Swal.fire({
+                title: 'Detail Presensi',
+                html: content,
+                icon: 'info',
+                confirmButtonText: 'Tutup'
+            });
         });
+
+        function getStatusClass(status) {
+            const statusMap = {
+                'Complete': 'success',
+                'Check In Only': 'warning',
+                'Check Out Only': 'info',
+                'Belum Absen': 'danger'
+            };
+            return statusMap[status] || 'secondary';
+        }
+
+        // =========================
+        // SYNC TO DATABASE
+        // =========================
+        $('#sync-btn').on('click', function() {
+            const companyId = $('#company_filter').val();
+            const date = $('#date_filter').val();
+
+            if (!confirm('Sync data presensi ke database?')) return;
+
+            $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Syncing...');
+
+            $.ajax({
+                url: '<?= base_url("hr-outsourcing-attendance/syncToDatabase") ?>',
+                type: 'POST',
+                data: {
+                    company_id: companyId,
+                    date: date,
+                    '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
+                },
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        showAlert('success', `Berhasil sync ${response.synced || 0} data ke database`, 5000);
+                    } else {
+                        showAlert('danger', response.message || 'Gagal sync data', 5000);
+                    }
+                },
+                error: function() {
+                    showAlert('danger', 'Error saat sync data', 5000);
+                },
+                complete: function() {
+                    $('#sync-btn').prop('disabled', false).html('<i class="fas fa-sync"></i> Sync to DB');
+                }
+            });
+        });
+
+        // =========================
+        // HELPER FUNCTIONS
+        // =========================
+        
+
+        function clearTable() {
+            $('#table-body').empty();
+            $('#summary-stats').hide();
+            $('#sync-btn').hide();
+        }
     });
 
-    // =========================
-    // LOAD ATTENDANCE DATA
-    // =========================
-    $('#load-btn').on('click', function() {
-        const companyId = $('#company_filter').val();
-        const date = $('#date_filter').val();
+    function showAlert(type, message, duration = 5000) {
+            const alert = $('#status-alert');
+            alert.removeClass().addClass(`alert alert-${type} alert-dismissible fade show`)
+                .html(`
+                    <strong>${type === 'success' ? 'Success!' : type === 'danger' ? 'Error!' : 'Warning!'}</strong>
+                    ${message}
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                `)
+                .show();
+            
+            if (duration) {
+                setTimeout(() => alert.alert('close'), duration);
+            }
+    }
 
+
+    function printPayrollPDF() {
+        const companyId = $('#company_filter').val();
+        const date = $('#date_filter').val(); // Format: YYYY-MM
+        
         if (!companyId) {
             showAlert('warning', 'Pilih perusahaan terlebih dahulu!', 3000);
             return;
@@ -189,285 +503,122 @@ $(document).ready(function() {
             return;
         }
 
-        // Show loading
-        $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Loading...');
-        $('#status-alert').hide();
-        $('#summary-stats').hide();
-        $('#sync-btn').hide();
-
-        $.ajax({
-            url: '<?= base_url("hr-outsourcing-attendance/all") ?>',
-            type: 'POST',
-            data: {
-                company_id: companyId,
-                date: date,
-                '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
-            },
-            dataType: 'json',
-            success: function(response) {
-                if (response.success) {
-                    showAlert('success', `Berhasil memuat ${response.total} data`, 5000);
-                    renderTable(response.data);
-                    updateSummaryStats(response.data);
-                    $('#summary-stats').show();
-                    $('#sync-btn').show();
-                } else {
-                    showAlert('danger', response.message || 'Gagal memuat data', 5000);
-                    clearTable();
-                }
-            },
-            error: function(xhr, status, error) {
-                showAlert('danger', 'Error: ' + (xhr.responseJSON?.message || error), 5000);
-                clearTable();
-            },
-            complete: function() {
-                $('#load-btn').prop('disabled', false).html('<i class="fas fa-search"></i> Load');
-            }
-        });
-    });
-
-    // =========================
-    // RENDER TABLE FUNCTION
-    // =========================
-    // =========================
-    // RENDER TABLE FUNCTION - PERBAIKAN
-    // =========================
-    function renderTable(data) {
-        const tbody = $('#table-body');
-        tbody.empty();
-
-        if (!data || data.length === 0) {
-            tbody.html(`
-                <tr>
-                    <td colspan="8" class="text-center py-4">
-                        <i class="fas fa-database fa-3x text-muted mb-3"></i>
-                        <h5 class="text-muted">Tidak ada data presensi</h5>
-                        <p class="text-muted small">Coba pilih tanggal atau perusahaan lain</p>
-                    </td>
-                </tr>
-            `);
-            return;
+        // Tentukan periode (1-15 atau 16-31)
+        const day = new Date(date).getDate();
+        const period = day <= 15 ? '1-15' : '16-31';
+        
+        // Tentukan tipe (harian/minggu) - bisa dari dropdown
+        const payrollType = $('#payroll_type').val() || 'harian';
+        
+        // Tentukan tanggal mulai dan akhir
+        const yearMonth = date.substring(0, 7); // YYYY-MM
+        let startDate, endDate;
+        
+        if (period === '1-15') {
+            startDate = yearMonth + '-01';
+            endDate = yearMonth + '-15';
+        } else {
+            const lastDay = new Date(yearMonth + '-01').getDate();
+            startDate = yearMonth + '-16';
+            endDate = yearMonth + '-' + lastDay;
         }
 
-        // Render table rows langsung dari data (tidak perlu grouping lagi)
-        let no = 1;
-        $.each(data, function(index, emp) {
-            // Format Check In dengan Verified badge
-            const checkInDisplay = emp.check_in 
-                ? `<div>
-                    <strong class="text-success">${emp.check_in}</strong>
-                    <div><small class="${emp.verified_in === 'Verified' ? 'text-success' : 'text-danger'}">
-                        <i class="fas ${emp.verified_in === 'Verified' ? 'fa-check-circle' : 'fa-times-circle'}"></i>
-                        ${emp.verified_in}
-                    </small></div>
-                </div>`
-                : '<span class="text-muted">-</span>';
-            
-            // Format Check Out dengan Verified badge
-            const checkOutDisplay = emp.check_out 
-                ? `<div>
-                    <strong class="text-warning">${emp.check_out}</strong>
-                    <div><small class="${emp.verified_out === 'Verified' ? 'text-success' : 'text-danger'}">
-                        <i class="fas ${emp.verified_out === 'Verified' ? 'fa-check-circle' : 'fa-times-circle'}"></i>
-                        ${emp.verified_out}
-                    </small></div>
-                </div>`
-                : '<span class="text-muted">-</span>';
-
-            // Badge color berdasarkan verified status
-            const badgeColor = emp.badge_no ? 'info' : 'secondary';
-            const badgeText = emp.badge_no || '-';
-
-            tbody.append(`
-                <tr>
-                    <td class="text-center">${no++}</td>
-                    <td class="text-center">
-                        <span class="badge badge-${badgeColor}" style="font-size: 1em; padding: 5px 10px;">
-                            <i class="fas fa-id-badge mr-1"></i>${badgeText}
-                        </span>
-                    </td>
-                    <td>
-                        <strong>${emp.name}</strong>
-                        <div class="small text-muted">User ID: ${emp.user_id}</div>
-                    </td>
-                    <td class="text-center">${checkInDisplay}</td>
-                    <td class="text-center">${checkOutDisplay}</td>
-                    <td class="text-center">
-                        <span class="badge badge-${emp.status_class}">
-                            ${emp.status}
-                        </span>
-                    </td>
-                    <td>${emp.company_name}</td>
-                    <td class="text-center">
-                        <div class="btn-group">
-                            <button class="btn btn-sm btn-info view-btn" 
-                                data-user-id="${emp.user_id}"
-                                data-name="${emp.name}"
-                                data-badge="${emp.badge_no}"
-                                data-checkin="${emp.check_in || ''}"
-                                data-checkout="${emp.check_out || ''}"
-                                data-status="${emp.status}"
-                                title="Detail">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="btn btn-sm btn-warning edit-btn" 
-                                data-user-id="${emp.user_id}"
-                                data-date="${$('#date_filter').val()}"
-                                title="Edit">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `);
-        });
-    }
-
-    // =========================
-    // UPDATE SUMMARY STATS - PERBAIKAN
-    // =========================
-    function updateSummaryStats(data) {
-        if (!data || data.length === 0) {
-            $('#total-employees').text('0');
-            $('#total-checkin').text('0');
-            $('#total-checkout').text('0');
-            $('#total-missing').text('0');
-            return;
-        }
-
-        const totalEmployees = data.length;
-        
-        // Count check in dan check out dari data baru
-        const checkInCount = data.filter(item => item.check_in !== null).length;
-        const checkOutCount = data.filter(item => item.check_out !== null).length;
-        
-        // Count status untuk missing
-        const missingCount = data.filter(item => item.status === 'Tidak Masuk').length;
-
-        $('#total-employees').text(totalEmployees);
-        $('#total-checkin').text(checkInCount);
-        $('#total-checkout').text(checkOutCount);
-        $('#total-missing').text(missingCount);
-    }
-
-    // =========================
-    // TAMBAHKAN EVENT UNTUK VIEW BUTTON
-    // =========================
-    $(document).on('click', '.view-btn', function() {
-        const userId = $(this).data('user-id');
-        const name = $(this).data('name');
-        const badge = $(this).data('badge');
-        const checkin = $(this).data('checkin');
-        const checkout = $(this).data('checkout');
-        const status = $(this).data('status');
-        
-        const content = `
-            <div class="attendance-detail">
-                <div class="row mb-3">
-                    <div class="col-4"><strong>User ID:</strong></div>
-                    <div class="col-8">${userId}</div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-4"><strong>Nama:</strong></div>
-                    <div class="col-8">${name}</div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-4"><strong>Badge No:</strong></div>
-                    <div class="col-8">${badge || '-'}</div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-4"><strong>Check In:</strong></div>
-                    <div class="col-8">${checkin || '<span class="text-muted">-</span>'}</div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-4"><strong>Check Out:</strong></div>
-                    <div class="col-8">${checkout || '<span class="text-muted">-</span>'}</div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-4"><strong>Status:</strong></div>
-                    <div class="col-8"><span class="badge badge-${getStatusClass(status)}">${status}</span></div>
-                </div>
-            </div>
-        `;
-        
+        // Tampilkan modal pilihan
         Swal.fire({
-            title: 'Detail Presensi',
-            html: content,
-            icon: 'info',
-            confirmButtonText: 'Tutup'
-        });
-    });
+            title: 'Generate Laporan Gaji',
+            html: `
+                <div class="form-group">
+                    <label>Periode:</label>
+                    <select id="print_period" class="form-control">
+                        <option value="1-15">1-15</option>
+                        <option value="16-31" ${period === '16-31' ? 'selected' : ''}>16-31</option>
+                    </select>
+                </div>
+                <div class="form-group mt-3">
+                    <label>Jenis Gaji:</label>
+                    <select id="print_type" class="form-control">
+                        <option value="harian">Harian</option>
+                        <option value="minggu">Mingguan</option>
+                    </select>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Generate PDF',
+            cancelButtonText: 'Batal',
+            preConfirm: () => {
+                return {
+                    period: $('#print_period').val(),
+                    type: $('#print_type').val()
+                };
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const params = result.value;
+                
+                // Show loading
+                Swal.fire({
+                    title: 'Generating PDF...',
+                    text: 'Sedang memproses laporan',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
 
-    function getStatusClass(status) {
-        const statusMap = {
-            'Complete': 'success',
-            'Check In Only': 'warning',
-            'Check Out Only': 'info',
-            'Belum Absen': 'danger'
-        };
-        return statusMap[status] || 'secondary';
-    }
-
-    // =========================
-    // SYNC TO DATABASE
-    // =========================
-    $('#sync-btn').on('click', function() {
-        const companyId = $('#company_filter').val();
-        const date = $('#date_filter').val();
-
-        if (!confirm('Sync data presensi ke database?')) return;
-
-        $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Syncing...');
-
-        $.ajax({
-            url: '<?= base_url("hr-outsourcing-attendance/syncToDatabase") ?>',
-            type: 'POST',
-            data: {
-                company_id: companyId,
-                date: date,
-                '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
-            },
-            dataType: 'json',
-            success: function(response) {
-                if (response.success) {
-                    showAlert('success', `Berhasil sync ${response.synced || 0} data ke database`, 5000);
-                } else {
-                    showAlert('danger', response.message || 'Gagal sync data', 5000);
-                }
-            },
-            error: function() {
-                showAlert('danger', 'Error saat sync data', 5000);
-            },
-            complete: function() {
-                $('#sync-btn').prop('disabled', false).html('<i class="fas fa-sync"></i> Sync to DB');
+                // AJAX request untuk generate PDF
+                $.ajax({
+                    url: '<?= base_url("hr-outsourcing-attendance/printPayrol") ?>',
+                    type: 'POST',
+                    data: {
+                        company_id: companyId,
+                        start_date: startDate,
+                        end_date: endDate,
+                        period: params.period,
+                        type: params.type,
+                        '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        Swal.close();
+                        
+                        if (response.success) {
+                            // Download PDF
+                            downloadPDF(response.data, response.filename);
+                            showAlert('success', 'PDF berhasil di-generate', 3000);
+                        } else {
+                            showAlert('danger', response.message || 'Gagal generate PDF', 5000);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.close();
+                        showAlert('danger', 'Error: ' + error, 5000);
+                    }
+                });
             }
         });
-    });
+    }
 
-    // =========================
-    // HELPER FUNCTIONS
-    // =========================
-    function showAlert(type, message, duration = 5000) {
-        const alert = $('#status-alert');
-        alert.removeClass().addClass(`alert alert-${type} alert-dismissible fade show`)
-            .html(`
-                <strong>${type === 'success' ? 'Success!' : type === 'danger' ? 'Error!' : 'Warning!'}</strong>
-                ${message}
-                <button type="button" class="close" data-dismiss="alert">&times;</button>
-            `)
-            .show();
+    // Fungsi untuk download PDF
+    function downloadPDF(base64Data, fileName) {
+        // Decode base64 to blob
+        const byteCharacters = atob(base64Data);
+        const byteNumbers = new Array(byteCharacters.length);
         
-        if (duration) {
-            setTimeout(() => alert.alert('close'), duration);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
         }
+        
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'application/pdf' });
+        
+        // Create download link
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
-
-    function clearTable() {
-        $('#table-body').empty();
-        $('#summary-stats').hide();
-        $('#sync-btn').hide();
-    }
-});
 </script>
 
 <style>

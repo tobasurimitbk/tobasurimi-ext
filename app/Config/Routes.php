@@ -34,6 +34,7 @@ $routes->set404Override();
 $routes->get('/', 'Setting\Auth::login');
 $routes->post('/login', 'Setting\Auth::doLogin');
 $routes->get('/logout', 'Setting\Auth::doLogout');
+$routes->post('/update-password', 'Setting\Auth::updatePassword');
 
 
 $routes->get('/change-company', 'Setting\User::changeCompany');
@@ -571,13 +572,19 @@ $routes->get('/pembayaran-invoice-export/id/(:segment)', 'Pembayaran\PembayaranI
 $routes->get('/pembayaran-invoice-export/all', 'Pembayaran\PembayaranInvoice::getAllPembayaranInvoiceExport', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice-export/all-invoice-export', 'Pembayaran\PembayaranInvoice::getAllDataInvoiceExport', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice-export/check-unpaid', 'Pembayaran\PembayaranInvoice::checkUnpaidInvoiceExport', ['filter' => 'Auth']);
+$routes->post('/pembayaran-invoice-export/update', 'Pembayaran\PembayaranInvoice::updateExport', ['filter' => 'Auth']);
 
 //pembayaran proforma invoice
 $routes->get('/pembayaran-proforma-invoice', 'Pembayaran\PembayaranInvoice::indexProformaInvoice', ['filter' => 'Auth']);
 $routes->get('/pembayaran-proforma-invoice/id/(:segment)', 'Pembayaran\PembayaranInvoice::getById/$1', ['filter' => 'Auth']);
 $routes->get('/pembayaran-proforma-invoice/all', 'Pembayaran\PembayaranInvoice::getAllPembayaranProformaInvoice', ['filter' => 'Auth']);
 $routes->get('/pembayaran-proforma-invoice/all-proforma-invoice', 'Pembayaran\PembayaranInvoice::getAllDataProformaInvoice', ['filter' => 'Auth']);
+$routes->get('/pembayaran-proforma-invoice/all-proforma-invoice-term/id/(:segment)', 'Pembayaran\PembayaranInvoice::getAllDataProformaInvoiceTerm/$1', ['filter' => 'Auth']);
+$routes->get('/pembayaran-proforma-invoice/get-detail-data-proforma-invoice/id/(:segment)', 'Pembayaran\PembayaranInvoice::getDataDetailProformaInvoice/$1', ['filter' => 'Auth']);
 $routes->get('/pembayaran-proforma-invoice/check-unpaid', 'Pembayaran\PembayaranInvoice::checkUnpaidProformaInvoice', ['filter' => 'Auth']);
+$routes->post('/pembayaran-proforma-invoice/posting', 'Pembayaran\PembayaranInvoice::postingPI', ['filter' => 'Auth']);
+$routes->post('/pembayaran-proforma-invoice/unpostingPI', 'Pembayaran\PembayaranInvoice::unpostingPI', ['filter' => 'Auth']);
+$routes->post('/pembayaran-proforma-invoice/update', 'Pembayaran\PembayaranInvoice::updatePI', ['filter' => 'Auth']);
 
 
 // SALES LOKAL

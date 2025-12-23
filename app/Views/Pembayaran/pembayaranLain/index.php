@@ -257,7 +257,7 @@
 <section class="section">
     <div class="section-header">
         <h1>Pembayaran Lain - Lain</h1>
-        <?php if (can('Pembayaran', 'Lain - Lain', 'c')) : ?>
+        <?php if (can('Transaksi Lokal', 'Lain - Lain', 'c')) : ?>
             <a class="btn btn-show-form btn-add float-right" href="#">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </a>
@@ -403,7 +403,7 @@
                     
                     if (status_posting == '0') {
                         // Unposted state - show delete and post buttons
-                        <?php if (can('Pembayaran', 'Lain - Lain', 'd')) : ?>
+                        <?php if (can('Transaksi Lokal', 'Lain - Lain', 'd')) : ?>
                             buttons += `
                                 <button onclick="remove('${id}')" 
                                         class="btn btn-danger"
@@ -412,7 +412,7 @@
                                 </button>`;
                         <?php endif; ?>
                         
-                        <?php if (can('Pembayaran', 'Lain - Lain', 'a')) : ?>
+                        <?php if (can('Transaksi Lokal', 'Lain - Lain', 'a')) : ?>
                             buttons += `
                                 <button onclick="posting('${id}', '1')" 
                                         class="btn btn-success"
@@ -422,7 +422,7 @@
                         <?php endif; ?>
                     } else {
                         // Posted state - show unpost button
-                        <?php if (can('Pembayaran', 'Lain - Lain', 'a')) : ?>
+                        <?php if (can('Transaksi Lokal', 'Lain - Lain', 'a')) : ?>
                             buttons += `
                                 <button onclick="posting('${id}', '0')" 
                                         class="btn btn-warning"

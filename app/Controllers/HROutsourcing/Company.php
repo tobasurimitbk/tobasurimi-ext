@@ -94,18 +94,6 @@ class Company extends BaseController
         $address = $this->request->getVar('address');
         $ip_finger = $this->request->getVar('ip_finger');
 
-        // $check = $this->hrOutsourcingCompanyModel->where('company_id', $this->this_company_id)
-        //     ->where('name', $name)
-        //     ->first();
-
-        // if ($check != null) {
-        //     return response()->setJSON([
-        //         'message' => "Data Company Sudah ada",
-        //         'status' => false,
-        //         'token' => csrf_hash()
-        //     ]);
-        // }
-
         $this->hrOutsourcingCompanyModel->insert([
             'company_id' => $this->this_company_id,
             'divisi_id' => $divisiId,
@@ -128,20 +116,6 @@ class Company extends BaseController
         $divisiId = $this->request->getVar('divisi_id');
         $address = $this->request->getVar('address');
         $ip_finger = $this->request->getVar('ip_finger');
-
-        // $check = $this->hrOutsourcingCompanyModel
-        //     ->where('company_id', $this->this_company_id)
-        //     ->where('name', $name)
-        //     ->where('id !=', $id)
-        //     ->first();
-
-        // if ($check != null) {
-        //     return response()->setJSON([
-        //         'message' => "Data Company Sudah ada",
-        //         'status' => false,
-        //         'token' => csrf_hash()
-        //     ]);
-        // }
 
         $this->hrOutsourcingCompanyModel->update($id, [
             'company_id' => $this->this_company_id,

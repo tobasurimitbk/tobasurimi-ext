@@ -169,13 +169,15 @@ class KursModel extends Model
         return $data;
     }
 
-    public function getKursCurrent($metadata_id, $end_date)
+    public function getKursCurrent($metadata_id, $date)
     {
         return $this->asArray()
             ->where('metadata_id', $metadata_id)
-            ->where('start_date <=', $end_date)
-            ->where('end_date <=', $end_date)
-            ->where('deletedAt', NULL)
+            ->where('start_date <=', $date)
+            ->where('end_date >=', $date)
+            ->where('deletedAt', null)
+            ->orderBy('start_date', 'DESC')
             ->first();
     }
+
 }
