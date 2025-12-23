@@ -60,8 +60,8 @@ class StockFisik extends BaseController
         $stockFisikData = $this->stockRevampModel->allStockFisik(
             $condition,
             $addCondition,
-            $limit,
-            $offset
+            100000000,
+            0,
         );
 
         $dataPemasukkanTotal = $this->getTotalPemasukkan();
@@ -103,11 +103,38 @@ class StockFisik extends BaseController
             ]);
         }
 
+        /**
+         * ==================================================
+         * FILTER: BUANG YANG QTY = 0 SEMUA
+         * ==================================================
+         */
+        $filteredStock = array_values(array_filter($dataStockFisik, function ($row) {
+            return !(
+                $row['total_qty'] == 0
+            );
+        }));
+
+        $totalFiltered = count($filteredStock);
+
+        /**
+         * ==================================================
+         * RE PAGINATION (array_slice)
+         * ==================================================
+         */
+        $paginatedData = array_slice($filteredStock, $offset, $limit);
+
+        // reset nomor urut
+        $no = $offset + 1;
+        foreach ($paginatedData as &$row) {
+            $row['no'] = $no++;
+        }
+        unset($row);
+
         $data = [
             "draw"              => intval($this->request->getGet("draw")),
-            "recordsTotal"      => $stockFisikData['totalData'],
-            "recordsFiltered"   => $stockFisikData['totalFilteredData'],
-            "data"              => $dataStockFisik,
+            "recordsTotal"      => $totalFiltered,
+            "recordsFiltered"   => $totalFiltered,
+            "data"              => $paginatedData,
             "payload"           => $payload
         ];
 

@@ -5,14 +5,12 @@
 <section class="section">
     <div class="section-header">
         <h1>Laporan Mutasi Barang Scrap</h1>
-        <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false" style="margin-right: -1px;">
-            Export
-        </button>
-        <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-            <li><button class="dropdown-item pdf" onclick="pdfExcel('<?= base_url("/laporan-bea-cukai/laporan-mutasi/print"); ?>')">PDF</button></li>
-            <li><button class="dropdown-item pdf" onclick="pdfExcel('<?= base_url("/laporan-bea-cukai/laporan-mutasi/excel"); ?>')">Excel</button></li>
-        </ul>
         <div class="col-button-tambah-spp">
+            <?php if (can('Laporan', 'Bea Cukai', 'p')): ?>
+                <a class="btn btn-warning btn-print float-right" href="#" id="btnExport">
+                    <i class="fa fa-download"></i> Export
+                </a>
+            <?php endif; ?>
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("laporan-bea-cukai"); ?>">
                 Kembali
             </a>
@@ -21,24 +19,12 @@
 
     <div class="card">
         <div class="card-body">
-
             <div class="row ">
                 <div class="col-md-2">
-                    <div class="form-floating mb-3">
-                        <select class="form-select kategori_barang" name="kategori_barang" id="kategori_barang">
-                            <option value="ALL" selected>SEMUA BARANG</option>
-                            <?php foreach ($tipeBarang as $t): ?>
-                                <option value="<?= $t['description'] ?>"><?= strtoupper($t['value']) ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <label style="z-index: 1;">Kategori Barang</label>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="input-group mb-3">
+                    <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
-                            <input placeholder="" class="form-control dateStart" id="dateStart" name="dateStart" aria-label="Floating label select example" value="<?= date('d/m/Y', strtotime(date('Y-m-01'))) ?>" />
-                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Awal</label>
+                            <input value="01/<?= date('m/Y') ?>" placeholder="" class="form-control dateStart" id="dateStart" name="dateStart" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tgl Awal</label>
                         </div>
                         <div class="input-group-append" style="height:50px;">
                             <button disabled class="btn btn-secondary" type="button">
@@ -48,10 +34,10 @@
                     </div>
                 </div>
                 <div class="col-md-2">
-                    <div class="input-group mb-3">
+                    <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
-                            <input placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" aria-label="Floating label select example" />
-                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Akhir</label>
+                            <input value="<?= date('d/m/Y') ?>" placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tgl Akhir</label>
                         </div>
                         <div class="input-group-append" style="height:50px;">
                             <button disabled class="btn btn-secondary" type="button">
@@ -62,31 +48,27 @@
                 </div>
                 <div class="col-md-2">
                     <div class="form-floating mb-3">
-                        <select class="form-select divisi_id" name="divisi_id" id="divisi_id" onchange="getListWarehouse()">
-                            <option disabled selected value=""></option>
-                            <?php foreach ($dataDivisi as $d) : ?>
-                                <option value="<?= $d['id'] ?>">
-                                    <?= $d['divisi']; ?>
-                                </option>
-                            <?php endforeach; ?>
+                        <select class="form-select type_barang" name="type_barang" id="type_barang">
+                            <option value="bahan_scrap" selected>BARANG SCRAP</option>
                         </select>
-                        <label style="z-index: 1;">Pilih Departemen</label>
+                        <label style="z-index: 1;">Pilih Tipe Barang</label>
                     </div>
                 </div>
-                <div class="col-md-2">
-                    <div class="form-floating mb-3">
-                        <select class="form-select warehouse_id" name="warehouse_id" id="warehouse_id">
-                            <option disabled selected value=""></option>
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input type="text" name="search" id="search" class="form-control search" placeholder="Cari Data">
+                            <label style="z-index: 1;">Cari Data</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <button type="button" class="btn btn-lg" style="height: 45px; background-color:#B8522A; color:whitesmoke;" onclick="handleFilter()">
+                        <span style="font-size: 15px;">
+                            <i class="fas fa-search"></i> Filter
+                        </span>
+                    </button>
 
-                        </select>
-                        <label style="z-index: 1;">Pilih Warehouse</label>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-floating mb-3">
-                        <input type="text" name="search" id="search" class="form-control search" placeholder="Cari Data">
-                        <label style="z-index: 1;">Cari Data</label>
-                    </div>
                 </div>
             </div>
 
@@ -95,20 +77,16 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No</th>
-                                <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
-                                <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>
-                                <th onclick="changeSort('satuan')">Satuan</th>
-                                <th onclick="changeSort('kategori_barang')">Tipe Barang</th>
-                                <th onclick="changeSort('jenis_kategori')">Kategori Barang</th>
-                                <th onclick="changeSort('divisi')">Departemen</th>
-                                <th onclick="changeSort('warehouse')">Warehouse</th>
-                                <th>Stok Awal</th>
-                                <th>Pemasukan</th>
-                                <th>Pengeluaran</th>
-                                <th>Penyesuaian</th>
-                                <th>Stok Akhir</th>
-                                <th>Dead Stok</th>
+                                <th onclick="changeSort('barang_master.parent_type_id')">No</th>
+                                <th onclick="changeSort('barang_master.parent_type_id')">Kategori</th>
+                                <th onclick="changeSort('barang_master.kode_barang')">Kode Barang</th>
+                                <th onclick="changeSort('barang_master.barang_name')">Barang</th>
+                                <th onclick="changeSort('barang_master_spesifikasi.satuan_1')">Satuan</th>
+                                <th>Awal</th>
+                                <th>Masuk</th>
+                                <th>Keluar</th>
+                                <th>Akhir</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table">
@@ -119,21 +97,16 @@
         </div>
     </div>
 </section>
-
 <script>
-    const csrfToken = '<?= csrf_token() ?>';
-    let sort = "stock.createdAt";
-    let sortType = "desc";
-    let kategori_barang = ["bahan_scrap"];
+    var csrfToken = '<?= csrf_token() ?>';
+    var sort = "barang_master.barang_name";
+    var sortType = "asc";
 
-    var table = $('.dataTable').DataTable({
-
+    var dataTable = $('#dataTable').DataTable({
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [
-            [1, 'asc']
-        ],
+        order: [],
         fixedHeader: true,
         lengthMenu: [
             [25],
@@ -141,94 +114,94 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("laporan-bea-cukai/all-mutasi-barang"); ?>",
-            dataSrc: "data",
-            data: function(data) {
-                data.kategori_barang = JSON.stringify(kategori_barang);
-                data.date_start = $(".dateStart").val();
-                data.date_end = $(".dateEnd").val();
-                data.divisi_id = $('.divisi_id').val();
-                data.warehouse_id = $('.warehouse_id').val();
-                data.search = $('.search').val();
-                data.sort = sort;
-                data.sortType = sortType;
+            url: "<?= base_url('laporan-bea-cukai/mutasi/all') ?>",
+            type: "GET",
+            data: function(d) {
+                d.dateStart = $('#dateStart').val();
+                d.dateEnd = $('#dateEnd').val();
+                d.type_barang = $('#type_barang').val();
+                d.search = $('#search').val();
+                d.sort = sort;
+                d.sortType = sortType;
+            }
+        },
+        columns: [{
+                data: 'no',
+                orderable: false
             },
+            {
+                data: 'parent_name'
+            },
+            {
+                data: 'kode_barang'
+            },
+            {
+                data: 'barang_name'
+            },
+            {
+                data: 'kode_satuan'
+            },
+            {
+                data: 'awal',
+                render: function(data) {
+                    if (data != "") {
+                        return greatFormatRupiah(parseFloat(data).toFixed(2));
+                    }
+                    return "";
+                }
+            },
+            {
+                data: 'masuk',
+                render: function(data) {
+                    if (data != "") {
+                        return greatFormatRupiah(parseFloat(data).toFixed(2));
+                    }
+                    return "";
+                }
+            },
+            {
+                data: 'keluar',
+                render: function(data) {
+                    if (data != "") {
+                        return greatFormatRupiah(parseFloat(data).toFixed(2));
+                    }
+                    return "";
+                }
+            },
+            {
+                data: 'akhir',
+                render: function(data) {
+                    if (data != "") {
+                        return greatFormatRupiah(parseFloat(data).toFixed(2));
+                    }
+                    return "";
+                }
+            },
+            {
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let id = row.id;
+                    return `
+                        <div class="mt-0 actions">
+                            <a href="javascript:void(0)" onclick="detail('${id}')" data-toggle="tooltip" title="Detail Stok" class="btn btn-success posting-spp actions">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </div>
+                    `
+                }
+            }
+        ],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
         },
-        // scrollX: true,
-        "initComplete": function(settings, json) {
-            $('.dataTables_length').empty();
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-        },
-        //responsive: true,
         display: "stripe",
         searching: false,
-        columns: [{
-                data: "no",
-                className: "text-center",
-                sortable: false
-            },
-            {
-                data: "kode_barang",
-                className: "text-center",
-
-            },
-            {
-                data: "nama_barang",
-                className: "text-center",
-
-            },
-            {
-                data: "satuan",
-                className: "text-center",
-            },
-            {
-                data: "kategori_barang",
-                className: "text-center",
-            },
-            {
-                data: "jenis_kategori",
-                className: "text-center",
-            },
-            {
-                data: "divisi",
-                className: "text-center",
-            },
-            {
-                data: "warehouse",
-                className: "text-center",
-            },
-            {
-                data: "stok_awal",
-                className: "text-center",
-                sortable: false
-            },
-            {
-                data: "stok_pemasukan",
-                className: "text-center",
-                sortable: false
-            },
-            {
-                data: "stok_pengeluaran",
-                className: "text-center",
-                sortable: false
-            },
-            {
-                data: "stok_penyesuaian",
-                className: "text-center",
-                sortable: false
-            },
-            {
-                data: "stok_akhir",
-                className: "text-center",
-                sortable: false
-            },
-            {
-                data: "stok_dead",
-                className: "text-center",
-                sortable: false
-            },
-        ],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -240,61 +213,79 @@
                 previous: '<i class="fa fa-angle-left"></i>',
                 next: '<i class="fa fa-angle-right"></i>'
             }
-        }
+        },
     });
 
-
-    $(".dateStart").datepicker({
+    $(".dateStart,.dateEnd").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
         autoclose: true
-    })
+    });
 
-    $(".dateEnd").datepicker({
-        todayHighlight: true,
-        format: "dd/mm/yyyy",
-        orientation: "bottom auto",
-        autoclose: true
-    })
-    $('#kategori_barang').select2({
-        placeholder: "Pilih Kategori Barang",
+    $('#type_barang').select2({
+        placeholder: "Pilih Tipe Barang",
         theme: "bootstrap-5",
         allowClear: false
     });
-    $('#divisi_id').select2({
-        placeholder: "Pilih Departemen",
-        theme: "bootstrap-5",
-        allowClear: true
-    });
-    $('#warehouse_id').select2({
-        placeholder: "Pilih Warehouse",
-        theme: "bootstrap-5",
-        allowClear: true
-    });
-    $('.icon-dateStart').click(function() {
-        $(".dateStart").focus();
-    });
 
-    $('.icon-dateEnd').click(function() {
-        $(".dateEnd").focus();
-    });
+    $("#divisi_id,#warehouse_id,#type_barang")
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('.divisi_id, .dateStart, .dateEnd, .warehouse_id, .kategori_barang').change(function() {
-        // kategori change
-        var selectedKategori = $('#kategori_barang option:selected').val();
-        if (selectedKategori == "ALL") {
-            kategori_barang = ['bahan_scrap'];
+
+    function handleFilter() {
+        dataTable.ajax.reload();
+    }
+
+    function detail(id) {
+        const width = 800;
+        const height = 600;
+        const left = window.innerWidth / 2 - width / 2;
+        const top = window.innerHeight / 2 - height / 2;
+        const dateStart = $('#dateStart').val();
+        const dateEnd = $('#dateEnd').val();
+        if (dateStart == '' || dateEnd == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pilih tanggal mulai & tanggal selesai',
+                confirmButtonColor: '#4e73df',
+            });
+            return;
         } else {
-            kategori_barang = ['bahan_scrap'];
+            window.open(
+                "<?= base_url('laporan-bea-cukai/mutasi/id/') ?>" + id + "?dateStart=" + dateStart + "&dateEnd=" + dateEnd,
+                "_blank",
+                `width=${width},height=${height},top=${top},left=${left},resizable=yes`
+            );
         }
-        table.ajax.reload();
-    });
 
-    $('.search').keyup(function() {
-        table.ajax.reload();
-    });
 
+    }
+
+    $('#btnExport').click(function(e) {
+        e.preventDefault();
+        var dateStart = $('#dateStart').val();
+        var dateEnd = $('#dateEnd').val();
+        var typeBarang = $('#type_barang').val();
+
+        if (dateStart == '' || dateEnd == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pilih tanggal mulai & tanggal selesai',
+                confirmButtonColor: '#4e73df',
+            });
+
+            return;
+        } else {
+            var url = "<?= base_url('laporan-bea-cukai/mutasi/excel') ?>" + '?dateStart=' + dateStart + '&dateEnd=' + dateEnd + '&type_barang=' + typeBarang;
+            window.location.href = url;
+        }
+    });
     const changeSort = function(val) {
         if (sort !== val) {
             sortType = "asc";
@@ -303,51 +294,7 @@
             sortType = sortType === "asc" ? "desc" : "asc";
         }
     }
-
-    $("#kategori_barang,#divisi_id,#warehouse_id")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
-
-    const pdfExcel = function(url) {
-        let date_start = $(".dateStart").val();
-        let date_end = $(".dateEnd").val();
-        let divisi_id = $(".divisi_id").val();
-        let warehouse_id = $('.warehouse_id').val();
-        let search = $(".search").val();
-        // let sort = "stock_details2.createdAt";
-        // let sortType = "desc";
-        window.open(url + `?kategori_barang=${JSON.stringify(kategori_barang)}&date_start=${date_start}&date_end=${date_end}&divisi_id=${divisi_id}&bsearch=${search}&warehouse_id=${warehouse_id}&sort=${sort}&sortType=${sortType}`, "_blank");
-    }
-
-    function getListWarehouse() {
-        // GET WAREHOUSES
-        $.ajax({
-            url: `<?= base_url('proses-rebus/warehouse'); ?>`,
-            method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            data: {
-                divisi_id: $("#divisi_id option:selected").val(),
-            },
-            dataType: "json",
-            success: function(res) {
-                $("#warehouse_id").empty()
-                $("#warehouse_id").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $("#warehouse_id").append(`<option value="${item.id}">${item.warehouse_name}</option>`)
-                })
-                $("#warehouse_id").val();
-            }
-        });
-    }
 </script>
+
 
 <?= $this->endSection(); ?>

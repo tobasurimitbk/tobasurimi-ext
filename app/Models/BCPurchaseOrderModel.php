@@ -1978,6 +1978,11 @@ class BCPurchaseOrderModel extends Model
             $whereBc27In[] = "stock_revamp.barang_master_id = '$condition[barang_master_id]'";
         }
 
+        if (!empty($condition['spesifikasi_id'])) {
+            $where[] = "penerimaan_barang_detail.spesifikasi_id='$condition[spesifikasi_id]'";
+            $whereBc27In[] = "stock_revamp.spesifiksi_id='$condition[spesifikasi_id]'";
+        }
+
         if (!empty($condition['company_id'])) {
             $where[] = "penerimaan_barang.company_id = '$condition[company_id]'";
             $whereBc27In[] = "penerimaan_mutasi_global.company_penerima_id = '$condition[company_id]'";
@@ -2056,6 +2061,7 @@ class BCPurchaseOrderModel extends Model
         (
             -- BAHAN BAKU LOKAL
             SELECT 
+                penerimaan_barang_detail.spesifikasi_id,
                 penerimaan_barang_detail.barang_id,
                 metadata.value AS jenis_doc,
                 bc_purchase_order.no_aju,
@@ -2101,6 +2107,7 @@ class BCPurchaseOrderModel extends Model
         (
             -- BAHAN PENOLONG LOKAL
             SELECT
+                penerimaan_barang_detail.spesifikasi_id,
                 penerimaan_barang_detail.barang_id,
                 metadata_jenisdoc.value AS jenis_doc,
                 bc_purchase_order.no_aju,
@@ -2147,6 +2154,7 @@ class BCPurchaseOrderModel extends Model
         (
             -- BAHAN PENOLONG IMPORT
             SELECT
+                penerimaan_barang_detail.spesifikasi_id,
                 penerimaan_barang_detail.barang_id,
                 metadata_jenisdoc.value AS jenis_doc,
                 bc_purchase_order.no_aju,
@@ -2193,6 +2201,7 @@ class BCPurchaseOrderModel extends Model
         (
             -- BAHAN BAKU IMPORT
             SELECT
+                penerimaan_barang_detail.spesifikasi_id,
                 penerimaan_barang_detail.barang_id,
                 metadata_jenisdoc.value AS jenis_doc,
                 bc_purchase_order.no_aju,
@@ -2239,6 +2248,7 @@ class BCPurchaseOrderModel extends Model
         (
             -- BC 2.7 IN
             SELECT
+                stock_revamp.spesifikasi_id AS spesifikasi_id,
                 stock_revamp.barang_master_id AS barang_id,
                 'BC 2.7 In' AS jenis_doc,
                 bc_27.no_aju,
