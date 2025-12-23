@@ -1174,33 +1174,24 @@ class BCPurchaseOrderModel extends Model
         $db = \Config\Database::connect();
         $where = [];
         $whereBc27In = [];
-        $wherePpbkbIn = [];
 
         if (!empty($condition['dateStart']) && !empty($condition['dateEnd'])) {
             $where[] = "DATE(bc_purchase_order.createdAt) BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
             $whereBc27In[] = "DATE(bc_27.createdAt) BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
-            $wherePpbkbIn[] = "mutasi.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
         }
 
         if (!empty($condition['dateStartLpb']) && !empty($condition['dateEndLpb'])) {
             $where[] = "penerimaan_barang.tanggal BETWEEN '$condition[dateStartLpb]' AND '$condition[dateEndLpb]'";
         }
 
-        // if ($condition['bc_id'] != "") {
-        //     $where[] = "penerimaan_barang.bc_type = '$condition[bc_id]'";
-        //     $where[] = "bc_purchase_order.no_daftar IS NOT NULL AND bc_purchase_order.no_aju IS NOT NULL";
-        // }
-
         if (!empty($condition['barang_master_id'])) {
             $where[] = "penerimaan_barang_detail.barang_id = '$condition[barang_master_id]'";
             $whereBc27In[] = "stock_revamp.barang_master_id = '$condition[barang_master_id]'";
-            $wherePpbkbIn[] = "stock_revamp.barang_master_id = '$condition[barang_master_id]'";
         }
 
         if (!empty($condition['company_id'])) {
             $where[] = "penerimaan_barang.company_id = '$condition[company_id]' AND barang_master.company_id = '$condition[company_id]'";
             $whereBc27In[] = "penerimaan_mutasi_global.company_penerima_id = '$condition[company_id]'";
-            $wherePpbkbIn[] = "penerimaan_mutasi.company_id = '$condition[company_id]'";
         }
         if (!empty($condition['divisi_id'])) {
             $where[] = "penerimaan_barang.divisi_id = '$condition[divisi_id]'";
@@ -1216,7 +1207,6 @@ class BCPurchaseOrderModel extends Model
         }
 
         $searchBc27In = "";
-        $searchPpbkbIn = "";
         $search = $db->escapeLikeString($condition['search']);
         if (!empty($condition['search'])) {
             $where[] = "(
@@ -1235,19 +1225,10 @@ class BCPurchaseOrderModel extends Model
                 OR penerimaan_mutasi_global.penerimaan_mutasi_no LIKE '%{$search}%' 
                 OR mutasi_global.no_mutasi LIKE '%{$search}%' 
             )";
-
-            $searchPpbkbIn = "AND (
-                ppbkb.no_ppbkb LIKE '%{$search}%' 
-                OR barang_master.kode_barang LIKE '%{$search}%' 
-                OR CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) LIKE '%{$search}%'
-                OR penerimaan_mutasi.penerimaan_mutasi_no LIKE '%{$search}%' 
-                OR mutasi.no_mutasi LIKE '%{$search}%' 
-            )";
         }
 
         $filterCondition = !empty($where) ? " AND " . implode(" AND ", $where) : "";
         $filterConditionBc27In = !empty($whereBc27In) ? " AND " . implode(" AND ", $whereBc27In) : "";
-        $filterConditionBcPpbkbIn = !empty($wherePpbkbIn) ? " AND " . implode(" AND ", $wherePpbkbIn) : "";
 
         $columns = [
             'id',
@@ -1501,45 +1482,6 @@ class BCPurchaseOrderModel extends Model
                     $filterConditionBc27In
                     $searchBc27In
                 )
-                UNION ALL
-                (
-                    SELECT
-                        1426 AS bc_type,
-                        'PPBKB In' AS jenis_doc,
-                        ppbkb.no_ppbkb AS no_aju,
-                        '' AS no_daftar,
-                        ppbkb.tanggal AS tanggal_daftar,
-                        penerimaan_mutasi.penerimaan_mutasi_no AS no_penerimaan_barang,
-                        ppbkb.tanggal AS tanggal_lpb,
-                        '' AS no_order,
-                        divisis.divisi AS divisi,
-                        warehouses.warehouse_name,
-                        '' AS supplier_name,
-                        barang_master.kode_barang,
-                        barang_master.barang_name,
-                        barang_master_spesifikasi.spesifikasi,
-                        '' AS qty_order,
-                        penerimaan_mutasi_detail.qty AS qty_diterima,
-                        satuans.kode_satuan,
-                        '' AS valas,
-                        '' AS total_harga,
-                        '' AS keterangan
-                    FROM penerimaan_mutasi_detail
-                    LEFT JOIN penerimaan_mutasi ON penerimaan_mutasi.id = penerimaan_mutasi_detail.penerimaan_mutasi_id
-                    LEFT JOIN ppbkb ON ppbkb.id = penerimaan_mutasi.ppbkb_id
-                    LEFT JOIN mutasi ON mutasi.id = penerimaan_mutasi_detail.mutasi_id
-                    LEFT JOIN divisis ON divisis.id = mutasi.divisi_tujuan_id 
-                    LEFT JOIN warehouses ON warehouses.id = mutasi.warehouse_tujuan_id
-                    LEFT JOIN stock_revamp_detail ON stock_revamp_detail.id = penerimaan_mutasi_detail.stock_detail_id
-                    LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
-                    LEFT JOIN barang_master ON barang_master.id = stock_revamp.barang_master_id
-                    LEFT JOIN barang_master_spesifikasi ON barang_master_spesifikasi.id = stock_revamp.spesifikasi_id
-                    LEFT JOIN satuans ON satuans.id = stock_revamp.unit_id
-                    WHERE penerimaan_mutasi_detail.deletedAt IS NULL
-                    AND ppbkb.status_posting='1'
-                    $filterConditionBcPpbkbIn
-                    $searchPpbkbIn
-                )
             ) x
         ";
 
@@ -1571,13 +1513,11 @@ class BCPurchaseOrderModel extends Model
         $db = \Config\Database::connect();
 
         $searchBc27Out = "";
-        $searchPpbkbOut = "";
         $searchBc41 = "";
         $searchBc25 = "";
         $searchBc30 = "";
 
         $whereBc27Out = [];
-        $wherePpbkbOut = [];
         $whereBc41 = [];
         $whereBc25 = [];
         $whereBc30 = [];
@@ -1585,7 +1525,6 @@ class BCPurchaseOrderModel extends Model
         /* ================= DATE FILTER ================= */
         if (!empty($condition['dateStart']) && !empty($condition['dateEnd'])) {
             $whereBc27Out[] = "DATE(bc_27.createdAt) BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
-            $wherePpbkbOut[] = "ppbkb.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
             $whereBc41[] = "bc_41.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
             $whereBc25[] = "bc_25.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
             $whereBc30[] = "bc_30.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
@@ -1594,7 +1533,6 @@ class BCPurchaseOrderModel extends Model
         /* ================= COMPANY FILTER ================= */
         if (!empty($condition['company_id'])) {
             $whereBc27Out[] = "bc_27.company_asal_id='$condition[company_id]'";
-            $wherePpbkbOut[] = "ppbkb.company_id='$condition[company_id]'";
             $whereBc41[] = "bc_41.company_id='$condition[company_id]'";
             $whereBc25[] = "bc_25.company_id='$condition[company_id]'";
             $whereBc30[] = "bc_30.company_id='$condition[company_id]'";
@@ -1602,7 +1540,6 @@ class BCPurchaseOrderModel extends Model
 
         if (!empty($condition['divisi_id'])) {
             $whereBc27Out[] = "mutasi_global.divisi_asal_id='$condition[divisi_id]'";
-            $wherePpbkbOut[] = "mutasi.divisi_asal_id='$condition[divisi_id]'";
             $whereBc41[] = "stock_revamp.divisi_id='$condition[divisi_id]'";
             $whereBc25[] = "stock_revamp.divisi_id='$condition[divisi_id]'";
             $whereBc30[] = "stock_revamp.divisi_id='$condition[divisi_id]'";
@@ -1610,7 +1547,6 @@ class BCPurchaseOrderModel extends Model
 
         if (!empty($condition['warehouse_id'])) {
             $whereBc27Out[] = "mutasi_global.warehouse_asal_id='$condition[warehouse_id]'";
-            $wherePpbkbOut[] = "mutasi.warehouse_asal_id='$condition[warehouse_id]'";
             $whereBc41[] = "stock_revamp.warehouse_id='$condition[warehouse_id]'";
             $whereBc25[] = "stock_revamp.warehouse_id='$condition[warehouse_id]'";
             $whereBc30[] = "stock_revamp.warehouse_id='$condition[warehouse_id]'";
@@ -1630,22 +1566,12 @@ class BCPurchaseOrderModel extends Model
                 OR warehouses.warehouse_name LIKE '%{$search}%'
             )";
 
-            $searchPpbkbOut = "AND (
-                ppbkb.no_ppbkb LIKE '%{$search}%'
-                OR barang_master.kode_barang LIKE '%{$search}%'
-                OR barang_master.barang_name LIKE '%{$search}%'
-                OR barang_master_spesifikasi.spesifikasi LIKE '%{$search}%'
-                OR divisis.divisi LIKE '%{$search}%'
-                OR warehouses.warehouse_name LIKE '%{$search}%'
-            )";
-
             $searchBc41 = $searchBc27Out;
             $searchBc25 = $searchBc27Out;
             $searchBc30 = $searchBc27Out;
         }
 
         $filterConditionBc27Out = !empty($whereBc27Out) ? " AND " . implode(" AND ", $whereBc27Out) : "";
-        $filterConditionPpkbOut = !empty($wherePpbkbOut) ? " AND " . implode(" AND ", $wherePpbkbOut) : "";
         $filterConditionBc41 = !empty($whereBc41) ? " AND " . implode(" AND ", $whereBc41) : "";
         $filterConditionBc25 = !empty($whereBc25) ? " AND " . implode(" AND ", $whereBc25) : "";
         $filterConditionBc30 = !empty($whereBc30) ? " AND " . implode(" AND ", $whereBc30) : "";
@@ -1717,44 +1643,6 @@ class BCPurchaseOrderModel extends Model
                     AND bc_27.status_posting = '1'
                     $filterConditionBc27Out
                     $searchBc27Out
-                )
-                UNION ALL
-                (
-                    SELECT 
-                        mutasi_detail.id,
-                        1426 AS bc_id,
-                        'PPBKB Out' AS jenis_doc,
-                        ppbkb.no_ppbkb,
-                        '' AS no_daftar,
-                        ppbkb.tanggal,
-                        mutasi.no_mutasi,
-                        mutasi.tanggal,
-                        divisis.divisi,
-                        warehouses.warehouse_name,
-                        companies.company,
-                        barang_master.kode_barang,
-                        barang_master.barang_name,
-                        barang_master_spesifikasi.spesifikasi,
-                        mutasi_detail.qty_mutasi,
-                        satuans.kode_satuan,
-                        '' AS valas_name,
-                        '' AS sub_total
-                    FROM mutasi_detail
-                    LEFT JOIN mutasi ON mutasi.id = mutasi_detail.mutasi_id
-                    LEFT JOIN stock_revamp_detail ON stock_revamp_detail.id = mutasi_detail.stock_detail_id
-                    LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
-                    LEFT JOIN barang_master ON barang_master.id = stock_revamp.barang_master_id
-                    LEFT JOIN barang_master_spesifikasi ON barang_master_spesifikasi.id = stock_revamp.spesifikasi_id
-                    LEFT JOIN ppbkb_mutasi ON ppbkb_mutasi.mutasi_id = mutasi.id
-                    LEFT JOIN ppbkb ON ppbkb.id = ppbkb_mutasi.ppbkb_id
-                    LEFT JOIN satuans ON satuans.id = mutasi_detail.unit_id_mutasi
-                    LEFT JOIN divisis ON divisis.id = mutasi.divisi_asal_id
-                    LEFT JOIN warehouses ON warehouses.id = mutasi.warehouse_asal_id
-                    LEFT JOIN companies ON companies.id = ppbkb.company_id
-                    WHERE mutasi_detail.deletedAt IS NULL
-                    AND ppbkb.status_posting = '1'
-                    $filterConditionPpkbOut
-                    $searchPpbkbOut
                 )
                 UNION ALL
                 (
@@ -1891,6 +1779,176 @@ class BCPurchaseOrderModel extends Model
         ];
     }
 
+    public function getListLapWip(
+        $condition,
+        $orderColumnIndex,
+        $orderDir,
+        $limit = 10,
+        $offset = 0
+    ) {
+        $db = \Config\Database::connect();
+        $whereBahanBaku = [];
+        $whereBahanPenolong = [];
+        $searchBahanBaku = "";
+        $searchBahanPenolong = "";
+
+        if (!empty($condition['dateStart']) && !empty($condition['dateEnd'])) {
+            $whereBahanBaku[] = "material_requests.production_date BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
+            $whereBahanPenolong[] = "material_requests_penolong.production_date BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
+        }
+
+        if (!empty($condition['company_id'])) {
+            $whereBahanBaku[] = "material_requests.company_id = '$condition[company_id]'";
+            $whereBahanPenolong[] = "material_requests_penolong.company_id = '$condition[company_id]'";
+        }
+
+        if (!empty($condition['divisi_id'])) {
+            $whereBahanBaku[] = "material_request_details.divisi_tujuan_id = '$condition[divisi_id]'";
+            $whereBahanPenolong[] = "material_request_penolong_details.divisi_tujuan_id = '$condition[divisi_id]'";
+        }
+
+        if (!empty($condition['warehouse_id'])) {
+            $whereBahanBaku[] = "material_request_details.warehouse_tujuan_id = '$condition[warehouse_id]'";
+            $whereBahanPenolong[] = "material_request_penolong_details.warehouse_tujuan_id = '$condition[warehouse_id]'";
+        }
+
+        $search = $db->escapeLikeString($condition['search']);
+        if (!empty($condition['search'])) {
+            $searchBahanBaku = "AND (
+                bc_purchase_order.no_daftar LIKE '%{$search}%' 
+                OR bc_purchase_order.no_aju LIKE '%{$search}%' 
+                OR material_requests.req_no LIKE '%{$search}%' 
+                OR barang_master.kode_barang LIKE '%{$search}%' 
+                OR CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) LIKE '%{$search}%'
+            )";
+
+            $searchBahanPenolong = "AND (
+                bc_purchase_order.no_daftar LIKE '%{$search}%' 
+                OR bc_purchase_order.no_aju LIKE '%{$search}%' 
+                OR material_requests_penolong.req_no LIKE '%{$search}%' 
+                OR barang_master.kode_barang LIKE '%{$search}%' 
+                OR CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) LIKE '%{$search}%'
+            )";
+        }
+
+        $filterConditionBahanBaku = !empty($whereBahanBaku) ? " AND " . implode(" AND ", $whereBahanBaku) : "";
+        $filterConditionBahanPenolong = !empty($whereBahanPenolong) ? " AND " . implode(" AND ", $whereBahanPenolong) : "";
+
+        $columns = [
+            'id',
+            'production_date',
+            'work_order_id',
+            'work_order_id', // barang jadi
+            'divisi',
+            'warehouse_name',
+            'req_no',
+            'no_aju',
+            'no_daftar',
+            'tanggal_daftar',
+            'kode_barang',
+            'barang_name',
+            'spesifikasi',
+            'qty',
+            'kode_satuan',
+        ];
+
+        $orderBy = "";
+        if ($orderColumnIndex !== null && isset($columns[$orderColumnIndex])) {
+            $col = $columns[$orderColumnIndex];
+            $dir = strtoupper($orderDir) === 'DESC' ? 'DESC' : 'ASC';
+            $orderBy = " ORDER BY $col $dir ";
+        }
+
+        $baseQuery = "
+        (
+            -- BAHAN BAKU LOKAL & IMPORT
+            SELECT 
+                material_request_details.id,
+                material_requests.production_date,
+                divisis.divisi,
+                warehouses.warehouse_name,
+                material_requests.req_no,
+                bc_purchase_order.no_aju,
+                bc_purchase_order.no_daftar,
+                DATE(bc_purchase_order.createdAt) AS tanggal_daftar,
+                barang_master.kode_barang,
+                barang_master.barang_name,
+                IFNULL(GROUP_CONCAT(DISTINCT barang_master_spesifikasi.spesifikasi SEPARATOR ', '), '') AS spesifikasi,
+                material_request_details.qty,
+                material_request_details.satuan AS kode_satuan,
+                material_requests.work_order_id
+            FROM material_request_details
+            LEFT JOIN material_requests ON material_requests.id = material_request_details.material_request_id
+            LEFT JOIN stock_revamp_detail ON stock_revamp_detail.id = material_request_details.stock_detail_id
+            LEFT JOIN penerimaan_barang ON penerimaan_barang.id = stock_revamp_detail.reference_id
+            LEFT JOIN bc_purchase_order_lpb ON bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id
+            LEFT JOIN bc_purchase_order ON bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id
+            LEFT JOIN divisis ON divisis.id = material_request_details.divisi_tujuan_id 
+            LEFT JOIN warehouses ON warehouses.id = material_request_details.warehouse_tujuan_id
+            LEFT JOIN barang_master ON barang_master.id = material_request_details.barang1_id
+            LEFT JOIN barang_master_spesifikasi ON barang_master_spesifikasi.id = material_request_details.barang2_id
+            WHERE material_request_details.deletedAt IS NULL
+            AND stock_revamp_detail.type_bc != 'NON PABEAN' -- KECUALIKAN YANG NON PABEAN
+            AND material_request_details.kondisi_barang='request'
+            AND penerimaan_barang.tipe_bahan='BAKU'
+            AND stock_revamp_detail.reference_type='LPB'
+            $filterConditionBahanBaku
+            $searchBahanBaku
+            GROUP BY bc_purchase_order.no_aju, barang_master.barang_name
+        )
+        UNION ALL
+        (
+            -- BAHAN PENOLONG LOKAL & IMPORT
+            SELECT 
+                material_request_penolong_details.id,
+                material_requests_penolong.production_date,
+                divisis.divisi,
+                warehouses.warehouse_name,
+                material_requests_penolong.req_no,
+                bc_purchase_order.no_aju,
+                bc_purchase_order.no_daftar,
+                DATE(bc_purchase_order.createdAt) AS tanggal_daftar,
+                barang_master.kode_barang,
+                barang_master.barang_name,
+                IFNULL(GROUP_CONCAT(DISTINCT barang_master_spesifikasi.spesifikasi SEPARATOR ', '), '') AS spesifikasi,
+                material_request_penolong_details.qty,
+                material_request_penolong_details.satuan AS kode_satuan,
+                material_requests_penolong.work_order_id
+            FROM material_request_penolong_details
+            LEFT JOIN material_requests_penolong ON material_requests_penolong.id = material_request_penolong_details.material_request_id
+            LEFT JOIN stock_revamp_detail ON stock_revamp_detail.id = material_request_penolong_details.stock_detail_id
+            LEFT JOIN penerimaan_barang ON penerimaan_barang.id = stock_revamp_detail.reference_id
+            LEFT JOIN bc_purchase_order_lpb ON bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id
+            LEFT JOIN bc_purchase_order ON bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id
+            LEFT JOIN divisis ON divisis.id = material_request_penolong_details.divisi_tujuan_id 
+            LEFT JOIN warehouses ON warehouses.id = material_request_penolong_details.warehouse_tujuan_id
+            LEFT JOIN barang_master ON barang_master.id = material_request_penolong_details.barang1_id
+            LEFT JOIN barang_master_spesifikasi ON barang_master_spesifikasi.id = material_request_penolong_details.barang2_id
+            WHERE material_request_penolong_details.deletedAt IS NULL
+            AND stock_revamp_detail.type_bc != 'NON PABEAN' -- KECUALIKAN YANG NON PABEAN
+            AND penerimaan_barang.tipe_bahan='PENOLONG'
+            AND stock_revamp_detail.reference_type='LPB'
+            $filterConditionBahanPenolong
+            $searchBahanPenolong
+            GROUP BY bc_purchase_order.no_aju, barang_master.barang_name
+
+        )
+    ";
+
+        $countQuery = "SELECT COUNT(*) AS cnt FROM ($baseQuery) AS x";
+        $totalFiltered = (int) $db->query($countQuery)->getRow()->cnt;
+
+        $mainQuery = $baseQuery . $orderBy . " LIMIT $limit OFFSET $offset";
+        $data = $db->query($mainQuery)->getResultArray();
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalFiltered,
+            'totalFilteredData' => $totalFiltered,
+            'sort'              => $orderColumnIndex,
+            'sortType'          => $orderDir,
+        ];
+    }
 
     public function getFisikPemasukkanBarang(
         $condition,
@@ -1899,35 +1957,30 @@ class BCPurchaseOrderModel extends Model
         $limit = 10,
         $offset = 0
     ) {
-        // Bc 40, Bc 23, Ppbkb In, Bc 27 In
+        // Bc 40, Bc 23, Bc 27 In
         $db = \Config\Database::connect();
         $where = [];
         $whereBc27In = [];
-        $wherePpbkbIn = [];
         $searchPoLokalBahanBaku = "";
         $searchPoBahanPenolong = "";
         $searchPoImportBahanBaku = "";
         $searchBc27In = "";
-        $searchPpbkbIn = "";
 
         $where = [];
 
         if (!empty($condition['dateStartLpb']) && !empty($condition['dateEndLpb'])) {
             $where[] = "penerimaan_barang.tanggal BETWEEN '$condition[dateStartLpb]' AND '$condition[dateEndLpb]'";
             $whereBc27In[] = "mutasi_global.tanggal BETWEEN '$condition[dateStartLpb]' AND '$condition[dateEndLpb]'";
-            $wherePpbkbIn[] = "mutasi.tanggal BETWEEN '$condition[dateStartLpb]' AND '$condition[dateEndLpb]'";
         }
 
         if (!empty($condition['barang_master_id'])) {
             $where[] = "penerimaan_barang_detail.barang_id = '$condition[barang_master_id]'";
             $whereBc27In[] = "stock_revamp.barang_master_id = '$condition[barang_master_id]'";
-            $wherePpbkbIn[] = "stock_revamp.barang_master_id = '$condition[barang_master_id]'";
         }
 
         if (!empty($condition['company_id'])) {
             $where[] = "penerimaan_barang.company_id = '$condition[company_id]'";
             $whereBc27In[] = "penerimaan_mutasi_global.company_penerima_id = '$condition[company_id]'";
-            $wherePpbkbIn[] = "penerimaan_mutasi.company_id = '$condition[company_id]'";
         }
 
         $search = $db->escapeLikeString($condition['search']);
@@ -1967,19 +2020,10 @@ class BCPurchaseOrderModel extends Model
                 OR penerimaan_mutasi_global.penerimaan_mutasi_no LIKE '%{$search}%' 
                 OR mutasi_global.no_mutasi LIKE '%{$search}%' 
             )";
-
-            $searchPpbkbIn = "AND (
-                ppbkb.no_ppbkb LIKE '%{$search}%' 
-                OR barang_master.kode_barang LIKE '%{$search}%' 
-                OR CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) LIKE '%{$search}%'
-                OR penerimaan_mutasi.penerimaan_mutasi_no LIKE '%{$search}%' 
-                OR mutasi.no_mutasi LIKE '%{$search}%' 
-            )";
         }
 
         $filterCondition = !empty($where) ? " AND " . implode(" AND ", $where) : "";
         $filterConditionBc27In = !empty($whereBc27In) ? " AND " . implode(" AND ", $whereBc27In) : "";
-        $filterConditionBcPpbkbIn = !empty($wherePpbkbIn) ? " AND " . implode(" AND ", $wherePpbkbIn) : "";
 
         $columns = [
             'tanggal_lpb',
@@ -2232,46 +2276,6 @@ class BCPurchaseOrderModel extends Model
             AND bc_27.status_posting='1'
             $filterConditionBc27In
             $searchBc27In
-        )
-        UNION ALL
-        (
-            -- PPBKB IN
-            SELECT
-                stock_revamp.barang_master_id AS barang_id,
-                'PPBKB In' AS jenis_doc,
-                ppbkb.no_ppbkb AS no_aju,
-                '' AS no_daftar,
-                ppbkb.tanggal AS tanggal_daftar,
-                penerimaan_mutasi.penerimaan_mutasi_no AS no_penerimaan_barang,
-                ppbkb.tanggal AS tanggal_lpb,
-                '' AS no_order,
-                divisis.divisi AS divisi,
-                warehouses.warehouse_name,
-                '' AS supplier_name,
-                barang_master.kode_barang,
-                barang_master.barang_name,
-                barang_master_spesifikasi.spesifikasi,
-                '' AS qty_order,
-                penerimaan_mutasi_detail.qty AS qty_diterima,
-                satuans.kode_satuan,
-                '' AS valas,
-                '' AS total_harga,
-                '' AS keterangan
-            FROM penerimaan_mutasi_detail
-            LEFT JOIN penerimaan_mutasi ON penerimaan_mutasi.id = penerimaan_mutasi_detail.penerimaan_mutasi_id
-            LEFT JOIN ppbkb ON ppbkb.id = penerimaan_mutasi.ppbkb_id
-            LEFT JOIN mutasi ON mutasi.id = penerimaan_mutasi_detail.mutasi_id
-            LEFT JOIN divisis ON divisis.id = mutasi.divisi_tujuan_id 
-            LEFT JOIN warehouses ON warehouses.id = mutasi.warehouse_tujuan_id
-            LEFT JOIN stock_revamp_detail ON stock_revamp_detail.id = penerimaan_mutasi_detail.stock_detail_id
-            LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
-            LEFT JOIN barang_master ON barang_master.id = stock_revamp.barang_master_id
-            LEFT JOIN barang_master_spesifikasi ON barang_master_spesifikasi.id = stock_revamp.spesifikasi_id
-            LEFT JOIN satuans ON satuans.id = stock_revamp.unit_id
-            WHERE penerimaan_mutasi_detail.deletedAt IS NULL
-            AND ppbkb.status_posting='1'
-            $filterConditionBcPpbkbIn
-            $searchPpbkbIn
         )
     ";
 
@@ -2568,15 +2572,13 @@ class BCPurchaseOrderModel extends Model
         $limit = 10,
         $offset = 0
     ) {
-        // BC 2.7 Out, PPBKB Out, BC 4.1, BC 2.5, BC 3.0, 
+        // BC 2.7 Out, BC 4.1, BC 2.5, BC 3.0, 
         $db = \Config\Database::connect();
         $searchBc27Out = "";
-        $searchPpbkbOut = "";
         $searchBc41 = "";
         $searchBc25 = "";
         $searchBc30 = "";
         $whereBc27Out = [];
-        $wherePpbkbOut = [];
         $whereBc41 = [];
         $whereBc25 = [];
         $whereBc30 = [];
@@ -2584,7 +2586,6 @@ class BCPurchaseOrderModel extends Model
 
         if (!empty($condition['dateStart']) && !empty($condition['dateEnd'])) {
             $whereBc27Out[] = "mutasi_global.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
-            $wherePpbkbOut[] = "ppbkb.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
             $whereBc41[] = "bc_41.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
             $whereBc25[] = "bc_25.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
             $whereBc30[] = "bc_30.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
@@ -2592,7 +2593,6 @@ class BCPurchaseOrderModel extends Model
 
         if (!empty($condition['company_id'])) {
             $whereBc27Out[] = "bc_27.company_asal_id='$condition[company_id]'";
-            $wherePpbkbOut[] = "ppbkb.company_id='$condition[company_id]'";
             $whereBc41[] = "bc_41.company_id='$condition[company_id]'";
             $whereBc25[] = "bc_25.company_id='$condition[company_id]'";
             $whereBc30[] = "bc_30.company_id='$condition[company_id]'";
@@ -2600,7 +2600,6 @@ class BCPurchaseOrderModel extends Model
 
         if (!empty($condition['barang1_id'])) {
             $whereBc27Out[] = "stock_revamp.barang_master_id='$condition[barang1_id]'";
-            $wherePpbkbOut[] = "stock_revamp.barang_master_id='$condition[barang1_id]'";
             $whereBc41[] = "bc_pengeluaran_barang.barang_master_id='$condition[barang1_id]'";
             $whereBc25[] = "bc_pengeluaran_barang.barang_master_id='$condition[barang1_id]'";
             $whereBc30[] = "bc_pengeluaran_barang.barang_master_id='$condition[barang1_id]'";
@@ -2611,14 +2610,6 @@ class BCPurchaseOrderModel extends Model
             $searchBc27Out = "AND (
                 bc_27.no_aju LIKE '%{$search}%'
                 OR bc_27.no_daftar LIKE '%{$search}%' 
-                OR barang_master.kode_barang LIKE '%{$search}%'
-                OR barang_master.barang_name LIKE '%{$search}%'
-                OR barang_master_spesifikasi.spesifikasi LIKE '%{$search}%'
-                OR divisis.divisi LIKE '%{$search}%' 
-                OR warehouses.warehouse_name LIKE '%{$search}%'
-            )";
-            $searchPpbkbOut = "AND (
-                ppbkb.no_ppbkb LIKE '%{$search}%'
                 OR barang_master.kode_barang LIKE '%{$search}%'
                 OR barang_master.barang_name LIKE '%{$search}%'
                 OR barang_master_spesifikasi.spesifikasi LIKE '%{$search}%'
@@ -2655,7 +2646,6 @@ class BCPurchaseOrderModel extends Model
         }
 
         $filterConditionBc27Out = !empty($whereBc27Out) ? " AND " . implode(" AND ", $whereBc27Out) : "";
-        $filterConditionPpkbOut = !empty($wherePpbkbOut) ? " AND " . implode(" AND ", $wherePpbkbOut) : "";
         $filterConditionBc41 = !empty($whereBc41) ? " AND " . implode(" AND ", $whereBc41) : "";
         $filterConditionBc25 = !empty($whereBc25) ? " AND " . implode(" AND ", $whereBc25) : "";
         $filterConditionBc30 = !empty($whereBc30) ? " AND " . implode(" AND ", $whereBc30) : "";
@@ -2720,42 +2710,6 @@ class BCPurchaseOrderModel extends Model
                 AND bc_27.status_posting='1'
                 $filterConditionBc27Out
                 $searchBc27Out
-            )
-            UNION ALL
-            (
-                -- PPBKB OUT
-                SELECT 
-                    mutasi_detail.id,
-                    divisis.divisi AS divisi_asal,
-                    warehouses.warehouse_name AS warehouse_asal,
-                    mutasi.no_mutasi AS reference_no,
-                    barang_master.kode_barang,
-                    barang_master.barang_name,
-                    barang_master_spesifikasi.spesifikasi,
-                    mutasi.tanggal AS tanggal_dokumen,
-                    'PPBKB Out' AS type_bc,
-                    ppbkb.no_ppbkb AS no_aju,
-                    '' AS no_daftar,
-                    mutasi_detail.qty_mutasi AS qty_diterima,
-                    satuans.kode_satuan,
-                    '' AS valas_name,
-                    '' AS sub_total,
-                    stock_revamp.barang_master_id AS barang1_id
-                FROM mutasi_detail
-                LEFT JOIN mutasi ON mutasi.id = mutasi_detail.mutasi_id
-                LEFT JOIN stock_revamp_detail ON stock_revamp_detail.id = mutasi_detail.stock_detail_id
-                LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
-                LEFT JOIN barang_master ON barang_master.id = stock_revamp.barang_master_id
-                LEFT JOIN barang_master_spesifikasi ON barang_master_spesifikasi.id = stock_revamp.spesifikasi_id
-                LEFT JOIN ppbkb_mutasi ON ppbkb_mutasi.mutasi_id = mutasi.id
-                LEFT JOIN ppbkb ON ppbkb.id = ppbkb_mutasi.ppbkb_id
-                LEFT JOIN satuans ON satuans.id = mutasi_detail.unit_id_mutasi
-                LEFT JOIN divisis ON divisis.id = mutasi.divisi_asal_id
-                LEFT JOIN warehouses ON warehouses.id = mutasi.warehouse_asal_id
-                WHERE mutasi_detail.deletedAt IS NULL
-                AND ppbkb.status_posting='1'
-                $filterConditionPpkbOut
-                $searchPpbkbOut
             )
             UNION ALL
             (
