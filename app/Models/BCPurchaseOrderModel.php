@@ -1874,7 +1874,7 @@ class BCPurchaseOrderModel extends Model
                 barang_master.kode_barang,
                 barang_master.barang_name,
                 IFNULL(GROUP_CONCAT(DISTINCT barang_master_spesifikasi.spesifikasi SEPARATOR ', '), '') AS spesifikasi,
-                material_request_details.qty,
+                SUM(material_request_details.qty) AS qty,
                 material_request_details.satuan AS kode_satuan,
                 material_requests.work_order_id
             FROM material_request_details
@@ -1911,7 +1911,7 @@ class BCPurchaseOrderModel extends Model
                 barang_master.kode_barang,
                 barang_master.barang_name,
                 IFNULL(GROUP_CONCAT(DISTINCT barang_master_spesifikasi.spesifikasi SEPARATOR ', '), '') AS spesifikasi,
-                material_request_penolong_details.qty,
+                SUM(material_request_penolong_details.qty) AS qty,
                 material_request_penolong_details.satuan AS kode_satuan,
                 material_requests_penolong.work_order_id
             FROM material_request_penolong_details

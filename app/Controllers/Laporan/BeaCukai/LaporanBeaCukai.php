@@ -895,6 +895,27 @@ class LaporanBeaCukai extends BaseController
         ]);
     }
 
+    private function getTotalWip($condition)
+    {
+        $start = 0;
+        $length = 100000000000000;
+        $orderDir = 'desc';
+        $orderColumnIndex = 2;
+        $dataWip = $this->bcPurchaseOrderModel->getListLapWip(
+            $condition,
+            $orderColumnIndex,
+            $orderDir,
+            $length,
+            $start
+        );
+
+        $totalQty = 0;
+        foreach ($dataWip['data'] as $d) {
+            $totalQty += (float)$d['qty'];
+        }
+
+        return $totalQty;
+    }
 
     private function mapWorkOrder()
     {
@@ -925,28 +946,6 @@ class LaporanBeaCukai extends BaseController
         }
 
         return $map;
-    }
-
-    private function getTotalWip($condition)
-    {
-        $start = 0;
-        $length = 100000000000000;
-        $orderDir = 'desc';
-        $orderColumnIndex = 2;
-        $dataWip = $this->bcPurchaseOrderModel->getListLapWip(
-            $condition,
-            $orderColumnIndex,
-            $orderDir,
-            $length,
-            $start
-        );
-
-        $totalQty = 0;
-        foreach ($dataWip['data'] as $d) {
-            $totalQty += (float)$d['qty'];
-        }
-
-        return $totalQty;
     }
 
     public function exportExcelWip()
