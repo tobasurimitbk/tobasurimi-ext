@@ -172,6 +172,7 @@
                                     <option value=""></option>
                                     <option value="SUPPLIER" selected>SUPPLIER</option>
                                     <option value="PROSES REBUS">PROSES REBUS</option>
+                                    <option value="MUTASI">MUTASI</option>
                                     <option value="VENDOR">VENDOR</option>
                                 </select>
                                 <label for="floatingInput" style="z-index: 1;">Asal Barang</label>

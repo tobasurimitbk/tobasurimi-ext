@@ -2088,11 +2088,15 @@ class MaterialRequest extends BaseController
                 ];
 
                 if (!empty($supplierId)) {
-                    $condition['supplier_filter'] = $supplierId;
+                    $condition['rmpo.supplier_id'] = $supplierId;
                 }
-                $condition["srd.reference_type"] = ["LPB", "PENERIMAAN MUTASI"];
+
+                if ($startDate && $endDate) {
+                    $condition['stock_date_between'] = [$startDate, $endDate];
+                }
+                
+                $condition["srd.reference_type"] = "LPB";
                 // $condition["srd2.reference_type"] = ["LPB"];
-                $condition['stock_date_between'] = [$startDate, $endDate];
 
                 $dataResult = $this->stockRevampDetailModel->getStockListPOWithCondition($condition);
             } elseif ($typeAsalBarang == "PROSES REBUS") {
@@ -2106,11 +2110,27 @@ class MaterialRequest extends BaseController
                 if (!empty($supplierId)) {
                     $condition['supplier_filter'] = $supplierId;
                 }
-                $condition["srd.reference_type"] = ["PROSES REBUS", "PENERIMAAN MUTASI"];
+                $condition["srd.reference_type"] = "PROSES REBUS";
                 $condition['stock_date_between'] = [$startDate, $endDate];
 
                 $dataResult = $this->stockRevampDetailModel->getStockListProsesRebusWithCondition($condition);
-            }else {
+            } elseif ($typeAsalBarang == "MUTASI") {
+                $condition = [
+                    "sr.company_id" => $this->this_company_id,
+                    "sr.barang_master_id" => $barangMasterId,
+                    "sr.divisi_id" => $divisiAsalId,
+                    "sr.warehouse_id" => $warehouseAsalId,
+                ];
+
+                if (!empty($supplierId)) {
+                    $condition['supplier_filter'] = $supplierId;
+                }
+                $condition["srd.reference_type"] = "PENERIMAAN MUTASI";
+                // $condition["srd.reference_type"] = ["PROSES REBUS", "PENERIMAAN MUTASI"];
+                $condition['stock_date_between'] = [$startDate, $endDate];
+
+                $dataResult = $this->stockRevampDetailModel->getStockListPenerimaanMutasiWithCondition($condition);
+            } else {
                 $condition = [
                     "stock_revamp.company_id" => $this->this_company_id,
                     "stock_revamp.barang_master_id" => $barangMasterId,
