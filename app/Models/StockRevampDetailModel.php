@@ -1295,7 +1295,7 @@ class StockRevampDetailModel extends Model
                 rmpod.daily_price AS harga_harian,
                 rmpod.monthly_price AS harga_bulanan,
 
-                pb.tanggal AS stock_date,
+                rmpo.po_date AS stock_date,
                 srd.type_bc,
                 bc.no_daftar AS no_daftar
             ")
@@ -1353,7 +1353,7 @@ class StockRevampDetailModel extends Model
                 NULL AS harga_harian,
                 NULL AS harga_bulanan,
 
-                pb.tanggal AS stock_date,
+                ripo.po_date AS stock_date,
                 srd.type_bc,
                 bc.no_daftar AS no_daftar
             ")
@@ -1556,7 +1556,7 @@ class StockRevampDetailModel extends Model
                 rmpod.daily_price AS harga_harian,
                 rmpod.monthly_price AS harga_bulanan,
 
-                pb.tanggal AS stock_date,
+                rmpo.po_date AS stock_date,
                 bc.no_daftar
             ")
             ->join('stock_revamp sr', 'sr.id = srd.stock_id')
@@ -1573,6 +1573,7 @@ class StockRevampDetailModel extends Model
             ->join('barang_master bm', 'bm.id = sr.barang_master_id', 'left')
             ->join('barang_master_spesifikasi bms', 'bms.id = sr.spesifikasi_id', 'left')
             ->join('satuans s', 's.id = bms.satuan_1', 'left')
+
             ->where('srd.po_type', 'LOKAL BAKU')
             ->where('srd.reference_type', 'PROSES REBUS');
 
@@ -1618,7 +1619,7 @@ class StockRevampDetailModel extends Model
                 NULL AS harga_harian,
                 NULL AS harga_bulanan,
 
-                pb.tanggal AS stock_date,
+                ripo.po_date AS stock_date,
                 bc.no_daftar
             ")
             ->join('stock_revamp sr', 'sr.id = srd.stock_id')
@@ -1635,6 +1636,7 @@ class StockRevampDetailModel extends Model
             ->join('barang_master bm', 'bm.id = sr.barang_master_id', 'left')
             ->join('barang_master_spesifikasi bms', 'bms.id = sr.spesifikasi_id', 'left')
             ->join('satuans s', 's.id = bms.satuan_1', 'left')
+
             ->where('srd.po_type', 'IMPORT BAKU')
             ->where('srd.reference_type', 'PROSES REBUS');
 
@@ -1657,7 +1659,7 @@ class StockRevampDetailModel extends Model
                 sr.divisi_id,
                 sr.warehouse_id,
 
-                srd.createdAt AS po_date,
+                pr.tanggal AS po_date,
                 'INISIASI' AS po_no,
                 'INISIASI' AS stock_dokumen,
                 NULL AS rm_purchase_order_id,
@@ -1689,6 +1691,7 @@ class StockRevampDetailModel extends Model
             ->join('barang_master bm', 'bm.id = sr.barang_master_id', 'left')
             ->join('barang_master_spesifikasi bms', 'bms.id = sr.spesifikasi_id', 'left')
             ->join('satuans s', 's.id = bms.satuan_1', 'left')
+            
             ->where('srd.po_id', NULL)
             ->where('srd.reference_type', 'PROSES REBUS');
 
@@ -1960,7 +1963,7 @@ class StockRevampDetailModel extends Model
                 rmpod.daily_price AS harga_harian,
                 rmpod.monthly_price AS harga_bulanan,
 
-                pb.tanggal AS stock_date,
+                rmpo.po_date AS stock_date,
                 srd.type_bc,
                 bc.no_daftar
             ")
@@ -1981,7 +1984,9 @@ class StockRevampDetailModel extends Model
             ->join('barang_master_spesifikasi bms', 'bms.id = sr.spesifikasi_id', 'left')
             ->join('satuans s', 's.id = bms.satuan_1', 'left')
 
-            ->where('srd.reference_type', 'PENERIMAAN MUTASI');
+            ->where('srd.reference_type', 'PENERIMAAN MUTASI')
+            ->where('srd2.reference_type', 'LPB')
+            ->where('srd2.po_type', 'LOKAL BAKU');
 
         /*
         ============================================================
@@ -2024,7 +2029,7 @@ class StockRevampDetailModel extends Model
                 NULL AS harga_harian,
                 NULL AS harga_bulanan,
 
-                pb.tanggal AS stock_date,
+                ripo.po_date AS stock_date,
                 srd.type_bc,
                 bc.no_daftar
             ")
@@ -2045,7 +2050,9 @@ class StockRevampDetailModel extends Model
             ->join('barang_master_spesifikasi bms', 'bms.id = sr.spesifikasi_id', 'left')
             ->join('satuans s', 's.id = bms.satuan_1', 'left')
 
-            ->where('srd.reference_type', 'PENERIMAAN MUTASI');
+            ->where('srd.reference_type', 'PENERIMAAN MUTASI')
+            ->where('srd2.reference_type', 'LPB')
+            ->where('srd2.po_type', 'IMPORT BAKU');
 
         /*
         ============================================================
@@ -2107,7 +2114,9 @@ class StockRevampDetailModel extends Model
             ->join('barang_master bm', 'bm.id = sr.barang_master_id', 'left')
             ->join('barang_master_spesifikasi bms', 'bms.id = sr.spesifikasi_id', 'left')
             ->join('satuans s', 's.id = bms.satuan_1', 'left')
-            ->where('srd.reference_type', 'PENERIMAAN MUTASI');
+
+            ->where('srd.reference_type', 'PENERIMAAN MUTASI')
+            ->where('srd2.reference_type', 'PROSES REBUS');
 
         /*
         ============================================================
@@ -2128,7 +2137,7 @@ class StockRevampDetailModel extends Model
                 srd.keterangan,
                 srd.reference_type,
 
-                srd2.createdAt AS po_date,
+                pm.tanggal AS po_date,
                 'INISIASI' AS po_no,
                 'INISIASI' AS stock_dokumen,
                 NULL AS rm_purchase_order_id,
@@ -2150,11 +2159,12 @@ class StockRevampDetailModel extends Model
                 0 AS harga_harian,
                 0 AS harga_bulanan,
 
-                srd2.createdAt AS stock_date,
+                pm.tanggal AS stock_date,
                 srd.type_bc,
                 NULL AS no_daftar
             ")
             ->join('penerimaan_mutasi_detail pmd', 'pmd.penerimaan_mutasi_id = srd.reference_id', 'left')
+            ->join('penerimaan_mutasi pm', 'pm.id = pmd.penerimaan_mutasi_id', 'left')
             ->join('mutasi_detail md', 'md.id = pmd.mutasi_detail_id', 'left')
             ->join('stock_revamp_detail srd2', "
                 srd2.id = md.stock_detail_id
@@ -2165,13 +2175,64 @@ class StockRevampDetailModel extends Model
             ->join('barang_master bm', 'bm.id = sr.barang_master_id', 'left')
             ->join('barang_master_spesifikasi bms', 'bms.id = sr.spesifikasi_id', 'left')
             ->join('satuans s', 's.id = bms.satuan_1', 'left')
-            ->where('srd.reference_type', 'PENERIMAAN MUTASI');
 
-        /*
-        ============================================================
+            ->where('srd.reference_type', 'PENERIMAAN MUTASI')
+            ->where('srd2.reference_type', 'INISIASI');
+
+        /* ==============================
+       FILTER GLOBAL (FIXED)
+       ============================== */
+
+        $builders = [
+            $lpbLokal,
+            $lpbImport,
+            $rebusPo,
+            $inisiasi
+        ];
+
+        // FILTER COMPANY / BARANG / DIVISI / WAREHOUSE
+        foreach ([
+            'sr.company_id',
+            'sr.barang_master_id',
+            'sr.divisi_id',
+            'sr.warehouse_id'
+        ] as $field) {
+            if (!empty($condition[$field])) {
+                foreach ($builders as $b) {
+                    $b->where($field, $condition[$field]);
+                }
+            }
+        }
+
+        // FILTER TANGGAL (pakai alias stock_date)
+        if (!empty($condition['stock_date_between'])) {
+            [$start, $end] = $condition['stock_date_between'];
+
+            if (!empty($start) && !empty($end)) {
+                foreach ($builders as $b) {
+                    $b->where('stock_date >=', $start)
+                    ->where('stock_date <=', $end);
+                }
+            }
+        }
+
+        // FILTER SUPPLIER
+        if (!empty($condition['supplier_id'])) {
+            foreach ([$lpbLokal, $lpbImport, $rebusPo] as $b) {
+                $b->where('sup.id', $condition['supplier_id']);
+            }
+        }
+
+        // FILTER PO NO
+        if (!empty($condition['po_no'])) {
+            foreach ([$lpbLokal, $lpbImport, $rebusPo] as $b) {
+                $b->like('po_no', $condition['po_no']);
+            }
+        }
+
+        /* ==============================
         UNION FINAL
-        ============================================================
-        */
+        ============================== */
         $sql =
             $lpbLokal->getCompiledSelect()
             . " UNION ALL " . $lpbImport->getCompiledSelect()
