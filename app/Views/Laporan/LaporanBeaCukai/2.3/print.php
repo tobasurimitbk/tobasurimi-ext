@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Pungutan Bea Cukai 2.3</title>
+    <title>Laporan Pungutan BC 2.3</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -27,7 +27,7 @@
             border: 1px solid;
             font-size: 12px;
             padding: 5px;
-            text-align: center; /* Center align text */
+            text-align: left;
         }
 
         .item-table th {
@@ -42,7 +42,7 @@
 </head>
 
 <body>
-    <h2>LAPORAN BEA CUKAI BC 2.3</h2>
+    <h2>LAPORAN PUNGUTAN BC 2.3</h2>
 
     <table class="w-100">
         <tbody>
@@ -54,14 +54,35 @@
                     <td style="width:10px"> S/D </td>
                     <td><?= date('d/m/Y', strtotime($condition['selesaiTanggalBC23'])); ?></td>
                 <?php else : ?>
-                    <td colspan="3" style="width:80px">ALL</td>
+                    <td colspan="3">ALL</td>
                 <?php endif; ?>
             </tr>
         </tbody>
     </table>
 
+    <?php
+    // ================= TOTAL INITIAL =================
+    $total = [
+        'PPN' => [
+            'tidak_dipungut' => 0,
+            'di_bebaskan' => 0,
+            'di_tangguhkan' => 0,
+        ],
+        'PPH' => [
+            'tidak_dipungut' => 0,
+            'di_bebaskan' => 0,
+            'di_tangguhkan' => 0,
+        ],
+        'BM' => [
+            'tidak_dipungut' => 0,
+            'di_bebaskan' => 0,
+            'di_tangguhkan' => 0,
+        ],
+    ];
+    ?>
+
     <table class="item-table">
-        <thead class="thead-dark">
+        <thead>
             <tr>
                 <th rowspan="2">No</th>
                 <th rowspan="2">Nama Supplier</th>
@@ -87,24 +108,54 @@
         </thead>
         <tbody>
             <?php foreach ($data as $row) : ?>
+
+                <?php
+                // ================= AKUMULASI TOTAL =================
+                foreach (['PPN', 'PPH', 'BM'] as $jenis) {
+                    foreach (['tidak_dipungut', 'di_bebaskan', 'di_tangguhkan'] as $fasilitas) {
+                        $total[$jenis][$fasilitas] += $row['dataBCTarif'][$jenis][$fasilitas];
+                    }
+                }
+                ?>
+
                 <tr>
                     <td><?= $row['no']; ?></td>
                     <td><?= $row['supplier_name']; ?></td>
-                    <td><?= date('d/m/Y', strtotime($row['date'])); ?></td>
+                    <td><?= $row['date']; ?></td>
                     <td><?= $row['no_aju']; ?></td>
                     <td><?= $row['no_daftar']; ?></td>
                     <td><?= $row['po_type']; ?></td>
-                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['PPN']['tidak_dipungut']); ?></td>
-                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['PPN']['di_bebaskan']); ?></td>
-                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['PPN']['di_tangguhkan']); ?></td>
-                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['PPH']['tidak_dipungut']); ?></td>
-                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['PPH']['di_bebaskan']); ?></td>
-                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['PPH']['di_tangguhkan']); ?></td>
-                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['BM']['tidak_dipungut']); ?></td>
-                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['BM']['di_bebaskan']); ?></td>
-                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['BM']['di_tangguhkan']); ?></td>
+
+                    <td><?= number_format($row['dataBCTarif']['PPN']['tidak_dipungut'], 2); ?></td>
+                    <td><?= number_format($row['dataBCTarif']['PPN']['di_bebaskan'], 2); ?></td>
+                    <td><?= number_format($row['dataBCTarif']['PPN']['di_tangguhkan'], 2); ?></td>
+
+                    <td><?= number_format($row['dataBCTarif']['PPH']['tidak_dipungut'], 2); ?></td>
+                    <td><?= number_format($row['dataBCTarif']['PPH']['di_bebaskan'], 2); ?></td>
+                    <td><?= number_format($row['dataBCTarif']['PPH']['di_tangguhkan'], 2); ?></td>
+
+                    <td><?= number_format($row['dataBCTarif']['BM']['tidak_dipungut'], 2); ?></td>
+                    <td><?= number_format($row['dataBCTarif']['BM']['di_bebaskan'], 2); ?></td>
+                    <td><?= number_format($row['dataBCTarif']['BM']['di_tangguhkan'], 2); ?></td>
                 </tr>
             <?php endforeach; ?>
+
+            <!-- ================= TOTAL ROW ================= -->
+            <tr>
+                <td colspan="6" style="text-align:right; font-weight:bold;">TOTAL</td>
+
+                <td><?= number_format($total['PPN']['tidak_dipungut'], 2); ?></td>
+                <td><?= number_format($total['PPN']['di_bebaskan'], 2); ?></td>
+                <td><?= number_format($total['PPN']['di_tangguhkan'], 2); ?></td>
+
+                <td><?= number_format($total['PPH']['tidak_dipungut'], 2); ?></td>
+                <td><?= number_format($total['PPH']['di_bebaskan'], 2); ?></td>
+                <td><?= number_format($total['PPH']['di_tangguhkan'], 2); ?></td>
+
+                <td><?= number_format($total['BM']['tidak_dipungut'], 2); ?></td>
+                <td><?= number_format($total['BM']['di_bebaskan'], 2); ?></td>
+                <td><?= number_format($total['BM']['di_tangguhkan'], 2); ?></td>
+            </tr>
         </tbody>
     </table>
 </body>

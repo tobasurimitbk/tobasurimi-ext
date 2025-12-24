@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Pungutan Bea Cukai 4.0</title>
+    <title>Laporan Pungutan BC 4.0</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -27,7 +27,7 @@
             border: 1px solid;
             font-size: 12px;
             padding: 5px;
-            text-align: center; /* Center align text */
+            text-align: left;
         }
 
         .item-table th {
@@ -38,11 +38,16 @@
         .w-100 {
             width: 100%;
         }
+
+        .total-row {
+            font-weight: bold;
+            background-color: #f2f2f2;
+        }
     </style>
 </head>
 
 <body>
-    <h2>LAPORAN BEA CUKAI BC 4.0</h2>
+    <h2>LAPORAN PUNGUTAN BC 4.0</h2>
 
     <table class="w-100">
         <tbody>
@@ -54,14 +59,14 @@
                     <td style="width:10px"> S/D </td>
                     <td><?= date('d/m/Y', strtotime($condition['selesaiTanggalBC40'])); ?></td>
                 <?php else : ?>
-                    <td colspan="3" style="width:80px">ALL</td>
+                    <td colspan="3">ALL</td>
                 <?php endif; ?>
             </tr>
         </tbody>
     </table>
 
     <table class="item-table">
-        <thead class="thead-dark">
+        <thead>
             <tr>
                 <th rowspan="2">No</th>
                 <th rowspan="2">Nama Supplier</th>
@@ -78,6 +83,14 @@
             </tr>
         </thead>
         <tbody>
+
+            <?php
+            // INISIALISASI TOTAL
+            $totalTidakDipungut = 0;
+            $totalDiBebaskan   = 0;
+            $totalDiTangguhkan = 0;
+            ?>
+
             <?php foreach ($data as $row) : ?>
                 <tr>
                     <td><?= $row['no']; ?></td>
@@ -86,11 +99,38 @@
                     <td><?= $row['no_aju']; ?></td>
                     <td><?= $row['no_daftar']; ?></td>
                     <td><?= $row['po_type']; ?></td>
-                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['PPN']['tidak_dipungut']); ?></td>
-                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['PPN']['di_bebaskan']); ?></td>
-                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['PPN']['di_tangguhkan']); ?></td>
+                    <td><?= number_format($row['dataBCTarif']['PPN']['tidak_dipungut'], 2); ?></td>
+                    <td><?= number_format($row['dataBCTarif']['PPN']['di_bebaskan'], 2); ?></td>
+                    <td><?= number_format($row['dataBCTarif']['PPN']['di_tangguhkan'], 2); ?></td>
                 </tr>
+
+                <?php
+                // AKUMULASI TOTAL
+                $totalTidakDipungut += $row['dataBCTarif']['PPN']['tidak_dipungut'];
+                $totalDiBebaskan   += $row['dataBCTarif']['PPN']['di_bebaskan'];
+                $totalDiTangguhkan += $row['dataBCTarif']['PPN']['di_tangguhkan'];
+                ?>
             <?php endforeach; ?>
+
+            <!-- BARIS TOTAL -->
+            <tr class="total-row">
+                <td colspan="6">TOTAL PPN</td>
+                <td><?= number_format($totalTidakDipungut, 2); ?></td>
+                <td><?= number_format($totalDiBebaskan, 2); ?></td>
+                <td><?= number_format($totalDiTangguhkan, 2); ?></td>
+            </tr>
+
+            <!-- GRAND TOTAL -->
+            <tr class="total-row">
+                <td colspan="6">GRAND TOTAL PPN</td>
+                <td colspan="3">
+                    <?= number_format(
+                        $totalTidakDipungut + $totalDiBebaskan + $totalDiTangguhkan,
+                        2
+                    ); ?>
+                </td>
+            </tr>
+
         </tbody>
     </table>
 </body>
