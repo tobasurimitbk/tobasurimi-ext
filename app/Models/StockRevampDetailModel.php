@@ -1385,8 +1385,8 @@ class StockRevampDetailModel extends Model
 
         if (!empty($condition['stock_date_between'])) {
             [$start, $end] = $condition['stock_date_between'];
-            $lokal->where('pb.tanggal >=', $start)->where('pb.tanggal <=', $end);
-            $import->where('pb.tanggal >=', $start)->where('pb.tanggal <=', $end);
+            $lokal->where('rmpo.po_date >=', $start)->where('rmpo.po_date <=', $end);
+            $import->where('ripo.po_date >=', $start)->where('ripo.po_date <=', $end);
         }
 
         /* ============================================================
@@ -1709,8 +1709,8 @@ class StockRevampDetailModel extends Model
         if (!empty($condition['stock_date_between'])) {
             [$start, $end] = $condition['stock_date_between'];
             if (!empty($start) && !empty($end)) {
-                $lokal->where('pb.tanggal >=', $start)->where('pb.tanggal <=', $end);
-                $import->where('pb.tanggal >=', $start)->where('pb.tanggal <=', $end);
+                $lokal->where('rmpo.po_date >=', $start)->where('rmpo.po_date <=', $end);
+                $import->where('ripo.po_date >=', $start)->where('ripo.po_date <=', $end);
                 $rebus->where('pr.tanggal >=', $start)->where('pr.tanggal <=', $end);
             }
         }
