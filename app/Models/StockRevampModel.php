@@ -2023,8 +2023,13 @@ class StockRevampModel extends Model
         return $dataBarang;
     }
 
-    public function allStockFisik($condition = [], $addCondition = [], $limit = 10, $offset = 0)
-    {
+    public function allStockFisik(
+        $condition = [],
+        $addCondition = [],
+        $limit = 10,
+        $offset = 0,
+        $tipeBarangArr = []
+    ) {
         $barangMasterModel = new BarangMasterModel();
 
         $availableSort = [
@@ -2050,6 +2055,10 @@ class StockRevampModel extends Model
             ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
             ->where($condition)
             ->orderBy($sort, $sortType);
+
+        if (count($tipeBarangArr) != 0) {
+            $baseBuilder->whereIn('barang_master.type_barang', $tipeBarangArr);
+        }
 
         $totalData = $baseBuilder->countAllResults(false);
 

@@ -32,6 +32,7 @@ use App\Models\RMImportPOModel;
 use App\Models\SalesOrderInvoiceModel;
 use App\Models\SatuansModel;
 use App\Models\StockDetail2Model;
+use App\Models\StockRevampModel;
 use App\Models\SupplierModel;
 use App\Models\WorkOrdersModel;
 use Dompdf\Dompdf;
@@ -82,6 +83,7 @@ class LaporanBeaCukai extends BaseController
     protected $companiesModel;
     protected $bcPurchaseOrderModel;
     protected $workOrdersModel;
+    protected $stockRevampModel;
 
     public function __construct()
     {
@@ -118,6 +120,7 @@ class LaporanBeaCukai extends BaseController
         $this->companiesModel = new CompaniesModel();
         $this->bcPurchaseOrderModel = new BCPurchaseOrderModel();
         $this->workOrdersModel = new WorkOrdersModel();
+        $this->stockRevampModel = new StockRevampModel();
     }
 
     public function index()
@@ -3957,465 +3960,584 @@ class LaporanBeaCukai extends BaseController
         die;
     }
 
-    public function laporanMutasiBahanBakuPenolong()
+    public function detailMutasi($id)
     {
-        $data = [
-            'tipeBarang' => $this->metadataModel->where('deletedAt', null)->where('name', "Kategori Barang")->whereIn('description', ['bahan_baku', 'bahan_penolong', 'kemasan'])->findAll(),
-            'dataDivisi' => $this->divisiModel->getDivisiAccess(),
+        $id = decrypt($id);
+        $dateStart = formatDMYtoYMD($this->request->getVar('dateStart'));
+        $dateEnd   = formatDMYtoYMD($this->request->getVar('dateEnd'));
+
+        $barangMaster = $this->barangMasterModel
+            ->select('barang_master.*, parent_barang.parent_name')
+            ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
+            ->where('barang_master.id', $id)
+            ->first();
+
+        // ===============================
+        // Helper aman ambil qty
+        // ===============================
+        $qty = fn($arr, $id) => $arr[$id]['qty_diterima'] ?? 0;
+
+        $awal = $masuk = $keluar = 0;
+        $kodeSatuan = '';
+
+        // ===============================
+        // PRELOAD DATA STOK
+        // ===============================
+        $stok = [
+            'awal' => [
+                'masuk'    => $this->getTotalPemasukkan("2025-09-01", $dateStart),
+                'masuk_p'  => $this->getTotalPemasukkanProduksi("2025-09-01", $dateStart),
+                'keluar'   => $this->getTotalPengeluaranPerDokumen("2025-09-01", $dateStart),
+                'keluar_p' => $this->getTotalPengeluaranProduksi("2025-09-01", $dateStart),
+            ],
+            'jalan' => [
+                'masuk'    => $this->getTotalPemasukkan($dateStart, $dateEnd),
+                'masuk_p'  => $this->getTotalPemasukkanProduksi($dateStart, $dateEnd),
+                'keluar'   => $this->getTotalPengeluaranPerDokumen($dateStart, $dateEnd),
+                'keluar_p' => $this->getTotalPengeluaranProduksi($dateStart, $dateEnd),
+            ]
         ];
 
-        return view('Laporan/LaporanBeaCukai/mutasi/bahanBakuPenolong', $data);
+        // ===============================
+        // HITUNG SALDO AWAL
+        // ===============================
+        $awal += $qty($stok['awal']['masuk'], $id);
+        $awal += $qty($stok['awal']['masuk_p'], $id);
+        $awal -= $qty($stok['awal']['keluar'], $id);
+        $awal -= $qty($stok['awal']['keluar_p'], $id);
+
+        // kode satuan (ambil dari salah satu sumber)
+        $kodeSatuan = $stok['awal']['masuk'][$id]['kode_satuan'] ?? '';
+
+        // ===============================
+        // HITUNG STOK BERJALAN
+        // ===============================
+        $masuk += $qty($stok['jalan']['masuk'], $id);
+        $masuk += $qty($stok['jalan']['masuk_p'], $id);
+
+        $keluar += $qty($stok['jalan']['keluar'], $id);
+        $keluar += $qty($stok['jalan']['keluar_p'], $id);
+
+        $akhir = $awal + $masuk - $keluar;
+
+        return view('Laporan/LaporanBeaCukai/mutasi/detail', [
+            'barangMaster' => $barangMaster,
+            'mutasi' => [
+                'awal'        => $awal,
+                'masuk'       => $masuk,
+                'keluar'      => $keluar,
+                'akhir'       => $akhir,
+                'kode_satuan' => $kodeSatuan,
+            ]
+        ]);
+    }
+
+    public function allMutasi()
+    {
+        $limit  = (int) $this->request->getGet("length");
+        $offset = (int) $this->request->getGet("start");
+
+        $payload = [
+            "pageSize"    => $limit,
+            "currentPage" => ($offset / $limit) + 1,
+            "search"      => $this->request->getGet("search"),
+            "sort"        => $this->request->getGet("sort"),
+            "sortType"    => $this->request->getGet("sortType"),
+        ];
+
+        $condition = [
+            "barang_master.company_id" => $this->this_company_id,
+            "barang_master.deletedAt"  => null,
+        ];
+
+        $addCondition = [
+            "sort"       => $this->request->getGet("sort"),
+            "sortType"   => $this->request->getGet("sortType"),
+            "company_id" => $this->this_company_id,
+            "search"     => trim($this->request->getVar('search'))
+        ];
+
+        $dateStart = $this->request->getVar("dateStart")
+            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart"))))
+            : null;
+
+        $dateEnd = $this->request->getVar("dateEnd")
+            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd"))))
+            : null;
+
+        $tipeBarang = explode(',', $this->request->getVar('type_barang'));
+
+        /**
+         * ==================================================
+         * FETCH SEMUA BARANG (TANPA PAGINATION DB)
+         * ==================================================
+         */
+        $stockMutasi = $this->stockRevampModel->allStockFisik(
+            $condition,
+            $addCondition,
+            100000000,
+            0,
+            $tipeBarang
+        );
+
+        /**
+         * ==================================================
+         * PRELOAD DATA STOK
+         * ==================================================
+         */
+        // Saldo awal masuk
+        $dataStokMasukAwal = $this->getTotalPemasukkan("2025-09-01", $dateStart);
+        $dataStokProduksiAwal = $this->getTotalPemasukkanProduksi("2025-09-01", $dateStart);
+
+        // Saldo awal keluar
+        $dataStokKeluarAwal = $this->getTotalPengeluaranPerDokumen("2025-09-01", $dateStart);
+        $dataStokKeluarProduksiAwal = $this->getTotalPengeluaranProduksi("2025-09-01", $dateStart);
+
+        // Stok berjalan masuk
+        $dataStokMasuk = $this->getTotalPemasukkan($dateStart, $dateEnd);
+        $dataStokProduksiMasuk = $this->getTotalPemasukkanProduksi($dateStart, $dateEnd);
+
+        // Stok berjalan keluar
+        $dataStokKeluar = $this->getTotalPengeluaranPerDokumen($dateStart, $dateEnd);
+        $dataStokProduksiKeluar = $this->getTotalPengeluaranProduksi($dateStart, $dateEnd);
+
+        /**
+         * ==================================================
+         * HITUNG MUTASI (TANPA PAGINATION)
+         * ==================================================
+         */
+        $dataMutasi = [];
+
+        foreach ($stockMutasi['data'] as $data) {
+
+            $awal = $masuk = $keluar = 0;
+            $kodeSatuan = "";
+
+            // === SALDO AWAL ===
+            if (isset($dataStokMasukAwal[$data['id']])) {
+                $awal += $dataStokMasukAwal[$data['id']]['qty_diterima'];
+                $kodeSatuan = $dataStokMasukAwal[$data['id']]['kode_satuan'];
+            }
+            if (isset($dataStokProduksiAwal[$data['id']])) {
+                $awal += $dataStokProduksiAwal[$data['id']]['qty_diterima'];
+            }
+            if (isset($dataStokKeluarAwal[$data['id']])) {
+                $awal -= $dataStokKeluarAwal[$data['id']]['qty_diterima'];
+            }
+            if (isset($dataStokKeluarProduksiAwal[$data['id']])) {
+                $awal -= $dataStokKeluarProduksiAwal[$data['id']]['qty_diterima'];
+            }
+
+            // === STOK MASUK ===
+            if (isset($dataStokMasuk[$data['id']])) {
+                $masuk += $dataStokMasuk[$data['id']]['qty_diterima'];
+            }
+            if (isset($dataStokProduksiMasuk[$data['id']])) {
+                $masuk += $dataStokProduksiMasuk[$data['id']]['qty_diterima'];
+            }
+
+            // === STOK KELUAR ===
+            if (isset($dataStokKeluar[$data['id']])) {
+                $keluar += $dataStokKeluar[$data['id']]['qty_diterima'];
+            }
+            if (isset($dataStokProduksiKeluar[$data['id']])) {
+                $keluar += $dataStokProduksiKeluar[$data['id']]['qty_diterima'];
+            }
+
+            $akhir = $awal + $masuk - $keluar;
+
+            // simpan dulu, filter nanti
+            $dataMutasi[] = [
+                "id"          => encrypt($data['id']),
+                "parent_name" => $data['parent_name'],
+                "kode_barang" => $data['kode_barang'],
+                "barang_name" => $data['barang_name'],
+                "kode_satuan" => $kodeSatuan,
+                "awal"        => $awal,
+                "masuk"       => $masuk,
+                "keluar"      => $keluar,
+                "akhir"       => $akhir,
+            ];
+        }
+
+        /**
+         * ==================================================
+         * FILTER: BUANG YANG QTY = 0 SEMUA
+         * ==================================================
+         */
+        $filteredMutasi = array_values(array_filter($dataMutasi, function ($row) {
+            return !(
+                $row['awal'] == 0 &&
+                $row['masuk'] == 0 &&
+                $row['keluar'] == 0 &&
+                $row['akhir'] == 0
+            );
+        }));
+
+        $totalFiltered = count($filteredMutasi);
+
+        /**
+         * ==================================================
+         * RE PAGINATION (array_slice)
+         * ==================================================
+         */
+        $paginatedData = array_slice($filteredMutasi, $offset, $limit);
+
+        // reset nomor urut
+        $no = $offset + 1;
+        foreach ($paginatedData as &$row) {
+            $row['no'] = $no++;
+        }
+        unset($row);
+
+        /**
+         * ==================================================
+         * RESPONSE DATATABLES
+         * ==================================================
+         */
+        return response()->setJSON([
+            "draw"            => intval($this->request->getGet("draw")),
+            "recordsTotal"    => $totalFiltered,
+            "recordsFiltered" => $totalFiltered,
+            "data"            => $paginatedData,
+            "payload"         => $payload
+        ]);
+    }
+
+    public function exportExcelMutasi()
+    {
+        $condition = [
+            "barang_master.company_id" => $this->this_company_id,
+            "barang_master.deletedAt"  => null,
+        ];
+
+        $addCondition = [
+            "sort"       => "barang_master.barang_name",
+            "sortType"   => "asc",
+            "company_id" => $this->this_company_id,
+            "search"     => trim($this->request->getVar('search'))
+        ];
+
+        $dateStart = $this->request->getVar("dateStart")
+            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart"))))
+            : null;
+
+        $dateEnd = $this->request->getVar("dateEnd")
+            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd"))))
+            : null;
+
+        $tipeBarang = explode(',', $this->request->getVar('type_barang'));
+
+        /**
+         * ==================================================
+         * FETCH & HITUNG MUTASI (SAMA PERSIS SEPERTI KAMU)
+         * ==================================================
+         */
+        $stockMutasi = $this->stockRevampModel->allStockFisik(
+            $condition,
+            $addCondition,
+            100000000,
+            0,
+            $tipeBarang
+        );
+
+        // preload stok
+        $dataStokMasukAwal = $this->getTotalPemasukkan("2025-09-01", $dateStart);
+        $dataStokProduksiAwal = $this->getTotalPemasukkanProduksi("2025-09-01", $dateStart);
+        $dataStokKeluarAwal = $this->getTotalPengeluaranPerDokumen("2025-09-01", $dateStart);
+        $dataStokKeluarProduksiAwal = $this->getTotalPengeluaranProduksi("2025-09-01", $dateStart);
+
+        $dataStokMasuk = $this->getTotalPemasukkan($dateStart, $dateEnd);
+        $dataStokProduksiMasuk = $this->getTotalPemasukkanProduksi($dateStart, $dateEnd);
+        $dataStokKeluar = $this->getTotalPengeluaranPerDokumen($dateStart, $dateEnd);
+        $dataStokProduksiKeluar = $this->getTotalPengeluaranProduksi($dateStart, $dateEnd);
+
+        $dataMutasi = [];
+
+        foreach ($stockMutasi['data'] as $data) {
+            $awal = $masuk = $keluar = 0;
+            $kodeSatuan = "";
+
+            if (isset($dataStokMasukAwal[$data['id']])) {
+                $awal += $dataStokMasukAwal[$data['id']]['qty_diterima'];
+                $kodeSatuan = $dataStokMasukAwal[$data['id']]['kode_satuan'];
+            }
+            if (isset($dataStokProduksiAwal[$data['id']])) {
+                $awal += $dataStokProduksiAwal[$data['id']]['qty_diterima'];
+            }
+            if (isset($dataStokKeluarAwal[$data['id']])) {
+                $awal -= $dataStokKeluarAwal[$data['id']]['qty_diterima'];
+            }
+            if (isset($dataStokKeluarProduksiAwal[$data['id']])) {
+                $awal -= $dataStokKeluarProduksiAwal[$data['id']]['qty_diterima'];
+            }
+
+            if (isset($dataStokMasuk[$data['id']])) {
+                $masuk += $dataStokMasuk[$data['id']]['qty_diterima'];
+            }
+            if (isset($dataStokProduksiMasuk[$data['id']])) {
+                $masuk += $dataStokProduksiMasuk[$data['id']]['qty_diterima'];
+            }
+
+            if (isset($dataStokKeluar[$data['id']])) {
+                $keluar += $dataStokKeluar[$data['id']]['qty_diterima'];
+            }
+            if (isset($dataStokProduksiKeluar[$data['id']])) {
+                $keluar += $dataStokProduksiKeluar[$data['id']]['qty_diterima'];
+            }
+
+            $akhir = $awal + $masuk - $keluar;
+
+            // skip kosong
+            if ($awal == 0 && $masuk == 0 && $keluar == 0 && $akhir == 0) {
+                continue;
+            }
+
+            $dataMutasi[] = [
+                $data['parent_name'],
+                $data['kode_barang'],
+                $data['barang_name'],
+                $kodeSatuan,
+                $awal,
+                $masuk,
+                $keluar,
+                $akhir,
+            ];
+        }
+
+        /**
+         * ==================================================
+         * EXCEL GENERATION
+         * ==================================================
+         */
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // ===== HEADER =====
+        $sheet->mergeCells('A1:I1');
+        $sheet->setCellValue('A1', 'LAPORAN MUTASI BARANG');
+
+        $sheet->mergeCells('A2:I2');
+        $sheet->setCellValue(
+            'A2',
+            'Periode : ' . date('d-m-Y', strtotime($dateStart)) . ' s/d ' . date('d-m-Y', strtotime($dateEnd))
+        );
+
+        $sheet->mergeCells('A3:I3');
+        $sheet->setCellValue(
+            'A3',
+            'Tipe Barang : ' . implode(', ', $tipeBarang)
+        );
+
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('A1:A3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        // ===== TABLE HEADER =====
+        $headerRow = 5;
+        $headers = ['No', 'Parent', 'Kode Barang', 'Nama Barang', 'Satuan', 'Awal', 'Masuk', 'Keluar', 'Akhir'];
+
+        $col = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($col . $headerRow, $header);
+            $col++;
+        }
+
+        $sheet->getStyle("A{$headerRow}:I{$headerRow}")->getFont()->setBold(true);
+        $sheet->getStyle("A{$headerRow}:I{$headerRow}")
+            ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+
+        // ===== TABLE BODY =====
+        $row = $headerRow + 1;
+        $no = 1;
+        foreach ($dataMutasi as $item) {
+            $sheet->setCellValue("A{$row}", $no++);
+            $sheet->fromArray($item, null, "B{$row}");
+            $row++;
+        }
+
+        $sheet->getStyle("A{$headerRow}:I" . ($row - 1))
+            ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+
+        // autosize
+        foreach (range('A', 'I') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        /**
+         * ==================================================
+         * OUTPUT
+         * ==================================================
+         */
+        $filename = 'Laporan_Mutasi_Barang_' . date('YmdHis') . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"{$filename}\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+
+
+    private function getTotalPemasukkan(
+        $dateStart,
+        $dateEnd
+    ) {
+        $dataPemasukkanMap = array();
+
+        $condition = [
+            'company_id'   => $this->this_company_id,
+            'dateStartLpb' => $dateStart,
+            'dateEndLpb' => $dateEnd,
+            'search' => ''
+        ];
+
+        $dataPemasukkan = $this->bcPurchaseOrderModel->getFisikPemasukkanBarang(
+            $condition,
+            0,
+            "desc",
+            1000000000,
+            0
+        );
+
+        foreach ($dataPemasukkan['data'] as $d) {
+            $barangId = $d['barang_id'];
+            if (!isset($dataPemasukkanMap[$barangId])) {
+                $dataPemasukkanMap[$barangId] = [
+                    'qty_diterima' => 0,
+                    'kode_satuan' => $d['kode_satuan']
+                ];
+            }
+            $dataPemasukkanMap[$barangId]['qty_diterima'] += floatval($d['qty_diterima']);
+        }
+
+        return $dataPemasukkanMap;
+    }
+
+    private function getTotalPemasukkanProduksi(
+        $dateStart,
+        $dateEnd
+    ) {
+        $dataPemasukkanMap = array();
+
+        $condition = [
+            'company_id'   => $this->this_company_id,
+            'dateStart' => $dateStart,
+            'dateEnd' => $dateEnd,
+            'search' => ''
+        ];
+
+        $dataPemasukkan = $this->bcPurchaseOrderModel->getFisikPemasukkanProduksi(
+            $condition,
+            0,
+            "desc",
+            1000000000,
+            0
+        );
+
+        foreach ($dataPemasukkan['data'] as $d) {
+            $barangId = $d['barang1_id'];
+            if (!isset($dataPemasukkanMap[$barangId])) {
+                $dataPemasukkanMap[$barangId] = [
+                    'qty_diterima' => 0,
+                    'kode_satuan' => $d['kode_satuan']
+                ];
+            }
+            $dataPemasukkanMap[$barangId]['qty_diterima'] += floatval($d['qty_diterima']);
+        }
+
+        return $dataPemasukkanMap;
+    }
+
+    private function getTotalPengeluaranProduksi(
+        $dateStart,
+        $dateEnd
+    ) {
+        $dataPengeluaranMap = array();
+
+        $condition = [
+            'company_id'   => $this->this_company_id,
+            'dateStart' => $dateStart,
+            'dateEnd' => $dateEnd,
+            'search' => ''
+        ];
+
+        $dataPengeluaran = $this->bcPurchaseOrderModel->getFisikPengeluaranProduksi(
+            $condition,
+            0,
+            "desc",
+            1000000000,
+            0
+        );
+
+        foreach ($dataPengeluaran['data'] as $d) {
+            $barangId = $d['barang1_id'];
+            if (!isset($dataPengeluaranMap[$barangId])) {
+                $dataPengeluaranMap[$barangId] = [
+                    'qty_diterima' => 0,
+                    'kode_satuan' => $d['kode_satuan']
+                ];
+            }
+            $dataPengeluaranMap[$barangId]['qty_diterima'] += floatval($d['qty_diterima']);
+        }
+
+        return $dataPengeluaranMap;
+    }
+
+    private function getTotalPengeluaranPerDokumen(
+        $dateStart,
+        $dateEnd
+    ) {
+        $dataPengeluaranMap = array();
+
+        $condition = [
+            'company_id'   => $this->this_company_id,
+            'dateStart' => $dateStart,
+            'dateEnd' => $dateEnd,
+            'search' => ''
+        ];
+
+        $dataPengeluaran = $this->bcPurchaseOrderModel->getFisikPengeluaranBarangPerDokumen(
+            $condition,
+            0,
+            "desc",
+            1000000000,
+            0
+        );
+
+        foreach ($dataPengeluaran['data'] as $d) {
+            $barangId = $d['barang1_id'];
+            if (!isset($dataPengeluaranMap[$barangId])) {
+                $dataPengeluaranMap[$barangId] = [
+                    'qty_diterima' => 0,
+                    'kode_satuan' => $d['kode_satuan']
+                ];
+            }
+            $dataPengeluaranMap[$barangId]['qty_diterima'] += floatval($d['qty_diterima']);
+        }
+
+        return $dataPengeluaranMap;
+    }
+
+    public function laporanMutasiBahanBakuPenolong()
+    {
+        return view('Laporan/LaporanBeaCukai/mutasi/bahanBakuPenolong');
     }
 
     public function laporanMutasiBarangJadi()
     {
-        $data = [
-            'tipeBarang' => $this->metadataModel->where('deletedAt', null)->where('name', "Kategori Barang")->whereIn('description', ['bahan_jadi'])->findAll(),
-            'dataDivisi' => $this->divisiModel->getDivisiAccess(),
-        ];
-
-        return view('Laporan/LaporanBeaCukai/mutasi/barangJadi', $data);
+        return view('Laporan/LaporanBeaCukai/mutasi/barangJadi');
     }
 
     public function laporanMutasiBarangScrap()
     {
-        $data = [
-            'tipeBarang' => $this->metadataModel->where('deletedAt', null)->where('name', "Kategori Barang")->whereIn('description', ['bahan_scrap'])->findAll(),
-            'dataDivisi' => $this->divisiModel->getDivisiAccess(),
-        ];
-
-        return view('Laporan/LaporanBeaCukai/mutasi/barangScrap', $data);
+        return view('Laporan/LaporanBeaCukai/mutasi/barangScrap');
     }
 
     public function laporanMutasiBarangModal()
     {
-        $data = [
-            'tipeBarang' => $this->metadataModel->where('deletedAt', null)->where('name', "Kategori Barang")->whereIn('description', ['bahan_modal'])->findAll(),
-            'dataDivisi' => $this->divisiModel->getDivisiAccess(),
-        ];
 
-        return view('Laporan/LaporanBeaCukai/mutasi/barangModal', $data);
-    }
-
-    public function allMutasiBarang()
-    {
-
-        $payload = [
-            "pageSize"      => $this->request->getVar("length"),
-            "currentPage"   => ($this->request->getVar("start") / $this->request->getVar("length")) + 1,
-            "search" => $this->request->getVar("search"),
-            "sort" => $this->request->getVar("sort"),
-            "sorttype" => $this->request->getVar("sortType"),
-        ];
-
-        $addCondition = [
-            "sort"   => $this->request->getVar("sort"),
-            "sortType"  => $this->request->getVar("sortType"),
-            "parent_type" => json_decode($this->request->getVar("kategori_barang")), // HARUS ARRAY
-            "divisi_id" => $this->request->getVar("divisi_id"),
-            "warehouse_id" => $this->request->getVar("warehouse_id"),
-            "search" =>  $this->request->getVar("search"),
-            "date_start" => $this->request->getVar("date_start") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_start")))) : "",
-            "date_end" => $this->request->getVar("date_end") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_end")))) : "",
-        ];
-
-        $limit = $this->request->getVar("length");
-        $offset = $this->request->getVar("start");
-        $listMutasiBarang = $this->getListMutasiBarang(
-            $addCondition,
-            $payload,
-            $limit,
-            $offset
-        );
-
-        return response()->setJSON($listMutasiBarang);
-    }
-
-    public function exportPDFLaporanMutasi()
-    {
-        $payload = [
-            "pageSize" => 10000000,
-            "currentPage" => 1,
-            "search" => $this->request->getVar("search"),
-            "sort" => $this->request->getVar("sort"),
-            "sorttype" => $this->request->getVar("sortType"),
-        ];
-
-        $addCondition = [
-            "sort"   => $this->request->getVar("sort"),
-            "sortType"  => $this->request->getVar("sortType"),
-            "parent_type" => json_decode($this->request->getVar("kategori_barang")), // HARUS ARRAY
-            "divisi_id" => $this->request->getVar("divisi_id") != 'null' ? $this->request->getVar("divisi_id") : '',
-            "warehouse_id" => $this->request->getVar("warehouse_id") != 'null' ? $this->request->getVar("warehouse_id") : '',
-            "search" => $this->request->getVar("search") != 'null' ? $this->request->getVar("search") : '',
-            "date_start" => $this->request->getVar("date_start") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_start")))) : "",
-            "date_end" => $this->request->getVar("date_end") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_end")))) : "",
-        ];
-
-        $listMutasiBarang = $this->getListMutasiBarang(
-            $addCondition,
-            $payload,
-            10000000,
-            0
-        );
-        $domPdf = new Dompdf();
-
-
-        $label = "";
-        if (in_array('bahan_baku', $addCondition['parent_type']) || in_array('kemasan', $addCondition['parent_type'])) {
-            $label = "Laporan Mutasi Bahan Baku dan Penolong : " . $this->request->getVar('date_start') . " / " . $this->request->getVar('date_end');
-        } elseif (in_array('bahan_jadi', $addCondition['parent_type'])) {
-            $label = "Laporan Mutasi Barang Jadi : " . $this->request->getVar('date_start') . " / " . $this->request->getVar('date_end');
-        } elseif (in_array('bahan_scrap', $addCondition['parent_type'])) {
-            $label = "Laporan Mutasi Barang Scrap : " . $this->request->getVar('date_start') . " / " . $this->request->getVar('date_end');
-        } elseif (in_array('bahan_modal', $addCondition['parent_type'])) {
-            $label = "Laporan Mutasi Barang Modal : " . $this->request->getVar('date_start') . " / " . $this->request->getVar('date_end');
-        }
-
-        $domPdf->loadHtml(view('Laporan/LaporanBeaCukai/mutasi/printMutasi', [
-            'data' => $listMutasiBarang['data'],
-            'condition' => $addCondition,
-            'company' => $this->companiesModel->find($_SESSION['login']->this_company_id),
-            'label' => $label
-        ]));
-        $domPdf->setPaper('legal', 'landscape');
-        $domPdf->render();
-        $domPdf->stream($label, array("Attachment" => false));
-    }
-
-    public function exportExcelLaporanMutasi()
-    {
-        $payload = [
-            "pageSize" => 10000000,
-            "currentPage" => 1,
-            "search" => $this->request->getVar("search"),
-            "sort" => $this->request->getVar("sort"),
-            "sorttype" => $this->request->getVar("sortType"),
-        ];
-
-        $addCondition = [
-            "sort"   => $this->request->getVar("sort"),
-            "sortType"  => $this->request->getVar("sortType"),
-            "parent_type" => json_decode($this->request->getVar("kategori_barang")), // HARUS ARRAY
-            "divisi_id" => $this->request->getVar("divisi_id") != 'null' ? $this->request->getVar("divisi_id") : '',
-            "warehouse_id" => $this->request->getVar("warehouse_id") != 'null' ? $this->request->getVar("warehouse_id") : '',
-            "search" => $this->request->getVar("search") != 'null' ? $this->request->getVar("search") : '',
-            "date_start" => $this->request->getVar("date_start") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_start")))) : "",
-            "date_end" => $this->request->getVar("date_end") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_end")))) : "",
-        ];
-
-        $company = $this->companiesModel->find($_SESSION['login']->this_company_id);
-
-
-        $label = "";
-        if (in_array('bahan_baku', $addCondition['parent_type']) || in_array('kemasan', $addCondition['parent_type'])) {
-            $label = "Laporan Mutasi Bahan Baku dan Penolong : " . $this->request->getVar('date_start') . " / " . $this->request->getVar('date_end');
-        } elseif (in_array('bahan_jadi', $addCondition['parent_type'])) {
-            $label = "Laporan Mutasi Barang Jadi : " . $this->request->getVar('date_start') . " / " . $this->request->getVar('date_end');
-        } elseif (in_array('bahan_scrap', $addCondition['parent_type'])) {
-            $label = "Laporan Mutasi Barang Scrap : " . $this->request->getVar('date_start') . " / " . $this->request->getVar('date_end');
-        } elseif (in_array('bahan_modal', $addCondition['parent_type'])) {
-            $label = "Laporan Mutasi Barang Modal : " . $this->request->getVar('date_start') . " / " . $this->request->getVar('date_end');
-        }
-
-        $listMutasiBarang = $this->getListMutasiBarang(
-            $addCondition,
-            $payload,
-            10000000,
-            0
-        );
-
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-
-        $headerStyleArray = [
-            'font' => [
-                'bold' => true,
-            ],
-            'alignment' => [
-                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
-            ],
-        ];
-
-        $dataStyleArray = [
-            'alignment' => [
-                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
-            ],
-        ];
-
-        // Merge untuk kolom A1 sampai M1
-        $sheet->mergeCells('A1:M1');
-        $sheet->mergeCells('A2:M2');
-        $sheet->mergeCells('A3:M3');
-        $sheet->mergeCells('A4:M4');
-
-        // Mengatur teks agar berada di tengah
-        $sheet->getStyle('A1:M1')->applyFromArray($headerStyleArray);
-        $sheet->getStyle('A2:M2')->applyFromArray($headerStyleArray);
-        $sheet->getStyle('A3:M3')->applyFromArray($headerStyleArray);
-        $sheet->getStyle('A4:M4')->applyFromArray($headerStyleArray);
-
-        // Menambah isi pada cell A1 - A4
-        $sheet->setCellValue('A1', $label);
-        $sheet->setCellValue('A2', $company['holding_company'] . " (" . session()->get('login')->this_company . ')');
-        $sheet->setCellValue('A3', '---');
-        $sheet->setCellValue('A4', '--');
-
-        // Membuat header di baris 6
-        $spreadsheet->setActiveSheetIndex(0)
-            ->setCellValue('A6', 'No')
-            ->setCellValue('B6', 'Kode Barang')
-            ->setCellValue('C6', 'Nama Barang')
-            ->setCellValue('D6', 'Satuan')
-            ->setCellValue('E6', 'Tipe')
-            ->setCellValue('F6', 'Kategori')
-            ->setCellValue('G6', 'Jumlah Barang')
-            ->setCellValue('H6', 'Stok Awal')
-            ->setCellValue('I6', 'Pemasukan')
-            ->setCellValue('J6', 'Pengeluaran')
-            ->setCellValue('K6', 'Penyesuaian')
-            ->setCellValue('L6', 'Stok Akhir')
-            ->setCellValue('M6', 'Stok Opname')
-            ->setCellValue('N6', 'Selisih')
-            ->setCellValue('O6', 'Keterangan');
-
-        // Menerapkan gaya header
-        $sheet->getStyle('A6:O6')->applyFromArray($headerStyleArray);
-
-        $column = 7; // Baris awal data
-        $totalStokAwal = 0;
-        $totalStokPemasukan = 0;
-        $totalStokPengeluaran = 0;
-        $totalStokPenyesuaian = 0;
-        $totalStokAkhir = 0;
-
-        foreach ($listMutasiBarang['data'] as $row) {
-
-            $totalStokAwal += floatval(str_replace(',', '', $row['stok_awal']));
-            $totalStokPemasukan += floatval(str_replace(',', '', $row['stok_pemasukan']));
-            $totalStokPengeluaran += floatval(str_replace(',', '', $row['stok_pengeluaran']));
-            $totalStokPenyesuaian += floatval(str_replace(',', '', $row['stok_penyesuaian']));
-            $totalStokAkhir += floatval(str_replace(',', '', $row['stok_akhir']));
-
-            $sheet->setCellValue('A' . $column, $row['no'])
-                ->setCellValue('B' . $column, $row['kode_barang'])
-                ->setCellValue('C' . $column, $row['nama_barang'])
-                ->setCellValue('D' . $column, $row['satuan'])
-                ->setCellValue('E' . $column, $row['kategori_barang'])
-                ->setCellValue('F' . $column, $row['jenis_kategori'])
-                ->setCellValue('G' . $column, '')
-                ->setCellValue('H' . $column, $row['stok_awal'])
-                ->setCellValue('I' . $column, $row['stok_pemasukan'])
-                ->setCellValue('J' . $column, $row['stok_pengeluaran'])
-                ->setCellValue('K' . $column, $row['stok_penyesuaian'])
-                ->setCellValue('L' . $column, $row['stok_akhir'])
-                ->setCellValue('M' . $column, '0.00')
-                ->setCellValue('N' . $column, '0.00')
-                ->setCellValue('O' . $column, '');
-
-            // Menerapkan gaya data
-            $sheet->getStyle('A' . $column . ':O' . $column)->applyFromArray($dataStyleArray);
-            $column++;
-        }
-
-        // Total
-        $sheet->setCellValue('F' . $column, "Total");
-        $sheet->setCellValue('H' . $column, number_format($totalStokAwal, 2));
-        $sheet->setCellValue('I' . $column, number_format($totalStokPemasukan, 2));
-        $sheet->setCellValue('J' . $column, number_format($totalStokPengeluaran, 2));
-        $sheet->setCellValue('K' . $column, number_format($totalStokPenyesuaian, 2));
-        $sheet->setCellValue('L' . $column, number_format($totalStokAkhir, 2));
-
-        // Set lebar kolom otomatis
-        foreach (range('A', 'O') as $columnID) {
-            $sheet->getColumnDimension($columnID)->setAutoSize(true);
-        }
-
-        $writer = new Xlsx($spreadsheet);
-        $filename = $label;
-
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename=' . $filename . '.xlsx');
-        header('Cache-Control: max-age=0');
-
-        $writer->save('php://output');
-        die;
-    }
-
-    public function getListMutasiBarang($addCondition, $payload, $limit, $offset)
-    {
-        if (!in_array("kemasan", $addCondition['parent_type'])) {
-            // BARANG
-            $condition = [
-                "barang_master.company_id" => $this->this_company_id,
-                "barang_master.deletedAt" => null,
-                "barang_master_spesifikasi.deletedAt" => null,
-                "stock.company_id" => $this->this_company_id,
-                "stock.deletedAt" => null,
-            ];
-
-            $dataQry = $this->stockDetail2Model->getListLaporanMutasiBarang($condition, $addCondition, $limit, $offset);
-            $dataResult = [];
-            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
-
-            foreach ($dataQry['data'] as $data) {
-
-                // PENGHITUNGAN STOK NYA
-                $totalStockAwal = $this->stockDetail2Model->getTotalStokLogLaporanMutasi([
-                    'stock.id' => $data->id
-                ], [
-                    'stock_awal' => true,
-                    'date_start' => $addCondition['date_start'],
-                    'stock_awal' => 1
-                ]);
-
-                $totalStokPemasukan = $this->stockDetail2Model->getTotalStokLogLaporanMutasi([
-                    'stock_details.status' => "In",
-                    'stock.id' => $data->id
-                ], [
-                    'date_start' => $addCondition['date_start'],
-                    'date_end' => $addCondition['date_end'],
-                    'stock_sum' => 1
-                ]);
-
-                $totalStokPengeluaran = $this->stockDetail2Model->getTotalStokLogLaporanMutasi([
-                    'stock_details.status' => "Out",
-                    'stock.id' => $data->id
-                ], [
-                    'date_start' => $addCondition['date_start'],
-                    'date_end' => $addCondition['date_end'],
-                    'stock_sum' => 1
-                ]);
-
-                $totalStokPenyesuaian = $this->stockDetail2Model->getTotalStokLogLaporanMutasi([
-                    'stock_details.sumber' => "ADJUSMENT",
-                    'stock.id' => $data->id
-                ], [
-                    'date_start' => $addCondition['date_start'],
-                    'date_end' => $addCondition['date_end'],
-                ]);
-
-                // $totalStokAkhir = $this->stockDetail2Model->getTotalStokLogLaporanMutasi([
-                //     'stock.id' => $data->id
-                // ], [
-                //     'date_start' => $addCondition['date_start'],
-                //     'date_end' => $addCondition['date_end'],
-                // ]);
-
-                $totalStokAkhirDead = ($totalStockAwal + $totalStokPemasukan) - $totalStokPengeluaran;
-
-
-                if ($data->parent_type == "bahan_jadi") {
-                    $data->parent_type = "barang_jadi";
-                }
-
-                $satuan1 = $this->satuanModel->find($data->satuan_1);
-
-                array_push($dataResult, [
-                    "no"                    => $no++,
-                    "id"                    => encrypt($data->id),
-                    "kode_barang"           => strtoupper($data->kode_barang),
-                    "nama_barang"           => strtoupper($data->barang_name . "-" . $data->spesifikasi),
-                    "satuan"                => $satuan1 == null ? "-" : $satuan1['kode_satuan'],
-                    "kategori_barang"       => strtoupper(str_replace("_", " ", strtoupper($data->parent_type))),
-                    "jenis_kategori"        => strtoupper($data->parent_name),
-                    "divisi"                => strtoupper($data->divisi),
-                    "warehouse"             => strtoupper($data->warehouse),
-                    "stok_awal"             => number_format($totalStockAwal, 2),
-                    "stok_pemasukan"        => number_format($totalStokPemasukan, 2),
-                    "stok_pengeluaran"      => number_format($totalStokPengeluaran, 2),
-                    "stok_penyesuaian"      => number_format($totalStokPenyesuaian, 2),
-                    "stok_akhir"            => number_format($totalStokAkhirDead, 2),
-                    "stok_dead"             => number_format($totalStokAkhirDead, 2)
-                ]);
-            }
-        } else {
-            // KEMASAN
-            $condition = [
-                "kemasan.company_id" => $this->this_company_id,
-                "kemasan.deletedAt" => null,
-                "stock.company_id" => $this->this_company_id,
-                "stock.deletedAt" => null,
-            ];
-
-            $dataQry = $this->stockDetail2Model->getListLaporanMutasiKemasan($condition, $addCondition, $limit, $offset);
-            $dataResult = [];
-            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
-
-            foreach ($dataQry['data'] as $data) {
-                $satuan1 = $this->satuanModel->find($data->satuan_id);
-
-                // PENGHITUNGAN STOK NYA
-                $totalStockAwal = $this->stockDetail2Model->getTotalStokLogLaporanMutasi([
-                    'stock.id' => $data->id
-                ], [
-                    'stock_awal' => true,
-                    'date_start' => $addCondition['date_start'],
-                    'stock_awal' => 1
-                ]);
-
-                $totalStokPemasukan = $this->stockDetail2Model->getTotalStokLogLaporanMutasi([
-                    'stock_details.status' => "In",
-                    'stock.id' => $data->id
-                ], [
-                    'date_start' => $addCondition['date_start'],
-                    'date_end' => $addCondition['date_end'],
-                ]);
-
-                $totalStokPengeluaran = $this->stockDetail2Model->getTotalStokLogLaporanMutasi([
-                    'stock_details.status' => "Out",
-                    'stock.id' => $data->id
-                ], [
-                    'date_start' => $addCondition['date_start'],
-                    'date_end' => $addCondition['date_end'],
-                ]);
-
-                $totalStokPenyesuaian = $this->stockDetail2Model->getTotalStokLogLaporanMutasi([
-                    'stock_details.sumber' => "ADJUSMENT",
-                    'stock.id' => $data->id
-                ], [
-                    'date_start' => $addCondition['date_start'],
-                    'date_end' => $addCondition['date_end'],
-                ]);
-
-                // $totalStokAkhir = $this->stockDetail2Model->getTotalStokLogLaporanMutasi([
-                //     'stock.id' => $data->id
-                // ], [
-                //     'date_start' => $addCondition['date_start'],
-                //     'date_end' => $addCondition['date_end'],
-                // ]);
-
-                $totalStokAkhirDead = ($totalStockAwal + $totalStokPemasukan) - $totalStokPengeluaran;
-
-                array_push($dataResult, [
-                    "no"                    => $no++,
-                    "id"                    => encrypt($data->id),
-                    "kode_barang"           => strtoupper($data->kode),
-                    "nama_barang"           => strtoupper($data->name),
-                    "satuan"                => $satuan1 == null ? "-" : $satuan1['kode_satuan'],
-                    "kategori_barang"       => strtoupper(str_replace("_", " ", strtoupper($data->parent_type))),
-                    "divisi"                => strtoupper($data->divisi),
-                    "warehouse"             => strtoupper($data->warehouse),
-                    "stok_awal"             => number_format($totalStockAwal, 2),
-                    "stok_pemasukan"        => number_format($totalStokPemasukan, 2),
-                    "stok_pengeluaran"      => number_format($totalStokPengeluaran, 2),
-                    "stok_penyesuaian"      => number_format($totalStokPenyesuaian, 2),
-                    "stok_akhir"            => number_format($totalStokAkhirDead, 2),
-                    "stok_dead"             => number_format($totalStokAkhirDead, 2)
-                ]);
-            }
-        }
-
-        $data = [
-            "draw"              => intval($this->request->getVar("draw")),
-            "recordsTotal"      => $dataQry['totalData'],
-            "recordsFiltered"   => $dataQry['totalFilteredData'],
-            "data"              => $dataResult,
-            "payload"           => $payload
-        ];
-
-        return $data;
+        return view('Laporan/LaporanBeaCukai/mutasi/barangModal');
     }
 }
