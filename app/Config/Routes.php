@@ -3213,6 +3213,9 @@ $routes->post('hr-outsourcing-finger-machine/attendances-unit/reset-data-finger'
 $routes->get('hr-outsourcing-attendance', 'HROutsourcing\Attendance::index', ['filter' => 'Auth']);
 $routes->get('hr-outsourcing-attendance/listCompanyByDivisi/(:num)', 'HROutsourcing\Attendance::getCompanyByDivisi/$1', ['filter' => 'Auth']);
 $routes->post('hr-outsourcing-attendance/all', 'HROutsourcing\Attendance::allData', ['filter' => 'Auth']);
+$routes->post('hr-outsourcing-attendance/printPayrol', 'HROutsourcing\Attendance::generatePayrollPdf', ['filter' => 'Auth']);
+$routes->post('hr-outsourcing-attendance/pull-from-fingerprint', 'HROutsourcing\Attendance::pullFromFingerprint', ['filter' => 'Auth']);
+$routes->post('hr-outsourcing-attendance/clear-data', 'HROutsourcing\Attendance::clearData', ['filter' => 'Auth']);
 
 //HR Ousourcing Scale 
 $routes->get('/hr-outsourcing-scale', 'HROutsourcing\Scale::generateQrBarangView', ['filter' => 'Auth']);
