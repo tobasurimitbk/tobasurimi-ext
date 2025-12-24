@@ -1475,7 +1475,7 @@ class LaporanBeaCukai extends BaseController
         foreach (['G', 'I', 'K'] as $col) {
             $sheet->getStyle("{$col}5:{$col}{$rowNum}")
                 ->getNumberFormat()
-                ->setFormatCode('#,##0');
+                ->setFormatCode('#,##0.00');
         }
 
         $sheet->getStyle("A{$rowNum}:L{$rowNum}")
@@ -1822,7 +1822,7 @@ class LaporanBeaCukai extends BaseController
         /* ===== FORMAT ANGKA ===== */
         $sheet->getStyle('G5:G' . $rowExcel)
             ->getNumberFormat()
-            ->setFormatCode('#,##0');
+            ->setFormatCode('#,##0.00');
 
         $sheet->getStyle('G5:G' . $rowExcel)
             ->getAlignment()
