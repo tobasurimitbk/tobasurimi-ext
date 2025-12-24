@@ -505,43 +505,57 @@
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33'
             }).then((result) => {
-                if (result.isConfirmed) {
-                    // Show loading
-                    Swal.fire({
-                        title: 'Menarik Data...',
-                        text: 'Sedang mengambil data dari fingerprint',
-                        allowOutsideClick: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
+                if (!result.isConfirmed) return;
 
-                    $.ajax({
-                        url: '<?= base_url("hr-outsourcing-attendance/pull-from-fingerprint") ?>',
-                        type: 'POST',
-                        data: {
-                            company_id: companyId,
-                            date: date,
-                            '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
-                        },
-                        dataType: 'json',
-                        success: function(response) {
-                            Swal.close();
-                            if (response.success) {
-                                showAlert('success', `Berhasil menarik ${response.total} data dari fingerprint`, 5000);
-                                loadAttendanceData(); // Reload data setelah pull
-                            } else {
-                                showAlert('danger', response.message || 'Gagal menarik data', 5000);
-                            }
-                        },
-                        error: function() {
-                            Swal.close();
-                            showAlert('danger', 'Error saat menarik data dari fingerprint', 5000);
+                Swal.fire({
+                    title: 'Menarik Data...',
+                    text: 'Sedang mengambil data dari fingerprint',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                $.ajax({
+                    url: '<?= base_url("hr-outsourcing-attendance/pull-from-fingerprint") ?>',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        company_id: companyId,
+                        date: date,
+                        '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
+                    },
+                    success: function (response) {
+                        Swal.close();
+
+                        if (!response.success) {
+                            showAlert('danger', response.message || 'Gagal menarik data', 5000);
+                            return;
                         }
-                    });
-                }
+
+                        const fromMachine = response.from_machine ?? 0;
+                        const inserted    = response.inserted ?? 0;
+
+                        showAlert(
+                            'success',
+                            `Fingerprint: ${fromMachine} data • Tersimpan: ${inserted} data`,
+                            6000
+                        );
+
+                        loadAttendanceData(); // reload table
+                    },
+                    error: function (xhr) {
+                        Swal.close();
+
+                        let msg = 'Error saat menarik data dari fingerprint';
+                        if (xhr.responseJSON?.message) {
+                            msg = xhr.responseJSON.message;
+                        }
+
+                        showAlert('danger', msg, 5000);
+                    }
+                });
             });
         }
+
 
         // =========================
         // EXPORT TO EXCEL

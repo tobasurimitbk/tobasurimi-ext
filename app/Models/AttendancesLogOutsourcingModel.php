@@ -7,7 +7,7 @@ use CodeIgniter\Model;
 class AttendancesLogOutsourcingModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'attendances_log_outsource';
+    protected $table            = 'attendance_log_outsource';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
@@ -16,7 +16,7 @@ class AttendancesLogOutsourcingModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'employee_id',
-        'attendances_unit',
+        'attendance_unit',
         'datetime',
     ];
 

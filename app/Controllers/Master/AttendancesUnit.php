@@ -7,6 +7,7 @@ use App\Controllers\BaseController;
 use App\Models\AttendancesUnitModel;
 use App\Models\EmployeesModel;
 use App\Models\EmployeesFingerModel;
+use App\Models\AttendancesLogOutsourcingModel;
 use Exception;
 
 class AttendancesUnit extends BaseController
@@ -18,6 +19,7 @@ class AttendancesUnit extends BaseController
     protected $EmployeesFingerModel;
     protected $maxTimeOut = 5; // Maksimal timeout 5 detik
     protected $EmployeesController;
+    protected $AttendancesLogOutsourcingModel;
 
     public function __construct()
     {
@@ -27,6 +29,7 @@ class AttendancesUnit extends BaseController
         $this->EmployeesModel = new EmployeesModel();
         $this->EmployeesFingerModel = new EmployeesFingerModel();
         $this->EmployeesController = new Employees();
+        $this->AttendancesLogOutsourcingModel = new AttendancesLogOutsourcingModel();
     }
 
     public function ListData()
@@ -819,6 +822,77 @@ class AttendancesUnit extends BaseController
 
         } catch (\Exception $e) {
             throw new \Exception("Error: " . $e->getMessage());
+        }
+    }
+
+    public function getAttendanceFromDatabase($companyId, $date)
+    {
+        try {
+            $selectedDate = date('Y-m-d', strtotime($date));
+
+            // Ambil semua log presensi dari DB berdasarkan company & tanggal
+            $logs = $this->AttendancesLogOutsourcingModel
+                ->select('
+                    attendances_log_outsource.employee_id as pin,
+                    attendances_log_outsource.datetime,
+                    attendances_log_outsource.attendance_unit,
+                    1 as verified,
+                    0 as status,
+                    0 as workcode
+                ')
+                ->join(
+                    'attendances_unit_outsource',
+                    'attendances_unit_outsource.id = attendances_log_outsource.attendances_unit',
+                    'left'
+                )
+                ->where('attendances_unit_outsource.company_id', $companyId)
+                ->where('DATE(attendances_log_outsource.datetime)', $selectedDate)
+                ->orderBy('attendances_log_outsource.datetime', 'ASC')
+                ->findAll();
+
+            return $logs;
+
+        } catch (\Throwable $e) {
+            throw new \Exception('DB Attendance Error: ' . $e->getMessage());
+        }
+    }
+
+
+    public function clearAttendanceFromDevice($ip, $unitKey = 0)
+    {
+        try {
+            $conn = @fsockopen($ip, 80, $errno, $errstr, 2);
+
+            if (!$conn) {
+                throw new \Exception("Koneksi gagal ke $ip: $errstr ($errno)");
+            }
+
+            $xml = "<ClearData>
+                        <ArgComKey>$unitKey</ArgComKey>
+                        <Arg>
+                            <Value>3</Value> <!-- 3 = Attendance Log -->
+                        </Arg>
+                    </ClearData>";
+
+            $nl = "\r\n";
+
+            fputs($conn, "POST /iWsService HTTP/1.0{$nl}");
+            fputs($conn, "Content-Type: text/xml{$nl}");
+            fputs($conn, "Content-Length: " . strlen($xml) . "{$nl}{$nl}");
+            fputs($conn, $xml . $nl);
+
+            $response = '';
+            while ($line = fgets($conn, 4096)) {
+                $response .= $line;
+            }
+
+            fclose($conn);
+
+            // Optional: cek response XML kalau mau
+            return true;
+
+        } catch (\Throwable $e) {
+            throw new \Exception("Gagal hapus log mesin: " . $e->getMessage());
         }
     }
 
