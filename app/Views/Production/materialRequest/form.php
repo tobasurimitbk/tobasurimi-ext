@@ -2340,9 +2340,9 @@
             totalQty += parseFloat(listStockSelectedBahanJadi[i].qty2) || 0;
             totalQtyIsi += parseFloat(listStockSelectedBahanJadi[i].qty_isi) || 0;
         });
-        $('.nilai-total-barang-jadi-awal').text(greatFormatRupiah(totalQtyAwal));
-        $('.nilai-total-barang-jadi-request').text(greatFormatRupiah(totalQty));
-        $('.nilai-total-isi-barang-jadi-request').text(greatFormatRupiah(totalQtyIsi));
+        $('.nilai-total-barang-jadi-awal').text(greatFormatRupiah(totalQtyAwal.toFixed(2)));
+        $('.nilai-total-barang-jadi-request').text(greatFormatRupiah(totalQty.toFixed(2)));
+        $('.nilai-total-isi-barang-jadi-request').text(greatFormatRupiah(totalQtyIsi.toFixed(2)));
     }
 
     function getIDListDataSelected() {
