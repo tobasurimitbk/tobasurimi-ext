@@ -81,22 +81,19 @@
                                 <th rowspan="2" onclick="changeSort('bc_purchase_order.no_daftar')">No Daftar</th>
                                 <th rowspan="2" onclick="changeSort('bc_purchase_order.po_type')">Tipe PO</th>
 
-                                <th colspan="3" class="text-left">PPN</th>
-                                <th colspan="3" class="text-left">PPH</th>
-                                <th colspan="3" class="text-left">BM</th>
+                                <th colspan="2" class="text-left">PPN</th>
+                                <th colspan="2" class="text-left">PPH</th>
+                                <th colspan="2" class="text-left">BM</th>
                             </tr>
                             <tr>
-                                <th class="text-left">Tidak Dipungut</th>
-                                <th class="text-left">Di Bebaskan</th>
-                                <th class="text-left">Di Tangguhkan</th>
+                                <th class="text-left">Nilai</th>
+                                <th class="text-left">Status</th>
 
-                                <th class="text-left">Tidak Dipungut</th>
-                                <th class="text-left">Di Bebaskan</th>
-                                <th class="text-left">Di Tangguhkan</th>
+                                <th class="text-left">Nilai</th>
+                                <th class="text-left">Status</th>
 
-                                <th class="text-left">Tidak Dipungut</th>
-                                <th class="text-left">Di Bebaskan</th>
-                                <th class="text-left">Di Tangguhkan</th>
+                                <th class="text-left">Nilai</th>
+                                <th class="text-left">Status</th>
                             </tr>
                         </thead>
 
@@ -123,116 +120,96 @@
         order: [
             [1, 'asc']
         ],
-        fixedHeader: true,
         lengthMenu: [
             [25],
-            [25],
+            [25]
         ],
         pageLength: 25,
+
         ajax: {
             url: "<?= base_url('laporan-bea-cukai/all-pungutan-bc-23'); ?>",
+            type: "GET",
             dataSrc: "data",
-            data: function(data) {
-                data.mulaiTanggalBC23 = $('.mulaiTanggalBC23').val();
-                data.selesaiTanggalBC23 = $('.selesaiTanggalBC23').val();
-                data.search = $('.search').val();
-                data.sort = sort;
-                data.sortType = sortType;
+            data: function(d) {
+                d.mulaiTanggalBC23 = $('.mulaiTanggalBC23').val();
+                d.selesaiTanggalBC23 = $('.selesaiTanggalBC23').val();
+                d.search = $('.search').val();
+                d.sort = sort;
+                d.sortType = sortType;
             }
         },
+
         columns: [{
                 data: 'no',
                 className: "text-left",
-                sortable: false
+                orderable: false
             },
             {
-                data: "supplier_name",
+                data: 'supplier_name',
                 className: "text-left"
             },
             {
-                data: "date",
+                data: 'date',
                 className: "text-left"
             },
             {
-                data: "no_aju",
+                data: 'no_aju',
                 className: "text-left"
             },
             {
-                data: "no_daftar",
+                data: 'no_daftar',
                 className: "text-left"
             },
             {
-                data: "po_type",
+                data: 'po_type',
                 className: "text-left"
             },
+
+            /* ================= PPN ================= */
             {
-                data: "dataBCTarif.PPN.tidak_dipungut",
-                className: "text-left",
+                data: "dataBCTarif.PPN.nilai",
+                className: "text-right",
                 render: function(data) {
-                    return greatFormatRupiah(data > 0 ? data : '');
+                    return data > 0 ? greatFormatRupiah(data) : '';
                 }
             },
             {
-                data: "dataBCTarif.PPN.di_bebaskan",
-                className: "text-left",
+                data: "dataBCTarif.PPN.status",
+                className: "text-center"
+            },
+
+            /* ================= PPH ================= */
+            {
+                data: "dataBCTarif.PPH.nilai",
+                className: "text-right",
                 render: function(data) {
-                    return greatFormatRupiah(data > 0 ? data : '');
+                    return data > 0 ? greatFormatRupiah(data) : '';
                 }
             },
             {
-                data: "dataBCTarif.PPN.di_tangguhkan",
-                className: "text-left",
+                data: "dataBCTarif.PPH.status",
+                className: "text-center"
+            },
+
+            /* ================= BM ================= */
+            {
+                data: "dataBCTarif.BM.nilai",
+                className: "text-right",
                 render: function(data) {
-                    return greatFormatRupiah(data > 0 ? data : '');
+                    return data > 0 ? greatFormatRupiah(data) : '';
                 }
             },
             {
-                data: "dataBCTarif.PPH.tidak_dipungut",
-                className: "text-left",
-                render: function(data) {
-                    return greatFormatRupiah(data > 0 ? data : '');
-                }
-            },
-            {
-                data: "dataBCTarif.PPH.di_bebaskan",
-                className: "text-left",
-                render: function(data) {
-                    return greatFormatRupiah(data > 0 ? data : '');
-                }
-            },
-            {
-                data: "dataBCTarif.PPH.di_tangguhkan",
-                className: "text-left",
-                render: function(data) {
-                    return greatFormatRupiah(data > 0 ? data : '');
-                }
-            },
-            {
-                data: "dataBCTarif.BM.tidak_dipungut",
-                className: "text-left",
-                render: function(data) {
-                    return greatFormatRupiah(data > 0 ? data : '');
-                }
-            },
-            {
-                data: "dataBCTarif.BM.di_bebaskan",
-                className: "text-left",
-                render: function(data) {
-                    return greatFormatRupiah(data > 0 ? data : '');
-                }
-            },
-            {
-                data: "dataBCTarif.BM.di_tangguhkan",
-                className: "text-left",
-                render: function(data) {
-                    return greatFormatRupiah(data > 0 ? data : '');
-                }
+                data: "dataBCTarif.BM.status",
+                className: "text-center"
             },
         ],
+
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
         }],
+
         language: {
             emptyTable: "Tidak Ada Data",
             lengthMenu: "Show _MENU_ entries",
@@ -242,6 +219,7 @@
             }
         }
     });
+
 
     function handleFilter() {
         table.ajax.reload();

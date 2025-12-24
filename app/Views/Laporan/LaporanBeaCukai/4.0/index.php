@@ -81,12 +81,11 @@
                                 <th rowspan="2" onclick="changeSort('bc_purchase_order.no_daftar')">No Daftar</th>
                                 <th rowspan="2" onclick="changeSort('bc_purchase_order.po_type')">Tipe PO</th>
 
-                                <th colspan="3" class="text-left">PPN</th>
+                                <th colspan="2" class="text-left">PPN</th>
                             </tr>
                             <tr>
-                                <th class="text-left">Tidak Dipungut</th>
-                                <th class="text-left">Di Bebaskan</th>
-                                <th class="text-left">Di Tangguhkan</th>
+                                <th class="text-left">Nilai</th>
+                                <th class="text-left">Status</th>
                             </tr>
                         </thead>
 
@@ -113,12 +112,12 @@
         order: [
             [1, 'asc']
         ],
-        fixedHeader: true,
         lengthMenu: [
             [25],
-            [25],
+            [25]
         ],
         pageLength: 25,
+
         ajax: {
             url: "<?= base_url('laporan-bea-cukai/all-pungutan-bc-40'); ?>",
             dataSrc: "data",
@@ -130,11 +129,12 @@
                 data.sortType = sortType;
             }
         },
+
         columns: [{
                 data: "no",
                 className: "text-left",
-                sortable: false
-            }, // Nomor urut
+                orderable: false
+            },
             {
                 data: "supplier_name",
                 className: "text-left"
@@ -156,45 +156,43 @@
                 className: "text-left"
             },
             {
-                data: "dataBCTarif.PPN.tidak_dipungut",
-                className: "text-left",
+                data: "ppn_nilai",
+                className: "text-right",
                 render: function(data) {
-                    return greatFormatRupiah(data > 0 ? data : '');
+                    return data > 0 ? greatFormatRupiah(parseFloat(data).toFixed(2)) : '';
                 }
             },
             {
-                data: "dataBCTarif.PPN.di_bebaskan",
+                data: "ppn_status",
                 className: "text-left",
                 render: function(data) {
-                    return greatFormatRupiah(data > 0 ? data : '');
+                    return data;
                 }
-            },
-            {
-                data: "dataBCTarif.PPN.di_tangguhkan",
-                className: "text-left",
-                render: function(data) {
-                    return greatFormatRupiah(data > 0 ? data : '');
-                }
-            },
+            }
         ],
-        "initComplete": function(settings, json) {
+
+        initComplete: function() {
             $('.dataTables_length').empty();
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+            $('.dataTables_length').html(
+                "<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>"
+            );
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%; position:relative;'></div>");
         },
+
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
         }],
+
         language: {
             emptyTable: "Tidak Ada Data",
-            lengthMenu: "Show _MENU_ entries",
             paginate: {
                 previous: '<i class="fa fa-angle-left"></i>',
                 next: '<i class="fa fa-angle-right"></i>'
             }
         }
     });
+
 
     $(".mulaiTanggalBC40, .selesaiTanggalBC40").datepicker({
         todayHighlight: true,
