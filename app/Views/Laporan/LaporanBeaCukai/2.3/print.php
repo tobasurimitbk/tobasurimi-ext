@@ -1,112 +1,135 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Pungutan Bea Cukai 2.3</title>
+    <meta charset="utf-8">
     <style>
         body {
             font-family: Arial, sans-serif;
+            font-size: 11px;
         }
 
         h2 {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 5px;
         }
 
-        .item-table {
-            border: 1px solid;
+        .periode {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
         }
 
-        .item-table th,
-        .item-table td {
-            border: 1px solid;
-            font-size: 12px;
-            padding: 5px;
-            text-align: center; /* Center align text */
+        th,
+        td {
+            border: 1px solid #000;
+            padding: 4px;
+            vertical-align: middle;
         }
 
-        .item-table th {
-            background-color: #f2f2f2;
+        th {
+            background: #eee;
+            text-align: center;
             font-weight: bold;
         }
 
-        .w-100 {
-            width: 100%;
+        .text-right {
+            text-align: right;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .bold {
+            font-weight: bold;
         }
     </style>
 </head>
 
 <body>
-    <h2>LAPORAN BEA CUKAI BC 2.3</h2>
 
-    <table class="w-100">
-        <tbody>
-            <tr>
-                <td style="width:150px">Tgl Mulai / Tgl Akhir</td>
-                <td style="width:10px">:</td>
-                <?php if ($condition['mulaiTanggalBC23'] != "" && $condition['selesaiTanggalBC23'] != "") : ?>
-                    <td style="width:80px"><?= date('d/m/Y', strtotime($condition['mulaiTanggalBC23'])); ?></td>
-                    <td style="width:10px"> S/D </td>
-                    <td><?= date('d/m/Y', strtotime($condition['selesaiTanggalBC23'])); ?></td>
-                <?php else : ?>
-                    <td colspan="3" style="width:80px">ALL</td>
-                <?php endif; ?>
-            </tr>
-        </tbody>
-    </table>
+    <h2>LAPORAN PUNGUTAN BC 2.3</h2>
+    <div class="periode">Periode : <?= $periode ?></div>
 
-    <table class="item-table">
-        <thead class="thead-dark">
+    <table>
+        <thead>
             <tr>
                 <th rowspan="2">No</th>
-                <th rowspan="2">Nama Supplier</th>
+                <th rowspan="2">Supplier</th>
                 <th rowspan="2">Tanggal</th>
                 <th rowspan="2">No Aju</th>
                 <th rowspan="2">No Daftar</th>
                 <th rowspan="2">Tipe PO</th>
-                <th colspan="3">PPN</th>
-                <th colspan="3">PPH</th>
-                <th colspan="3">BM</th>
+                <th colspan="2">PPN</th>
+                <th colspan="2">PPH</th>
+                <th colspan="2">BM</th>
             </tr>
             <tr>
-                <th>Tidak Dipungut</th>
-                <th>Di Bebaskan</th>
-                <th>Di Tangguhkan</th>
-                <th>Tidak Dipungut</th>
-                <th>Di Bebaskan</th>
-                <th>Di Tangguhkan</th>
-                <th>Tidak Dipungut</th>
-                <th>Di Bebaskan</th>
-                <th>Di Tangguhkan</th>
+                <th>Nilai</th>
+                <th>Status</th>
+                <th>Nilai</th>
+                <th>Status</th>
+                <th>Nilai</th>
+                <th>Status</th>
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($data as $row) : ?>
+
+            <?php
+            $total = ['PPN' => 0, 'PPH' => 0, 'BM' => 0];
+            foreach ($data as $r):
+                $total['PPN'] += $r['pungutan']['PPN']['nilai'];
+                $total['PPH'] += $r['pungutan']['PPH']['nilai'];
+                $total['BM']  += $r['pungutan']['BM']['nilai'];
+            ?>
                 <tr>
-                    <td><?= $row['no']; ?></td>
-                    <td><?= $row['supplier_name']; ?></td>
-                    <td><?= date('d/m/Y', strtotime($row['date'])); ?></td>
-                    <td><?= $row['no_aju']; ?></td>
-                    <td><?= $row['no_daftar']; ?></td>
-                    <td><?= $row['po_type']; ?></td>
-                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['PPN']['tidak_dipungut']); ?></td>
-                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['PPN']['di_bebaskan']); ?></td>
-                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['PPN']['di_tangguhkan']); ?></td>
-                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['PPH']['tidak_dipungut']); ?></td>
-                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['PPH']['di_bebaskan']); ?></td>
-                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['PPH']['di_tangguhkan']); ?></td>
-                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['BM']['tidak_dipungut']); ?></td>
-                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['BM']['di_bebaskan']); ?></td>
-                    <td><?= formatRupiahPdfExcel($row['dataBCTarif']['BM']['di_tangguhkan']); ?></td>
+                    <td class="text-center"><?= $r['no'] ?></td>
+                    <td><?= $r['supplier_name'] ?></td>
+                    <td class="text-center"><?= $r['date'] ?></td>
+                    <td><?= $r['no_aju'] ?></td>
+                    <td><?= $r['no_daftar'] ?></td>
+                    <td><?= $r['po_type'] ?></td>
+
+                    <td class="text-right"><?= number_format($r['pungutan']['PPN']['nilai'], 2) ?></td>
+                    <td><?= $r['pungutan']['PPN']['status'] ?></td>
+
+                    <td class="text-right"><?= number_format($r['pungutan']['PPH']['nilai'], 2) ?></td>
+                    <td><?= $r['pungutan']['PPH']['status'] ?></td>
+
+                    <td class="text-right"><?= number_format($r['pungutan']['BM']['nilai'], 2) ?></td>
+                    <td><?= $r['pungutan']['BM']['status'] ?></td>
                 </tr>
             <?php endforeach; ?>
+
+            <tr class="bold">
+                <td colspan="6" class="text-right">TOTAL PPN</td>
+                <td class="text-right"><?= number_format($total['PPN'], 2) ?></td>
+                <td colspan="5"></td>
+            </tr>
+            <tr class="bold">
+                <td colspan="6" class="text-right">TOTAL PPH</td>
+                <td class="text-right"><?= number_format($total['PPH'], 2) ?></td>
+                <td colspan="5"></td>
+            </tr>
+            <tr class="bold">
+                <td colspan="6" class="text-right">TOTAL BM</td>
+                <td class="text-right"><?= number_format($total['BM'], 2) ?></td>
+                <td colspan="5"></td>
+            </tr>
+            <tr class="bold">
+                <td colspan="6" class="text-right">GRAND TOTAL PUNGUTAN</td>
+                <td class="text-right"><?= number_format($total['PPN'] + $total['PPH'] + $total['BM'], 2) ?></td>
+                <td colspan="5"></td>
+            </tr>
+
         </tbody>
     </table>
+
 </body>
 
 </html>

@@ -5,6 +5,7 @@ namespace App\Controllers\HROutsourcing;
 use App\Controllers\API\Attendances;
 use App\Controllers\BaseController;
 use App\Controllers\Master\AttendancesUnit;
+use App\Models\AttendancesLogOutsourcingModel;
 use App\Models\AttendancesUnitOutsourceModel;
 use App\Models\DivisisModel;
 use App\Models\HROutsourcingCompanyModel;
@@ -35,6 +36,7 @@ class Attendance extends BaseController
     protected $AttendancesUnitOutsourceModel;
     protected $Attendance;
     protected $divisiModel;
+    protected $AttendancesLogOutsourcingModel;
     
 
     public function __construct()
@@ -44,6 +46,7 @@ class Attendance extends BaseController
         $this->hrOutSourcingCompanyModel = new HROutsourcingCompanyModel();
         $this->AttendancesUnitOutsourceModel = new AttendancesUnitOutsourceModel();
         $this->hrOutSourcingEmployeModel = new HROutsourcingEmployeeModel();
+        $this->AttendancesLogOutsourcingModel = new AttendancesLogOutsourcingModel();
         $this->Attendance = new AttendancesUnit();
         $this->divisiModel = new DivisisModel();
     }
@@ -310,6 +313,149 @@ class Attendance extends BaseController
         }
     }
 
+    public function pullFromFingerprint()
+    {
+        // Cek input
+        $companyId = $this->request->getVar('company_id');
+        $date = $this->request->getVar('date');
+        
+        if (!$companyId || !$date) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Company ID dan Tanggal harus diisi'
+            ]);
+        }
+        
+        try {
+            // 1. Get company data
+            $company = $this->hrOutSourcingCompanyModel
+                ->where('id', $companyId)
+                ->where('deletedAt', NULL)
+                ->first();
+                
+            if (!$company) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Perusahaan tidak ditemukan'
+                ]);
+            }
+            
+            // 2. Get device IP from AttendancesUnitOutsourceModel
+            $device = $this->AttendancesUnitOutsourceModel
+                ->where('id', $company['ip_finger'])
+                ->first();
+                
+            if (!$device) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Device fingerprint tidak ditemukan'
+                ]);
+            }
+            
+            // 3. Get all employees for this company
+            $allEmployees = $this->hrOutSourcingEmployeModel
+                ->where('company_id', $companyId)
+                ->findAll();
+            
+            if (empty($allEmployees)) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Tidak ada karyawan di perusahaan ini'
+                ]);
+            }
+            
+            // 4. Parse tanggal dari input
+            $selectedDate = date('Y-m-d', strtotime($date));
+            
+            // 5. Get attendance data from device
+            $attendanceData = $this->Attendance->getAttendanceFromDevice(
+                $device['ip'],
+                0,
+                $selectedDate
+            );
+            
+            if (empty($attendanceData)) {
+                return $this->response->setJSON([
+                    'success' => true,
+                    'message' => 'Tidak ada data presensi di mesin untuk tanggal ' . $selectedDate,
+                    'total' => 0,
+                    'saved' => 0
+                ]);
+            }
+            
+            // 6. Filter data berdasarkan tanggal yang dipilih
+            $filteredData = [];
+            foreach ($attendanceData as $att) {
+                $attDate = date('Y-m-d', strtotime($att['datetime']));
+                if ($attDate === $selectedDate) {
+                    $filteredData[] = $att;
+                }
+            }
+            
+            if (empty($filteredData)) {
+                return $this->response->setJSON([
+                    'success' => true,
+                    'message' => 'Tidak ada data presensi untuk tanggal ' . $selectedDate,
+                    'total' => 0,
+                    'saved' => 0
+                ]);
+            }
+            
+            // 7. Validasi dan simpan ke database
+            $savedCount = 0;
+            $errorLogs = [];
+            
+            foreach ($filteredData as $att) {
+                try {
+                    // Cek apakah employee_id (PIN) ada di database karyawan
+                    $employeeExists = false;
+                    foreach ($allEmployees as $emp) {
+                        if ((int)$emp['id'] === (int)$att['pin']) {
+                            $employeeExists = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!$employeeExists) {
+                        $errorLogs[] = "PIN " . $att['pin'] . " tidak terdaftar sebagai karyawan";
+                        continue;
+                    }
+                    
+                    // Simpan ke database
+                    $result = $this->AttendancesLogOutsourcingModel->saveLogFromDevice($att);
+                    
+                    if ($result) {
+                        $savedCount++;
+                    }
+                    
+                } catch (\Exception $e) {
+                    $errorLogs[] = "Error pada PIN " . $att['pin'] . ": " . $e->getMessage();
+                }
+            }
+            
+            // 8. Prepare response
+            $response = [
+                'success' => true,
+                'message' => 'Data berhasil ditarik dari mesin',
+                'total' => count($filteredData),
+                'saved' => $savedCount,
+                'errors' => $errorLogs
+            ];
+            
+            if (!empty($errorLogs)) {
+                $response['message'] = 'Data berhasil ditarik dengan beberapa error';
+            }
+            
+            return $this->response->setJSON($response);
+            
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ]);
+        }
+    }
+
     private function getAttendanceType($status)
     {
         $types = [
@@ -396,6 +542,7 @@ public function generatePayrollPdf()
         // ===============================
         $device = $this->AttendancesUnitOutsourceModel
             ->where('id', $company['ip_finger'])
+            ->where('deletedAt', NULL)
             ->first();
 
         if (!$device) {
@@ -423,47 +570,50 @@ public function generatePayrollPdf()
         // 5. AMBIL ABSENSI (1x SAJA)
         // ===============================
         $rawAttendance = $this->Attendance->getAttendanceFromDevice(
-    $device['ip'],
-    0,
-    null
-);
+            $device['ip'],
+            0,
+            $this->request->getPost('start_date')
+        );
 
-$attendanceData = [];
+        var_dump($rawAttendance);
+        die;
 
-foreach ($rawAttendance as $att) {
+        $attendanceData = [];
 
-    $pin = (int)$att['pin'];
-    if ($pin <= 0) continue;
+        foreach ($rawAttendance as $att) {
 
-    $attDate = date('Y-m-d', strtotime($att['datetime']));
+            $pin = (int)$att['pin'];
+            if ($pin <= 0) continue;
 
-    if ($attDate < $startDate || $attDate > $endDate) {
-        continue;
-    }
+            $attDate = date('Y-m-d', strtotime($att['datetime']));
 
-    if (!isset($attendanceData[$attDate])) {
-        $attendanceData[$attDate] = [];
-    }
+            if ($attDate < $startDate || $attDate > $endDate) {
+                continue;
+            }
 
-    if (!isset($attendanceData[$attDate][$pin])) {
-        $attendanceData[$attDate][$pin] = [];
-    }
+            if (!isset($attendanceData[$attDate])) {
+                $attendanceData[$attDate] = [];
+            }
 
-    $attendanceData[$attDate][$pin][] = [
-        'datetime'  => $att['datetime'],
-        'timestamp' => strtotime($att['datetime']),
-        'verified'  => (int)$att['verified'],
-        'status'    => (int)$att['status'],
-        'workcode'  => (int)$att['workcode'],
-    ];
-}
+            if (!isset($attendanceData[$attDate][$pin])) {
+                $attendanceData[$attDate][$pin] = [];
+            }
 
-// sort log
-foreach ($attendanceData as $date => $employees) {
-    foreach ($employees as $pin => $records) {
-        usort($attendanceData[$date][$pin], fn($a,$b) => $a['timestamp'] <=> $b['timestamp']);
-    }
-}
+            $attendanceData[$attDate][$pin][] = [
+                'datetime'  => $att['datetime'],
+                'timestamp' => strtotime($att['datetime']),
+                'verified'  => (int)$att['verified'],
+                'status'    => (int)$att['status'],
+                'workcode'  => (int)$att['workcode'],
+            ];
+        }
+
+        // sort log
+        foreach ($attendanceData as $date => $employees) {
+            foreach ($employees as $pin => $records) {
+                usort($attendanceData[$date][$pin], fn($a,$b) => $a['timestamp'] <=> $b['timestamp']);
+            }
+        }
 
 
         // ===============================

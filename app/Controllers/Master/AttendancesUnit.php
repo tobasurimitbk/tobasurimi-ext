@@ -815,25 +815,12 @@ class AttendancesUnit extends BaseController
             // Parse semua log
             $allLogs = $this->parseAttLogResponse($response);
 
-            // ================
-            // FILTER HARI INI
-            // ================
-            $filtered = array_filter($allLogs, function($row) use ($today) {
-                if (!isset($row['datetime'])) return false;
-
-                $dateOnly = substr($row['datetime'], 0, 10); // ambil yyyy-mm-dd
-
-                return $dateOnly === $today;
-            });
-
-            // Reset array index
-            return array_values($filtered);
+            return array_values($allLogs);
 
         } catch (\Exception $e) {
             throw new \Exception("Error: " . $e->getMessage());
         }
     }
-
 
     private function parseAttLogResponse($xml)
     {
@@ -865,7 +852,6 @@ class AttendancesUnit extends BaseController
         }
         return null;
     }
-
 
     private function parseFingerResponse($data)
     {

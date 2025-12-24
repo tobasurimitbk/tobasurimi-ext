@@ -105,7 +105,7 @@
             </a>
         </div>
         <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-            <a href="<?= base_url('/laporan-bea-cukai/laporan-2.3') ?>">
+            <a href="<?= base_url('/laporan-bea-cukai/pungutan-bc-23') ?>">
                 <div class="card card-statistic-1">
                     <div class="card-icon bg-danger">
                         <i class="far fa-file"></i>
@@ -161,7 +161,7 @@
             </a>
         </div> -->
         <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-            <a href="<?= base_url('/laporan-bea-cukai/laporan-4.0') ?>">
+            <a href="<?= base_url('/laporan-bea-cukai/pungutan-bc-40') ?>">
                 <div class="card card-statistic-1">
                     <div class="card-icon bg-danger">
                         <i class="far fa-file"></i>

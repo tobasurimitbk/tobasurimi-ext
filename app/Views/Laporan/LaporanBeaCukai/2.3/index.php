@@ -5,13 +5,15 @@
 <section class="section">
     <div class="section-header">
         <h1>Laporan Pungutan Bea Cukai 2.3</h1>
-        <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false" style="margin-right: -1px;">
-            Export
-        </button>
-        <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-            <li><button class="dropdown-item pdf" onclick="pdfExcel('<?= base_url("/laporan-bea-cukai/laporan-2.3/print"); ?>')">PDF</button></li>
-            <li><button class="dropdown-item pdf" onclick="pdfExcel('<?= base_url("/laporan-bea-cukai/laporan-2.3/excel"); ?>')">Excel</button></li>
-        </ul>
+        <?php if (can('Laporan', 'Bea Cukai', 'p')): ?>
+            <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false" style="margin-right: -1px;">
+                <i class="fa fa-download"></i> Export
+            </button>
+            <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+                <li><button class="dropdown-item pdf" onclick="pdfExcel('<?= base_url("/laporan-bea-cukai/pungutan-bc-23/export-pdf"); ?>')">PDF</button></li>
+                <li><button class="dropdown-item pdf" onclick="pdfExcel('<?= base_url("/laporan-bea-cukai/pungutan-bc-23/export-excel"); ?>')">Excel</button></li>
+            </ul>
+        <?php endif; ?>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("laporan-bea-cukai"); ?>">
                 Kembali
@@ -22,57 +24,76 @@
     <div class="card">
         <div class="card-body">
 
-            <div class="row justify-content-start row-col-spp">
-                <div class="col-md-4 mb-3">
-                    <?= csrf_field() ?>
-                    <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker mulaiTanggalBC23" id="mulaiTanggalBC23" name="mulaiTanggalBC23" placeholder="Mulai Tanggal BC 2.3 Dibuat">
-                        <div class="input-group-prepend group-prepend-password align-items-center">
-                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-mulaiTanggalBC23"></i>
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input value="01/<?= date('m/Y') ?>" placeholder="" class="form-control mulaiTanggalBC23" id="mulaiTanggalBC23" name="mulaiTanggalBC23" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tgl Awal Dokumen</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker selesaiTanggalBC23" id="selesaiTanggalBC23" name="selesaiTanggalBC23" placeholder="Selesai Tanggal BC 2.3 Dibuat">
-                        <div class="input-group-prepend group-prepend-password align-items-center">
-                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-selesaiTanggalBC23"></i>
+                <div class="col-md-2">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input value="<?= date('d/m/Y') ?>" placeholder="" class="form-control selesaiTanggalBC23" id="selesaiTanggalBC23" name="selesaiTanggalBC23" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tgl Akhir Dokumen</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <input autocomplete="one-time-code" class="form-control searchData search form-out-search" placeholder="Cari" value="" />
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input type="text" name="search" id="search" class="form-control search" placeholder="Cari Data">
+                            <label style="z-index: 1;">Cari Data</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <button type="button" class="btn btn-lg" style="height: 45px; background-color:#B8522A; color:whitesmoke;" onclick="handleFilter()">
+                        <span style="font-size: 15px;">
+                            <i class="fas fa-search"></i> Filter
+                        </span>
+                    </button>
+
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row mt-3">
                 <div class="table-responsive">
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
                                 <th rowspan="2">No</th>
-                                <th rowspan="2" onclick="changeSort('bc_purchase_order.supplier_id')" class="sort" style="text-align: center;">Nama Supplier</th>
-                                <th rowspan="2" onclick="changeSort('bc_23.createdAt')" class="sort" style="text-align: center;">Tanggal</th>
-                                <th rowspan="2" onclick="changeSort('bc_23.no_aju')" class="sort" style="text-align: center;">No Aju</th>
-                                <th rowspan="2" onclick="changeSort('bc_purchase_order.no_daftar')" style="text-align: center;">No Daftar</th>
-                                <th rowspan="2" onclick="changeSort('bc_purchase_order.po_type')" style="text-align: center;">Tipe PO</th>
+                                <th rowspan="2" onclick="changeSort('bc_purchase_order.supplier_id')">Supplier</th>
+                                <th rowspan="2" onclick="changeSort('bc_23.createdAt')">Tanggal</th>
+                                <th rowspan="2" onclick="changeSort('bc_23.no_aju')">No Aju</th>
+                                <th rowspan="2" onclick="changeSort('bc_purchase_order.no_daftar')">No Daftar</th>
+                                <th rowspan="2" onclick="changeSort('bc_purchase_order.po_type')">Tipe PO</th>
 
-                                <th colspan="3" class="text-center">PPN</th>
-                                <th colspan="3" class="text-center">PPH</th>
-                                <th colspan="3" class="text-center">BM</th>
+                                <th colspan="2" class="text-left">PPN</th>
+                                <th colspan="2" class="text-left">PPH</th>
+                                <th colspan="2" class="text-left">BM</th>
                             </tr>
                             <tr>
-                                <th class="text-center">Tidak Dipungut</th>
-                                <th class="text-center">Di Bebaskan</th>
-                                <th class="text-center">Di Tangguhkan</th>
+                                <th class="text-left">Nilai</th>
+                                <th class="text-left">Status</th>
 
-                                <th class="text-center">Tidak Dipungut</th>
-                                <th class="text-center">Di Bebaskan</th>
-                                <th class="text-center">Di Tangguhkan</th>
+                                <th class="text-left">Nilai</th>
+                                <th class="text-left">Status</th>
 
-                                <th class="text-center">Tidak Dipungut</th>
-                                <th class="text-center">Di Bebaskan</th>
-                                <th class="text-center">Di Tangguhkan</th>
+                                <th class="text-left">Nilai</th>
+                                <th class="text-left">Status</th>
                             </tr>
                         </thead>
 
@@ -91,147 +112,104 @@
     let sortType = "desc";
 
     var table = $('.dataTable').DataTable({
-
+        processing: true,
         serverSide: true,
         ordering: true,
-        searching: false, // Menghilangkan fitur pencarian
-        order: [
-            [1, 'asc'] // Urutan default berdasarkan kolom kedua
-        ],
         fixedHeader: true,
+        searching: false,
+        order: [
+            [1, 'asc']
+        ],
         lengthMenu: [
             [25],
-            [25],
+            [25]
         ],
         pageLength: 25,
+
         ajax: {
-            url: "<?= base_url('laporan-bea-cukai/all-2.3'); ?>",
+            url: "<?= base_url('laporan-bea-cukai/all-pungutan-bc-23'); ?>",
+            type: "GET",
             dataSrc: "data",
-            data: function(data) {
-                data.mulaiTanggalBC23 = $('.mulaiTanggalBC23').val();
-                data.selesaiTanggalBC23 = $('.selesaiTanggalBC23').val();
-                data.supplierName = $('.supplierName').val();
-                data.statusLPB = $('.statusLPB').val();
-                data.statusBC = $('.statusBC').val();
-                data.noPenerimaanBarang = $('.noPenerimaanBarang').val();
-                data.noAju = $('.noAju').val();
-                data.search = $('.searchData').val();
-                data.sort = sort;
-                data.sortType = sortType;
+            data: function(d) {
+                d.mulaiTanggalBC23 = $('.mulaiTanggalBC23').val();
+                d.selesaiTanggalBC23 = $('.selesaiTanggalBC23').val();
+                d.search = $('.search').val();
+                d.sort = sort;
+                d.sortType = sortType;
             }
         },
+
         columns: [{
-                data: null,
-                className: "text-center",
-                sortable: false
-            }, // Nomor urut
+                data: 'no',
+                className: "text-left",
+                orderable: false
+            },
             {
-                data: "supplier_name",
+                data: 'supplier_name',
+                className: "text-left"
+            },
+            {
+                data: 'date',
+                className: "text-left"
+            },
+            {
+                data: 'no_aju',
+                className: "text-left"
+            },
+            {
+                data: 'no_daftar',
+                className: "text-left"
+            },
+            {
+                data: 'po_type',
+                className: "text-left"
+            },
+
+            /* ================= PPN ================= */
+            {
+                data: "dataBCTarif.PPN.nilai",
+                className: "text-right",
+                render: function(data) {
+                    return data > 0 ? greatFormatRupiah(data) : '';
+                }
+            },
+            {
+                data: "dataBCTarif.PPN.status",
                 className: "text-center"
             },
+
+            /* ================= PPH ================= */
             {
-                data: "date",
+                data: "dataBCTarif.PPH.nilai",
+                className: "text-right",
+                render: function(data) {
+                    return data > 0 ? greatFormatRupiah(data) : '';
+                }
+            },
+            {
+                data: "dataBCTarif.PPH.status",
                 className: "text-center"
             },
+
+            /* ================= BM ================= */
             {
-                data: "no_aju",
+                data: "dataBCTarif.BM.nilai",
+                className: "text-right",
+                render: function(data) {
+                    return data > 0 ? greatFormatRupiah(data) : '';
+                }
+            },
+            {
+                data: "dataBCTarif.BM.status",
                 className: "text-center"
-            },
-            {
-                data: "no_daftar",
-                className: "text-center"
-            },
-            {
-                data: "po_type",
-                className: "text-center"
-            },
-            {
-                data: "dataBCTarif.PPN.tidak_dipungut",
-                className: "text-center",
-                render: function(data) {
-                    return formatRupiah(data > 0 ? data : '0');
-                }
-            },
-            {
-                data: "dataBCTarif.PPN.di_bebaskan",
-                className: "text-center",
-                render: function(data) {
-                    return formatRupiah(data > 0 ? data : '0');
-                }
-            },
-            {
-                data: "dataBCTarif.PPN.di_tangguhkan",
-                className: "text-center",
-                render: function(data) {
-                    return formatRupiah(data > 0 ? data : '0');
-                }
-            },
-            {
-                data: "dataBCTarif.PPH.tidak_dipungut",
-                className: "text-center",
-                render: function(data) {
-                    return formatRupiah(data > 0 ? data : '0');
-                }
-            },
-            {
-                data: "dataBCTarif.PPH.di_bebaskan",
-                className: "text-center",
-                render: function(data) {
-                    return formatRupiah(data > 0 ? data : '0');
-                }
-            },
-            {
-                data: "dataBCTarif.PPH.di_tangguhkan",
-                className: "text-center",
-                render: function(data) {
-                    return formatRupiah(data > 0 ? data : '0');
-                }
-            },
-            {
-                data: "dataBCTarif.BM.tidak_dipungut",
-                className: "text-center",
-                render: function(data) {
-                    return formatRupiah(data > 0 ? data : '0');
-                }
-            },
-            {
-                data: "dataBCTarif.BM.di_bebaskan",
-                className: "text-center",
-                render: function(data) {
-                    return formatRupiah(data > 0 ? data : '0');
-                }
-            },
-            {
-                data: "dataBCTarif.BM.di_tangguhkan",
-                className: "text-center",
-                render: function(data) {
-                    return formatRupiah(data > 0 ? data : '0');
-                }
             },
         ],
-        "initComplete": function(settings, json) {
-            $('.dataTables_length').empty();
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-        },
-        rowCallback: function(row, data, displayNum, displayIndex, dataIndex) {
-            var pageInfo = table.page.info();
-            var no = pageInfo.start + displayIndex + 1; // Menentukan nomor urut berdasarkan halaman dan posisi data
-            $('td:eq(0)', row).html(no); // Menampilkan nomor urut di kolom pertama
-        },
-        drawCallback: function(settings) {
-            var api = this.api();
-            var pageInfo = api.page.info();
-            api.column(0, {
-                page: 'current'
-            }).nodes().each(function(cell, i) {
-                cell.innerHTML = pageInfo.start + i + 1;
-            });
-        },
+
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
         }],
+
         language: {
             emptyTable: "Tidak Ada Data",
             lengthMenu: "Show _MENU_ entries",
@@ -243,13 +221,9 @@
     });
 
 
-    $('.mulaiTanggalBC23, .selesaiTanggalBC23').change(function() {
+    function handleFilter() {
         table.ajax.reload();
-    });
-
-    $('.searchData').keyup(function() {
-        table.ajax.reload();
-    });
+    }
 
     $(".mulaiTanggalBC23, .selesaiTanggalBC23").datepicker({
         todayHighlight: true,
@@ -268,12 +242,9 @@
     }
 
     const pdfExcel = function(url) {
-
-        let date_start = $(".dateStart").val();
-        let date_end = $(".dateEnd").val();
-        // let sort = "stock_details2.createdAt";
-        // let sortType = "desc";
-        window.open(url + `?date_start=${date_start}&date_end=${date_end}&sort=${sort}&sortType=${sortType}`, "_blank");
+        let date_start = $(".mulaiTanggalBC23").val();
+        let date_end = $(".selesaiTanggalBC23").val();
+        window.open(url + `?mulaiTanggalBC23=${date_start}&selesaiTanggalBC23=${date_end}&sort=${sort}&sortType=${sortType}`, "_blank");
     }
 </script>
 
