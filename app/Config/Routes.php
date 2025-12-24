@@ -2861,10 +2861,13 @@ $routes->get('laporan-accounting/hutang/detail/export-excel', 'Laporan\Accountin
 
 $routes->get('/laporan-accounting/piutang', 'Laporan\Accounting\Piutang::index', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/piutang/all', 'Laporan\Accounting\Piutang::allPiutang', ['filter' => 'Auth']);
-$routes->get('/laporan-accounting/piutang/details/(:segment)', 'Laporan\Accounting\Piutang::detail/$1', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/piutang/details/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Piutang::detail/$1/$2/$3/$4/$5/$6/$7', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/piutang/details/invoice/(:segment)', 'Laporan\Accounting\Piutang::allDetailsInvoice/$1', ['filter' => 'Auth']);
-$routes->get('/laporan-accounting/piutang/printPDF/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Piutang::LaporanPiutangPrint/$1/$2/$3/$4', ['filter' => 'Auth']);
-$routes->get('/laporan-accounting/piutang/printExcel/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\Piutang::exportExcel/$1/$2/$3/$4', ['filter' => 'Auth']);
+$routes->get('laporan-accounting/piutang/print', 'Laporan\Accounting\Piutang::printPiutang');
+$routes->get('laporan-accounting/piutang/export-excel', 'Laporan\Accounting\Piutang::exportExcelPiutang');
+$routes->get('laporan-accounting/piutang/detail/print', 'Laporan\Accounting\Piutang::printPiutangDetail');
+$routes->get('laporan-accounting/piutang/detail/export-excel', 'Laporan\Accounting\Piutang::exportExcelPiutangDetail');
+
 
 $routes->get('/laporan-accounting/neraca', 'Laporan\Accounting\Neraca::index', ['filter' => 'Auth']);
 $routes->post('/laporan-accounting/neraca', 'Laporan\Accounting\Neraca::index', ['filter' => 'Auth']);
