@@ -91,21 +91,17 @@ class Piutang extends BaseController
             $res = $this->salesOrderInvoiceModel->getDataInvoiceReportAccounting($condition, $addCondition, $limit, $offset);
         }
 
-        var_dump($condition, $addCondition, $limit, $offset, $res['data']);
-        exit;
-
-
         $rdata = [];
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($res['data'] as $data) {
-            $totalRemaining = $data->total - $data->remaining;
+            $totalRemaining = $data->sum_amount_invoice - $data->sum_harga_dibayar;
             array_push($rdata, [
                 "no"                    => $no++,
                 "id"                    => $data->id,
-                "supplier"              => $data->name,
-                "nominal_idr"           => number_format($data->total, 2, '.', ''),
+                "customer_name"         => $data->customer_name,
+                "nominal_idr"           => number_format($data->sum_amount_invoice, 2, '.', ''),
                 "remaining_idr"         => number_format($totalRemaining, 2, '.', ''),
             ]);
         }
@@ -210,11 +206,6 @@ class Piutang extends BaseController
             // "company_id"  => $this->this_company_id,
             "penerimaan_barang.deletedAt" => NULL
         ];
-
-        // var_dump($tglAwal);
-        // var_dump($tglAkhir);
-        // var_dump($filterData);
-        // exit;
 
         $addCondition = [
             "search"        => $search != "all" ? $search : "",

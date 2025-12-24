@@ -151,8 +151,8 @@
                 sortable: false,
                 width: "5%"
             }, {
-                data: "customer",
-                className: "text-center",
+                data: "customer_name",
+                className: "text-left",
             }, {
                 data: "nominal_idr",
                 className: "text-center",
