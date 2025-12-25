@@ -190,6 +190,11 @@
                             <button <?= !empty($dataPI) ? ($dataPI['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="btn btn-show-detail btn-add btn-block float-right" id="btnAddBarang" type="button" style="width: 90% !important;">
                                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                             </button>
+                            <?php if (empty($dataPI)): ?>
+                                <button <?= !empty($dataPI) ? ($dataPI['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="btn btn-show-detail btn-add btn-block float-right" id="btnAmbilBarang" type="button" style="min-width: 138px !important; margin-right:13px !important; background-color:#2B90E5 !important;">
+                                    <i class="fa-solid fa-download"></i> Ambil Barang
+                                </button>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -1942,5 +1947,35 @@
         $('#tipe_biaya_tambahan').val("PLUS").change();
         $('#nilai_biaya_tambahan').val(null);
     }
+
+    $('#btnAmbilBarang').click(function(e) {
+        e.preventDefault();
+        $.ajax({
+            url: "<?= base_url("proforma-invoice/get-referensi-barang"); ?>",
+            data: {
+                sales_contract_id: $("#sales_contract_id").val(),
+            },
+            beforeSend: function(xhr) {
+                setLoading()
+            },
+            complete: function() {
+                stopLoading();
+            },
+            method: "GET",
+            success: function(response) {
+                if (response.status) {
+                    listBarang = response.data;
+                    drawTableBarang(listBarang);
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: response.message,
+                        confirmButtonColor: '#4e73df',
+                    });
+                    return;
+                }
+            },
+        });
+    });
 </script>
 <?= $this->endSection(); ?>

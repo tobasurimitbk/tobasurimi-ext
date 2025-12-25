@@ -36,17 +36,6 @@
                     <?= strtoupper(date('F d, Y', strtotime($dataSample['tanggal']))); ?>
                 </td>
             </tr>
-            <!-- <tr>
-                <td>
-                    DEPARTMENT
-                </td>
-                <td>
-                    :
-                </td>
-                <td>
-                    <?= strtoupper($dataSample['divisi']); ?>
-                </td>
-            </tr> -->
         </table>
     </div>
 
@@ -61,11 +50,19 @@
                     PRODUCTS
                 </th>
                 <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd;">
-                    QUANTITY
+                    QTY
                 </th>
-                <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd;width:200px;">
+                <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd;">
+                    UNIT
+                </th>
+                <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd;">
                     SPECIFICATIONS
                 </th>
+                <?php if ($note['isNote']): ?>
+                    <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd;">
+                        NOTE
+                    </th>
+                <?php endif; ?>
                 <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd;width:300px;">
                     DIKIRIM KE
                 </th>
@@ -86,103 +83,87 @@
             $kodeSatuan = ""
             ?>
             <?php foreach ($dataBarangList as $i => $d): ?>
-                <?php
-                $kodeSatuan = $d['kode_satuan']
-                ?>
                 <tr>
                     <td style="padding: 3px; border: 1px solid #ddd;"><?= $no++ ?></td>
-                    <td style="padding: 3px; border: 1px solid #ddd; width: 1.5%;text-align: left;">
+                    <td style="padding: 3px; border: 1px solid #ddd;text-align: left;">
                         <?= $d['divisi_barang_text'] ?>
                     </td>
-                    <td style="padding: 3px; border: 1px solid #ddd; width:9.5%; text-align: left;">
+                    <td style="padding: 3px; border: 1px solid #ddd;text-align: left;">
                         <?= $d['barang'] ?> <br>
                         <?= $d['note'] ?>
                     </td>
-                    <td style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: left;">
+                    <td style="padding: 3px; border: 1px solid #ddd; text-align: left;">
                         <?= number_format($d['qty'], 2) ?>
                     </td>
-                    <td style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: left;">
+                    <td style="padding: 3px; border: 1px solid #ddd; text-align: left;">
+                        <?= $d['kode_satuan'] ?>
+                    </td>
+                    <td style="padding: 3px; border: 1px solid #ddd; text-align: left;">
                         <b>
                             <?= $d['grade']  ?>
                         </b>
                     </td>
-                    <?php if ($i == 0): ?>
-                        <td style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: left;" rowspan="<?= count($dataBarangList) ?>">
-                            <b style="text-align: center;">
-                                <u>
-                                    <?= $dataSample['delivery'] ?>
-                                </u>
-                            </b> <br>
-                            <b>
-                                <?= $dataSample['delivery_address'] ?>
-                            </b> <br>
-                            <b>
-                                Attn No : <?= $dataSample['attn_no'] ?>
-                            </b><br>
-                            <b>
-                                NB : <?= $dataSample['nb'] ?>
-                            </b><br>
+                    <?php if ($note['isNote']): ?>
+                        <td style="padding: 3px; border: 1px solid #ddd; text-align: left;">
+                            <?= $d['note'] ?>
                         </td>
-                        <td style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: left;" rowspan="<?= count($dataBarangList) ?>">
+                    <?php endif; ?>
+                    <?php if ($i == 0): ?>
+                        <td style="padding:3px; border:1px solid #ddd; text-align:left; vertical-align: top;"
+                            rowspan="<?= count($dataBarangList) ?>">
+                            <b style="display:block;">
+                                <u><?= $dataSample['delivery'] ?></u>
+                            </b>
+                            <b><?= $dataSample['delivery_address'] ?></b><br>
+                            <?php if (!empty($dataSample['attn_no'])): ?>
+                                <b>Attn To : <?= $dataSample['attn_no'] ?></b><br>
+                            <?php endif; ?>
+                            <?php if (!empty($dataSample['nb'])): ?>
+                                <b>NB : <?= $dataSample['nb'] ?></b>
+                            <?php endif; ?>
+                        </td>
+
+                        <td style="padding:3px; border:1px solid #ddd; text-align:left; vertical-align: top;"
+                            rowspan="<?= count($dataBarangList) ?>">
                             <?= $d['an'] ?>
                         </td>
-                        <td style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: left;" rowspan="<?= count($dataBarangList) ?>">
+
+                        <td style="padding:3px; border:1px solid #ddd; text-align:left; vertical-align: top;"
+                            rowspan="<?= count($dataBarangList) ?>">
                             <?= $d['pickup_date'] ?>
                         </td>
-                        <td style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: left;" rowspan="<?= count($dataBarangList) ?>">
+
+                        <td style="padding:3px; border:1px solid #ddd; text-align:left; vertical-align: top;"
+                            rowspan="<?= count($dataBarangList) ?>">
                             <?= $d['via'] ?>
                         </td>
                     <?php endif; ?>
+
                 </tr>
             <?php endforeach; ?>
-            <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;">
-                <td colspan="2" style="padding: 6px; border: 1px solid #ddd;"></td>
-                <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
-                    TOTAL QTY (<?= $kodeSatuan ?>)
-                </td>
-                <td style="padding: 6px; border: 1px solid #ddd; " colspan="6">
-                    <?= number_format($dataSample['total_qty'], 2) ?>
-                </td>
-            </tr>
             <?php if ($dataSample['total_berat_bersih'] != 0 && !empty($dataSample['total_berat_bersih'])): ?>
-                <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;" colspan="6">
+                <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;" colspan="<?= $note['totalCols'] ?>">
                     <td colspan="2" style="padding: 6px; border: 1px solid #ddd;"></td>
                     <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
                         TOTAL NET WEIGHT (KG)
                     </td>
-                    <td style="padding: 6px; border: 1px solid #ddd; " colspan="6">
+                    <td style="padding: 6px; border: 1px solid #ddd; " colspan="<?= $note['totalColsBeratBersih'] ?>">
                         <?= number_format($dataSample['total_berat_bersih'], 2) ?>
                     </td>
                 </tr>
             <?php endif; ?>
             <?php if ($dataSample['total_berat_kotor'] != 0 && !empty($dataSample['total_berat_kotor'])): ?>
-                <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;" colspan="6">
+                <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;" colspan="<?= $note['totalCols'] ?>">
                     <td colspan="2" style="padding: 6px; border: 1px solid #ddd;"></td>
                     <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
                         TOTAL GROSS WEIGHT (KG)
                     </td>
-                    <td style="padding: 6px; border: 1px solid #ddd; " colspan="6">
+                    <td style="padding: 6px; border: 1px solid #ddd; " colspan="<?= $note['totalColsBeratBersih'] ?>">
                         <?= number_format($dataSample['total_berat_kotor'], 2) ?>
                     </td>
                 </tr>
             <?php endif; ?>
-            <?php if (count($dataAdditionalItem) > 0): ?>
-                <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;" colspan="6">
-                    <td style="padding: 6px; border: 1px solid #8e8181ff;" colspan="9">
-                        <table style="width:20%; border-collapse: collapse; margin-left:6px; margin-top:3px; font-size:11px;">
-                            <tbody>
-                                <?php foreach ($dataAdditionalItem as $d): ?>
-                                    <tr>
-                                        <td style="border: 1px solid #000; padding: 4px;"><?= $d['additional_item'] ?></td>
-                                        <td style="border: 1px solid #000; padding: 4px; width:20px;"><?= number_format($d['total_qty_additional'], 2) ?></td>
-                                        <td style="border: 1px solid #000; padding: 4px; width:20px;"><?= $d['kode_satuan'] ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
-            <?php endif; ?>
+
         </tbody>
     </table>
     <table border="1" style="width: 100%; border: 1px solid black; border-collapse: collapse;" class="label">

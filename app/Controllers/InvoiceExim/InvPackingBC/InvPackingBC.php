@@ -12,6 +12,7 @@ use App\Models\InvPackingBcBiayaModel;
 use App\Models\InvPackingBcModel;
 use App\Models\InvPackingBcPackModel;
 use App\Models\MetadataModel;
+use App\Models\SalesOrderExportDetailModel;
 use App\Models\SalesOrderExportModel;
 use App\Models\SatuansModel;
 use Dompdf\Dompdf;
@@ -32,6 +33,7 @@ class InvPackingBC extends BaseController
     protected $invPackingBcBarangModel;
     protected $invPackingBcBiayaModel;
     protected $invPackingBcPackModel;
+    protected $salesOrderExportDetailModel;
     protected $dompdf;
 
     public function __construct()
@@ -48,6 +50,7 @@ class InvPackingBC extends BaseController
         $this->invPackingBcBarangModel = new InvPackingBcBarangModel();
         $this->invPackingBcBiayaModel = new InvPackingBcBiayaModel();
         $this->invPackingBcPackModel = new InvPackingBcPackModel();
+        $this->salesOrderExportDetailModel = new SalesOrderExportDetailModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -574,6 +577,58 @@ class InvPackingBC extends BaseController
                 'biaya_tambahan' => $l->biaya_tambahan,
                 'tipe_biaya_tambahan' => $l->tipe_biaya_tambahan,
                 'nilai_biaya_tambahan' => $l->nilai_biaya_tambahan
+            ]);
+        }
+    }
+
+    public function getReferensiBarang()
+    {
+        try {
+            $id = $this->request->getVar('sales_order_export_id');
+            $dataSalesOrderExport = $this->salesOrderExportModel->getById($id);
+            $dataSalesExportDetail =  $this->salesOrderExportModel
+                ->getDetailSalesKontrakInOrderForm(
+                    $dataSalesOrderExport->sales_contract_id,
+                    $id,
+                    true
+                );
+
+            $dataBarang = [];
+            foreach ($dataSalesExportDetail['salesContractDetailList'] as $barang) {
+                $satuanId = $kodeSatuan = "";
+                $qtyInput = $harga = $totalInput = 0;
+                foreach ($barang['size_breakdown'] as $size) {
+                    $satuanId = $size['satuan_size_id'];
+                    $kodeSatuan = $size['satuan_size_code'];
+                    $qtyInput += $size['qty_input'];
+                    $totalInput += $size['total_input'];
+                    $harga = $size['harga'];
+                }
+
+                $dataBarang[] = [
+                    'id_barang' => $barang['id'],
+                    'nama_barang' => $barang['barang_name'],
+                    'hs_code' => "",
+                    'hs_code_name' => "",
+                    'qty' => (float)$qtyInput,
+                    'satuan_id' => $satuanId,
+                    'kode_satuan' => $kodeSatuan,
+                    'harga_satuan_barang' => (float)$harga,
+                    'total_harga_barang' => (float)$totalInput,
+                    'catatan' => ""
+                ];
+            }
+
+            return response()->setJSON([
+                'data' => $dataBarang,
+                'token' => csrf_hash(),
+                'status' => true
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => $e->getMessage(),
+                'token' => csrf_hash()
             ]);
         }
     }

@@ -116,13 +116,32 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating">
-                            <textarea class="full-textarea form-control delivery_address" id="delivery_address" name="delivery_address" placeholder="Delivery Address"><?= !empty($dataSample) ? $dataSample['delivery_address'] : ""; ?></textarea>
-                            <label for="floatingInput">Delivery Address</label>
+                        <div class="form-floating mb-3">
+                            <input autocomplete="one-time-code" type="text" class="form-control an" id="an" name="an" placeholder="AN" value="<?= !empty($an) ? $an : "" ?>">
+                            <label for="floatingInput">AN</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="form-floating">
+                    <div class="col-md-3">
+                        <div class="form-floating mb-3">
+                            <textarea class="full-textarea form-control" id="pickup_date" name="pickup_date" placeholder="Pickup Date (Optional)"><?= !empty($pickupDate) ? $pickupDate : ""; ?></textarea>
+                            <label for="floatingInput">Pickup Date (Optional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating mb-3">
+                            <textarea class="full-textarea form-control" id="via" name="via" placeholder="Via (Optional)"><?= !empty($via) ? $via : ""; ?></textarea>
+                            <label for="floatingInput">Via (Optional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating mb-3">
+                            <textarea class="full-textarea form-control delivery_address" id="delivery_address" name="delivery_address" placeholder="Delivery Address"><?= !empty($dataSample) ? $dataSample['delivery_address'] : ""; ?></textarea>
+                            <label for="floatingInput">Delivery Address (Optional)</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-floating mb-3">
                             <textarea class="full-textarea form-control nb" id="nb" name="nb" placeholder="NB (Optional)"><?= !empty($dataSample) ? $dataSample['nb'] : ""; ?></textarea>
                             <label for="floatingInput">NB (Optional)</label>
                         </div>
@@ -153,9 +172,9 @@
                                     <th>Product</th>
                                     <th>Grade / Spesification</th>
                                     <th>Note</th>
-                                    <th>AN</th>
+                                    <!-- <th>AN</th>
                                     <th>Pickup Date</th>
-                                    <th>Via</th>
+                                    <th>Via</th> -->
                                     <th>Qty</th>
                                     <th>Unit</th>
                                     <th>Gross Weight (Kg)</th>
@@ -168,7 +187,7 @@
                             </tbody>
                             <tfoot class="foot-barang" id="foot-barang">
                                 <tr>
-                                    <td colspan="13">List Items Empty</td>
+                                    <td colspan="10">List Items Empty</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -229,24 +248,7 @@
                                 <label for="floatingInput">Grade / Specification</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control an" id="an" name="an" placeholder="AN">
-                                <label for="floatingInput">AN</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control pickup_date" id="pickup_date" name="pickup_date" placeholder="Pickup Date">
-                                <label for="floatingInput">Pickup Date</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control via" id="via" name="via" placeholder="Via">
-                                <label for="floatingInput">Via</label>
-                            </div>
-                        </div>
+
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input oninput="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control qty" id="qty" name="qty" placeholder="Qty">
@@ -262,24 +264,6 @@
                                     <?php endforeach; ?>
                                 </select>
                                 <label for="floatingInput" style="z-index: 1;">Select Unit</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input oninput="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control berat_kotor" id="berat_kotor" name="berat_kotor" placeholder="Gross Weight (Optional)">
-                                <label for="floatingInput">Gross Weight (Optional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input oninput="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control berat_bersih" id="berat_bersih" name="berat_bersih" placeholder="Net Weight (Optional)">
-                                <label for="floatingInput">Net Weight (Optional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating">
-                                <textarea class="full-textarea form-control note" id="note" name="note" placeholder="Note Items (Optional)"></textarea>
-                                <label for="floatingInput">Note (Optional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -300,9 +284,28 @@
                                 <label for="floatingInput" style="z-index: 1;">Select Department</label>
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input oninput="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control berat_kotor" id="berat_kotor" name="berat_kotor" placeholder="Gross Weight (Optional)">
+                                <label for="floatingInput">Gross Weight (Optional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input oninput="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control berat_bersih" id="berat_bersih" name="berat_bersih" placeholder="Net Weight (Optional)">
+                                <label for="floatingInput">Net Weight (Optional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <textarea class="full-textarea form-control note" id="note" name="note" placeholder="Note Items (Optional)"></textarea>
+                                <label for="floatingInput">Note (Optional)</label>
+                            </div>
+                        </div>
+
                     </div>
 
-                    <div class="col-subtitle-modal">
+                    <!-- <div class="col-subtitle-modal">
                         <div class="row mt-3 justify-content-end">
                             <div class="col-md-6">
                                 <label class="form-label font-weight-bold modal-sub-title"></label>
@@ -313,9 +316,9 @@
                                 </button>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
-                    <div class="row">
+                    <!-- <div class="row">
                         <div style="max-height: 400px; overflow-y: auto;">
                             <div class="table-responsive">
                                 <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="additionalTable" width="100%" cellspacing="0">
@@ -329,7 +332,6 @@
                                         </tr>
                                     </thead>
                                     <tbody class="body-additional" id="body-additional">
-                                        <!-- isi data -->
                                     </tbody>
                                     <tfoot class="tfoot-additional" id="tfoot-additional">
                                         <tr>
@@ -342,7 +344,7 @@
                                 </table>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
                 </div>
 
@@ -566,15 +568,15 @@
                 grade: {
                     required: true
                 },
-                an: {
-                    required: true
-                },
-                pickup_date: {
-                    required: true
-                },
-                via: {
-                    required: true
-                },
+                // an: {
+                //     required: true
+                // },
+                // pickup_date: {
+                //     required: true
+                // },
+                // via: {
+                //     required: true
+                // },
                 qty: {
                     required: true
                 },
@@ -595,15 +597,15 @@
                 grade: {
                     required: "Grade required"
                 },
-                an: {
-                    required: "An required"
-                },
-                pickup_date: {
-                    required: "Pickup date required"
-                },
-                via: {
-                    required: "Via required"
-                },
+                // an: {
+                //     required: "An required"
+                // },
+                // pickup_date: {
+                //     required: "Pickup date required"
+                // },
+                // via: {
+                //     required: "Via required"
+                // },
                 qty: {
                     required: "Qty required"
                 },
@@ -913,9 +915,6 @@
         $('#id_barang').val(null);
         $('#barang_master_sales_id').val(null).change();
         $('#grade').val(null);
-        $('#an').val(null);
-        $('#pickup_date').val(null);
-        $('#via').val(null);
         $('#qty').val(null);
         $('#satuan_id').val(null).change();
         $('#berat_kotor').val(null);
@@ -942,16 +941,13 @@
         if (!Array.isArray(listBarang) || listBarang.length === 0) {
             tbody.html(`
             <tr>
-                <td colspan="13" class="text-center text-muted">List Items Empty</td>
+                <td colspan="10" class="text-center text-muted">List Items Empty</td>
             </tr>
         `);
             return;
         }
 
         let htmlRows = [];
-        let totalBeratBersih = 0;
-        let totalBeratKotor = 0;
-        totalQty = 0;
         let kode_satuan = '';
         let no = 1;
 
@@ -960,16 +956,15 @@
             const barang = item.barang || '';
             const grade = item.grade || '';
             const note = item.note || '';
-            const an = item.an || '';
-            const pickup_date = item.pickup_date || '';
-            const via = item.via || '';
+            // const an = item.an || '';
+            // const pickup_date = item.pickup_date || '';
+            // const via = item.via || '';
             const qty = parseFloat(item.qty || 0);
             const berat_kotor = parseFloat(item.berat_kotor || 0);
             const berat_bersih = parseFloat(item.berat_bersih || 0);
             const divisi_barang_text = item.divisi_barang_text;
             kode_satuan = item.kode_satuan || '';
 
-            totalQty += qty;
             totalBeratKotor += berat_kotor;
             totalBeratBersih += berat_bersih;
 
@@ -981,9 +976,6 @@
                 <td>${barang}</td>
                 <td>${grade}</td>
                 <td>${note}</td>
-                <td>${an}</td>
-                <td>${pickup_date}</td>
-                <td>${via}</td>
                 <td>${greatFormatRupiah(qty)}</td>
                 <td>${kode_satuan}</td>
                 <td>${greatFormatRupiah(berat_kotor)}</td>
@@ -1035,10 +1027,8 @@
         // Footer total
         const totalRow = `
         <tr>
-            <td colspan="7"></td>
+            <td colspan="6"></td>
             <td><b>TOTAL</b></td>
-            <td><b>${greatFormatRupiah(totalQty)} (${kode_satuan})</b></td>
-            <td></td>
             <td><b>${greatFormatRupiah(totalBeratKotor.toFixed(2))} (Gross Weight)</b></td>
             <td><b>${greatFormatRupiah(totalBeratBersih.toFixed(2))} (Net Weight)</b></td>
             <td></td>

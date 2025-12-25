@@ -1688,13 +1688,13 @@ class SalesOrderExportModel extends Model
 
 
         $totalFilteredData = $salesDataQry->countAllResults(false);
-        
+
         if ($limit == null && $offset == null) {
             $data = $salesDataQry->findAll();
         } else {
             $data = $salesDataQry->findAll($limit, $offset);
         }
-        
+
         return [
             'data'              => $data,
             'totalData'         => $totalData,
@@ -1728,7 +1728,7 @@ class SalesOrderExportModel extends Model
                 SUM(DISTINCT sales_order_invoice_detail.amount_invoice) AS sum_amount_invoice, 
                 SUM(DISTINCT pembayaran_invoice_detail.harga_dibayar) AS sum_harga_dibayar
             ";
-        }else{
+        } else {
             $selectQry = " 
                     rm_purchase_orders.po_date AS tanggal_invoice, 
                     rm_purchase_orders.po_no AS no_invoice, 
@@ -1752,12 +1752,12 @@ class SalesOrderExportModel extends Model
             ->join('customers', 'customers.id = sales_contract.customer_id')
             ->join('pembayaran_invoice_detail', "pembayaran_invoice_detail.sales_order_invoice_id = sales_order_export.id AND pembayaran_invoice_detail.sales_order_invoice_detail_id = sales_order_invoice_detail.id AND pembayaran_invoice_detail.type_invoice = 'EKSPOR'", 'left')
             ->join('pembayaran_invoice', "pembayaran_invoice.id = pembayaran_invoice_detail.pembayaran_invoice_id AND pembayaran_invoice.type_invoice = 'LOKAL'", 'left');
-            if (isset($addCondition['summary']) && $addCondition['summary'] == "summary") {
-                $poDataQry->groupBy('customers.name');
-            } else {
-                $poDataQry->groupBy('sales_order_export.id');
-            }
-            $poDataQry->orderBy($sort, $sortType);
+        if (isset($addCondition['summary']) && $addCondition['summary'] == "summary") {
+            $poDataQry->groupBy('customers.name');
+        } else {
+            $poDataQry->groupBy('sales_order_export.id');
+        }
+        $poDataQry->orderBy($sort, $sortType);
 
         $totalData = $poDataQry->countAllResults(false);
 
