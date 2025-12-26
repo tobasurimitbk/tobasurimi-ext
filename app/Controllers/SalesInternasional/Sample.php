@@ -151,12 +151,22 @@ class Sample extends BaseController
             ->findAll();
         $dataBarangList = $this->sampleDetailModel->getSampleDetail($id);
 
+        $pickupDate = $via = $an = "";
+        foreach ($dataBarangList as $d) {
+            $pickupDate = $d['pickup_date'];
+            $via = $d['via'];
+            $an = $d['an'];
+        }
+
         $data = [
             'dataSample' => $dataSample,
             'dataBarangList' => $dataBarangList,
             'dataSatuan' => $dataSatuan,
             "dataDivisi" => $dataDivisi,
-            'dataBarang' => $dataBarang
+            'dataBarang' => $dataBarang,
+            "pickupDate" => $pickupDate,
+            "via" => $via,
+            "an" => $an
         ];
 
         return view('SalesInternasional/Sample/form', $data);
@@ -175,36 +185,42 @@ class Sample extends BaseController
             return redirect()->to('sample-ekspor');
         }
 
-        $dataSatuan = $this->satuanModel->findAll();
-        $dataBarang = $this->barangMasterSalesModel
-            ->where('company_id', $this->this_company_id)
-            ->where('type_barang_sales', "EKSPOR")
-            ->where('deletedAt', null)
-            ->orderBy('barang_name', "asc")
-            ->findAll();
         $dataBarangList = $this->sampleDetailModel->getSampleDetail($id);
-        $dataAdditionalItem = $this->sampleAdditionalModel
-            ->select('
-                sample_additional.additional_item, 
-                SUM(sample_additional.qty_additional) AS total_qty_additional, 
-                satuans.kode_satuan')
-            ->join('satuans', 'satuans.id = sample_additional.satuan_additional', 'left')
-            ->where('sample_additional.sample_id', $id)
-            ->where('sample_additional.deletedAt', null)
-            ->groupBy('sample_additional.additional_item')
-            ->findAll();
+        // $dataAdditionalItem = $this->sampleAdditionalModel
+        //     ->select('
+        //         sample_additional.additional_item, 
+        //         SUM(sample_additional.qty_additional) AS total_qty_additional, 
+        //         satuans.kode_satuan')
+        //     ->join('satuans', 'satuans.id = sample_additional.satuan_additional', 'left')
+        //     ->where('sample_additional.sample_id', $id)
+        //     ->where('sample_additional.deletedAt', null)
+        //     ->groupBy('sample_additional.additional_item')
+        //     ->findAll();
 
         $company = $this->companyModel->where('id', $this->this_company_id)->first();
 
+        $note = [
+            'totalCols' => 10,
+            'totalColsBeratBersih' => 7,
+            'note' => false
+        ];
 
+        foreach ($dataBarangList as $d) {
+            if ($d['note'] != null || !empty($d['note'])) {
+                $note = [
+                    'totalCols' => 10,
+                    'totalColsBeratBersih' => 8,
+                    'isNote' => true
+                ];
+                break;
+            }
+        }
 
         $data = [
             'dataSample' => $dataSample,
             'dataBarangList' => $dataBarangList,
-            'dataSatuan' => $dataSatuan,
-            'dataBarang' => $dataBarang,
             "company" => $company,
-            "dataAdditionalItem" => $dataAdditionalItem
+            'note' => $note
         ];
 
         $this->dompdf->loadHtml(view('SalesInternasional/Sample/print', $data));
@@ -260,15 +276,19 @@ class Sample extends BaseController
                 'total_qty' => $this->request->getVar('total_qty')
             ]);
 
+            $an = $this->request->getVar('an');
+            $pickupDate = $this->request->getVar('pickup_date');
+            $via = $this->request->getVar('via');
+
             foreach (json_decode($_POST['listBarang']) as $l) {
                 $sample_detail_id = $this->sampleDetailModel->insert([
                     'sample_id' => $id,
                     'barang_master_sales_id' => $l->barang_master_sales_id,
                     'satuan_id' => $l->satuan_id,
                     'grade' => $l->grade,
-                    'an' => $l->an,
-                    'pickup_date' => $l->pickup_date,
-                    'via' => $l->via,
+                    'an' => $an,
+                    'pickup_date' => $pickupDate,
+                    'via' => $via,
                     'qty' => $l->qty,
                     'berat_kotor' => $l->berat_kotor,
                     'berat_bersih' => $l->berat_bersih,
@@ -339,6 +359,10 @@ class Sample extends BaseController
                 'total_qty' => $this->request->getVar('total_qty')
             ]);
 
+            $an = $this->request->getVar('an');
+            $pickupDate = $this->request->getVar('pickup_date');
+            $via = $this->request->getVar('via');
+
             $this->sampleDetailModel->where('sample_id', $id)->delete(null, true);
             $this->sampleAdditionalModel->where('sample_id', $id)->delete(null, true);
             foreach (json_decode($_POST['listBarang']) as $l) {
@@ -347,9 +371,9 @@ class Sample extends BaseController
                     'barang_master_sales_id' => $l->barang_master_sales_id,
                     'satuan_id' => $l->satuan_id,
                     'grade' => $l->grade,
-                    'an' => $l->an,
-                    'pickup_date' => $l->pickup_date,
-                    'via' => $l->via,
+                    'an' => $an,
+                    'pickup_date' => $pickupDate,
+                    'via' => $via,
                     'qty' => $l->qty,
                     'berat_kotor' => $l->berat_kotor,
                     'berat_bersih' => $l->berat_bersih,

@@ -629,4 +629,57 @@ class InvPackingCustomer extends BaseController
             ]);
         }
     }
+
+    public function getReferensiBarang()
+    {
+        try {
+            $id = $this->request->getVar('sales_order_export_id');
+            $dataSalesOrderExport = $this->salesOrderExportModel->getById($id);
+            $dataSalesExportDetail =  $this->salesOrderExportModel
+                ->getDetailSalesKontrakInOrderForm(
+                    $dataSalesOrderExport->sales_contract_id,
+                    $id,
+                    true
+                );
+
+            $dataBarang = [];
+            foreach ($dataSalesExportDetail['salesContractDetailList'] as $barang) {
+                $catatan = "SPECIES : " . strtoupper($barang['species']) . " SPECS : " . strtoupper($barang['specs']) . " PACKING : " . strtoupper($barang['packing']);
+                $sizeBreakdown = [];
+
+                foreach ($barang['size_breakdown'] as $s) {
+                    $sizeBreakdown[] = [
+                        'id_detail_breakdown' => $s['id_detail_breakdown'],
+                        'size' => $s['size'],
+                        'grade' => $s['grade'],
+                        'qty' => (float)$s['qty_input'],
+                        'harga' => (float)$s['harga'],
+                        'total' => (float)$s['total_input'],
+                        'satuan_size_id' => $s['satuan_size_id'],
+                        'satuan_size_code' => $s['satuan_size_code']
+                    ];
+                }
+
+                $dataBarang[] = [
+                    'id_barang' => $barang['id'],
+                    'nama_barang' => $barang['barang_name'],
+                    'catatan' => $catatan,
+                    'hs_code_name' => "",
+                    'size_breakdown' => $sizeBreakdown
+                ];
+            }
+
+            return response()->setJSON([
+                'data' => $dataBarang,
+                'token' => csrf_hash(),
+                'status' => true
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => $e->getMessage(),
+                'token' => csrf_hash()
+            ]);
+        }
+    }
 }

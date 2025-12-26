@@ -1688,13 +1688,13 @@ class SalesOrderExportModel extends Model
 
 
         $totalFilteredData = $salesDataQry->countAllResults(false);
-        
+
         if ($limit == null && $offset == null) {
             $data = $salesDataQry->findAll();
         } else {
             $data = $salesDataQry->findAll($limit, $offset);
         }
-        
+
         return [
             'data'              => $data,
             'totalData'         => $totalData,
@@ -1728,7 +1728,7 @@ class SalesOrderExportModel extends Model
                 SUM(sales_order_export.shipment_value_net) AS sum_amount_invoice, 
                 SUM(pembayaran_invoice.total_bayar) AS sum_harga_dibayar
             ";
-        }else{
+        } else {
             $selectQry = " 
                     rm_purchase_orders.po_date AS tanggal_invoice, 
                     rm_purchase_orders.po_no AS no_invoice, 
@@ -1751,12 +1751,12 @@ class SalesOrderExportModel extends Model
             ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
             ->join('customers', 'customers.id = sales_contract.customer_id')
             ->join('pembayaran_invoice', "FIND_IN_SET(sales_order_export.sales_order_export_id, REPLACE(REPLACE(pembayaran_invoice.invoice_id, '[', ''), ']', '')) AND pembayaran_invoice.type_invoice = 'EKSPOR'", 'left');
-            if (isset($addCondition['summary']) && $addCondition['summary'] == "summary") {
-                $poDataQry->groupBy('customers.name');
-            } else {
-                $poDataQry->groupBy('sales_order_export.id');
-            }
-            $poDataQry->orderBy($sort, $sortType);
+        if (isset($addCondition['summary']) && $addCondition['summary'] == "summary") {
+            $poDataQry->groupBy('customers.name');
+        } else {
+            $poDataQry->groupBy('sales_order_export.id');
+        }
+        $poDataQry->orderBy($sort, $sortType);
 
         $totalData = $poDataQry->countAllResults(false);
 

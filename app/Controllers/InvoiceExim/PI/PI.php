@@ -12,6 +12,7 @@ use App\Models\ProformaInvoiceBiayaModel;
 use App\Models\ProformaInvoiceModel;
 use App\Models\ProformaInvoiceSizeBreakdownModel;
 use App\Models\ProformaInvoiceTermModel;
+use App\Models\SalesKontrakDetailModel;
 use App\Models\SalesKontrakModel;
 use App\Models\SalesOrderExportModel;
 use App\Models\SatuansModel;
@@ -33,6 +34,7 @@ class PI extends BaseController
     protected $proformaInvoiceBiayaModel;
     protected $proformaInvoiceSizeBreakdownModel;
     protected $companyModel;
+    protected $salesKontrakDetailModel;
     protected $dompdf;
 
     public function __construct()
@@ -50,6 +52,7 @@ class PI extends BaseController
         $this->companyModel = new CompaniesModel();
         $this->proformaInvoiceBiayaModel = new ProformaInvoiceBiayaModel();
         $this->proformaInvoiceSizeBreakdownModel = new ProformaInvoiceSizeBreakdownModel();
+        $this->salesKontrakDetailModel = new SalesKontrakDetailModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -731,6 +734,54 @@ class PI extends BaseController
                 'token' => csrf_hash(),
                 'message' => $e->getMessage(),
                 'status' => false
+            ]);
+        }
+    }
+
+    public function getReferensiBarang()
+    {
+        try {
+            $id = $this->request->getVar('sales_contract_id');
+            $salesKontrak = $this->salesKontrakModel->where('id', $id)->first();
+            $dataSalesKontrakDetail = $this->salesKontrakDetailModel->detail($id);
+            $dataBarang = [];
+            foreach ($dataSalesKontrakDetail as $barang) {
+                $keterangan = $salesKontrak['customer_po_no'] . " " . "SPECIES : " . strtoupper($barang['species']) . " SPECS : " . strtoupper($barang['specs']);
+                $sizeBreakdown = [];
+
+                foreach ($barang['size_breakdown'] as $s) {
+                    $sizeBreakdown[] = [
+                        'id_detail_breakdown' => $s['id_detail_breakdown'],
+                        'size' => $s['size'],
+                        'grade' => $s['grade'],
+                        'packing_size' => $s['packing'],
+                        'qty' => (float)$s['qty'],
+                        'harga' => (float)$s['harga'],
+                        'total' => (float)$s['total'],
+                        'satuan_size_id' => $s['satuan_size_id'],
+                        'satuan_size_code' => $s['satuan_size_code']
+                    ];
+                }
+
+
+                $dataBarang[] = [
+                    'id_barang' => $barang['id_detail'],
+                    'nama_barang' => $barang['barang_name'],
+                    'keterangan' => $keterangan,
+                    'size_breakdown' => $sizeBreakdown
+                ];
+            }
+
+            return response()->setJSON([
+                'data' => $dataBarang,
+                'token' => csrf_hash(),
+                'status' => true
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => $e->getMessage(),
+                'token' => csrf_hash()
             ]);
         }
     }

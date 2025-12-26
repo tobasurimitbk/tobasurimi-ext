@@ -434,6 +434,18 @@
             {
                 data: "barang_name",
                 className: "text-left",
+                render: function(data) {
+                    if (!data) return '';
+
+                    let words = data.split(' ');
+                    let result = [];
+
+                    for (let i = 0; i < words.length; i += 5) {
+                        result.push(words.slice(i, i + 5).join(' '));
+                    }
+
+                    return result.join('<br>');
+                }
             },
             {
                 data: "satuan",
@@ -464,6 +476,18 @@
             {
                 data: "supplier_terakhir",
                 className: "text-left",
+                render: function(data) {
+                    if (!data) return '';
+
+                    let words = data.split(' ');
+                    let result = [];
+
+                    for (let i = 0; i < words.length; i += 5) {
+                        result.push(words.slice(i, i + 5).join(' '));
+                    }
+
+                    return result.join('<br>');
+                }
             },
             {
                 data: "akun_coa", // Assuming "akun_coa" is the field name in your data source
@@ -835,10 +859,10 @@
             ],
             fixedHeader: true,
             lengthMenu: [
-                [25],
-                [25],
+                [10],
+                [10],
             ],
-            pageLength: 25,
+            pageLength: 10,
             ajax: {
                 url: "<?= base_url("barang-bahan-penolong/histori"); ?>",
                 dataSrc: "data",
@@ -934,10 +958,10 @@
             ],
             fixedHeader: true,
             lengthMenu: [
-                [25],
-                [25],
+                [15],
+                [15],
             ],
-            pageLength: 25,
+            pageLength: 15,
             ajax: {
                 url: "<?= base_url("barang-bahan-penolong/histori"); ?>",
                 dataSrc: "data",

@@ -62,99 +62,104 @@ class Attendance extends BaseController
 
     public function allData()
     {
-        // Cek input
+        // =============================
+        // 0. Validasi input
+        // =============================
         $companyId = $this->request->getVar('company_id');
-        $date = $this->request->getVar('date');
-        
+        $date      = $this->request->getVar('date');
+
         if (!$companyId || !$date) {
             return $this->response->setJSON([
                 'success' => false,
                 'message' => 'Company ID dan Tanggal harus diisi',
-                'data' => [],
-                'total' => 0
+                'data'    => [],
+                'total'   => 0
             ]);
         }
-        
+
         try {
-            // Get company data
+            // =============================
+            // 1. Ambil company
+            // =============================
             $company = $this->hrOutSourcingCompanyModel
                 ->where('id', $companyId)
-                ->where('deletedAt', NULL)
+                ->where('deletedAt', null)
                 ->first();
-                
+
             if (!$company) {
                 return $this->response->setJSON([
                     'success' => false,
                     'message' => 'Perusahaan tidak ditemukan',
-                    'data' => [],
-                    'total' => 0
+                    'data'    => [],
+                    'total'   => 0
                 ]);
             }
-            
-            // Get device IP from AttendancesUnitOutsourceModel
-            $device = $this->AttendancesUnitOutsourceModel
-                ->where('id', $company['ip_finger'])
-                ->first();
-                
-            if (!$device) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'Device fingerprint tidak ditemukan',
-                    'data' => [],
-                    'total' => 0
-                ]);
-            }
-            
-            // Parse tanggal dari input
+
             $selectedDate = date('Y-m-d', strtotime($date));
-            
-            // Get attendance data from device dengan tanggal yang difilter
-            $attendanceData = $this->Attendance->getAttendanceFromDevice(
-                $device['ip'],
-                0,
-                $selectedDate // Gunakan tanggal dari input
-            );
 
             // =============================
-            // 1. Get semua karyawan perusahaan
+            // 2. AMBIL PRESENSI DARI DATABASE
+            // =============================
+            $rawAttendance = $this->AttendancesLogOutsourcingModel
+                    ->select('
+                        attendance_log_outsource.employee_id AS pin,
+                        attendance_log_outsource.datetime,
+                        hr_outsourcing_employee.nama,
+                        hr_outsourcing_employee.badge
+                    ')
+                    ->join(
+                        'attendance_unit_outsource',
+                        'attendance_unit_outsource.id = attendance_log_outsource.attendance_unit',
+                        'left'
+                    )
+                    ->join(
+                        'hr_outsourcing_employee',
+                        'hr_outsourcing_employee.id = attendance_log_outsource.employee_id',
+                        'left'
+                    )
+                    ->where('hr_outsourcing_employee.company_id', $companyId)
+                    ->where('DATE(attendance_log_outsource.datetime)', $selectedDate)
+                    ->orderBy('attendance_log_outsource.datetime', 'ASC')
+                    ->findAll();
+
+            /**
+             * =====================================================
+             * 3. ADAPTER → SAMAKAN FORMAT DENGAN DATA MESIN
+             * =====================================================
+             */
+            $attendanceData = array_map(function ($row) {
+                return [
+                    'pin'      => (string) $row['pin'],
+                    'datetime' => $row['datetime'],
+                    'status'   => '0',   // dummy (logic kita yg nentuin)
+                    'verified' => '1'    // trusted karena dari DB
+                ];
+            }, $rawAttendance);
+
+            // =============================
+            // 4. Ambil SEMUA karyawan
             // =============================
             $allEmployees = $this->hrOutSourcingEmployeModel
                 ->where('company_id', $companyId)
                 ->findAll();
-            
+
             if (empty($allEmployees)) {
                 return $this->response->setJSON([
                     'success' => true,
-                    'message' => 'Tidak ada karyawan di perusahaan ini',
-                    'data' => [],
-                    'total' => 0,
-                    'date' => $date
+                    'message' => 'Tidak ada karyawan',
+                    'data'    => [],
+                    'total'   => 0,
+                    'date'    => $date
                 ]);
             }
 
             // =============================
-            // 2. Filter attendance data berdasarkan tanggal yang dipilih
-            // =============================
-            $filteredAttendance = [];
-            
-            if (!empty($attendanceData)) {
-                foreach ($attendanceData as $att) {
-                    $attDate = date('Y-m-d', strtotime($att['datetime']));
-                    
-                    // Hanya ambil data pada tanggal yang dipilih
-                    if ($attDate === $selectedDate) {
-                        $filteredAttendance[] = $att;
-                    }
-                }
-            }
-
-            // =============================
-            // 3. Group attendance by employee dan sort by time
+            // 5. Group attendance per employee
             // =============================
             $employeeAttendanceMap = [];
-            
-            foreach ($filteredAttendance as $att) {
-                $pin = (int)$att['pin']; // 🔥 FIX PENTING
+
+            foreach ($attendanceData as $att) {
+                $pin = (int) $att['pin'];
 
                 if (!isset($employeeAttendanceMap[$pin])) {
                     $employeeAttendanceMap[$pin] = [];
@@ -168,290 +173,98 @@ class Attendance extends BaseController
                 ];
             }
 
-            
-            // Sort attendance untuk setiap employee berdasarkan waktu
-            foreach ($employeeAttendanceMap as $pin => $attRecords) {
-                usort($employeeAttendanceMap[$pin], function($a, $b) {
-                    return $a['timestamp'] - $b['timestamp'];
-                });
+            // Sort waktu
+            foreach ($employeeAttendanceMap as $pin => $records) {
+                usort($employeeAttendanceMap[$pin], fn ($a, $b) => $a['timestamp'] <=> $b['timestamp']);
             }
 
             // =============================
-            // 4. Process semua karyawan (termasuk yang tidak absen)
+            // 6. Proses SEMUA karyawan
             // =============================
             $processedData = [];
             $counter = 1;
-            
+
             foreach ($allEmployees as $employee) {
-                $pin = $employee['id'];
-                $hasAttendance = isset($employeeAttendanceMap[$pin]);
-                
-                // Default data untuk karyawan yang tidak absen
+                $pin = (int) $employee['id'];
+
                 $empData = [
-                    'no' => $counter++,
-                    'user_id' => $pin,
-                    'name' => $employee['nama'],
-                    'badge_no' => $employee['badge'],
-                    'check_in' => null,
-                    'check_out' => null,
-                    'verified_in' => 'Not Verified',
-                    'verified_out' => 'Not Verified',
-                    'status' => 'Tidak Masuk',
-                    'status_class' => 'danger',
-                    'company_name' => $company['name'],
-                    'company_id' => $companyId,
+                    'no'               => $counter++,
+                    'user_id'          => $pin,
+                    'name'             => $employee['nama'],
+                    'badge_no'         => $employee['badge'],
+                    'check_in'         => null,
+                    'check_out'        => null,
+                    'verified_in'      => 'Not Verified',
+                    'verified_out'     => 'Not Verified',
+                    'status'           => 'Tidak Masuk',
+                    'status_class'     => 'danger',
+                    'company_name'     => $company['name'],
+                    'company_id'       => $companyId,
                     'attendance_count' => 0
                 ];
-                
-                if ($hasAttendance) {
-                    $attRecords = $employeeAttendanceMap[$pin];
-                    $empData['attendance_count'] = count($attRecords);
-                    
-                    // Ambil check-in pertama
-                    $firstRecord = $attRecords[0];
-                    $empData['check_in'] = date('H:i:s', $firstRecord['timestamp']);
-                    $empData['verified_in'] = $firstRecord['verified'] == '1' ? 'Verified' : 'Not Verified';
-                    
-                    // Tentukan check-out berdasarkan beberapa skenario:
-                    // 1. Jika ada record check-out/Overtime Out
-                    // 2. Jika hanya ada 1 record, cek apakah sudah lebih dari 8 jam
-                    // 3. Ambil record terakhir jika ada multiple records
-                    
-                    $checkOutTime = null;
-                    
-                    // Cari record check-out/Overtime Out
-                    foreach ($attRecords as $record) {
-                        if ($record['type'] === 'Check Out' || $record['type'] === 'Overtime Out') {
-                            $checkOutTime = $record['timestamp'];
-                            $empData['verified_out'] = $record['verified'] == '1' ? 'Verified' : 'Not Verified';
-                            break;
-                        }
-                    }
-                    
-                    // Jika tidak ada check-out yang eksplisit
-                    if ($checkOutTime === null) {
-                        $lastRecord = end($attRecords);
-                        
-                        // Jika hanya ada 1 record dan sudah lebih dari 8 jam, anggap sudah check-out
-                        if (count($attRecords) === 1) {
-                            $hoursWorked = (time() - $firstRecord['timestamp']) / 3600;
-                            if ($hoursWorked >= 8) {
-                                $checkOutTime = $firstRecord['timestamp'] + (8 * 3600); // Tambah 8 jam
-                            }
-                        } else {
-                            // Ambil record terakhir sebagai check-out
-                            $checkOutTime = $lastRecord['timestamp'];
-                            $empData['verified_out'] = $lastRecord['verified'] == '1' ? 'Verified' : 'Not Verified';
-                        }
-                    }
-                    
-                    if ($checkOutTime) {
-                        $empData['check_out'] = date('H:i:s', $checkOutTime);
-                        
-                        // Tentukan status
-                        if ($empData['check_in'] && $empData['check_out']) {
-                            $empData['status'] = 'Complete';
-                            $empData['status_class'] = 'success';
-                        }
+
+                if (isset($employeeAttendanceMap[$pin])) {
+                    $records = $employeeAttendanceMap[$pin];
+                    $empData['attendance_count'] = count($records);
+
+                    $first = $records[0];
+                    $last  = end($records);
+
+                    $empData['check_in']    = date('H:i:s', $first['timestamp']);
+                    $empData['verified_in'] = $first['verified'] == '1' ? 'Verified' : 'Not Verified';
+
+                    if (count($records) > 1) {
+                        $empData['check_out']    = date('H:i:s', $last['timestamp']);
+                        $empData['verified_out'] = $last['verified'] == '1' ? 'Verified' : 'Not Verified';
+                        $empData['status']       = 'Complete';
+                        $empData['status_class'] = 'success';
                     } else {
-                        $empData['status'] = 'Check In Only';
+                        $empData['status']       = 'Check In Only';
                         $empData['status_class'] = 'warning';
                     }
-                    
-                    // Tambahkan informasi tambahan jika ada multiple records
-                    if (count($attRecords) > 2) {
-                        $empData['status'] = 'Multiple Records (' . count($attRecords) . ')';
+
+                    if (count($records) > 2) {
+                        $empData['status']       = 'Multiple Records (' . count($records) . ')';
                         $empData['status_class'] = 'info';
                     }
                 }
-                
+
                 $processedData[] = $empData;
             }
 
             // =============================
-            // 5. Sort by badge number
+            // 7. Sort by badge
             // =============================
-            usort($processedData, function($a, $b) {
-                return strcmp($a['badge_no'], $b['badge_no']);
-            });
-            
-            // Reset numbering setelah sort
-            foreach ($processedData as $key => $data) {
-                $processedData[$key]['no'] = $key + 1;
+            usort($processedData, fn ($a, $b) => strcmp($a['badge_no'], $b['badge_no']));
+            foreach ($processedData as $i => $row) {
+                $processedData[$i]['no'] = $i + 1;
             }
-            
-            // Hitung statistik
+
+            // =============================
+            // 8. Statistik
+            // =============================
             $stats = [
                 'total_employees' => count($allEmployees),
-                'present' => count(array_filter($processedData, function($item) {
-                    return $item['status'] !== 'Tidak Masuk';
-                })),
-                'absent' => count(array_filter($processedData, function($item) {
-                    return $item['status'] === 'Tidak Masuk';
-                })),
-                'complete' => count(array_filter($processedData, function($item) {
-                    return $item['status'] === 'Complete';
-                }))
+                'present'  => count(array_filter($processedData, fn ($d) => $d['status'] !== 'Tidak Masuk')),
+                'absent'   => count(array_filter($processedData, fn ($d) => $d['status'] === 'Tidak Masuk')),
+                'complete' => count(array_filter($processedData, fn ($d) => $d['status'] === 'Complete')),
             ];
-            
-            return $this->response->setJSON([
-                'success' => true,
-                'message' => 'Data berhasil diambil',
-                'data' => $processedData,
-                'total' => count($processedData),
-                'date' => $date,
-                'stats' => $stats
-            ]);
-            
-        } catch (\Exception $e) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'Error: ' . $e->getMessage(),
-                'data' => [],
-                'total' => 0
-            ]);
-        }
-    }
 
-    public function pullFromFingerprint()
-    {
-        // Cek input
-        $companyId = $this->request->getVar('company_id');
-        $date = $this->request->getVar('date');
-        
-        if (!$companyId || !$date) {
             return $this->response->setJSON([
-                'success' => false,
-                'message' => 'Company ID dan Tanggal harus diisi'
-            ]);
-        }
-        
-        try {
-            // 1. Get company data
-            $company = $this->hrOutSourcingCompanyModel
-                ->where('id', $companyId)
-                ->where('deletedAt', NULL)
-                ->first();
-                
-            if (!$company) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'Perusahaan tidak ditemukan'
-                ]);
-            }
-            
-            // 2. Get device IP from AttendancesUnitOutsourceModel
-            $device = $this->AttendancesUnitOutsourceModel
-                ->where('id', $company['ip_finger'])
-                ->first();
-                
-            if (!$device) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'Device fingerprint tidak ditemukan'
-                ]);
-            }
-            
-            // 3. Get all employees for this company
-            $allEmployees = $this->hrOutSourcingEmployeModel
-                ->where('company_id', $companyId)
-                ->findAll();
-            
-            if (empty($allEmployees)) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'Tidak ada karyawan di perusahaan ini'
-                ]);
-            }
-            
-            // 4. Parse tanggal dari input
-            $selectedDate = date('Y-m-d', strtotime($date));
-            
-            // 5. Get attendance data from device
-            $attendanceData = $this->Attendance->getAttendanceFromDevice(
-                $device['ip'],
-                0,
-                $selectedDate
-            );
-            
-            if (empty($attendanceData)) {
-                return $this->response->setJSON([
-                    'success' => true,
-                    'message' => 'Tidak ada data presensi di mesin untuk tanggal ' . $selectedDate,
-                    'total' => 0,
-                    'saved' => 0
-                ]);
-            }
-            
-            // 6. Filter data berdasarkan tanggal yang dipilih
-            $filteredData = [];
-            foreach ($attendanceData as $att) {
-                $attDate = date('Y-m-d', strtotime($att['datetime']));
-                if ($attDate === $selectedDate) {
-                    $filteredData[] = $att;
-                }
-            }
-            
-            if (empty($filteredData)) {
-                return $this->response->setJSON([
-                    'success' => true,
-                    'message' => 'Tidak ada data presensi untuk tanggal ' . $selectedDate,
-                    'total' => 0,
-                    'saved' => 0
-                ]);
-            }
-            
-            // 7. Validasi dan simpan ke database
-            $savedCount = 0;
-            $errorLogs = [];
-            
-            foreach ($filteredData as $att) {
-                try {
-                    // Cek apakah employee_id (PIN) ada di database karyawan
-                    $employeeExists = false;
-                    foreach ($allEmployees as $emp) {
-                        if ((int)$emp['id'] === (int)$att['pin']) {
-                            $employeeExists = true;
-                            break;
-                        }
-                    }
-                    
-                    if (!$employeeExists) {
-                        $errorLogs[] = "PIN " . $att['pin'] . " tidak terdaftar sebagai karyawan";
-                        continue;
-                    }
-                    
-                    // Simpan ke database
-                    $result = $this->AttendancesLogOutsourcingModel->saveLogFromDevice($att);
-                    
-                    if ($result) {
-                        $savedCount++;
-                    }
-                    
-                } catch (\Exception $e) {
-                    $errorLogs[] = "Error pada PIN " . $att['pin'] . ": " . $e->getMessage();
-                }
-            }
-            
-            // 8. Prepare response
-            $response = [
                 'success' => true,
-                'message' => 'Data berhasil ditarik dari mesin',
-                'total' => count($filteredData),
-                'saved' => $savedCount,
-                'errors' => $errorLogs
-            ];
-            
-            if (!empty($errorLogs)) {
-                $response['message'] = 'Data berhasil ditarik dengan beberapa error';
-            }
-            
-            return $this->response->setJSON($response);
-            
-        } catch (\Exception $e) {
+                'message' => 'Data presensi berhasil diambil dari database',
+                'data'    => $processedData,
+                'total'   => count($processedData),
+                'date'    => $date,
+                'stats'   => $stats
+            ]);
+
+        } catch (\Throwable $e) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'Error: ' . $e->getMessage()
+                'message' => $e->getMessage(),
+                'data'    => [],
+                'total'   => 0
             ]);
         }
     }
@@ -459,13 +272,112 @@ class Attendance extends BaseController
     private function getAttendanceType($status)
     {
         $types = [
-            '0' => 'Check In',
-            '1' => 'Check Out',
+            '0'   => 'Check In',
+            '1'   => 'Check Out',
             '255' => 'Overtime In',
             '256' => 'Overtime Out'
         ];
-        
-        return isset($types[$status]) ? $types[$status] : 'Unknown';
+
+        return $types[$status] ?? 'Unknown';
+    }
+
+    public function pullFromFingerprint()
+    {
+        // WAJIB buat proses besar
+        set_time_limit(0);
+        ini_set('memory_limit', '512M');
+
+        $companyId = $this->request->getVar('company_id');
+        $date      = $this->request->getVar('date');
+
+        if (!$companyId || !$date) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Company ID dan Tanggal harus diisi'
+            ]);
+        }
+
+        try {
+            /* ===============================
+            * COMPANY
+            * =============================== */
+            $company = $this->hrOutSourcingCompanyModel
+                ->where('id', $companyId)
+                ->where('deletedAt', null)
+                ->first();
+
+            if (!$company) {
+                throw new \Exception('Perusahaan tidak ditemukan');
+            }
+
+            /* ===============================
+            * DEVICE
+            * =============================== */
+            $device = $this->AttendancesUnitOutsourceModel
+                ->where('id', $company['ip_finger'])
+                ->first();
+
+            if (!$device) {
+                throw new \Exception('Device fingerprint tidak ditemukan');
+            }
+
+            /* ===============================
+            * PULL FROM MACHINE
+            * =============================== */
+            $attendanceData = $this->Attendance->getAttendanceFromDevice(
+                $device['ip'],
+                0,
+                $date
+            );
+
+            if (empty($attendanceData)) {
+                return $this->response->setJSON([
+                    'success'       => true,
+                    'message'       => 'Tidak ada data dari mesin',
+                    'from_machine'  => 0,
+                    'inserted'      => 0
+                ]);
+            }
+
+            /* ===============================
+            * PREPARE BATCH DATA
+            * =============================== */
+            $batchData = [];
+
+            foreach ($attendanceData as $att) {
+                $batchData[] = [
+                    'employee_id'       => (int) $att['pin'],
+                    'attendance_unit'  => $device['id'],
+                    'datetime'          => $att['datetime'],
+                ];
+            }
+
+            /* ===============================
+            * INSERT BATCH (CHUNK)
+            * =============================== */
+            $chunkSize = 500; // AMAN buat DB & mesin
+            $chunks    = array_chunk($batchData, $chunkSize);
+
+            $inserted = 0;
+
+            foreach ($chunks as $chunk) {
+                $this->AttendancesLogOutsourcingModel->insertBatch($chunk);
+                $inserted += count($chunk);
+            }
+
+            return $this->response->setJSON([
+                'success'       => true,
+                'message'       => 'Data berhasil ditarik dari mesin',
+                'from_machine'  => count($attendanceData),
+                'inserted'      => $inserted
+            ]);
+
+        } catch (\Throwable $e) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 
     // Function untuk mengambil semua karyawan dari perusahaan
@@ -502,20 +414,18 @@ class Attendance extends BaseController
         return $this->response->setJSON($company);
     }
 
-
 public function generatePayrollPdf()
 {
     try {
         // ===============================
-        // 1. AMBIL PARAMETER
+        // 1. AMBIL PARAMETER (SINGLE DATE)
         // ===============================
         $companyId = $this->request->getPost('company_id');
-        $startDate = $this->request->getPost('start_date');
-        $endDate   = $this->request->getPost('end_date');
+        $date      = $this->request->getPost('date');    // Changed from start_date
         $period    = $this->request->getPost('period'); // 1-15 / 16-31
         $type      = $this->request->getPost('type');   // harian / minggu
 
-        if (!$companyId || !$startDate || !$endDate || !$period) {
+        if (!$companyId || !$date || !$period) {
             return $this->response->setJSON([
                 'success' => false,
                 'message' => 'Parameter tidak lengkap'
@@ -538,22 +448,7 @@ public function generatePayrollPdf()
         }
 
         // ===============================
-        // 3. DEVICE FINGERPRINT
-        // ===============================
-        $device = $this->AttendancesUnitOutsourceModel
-            ->where('id', $company['ip_finger'])
-            ->where('deletedAt', NULL)
-            ->first();
-
-        if (!$device) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'Device fingerprint tidak ditemukan'
-            ]);
-        }
-
-        // ===============================
-        // 4. DATA KARYAWAN
+        // 3. DATA KARYAWAN
         // ===============================
         $allEmployees = $this->hrOutSourcingEmployeModel
             ->where('company_id', $companyId)
@@ -567,131 +462,151 @@ public function generatePayrollPdf()
         }
 
         // ===============================
-        // 5. AMBIL ABSENSI (1x SAJA)
+        // 4. AMBIL ABSENSI DARI DATABASE (SINGLE DATE)
         // ===============================
-        $rawAttendance = $this->Attendance->getAttendanceFromDevice(
-            $device['ip'],
-            0,
-            $this->request->getPost('start_date')
-        );
+        $selectedDate = date('Y-m-d', strtotime($date));
+        
+        $rawAttendance = $this->AttendancesLogOutsourcingModel
+            ->select('
+                attendance_log_outsource.employee_id AS pin,
+                attendance_log_outsource.datetime,
+                hr_outsourcing_employee.nama,
+                hr_outsourcing_employee.badge,
+                DATE(attendance_log_outsource.datetime) as attendance_date
+            ')
+            ->join(
+                'attendance_unit_outsource',
+                'attendance_unit_outsource.id = attendance_log_outsource.attendance_unit',
+                'left'
+            )
+            ->join(
+                'hr_outsourcing_employee',
+                'hr_outsourcing_employee.id = attendance_log_outsource.employee_id',
+                'left'
+            )
+            ->where('hr_outsourcing_employee.company_id', $companyId)
+            ->where('DATE(attendance_log_outsource.datetime)', $selectedDate)
+            ->orderBy('attendance_log_outsource.datetime', 'ASC')
+            ->findAll();
 
-        var_dump($rawAttendance);
-        die;
+        // ===============================
+        // 5. FORMAT DATA ABSENSI (ADAPTER)
+        // ===============================
+        $formattedAttendance = array_map(function ($row) {
+            return [
+                'pin'      => (string) $row['pin'],
+                'datetime' => $row['datetime'],
+                'status'   => '0',   // default status
+                'verified' => '1',   // trusted dari DB
+                'date'     => $row['attendance_date']
+            ];
+        }, $rawAttendance);
 
-        $attendanceData = [];
+        // ===============================
+        // 6. GROUP ABSENSI PER KARYAWAN
+        // ===============================
+        $employeeAttendanceMap = [];
 
-        foreach ($rawAttendance as $att) {
-
+        foreach ($formattedAttendance as $att) {
             $pin = (int)$att['pin'];
+            
             if ($pin <= 0) continue;
 
-            $attDate = date('Y-m-d', strtotime($att['datetime']));
-
-            if ($attDate < $startDate || $attDate > $endDate) {
-                continue;
+            if (!isset($employeeAttendanceMap[$pin])) {
+                $employeeAttendanceMap[$pin] = [];
             }
 
-            if (!isset($attendanceData[$attDate])) {
-                $attendanceData[$attDate] = [];
-            }
-
-            if (!isset($attendanceData[$attDate][$pin])) {
-                $attendanceData[$attDate][$pin] = [];
-            }
-
-            $attendanceData[$attDate][$pin][] = [
+            $employeeAttendanceMap[$pin][] = [
                 'datetime'  => $att['datetime'],
                 'timestamp' => strtotime($att['datetime']),
                 'verified'  => (int)$att['verified'],
                 'status'    => (int)$att['status'],
-                'workcode'  => (int)$att['workcode'],
+                'workcode'  => 0,
+                'date'      => $att['date']
             ];
         }
 
-        // sort log
-        foreach ($attendanceData as $date => $employees) {
-            foreach ($employees as $pin => $records) {
-                usort($attendanceData[$date][$pin], fn($a,$b) => $a['timestamp'] <=> $b['timestamp']);
-            }
+        // Sort log per karyawan
+        foreach ($employeeAttendanceMap as $pin => $records) {
+            usort($employeeAttendanceMap[$pin], fn($a, $b) => $a['timestamp'] <=> $b['timestamp']);
         }
 
-
         // ===============================
-        // 6. PROSES GAJI
+        // 7. PROSES GAJI UNTUK SETIAP KARYAWAN
         // ===============================
         $processedEmployees = [];
 
         foreach ($allEmployees as $employee) {
+            $employeeId = (int)$employee['id'];
+            
+            // Default: Tidak masuk
+            $employeeAttendanceDays = [];
+            $workDays = 0;
 
-    // 🔥 PIN == EMPLOYEE.ID
-    $employeeId = (int)$employee['id'];
+            // Cek apakah karyawan ini punya absensi
+            if (isset($employeeAttendanceMap[$employeeId]) && !empty($employeeAttendanceMap[$employeeId])) {
+                $records = $employeeAttendanceMap[$employeeId];
+                
+                // Ambil check in pertama dan check out terakhir
+                $firstRecord = $records[0];
+                $lastRecord = end($records);
+                
+                // Cari check out dengan status = 1 (pulang) jika ada
+                $finalCheckOut = $lastRecord['datetime'];
+                foreach ($records as $r) {
+                    if ($r['status'] === 1) {
+                        $finalCheckOut = $r['datetime'];
+                        break;
+                    }
+                }
 
-    $employeeAttendanceDays = [];
-    $workDays = 0;
+                $employeeAttendanceDays[$selectedDate] = [
+                    'check_in'  => $firstRecord['datetime'],
+                    'check_out' => $finalCheckOut,
+                    'records'   => $records,
+                    'date'      => $selectedDate
+                ];
 
-    foreach ($attendanceData as $date => $dailyData) {
-
-        if (!isset($dailyData[$employeeId])) {
-            continue;
-        }
-
-        $records = $dailyData[$employeeId];
-        if (empty($records)) continue;
-
-        $checkIn  = $records[0]['datetime'];
-        $checkOut = end($records)['datetime'];
-
-        // cari checkout valid
-        $finalCheckOut = $checkOut;
-        foreach ($records as $r) {
-            if ($r['status'] === 1) {
-                $finalCheckOut = $r['datetime'];
-                break;
+                $workDays = 1; // Hanya 1 hari untuk single date
             }
+
+            // Hitung gaji (meskipun tidak masuk, untuk ditampilkan)
+            $calculations = $this->calculateSalary($employee, $employeeAttendanceDays, $type, $period);
+            
+            $processedEmployees[] = [
+                'employee'     => $employee,
+                'attendance'   => $employeeAttendanceDays,
+                'work_days'    => $workDays,
+                'calculations' => $calculations,
+                'attendance_status' => empty($employeeAttendanceDays) ? 'Tidak Masuk' : 'Hadir'
+            ];
         }
-
-        $employeeAttendanceDays[$date] = [
-            'check_in'  => $checkIn,
-            'check_out' => $finalCheckOut,
-            'records'   => $records
-        ];
-
-        $workDays++;
-    }
-
-    if (!empty($employeeAttendanceDays)) {
-        $processedEmployees[] = [
-            'employee'   => $employee,
-            'attendance' => $employeeAttendanceDays,
-            'work_days'  => $workDays
-        ];
-    }
-}
-
 
         // ===============================
-        // 7. GENERATE PDF
+        // 8. GENERATE PDF
         // ===============================
         $html = $this->generateHtmlContent(
             $processedEmployees,
             $period,
             $type,
-            $startDate,
-            $endDate,
+            $date, // Single date
+            $date, // Start dan end sama
             $company
         );
 
         $pdfContent = $this->generatePdf($html);
 
         // ===============================
-        // 8. RESPONSE
+        // 9. RESPONSE
         // ===============================
         return $this->response->setJSON([
             'success'          => true,
             'data'             => base64_encode($pdfContent),
-            'filename'         => "Payroll_{$company['name']}_{$period}_{$type}_" . date('Ymd_His') . ".pdf",
+            'filename'         => "Payroll_{$company['name']}_{$selectedDate}_{$type}_" . date('Ymd_His') . ".pdf",
             'total_employees'  => count($processedEmployees),
-            'period'           => date('d/m/Y', strtotime($startDate)) . ' - ' . date('d/m/Y', strtotime($endDate))
+            'date'             => $selectedDate,
+            'present_count'    => count(array_filter($processedEmployees, fn($e) => !empty($e['attendance']))),
+            'absent_count'     => count(array_filter($processedEmployees, fn($e) => empty($e['attendance'])))
         ]);
 
     } catch (\Throwable $e) {
@@ -702,9 +617,8 @@ public function generatePayrollPdf()
     }
 }
 
-
 /**
- * FUNGSI PERHITUNGAN GAJI BERDASARKAN JENIS
+ * PERHITUNGAN GAJI YANG LEBIH DETAIL
  */
 private function calculateSalary($employee, $attendanceDays, $type, $period)
 {
@@ -720,7 +634,8 @@ private function calculateSalary($employee, $attendanceDays, $type, $period)
         'daily_rate' => 0,
         'overtime_rate' => 0,
         'longshift_rate' => 0,
-        'work_days' => count($attendanceDays)
+        'work_days' => count($attendanceDays),
+        'daily_details' => [] // Detail per hari
     ];
 
     // Tentukan rate berdasarkan jenis (harian/minggu)
@@ -728,7 +643,7 @@ private function calculateSalary($employee, $attendanceDays, $type, $period)
         // GAJI HARIAN (PER 15 HARI)
         $daysInPeriod = $this->getWorkingDaysInPeriod($period);
         
-        // Rate statis per jam
+        // Rate sesuai permintaan
         $hourlyRate = 67166.67 / 8; // = 8,395.83375 per jam
         $dailyRate = 67166.67; // Rate harian penuh
         $overtimeRate = $hourlyRate * 1.5; // Lembur 1.5x
@@ -751,25 +666,45 @@ private function calculateSalary($employee, $attendanceDays, $type, $period)
         if (isset($dayData['check_in']) && isset($dayData['check_out'])) {
             $hours = $this->calculateDailyHours($dayData);
             
+            $dailyDetail = [
+                'date' => $date,
+                'check_in' => $dayData['check_in'],
+                'check_out' => $dayData['check_out'],
+                'total_hours' => $hours,
+                'regular_hours' => 0,
+                'overtime_hours' => 0,
+                'is_longshift' => false
+            ];
+            
             if ($hours > 0) {
                 if ($hours <= 8) {
-                    $result['regular_hours'] += $hours;
-                    $result['regular_salary'] += ($hours * $hourlyRate);
+                    $regularHours = $hours;
+                    $overtimeHours = 0;
                 } else {
-                    $result['regular_hours'] += 8;
-                    $result['regular_salary'] += (8 * $hourlyRate);
-                    
-                    $overtime = $hours - 8;
-                    $result['overtime_hours'] += $overtime;
-                    $result['overtime_salary'] += ($overtime * $overtimeRate);
+                    $regularHours = 8;
+                    $overtimeHours = $hours - 8;
+                }
+                
+                $dailyDetail['regular_hours'] = $regularHours;
+                $dailyDetail['overtime_hours'] = $overtimeHours;
+                
+                $result['regular_hours'] += $regularHours;
+                $result['regular_salary'] += ($regularHours * $hourlyRate);
+                
+                if ($overtimeHours > 0) {
+                    $result['overtime_hours'] += $overtimeHours;
+                    $result['overtime_salary'] += ($overtimeHours * $overtimeRate);
                 }
                 
                 // Cek apakah longshift (kerja > 14 jam total)
                 if ($hours > 14) {
+                    $dailyDetail['is_longshift'] = true;
                     $result['longshift_hours'] += 1;
                     $result['longshift_salary'] += $longshiftRate;
                 }
             }
+            
+            $result['daily_details'][] = $dailyDetail;
         }
     }
 
@@ -782,6 +717,7 @@ private function calculateSalary($employee, $attendanceDays, $type, $period)
 
 /**
  * HITUNG JAM KERJA HARIAN DARI CHECK-IN DAN CHECK-OUT
+ * (Diperbaiki untuk menghitung dengan benar)
  */
 private function calculateDailyHours($dayData)
 {
@@ -808,12 +744,16 @@ private function calculateDailyHours($dayData)
 }
 
 /**
- * GENERATE HTML CONTENT UNTUK PDF
+ * GENERATE HTML CONTENT UNTUK PDF (DIPERBAIKI)
  */
 private function generateHtmlContent($data, $period, $type, $startDate, $endDate, $company)
 {
     $periodText = $period === '1-15' ? '1-15' : '16-' . date('t', strtotime($startDate));
     $title = $type === 'harian' ? "SLIP GAJI HARIAN PERIODE {$periodText}" : "SLIP GAJI MINGGUAN";
+    
+    // WARNING: Jika data terlalu banyak, buat per page
+    $perPage = 30;
+    $totalPages = ceil(count($data) / $perPage);
     
     $html = '<!DOCTYPE html>
     <html>
@@ -821,12 +761,12 @@ private function generateHtmlContent($data, $period, $type, $startDate, $endDate
         <meta charset="UTF-8">
         <title>Laporan Penggajian</title>
         <style>
-            body { font-family: Arial, sans-serif; font-size: 10px; }
+            body { font-family: Arial, sans-serif; font-size: 10px; margin: 0; padding: 20px; }
             .header { text-align: center; margin-bottom: 15px; border-bottom: 2px solid #000; padding-bottom: 10px; }
             .header h2 { margin: 0; padding: 0; color: #333; }
             .header p { margin: 3px 0; padding: 0; }
             .company-info { text-align: left; margin-bottom: 15px; padding: 10px; background-color: #f9f9f9; border-radius: 5px; border: 1px solid #ddd; }
-            table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
             table, th, td { border: 1px solid #000; }
             th, td { padding: 4px 6px; text-align: center; }
             th { background-color: #f2f2f2; font-weight: bold; }
@@ -834,51 +774,100 @@ private function generateHtmlContent($data, $period, $type, $startDate, $endDate
             .text-right { text-align: right; }
             .total-row { font-weight: bold; background-color: #e8e8e8; }
             .employee-row:hover { background-color: #f5f5f5; }
-            .signature { width: 100%; margin-top: 40px; }
+            .signature { width: 100%; margin-top: 20px; }
             .signature td { border: none; text-align: center; padding-top: 40px; }
             .summary-box { background-color: #f0f8ff; padding: 10px; border-radius: 5px; margin-bottom: 15px; border: 1px solid #ccc; }
             .summary-item { display: inline-block; margin-right: 20px; }
             .summary-label { font-weight: bold; }
             .page-break { page-break-after: always; }
+            .page-number { text-align: center; margin-top: 10px; font-size: 9px; color: #666; }
             @media print {
-                body { font-size: 9px; }
+                body { font-size: 9px; padding: 10px; }
                 .no-print { display: none; }
             }
         </style>
     </head>
     <body>';
 
-    // HEADER
-    $html .= '<div class="header">
-        <h2>' . $title . '</h2>
-        <p>Perusahaan: <strong>' . ($company['name'] ?? 'N/A') . '</strong></p>
-        <p>Periode: ' . date('d/m/Y', strtotime($startDate)) . ' - ' . date('d/m/Y', strtotime($endDate)) . '</p>
-        <p>Tanggal Cetak: ' . date('d/m/Y H:i:s') . '</p>
-    </div>';
+    // Jika banyak data, buat per page
+    if ($totalPages > 1) {
+        for ($page = 0; $page < $totalPages; $page++) {
+            $start = $page * $perPage;
+            $pageData = array_slice($data, $start, $perPage);
+            
+            $html .= $this->generatePageContent(
+                $pageData, 
+                $title, 
+                $company, 
+                $startDate, 
+                $endDate, 
+                $page + 1, 
+                $totalPages,
+                ($page == 0) // first page
+            );
+            
+            if ($page < $totalPages - 1) {
+                $html .= '<div class="page-break"></div>';
+            }
+        }
+    } else {
+        $html .= $this->generatePageContent(
+            $data, 
+            $title, 
+            $company, 
+            $startDate, 
+            $endDate, 
+            1, 
+            1,
+            true
+        );
+    }
 
-    // COMPANY INFO
-    $html .= '<div class="company-info">
-        <p><strong>Informasi Perusahaan:</strong></p>
-        <p>Nama: ' . ($company['name'] ?? 'N/A') . '</p>
-        <p>Alamat: ' . ($company['address'] ?? 'N/A') . '</p>
-        <p>Telepon: ' . ($company['phone'] ?? 'N/A') . '</p>
-    </div>';
+    $html .= '</body></html>';
 
-    // SUMMARY
-    $totalEmployees = count($data);
-    $totalRegularHours = array_sum(array_column(array_column($data, 'calculations'), 'regular_hours'));
-    $totalOvertimeHours = array_sum(array_column(array_column($data, 'calculations'), 'overtime_hours'));
-    $totalSalary = array_sum(array_column(array_column($data, 'calculations'), 'total_salary'));
-    $totalWorkDays = array_sum(array_column(array_column($data, 'calculations'), 'work_days'));
+    return $html;
+}
+
+/**
+ * GENERATE CONTENT PER PAGE
+ */
+private function generatePageContent($pageData, $title, $company, $startDate, $endDate, $currentPage, $totalPages, $isFirstPage = false)
+{
+    $html = '';
     
-    $html .= '<div class="summary-box">
-        <div class="summary-item"><span class="summary-label">Jumlah Karyawan:</span> ' . $totalEmployees . '</div>
-        <div class="summary-item"><span class="summary-label">Total Hari Kerja:</span> ' . $totalWorkDays . '</div>
-        <div class="summary-item"><span class="summary-label">Total Jam Kerja:</span> ' . number_format($totalRegularHours + $totalOvertimeHours, 2) . ' jam</div>
-        <div class="summary-item"><span class="summary-label">Total Gaji:</span> Rp ' . number_format($totalSalary, 2) . '</div>
-    </div>';
+    if ($isFirstPage) {
+        // HEADER hanya di page pertama
+        $html .= '<div class="header">
+            <h2>' . $title . '</h2>
+            <p>Perusahaan: <strong>' . ($company['name'] ?? 'N/A') . '</strong></p>
+            <p>Periode: ' . date('d/m/Y', strtotime($startDate)) . ' - ' . date('d/m/Y', strtotime($endDate)) . '</p>
+            <p>Tanggal Cetak: ' . date('d/m/Y H:i:s') . '</p>
+        </div>';
 
-    // TABEL GAJI
+        // COMPANY INFO hanya di page pertama
+        $html .= '<div class="company-info">
+            <p><strong>Informasi Perusahaan:</strong></p>
+            <p>Nama: ' . ($company['name'] ?? 'N/A') . '</p>
+            <p>Alamat: ' . ($company['address'] ?? 'N/A') . '</p>
+            <p>Telepon: ' . ($company['phone'] ?? 'N/A') . '</p>
+        </div>';
+
+        // SUMMARY hanya di page pertama
+        $totalEmployees = count($pageData) * $totalPages; // Estimasi
+        $totalRegularHours = array_sum(array_column(array_column($pageData, 'calculations'), 'regular_hours'));
+        $totalOvertimeHours = array_sum(array_column(array_column($pageData, 'calculations'), 'overtime_hours'));
+        $totalSalary = array_sum(array_column(array_column($pageData, 'calculations'), 'total_salary'));
+        $totalWorkDays = array_sum(array_column(array_column($pageData, 'calculations'), 'work_days'));
+        
+        $html .= '<div class="summary-box">
+            <div class="summary-item"><span class="summary-label">Jumlah Karyawan:</span> ' . $totalEmployees . '</div>
+            <div class="summary-item"><span class="summary-label">Total Hari Kerja:</span> ' . $totalWorkDays . '</div>
+            <div class="summary-item"><span class="summary-label">Total Jam Kerja:</span> ' . number_format($totalRegularHours + $totalOvertimeHours, 2) . ' jam</div>
+            <div class="summary-item"><span class="summary-label">Total Gaji:</span> Rp ' . number_format($totalSalary, 2) . '</div>
+        </div>';
+    }
+
+    // TABEL GAJI untuk page ini
     $html .= '<table>
         <thead>
             <tr>
@@ -897,17 +886,17 @@ private function generateHtmlContent($data, $period, $type, $startDate, $endDate
         </thead>
         <tbody>';
 
-    $grandTotalHours = 0;
-    $grandTotalSalary = 0;
-    $no = 1;
+    $no = (($currentPage - 1) * 30) + 1;
+    $pageTotalHours = 0;
+    $pageTotalSalary = 0;
 
-    foreach ($data as $item) {
+    foreach ($pageData as $item) {
         $calc = $item['calculations'];
         $emp = $item['employee'];
         
         $html .= '<tr class="employee-row">
             <td>' . $no++ . '</td>
-            <td>' . ($emp['badge_no'] ?? $emp['id'] ?? '-') . '</td>
+            <td>' . ($emp['badge'] ?? $emp['badge_no'] ?? $emp['id'] ?? '-') . '</td>
             <td class="text-left">' . $emp['nama'] . '</td>
             <td>' . $calc['work_days'] . '</td>
             <td>' . number_format($calc['regular_hours'], 2) . '</td>
@@ -919,62 +908,74 @@ private function generateHtmlContent($data, $period, $type, $startDate, $endDate
             <td class="text-right"><strong>Rp ' . number_format($calc['total_salary'], 2) . '</strong></td>
         </tr>';
 
-        $grandTotalHours += $calc['total_hours'];
-        $grandTotalSalary += $calc['total_salary'];
+        $pageTotalHours += $calc['total_hours'];
+        $pageTotalSalary += $calc['total_salary'];
     }
 
-    // TOTAL ROW
-    $html .= '<tr class="total-row">
-        <td colspan="3"><strong>GRAND TOTAL</strong></td>
-        <td><strong>' . $totalWorkDays . '</strong></td>
-        <td><strong>' . number_format($totalRegularHours, 2) . '</strong></td>
-        <td><strong>' . number_format($totalOvertimeHours, 2) . '</strong></td>
-        <td><strong>' . number_format(array_sum(array_column(array_column($data, 'calculations'), 'longshift_hours')), 0) . '</strong></td>
-        <td class="text-right"><strong>Rp ' . number_format(array_sum(array_column(array_column($data, 'calculations'), 'regular_salary')), 2) . '</strong></td>
-        <td class="text-right"><strong>Rp ' . number_format(array_sum(array_column(array_column($data, 'calculations'), 'overtime_salary')), 2) . '</strong></td>
-        <td class="text-right"><strong>Rp ' . number_format(array_sum(array_column(array_column($data, 'calculations'), 'longshift_salary')), 2) . '</strong></td>
-        <td class="text-right"><strong>Rp ' . number_format($grandTotalSalary, 2) . '</strong></td>
-    </tr>';
+    // TOTAL ROW untuk page ini
+    if (!empty($pageData)) {
+        $pageRegularHours = array_sum(array_column(array_column($pageData, 'calculations'), 'regular_hours'));
+        $pageOvertimeHours = array_sum(array_column(array_column($pageData, 'calculations'), 'overtime_hours'));
+        $pageWorkDays = array_sum(array_column(array_column($pageData, 'calculations'), 'work_days'));
+        $pageLongshift = array_sum(array_column(array_column($pageData, 'calculations'), 'longshift_hours'));
+        $pageRegularSalary = array_sum(array_column(array_column($pageData, 'calculations'), 'regular_salary'));
+        $pageOvertimeSalary = array_sum(array_column(array_column($pageData, 'calculations'), 'overtime_salary'));
+        $pageLongshiftSalary = array_sum(array_column(array_column($pageData, 'calculations'), 'longshift_salary'));
+        
+        $html .= '<tr class="total-row">
+            <td colspan="3"><strong>PAGE TOTAL (Halaman ' . $currentPage . ')</strong></td>
+            <td><strong>' . $pageWorkDays . '</strong></td>
+            <td><strong>' . number_format($pageRegularHours, 2) . '</strong></td>
+            <td><strong>' . number_format($pageOvertimeHours, 2) . '</strong></td>
+            <td><strong>' . number_format($pageLongshift, 0) . '</strong></td>
+            <td class="text-right"><strong>Rp ' . number_format($pageRegularSalary, 2) . '</strong></td>
+            <td class="text-right"><strong>Rp ' . number_format($pageOvertimeSalary, 2) . '</strong></td>
+            <td class="text-right"><strong>Rp ' . number_format($pageLongshiftSalary, 2) . '</strong></td>
+            <td class="text-right"><strong>Rp ' . number_format($pageTotalSalary, 2) . '</strong></td>
+        </tr>';
+    }
 
     $html .= '</tbody></table>';
 
-    // SUMMARY BOTTOM
-    $html .= '<div style="margin-top: 20px; padding: 15px; background-color: #e6f7ff; border: 2px solid #1890ff; border-radius: 5px;">
-        <h3 style="margin: 0; color: #0050b3; text-align: center;">
-            TOTAL: ' . number_format($grandTotalHours, 2) . ' Jam Kerja | Rp ' . number_format($grandTotalSalary, 2) . '
-        </h3>
-        <p style="text-align: center; margin: 5px 0 0 0;">*Termasuk jam normal, lembur, dan longshift</p>
-    </div>';
+    // Page number
+    $html .= '<div class="page-number">Halaman ' . $currentPage . ' dari ' . $totalPages . '</div>';
 
-    // FOOTER & SIGNATURE
-    $html .= '<table class="signature">
-        <tr>
-            <td>KARYAWAN</td>
-            <td>HRD</td>
-            <td>MANAJER</td>
-            <td>DIREKTUR</td>
-        </tr>
-        <tr>
-            <td style="padding-top: 60px;">(___________________)</td>
-            <td style="padding-top: 60px;">(___________________)</td>
-            <td style="padding-top: 60px;">(___________________)</td>
-            <td style="padding-top: 60px;">(___________________)</td>
-        </tr>
-        <tr>
-            <td>Nama & Tanda Tangan</td>
-            <td>Verifikasi HRD</td>
-            <td>Persetujuan Manager</td>
-            <td>Persetujuan Direktur</td>
-        </tr>
-    </table>';
+    // FOOTER & SIGNATURE hanya di halaman terakhir
+    if ($currentPage == $totalPages) {
+        $html .= '<div style="margin-top: 20px; padding: 15px; background-color: #e6f7ff; border: 2px solid #1890ff; border-radius: 5px;">
+            <h3 style="margin: 0; color: #0050b3; text-align: center;">
+                TOTAL SELURUH KARYAWAN: Rp ' . number_format($pageTotalSalary, 2) . '
+            </h3>
+            <p style="text-align: center; margin: 5px 0 0 0;">*Termasuk jam normal, lembur, dan longshift</p>
+        </div>';
 
-    $html .= '</body></html>';
+        $html .= '<table class="signature">
+            <tr>
+                <td>KARYAWAN</td>
+                <td>HRD</td>
+                <td>MANAJER</td>
+                <td>DIREKTUR</td>
+            </tr>
+            <tr>
+                <td style="padding-top: 60px;">(___________________)</td>
+                <td style="padding-top: 60px;">(___________________)</td>
+                <td style="padding-top: 60px;">(___________________)</td>
+                <td style="padding-top: 60px;">(___________________)</td>
+            </tr>
+            <tr>
+                <td>Nama & Tanda Tangan</td>
+                <td>Verifikasi HRD</td>
+                <td>Persetujuan Manager</td>
+                <td>Persetujuan Direktur</td>
+            </tr>
+        </table>';
+    }
 
     return $html;
 }
 
 /**
- * GENERATE PDF DARI HTML
+ * GENERATE PDF DARI HTML (DOMpdf)
  */
 private function generatePdf($html)
 {

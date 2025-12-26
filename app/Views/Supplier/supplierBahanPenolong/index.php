@@ -208,7 +208,7 @@
     </div>
 </div>
 <div class="modal fade" id="historiModal" tabindex="-1" role="dialog" aria-labelledby="historiModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document" style="min-width: 1600px">
+    <div class="modal-dialog modal-xl" role="document" style="min-width: 1700px">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="historiModalLabel">Histori Purchase Order</h5>
@@ -448,10 +448,10 @@
             ],
             fixedHeader: true,
             lengthMenu: [
-                [25],
-                [25],
+                [15],
+                [15],
             ],
-            pageLength: 25,
+            pageLength: 15,
             ajax: {
                 url: "<?= base_url("barang-bahan-penolong/histori-supplier"); ?>",
                 dataSrc: "data",
@@ -472,44 +472,70 @@
             display: "stripe",
             searching: false,
             columns: [{
-                data: "no",
-                className: "text-left",
-                sortable: false
-            }, {
-                data: "spp_no",
-                className: "text-left"
-            }, {
-                data: "po_no",
-                className: "text-left"
-            }, {
-                data: "no_penerimaan_barang",
-                className: "text-left",
-                sortable: false
-            }, {
-                data: "po_date",
-                className: "text-left"
-            }, {
-                data: "nama_supplier",
-                className: "text-left"
-            }, {
-                data: "nama_barang",
-                className: "text-left"
-            }, {
-                data: "note",
-                className: "text-left"
-            }, {
-                data: "divisi",
-                className: "text-left"
-            }, {
-                data: "qty",
-                className: "text-left"
-            }, {
-                data: "kode_satuan",
-                className: "text-left"
-            }, {
-                data: "price",
-                className: "text-left"
-            }],
+                    data: "no",
+                    className: "text-left",
+                    sortable: false
+                }, {
+                    data: "spp_no",
+                    className: "text-left"
+                }, {
+                    data: "po_no",
+                    className: "text-left"
+                }, {
+                    data: "no_penerimaan_barang",
+                    className: "text-left",
+                    sortable: false
+                }, {
+                    data: "po_date",
+                    className: "text-left"
+                }, {
+                    data: "nama_supplier",
+                    className: "text-left"
+                }, {
+                    data: "nama_barang",
+                    className: "text-left",
+                    render: function(data, type, row) {
+                        if (!data) return '';
+
+                        let words = data.split(' ');
+                        let result = [];
+
+                        for (let i = 0; i < words.length; i += 5) {
+                            result.push(words.slice(i, i + 5).join(' '));
+                        }
+
+                        return result.join('<br>');
+                    }
+                },
+                {
+                    data: "note",
+                    className: "text-left",
+                    render: function(data) {
+                        if (!data) return '';
+
+                        let words = data.split(' ');
+                        let result = [];
+
+                        for (let i = 0; i < words.length; i += 5) {
+                            result.push(words.slice(i, i + 5).join(' '));
+                        }
+
+                        return result.join('<br>');
+                    }
+                }, {
+                    data: "divisi",
+                    className: "text-left"
+                }, {
+                    data: "qty",
+                    className: "text-left"
+                }, {
+                    data: "kode_satuan",
+                    className: "text-left"
+                }, {
+                    data: "price",
+                    className: "text-left"
+                }
+            ],
             columnDefs: [{
                 defaultContent: "-",
                 targets: "_all"

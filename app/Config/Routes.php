@@ -909,6 +909,8 @@ $routes->get('/proforma-invoice/duplicate/(:segment)', 'InvoiceExim\PI\PI::dupli
 $routes->get('/proforma-invoice/id/(:segment)', 'InvoiceExim\PI\PI::editPI/$1', ['filter' => 'Auth']);
 $routes->get('/proforma-invoice/print/(:segment)', 'InvoiceExim\PI\PI::printPI/$1', ['filter' => 'Auth']);
 $routes->post('/proforma-invoice/update-no-invoice', 'InvoiceExim\PI\PI::updateNoInvoice', ['filter' => 'Auth']);
+$routes->get('/proforma-invoice/get-referensi-barang', 'InvoiceExim\PI\PI::getReferensiBarang', ['filter' => 'Auth']);
+
 // INVOICE PACKING CUSTOMER
 $routes->get('/invoice-packing-customer', 'InvoiceExim\InvPacking\InvPackingCustomer::index', ['filter' => 'Auth']);
 $routes->get('/invoice-packing-customer/all-order-form', 'InvoiceExim\InvPacking\InvPackingCustomer::allOrderForm', ['filter' => 'Auth']);
@@ -923,6 +925,8 @@ $routes->get('/invoice-packing-customer/all-invoice', 'InvoiceExim\InvPacking\In
 $routes->get('/invoice-packing-customer/duplicate/(:segment)', 'InvoiceExim\InvPacking\InvPackingCustomer::duplicatePackingCustomer/$1', ['filter' => 'Auth']);
 $routes->get('/invoice-packing-customer/id/(:segment)', 'InvoiceExim\InvPacking\InvPackingCustomer::updatePackingCustomer/$1', ['filter' => 'Auth']);
 $routes->get('/invoice-packing-customer/print/(:segment)', 'InvoiceExim\InvPacking\InvPackingCustomer::printPackingCustomer/$1', ['filter' => 'Auth']);
+$routes->get('/invoice-packing-customer/get-referensi-barang', 'InvoiceExim\InvPacking\InvPackingCustomer::getReferensiBarang', ['filter' => 'Auth']);
+
 // INVOICE PACKING BC
 $routes->get('/invoice-packing-bc', 'InvoiceExim\InvPackingBC\InvPackingBC::index', ['filter' => 'Auth']);
 $routes->get('/invoice-packing-bc/all-order-form', 'InvoiceExim\InvPackingBC\InvPackingBC::allOrderForm', ['filter' => 'Auth']);
@@ -938,6 +942,8 @@ $routes->get('/invoice-packing-bc/all-invoice', 'InvoiceExim\InvPackingBC\InvPac
 $routes->get('/invoice-packing-bc/id/(:segment)', 'InvoiceExim\InvPackingBC\InvPackingBC::updatePackingBC/$1', ['filter' => 'Auth']);
 $routes->get('/invoice-packing-bc/duplicate/(:segment)', 'InvoiceExim\InvPackingBC\InvPackingBC::duplicatePackingBC/$1', ['filter' => 'Auth']);
 $routes->get('/invoice-packing-bc/print/(:segment)', 'InvoiceExim\InvPackingBC\InvPackingBC::printPackingBC/$1', ['filter' => 'Auth']);
+$routes->get('/invoice-packing-bc/get-referensi-barang', 'InvoiceExim\InvPackingBC\InvPackingBC::getReferensiBarang', ['filter' => 'Auth']);
+
 // $routes->get('/pi-peb/get', 'BiayaExim\PIPeb\PIPeb::getPiPeb', ['filter' => 'Auth']);
 // $routes->post('/pi-peb/update', 'BiayaExim\PIPeb\PIPeb::updatePiPeb', ['filter' => 'Auth']);
 
