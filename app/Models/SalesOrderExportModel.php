@@ -1509,6 +1509,7 @@ class SalesOrderExportModel extends Model
     {
         $metaDataModel = new MetadataModel();
         $salesOrderExportModel = new SalesOrderExportModel();
+        $sampleModel = new SampleModel();
 
         $year = date('y');
         if ($companyId == 1) {
@@ -1532,21 +1533,42 @@ class SalesOrderExportModel extends Model
         $formatCode = explode(',', $formatCodeFirst['value']); // misal: [C,H,N,M,E,I,J,U,L,O]
         $base = count($formatCode);
 
-        // Cari invoice terakhir
+        // Invoice terakhir dari Sales Order Export
         $salesOrderExport = $salesOrderExportModel
+            ->select('no_invoice, createdAt')
             ->where('company_id', $companyId)
             ->where('deletedAt', null)
-            ->orderBy('sales_order_export_id', "desc")
+            ->orderBy('createdAt', 'desc')
             ->first();
 
-        // Hitung index berikutnya
-        $lastCode = null;
-        if ($salesOrderExport && $salesOrderExport['no_invoice']) {
-            // Ambil kode setelah template, misal "TSI/2025/CN" → ambil "CN"
-            $parts = explode('/', $salesOrderExport['no_invoice']);
-            $lastCode = end($parts);
+        // Invoice terakhir dari Sample
+        $sample = $sampleModel
+            ->select('no_invoice, createdAt')
+            ->where('company_id', $companyId)
+            ->where('deletedAt', null)
+            ->orderBy('createdAt', 'desc')
+            ->first();
+
+        // Tentukan invoice terakhir (merge logic)
+        $lastInvoice = null;
+
+        if ($salesOrderExport && $sample) {
+            $lastInvoice = strtotime($salesOrderExport['createdAt']) >= strtotime($sample['createdAt'])
+                ? $salesOrderExport
+                : $sample;
+        } elseif ($salesOrderExport) {
+            $lastInvoice = $salesOrderExport;
+        } elseif ($sample) {
+            $lastInvoice = $sample;
         }
 
+        // Ambil kode terakhir
+        $lastCode = null;
+        if ($lastInvoice && !empty($lastInvoice['no_invoice'])) {
+            $parts = explode('/', $lastInvoice['no_invoice']);
+            $lastCode = end($parts);
+        }
+        // Generate kode berikutnya
         $nextCode = $this->getNextCode($lastCode, $formatCode);
 
         return $invTempleate . "/" . $nextCode;

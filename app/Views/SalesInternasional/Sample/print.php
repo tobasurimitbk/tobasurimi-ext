@@ -112,7 +112,7 @@
                         <td style="padding:3px; border:1px solid #ddd; text-align:left; vertical-align: top;"
                             rowspan="<?= count($dataBarangList) ?>">
                             <b style="display:block;">
-                                <u><?= $dataSample['delivery'] ?></u>
+                                <u><?= $dataSample['customer_name'] ?></u>
                             </b>
                             <b><?= $dataSample['delivery_address'] ?></b><br>
                             <?php if (!empty($dataSample['attn_no'])): ?>

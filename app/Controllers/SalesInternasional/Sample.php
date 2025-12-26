@@ -5,7 +5,9 @@ namespace App\Controllers\SalesInternasional;
 use App\Controllers\BaseController;
 use App\Models\BarangMasterSalesModel;
 use App\Models\CompaniesModel;
+use App\Models\CustomerModel;
 use App\Models\DivisisModel;
+use App\Models\SalesOrderExportModel;
 use App\Models\SampleAdditionalModel;
 use App\Models\SampleDetailModel;
 use App\Models\SampleModel;
@@ -25,6 +27,8 @@ class Sample extends BaseController
     protected $sampleDetailModel;
     protected $companyModel;
     protected $sampleAdditionalModel;
+    protected $customerModel;
+    protected $salesOrderExportModel;
     protected $dompdf;
 
     public function __construct()
@@ -39,6 +43,8 @@ class Sample extends BaseController
         $this->sampleDetailModel = new SampleDetailModel();
         $this->companyModel = new CompaniesModel();
         $this->sampleAdditionalModel = new SampleAdditionalModel();
+        $this->salesOrderExportModel = new SalesOrderExportModel();
+        $this->customerModel = new CustomerModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -71,7 +77,7 @@ class Sample extends BaseController
         }
 
         $addCondition = [
-            "search"        => $this->request->getGet("search"),
+            "search"        => trim($this->request->getGet("search")),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
             "status"      => $this->request->getGet("status"),
@@ -92,12 +98,12 @@ class Sample extends BaseController
                 "no"                        => $no++,
                 "id"                        => encrypt($data->id),
                 "no_sample"                 => $data->no_sample,
-                "divisi"                    => $data->divisi,
+                "no_invoice"                => $data->no_invoice,
+                "customer_name"             => $data->customer_name,
+                "tanggal_invoice"           => date('d/m/Y', strtotime($data->tanggal_invoice)),
                 "tanggal"                   => date('d/m/Y', strtotime($data->tanggal)),
-                "delivery"                  => $data->delivery,
-                "attn_no"                      => $data->attn_no,
-                "total_berat_bersih"               => (float)$data->total_berat_bersih,
-                "total_berat_kotor"              => (float)$data->total_berat_kotor,
+                "total_berat_bersih"        => (float)$data->total_berat_bersih,
+                "total_berat_kotor"         => (float)$data->total_berat_kotor,
             ]);
         }
 
@@ -123,11 +129,16 @@ class Sample extends BaseController
             ->where('deletedAt', null)
             ->orderBy('barang_name', "asc")
             ->findAll();
+        $dataCustomer = $this->customerModel->getCustomerEkspor(
+            $this->this_user_id,
+            $this->is_admin
+        );
 
         $data = [
             'dataSatuan' => $dataSatuan,
             "dataDivisi" => $dataDivisi,
-            'dataBarang' => $dataBarang
+            'dataBarang' => $dataBarang,
+            "dataCustomer" => $dataCustomer
         ];
 
         return view('SalesInternasional/Sample/form', $data);
@@ -150,6 +161,10 @@ class Sample extends BaseController
             ->orderBy('barang_name', "asc")
             ->findAll();
         $dataBarangList = $this->sampleDetailModel->getSampleDetail($id);
+        $dataCustomer = $this->customerModel->getCustomerEkspor(
+            $this->this_user_id,
+            $this->is_admin
+        );
 
         $pickupDate = $via = $an = "";
         foreach ($dataBarangList as $d) {
@@ -166,7 +181,8 @@ class Sample extends BaseController
             'dataBarang' => $dataBarang,
             "pickupDate" => $pickupDate,
             "via" => $via,
-            "an" => $an
+            "an" => $an,
+            "dataCustomer" => $dataCustomer
         ];
 
         return view('SalesInternasional/Sample/form', $data);
@@ -176,8 +192,8 @@ class Sample extends BaseController
     {
         $id = decrypt($id);
         $dataSample = $this->sampleModel
-            ->select('sample.*,divisis.divisi')
-            ->join('divisis', 'divisis.id = sample.divisi_id', 'left')
+            ->select('sample.*,customers.name AS customer_name')
+            ->join('customers', 'customers.id = sample.customer_id', 'left')
             ->where('sample.id', $id)
             ->first();
 
@@ -258,11 +274,16 @@ class Sample extends BaseController
                 ]);
             }
 
+            $noInvoice = $this->salesOrderExportModel->generateCodePI($this->this_company_id);
+
             $id = $this->sampleModel->insert([
                 'user_id' => $this->this_user_id,
                 'company_id' => $this->this_company_id,
                 'no_sample' => $noSample,
                 "tanggal" => $tanggal,
+                "tanggal_invoice" => $tanggal,
+                "no_invoice" => $noInvoice, // auto generate
+                "customer_id" => $this->request->getVar('customer_id'),
                 'divisi_id' => $this->request->getVar('divisi_id'),
                 'delivery' => trim($this->request->getVar('delivery')),
                 'delivery_address' => trim($this->request->getVar('delivery_address')),
@@ -346,6 +367,7 @@ class Sample extends BaseController
                 'company_id' => $this->this_company_id,
                 'no_sample' => $noSample,
                 "tanggal" => $tanggal,
+                "customer_id" => $this->request->getVar('customer_id'),
                 'divisi_id' => $this->request->getVar('divisi_id'),
                 'delivery' => trim($this->request->getVar('delivery')),
                 'delivery_address' => trim($this->request->getVar('delivery_address')),

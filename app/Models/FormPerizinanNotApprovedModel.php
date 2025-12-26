@@ -137,7 +137,7 @@ class FormPerizinanNotApprovedModel extends Model
         // Ambil absensi dalam range
         $attendancesInMonth = $attendancesModel
             ->whereIn('employee_id', $employeeIds)
-            ->where('year_month', $yearMonth)
+            // ->where('year_month', $yearMonth)
             ->groupStart()
             ->where('periode >=', $startDate)
             ->where('periode <=', $endDate)
@@ -158,6 +158,10 @@ class FormPerizinanNotApprovedModel extends Model
             ];
         }
 
+        // var_dump($dataResultTotal);
+        // die;
+
+        $totalHadir = 0;
         foreach ($attendancesInMonth as $p) {
             $eid = $p['employee_id'];
 
@@ -183,6 +187,7 @@ class FormPerizinanNotApprovedModel extends Model
                 // if ($dayOfWeek != 0) {
                 //     $dataResultTotal[$eid]['hadir_final']++;
                 // }
+                $totalHadir++;
             }
         }
 

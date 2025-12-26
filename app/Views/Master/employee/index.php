@@ -328,7 +328,7 @@
 
                 res += `
                   <?php if (can('Personalia', 'Karyawan', 'u')): ?>
-                        <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                        <a href="<?= base_url('employee/id/') ?>${id}" data-toggle="tooltip" title="Edit" class="btn btn-primary">
                             <i class="fas fa-edit"></i>
                         </a>
                     <?php endif ?>
@@ -337,9 +337,9 @@
                             <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                         </button>
                     <?php endif ?>
-                    <button data-toggle="tooltip" title="Atur Jam Kerja" onclick="jamKerjaAction('${row.id}')" class="btn btn-success">
+                    <a data-toggle="tooltip" title="Atur Jam Kerja" href="<?= base_url('employee/jam-kerja/') ?>${id}" class="btn btn-success text-white">
                         <i class="fas fa-user-clock"></i>
-                    </button>
+                    </a>
                     <button data-toggle="tooltip" title="List Finger" onclick="listFingerAction('${row.id}')" class="btn btn-info">
                         <i class="fa-solid fa-fingerprint"></i>
                     </button>

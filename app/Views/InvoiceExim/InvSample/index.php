@@ -4,12 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Sample</h1>
-        <?php if (can('Penjualan Ekspor', 'Sample', 'c')) : ?>
-            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("sample-ekspor/create"); ?>">
-                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Create New
-            </a>
-        <?php endif; ?>
+        <h1>Invoice Sample</h1>
     </div>
     <?= csrf_field() ?>
     <div class="card">
@@ -42,14 +37,16 @@
                             <tr>
                                 <th>No</th>
                                 <th onclick="changeSort('no_sample')" class="sort">No. Sample</th>
-                                <th onclick="changeSort('tanggal')" class="sort">Sample Date</th>
-                                <th onclick="changeSort('delivery')" class="sort">Delivery To</th>
+                                <th onclick="changeSort('no_invoice')" class="sort">No. Invoice</th>
+                                <th onclick="changeSort('tanggal_invoice')" class="sort">Tgl Invoice</th>
+                                <th onclick="changeSort('customer_id')" class="sort">Delivery To</th>
                                 <th onclick="changeSort('total_berat_kotor')" class="sort">Gross Weight (Kg)</th>
                                 <th onclick="changeSort('total_berat_bersih')" class="sort">Net Weight (Kg)</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table">
+
                         </tbody>
                     </table>
                 </div>
@@ -57,11 +54,43 @@
         </div>
     </div>
 </section>
-
+<div class="modal noinvoicemodal" id="noinvoicemodal" tabindex="1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary">Update Nomor Invoice</h5>
+            </div>
+            <form class="form-noinvoice">
+                <input type="hidden" name="id" id="id">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input value="" autocomplete="one-time-code" type="text" class="form-control tanggal_invoice" id="tanggal_invoice" name="tanggal_invoice" placeholder="Tanggal Invoice">
+                                <label for="floatingInput">Tgl Invoice</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input value="" autocomplete="one-time-code" type="text" class="form-control no_invoice" id="no_invoice" name="no_invoice" placeholder="No Invoice">
+                                <label for="floatingInput">No Invoice</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-hide-detail btn-discard mr-3" id="btn-hide-noinvoice">Back</button>
+                    <button type="button" class="btn btn-submit-form" id="btnSubmitInvoice">Update Nomor Invoice</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "createdAt";
+    let sort = "tanggal";
     let sortType = "desc";
+    var csrf = $(`[name="${csrfToken}"]`);
 
     const table = $('.dataTable').DataTable({
         processing: true,
@@ -77,7 +106,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("sample-ekspor/all"); ?>",
+            url: "<?= base_url("invoice-sample/all-sample"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
@@ -102,7 +131,10 @@
                 data: "no_sample",
                 className: "text-left"
             }, {
-                data: "tanggal",
+                data: "no_invoice",
+                className: "text-left",
+            }, {
+                data: "tanggal_invoice",
                 className: "text-left",
             }, {
                 data: "customer_name",
@@ -128,27 +160,24 @@
                 width: "8%",
                 render: function(data, type, row) {
                     let id = row.id;
+                    let no_invoice = row.no_invoice;
+                    let tanggal_invoice = row.tanggal_invoice;
 
                     let res = '';
 
                     res += `
                         <div class="mt-0">
-                          <?php if (can('Penjualan Ekspor', 'Sample', 'u')) : ?>
-                            <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                        <?php endif; ?>
+                            <?php if (can('Invoice Exim', 'Sample', 'u')): ?>
+                                <a href="#" onclick="updateNoInvoiceModal('${id}', '${no_invoice}', '${tanggal_invoice}')" data-toggle="tooltip" title="Update No Invoice" class="btn btn-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            <?php endif; ?>
                             <?php if (can('Penjualan Ekspor', 'Sample', 'p')) : ?>
                                 <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('${id}')" style="box-shadow: none !important;">
                                     <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                 </button>
                             <?php endif; ?>
-                            <?php if (can('Penjualan Ekspor', 'Sample', 'd')) : ?>
-                                <button data-toggle="tooltip" title="Delete" onclick="remove('${id}')" class="btn btn-danger delete-parent">
-                                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                                </button>
-                            <?php endif; ?>
-                            </div>
+                         </div>
                         `;
 
                     return `
@@ -193,7 +222,7 @@
         autoclose: true
     })
 
-    $(".date_revision").datepicker({
+    $(".tanggal_invoice").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
@@ -208,61 +237,109 @@
         $(".dateEnd").focus();
     });
 
-    function edit(id) {
-        var base_url = "<?= base_url() ?>";
-        window.location.href = base_url + `sample-ekspor/id/${id}`;
+    var validator = $(".form-noinvoice").validate({
+        rules: {
+            no_invoice: {
+                required: true
+            },
+            tanggal_invoice: {
+                required: true
+            },
+        },
+        messages: {
+            no_invoice: {
+                required: "No Invoice Wajib Diisi"
+            },
+            tanggal_invoice: {
+                required: "Tanggal Invoice Wajib Diisi"
+            },
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
+
+    $('#btn-hide-noinvoice').click(function(e) {
+        e.preventDefault();
+        $('#noinvoicemodal').modal('hide');
+    });
+
+    $('#btnSubmitInvoice').click(function(e) {
+        e.preventDefault();
+        if ($('.form-noinvoice').valid()) {
+            var id = $('#id').val();
+            var noInvoice = $('#no_invoice').val();
+            var tanggalInvoice = $('#tanggal_invoice').val();
+
+            $.ajax({
+                url: "<?= base_url("invoice-sample/update-no-invoice"); ?>",
+                data: {
+                    id: id,
+                    no_invoice: noInvoice,
+                    tanggal_invoice: tanggalInvoice
+                },
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    setLoading()
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                method: "POST",
+                dataType: "json",
+                success: function(response) {
+                    csrf.val(response.token);
+                    if (response.status) {
+                        Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                            .then(() => {
+                                $('#noinvoicemodal').modal('hide');
+                                table.ajax.reload();
+                            })
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                    }
+                },
+            });
+        }
+    });
+
+    function updateNoInvoiceModal(id, noInvoice, tanggalInvoice) {
+        $('#id').val(id);
+        $('#no_invoice').val(noInvoice);
+        $('#tanggal_invoice').val(tanggalInvoice);
+
+        $('#noinvoicemodal').modal('show');
     }
 
     function print(id) {
         var base_url = "<?= base_url() ?>";
-        window.open(base_url + `sample-ekspor/print/${id}`, '_blank');
+        window.open(base_url + `invoice-sample/print/${id}`, '_blank');
     }
-
-    const remove = function(id) {
-        Swal.fire({
-            icon: 'question',
-            title: 'Delete Sample ?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Delete',
-            cancelButtonText: 'Back',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const csrf = $(`[name="${csrfToken}"]`);
-                $.ajax({
-                    url: "<?= base_url("sample-ekspor/delete"); ?>",
-                    data: {
-                        id: id,
-                    },
-                    beforeSend: function(xhr) {
-                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        setLoading();
-                    },
-                    complete: function() {
-                        stopLoading();
-                    },
-                    method: "POST",
-                    dataType: "json",
-                    success: function(response) {
-                        csrf.val(response.token);
-                        if (response.status) {
-                            Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    table.ajax.reload()
-                                })
-                        }
-                    },
-                });
-            }
-        })
-    }
-
 
     $(".dataTable_info").addClass("pt-0");
 

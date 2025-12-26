@@ -944,6 +944,12 @@ $routes->get('/invoice-packing-bc/duplicate/(:segment)', 'InvoiceExim\InvPacking
 $routes->get('/invoice-packing-bc/print/(:segment)', 'InvoiceExim\InvPackingBC\InvPackingBC::printPackingBC/$1', ['filter' => 'Auth']);
 $routes->get('/invoice-packing-bc/get-referensi-barang', 'InvoiceExim\InvPackingBC\InvPackingBC::getReferensiBarang', ['filter' => 'Auth']);
 
+// INVOICE SAMPLE
+$routes->get('/invoice-sample', 'InvoiceExim\InvSample\InvSample::index', ['filter' => 'Auth']);
+$routes->get('/invoice-sample/all-sample', 'SalesInternasional\Sample::all', ['filter' => 'Auth']);
+$routes->post('/invoice-sample/update-no-invoice', 'InvoiceExim\InvSample\InvSample::updateNoInvoice', ['filter' => 'Auth']);
+$routes->get('/invoice-sample/print/(:segment)', 'SalesInternasional\Sample::print/$1', ['filter' => 'Auth']);
+
 // $routes->get('/pi-peb/get', 'BiayaExim\PIPeb\PIPeb::getPiPeb', ['filter' => 'Auth']);
 // $routes->post('/pi-peb/update', 'BiayaExim\PIPeb\PIPeb::updatePiPeb', ['filter' => 'Auth']);
 

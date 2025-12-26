@@ -44,12 +44,11 @@ class SampleModel extends Model
     {
         $availableSort = [
             'no_sample'             => 'sample.no_sample',
-            'divisi_id'             => 'sample.divisi_id',
+            'no_invoice'            => 'sample.no_invoice',
+            'customer_id'           => 'sample.customer_id',
             'tanggal'               => 'sample.tanggal',
-            'delivery'              => 'sample.delivery',
-            'attn'                  => 'sample.attn_no',
-            'total_berat_kotor'           => 'sample.total_berat_kotor',
-            'total_berat_bersih'          => 'sample.total_berat_bersih',
+            'total_berat_kotor'     => 'sample.total_berat_kotor',
+            'total_berat_bersih'    => 'sample.total_berat_bersih',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -57,11 +56,11 @@ class SampleModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "sample.*, 
-                      divisis.divisi";
+                      customers.name AS customer_name";
         $salesDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->join('divisis', 'divisis.id = sample.divisi_id', 'left')
+            ->join('customers', 'customers.id = sample.customer_id', 'left')
             ->orderBy($sort, $sortType);
 
         $totalData = $salesDataQry->countAllResults(false);
@@ -69,10 +68,11 @@ class SampleModel extends Model
         if ($addCondition['search']) {
             $salesDataQry
                 ->groupStart()
-                ->like('sample.sample_no', $addCondition['search'])
+                ->like('sample.no_sample', $addCondition['search'])
                 ->orLike('sample.delivery', $addCondition['search'])
                 ->orLike('sample.attn_no', $addCondition['search'])
-                ->orLike('divisis.divisi', $addCondition['search'])
+                ->orLike('customers.name', $addCondition['search'])
+                ->orLike('sample.no_invoice', $addCondition['search'])
                 ->groupEnd();
         }
 
