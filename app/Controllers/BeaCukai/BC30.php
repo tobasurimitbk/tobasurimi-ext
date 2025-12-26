@@ -294,7 +294,7 @@ class BC30 extends BaseController
             ]);
 
             $listStock = json_decode($this->request->getVar('listStock'));
-            $this->bcPengeluaranBarangModel->where('bc_pengeluaran_id', $id)->where('tipe_bc', "BC 2.5")->delete(null, true);
+            $this->bcPengeluaranBarangModel->where('bc_pengeluaran_id', $id)->where('tipe_bc', "BC 3.0")->delete(null, true);
             foreach ($listStock as $l) {
                 $stock = $this->stockRevampDetailModel
                     ->select('stock_revamp_detail.*,stock_revamp.barang_master_id')
