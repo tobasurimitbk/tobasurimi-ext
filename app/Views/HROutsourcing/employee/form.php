@@ -91,6 +91,12 @@
                             <label for="tanggal_masuk_kerja">Tanggal Masuk Kerja</label>
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input type="date" class="form-control tanggal_masuk_kerja" id="tanggal_masuk_kerja" name="tanggal_masuk_kerja" placeholder="tanggal_masuk_kerja" required>
+                            <label for="tanggal_masuk_kerja">Tanggal Masuk Kerja</label>
+                        </div>
+                    </div>
                 </div>
             </form>
             <div class="col-subtitle-modal">
@@ -119,6 +125,7 @@
                                 <th width="10" onclick="changeSort('hr_outsourcing_employee.id')">No</th>
                                 <th onclick="changeSort('hr_outsourcing_employee.tanggal_masuk_kerja')">Tanggal Masuk Kerja</th>
                                 <th onclick="changeSort('hr_outsourcing_employee.badge')">Badge</th>
+                                <th onclick="changeSort('hr_outsourcing_employee.Tipe')">Tipe</th>
                                 <th onclick="changeSort('hr_outsourcing_employee.nama')">Nama</th>
                                 <th style="width: 100px;">Action</th>
                             </tr>

@@ -323,7 +323,7 @@
         // Fungsi load data
         function loadDataTipeKaryawan() {
             $.ajax({
-                url: 'api/all-tipe-karyawan', // Sesuaikan endpoint
+                url: 'hr-outsourcing-company/all-tipe-karyawan', // Sesuaikan endpoint
                 type: 'GET',
                 dataType: 'json',
                 beforeSend: function() {
@@ -363,6 +363,7 @@
 
         // Submit form (Create/Update)
         $('#formTambahTipeKaryawan').submit(function(e) {
+            const csrf = $(`[name="${csrfToken}"]`);
             e.preventDefault();
             
             const formData = {
@@ -375,16 +376,17 @@
             $('.invalid-feedback').text('');
 
             const url = editMode ? 
-                `api/tipe-karyawan/${currentEditId}` : 
-                'api/tipe-karyawan';
-            const method = editMode ? 'PUT' : 'POST';
+                '/hr-outsourcing-company/update-tipe-karyawan' : 
+                '/hr-outsourcing-company/save-tipe-karyawan';
+            const method = editMode ? 'POST' : 'POST';
 
             $.ajax({
                 url: url,
                 type: method,
                 data: formData,
                 dataType: 'json',
-                beforeSend: function() {
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
                     $('#btnSimpan').prop('disabled', true).html('<i class="fa fa-spinner fa-spin mr-2"></i>Menyimpan...');
                 },
                 success: function(response) {
@@ -453,7 +455,7 @@
             const id = $(this).data('id');
             
             $.ajax({
-                url: `api/tipe-karyawan/${id}`,
+                url: `hr-outsourcing-company/tipe-karyawan/${id}`,
                 type: 'DELETE',
                 dataType: 'json',
                 success: function(response) {
