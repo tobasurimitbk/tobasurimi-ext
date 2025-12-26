@@ -627,7 +627,7 @@ class MaterialRequestPenolong extends BaseController
             }
 
             $dataMaterial = [
-                'work_order_id' => implode(",", $this->request->getVar("kode_produksi")),
+                'work_order_id' => $this->request->getVar("kode_produksi"),
                 "production_date" => $this->request->getVar("date_production") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_production")))) : "",
                 "request_date" => $this->request->getVar("date_request") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_request")))) : "",
                 "req_no" => $no,
