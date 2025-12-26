@@ -277,7 +277,7 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select type_pengambilan_stock_bahan_baku" id="type_pengambilan_stock_bahan_baku" name="type_pengambilan_stock_bahan_baku" aria-label="Floating label select example">
                                     <option value=""></option>
-                                    <option value="PABEAN">PABEAN</option>
+                                    <option value="PABEAN" selected>PABEAN</option>
                                     <option value="FIFO">FIFO</option>
                                 </select>
                                 <label for="floatingInput" style="z-index: 1;">Tipe Pengambilan Stok</label>
@@ -1672,7 +1672,7 @@
             var departmentTujuanID = $("#divisi_tujuan_id").val();
             var departmentTujuanText = $("#divisi_tujuan_id option:selected").text();
             var warehouseTujuanID = $("#warehouse_tujuan_id").val();
-            // var keterangan = $("#keterangan").val();
+            var keterangan = $("#keterangan").val();
             var warehouseTujuanText = $("#warehouse_tujuan_id option:selected").text();
         } else if (typePengambilanStockBahanBaku != '') {
             // Bahan Baku
@@ -1700,7 +1700,7 @@
 
                 if ($.inArray(currentID, dataIds) !== -1) {
                     var isIDSelected = $.grep(listStockSelectedBahanBaku, function(item) {
-                        return item.id == currentID;
+                        return item.id == currentID && item.keterangan == keterangan;
                     }).length > 0;
                     if (!isIDSelected) {
                         listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
@@ -1711,7 +1711,9 @@
                         listStockAsal[i].departmentText = departmentText;
                         listStockAsal[i].warehouseID = warehouseID;
                         listStockAsal[i].warehouseText = warehouseText;
-                        // listStockAsal[i].keterangan = keterangan;
+                        if (keterangan != "" || keterangan != null || keterangan != undefined) {
+                            listStockAsal[i].keterangan = keterangan;
+                        }
                         listStockAsal[i].departmentTujuanID = departmentTujuanID;
                         listStockAsal[i].departmentTujuanText = departmentTujuanText;
                         listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
@@ -1724,7 +1726,7 @@
                 currentID = (currentID);
                 if ($.inArray(currentID, dataIds) !== -1) {
                     var isIDSelected = $.grep(listStockSelectedBahanJadi, function(item) {
-                        return item.id == (currentID);
+                        return item.id == currentID && item.keterangan == keterangan;
                     }).length > 0;
 
                     if (!isIDSelected) {
@@ -1736,7 +1738,9 @@
                         listStockAsal[i].departmentText = departmentText;
                         listStockAsal[i].warehouseID = warehouseID;
                         listStockAsal[i].warehouseText = warehouseText;
-                        // listStockAsal[i].keterangan = keterangan;
+                        if (keterangan != "" || keterangan != null || keterangan != undefined) {
+                            listStockAsal[i].keterangan = keterangan;
+                        }
                         listStockAsal[i].departmentTujuanID = departmentTujuanID;
                         listStockAsal[i].departmentTujuanText = departmentTujuanText;
                         listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
@@ -1750,7 +1754,7 @@
 
                 if ($.inArray(currentID, dataIds) !== -1) {
                     var isIDSelected = $.grep(listStockSelectedBahanSetengahJadi, function(item) {
-                        return item.id == (currentID);
+                        return item.id == currentID && item.keterangan == keterangan;
                     }).length > 0;
                     if (!isIDSelected && parseFloat(listStockAsal[i].stok_total) != 0) {
                         listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
@@ -1760,7 +1764,9 @@
                         listStockAsal[i].departmentText = departmentText;
                         listStockAsal[i].warehouseID = warehouseID;
                         listStockAsal[i].warehouseText = warehouseText;
-                        // listStockAsal[i].keterangan = keterangan;
+                        if (keterangan != "" || keterangan != null || keterangan != undefined) {
+                            listStockAsal[i].keterangan = keterangan;
+                        }
                         listStockAsal[i].departmentTujuanID = departmentTujuanID;
                         listStockAsal[i].departmentTujuanText = departmentTujuanText;
                         listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
@@ -1773,7 +1779,7 @@
                 if ($.inArray(currentID, dataIds) !== -1) {
                     currentID = Number(currentID);
                     var isIDSelected = $.grep(listStockSelectedBahan, function(item) {
-                        return item.id == Number(currentID);
+                        return item.id == Number(currentID) && item.keterangan == keterangan;
                     }).length > 0;
                     if (!isIDSelected && parseFloat(listStockAsal[i].stok_total) != 0) {
                         listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
@@ -1783,7 +1789,9 @@
                         listStockAsal[i].departmentText = departmentText;
                         listStockAsal[i].warehouseID = warehouseID;
                         listStockAsal[i].warehouseText = warehouseText;
-                        // listStockAsal[i].keterangan = keterangan;
+                        if (keterangan != "" || keterangan != null || keterangan != undefined) {
+                            listStockAsal[i].keterangan = keterangan;
+                        }
                         listStockAsal[i].departmentTujuanID = departmentTujuanID;
                         listStockAsal[i].departmentTujuanText = departmentTujuanText;
                         listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
@@ -1817,7 +1825,7 @@
             var departmentTujuanID = $("#divisi_tujuan_id").val();
             var departmentTujuanText = $("#divisi_tujuan_id option:selected").text();
             var warehouseTujuanID = $("#warehouse_tujuan_id").val();
-            // var keterangan = $("#keterangan").val();
+            var keterangan = $("#keterangan").val();
             var warehouseTujuanText = $("#warehouse_tujuan_id option:selected").text();
             qtyMutasiFifo = parseFloat($('#qty_mutasi_fifo').val());
 
@@ -1830,7 +1838,7 @@
             var departmentTujuanID = $("#divisi_tujuan_bahan_baku_id").val();
             var departmentTujuanText = $("#divisi_tujuan_bahan_baku_id option:selected").text();
             var warehouseTujuanID = $("#warehouse_tujuan_bahan_baku_id").val();
-            // var keterangan = $("#keterangan").val();
+            var keterangan = $("#keterangan").val();
             var warehouseTujuanText = $("#warehouse_tujuan_bahan_baku_id option:selected").text();
             qtyMutasiFifo = parseFloat($('#qty_keluar_fifo').val());
         }
@@ -1868,7 +1876,7 @@
                     if (listStockAsal[i].type_barang == "bahan_baku") {
                         if ($.inArray(currentID, dataIds) == -1) {
                             var isIDSelected = $.grep(listStockSelectedBahanBaku, function(item) {
-                                return item.id == currentID;
+                                return item.id == currentID && item.keterangan == keterangan;
                             }).length > 0;
                             console.log(listStockAsal[i], isIDSelected, parseFloat(qtyMutasiFifo), parseFloat(listStockAsal[i].stok_total));
 
@@ -1883,7 +1891,9 @@
                                 listStockAsal[i].departmentText = departmentText;
                                 listStockAsal[i].warehouseID = warehouseID;
                                 listStockAsal[i].warehouseText = warehouseText;
-                                // listStockAsal[i].keterangan = keterangan;
+                                if (keterangan != "" || keterangan != null || keterangan != undefined) {
+                                    listStockAsal[i].keterangan = keterangan;
+                                }
                                 listStockAsal[i].departmentTujuanID = departmentTujuanID;
                                 listStockAsal[i].departmentTujuanText = departmentTujuanText;
                                 listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
@@ -1897,7 +1907,7 @@
                         currentID = Number(currentID);
                         if ($.inArray(currentID, dataIds) == -1) {
                             var isIDSelected = $.grep(listStockSelectedBahanJadi, function(item) {
-                                return item.id == Number(currentID);
+                                return item.id == Number(currentID) && item.keterangan == keterangan;
                             }).length > 0;
                             if (!isIDSelected && parseFloat(qtyMutasiFifo) > 0 && parseFloat(listStockAsal[i].stok_total) > 0) {
                                 var mutasiQty = Math.min(parseFloat(qtyMutasiFifo), parseFloat(listStockAsal[i].stok_total));
@@ -1908,7 +1918,9 @@
                                 listStockAsal[i].departmentText = departmentText;
                                 listStockAsal[i].warehouseID = warehouseID;
                                 listStockAsal[i].warehouseText = warehouseText;
-                                // listStockAsal[i].keterangan = keterangan;
+                                if (keterangan != "" || keterangan != null || keterangan != undefined) {
+                                    listStockAsal[i].keterangan = keterangan;
+                                }
                                 listStockAsal[i].departmentTujuanID = departmentTujuanID;
                                 listStockAsal[i].departmentTujuanText = departmentTujuanText;
                                 listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
@@ -1922,7 +1934,7 @@
                         currentID = Number(currentID);
                         if ($.inArray(currentID, dataIds) == -1) {
                             var isIDSelected = $.grep(listStockSelectedBahanSetengahJadi, function(item) {
-                                return item.id == Number(currentID);
+                                return item.id == Number(currentID) && item.keterangan == keterangan;
                             }).length > 0;
                             if (!isIDSelected && parseFloat(qtyMutasiFifo) > 0 && parseFloat(listStockAsal[i].stok_total) > 0) {
                                 var mutasiQty = Math.min(parseFloat(qtyMutasiFifo), parseFloat(listStockAsal[i].stok_total));
@@ -1933,7 +1945,9 @@
                                 listStockAsal[i].departmentText = departmentText;
                                 listStockAsal[i].warehouseID = warehouseID;
                                 listStockAsal[i].warehouseText = warehouseText;
-                                // listStockAsal[i].keterangan = keterangan;
+                                if (keterangan != "" || keterangan != null || keterangan != undefined) {
+                                    listStockAsal[i].keterangan = keterangan;
+                                }
                                 listStockAsal[i].departmentTujuanID = departmentTujuanID;
                                 listStockAsal[i].departmentTujuanText = departmentTujuanText;
                                 listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
@@ -1947,7 +1961,7 @@
                         if ($.inArray(currentID, dataIds) == -1) {
                             currentID = Number(currentID);
                             var isIDSelected = $.grep(listStockSelectedBahan, function(item) {
-                                return item.id == Number(currentID);
+                                return item.id == Number(currentID) && item.keterangan == keterangan;
                             }).length > 0;
                             if (!isIDSelected && parseFloat(qtyMutasiFifo) > 0 && parseFloat(listStockAsal[i].stok_total) > 0) {
                                 var mutasiQty = Math.min(parseFloat(qtyMutasiFifo), parseFloat(listStockAsal[i].stok_total));
@@ -1958,7 +1972,9 @@
                                 listStockAsal[i].departmentText = departmentText;
                                 listStockAsal[i].warehouseID = warehouseID;
                                 listStockAsal[i].warehouseText = warehouseText;
-                                // listStockAsal[i].keterangan = keterangan;
+                                if (keterangan != "" || keterangan != null || keterangan != undefined) {
+                                    listStockAsal[i].keterangan = keterangan;
+                                }
                                 listStockAsal[i].departmentTujuanID = departmentTujuanID;
                                 listStockAsal[i].departmentTujuanText = departmentTujuanText;
                                 listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
@@ -2290,7 +2306,7 @@
             newRow.append(`<td style="text-align: center;">
             <button <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "disabled" : ""; ?> 
                 type="button" class="btn btn-discard delete-btn btn-trash" 
-                onclick="deleteDetailBahanJadi(${v.id}, ${v.id_material_request_detail})">
+                onclick="deleteDetailBahanJadi(${v.id}, ${v.id_material_request_detail}, ${v.keterangan})">
                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
             </button>
         </td>`);
@@ -2533,11 +2549,11 @@
         }
     }
 
-    function deleteDetailBahanJadi(id, iddetail) {
+    function deleteDetailBahanJadi(id, iddetail, keterangan) {
         if (id) {
             var indexToRemove = -1;
             for (var i = 0; i < listStockSelectedBahanJadi.length; i++) {
-                if (listStockSelectedBahanJadi[i].id == id) {
+                if (listStockSelectedBahanJadi[i].id == id && listStockSelectedBahanJadi[i].keterangan == keterangan) {
                     indexToRemove = i;
                     break;
                 }
@@ -2847,12 +2863,21 @@
     }
 
     function pindahTab(type) {
-        // Clear Form Bahan Baku
-        $('#type_pengambilan_stock_bahan_baku').val(null).change();
-        $('#qty_keluar_fifo').val(null);
-        // Clear Form Bahan Lain
-        $('#type_pengambilan_stock').val(null).change();
-        $('#qty_mutasi_fifo').val(null);
+        if (type == "BAHAN BAKU") {
+            // Clear Form Bahan Baku
+            $('#type_pengambilan_stock_bahan_baku').val("PABEAN").change();
+            $('#qty_keluar_fifo').val(null);
+            // Clear Form Bahan Lain
+            $('#type_pengambilan_stock').val(null).change();
+            $('#qty_mutasi_fifo').val(null);
+        } else {
+            // Clear Form Bahan Baku
+            $('#type_pengambilan_stock_bahan_baku').val(null).change();
+            $('#qty_keluar_fifo').val(null);
+            // Clear Form Bahan Lain
+            $('#type_pengambilan_stock').val("PABEAN").change();
+            $('#qty_mutasi_fifo').val(null);
+        }
 
         // Clear Stok Asal
         listStockAsal = [];
