@@ -4,7 +4,16 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Laporan Detail Hutang</h1>
+        <h1>Laporan Detail Piutang</h1>
+        <?php if (can('Laporan', 'Accounting', 'p')) : ?>
+            <button style="right: 10px;" class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+                Export
+            </button>
+            <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+                <li><button class="dropdown-item" onclick="exportToPDF()">PDF</button></li>
+                <li><button class="dropdown-item" onclick="exportToExcel()">EXCEL</button></li>
+            </ul>
+        <?php endif; ?>
     </div>
     <div class="card">
         <div class="card-body">
@@ -13,7 +22,7 @@
                     <div class="row">
                         <div class="col-md-4 mb-3">
                             <div class="input-group" style="height: 50px;">
-                                <input style="height: auto;" autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Mulai Tanggal Transaksi">
+                                <input style="height: auto;" autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Mulai Tanggal Transaksi" value="<?= $tanggalAwal; ?>" />
                                 <div class="input-group-prepend group-prepend-password align-items-center">
                                     <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
                                 </div>
@@ -21,14 +30,14 @@
                         </div>
                         <div class="col-md-4 mb-3">
                             <div class="input-group" style="height: 50px;">
-                                <input style="height: auto;" autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Selesai Tanggal Transaksi">
+                                <input style="height: auto;" autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Selesai Tanggal Transaksi" value="<?= $tanggalAkhir; ?>">
                                 <div class="input-group-prepend group-prepend-password align-items-center">
                                     <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-4" style="height: 50px;">
-                            <input style="height: auto;" autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
+                            <input style="height: auto;" autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="<?php $search == "all" ? "" : $search; ?>" />
                         </div>
                     </div>
                 </div>
@@ -41,7 +50,8 @@
                                 <th>No.</th>
                                 <th>Tanggal</th>
                                 <th>No. Invoice</th>
-                                <th>Divisi</th>
+                                <th>Valas</th>
+                                <th>Exchange Rate</th>
                                 <th>Amount(IDR)</th>
                                 <th>Remaining(IDR)</th>
                             </tr>
@@ -81,6 +91,9 @@
                     data.search = $(".search").val();
                     data.dateStart = $(".dateStart").val();
                     data.dateEnd = $(".dateEnd").val();
+                    data.filter = <?php echo json_encode($filter); ?>;
+                    data.filter_divisi = <?php echo json_encode($filterDivisi); ?>;
+                    data.tipe_barang = <?php echo json_encode($tipeBarang); ?>;
                     data.sort = sort;
                     data.sortType = sortType;
                 }
@@ -104,9 +117,12 @@
                 data: "no_invoice",
                 className: "text-center",
             }, {
-                data: "divisi_invoice",
+                data: "valas",
                 className: "text-center",
-            },{
+            }, {
+                data: "exchange_rate",
+                className: "text-center",
+            }, {
                 data: "nominal_invoice",
                 className: "text-center",
                 render: function(data) {
@@ -172,6 +188,30 @@
         var formattedDate = dateParts[2] + "-" + dateParts[1] + "-" + dateParts[0];
 
         return formattedDate;
+    }
+
+    function getFilterQuery() {
+        return {
+            search: $(".search").val(),
+            filter: <?php echo json_encode($filter); ?>,
+            filter_divisi: <?php echo json_encode($filterDivisi); ?>,
+            tipe_barang: <?php echo json_encode($tipeBarang); ?>,
+            supplierId: <?= json_encode($id) ?>,
+            dateStart: $(".dateStart").val(),
+            dateEnd: $(".dateEnd").val(),
+            sort: sort,
+            sortType: sortType
+        };
+    }
+
+    function exportToPDF() {
+        const params = new URLSearchParams(getFilterQuery()).toString();
+        window.open(`<?= base_url("laporan-accounting/hutang/detail/print") ?>?${params}`, "_blank");
+    }
+
+    function exportToExcel() {
+        const params = new URLSearchParams(getFilterQuery()).toString();
+        window.open(`<?= base_url("laporan-accounting/hutang/detail/export-excel") ?>?${params}`, "_blank");
     }
 </script>
 <?= $this->endSection(); ?>

@@ -1725,8 +1725,8 @@ class SalesOrderExportModel extends Model
                 ) AS id,
                 customers.name AS customer_name,
 
-                SUM(DISTINCT sales_order_invoice_detail.amount_invoice) AS sum_amount_invoice, 
-                SUM(DISTINCT pembayaran_invoice_detail.harga_dibayar) AS sum_harga_dibayar
+                SUM(sales_order_export.shipment_value_net) AS sum_amount_invoice, 
+                SUM(pembayaran_invoice.total_bayar) AS sum_harga_dibayar
             ";
         }else{
             $selectQry = " 
@@ -1747,11 +1747,10 @@ class SalesOrderExportModel extends Model
         $poDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->where('sales_order_export.status_posting', 1)
+            ->where('sales_order_export.status', 'POSTED')
             ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
             ->join('customers', 'customers.id = sales_contract.customer_id')
-            ->join('pembayaran_invoice_detail', "pembayaran_invoice_detail.sales_order_invoice_id = sales_order_export.id AND pembayaran_invoice_detail.sales_order_invoice_detail_id = sales_order_invoice_detail.id AND pembayaran_invoice_detail.type_invoice = 'EKSPOR'", 'left')
-            ->join('pembayaran_invoice', "pembayaran_invoice.id = pembayaran_invoice_detail.pembayaran_invoice_id AND pembayaran_invoice.type_invoice = 'LOKAL'", 'left');
+            ->join('pembayaran_invoice', "FIND_IN_SET(sales_order_export.sales_order_export_id, REPLACE(REPLACE(pembayaran_invoice.invoice_id, '[', ''), ']', '')) AND pembayaran_invoice.type_invoice = 'EKSPOR'", 'left');
             if (isset($addCondition['summary']) && $addCondition['summary'] == "summary") {
                 $poDataQry->groupBy('customers.name');
             } else {
@@ -1766,20 +1765,20 @@ class SalesOrderExportModel extends Model
         }
 
         if (!empty($addCondition['companyId']) && $addCondition['companyId'] != []) {
-            $poDataQry->whereIn('sales_order_export.id_company', $addCondition['companyId']);
+            $poDataQry->whereIn('sales_order_export.company_id', $addCondition['companyId']);
         }
 
         if (!empty($addCondition['search'])) {
-            $poDataQry->like('sales_order_export.no_faktur', $addCondition['search'])
+            $poDataQry->like('sales_order_export.sales_order_export_no', $addCondition['search'])
                 ->orLike('customers.name', $addCondition['search']);
         }
 
         if (!empty($addCondition['dateStart'])) {
-            $poDataQry->where('sales_order_export.tanggal_faktur >=', $addCondition['dateStart']);
+            $poDataQry->where('sales_order_export.tanggal >=', $addCondition['dateStart']);
         }
 
         if (!empty($addCondition['dateEnd'])) {
-            $poDataQry->where('sales_order_export.tanggal_faktur <=', $addCondition['dateEnd']);
+            $poDataQry->where('sales_order_export.tanggal <=', $addCondition['dateEnd']);
         }
 
         if (!empty($addCondition['filter'])) {

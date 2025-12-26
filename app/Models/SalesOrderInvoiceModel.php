@@ -879,8 +879,8 @@ class SalesOrderInvoiceModel extends Model
                 ) AS id,
                 customers.name AS customer_name,
 
-                SUM(DISTINCT sales_order_invoice_detail.amount_invoice) AS sum_amount_invoice, 
-                SUM(DISTINCT pembayaran_invoice_detail.harga_dibayar) AS sum_harga_dibayar
+                SUM(sales_order_invoice_detail.amount_invoice) AS sum_amount_invoice, 
+                SUM(pembayaran_invoice_detail.harga_dibayar) AS sum_harga_dibayar
             ";
         }else{
             $selectQry = " 
@@ -907,7 +907,7 @@ class SalesOrderInvoiceModel extends Model
             ->join('pembayaran_invoice_detail', "pembayaran_invoice_detail.sales_order_invoice_id = sales_order_invoice.id AND pembayaran_invoice_detail.sales_order_invoice_detail_id = sales_order_invoice_detail.id AND pembayaran_invoice_detail.type_invoice = 'LOKAL'", 'left')
             ->join('pembayaran_invoice', "pembayaran_invoice.id = pembayaran_invoice_detail.pembayaran_invoice_id AND pembayaran_invoice.type_invoice = 'LOKAL'", 'left');
             if (isset($addCondition['summary']) && $addCondition['summary'] == "summary") {
-                $poDataQry->groupBy('customers.name');
+                $poDataQry->groupBy('sales_order_invoice.id_customer');
             } else {
                 $poDataQry->groupBy('sales_order_invoice.id');
             }
@@ -937,7 +937,7 @@ class SalesOrderInvoiceModel extends Model
         }
 
         if (!empty($addCondition['filter'])) {
-            $poDataQry->whereIn('customers.id', $addCondition['filter']);
+            $poDataQry->where('customers.id', $addCondition['filter']);
         }
 
         if (!empty($addCondition['search']) || !empty($addCondition['dateStart']) || !empty($addCondition['dateEnd']) || !empty($addCondition['filter']) || !empty($addCondition['divisi']) || !empty($addCondition['companyId'])) {
