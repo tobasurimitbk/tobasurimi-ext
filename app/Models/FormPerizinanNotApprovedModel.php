@@ -127,6 +127,7 @@ class FormPerizinanNotApprovedModel extends Model
         $endDate
     ) {
         $attendancesModel = new AttendancesModel();
+        $bigDaysModel = new BigDaysModel();
 
         // Hapus data lama dulu
         $this->db->table('form_perizinan_not_approved')
@@ -161,9 +162,14 @@ class FormPerizinanNotApprovedModel extends Model
         // var_dump($dataResultTotal);
         // die;
 
-        $totalHadir = 0;
+        $bigDays = $bigDaysModel->where('company_id', $companyId)->where('deletedAt', null)->findAll();
+        $tanggalBigDays = array_column($bigDays, 'date');
+
         foreach ($attendancesInMonth as $p) {
             $eid = $p['employee_id'];
+            $tanggal = $p['periode'];
+            $dayName = date('D', strtotime($tanggal));
+            $statusLibur = false;
 
             // Not approved → simpan ke table form_perizinan_not_approved
             if ($p['status'] !== "HADIR_H" && !$p['isApproved']) {
@@ -179,15 +185,25 @@ class FormPerizinanNotApprovedModel extends Model
                 $dataResultTotal[$eid]['total_perizinan_not_approved']++;
             }
 
+            if (in_array($tanggal, $tanggalBigDays)) {
+                // Hari Besar
+                $statusLibur = true;
+            }
+
+            if ($dayName == 'Sun') {
+                // Hari Minggu
+                $statusLibur = true;
+            }
+
             // Approved → hitung total approved
-            if ($p['isApproved'] == 1 && $p['status'] !== "ALPHA_A" && $p['status'] !== "LIBUR_L" && $p['status'] !== "HADIR_H") {
+            // Ga termasuk minggu & hari besar
+            if ($p['isApproved'] == 1 && !$statusLibur  && $p['status'] !== "ALPHA_A" && $p['status'] !== "LIBUR_L" && $p['status'] !== "HADIR_H") {
                 $dataResultTotal[$eid]['hadir_final']++;
                 $dataResultTotal[$eid]['total_perizinan_approved']++;
                 // Hadir_final hanya tambah jika bukan hari Minggu
                 // if ($dayOfWeek != 0) {
                 //     $dataResultTotal[$eid]['hadir_final']++;
                 // }
-                $totalHadir++;
             }
         }
 

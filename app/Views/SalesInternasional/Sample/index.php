@@ -60,6 +60,7 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
+    let csrf = $(`[name="${csrfToken}"]`);
     let sort = "createdAt";
     let sortType = "desc";
 
@@ -230,7 +231,6 @@
             cancelButtonText: 'Back',
         }).then((result) => {
             if (result.isConfirmed) {
-                const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
                     url: "<?= base_url("sample-ekspor/delete"); ?>",
                     data: {
