@@ -764,7 +764,7 @@ class SalesOrderInvoiceModel extends Model
         }
 
         $totalFilteredData = $salesOrderInvoiceLokal->countAllResults(false);
-        
+
         if ($limit == null && $offset == null) {
             $data = $salesOrderInvoiceLokal->findAll();
         } else {
@@ -882,21 +882,16 @@ class SalesOrderInvoiceModel extends Model
                 SUM(sales_order_invoice_detail.amount_invoice) AS sum_amount_invoice, 
                 SUM(pembayaran_invoice_detail.harga_dibayar) AS sum_harga_dibayar
             ";
-        }else{
+        } else {
             $selectQry = " 
-                    rm_purchase_orders.po_date AS tanggal_invoice, 
-                    rm_purchase_orders.po_no AS no_invoice, 
-                    rm_purchase_orders.company_id, 
-                    suppliers.id AS supplier_id, 
-                    suppliers.name AS supplier_name,
-                    divisis.divisi AS divisi,
-                    COUNT(rm_purchase_order_details.id) AS itemCount,
-                    penerimaan_barang_detail.sub_total AS total, 
-                    local_po_payments.amount AS remaining,
-                    SUM(DISTINCT penerimaan_barang_detail.sub_total) AS sum_total, 
-                    SUM(DISTINCT local_po_payments.amount) AS sum_remaining,
-                    penerimaan_barang.no_penerimaan_barang AS no_penerimaan_barang,
-                    GROUP_CONCAT(DISTINCT penerimaan_barang.no_penerimaan_barang SEPARATOR ', ') AS list_no_penerimaan_barang";
+                    sales_order_invoice.tanggal_faktur AS tanggal_invoice, 
+                    sales_order_invoice.no_faktur AS no_invoice, 
+                    sales_order_invoice.id_company as company_id, 
+                    sales_order_invoice.id as id, 
+                    customers.name AS customer_name,
+                    SUM(sales_order_invoice_detail.amount_invoice) AS total, 
+                    SUM(pembayaran_invoice_detail.harga_dibayar) AS remaining
+                    ";
         }
         $poDataQry = $this->asObject()
             ->select($selectQry)
@@ -906,12 +901,12 @@ class SalesOrderInvoiceModel extends Model
             ->join('sales_order_invoice_detail', 'sales_order_invoice_detail.id_sales_order_invoice = sales_order_invoice.id', 'right')
             ->join('pembayaran_invoice_detail', "pembayaran_invoice_detail.sales_order_invoice_id = sales_order_invoice.id AND pembayaran_invoice_detail.sales_order_invoice_detail_id = sales_order_invoice_detail.id AND pembayaran_invoice_detail.type_invoice = 'LOKAL'", 'left')
             ->join('pembayaran_invoice', "pembayaran_invoice.id = pembayaran_invoice_detail.pembayaran_invoice_id AND pembayaran_invoice.type_invoice = 'LOKAL'", 'left');
-            if (isset($addCondition['summary']) && $addCondition['summary'] == "summary") {
-                $poDataQry->groupBy('sales_order_invoice.id_customer');
-            } else {
-                $poDataQry->groupBy('sales_order_invoice.id');
-            }
-            $poDataQry->orderBy($sort, $sortType);
+        if (isset($addCondition['summary']) && $addCondition['summary'] == "summary") {
+            $poDataQry->groupBy('sales_order_invoice.id_customer');
+        } else {
+            $poDataQry->groupBy('sales_order_invoice.id');
+        }
+        $poDataQry->orderBy($sort, $sortType);
 
         $totalData = $poDataQry->countAllResults(false);
 

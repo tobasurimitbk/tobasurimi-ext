@@ -1724,25 +1724,23 @@ class SalesOrderExportModel extends Model
                     SEPARATOR ', '
                 ) AS id,
                 customers.name AS customer_name,
+                metadata.value AS valas_name,
+                kurs.nilai_kurs AS nilai_kurs,
 
                 SUM(sales_order_export.shipment_value_net) AS sum_amount_invoice, 
                 SUM(pembayaran_invoice.total_bayar) AS sum_harga_dibayar
             ";
         } else {
             $selectQry = " 
-                    rm_purchase_orders.po_date AS tanggal_invoice, 
-                    rm_purchase_orders.po_no AS no_invoice, 
-                    rm_purchase_orders.company_id, 
-                    suppliers.id AS supplier_id, 
-                    suppliers.name AS supplier_name,
-                    divisis.divisi AS divisi,
-                    COUNT(rm_purchase_order_details.id) AS itemCount,
-                    penerimaan_barang_detail.sub_total AS total, 
-                    local_po_payments.amount AS remaining,
-                    SUM(DISTINCT penerimaan_barang_detail.sub_total) AS sum_total, 
-                    SUM(DISTINCT local_po_payments.amount) AS sum_remaining,
-                    penerimaan_barang.no_penerimaan_barang AS no_penerimaan_barang,
-                    GROUP_CONCAT(DISTINCT penerimaan_barang.no_penerimaan_barang SEPARATOR ', ') AS list_no_penerimaan_barang";
+                    sales_order_export.sales_order_export_id AS id, 
+                    sales_order_export.tanggal AS tanggal_invoice, 
+                    sales_order_export.sales_order_export_no AS no_invoice, 
+                    sales_order_export.company_id, 
+                    customers.name AS customer_name,
+                    metadata.value AS valas_name,
+                    kurs.nilai_kurs AS nilai_kurs,
+                    sales_order_export.shipment_value_net AS total, 
+                    pembayaran_invoice.total_bayar AS remaining";
         }
         $poDataQry = $this->asObject()
             ->select($selectQry)
@@ -1750,11 +1748,13 @@ class SalesOrderExportModel extends Model
             ->where('sales_order_export.status', 'POSTED')
             ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
             ->join('customers', 'customers.id = sales_contract.customer_id')
+            ->join('metadata', 'metadata.id = sales_order_export.valas_id')
+            ->join('kurs', 'kurs.metadata_id = metadata.id AND DATE(kurs.start_date) <= DATE(sales_order_export.tanggal_invoice) AND DATE(kurs.end_date) >= DATE(sales_order_export.tanggal_invoice)', 'left')
             ->join('pembayaran_invoice', "FIND_IN_SET(sales_order_export.sales_order_export_id, REPLACE(REPLACE(pembayaran_invoice.invoice_id, '[', ''), ']', '')) AND pembayaran_invoice.type_invoice = 'EKSPOR'", 'left');
         if (isset($addCondition['summary']) && $addCondition['summary'] == "summary") {
-            $poDataQry->groupBy('customers.name');
+            $poDataQry->groupBy('customers.id');
         } else {
-            $poDataQry->groupBy('sales_order_export.id');
+            $poDataQry->groupBy('sales_order_export.sales_order_export_id');
         }
         $poDataQry->orderBy($sort, $sortType);
 
@@ -1774,11 +1774,11 @@ class SalesOrderExportModel extends Model
         }
 
         if (!empty($addCondition['dateStart'])) {
-            $poDataQry->where('sales_order_export.tanggal >=', $addCondition['dateStart']);
+            $poDataQry->where('sales_order_export.tanggal_invoice >=', $addCondition['dateStart']);
         }
 
         if (!empty($addCondition['dateEnd'])) {
-            $poDataQry->where('sales_order_export.tanggal <=', $addCondition['dateEnd']);
+            $poDataQry->where('sales_order_export.tanggal_invoice <=', $addCondition['dateEnd']);
         }
 
         if (!empty($addCondition['filter'])) {

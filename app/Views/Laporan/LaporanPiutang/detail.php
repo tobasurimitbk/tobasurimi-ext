@@ -85,7 +85,7 @@
             ],
             pageLength: 25,
             ajax: {
-                url: "<?= base_url("laporan-accounting/hutang/details/invoice/" . $id); ?>",
+                url: "<?= base_url("laporan-accounting/piutang/details/invoice/" . $id); ?>",
                 dataSrc: "data",
                 data: function(data) {
                     data.search = $(".search").val();
@@ -93,7 +93,7 @@
                     data.dateEnd = $(".dateEnd").val();
                     data.filter = <?php echo json_encode($filter); ?>;
                     data.filter_divisi = <?php echo json_encode($filterDivisi); ?>;
-                    data.tipe_barang = <?php echo json_encode($tipeBarang); ?>;
+                    data.type_barang = <?php echo json_encode($tipeBarang); ?>;
                     data.sort = sort;
                     data.sortType = sortType;
                 }
@@ -122,6 +122,9 @@
             }, {
                 data: "exchange_rate",
                 className: "text-center",
+                render: function(data) {
+                    return greatFormatRupiahPayment(data);
+                }
             }, {
                 data: "nominal_invoice",
                 className: "text-center",
@@ -195,8 +198,8 @@
             search: $(".search").val(),
             filter: <?php echo json_encode($filter); ?>,
             filter_divisi: <?php echo json_encode($filterDivisi); ?>,
-            tipe_barang: <?php echo json_encode($tipeBarang); ?>,
-            supplierId: <?= json_encode($id) ?>,
+            type_barang: <?php echo json_encode($tipeBarang); ?>,
+            idCustomer: <?= json_encode($id) ?>,
             dateStart: $(".dateStart").val(),
             dateEnd: $(".dateEnd").val(),
             sort: sort,
@@ -206,12 +209,12 @@
 
     function exportToPDF() {
         const params = new URLSearchParams(getFilterQuery()).toString();
-        window.open(`<?= base_url("laporan-accounting/hutang/detail/print") ?>?${params}`, "_blank");
+        window.open(`<?= base_url("laporan-accounting/piutang/detail/print") ?>?${params}`, "_blank");
     }
 
     function exportToExcel() {
         const params = new URLSearchParams(getFilterQuery()).toString();
-        window.open(`<?= base_url("laporan-accounting/hutang/detail/export-excel") ?>?${params}`, "_blank");
+        window.open(`<?= base_url("laporan-accounting/piutang/detail/export-excel") ?>?${params}`, "_blank");
     }
 </script>
 <?= $this->endSection(); ?>

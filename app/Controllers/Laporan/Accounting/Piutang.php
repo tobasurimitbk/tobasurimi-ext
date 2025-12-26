@@ -34,14 +34,14 @@ class Piutang extends BaseController
         } else {
             $companyId = [16];
         }
-        
+
         $customerData = $this->customerModel
             ->select('GROUP_CONCAT(customers.id) AS id, customers.name ')
             ->whereIn('company_id', $companyId)
             ->asObject()
             ->groupBy('customers.name')
             ->findAll();
-            
+
         $data = [
             'customer' => $customerData
         ];
@@ -57,8 +57,8 @@ class Piutang extends BaseController
             "filter"        => $this->request->getGet("filter"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-            "startdate"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
-            "lastdate"      => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"      => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
         $condition = [
@@ -76,7 +76,7 @@ class Piutang extends BaseController
             "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "dateEnd"      => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
-        
+
         if ($this->this_company_id != 16 && $this->this_company_id != 15) {
             $addCondition['companyId'] = [1, 2];
         } else if ($this->this_company_id == 15) {
@@ -99,12 +99,13 @@ class Piutang extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($res['data'] as $data) {
-            $totalRemaining = $data->sum_amount_invoice - $data->sum_harga_dibayar;
+            $total = $data->sum_amount_invoice * ($data->nilai_kurs ?? 1);
+            $totalRemaining = ($data->sum_amount_invoice - $data->sum_harga_dibayar) * ($data->nilai_kurs ?? 1);
             array_push($rdata, [
                 "no"                    => $no++,
                 "id"                    => $data->id,
                 "customer_name"         => $data->customer_name,
-                "nominal_idr"           => number_format($data->sum_amount_invoice, 2, '.', ''),
+                "nominal_idr"           => number_format($total, 2, '.', ''),
                 "remaining_idr"         => number_format($totalRemaining, 2, '.', ''),
             ]);
         }
@@ -134,7 +135,7 @@ class Piutang extends BaseController
         if ($rawFilter) {
             $filter = explode(',', $rawFilter);
         }
-        
+
         $startDate = $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "";
         $endDate = $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "";
 
@@ -206,7 +207,7 @@ class Piutang extends BaseController
         if ($rawFilter) {
             $filter = explode(',', $rawFilter);
         }
-        
+
         $startDate = $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "";
         $endDate = $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "";
 
@@ -301,36 +302,36 @@ class Piutang extends BaseController
         ];
 
         $condition = [
-            "suppliers.id"  => $id,
-            "suppliers.deletedAt" => NULL
+            "customers.deletedAt" => NULL,
+            "customers.id" => $id
         ];
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
-            "filter"        => $this->request->getGet("filter"),
+            "filter"        => $this->request->getGet("filter") == "all" ? [] : explode(',', $this->request->getGet("filter")),
+            "divisi"        => $this->request->getGet("divisi"),
+            "type_barang"   => $this->request->getGet("type_barang"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
             "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "dateEnd"      => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
+        if ($this->this_company_id != 16 && $this->this_company_id != 15) {
+            $addCondition['companyId'] = [1, 2];
+        } else if ($this->this_company_id == 15) {
+            $addCondition['companyId'] = [15];
+        } else {
+            $addCondition['companyId'] = [16];
+        }
+
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        $checkSupplier = $this->supplierModel->find($id);
-
-        // var_dump($condition, $addCondition, $limit, $offset);
-        // exit;
-
-        if ($checkSupplier['type'] == "BAHAN PENOLONG") {
-            $res = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, $limit, $offset);
-        } else if ($checkSupplier['type'] == "BAHAN BAKU") {
-            $res = $this->rMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, $limit, $offset);
+        if ($addCondition['type_barang'] == 'LOKAL') {
+            $res = $this->salesOrderInvoiceModel->getDataInvoiceReportAccounting($condition, $addCondition, $limit, $offset);
         } else {
-            $res = $this->aMPurchaseOrderModel->getPOByIdSupplierWithInvoice($condition, $addCondition, $limit, $offset);
-            if (!$res) {
-                $res = $this->rMImportPOModel->getPOByIdSupplierWithInvoice($condition, $addCondition, $limit, $offset);
-            }
+            $res = $this->salesOrderExportModel->getDataInvoiceReportAccounting($condition, $addCondition, $limit, $offset);
         }
 
         $rdata = [];
@@ -338,14 +339,16 @@ class Piutang extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($res['data'] as $data) {
-            $totalRemaining = $data->total - $data->remaining;
+            $total = $data->total * ($data->nilai_kurs ?? 1);
+            $totalRemaining = ($data->total - $data->remaining) * ($data->nilai_kurs ?? 1);
             array_push($rdata, [
                 "no"                    => $no++,
                 "id"                    => $data->id,
                 "tanggal_invoice"       => $data->tanggal_invoice,
                 "no_invoice"            => $data->no_invoice,
-                "divisi_invoice"        => $data->divisi,
-                "nominal_invoice"       => number_format($data->total, 2, '.', ''),
+                "valas"                 => $data->valas_name ?? 'IDR',
+                "exchange_rate"         => number_format(($data->nilai_kurs ?? 1), 2, '.', ''),
+                "nominal_invoice"       => number_format($total, 2, '.', ''),
                 "remaining_invoice"     => number_format($totalRemaining, 2, '.', ''),
             ]);
         }
@@ -359,5 +362,143 @@ class Piutang extends BaseController
         ];
 
         return response()->setJSON($data);
+    }
+
+    public function printPiutangDetail()
+    {
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
+        ob_end_clean();
+        ob_start();
+
+        $id = $this->request->getGet("idCustomer");
+
+        $condition = [
+            "customers.deletedAt" => NULL,
+            "customers.id" => $id
+        ];
+
+        $addCondition = [
+            "search"        => $this->request->getGet("search"),
+            "filter"        => $this->request->getGet("filter") == "all" ? [] : explode(',', $this->request->getGet("filter")),
+            "divisi"        => $this->request->getGet("divisi"),
+            "type_barang"   => $this->request->getGet("type_barang"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"      => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+        ];
+
+        if ($this->this_company_id != 16 && $this->this_company_id != 15) {
+            $addCondition['companyId'] = [1, 2];
+        } else if ($this->this_company_id == 15) {
+            $addCondition['companyId'] = [15];
+        } else {
+            $addCondition['companyId'] = [16];
+        }
+
+        if ($addCondition['type_barang'] == 'LOKAL') {
+            $res = $this->salesOrderInvoiceModel->getDataInvoiceReportAccounting($condition, $addCondition, null, null);
+        } else {
+            $res = $this->salesOrderExportModel->getDataInvoiceReportAccounting($condition, $addCondition, null, null);
+        }
+
+        $data = [
+            'data' => $res['data'],
+            'title' => 'Laporan Piutang Customer',
+            'date_range' => ($addCondition['dateStart'] && $addCondition['dateEnd']) ? date("d/m/Y", strtotime($addCondition['dateStart'])) . " - " . date("d/m/Y", strtotime($addCondition['dateEnd'])) : "Semua Periode"
+        ];
+
+        // Render view to HTML
+        $html = view('Laporan/LaporanPiutang/print_pdf_detail', $data);
+
+        // Dompdf setup
+        $options = new \Dompdf\Options();
+        $options->set('isRemoteEnabled', true);
+
+        $dompdf = new \Dompdf\Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->render();
+        $dompdf->stream('laporan-piutang.pdf', ["Attachment" => false]);
+        exit;
+    }
+
+    public function exportExcelPiutangDetail()
+    {
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
+        ob_end_clean();
+        ob_start();
+
+        $id = $this->request->getGet("idCustomer");
+
+        $condition = [
+            "customers.deletedAt" => NULL,
+            "customers.id" => $id
+        ];
+
+        $addCondition = [
+            "search"        => $this->request->getGet("search"),
+            "filter"        => $this->request->getGet("filter") == "all" ? [] : explode(',', $this->request->getGet("filter")),
+            "divisi"        => $this->request->getGet("divisi"),
+            "type_barang"   => $this->request->getGet("type_barang"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"      => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+        ];
+
+        if ($this->this_company_id != 16 && $this->this_company_id != 15) {
+            $addCondition['companyId'] = [1, 2];
+        } else if ($this->this_company_id == 15) {
+            $addCondition['companyId'] = [15];
+        } else {
+            $addCondition['companyId'] = [16];
+        }
+
+        if ($addCondition['type_barang'] == 'LOKAL') {
+            $res = $this->salesOrderInvoiceModel->getDataInvoiceReportAccounting($condition, $addCondition, null, null);
+        } else {
+            $res = $this->salesOrderExportModel->getDataInvoiceReportAccounting($condition, $addCondition, null, null);
+        }
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Detail Piutang Customer');
+
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'Tanggal');
+        $sheet->setCellValue('C1', 'No Invoice');
+        $sheet->setCellValue('D1', 'Valas');
+        $sheet->setCellValue('E1', 'Exchange Rate');
+        $sheet->setCellValue('F1', 'Nominal (Rp)');
+        $sheet->setCellValue('G1', 'Remaining (Rp)');
+
+        $no = 1;
+        $row = 2;
+
+        foreach ($res['data'] as $item) {
+            $total = $item->total * ($item->nilai_kurs ?? 1);
+            $remaining = ($item->total - $item->remaining) * ($item->nilai_kurs ?? 1);
+
+            $sheet->setCellValue("A$row", $no++);
+            $sheet->setCellValue("B$row", $item->tanggal_invoice);
+            $sheet->setCellValue("C$row", $item->no_invoice);
+            $sheet->setCellValue("D$row", $item->valas_name ?? 'IDR');
+            $sheet->setCellValue("E$row", $item->nilai_kurs ?? 1);
+            $sheet->setCellValue("F$row", $total);
+            $sheet->setCellValue("G$row", $remaining);
+            $row++;
+        }
+
+        $filename = 'Detail-Piutang-Customer.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment;filename=\"$filename\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
     }
 }

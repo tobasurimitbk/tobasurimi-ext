@@ -61,7 +61,7 @@
                                 <select class="form-select list_type_barang" name="list_type_barang" id="list_type_barang">
                                     <option value=""></option>
                                     <option value="LOKAL" selected>LOKAL</option>
-                                    <option value="IMPORT">IMPORT</option>
+                                    <option value="EKSPORT">EKSPORT</option>
                                 </select>
                                 <label for="floatingInput">Tipe Barang</label>
                             </div>
@@ -257,7 +257,7 @@
         });
 
     });
-    
+
     const convertDateFormat = function(dateString) {
         // Memisahkan tanggal, bulan, dan tahun dari string
         var dateParts = dateString.split("/");
