@@ -897,7 +897,7 @@ class ProsesRebus extends BaseController
     public function dropdownListBarangIsInit()
     {
         $stockRevampModel = new StockRevampModel();
-        $data =   $data = $stockRevampModel->getBarangRebusAndStock(
+        $data = $stockRevampModel->getBarangRebusAndStock(
             $this->request->getVar('type_barang'),
             $this->request->getVar('divisi_id'),
             $this->request->getVar('warehouse_id')

@@ -774,15 +774,33 @@ class JasaVendorOut extends BaseController
         if (!empty($this->request->getVar('stock_id')) && (!empty($supplierId) || !empty($vendorId))) {
 
             if (!empty($supplierId)) {
-                    // Untuk Dari Po & Supplier
-                $condition = [
-                        'rm_purchase_orders.supplier_id' => $this->request->getVar('supplier_id'),
-                    ];
 
-                $dataResult = $stockRevampDetailModel->getStockListWithAddConditionForProsesRebus(
-                    $condition,
-                    $this->request->getVar('spesifikasi_id'),
-                );
+
+                $tipeSupplier = $this->supplierModel->where('id', $supplierId)->first();
+
+                if ($tipeSupplier['type'] == "BAHAN BAKU") {
+                        // Untuk Dari Po & Supplier
+                        $condition = [
+                                'rm_purchase_orders.supplier_id' => $this->request->getVar('supplier_id'),
+                            ];
+
+                        $dataResult = $stockRevampDetailModel->getStockListWithAddConditionForProsesRebus(
+                            $condition,
+                            $this->request->getVar('spesifikasi_id'),
+                        );
+                } elseif ($tipeSupplier['type'] == "INTERNASIONAL") {
+                        $condition = [
+                                'rm_import_pos.supplier_id' => $this->request->getVar('supplier_id'),
+                            ];
+
+                        $dataResult = $stockRevampDetailModel->getStockListWithAddConditionForProsesRebusImport(
+                            $condition,
+                            $this->request->getVar('spesifikasi_id'),
+                        );
+                }
+
+
+             
 
 
                 // $stock = $stockRevampModel->where('id', $this->request->getVar('stock_id'))->first();
@@ -865,13 +883,30 @@ class JasaVendorOut extends BaseController
         $stockRevampDetailModel = new StockRevampDetailModel();
 
             if (!empty($supplierId) && !empty($barangMasterId)) {
-                // Untuk Dari Po & Supplier
-                $condition = [
-                    'rm_purchase_orders.supplier_id' => $supplierId,
-                    'stock_revamp.barang_master_id' => $barangMasterId,
-                    'stock_revamp_detail.qty_diterima >' => 0,
-                ];
-                $dataResult = $stockRevampDetailModel->getStockListWithAddConditionForJasaVendorOut($condition);
+
+                $tipeSupplier = $this->supplierModel->where('id', $supplierId)->first();
+
+
+                if ($tipeSupplier['type'] == "BAHAN BAKU") {
+                    
+                    // Untuk Dari Po & Supplier
+                    $condition = [
+                        'rm_purchase_orders.supplier_id' => $supplierId,
+                        'stock_revamp.barang_master_id' => $barangMasterId,
+                        'stock_revamp_detail.qty_diterima >' => 0,
+                    ];
+                    $dataResult = $stockRevampDetailModel->getStockListWithAddConditionForJasaVendorOut($condition);
+
+                } elseif ($tipeSupplier['type'] == "INTERNASIONAL") {
+                     // Untuk Dari Po & Supplier
+                    $condition = [
+                        'rm_import_pos.supplier_id' => $supplierId,
+                        'stock_revamp.barang_master_id' => $barangMasterId,
+                        'stock_revamp_detail.qty_diterima >' => 0,
+                    ];
+                    $dataResult = $stockRevampDetailModel->getStockListWithAddConditionForJasaVendorOutImport($condition);
+
+                }
 
                 
                 $resultArr = [];

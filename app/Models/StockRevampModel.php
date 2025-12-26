@@ -714,13 +714,13 @@ class StockRevampModel extends Model
     public function getBarangRebusAndStock($type_barang, $divisi_id, $warehouse_id)
     {
         $selectQry = "
-        stock_revamp.id AS stock_id,
-        stock_revamp.spesifikasi_id AS spesifikasi_id,
-        CONCAT(UPPER(barang_master.barang_name), '-', UPPER(barang_master_spesifikasi.spesifikasi)) AS barang,
-        barang_master.kode_barang,
-        barang_master.id,
-        satuans.kode_satuan
-    ";
+            stock_revamp.id AS stock_id,
+            stock_revamp.spesifikasi_id AS spesifikasi_id,
+            CONCAT(UPPER(barang_master.barang_name), '-', UPPER(barang_master_spesifikasi.spesifikasi)) AS barang,
+            barang_master.kode_barang,
+            barang_master.id,
+            satuans.kode_satuan
+        ";
 
         $dataResult1 = $this->asArray()->select($selectQry)
             ->join('barang_master', 'barang_master.id = stock_revamp.barang_master_id')
@@ -744,13 +744,13 @@ class StockRevampModel extends Model
         // var_dump($type_barang, $divisi_id, $warehouse_id);
         // die;
         $selectQry = "
-        stock_revamp.id AS stock_id,
-        stock_revamp.spesifikasi_id AS spesifikasi_id,
-        CONCAT(UPPER(barang_master.barang_name), '-', UPPER(barang_master_spesifikasi.spesifikasi)) AS barang,
-        barang_master.kode_barang,
-        barang_master.id,
-        satuans.kode_satuan
-    ";
+            stock_revamp.id AS stock_id,
+            stock_revamp.spesifikasi_id AS spesifikasi_id,
+            CONCAT(UPPER(barang_master.barang_name), '-', UPPER(barang_master_spesifikasi.spesifikasi)) AS barang,
+            barang_master.kode_barang,
+            barang_master.id,
+            satuans.kode_satuan
+        ";
 
         $dataResult1 = $this->asArray()->select($selectQry)
             ->join('barang_master', 'barang_master.id = stock_revamp.barang_master_id')

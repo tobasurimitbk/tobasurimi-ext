@@ -104,7 +104,7 @@
                                 <select class="form-select multiple_reference_id" id="multiple_reference_id" multiple name="multiple_reference_id[]">
                                     <option value=""></option>
                                     <?php foreach ($dataReferencePengeluaran as $d): ?>
-                                        <option <?= in_array($d['sales_order_export_id'], $multipleReferenceIds) ? 'selected' : '' ?> value="<?= $d['sales_order_export_id'] ?>"><?= $d['sales_order_export_no'] ?></option>
+                                        <option <?= in_array($d['sales_order_export_id'], $multipleReferenceIds) ? 'selected' : '' ?> value="<?= $d['sales_order_export_id'] ?>"><?= $d['sales_order_export_no'] . " (" . $d['no_invoice'] . ")" ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>

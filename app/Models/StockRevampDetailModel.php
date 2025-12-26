@@ -218,6 +218,57 @@ class StockRevampDetailModel extends Model
     }
 
 
+    public function getStockListWithAddConditionForProsesRebusImport($condition, $spesifikasiId)
+    {
+        $builder = $this->asArray()
+            ->select('
+                stock_revamp_detail.id AS id,
+                stock_revamp.spesifikasi_id,
+                suppliers.name AS supplier_name,
+                stock_revamp_detail.stock_id,
+                stock_revamp_detail.bc_id,
+                rm_import_pos.supplier_id,
+                stock_revamp_detail.reference_type,
+                rm_import_pos.po_date,
+                rm_import_pos.po_no,
+                rm_import_pos.id as rm_purchase_order_id,
+                rm_import_po_details.id as rm_purchase_order_detail_id,
+                CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi) AS barang,
+                satuans.kode_satuan,
+                satuans.id as satuan_id,
+                stock_revamp_detail.qty_bersih AS total_penerimaan,
+                stock_revamp_detail.qty_bersih as stok_total_bersih,
+                stock_revamp_detail.qty_diterima as stok_total_diterima,
+            ')
+            ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
+            ->join('rm_import_pos', 'rm_import_pos.id = stock_revamp_detail.po_id', 'left')
+            ->join('suppliers', 'suppliers.id = rm_import_pos.supplier_id', 'left')
+            ->join('rm_import_po_details', 'rm_import_po_details.rm_import_po_id = rm_import_pos.id', 'left')
+            ->join('barang_master', 'barang_master.id = stock_revamp.barang_master_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock_revamp.spesifikasi_id', 'left')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left');
+
+        // Kondisi dinamis
+        foreach ($condition as $field => $value) {
+            if (is_array($value)) {
+                $builder->whereIn($field, $value);
+            } else {
+                $builder->where($field, $value);
+            }
+        }
+
+        return $builder
+            ->groupBy('
+                stock_revamp_detail.id,
+            ')
+            ->where('stock_revamp_detail.qty_bersih >', 0)
+            ->where('stock_revamp_detail.reference_type !=', "PROSES REBUS")
+            ->where('stock_revamp.spesifikasi_id', $spesifikasiId)
+            ->orderBy('stock_revamp_detail.createdAt', 'ASC')
+            ->findAll();
+    }
+
+
     public function getStockListWithAddConditionForStuffing($condition)
     {
         $builder = $this->asArray()
@@ -412,6 +463,55 @@ class StockRevampDetailModel extends Model
                 stock_revamp_detail.id,
             ')
             ->orderBy('rm_purchase_orders.po_no', 'ASC')
+            ->findAll();
+    }
+
+    public function getStockListWithAddConditionForJasaVendorOutImport($condition)
+    {
+        $builder = $this->asArray()
+            ->select('
+                stock_revamp_detail.id AS id,
+                stock_revamp.spesifikasi_id,
+                suppliers.name AS supplier_name,
+                stock_revamp_detail.stock_id,
+                stock_revamp_detail.bc_id,
+                stock_revamp_detail.type_bc,
+                rm_import_pos.supplier_id,
+                stock_revamp_detail.reference_type,
+                stock_revamp_detail.reference_id,
+                rm_import_pos.po_date,
+                rm_import_pos.po_no,
+                rm_import_pos.id as rm_purchase_order_id,
+                rm_import_po_details.id as rm_purchase_order_detail_id,
+                CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi) AS barang,
+                satuans.kode_satuan,
+                satuans.id as satuan_id,
+                stock_revamp_detail.qty_bersih AS total_penerimaan,
+                stock_revamp_detail.qty_bersih as stok_total,
+                stock_revamp_detail.qty_diterima as stok_total_diterima,
+            ')
+            ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
+            ->join('rm_import_pos', 'rm_import_pos.id = stock_revamp_detail.po_id', 'left')
+            ->join('suppliers', 'suppliers.id = rm_import_pos.supplier_id', 'left')
+            ->join('rm_import_po_details', 'rm_import_po_details.rm_import_po_id = rm_import_pos.id', 'left')
+            ->join('barang_master', 'barang_master.id = stock_revamp.barang_master_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock_revamp.spesifikasi_id', 'left')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left');
+
+        // Kondisi dinamis
+        foreach ($condition as $field => $value) {
+            if (is_array($value)) {
+                $builder->whereIn($field, $value);
+            } else {
+                $builder->where($field, $value);
+            }
+        }
+
+        return $builder
+            ->groupBy('
+                stock_revamp_detail.id,
+            ')
+            ->orderBy('rm_import_pos.po_no', 'ASC')
             ->findAll();
     }
 
