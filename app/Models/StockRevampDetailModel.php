@@ -2681,11 +2681,25 @@ class StockRevampDetailModel extends Model
 
         // Kondisi dinamis
         foreach ($condition as $field => $value) {
+            if ($field === 'stock_date_between') {
+                continue;
+            }
+
             if (is_array($value)) {
                 $builder->whereIn($field, $value);
             } else {
                 $builder->where($field, $value);
             }
+        }
+
+        /** ===============================
+         * FILTER TANGGAL (HAVING)
+         * =============================== */
+        if (isset($condition['stock_date_between'])) {
+            [$startDate, $endDate] = $condition['stock_date_between'];
+
+            $builder->having("stock_date >=", $startDate)
+                    ->having("stock_date <=", $endDate);
         }
 
         return $builder

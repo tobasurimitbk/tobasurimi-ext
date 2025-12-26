@@ -2128,7 +2128,7 @@ class MaterialRequest extends BaseController
                 $condition["srd.reference_type"] = "PENERIMAAN MUTASI";
                 // $condition["srd.reference_type"] = ["PROSES REBUS", "PENERIMAAN MUTASI"];
                 $condition['stock_date_between'] = [$startDate, $endDate];
-
+                
                 $dataResult = $this->stockRevampDetailModel->getStockListPenerimaanMutasiWithCondition($condition);
             } else {
                 $condition = [
@@ -2143,6 +2143,7 @@ class MaterialRequest extends BaseController
                 }
                 // $condition["stock_revamp_detail.reference_type "] = ["JASA VENDOR", "PROSES REBUS", "PENERIMAAN MUTASI"];
                 $condition["stock_revamp_detail.reference_type "] = ["JASA VENDOR"];
+                $condition['stock_date_between'] = [$startDate, $endDate];
                 $dataResult = $this->stockRevampDetailModel->getStockListVendorWithCondition($condition);
             }
 
