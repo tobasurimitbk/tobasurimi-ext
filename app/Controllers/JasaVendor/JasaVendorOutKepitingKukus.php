@@ -532,18 +532,22 @@ class JasaVendorOutKepitingKukus extends BaseController
                 'message' => 'Minimal 3 karakter'
             ]);
         }
-        
 
-        $builder = $this->barangMasterModel
-            ->select('barang_master.barang_name as master_barang, barang_master.id as id')
+        $data = $this->barangMasterModel
+            ->select("
+                barang_master.id AS id,
+                CONCAT(barang_master.kode_barang, ' - ', barang_master.barang_name) AS master_barang
+            ")
             ->where('barang_master.deletedAt', null)
             ->where('barang_master.company_id', $this->this_company_id)
             ->where('barang_master.type_barang', 'bahan_baku')
             ->groupStart()
-                ->like('barang_master.barang_name', "%{$term}%")
-            ->groupEnd();
-
-        $data = $builder->get()->getResultArray();
+                ->like('barang_master.kode_barang', $term)
+                ->orLike('barang_master.barang_name', $term)
+            ->groupEnd()
+            ->limit(20)
+            ->get()
+            ->getResultArray();
 
         return $this->response->setJSON([
             'data'   => $data,
@@ -551,6 +555,7 @@ class JasaVendorOutKepitingKukus extends BaseController
             'token'  => csrf_hash()
         ]);
     }
+
 
     public function getListStockByStockID()
     {

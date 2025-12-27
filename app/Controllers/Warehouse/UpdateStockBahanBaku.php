@@ -234,20 +234,41 @@ class UpdateStockBahanBaku extends BaseController
         $barang_id         = $this->request->getVar('barang_id');
         $spesifikasi_id         = $this->request->getVar('spesifikasi_id');
 
-        // siapkan condition kosong dulu
-        $condition = [
-            'rm_purchase_orders.warehouse_id' => $warehouse_id,
-            'rm_purchase_orders.divisi_id' => $divisi_id,
-            'rm_purchase_orders.supplier_id' => $supplier_id,
-            'stock_revamp.barang_master_id' => $barang_id,
-            'rm_purchase_orders.po_date >=' => DateTime::createFromFormat('d/m/Y', $tanggal_po_awal)->format('Y-m-d'),
-            'rm_purchase_orders.po_date <=' => DateTime::createFromFormat('d/m/Y', $tanggal_po_akhir)->format('Y-m-d'),
-            'stock_revamp_detail.reference_type' => 'LPB',
-            'stock_revamp_detail.deletedAt' => NULL,
-        ];
 
-        $dataResult = $this->stockRevampDetailModel->getStockListWithAddConditionForUpdateStock($condition, $spesifikasi_id);    
-          
+            $tipeSupplier = $this->supplierModel->where('id', $supplier_id)->first();
+
+            if ($tipeSupplier['type'] == "BAHAN BAKU") {
+                // siapkan condition kosong dulu
+                $condition = [
+                    'rm_purchase_orders.warehouse_id' => $warehouse_id,
+                    'rm_purchase_orders.divisi_id' => $divisi_id,
+                    'rm_purchase_orders.supplier_id' => $supplier_id,
+                    'stock_revamp.barang_master_id' => $barang_id,
+                    'rm_purchase_orders.po_date >=' => DateTime::createFromFormat('d/m/Y', $tanggal_po_awal)->format('Y-m-d'),
+                    'rm_purchase_orders.po_date <=' => DateTime::createFromFormat('d/m/Y', $tanggal_po_akhir)->format('Y-m-d'),
+                    'stock_revamp_detail.reference_type' => 'LPB',
+                    'stock_revamp_detail.deletedAt' => NULL,
+                ];
+
+                $dataResult = $this->stockRevampDetailModel->getStockListWithAddConditionForUpdateStock($condition, $spesifikasi_id);    
+
+            } elseif ($tipeSupplier['type'] == "INTERNASIONAL") {
+                // siapkan condition kosong dulu
+                $condition = [
+                    // 'rm_import_pos.warehouse_id' => $warehouse_id,
+                    'rm_import_pos.division_id' => $divisi_id,
+                    'rm_import_pos.supplier_id' => $supplier_id,
+                    'stock_revamp.barang_master_id' => $barang_id,
+                    'rm_import_pos.po_date >=' => DateTime::createFromFormat('d/m/Y', $tanggal_po_awal)->format('Y-m-d'),
+                    'rm_import_pos.po_date <=' => DateTime::createFromFormat('d/m/Y', $tanggal_po_akhir)->format('Y-m-d'),
+                    'stock_revamp_detail.reference_type' => 'LPB',
+                    'stock_revamp_detail.deletedAt' => NULL,
+                ];
+
+                $dataResult = $this->stockRevampDetailModel->getStockListWithAddConditionForUpdateStockInternational($condition, $spesifikasi_id);    
+
+            }
+                  
         $resultArr = array();
            
         // Khsus Dari Supplier
