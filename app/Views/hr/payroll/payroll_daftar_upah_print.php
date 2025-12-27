@@ -68,7 +68,7 @@
                 <td>DAFTAR UPAH KARYAWAN</td>
             </tr>
             <tr align="center" style=" font-size:12px">
-                <td> Bulan <?= date('M', strtotime("{$year}-{$month}-01")) ?> Tahun <?= $year ?> Periode 1</td>
+                <td> Bulan <?= convertMonthIndo($month) ?> Tahun <?= $year ?> Periode 1</td>
             </tr>
             <tr align="center" style=" font-size:12px">
                 <td>Pembayaran dari tanggal <?= $startDate ?> s/d tanggal <?= $endDate ?> </td>
@@ -133,7 +133,7 @@
                 </tr>
 
             <?php endforeach; ?>
-            <tr>
+            <!-- <tr>
                 <td colspan="4" style="text-align: right;">
                     Total Keseluruhan
                 </td>
@@ -145,7 +145,7 @@
                 <td><?= number_format($payrollData['total']['subTotalPotongan'], 2, ',', '.') ?></td>
                 <td><?= number_format($payrollData['total']['subTotalJumlahUpah'], 2, ',', '.') ?></td>
                 <td></td>
-            </tr>
+            </tr> -->
         </table>
 
         <table width="100%" style="margin-top: 20px;">
