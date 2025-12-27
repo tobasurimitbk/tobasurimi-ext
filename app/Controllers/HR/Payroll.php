@@ -172,7 +172,9 @@ class Payroll extends BaseController
             // delete first
             $this->payrollModel->where('company_id', $this->this_company_id)
                 ->where('employee_id', $employeeID)
+                ->where('year_month', $yearMonth)
                 ->delete();
+
 
             $employeeIds = [$employeeID];
 
@@ -1189,8 +1191,28 @@ class Payroll extends BaseController
 
         return response()->setJSON([
             'data' => $data,
-            'status' => true
+            'status' => true,
+            'token' => csrf_hash()
         ]);
+    }
+
+    public function delete()
+    {
+        try {
+            $id = decrypt($this->request->getVar('id'));
+            $this->payrollModel->delete($id);
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'message' => "payroll berhasil dihapus",
+                'status' => true
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'message' => $e->getMessage(),
+                'status' => false
+            ]);
+        }
     }
 
     // helper

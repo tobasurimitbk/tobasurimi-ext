@@ -436,6 +436,11 @@
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
                         <?php endif ?>
+                        <?php if (can('Personalia', 'Payroll', 'd')): ?>
+                            <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                        <?php endif ?>
                     `;
 
                     return res;
@@ -744,6 +749,60 @@
             });
         }
     });
+
+    function remove(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Payroll ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Ya, Hapus',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const formData = new FormData();
+                var csrf = $(`[name="${csrfToken}"]`);
+                formData.set('id', id);
+                $.ajax({
+                    url: "<?= base_url("payroll/delete"); ?>",
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    data: formData,
+                    method: "POST",
+                    dataType: "json",
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload();
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    }
+                });
+            }
+        })
+    }
+
 
     function print(url) {
         window.open(url, "_blank");

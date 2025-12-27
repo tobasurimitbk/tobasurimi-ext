@@ -547,7 +547,7 @@ class PayrollsModel extends Model
             $lemburKerja = $p->nominal_uang_lembur;
             $tunjanganKesejahteraan = 0;
             $potongan = $p->nominal_pengurangan_gaji;
-            $jumlahUpah = $p->nominal_gaji_diterima;
+            $jumlahUpah = $upahPokok + $lemburKerja - $potongan;
 
             // sum
             $subTotalUpah += $totalUpah;
