@@ -643,7 +643,7 @@ class MaterialRequestPenolong extends BaseController
                 if ($item->type_barang == "bahan_baku") {
                     // Handle bahan baku items
                     $stockId = $item->stock_id;
-                    $stockData = $this->stockModel->asObject()->where('id', $stockId)->first();
+                    $stockData = $this->stockRevampModel->asObject()->where('id', $stockId)->first();
 
                     $dataMaterialDetail = [
                         'material_request_id' => $id,
@@ -693,8 +693,8 @@ class MaterialRequestPenolong extends BaseController
                         $this->materialRequestDetailsModel->update($item->id_material_request_detail, $dataMaterialDetail);
                     } else {
                         // Insert new detail
-                        $stockData = $this->stockModel->asObject()->find($item->stock_id);
-                        $stockDetailData = $this->stockDetailModel->asObject()->find($item->stock_detail_id);
+                        $stockData = $this->stockRevampModel->asObject()->find($item->stock_id);
+                        $stockDetailData = $this->stockRevampDetailModel->asObject()->find($item->stock_detail_id);
 
                         $dataMaterialDetail = [
                             'material_request_id' => $id,
