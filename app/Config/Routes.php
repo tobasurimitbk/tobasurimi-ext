@@ -2232,6 +2232,7 @@ $routes->get('/payroll/print/summary', 'HR\Payroll::exportPdfSummary', ['filter'
 $routes->get('/payroll/print/potongan', 'HR\Payroll::exportPdfPotongan', ['filter' => 'Auth']);
 $routes->post('/payroll/employees-by-bagian', 'HR\Payroll::getEmployeeByBagian', ['filter' => 'Auth']);
 $routes->get('/payroll/like-employees', 'HR\Attendance::getEmployeesLike', ['filter' => 'Auth']);
+$routes->post('/payroll/delete', 'HR\Payroll::delete', ['filter' => 'Auth']);
 
 // pinjaman karyawan
 $routes->get('/pinjaman-karyawan', 'HR\PinjamanKaryawan::index', ['filter' => 'Auth']);
