@@ -226,7 +226,7 @@
                         </div>
                         <div class="col-md-4" id="supplier_id_select">
                             <div class="form-floating mb-3" id="supplier_id_select" style="height: 50px;">
-                                <select class="form-select supplier_id" id="supplier_id" name="supplier_id[]" multiple>
+                                <select class="form-select supplier_id" id="supplier_id" name="supplier_id">
                                     <?php foreach ($supplier as $s): ?>
                                         <option value="<?= $s['id'] ?>"><?= $s['name'] ?></option>
                                     <?php endforeach; ?>
@@ -569,7 +569,7 @@
     $('#supplier_id').select2({
         placeholder: "Pilih Supplier",
         theme: "bootstrap-5",
-        multiple: true,
+        // multiple: true,
         // allowClear: true,
         width: '100%',
         dropdownParent: $('#supplier_id_select')
