@@ -9,35 +9,35 @@
                 Kembali
             </a>
             <?php if (empty($paymentData)) : ?>
-                <?php if (can('Transaksi Internasional', 'Internasional', 'c')) : ?>
+                <?php if (can('Transaksi Internasional', 'Import', 'c')) : ?>
                     <button class="btn btn-show-form btn-save float-right btn-submit-form">
                         Simpan
                     </button>
                 <?php endif; ?>
             <?php else : ?>
                 <?php if ($paymentData['status_posting'] == "0") : ?>
-                    <?php if (can('Transaksi Internasional', 'Internasional', 'd')) : ?>
+                    <?php if (can('Transaksi Internasional', 'Import', 'd')) : ?>
                         <button onclick="remove('<?= encrypt($paymentData['id']) ?>')" class="btn btn-hapus delete-parent float-right">
                             Hapus
                         </button>
                     <?php endif; ?>
-                    <?php if (can('Transaksi Internasional', 'Internasional', 'p')) : ?>
+                    <?php if (can('Transaksi Internasional', 'Import', 'p')) : ?>
                         <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('pembayaran-po-import/print/' . encrypt($paymentData['id']) ?? '') ?>">
                             Print
                         </a>
                     <?php endif; ?>
-                    <?php if (can('Transaksi Internasional', 'Internasional', 'a')) : ?>
+                    <?php if (can('Transaksi Internasional', 'Import', 'a')) : ?>
                         <button onclick="posting('<?= encrypt($paymentData['id']) ?>')" class="btn btn-success posting-spp float-right posting">
                             Posting
                         </button>
                     <?php endif; ?>
-                    <?php if (can('Transaksi Internasional', 'Internasional', 'u')) : ?>
+                    <?php if (can('Transaksi Internasional', 'Import', 'u')) : ?>
                         <button class="btn btn-show-form btn-save float-right btn-submit-form">
                             Update
                         </button>
                     <?php endif; ?>
                 <?php else : ?>
-                    <?php if (can('Transaksi Internasional', 'Internasional', 'p')) : ?>
+                    <?php if (can('Transaksi Internasional', 'Import', 'p')) : ?>
                         <a class="btn btn-warning btn-print float-right text-white" target="_blank" href="<?= base_url('pembayaran-po-import/print/' . encrypt($paymentData['id']) ?? '') ?>">
                             Print
                         </a>

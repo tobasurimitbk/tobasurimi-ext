@@ -20,6 +20,7 @@ class HROutsourcingEmployeeModel extends Model
         'company_id',
         'nama',
         'tanggal_masuk_kerja',
+        'tipe_karyawan',
         'createdAt',
         'updatedAt',
         'deletedAt'
@@ -63,8 +64,9 @@ class HROutsourcingEmployeeModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'hr_outsourcing_employee.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'asc'] ?? 'ASC';
 
-        $selectQry = "hr_outsourcing_employee.*";
+        $selectQry = "hr_outsourcing_employee.*, metadata.value as tipe_karyawan_name";
         $dataQry = $this->asObject()
+            ->join('metadata', 'metadata.id = hr_outsourcing_employee.tipe_karyawan', 'left')
             ->select($selectQry)
             ->where($condition)
             ->where('hr_outsourcing_employee.deletedAt', null)

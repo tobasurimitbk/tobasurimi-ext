@@ -376,8 +376,8 @@
             $('.invalid-feedback').text('');
 
             const url = editMode ? 
-                '/hr-outsourcing-company/update-tipe-karyawan' : 
-                '/hr-outsourcing-company/save-tipe-karyawan';
+                'hr-outsourcing-company/update-tipe-karyawan' : 
+                'hr-outsourcing-company/save-tipe-karyawan';
             const method = editMode ? 'POST' : 'POST';
 
             $.ajax({
@@ -451,13 +451,21 @@
         // Delete button click
         $(document).on('click', '.btn-hapus', function() {
             if(!confirm('Apakah Anda yakin ingin menghapus data ini?')) return;
+            const csrf = $(`[name="${csrfToken}"]`);
             
             const id = $(this).data('id');
             
             $.ajax({
-                url: `hr-outsourcing-company/tipe-karyawan/${id}`,
-                type: 'DELETE',
+                url: `hr-outsourcing-company/delete-tipe-karyawan`,
+                type: 'POST',
+                data: {
+                    id : id
+                },
                 dataType: 'json',
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    $('#btnSimpan').prop('disabled', true).html('<i class="fa fa-spinner fa-spin mr-2"></i>Menyimpan...');
+                },
                 success: function(response) {
                     if(response.status === 'success') {
                         // Remove row from table

@@ -5,7 +5,7 @@
 <section class="section">
     <div class="section-header">
         <h1>Pembayaran PO Import</h1>
-        <?php if (can('Transaksi Internasional', 'Internasional', 'c')) : ?>
+        <?php if (can('Transaksi Internasional', 'Import', 'c')) : ?>
             <a class="btn btn-show-form btn-add float-right" href="<?= base_url("pembayaran-po-import/create"); ?>">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </a>
@@ -152,7 +152,7 @@
 
                     if (status_posting == '0') {
 
-                        <?php if (can('Transaksi Internasional', 'Internasional', 'd')) : ?>
+                        <?php if (can('Transaksi Internasional', 'Import', 'd')) : ?>
                         form += `
                             <button title="Hapus"
                                 onclick="remove('${id}')"
@@ -162,7 +162,7 @@
                         `;
                         <?php endif; ?>
 
-                        <?php if (can('Transaksi Internasional', 'Internasional', 'p')) : ?>
+                        <?php if (can('Transaksi Internasional', 'Import', 'p')) : ?>
                         form += `
                             <button title="Print"
                                 class="btn btn-warning btn-print"
@@ -172,7 +172,7 @@
                         `;
                         <?php endif; ?>
 
-                        <?php if (can('Transaksi Internasional', 'Internasional', 'a')) : ?>
+                        <?php if (can('Transaksi Internasional', 'Import', 'a')) : ?>
                         form += `
                             <button title="Posting"
                                 onclick="posting('${id}')"
@@ -184,7 +184,7 @@
 
                     } else {
 
-                        <?php if (can('Transaksi Internasional', 'Internasional', 'p')) : ?>
+                        <?php if (can('Transaksi Internasional', 'Import', 'p')) : ?>
                         form += `
                             <button title="Print"
                                 class="btn btn-warning btn-print"
@@ -194,7 +194,7 @@
                         `;
                         <?php endif; ?>
 
-                        <?php if (can('Transaksi Internasional', 'Internasional', 'a')) : ?>
+                        <?php if (can('Transaksi Internasional', 'Import', 'a')) : ?>
                         form += `
                             <button title="Unposting"
                                 onclick="posting('${id}')"
