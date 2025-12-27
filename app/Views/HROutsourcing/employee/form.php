@@ -87,8 +87,15 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="date" class="form-control tanggal_masuk_kerja" id="tanggal_masuk_kerja" name="tanggal_masuk_kerja" placeholder="tanggal_masuk_kerja" required>
-                            <label for="tanggal_masuk_kerja">Tanggal Masuk Kerja</label>
+                           <select id="tipe_karyawan" name="tipe_karyawan" class="form-control tipe_karyawan" required>
+                                <option value=""></option>
+                                <?php foreach ($tipeKaryawan as $t): ?>
+                                    <option value="<?= esc($t['id']) ?>">
+                                        <?= esc($t['value']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="tipe_karyawan">Tipe Karyawan</label>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -212,6 +219,10 @@
                 className: "text-center",
             },
             {
+                data: "tipe_karyawan_name",
+                className: "text-center",
+            },
+            {
                 data: "nama",
                 className: "text-center",
             },
@@ -226,6 +237,7 @@
                             data-id="${row.id}" 
                             data-badge="${row.badge}" 
                             data-tanggal_masuk_kerja="${row.tanggal_masuk_kerja}" 
+                            data-tipe_karyawan="${row.tipe_karyawan}" 
                             data-nama="${row.nama}">
                             <i class="fa fa-pencil fa-sm"></i>
                         </button>
@@ -259,6 +271,7 @@
             $('#badge_karyawan').val($(this).data('badge'));
             $('#nama').val($(this).data('nama'));
             $('#tanggal_masuk_kerja').val($(this).data('tanggal_masuk_kerja'));
+            $('#tipe_karyawan').val($(this).data('tipe_karyawan')).trigger('change');
             $('#auto_generate').prop('checked', false);
             $(".badge_karyawan").attr("readonly", false);
         });
@@ -386,6 +399,12 @@
         });
     });
 
+    $('#tipe_karyawan').select2({
+        placeholder: "Pilih Tipe Karyawan",
+        theme: "bootstrap-5",
+        allowClear: true
+    });
+
     $('.search').keyup(function() {
         table.ajax.reload();
     });
@@ -397,6 +416,9 @@
             },
             nama: {
                 required: true
+            },
+            tipe_karyawan: {
+                required: true
             }
         },
         messages: {
@@ -405,6 +427,9 @@
             },
             nama: {
                 required: "Nama wajib diisi"
+            },
+            tipe_karyawan: {
+                required: "Tipe Karyawan wajib diisi"
             }
         },
         errorElement: 'span',
@@ -666,6 +691,7 @@
                 id: id,
                 badge_karyawan: $('#badge_karyawan').val(),
                 tanggal_masuk_kerja: $('#tanggal_masuk_kerja').val(),
+                tipe_karyawan: $('#tipe_karyawan').val(),
                 nama: $('#nama').val(),
                 company_id: $('#company_id').val()
             };
