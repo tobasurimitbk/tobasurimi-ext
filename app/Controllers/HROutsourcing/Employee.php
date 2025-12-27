@@ -8,6 +8,7 @@ use App\Models\AttendancesUnitOutsourceModel;
 use App\Models\DivisisModel;
 use App\Models\HROutsourcingCompanyModel;
 use App\Models\HROutsourcingEmployeeModel;
+use App\Models\MetadataModel;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\ErrorCorrectionLevel;
 use Exception;
@@ -20,6 +21,7 @@ class Employee extends BaseController
     protected $hrOutsourcingEmployeeModel;
     protected $hrOutsourcingAttendanceModel;
     protected $attendanceUnit;
+    protected $metaDataModel;
 
     public function __construct()
     {
@@ -29,6 +31,7 @@ class Employee extends BaseController
         $this->hrOutsourcingEmployeeModel = new HROutsourcingEmployeeModel();
         $this->hrOutsourcingAttendanceModel = new AttendancesUnitOutsourceModel();
         $this->attendanceUnit = new AttendancesUnit();
+        $this->metaDataModel = new MetadataModel();
     }
 
 
@@ -38,6 +41,7 @@ class Employee extends BaseController
     {
         $data = [
             'company' => $this->hrOutsourcingCompanyModel->where('id', decrypt($id))->first(),
+            'tipeKaryawan' => $this->metaDataModel->where('name', 'tipe_karyawan_outsource')->findAll(),
         ];
 
         return view('HROutsourcing/employee/form', $data);
@@ -75,6 +79,8 @@ class Employee extends BaseController
                 "no"            => $no++,
                 "id"            => encrypt($data->id),
                 "nama" => $data->nama,
+                "tipe_karyawan" => $data->tipe_karyawan,
+                "tipe_karyawan_name" => $data->tipe_karyawan_name ?? "",
                 "tanggal_masuk_kerja" => $data->tanggal_masuk_kerja,
                 "badge" => $data->badge,
                 "total" => 0,
@@ -138,12 +144,14 @@ class Employee extends BaseController
         $badge = $this->request->getVar('badge_karyawan');
         $nama = $this->request->getVar('nama');
         $tanggal_masuk_kerja = $this->request->getVar('tanggal_masuk_kerja');
+        $tipe_karyawan = $this->request->getVar('tipe_karyawan');
 
         $this->hrOutsourcingEmployeeModel->insert([
             'company_id' => $companyId,
             'badge' => $badge,
             'nama' => $nama,
-            'tanggal_masuk_kerja' => $tanggal_masuk_kerja
+            'tanggal_masuk_kerja' => $tanggal_masuk_kerja,
+            'tipe_karyawan' => $tipe_karyawan
         ]);
 
         return response()->setJSON([
@@ -159,12 +167,14 @@ class Employee extends BaseController
         $companyId = $this->request->getVar('company_id');
         $badge = $this->request->getVar('badge_karyawan');
         $nama = $this->request->getVar('nama');
+        $tipe_karyawan = $this->request->getVar('tipe_karyawan');
         $tanggal_masuk_kerja = $this->request->getVar('tanggal_masuk_kerja');
 
         $this->hrOutsourcingEmployeeModel->update($id, [
             'company_id' => $companyId,
             'badge' => $badge,
             'nama' => $nama,
+            'tipe_karyawan' => $tipe_karyawan,
             'tanggal_masuk_kerja' => $tanggal_masuk_kerja
         ]);
 
