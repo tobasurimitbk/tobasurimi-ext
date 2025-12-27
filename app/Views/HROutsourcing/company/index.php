@@ -376,8 +376,8 @@
             $('.invalid-feedback').text('');
 
             const url = editMode ? 
-                '/hr-outsourcing-company/update-tipe-karyawan' : 
-                '/hr-outsourcing-company/save-tipe-karyawan';
+                'hr-outsourcing-company/update-tipe-karyawan' : 
+                'hr-outsourcing-company/save-tipe-karyawan';
             const method = editMode ? 'POST' : 'POST';
 
             $.ajax({
