@@ -59,7 +59,14 @@
                                 <label for="floatingInput">Contact Person (Opsional)</label>
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control name_alias" id="name_alias" name="name_alias" placeholder="Nama Alias (Opsional)">
+                                <label for="floatingInput">Nama Alias (Opsional)</label>
+                            </div>
+                        </div>
                     </div>
+
                 </form>
             </div>
             <div class="modal-footer">
@@ -434,6 +441,7 @@
                     $(".fax").val(res.data.fax);
                     $(".phone").val(res.data.phone);
                     $(".contact_person").val(res.data.contact_person);
+                    $(".name_alias").val(res.data.name_alias);
                     $('#auto_generate').css('display', 'none');
                     $("#kode").prop("readonly", false);
                     $('.modal').on('hidden.bs.modal', function() {

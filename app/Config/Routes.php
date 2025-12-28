@@ -786,6 +786,7 @@ $routes->post('/sample-ekspor/update', 'SalesInternasional\Sample::update', ['fi
 $routes->post('/sample-ekspor/delete', 'SalesInternasional\Sample::delete', ['filter' => 'Auth']);
 $routes->get('/sample-ekspor/id/(:segment)', 'SalesInternasional\Sample::updateView/$1', ['filter' => 'Auth']);
 $routes->get('/sample-ekspor/print/(:segment)', 'SalesInternasional\Sample::print/$1', ['filter' => 'Auth']);
+$routes->get('/sample-ekspor/customer', 'SalesInternasional\SalesKontrak::dropdownCustomer', ['filter' => 'Auth']);
 
 // Customer Lokal
 $routes->get('/customer-lokal', 'SalesLokal\Customer::index', ['filter' => 'Auth']);
@@ -1512,6 +1513,14 @@ $routes->get('/mutasi/lokal', 'Inventori\MutasiLokal::index', ['filter' => 'Auth
 $routes->get('/mutasi/create-lokal', 'Inventori\MutasiLokal::create', ['filter' => 'Auth']);
 $routes->get('/mutasi/id-lokal/(:segment)', 'Inventori\MutasiLokal::detail/$1', ['filter' => 'Auth']);
 $routes->get('/mutasi/print-lokal/(:segment)', 'Inventori\MutasiLokal::print/$1', ['filter' => 'Auth']);
+
+// ALIAS BARANG
+$routes->get('/alias-barang', 'Inventori\AliasBarang::indexBarangSales', ['filter' => 'Auth']);
+$routes->get('/alias-barang/all-sales', 'Inventori\AliasBarang::allBarangSales', ['filter' => 'Auth']);
+$routes->get('/alias-barang/all-impor', 'Inventori\AliasBarang::allBarangImport', ['filter' => 'Auth']);
+$routes->post('/alias-barang/update-sales', 'Inventori\AliasBarang::updateAliasBarangSales', ['filter' => 'Auth']);
+$routes->post('/alias-barang/update-impor', 'Inventori\AliasBarang::updateAliasBarangImpor', ['filter' => 'Auth']);
+
 // PENERIMAAN BARANG LOKAL BP
 $routes->get('/penerimaan-barang-lokal-bp', 'Warehouse\PenerimaanBarangLokalBP::index', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal-bp/all', 'Warehouse\PenerimaanBarangLokalBP::all', ['filter' => 'Auth']);

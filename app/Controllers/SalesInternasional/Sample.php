@@ -5,6 +5,7 @@ namespace App\Controllers\SalesInternasional;
 use App\Controllers\BaseController;
 use App\Models\BarangMasterSalesModel;
 use App\Models\CompaniesModel;
+use App\Models\CountryModel;
 use App\Models\CustomerModel;
 use App\Models\DivisisModel;
 use App\Models\SalesOrderExportModel;
@@ -29,6 +30,7 @@ class Sample extends BaseController
     protected $sampleAdditionalModel;
     protected $customerModel;
     protected $salesOrderExportModel;
+    protected $countryModel;
     protected $dompdf;
 
     public function __construct()
@@ -45,6 +47,7 @@ class Sample extends BaseController
         $this->sampleAdditionalModel = new SampleAdditionalModel();
         $this->salesOrderExportModel = new SalesOrderExportModel();
         $this->customerModel = new CustomerModel();
+        $this->countryModel = new CountryModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -133,12 +136,14 @@ class Sample extends BaseController
             $this->this_user_id,
             $this->is_admin
         );
+        $dataCountry = $this->countryModel->findAll();
 
         $data = [
             'dataSatuan' => $dataSatuan,
             "dataDivisi" => $dataDivisi,
             'dataBarang' => $dataBarang,
-            "dataCustomer" => $dataCustomer
+            "dataCustomer" => $dataCustomer,
+            "dataCountry" => $dataCountry
         ];
 
         return view('SalesInternasional/Sample/form', $data);
@@ -182,7 +187,7 @@ class Sample extends BaseController
             "pickupDate" => $pickupDate,
             "via" => $via,
             "an" => $an,
-            "dataCustomer" => $dataCustomer
+            "dataCustomer" => $dataCustomer,
         ];
 
         return view('SalesInternasional/Sample/form', $data);

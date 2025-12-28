@@ -32,7 +32,8 @@ class SupplierModel extends Model
         'country_code',
         'account_receivable',
         'account_payable',
-        'user_id'
+        'user_id',
+        'name_alias'
         // 'no_rekening',
         // 'supplier_buyer',
         //'kategori',

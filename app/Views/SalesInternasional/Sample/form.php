@@ -80,21 +80,34 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select
-                                class="form-select customer_id"
-                                aria-label="Floating label select example"
-                                name="customer_id"
-                                id="customer_id">
-                                <option value=""></option>
-                                <?php foreach ($dataCustomer as $d) : ?>
-                                    <option value="<?= $d['id'] ?>"
-                                        <?= !empty($dataSample['customer_id']) && $dataSample['customer_id'] == $d['id'] ? 'selected' : '' ?>>
-                                        <?= "(" . $d['kode'] . ") " . $d['name'] ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">Delivery To</label>
+                        <div class="input-group">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select
+                                    class="form-select customer_id"
+                                    aria-label="Floating label select example"
+                                    name="customer_id"
+                                    id="customer_id">
+                                    <option value=""></option>
+                                    <?php foreach ($dataCustomer as $d) : ?>
+                                        <option value="<?= $d['id'] ?>"
+                                            <?= !empty($dataSample['customer_id']) && $dataSample['customer_id'] == $d['id'] ? 'selected' : '' ?>>
+                                            <?= "(" . $d['kode'] . ") " . $d['name'] ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Delivery To</label>
+                            </div>
+                            <?php if (can('Penjualan Ekspor', 'Customer', 'c')) : ?>
+                                <div class="input-group-append" style="height:50px;">
+                                    <?php if (!empty($dataSample)) : ?>
+
+                                    <?php else : ?>
+                                        <button class="btn btn-success btn-customer-add" id="btn-customer-add" data-toggle="modal" type="button">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                     <!-- <div class="col-sm-4">
@@ -404,6 +417,60 @@
     </div>
 </div>
 
+<div class="modal addCustomerModal" id="addCustomerModal" tabindex="-1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Data</h5>
+            </div>
+            <div class="modal-body">
+                <form class="create-form-customer" id="create-form-customer" role="form" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="tipe_customer" class="tipe_customer" id="tipe_customer" value="INTERNASIONAL">
+                    <?= csrf_field() ?>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control name" id="name" name="name" placeholder="Nama">
+                                <label for="floatingInput">Pic Name</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select country_id" name="country_id" id="country_id">
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($dataCountry)) {
+                                        foreach ($dataCountry as $dc) {
+                                    ?>
+                                            <option value="<?= $dc["id"]; ?>">(<?= $dc["code"]; ?>) <?= $dc['country_name'] ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <label for="floatingInput">Country</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <textarea autocomplete="one-time-code" class="form-control address" id="address" name="address"></textarea>
+                                <label for="floatingInput">Address (Optional)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-form btn-discard mr-2 btn-discard-customer" id="btn-discard-customer">Back</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-customer">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     var listBarang = [];
@@ -442,6 +509,12 @@
             theme: "bootstrap-5",
         }).change(function() {});
 
+        $('.country_id').select2({
+            placeholder: "Select Country",
+            theme: "bootstrap-5",
+            dropdownParent: $('#addCustomerModal')
+        }).change(function() {});
+
         $('.barang_master_sales_id').select2({
             placeholder: "Select Items",
             theme: "bootstrap-5",
@@ -467,14 +540,14 @@
         }).change(function() {});
 
         //CSS SELECT2 FLOATING LABEL
-        $('.sales_contract_id, .customer_id,.barang_master_sales_id,.satuan_id,.satuan_additional,.divisi_barang_id')
+        $('.sales_contract_id, .customer_id,.barang_master_sales_id,.satuan_id,.satuan_additional,.divisi_barang_id,.country_id')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.sales_contract_id, .customer_id,.barang_master_sales_id,.satuan_id,.satuan_additional,.divisi_barang_id')
+        $('.sales_contract_id, .customer_id,.barang_master_sales_id,.satuan_id,.satuan_additional,.divisi_barang_id,.country_id')
             .parent('div')
             .children('span')
             .children('span')
@@ -482,7 +555,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.sales_contract_id, .customer_id,.barang_master_sales_id,.satuan_id,.satuan_additional,.divisi_barang_id')
+        $('.sales_contract_id, .customer_id,.barang_master_sales_id,.satuan_id,.satuan_additional,.divisi_barang_id,.country_id')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -640,6 +713,46 @@
                 $(element).removeClass('select-class');
             },
         });
+
+        var validatorCustomer = $("#create-form-customer").validate({
+            rules: {
+                name: {
+                    required: true
+                },
+                country_id: {
+                    required: true
+                },
+            },
+            messages: {
+                name: {
+                    required: "name required"
+                },
+                country_id: {
+                    required: "country required"
+                },
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');
+
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
+
 
         var validatorAdditionalItem = $(".create-form-additional-item").validate({
             rules: {
@@ -909,7 +1022,105 @@
             drawTableAdditionalItem(listAdditional);
 
         }
-    })
+    });
+
+    $('#btn-customer-add').click(function(e) {
+        e.preventDefault();
+        resetFormCustomer();
+        $('#addCustomerModal').modal('show');
+    });
+
+    $('#btn-discard-customer').click(function(e) {
+        e.preventDefault();
+        $('#addCustomerModal').modal('hide');
+    });
+
+    $('.btn-submit-customer').click(function() {
+        if ($('.create-form-customer').valid()) {
+            const csrf = $(`[name="${csrfToken}"]`);
+            const data = new FormData(document.querySelector(".create-form-customer"));
+            Swal.fire({
+                icon: 'question',
+                title: 'Create PIC?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Create',
+                cancelButtonText: 'Back',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "<?= base_url("customer-ekspor/save"); ?>",
+                        data: data,
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            csrf.val(response.token);
+                            $("#addCustomerModal").modal("hide");
+                            if (response.status) {
+                                Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        $('#addCustomerModal').modal('hide');
+
+                                    })
+                                getListCustomer();
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                            }
+                        },
+                    });
+                }
+            })
+
+        }
+    });
+
+    function getListCustomer() {
+        $.ajax({
+            url: `<?= base_url('sample-ekspor/customer'); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {},
+            dataType: "json",
+            success: function(res) {
+                $(".customer_id").empty()
+                $(".customer_id").append(`<option value=""></option>`)
+                res.data.forEach(function(item) {
+                    $(".customer_id").append(`<option value="${item.id}">(${item.kode}) ${item.name}</option>`)
+                })
+                $(".customer_id").val();
+            }
+        });
+    }
+
+    function resetFormCustomer() {
+        $('#name').val(null);
+        $('#country_id').val(null).change();
+        $('#address').val(null);
+    }
 
     function resetFormBarang() {
         $('#id_barang').val(null);

@@ -852,7 +852,8 @@ class Supplier extends BaseController
                 "fax" => $this->request->getPost("fax"),
                 "phone" => $this->request->getPost("phone"),
                 "contact_person" => $this->request->getPost("contact_person"),
-                "type"              => "INTERNASIONAL"
+                "type"              => "INTERNASIONAL",
+                "name_alias" => $this->request->getPost('name_alias')
             ];
             // Validasi Kode Supplier
             $supplier = $this->supplierModel->where('company_id', $this->this_company_id)
@@ -944,6 +945,7 @@ class Supplier extends BaseController
                     "phone" => $this->request->getPost("phone"),
                     "contact_person" => $this->request->getPost("contact_person"),
                     "kode" => $this->request->getPost("kode"),
+                    "name_alias" => $this->request->getPost('name_alias')
                 ];
 
                 // Validasi Kode Supplier

@@ -545,7 +545,7 @@
     function unPostingAction(id) {
         Swal.fire({
             icon: 'question',
-            title: 'Un Posting Dokumen BC 2.5 ?',
+            title: 'Un Posting Dokumen BC 3.0 ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,

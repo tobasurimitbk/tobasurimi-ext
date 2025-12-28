@@ -21,6 +21,7 @@ class BarangMasterModel extends Model
         'parent_type_id',
         'divisi_id',
         'barang_name',
+        'barang_name_alias',
         'kode_barang',
         'type_barang',
         'minimum_stock',
@@ -467,5 +468,107 @@ class BarangMasterModel extends Model
 
         $dataBarang = $dataQry->findAll(100);
         return $dataBarang;
+    }
+
+    public function getListBarangAlias(
+        array $condition,
+        array $addCondition,
+        int $limit = 10,
+        int $offset = 0
+    ) {
+        // SORTABLE COLUMN (harus REAL column / alias valid)
+        $availableSort = [
+            'barang_impor' => 'barang_impor',
+            'barang_alias' => 'barang_alias',
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'barang_impor']
+            ?? 'barang_impor';
+
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'asc']
+            ?? 'ASC';
+
+        /* ===============================
+     * TOTAL DATA (TANPA SEARCH)
+     * =============================== */
+        $totalDataQry = $this->builder();
+        $totalDataQry
+            ->select('barang_master_spesifikasi.id')
+            ->join(
+                'barang_master_spesifikasi',
+                'barang_master_spesifikasi.barang_master_id = barang_master.id',
+                'left'
+            )
+            ->where($condition)
+            ->like('barang_master.kode_barang', 'BI-', 'after');
+
+        $totalData = $totalDataQry->countAllResults();
+
+        /* ===============================
+     * DATA QUERY
+     * =============================== */
+        $barangDataQry = $this->asArray()
+            ->select([
+                'barang_master.type_barang',
+                'barang_master_spesifikasi.id AS id',
+                "CONCAT(barang_master.barang_name,' - ',barang_master_spesifikasi.spesifikasi) AS barang_impor",
+                "CONCAT(barang_master.barang_name_alias,' - ',barang_master_spesifikasi.spesifikasi_alias) AS barang_alias",
+                'barang_master.barang_name_alias',
+                'barang_master_spesifikasi.spesifikasi_alias'
+            ])
+            ->join(
+                'barang_master_spesifikasi',
+                'barang_master_spesifikasi.barang_master_id = barang_master.id',
+                'left'
+            )
+            ->where($condition)
+            ->like('barang_master.kode_barang', 'BI-', 'after');
+
+        /* ===============================
+     * SEARCH
+     * =============================== */
+        if (!empty($addCondition['search'])) {
+            $search = trim($addCondition['search']);
+
+            $barangDataQry
+                ->groupStart()
+                ->like(
+                    "CONCAT(barang_master.barang_name,' ',barang_master_spesifikasi.spesifikasi)",
+                    $search,
+                    'both',
+                    null,
+                    true // 🔥 RAW
+                )
+                ->orLike(
+                    "CONCAT(barang_master.barang_name_alias,' ',barang_master_spesifikasi.spesifikasi_alias)",
+                    $search,
+                    'both',
+                    null,
+                    true // 🔥 RAW
+                )
+                ->groupEnd();
+        }
+
+        /* ===============================
+     * TOTAL FILTERED
+     * =============================== */
+        $totalFilteredData = $barangDataQry->countAllResults(false);
+
+        /* ===============================
+     * FINAL DATA
+     * =============================== */
+        $data = $barangDataQry
+            ->orderBy($sort, $sortType)
+            ->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'              => $sort,
+            'sortType'          => $sortType,
+        ];
     }
 }

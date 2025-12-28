@@ -104,7 +104,7 @@
                                 <select class="form-select multiple_reference_id" id="multiple_reference_id" multiple name="multiple_reference_id[]">
                                     <option value=""></option>
                                     <?php foreach ($dataReferencePengeluaran as $d): ?>
-                                        <option <?= in_array($d['sales_order_export_id'], $multipleReferenceIds) ? 'selected' : '' ?> value="<?= $d['sales_order_export_id'] ?>"><?= $d['sales_order_export_no'] . " (" . $d['no_invoice'] . ")" ?></option>
+                                        <option <?= in_array($d['id'], $multipleReferenceIds) ? 'selected' : '' ?> value="<?= $d['id'] ?>"><?= $d['no_reference'] . " (" . $d['no_invoice'] . ")" ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
@@ -1594,10 +1594,10 @@
                 totalNilaiBarang += parseFloat(v.total_harga_barang);
             });
             table.find('tfoot').empty();
-            var newRow = $('<tr>');
-            newRow.append($('<td colspan="5" style="text-align:right;"><b>TOTAL</b></td>'));
-            newRow.append($('<td><b>' + greatFormatRupiah(totalNilaiBarang) + '</b></td>'));
-            table.find('tfoot').append(newRow);
+            // var newRow = $('<tr>');
+            // newRow.append($('<td colspan="5" style="text-align:right;"><b>TOTAL</b></td>'));
+            // newRow.append($('<td><b>' + greatFormatRupiah(totalNilaiBarang) + '</b></td>'));
+            // table.find('tfoot').append(newRow);
         }
 
     }
@@ -1679,10 +1679,12 @@
     }
 
     function dropdownBarangSalesEkspor() {
+        let id = $('#id').val();
         let multiple_reference_id = $('#multiple_reference_id').val();
         $.ajax({
             url: "<?= base_url("bea-cukai-bc-30/list-barang-sales-ekspor"); ?>",
             data: {
+                id: id,
                 multiple_reference_id: JSON.stringify(multiple_reference_id),
             },
             method: "GET",

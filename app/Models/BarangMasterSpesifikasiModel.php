@@ -18,6 +18,7 @@ class BarangMasterSpesifikasiModel extends Model
         'id',
         'barang_master_id',
         'spesifikasi',
+        'spesifikasi_alias',
         'is_primer',
         'satuan_1',
         'satuan_2',

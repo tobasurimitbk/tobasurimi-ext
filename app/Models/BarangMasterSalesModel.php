@@ -17,7 +17,7 @@ class BarangMasterSalesModel extends Model
     protected $allowedFields    = [];
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'createdAt';
     protected $updatedField  = 'updatedAt';
@@ -83,6 +83,57 @@ class BarangMasterSalesModel extends Model
         }
 
         if ($addCondition['search'] || $addCondition['type_barang']) {
+            $barangDataQry->groupEnd();
+        }
+
+        $totalFilteredData = $barangDataQry->countAllResults(false);
+
+        if ($limit && $offset) {
+            $data = $barangDataQry->findAll($limit, $offset);
+        } else {
+            $data = $barangDataQry->findAll();
+        }
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'              => $sort,
+            'sortType'          => $sortType
+        ];
+    }
+
+    public function getListAlias($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'type_barang_sales'       => 'type_barang_sales',
+            'barang_sales_name'       => 'barang_sales_name',
+            'barang_inventori_name'   => 'barang_inventori_name',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'barang_sales_name'] ?? 'barang_sales_name';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "
+            barang_master_sales.id,
+            barang_master_sales.type_barang_sales,
+            barang_master_sales.barang_name AS barang_sales_name,
+            barang_master.barang_name AS barang_inventori_name";
+
+        $barangDataQry = $this->asArray()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('barang_master', 'barang_master.id = barang_master_sales.barang_master_id', 'left')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $barangDataQry->countAllResults(false);
+
+        if ($addCondition['search']) {
+            $barangDataQry->groupStart();
+            $barangDataQry->like('barang_master_sales.barang_name', $addCondition['search'])
+                ->orLike('barang_master.barang_name', $addCondition['search'])
+                ->orLike('barang_master_sales.type_barang_sales', $addCondition['search']);
             $barangDataQry->groupEnd();
         }
 
