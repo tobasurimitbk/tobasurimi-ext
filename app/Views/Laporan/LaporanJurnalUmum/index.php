@@ -5,20 +5,16 @@
 <section class="section">
     <div class="section-header">
         <h1>Jurnal Umum</h1>
-        <?php if (can('Laporan', 'Accounting', 'p')) : ?>
-            <button style="right: 10px;" class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
-                Export
-            </button>
-            <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-                <a class="dropdown-item" onclick="printPDF('<?= base_url("/laporan-accounting/jurnalumum/printPDF"); ?>')">PDF</a>
-                <a class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-accounting/jurnalumum/printExcel"); ?>')">Excel</a>
-            </ul>
-        <?php endif; ?>
+        <button style="right: 10px;" class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+            Export
+        </button>
+        <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+            <a class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-accounting/jurnalumum/printExcel"); ?>')">Excel</a>
+        </ul>
     </div>
     <div class="card">
         <div class="card-body">
-            <form action="<?= base_url("laporan-accounting/jurnalumum"); ?>" method="post" id="formSubmit" enctype="multipart/form-data">
-                <div class="row justify-content-end row-col-spp">
+            <div class="row justify-content-end row-col-spp">
                     <div class="col-md-12">
                         <?= csrf_field(); ?>
                         <div class="row">
@@ -40,7 +36,7 @@
                             </div>
                             <div class="col-md-3">
                                 <div class="form-floating mb-3">
-                                    <select class="form-select type_transaksi" name="type_transaksi" id="type_transaksi" onchange="changeFilter()">
+                                    <select class="form-select type_transaksi" name="type_transaksi" id="type_transaksi">
                                         <option value="" data-code=""></option>
                                         <?php
                                         if (!empty($dataMetadataTipeTransaksi)) {
@@ -55,25 +51,6 @@
                                     <label for="floatingInput">Tipe Transaksi</label>
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <div class="form-floating mb-3">
-                                    <select class="form-select no_bukti" name="no_bukti" id="no_bukti" onchange="changeFilter()">
-                                        <option value="" data-code=""></option>
-                                        <?php
-                                        if (!empty($dataTransaksiJurnal)) {
-                                            foreach ($dataTransaksiJurnal as $transaksiJurnal) {
-                                        ?>
-                                                <option value="<?= $transaksiJurnal->tipe_transaksi_hex; ?>"><?= $transaksiJurnal->no_bukti; ?></option>
-                                        <?php
-                                            }
-                                        }
-                                        ?>
-                                    </select>
-                                    <label for="floatingInput">No Bukti</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-3">
                                 <div class="form-floating mb-3">
                                     <select class="form-select subs_akun" name="subs_akun" id="subs_akun">
@@ -94,80 +71,28 @@
                         </div>
                     </div>
                 </div>
-            </form>
 
             <div class="row">
                 <div class="table-responsive">
-                    <table class="table table-hover" id="myTable" width="100%" cellspacing="0">
+                    <table class="table table-hover" id="myTable" width="100%">
                         <thead>
                             <tr>
-                                <th data-sortable="false" width="10%">Tanggal</th>
-                                <th data-sortable="false">Department</th>
-                                <th data-sortable="false" colspan="2">Desc</th>
-                                <th data-sortable="false">Reference</th>
-                                <th data-sortable="false">Supplier</th>
-                                <th data-sortable="false">Currency</th>
-                                <th data-sortable="false">Exchange Rate</th>
-                                <th data-sortable="false">Debit</th>
-                                <th data-sortable="false">Kredit</th>
+                                <th>Tanggal</th>
+                                <th>Department</th>
+                                <th>Desc</th>
+                                <th>Reference</th>
+                                <th>Supplier</th>
+                                <th>Currency</th>
+                                <th>Exchange Rate</th>
+                                <th>Debit</th>
+                                <th>Kredit</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <?php
-                            function format_ribuan($nilai)
-                            {
-                                $nilaiFloat = floatval($nilai);
-                                return "Rp " . number_format($nilaiFloat, 2, ',', '.');
-                            }
-                            $flag = 0;
-                            foreach ($dataMetadataTipeTransaksi as $Tipe) :
-                                foreach ($dataTransaksiJurnal as $transaksiJurnalData) :
-                                    foreach ($dataJurnalUmumWithGroup as $jurnalUmumWithGroupData) :
-                                        if ($jurnalUmumWithGroupData->id_transaksi == $transaksiJurnalData->id && $transaksiJurnalData->type_transaksi === $Tipe->id) :
-                            ?>
-                                            <!-- <tr onclick="updateJurnal('<?= ($jurnalUmumWithGroupData->id_transaksi == $transaksiJurnalData->id) ? $transaksiJurnalData->id_transaksi_hex : 0; ?>')" data-header-id="<?= ($transaksiJurnalData->type_transaksi === $Tipe->id) ? $Tipe->hexid : 0; ?>" data-transaksi-id="<?= ($jurnalUmumWithGroupData->id_transaksi == $transaksiJurnalData->id) ? $transaksiJurnalData->tipe_transaksi_hex : 0; ?>"> -->
-                                            <tr data-header-id="<?= ($transaksiJurnalData->type_transaksi === $Tipe->id) ? $Tipe->hexid : 0; ?>" data-transaksi-id="<?= ($jurnalUmumWithGroupData->id_transaksi == $transaksiJurnalData->id) ? $transaksiJurnalData->tipe_transaksi_hex : 0; ?>">
-                                                <td colspan="2"><?= date('d-m-Y', strtotime($jurnalUmumWithGroupData->tanggal_jurnal)); ?></td>
-                                                <!-- <td></td> -->
-                                                <td colspan="8"> <?= $jurnalUmumWithGroupData->no_bukti . ' - ' . $jurnalUmumWithGroupData->keterangan; ?></td>
-                                            </tr>
-                                        <?php
-                                        endif;
-                                    endforeach;
-                                    // kategori
-                                    $total_debit  = 0;
-                                    $total_kredit = 0;
-                                    foreach ($dataJurnalUmum as $jurnalUmumData) :
-                                        $flag = 1;
-                                        $total_debit  += $jurnalUmumData->debit;
-                                        $total_kredit += $jurnalUmumData->kredit;
-                                        if ($jurnalUmumData->id_transaksi == $transaksiJurnalData->id && $transaksiJurnalData->type_transaksi === $Tipe->id) :
-                                        ?>
-                                            <!-- <tr onclick="updateJurnal('<?= ($jurnalUmumData->id_transaksi == $transaksiJurnalData->id) ? $transaksiJurnalData->id_transaksi_hex : 0; ?>')" data-header-id="<?= ($transaksiJurnalData->type_transaksi === $Tipe->id) ? $Tipe->hexid : 0; ?>" data-transaksi-id="<?= ($jurnalUmumData->id_transaksi == $transaksiJurnalData->id) ? $transaksiJurnalData->tipe_transaksi_hex : 0; ?>"> -->
-                                            <tr data-header-id="<?= ($transaksiJurnalData->type_transaksi === $Tipe->id) ? $Tipe->hexid : 0; ?>" data-transaksi-id="<?= ($jurnalUmumData->id_transaksi == $transaksiJurnalData->id) ? $transaksiJurnalData->tipe_transaksi_hex : 0; ?>">
-                                                <td></td>
-                                                <td><?= $jurnalUmumData->nama_divisi; ?></td>
-                                                <td colspan="2"><?= $jurnalUmumData->no_sub . " - " . $jurnalUmumData->nama_sub; ?></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td><?= format_ribuan($jurnalUmumData->debit + $jurnalUmumData->kredit) . $jurnalUmumData->valas; ?></td>
-                                                <td><?= $jurnalUmumWithGroupData->exchange_rate; ?></td>
-                                                <td class="yy"><?= format_ribuan($jurnalUmumData->debit); ?></td>
-                                                <td class="xx"><?= format_ribuan($jurnalUmumData->kredit); ?></td>
-                                            </tr>
-                            <?php
-                                        endif;
-                                    endforeach;
-                                endforeach;
-                            endforeach;
-                            // akhir sub akun
-                            ?>
-                        </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="8"><strong>Total Transaksi</strong></td>
-                                <td id="jumlahDebet"><strong><?= ($flag != 0) ? format_ribuan($total_debit) :  format_ribuan(0); ?></strong></td>
-                                <td id="jumlahKredit"><strong><?= ($flag != 0) ? format_ribuan($total_kredit) : format_ribuan(0); ?></strong></td>
+                                <td colspan="7"><strong>Total Transaksi</strong></td>
+                                <td id="jumlahDebet"><strong>Rp 0,00</strong></td>
+                                <td id="jumlahKredit"><strong>Rp 0,00</strong></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -179,26 +104,17 @@
 
 <script>
     $(document).ready(function() {
-        // Mendapatkan tanggal saat ini
         var currentDate = new Date();
         $(".dateStart[readonly]").datepicker("destroy");
         $(".dateEnd[readonly]").datepicker("destroy");
 
-        // Inisialisasi datepicker untuk dateStart dengan nilai default tanggal 1 di bulan berjalan
         $(".dateStart").datepicker({
             todayHighlight: true,
             format: "dd/mm/yyyy",
             orientation: "bottom auto",
-            autoclose: true,
-            // Atur nilai awal menjadi tanggal 1 di bulan berjalan
-            // defaultViewDate: {
-            //     year: currentDate.getFullYear(),
-            //     month: currentDate.getMonth(),
-            //     day: 1
-            // }
+            autoclose: true
         });
 
-        // Inisialisasi datepicker untuk dateEnd
         $(".dateEnd").datepicker({
             todayHighlight: true,
             format: "dd/mm/yyyy",
@@ -206,31 +122,26 @@
             autoclose: true
         });
 
-        // Tambahkan event listener untuk mengatur dateStart saat dateEnd berubah
         $(".dateEnd").on("changeDate", function(e) {
-            // Ambil tanggal yang dipilih pada dateEnd
             var selectedDate = e.date;
 
-            // Atur dateStart menjadi tanggal 1 di bulan yang sama
             $(".dateStart").datepicker("setDate", new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1));
         });
 
-        // Set nilai awal dateStart pada saat dokumen siap (document ready)
-        // $(".dateStart").datepicker("setDate", new Date(currentDate.getFullYear(), currentDate.getMonth(), 1));
-
-        $('.type_transaksi, .no_bukti, .subs_akun').select2({
+        $('.type_transaksi, .subs_akun').select2({
             placeholder: "",
             theme: "bootstrap-5",
             allowClear: true
         });
-        $('.type_transaksi, .no_bukti, .subs_akun')
+
+        $('.type_transaksi, .subs_akun')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.type_transaksi, .no_bukti, .subs_akun')
+        $('.type_transaksi, .subs_akun')
             .parent('div')
             .children('span')
             .children('span')
@@ -238,162 +149,89 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.type_transaksi, .no_bukti, .subs_akun')
+        $('.type_transaksi, .subs_akun')
             .parent('div')
             .find('label')
             .css('z-index', '1');
 
-        $(".clickable").click(function(e) {
-            e.preventDefault();
-            var targetClass = $(this).data('target');
-            if ($(targetClass).hasClass('out')) {
-                $(targetClass).addClass('in')
-                $(targetClass).removeClass('out')
-            } else {
-                $(targetClass).addClass('out')
-                $(targetClass).removeClass('in')
+        var table = $('#myTable').DataTable({
+            ajax: {
+                url: "<?= base_url('laporan-accounting/jurnalumum/getData') ?>",
+                type: "GET",
+                data: function(d){
+                    d.dateStart = $('#dateStart').val();
+                    d.dateEnd = $('#dateEnd').val();
+                    d.type_transaksi = $('#type_transaksi').val();
+                    d.subs_akun = $('#subs_akun').val();
+                },
+                dataSrc: "data"
+            },
+            paging: false,
+            searching: false,
+            info: false,
+            order: [],
+
+            columns: [
+                { data: "tanggal_jurnal" },
+                { data: "nama_divisi" },
+                { data: "desc" },
+                { data: "reference" },
+                { data:"supplier" },
+                { data:"currency" },
+                { data:"exchange_rate" },
+                { data:"debit",  render: $.fn.dataTable.render.number('.', ',', 2, 'Rp ') },
+                { data:"kredit", render: $.fn.dataTable.render.number('.', ',', 2, 'Rp ') }
+            ],
+
+            createdRow: function(row, data){
+                if(data.is_header){
+
+                    $(row).addClass('header-row').css({
+                        "background":"#fff8e6",
+                        "font-weight":"700"
+                    });
+
+                    $('td:eq(0)', row).html(`
+                        <div><b>${data.tanggal_jurnal ?? ''}</b></div>
+                    `);
+
+                    $('td:eq(2)', row).html(`
+                        <div><b>${data.desc ?? ''}</b></div>
+                    `);
+
+                    [1,3,4,5,6,7,8].forEach(i => $('td:eq('+i+')', row).html(''));
+                }
+            },
+
+            drawCallback: function(){
+                let api = this.api();
+
+                let totalDebit  = api.column(7).data().reduce((a,b)=>a+(parseFloat(b)||0),0);
+                let totalKredit = api.column(8).data().reduce((a,b)=>a+(parseFloat(b)||0),0);
+
+                $('#jumlahDebet').html('Rp ' + totalDebit.toLocaleString('id-ID',{minimumFractionDigits:2}));
+                $('#jumlahKredit').html('Rp ' + totalKredit.toLocaleString('id-ID',{minimumFractionDigits:2}));
             }
-            $(this).find('i').toggleClass('fa-chevron-down fa-chevron-up');
         });
 
-        $("#dateEnd").change(function(e) {
-            $('#formSubmit').submit();
-        });
-
-
-        $("#formSubmit").on("submit", function() {
-            $("#dateStart").prop("disabled", false);
+        $('#dateStart, #dateEnd, #type_transaksi, #subs_akun').change(function(){
+            table.ajax.reload();
         });
     });
 
-    const changeFilter = function() {
-        var selectedValueTypeTransaksi = $("#type_transaksi").val();
-        var selectedValueNoBukti = $("#no_bukti").val();
-
-        console.log(selectedValueTypeTransaksi);
-        console.log(selectedValueNoBukti);
-        var inputsDebit = 0;
-        var inputsKredit = 0;
-
-        // Check if the selected value is empty
-        if (selectedValueTypeTransaksi || selectedValueNoBukti) {
-            // Reset totalInputs menjadi 0 setiap kali dropdown berubah
-            totalInputsDebit = 0;
-            totalInputsKredit = 0;
-
-            $("tbody tr").each(function() {
-                var headerIdValue = $(this).data('header-id');
-                var transaksiIdValue = $(this).data('transaksi-id');
-                if (headerIdValue === selectedValueTypeTransaksi && !selectedValueNoBukti) {
-                    inputsDebit = $(this).find('.yy');
-                    inputsDebit.each(function() {
-                        var inputValue = parseFloat(inputsDebit.text().replace('Rp ', '').replaceAll('.', '').replace(',', '.'));
-                        totalInputsDebit += inputValue;
-                    });
-                    inputsKredit = $(this).find('.xx');
-                    inputsKredit.each(function() {
-                        var inputValue = parseFloat(inputsKredit.text().replace('Rp ', '').replaceAll('.', '').replace(',', '.'));
-                        totalInputsKredit += inputValue;
-                    });
-                    $(this).show();
-                } else if (transaksiIdValue === selectedValueNoBukti && !selectedValueTypeTransaksi) {
-                    inputsDebit = $(this).find('.yy');
-                    inputsDebit.each(function() {
-                        var inputValue = parseFloat(inputsDebit.text().replace('Rp ', '').replaceAll('.', '').replace(',', '.'));
-                        totalInputsDebit += inputValue;
-                    });
-                    inputsKredit = $(this).find('.xx');
-                    inputsKredit.each(function() {
-                        var inputValue = parseFloat(inputsKredit.text().replace('Rp ', '').replaceAll('.', '').replace(',', '.'));
-                        totalInputsKredit += inputValue;
-                    });
-                    $(this).show();
-                } else if (headerIdValue === selectedValueTypeTransaksi && transaksiIdValue === selectedValueNoBukti) {
-                    inputsDebit = $(this).find('.yy');
-                    inputsDebit.each(function() {
-                        var inputValue = parseFloat(inputsDebit.text().replace('Rp ', '').replaceAll('.', '').replace(',', '.'));
-                        totalInputsDebit += inputValue;
-                    });
-                    inputsKredit = $(this).find('.xx');
-                    inputsKredit.each(function() {
-                        var inputValue = parseFloat(inputsKredit.text().replace('Rp ', '').replaceAll('.', '').replace(',', '.'));
-                        totalInputsKredit += inputValue;
-                    });
-                    $(this).show();
-                } else {
-                    $(this).hide();
-                }
-            });
-            $("#jumlahDebet").text(formatRupiah(totalInputsDebit.toFixed(2).toString()));
-            $("#jumlahKredit").text(formatRupiah(totalInputsKredit.toFixed(2).toString()));
-        } else {
-            // Reset totalInputs menjadi 0 setiap kali dropdown berubah
-            totalInputsDebit = 0;
-            totalInputsKredit = 0;
-            // Reset data-header-id and show all rows
-            $("tbody tr").each(function() {
-                if ($(this).attr('data-header-id')) {
-                    $(this).show();
-                }
-                inputsDebit = $(this).find('.yy');
-                inputsDebit.each(function() {
-                    var inputValue = parseFloat(inputsDebit.text().replace('Rp ', '').replaceAll('.', '').replace(',', '.'));
-                    totalInputsDebit += inputValue;
-                });
-                inputsKredit = $(this).find('.xx');
-                inputsKredit.each(function() {
-                    var inputValue = parseFloat(inputsKredit.text().replace('Rp ', '').replaceAll('.', '').replace(',', '.'));
-                    totalInputsKredit += inputValue;
-                });
-            });
-            $("#jumlahDebet").text(formatRupiah(totalInputsDebit.toFixed(2).toString()));
-            $("#jumlahKredit").text(formatRupiah(totalInputsKredit.toFixed(2).toString()));
-        }
-
-        function formatRupiah(angka) {
-            angka = angka.replace(/\./g, ',');
-            angka = angka.replace(/[^\d,]/g, '');
-            var parts = angka.split(',');
-            var ribuan = parts[0];
-            var desimal = parts[1] || '00';
-            var reverse = ribuan.toString().split('').reverse().join('');
-            var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
-            return 'Rp. ' + ribuanFormatted + ',' + desimal;
-        }
-    }
-
-    const updateJurnal = function(transaksiId) {
-        console.log(transaksiId);
-        window.location.href = '<?= base_url("jurnal/update") ?>/' + transaksiId;
-    }
-
-
     const convertDateFormat = function(dateString) {
-        // Memisahkan tanggal, bulan, dan tahun dari string
         var dateParts = dateString.split("/");
-
-        // Membalikkan urutan elemen array untuk membuat format "YYYY-MM-DD"
         var formattedDate = dateParts[2] + "-" + dateParts[1] + "-" + dateParts[0];
-
         return formattedDate;
     }
-    const printPDF = function(url) {
-        var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "all";
-        var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
-        var filter = $(".type_transaksi").val() ? $(".type_transaksi").val() : "all";
-        url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter;
-        // console.log(url2);
-        window.open(url2, "_blank");
-    }
+
     const printExcel = function(url) {
         var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "all";
         var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
         var filter = $(".type_transaksi").val() ? $(".type_transaksi").val() : "all";
         url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter;
-        // console.log(url2);
+
         window.open(url2, "_blank");
     }
 </script>
-
-
 <?= $this->endSection(); ?>

@@ -32,17 +32,13 @@ class JurnalUmum extends BaseController
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->this_role_id = session()->get("login")->this_role_id;
         $this->Sub_AkunsModel = new Sub_AkunsModel();
-        $this->KategoriAkunsModel = new KategoriAkunsModel();
-        $this->HeaderAkunsModel = new HeaderAkunsModel();
         $this->MetadataModel = new MetadataModel();
         $this->jurnalUmumModel = new JurnalUmumModel();
-        $this->transaksiJurnalModel = new TransaksiJurnalModel();
         $this->encrypter = \Config\Services::encrypter();
     }
+
     public function index()
     {
-        // var_dump(session()->get("login"));
-        // exit;
         $dateStart = $this->request->getPost('dateStart');
         $dateEnd = $this->request->getPost('dateEnd');
 
@@ -83,17 +79,6 @@ class JurnalUmum extends BaseController
             $condition3 = '1404';
         }
 
-        $dataMetadata = $this->MetadataModel
-            ->asObject()
-            ->where('name', 'Kelompok Akun')
-            ->groupStart()
-            ->like('value', 'Aktiva / Harta')
-            ->orLike('value', 'Kewajiban / Hutang')
-            ->orLike('value', 'Modal')
-            ->groupEnd()
-            ->findAll();
-        $dataKategoriAkun = $this->KategoriAkunsModel->getAPAR($this->this_company_id);
-        $dataHeaderAkun = $this->HeaderAkunsModel->getAPAR($this->this_company_id);
         $dataSubAkun = $this->Sub_AkunsModel->getAPAR($this->this_company_id);
 
         $dataMetadataTipeTransaksi = $this->MetadataModel
@@ -104,49 +89,9 @@ class JurnalUmum extends BaseController
         foreach ($dataMetadataTipeTransaksi as $val) {
             $val->hexid = bin2hex($this->encrypter->encrypt($val->id));
         }
-        $dataTransaksiJurnal = $this->transaksiJurnalModel
-            ->asObject()
-            ->where($condition2)
-            ->findAll();
-        foreach ($dataTransaksiJurnal as $val) {
-            $val->tipe_transaksi_hex = bin2hex($this->encrypter->encrypt($val->type_transaksi));
-            $val->id_transaksi_hex = bin2hex($this->encrypter->encrypt($val->id));
-        }
-        $dataJurnalUmum = $this->jurnalUmumModel
-            ->asObject()
-            ->select('*, sub_akuns.header_id as id_header, 
-                CASE 
-                    WHEN jurnal_umum.divisi_id = 0 THEN "ALL" 
-                    ELSE COALESCE(divisis.divisi, "ALL") 
-                END as nama_divisi')
-            ->join('sub_akuns', 'jurnal_umum.id_coa = sub_akuns.id', 'left')
-            ->join('transaksi_jurnal', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
-            ->join('metadata', 'transaksi_jurnal.type_transaksi = metadata.id', 'left')
-            ->join('divisis', 'jurnal_umum.divisi_id = divisis.id', 'left')
-            ->where($condition)
-            ->whereIn('jurnal_umum.company_id', $companyId)
-            ->findAll();
-        $dataJurnalUmumWithGroup = $this->jurnalUmumModel
-            ->asObject()
-            ->select('*, sub_akuns.header_id as id_header, jurnal_umum.id_transaksi as trans_id, transaksi_jurnal.valas as valas, transaksi_jurnal.exchange_rate as exchange_rate')
-            ->join('sub_akuns', 'jurnal_umum.id_coa = sub_akuns.id', 'left')
-            ->join('transaksi_jurnal', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
-            ->join('metadata', 'transaksi_jurnal.type_transaksi = metadata.id', 'left')
-            ->where($condition)
-            ->whereIn('jurnal_umum.company_id', $companyId)
-            ->groupBy('trans_id')
-            ->findAll();
-        // var_dump($dataJurnalUmumWithGroup);
-        // var_dump($dataJurnalUmum);
 
         $data = [
-            "dataMetadata" => $dataMetadata,
-            "dataKategoriAkun" => $dataKategoriAkun,
-            "dataHeaderAkun" => $dataHeaderAkun,
             "dataSubAkuns" => $dataSubAkun,
-            "dataTransaksiJurnal" => $dataTransaksiJurnal,
-            "dataJurnalUmum" => $dataJurnalUmum,
-            "dataJurnalUmumWithGroup" => $dataJurnalUmumWithGroup,
             "dataMetadataTipeTransaksi" => $dataMetadataTipeTransaksi,
             "dateStart" => $dateStart ? $dateStart : date('01/m/Y'),
             "dateEnd" => $dateEnd ? $dateEnd : date('d/m/Y'),
@@ -154,108 +99,105 @@ class JurnalUmum extends BaseController
         return view('Laporan/LaporanJurnalUmum/index', $data);
     }
 
-    public function exportPDF($tglAwal, $tglAkhir, $filter)
+    public function getData()
     {
-        set_time_limit(0);
-        ini_set('memory_limit', '512M');
-        $dompdf = new Dompdf();
-        $dateStart = $tglAwal;
-        $dateEnd = $tglAkhir;
-        $Filter = $filter != "all" ? $this->encrypter->decrypt(hex2bin($filter)) : "";
+        $request = $this->request->getVar();
 
-        if ($dateStart != "" && $dateEnd != "") {
-            $condition = [
-                'tanggal_jurnal >=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateStart))),
-                'tanggal_jurnal <=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateEnd))),
-            ];
-            $condition2 = [
-                'tanggal_transaksi >=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateStart))),
-                'tanggal_transaksi <=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateEnd))),
-            ];
-            $condition3 = [
-                'name' => 'tipe_transaksi',
-            ];
-        } else {
-            $condition = [
-                'tanggal_jurnal >=' => date('Y-m-01'),
-                'tanggal_jurnal <=' => date('Y-m-d')
-            ];
-            $condition2 = [
-                'tanggal_transaksi >=' => date('Y-m-01'),
-                'tanggal_transaksi <=' => date('Y-m-d')
-            ];
-            $condition3 = [
-                'name' => 'tipe_transaksi',
-            ];
-        }
-        if ($Filter != "") {
-            $condition = [
-                'transaksi_jurnal.type_transaksi' => $Filter,
-            ];
-            $condition2 = [
-                'type_transaksi' => $Filter,
-            ];
-            $condition3 = [
-                'name' => 'tipe_transaksi',
-                'id' => $Filter,
-            ];
-        } else {
-            $condition3 = [
-                'name' => 'tipe_transaksi',
-            ];
-        }
+        $dateStart     = $request['dateStart'] ?? date('Y-m-01');
+        $dateEnd       = $request['dateEnd'] ?? date('Y-m-d');
+        $typeTransaksi = $request['type_transaksi'] ?? null;
+        $noBukti       = $request['no_bukti'] ?? null;
+        $subsAkun      = $request['subs_akun'] ?? null;
 
-        if ($this->this_company_id == "1" || $this->this_company_id == "2") {
-            $companyId = [1, 2];
-        } else if ($this->this_company_id == "15") {
-            $companyId = [15];
-        } else {
-            $companyId = [16];
-        }
+        $companyId = match($this->this_company_id){
+            "1","2" => [1,2],
+            "15" => [15],
+            default => [16],
+        };
 
-        $dataMetadataTipeTransaksi = $this->MetadataModel
+        $builder = $this->jurnalUmumModel
             ->asObject()
-            ->where($condition3)
-            ->findAll();
-        foreach ($dataMetadataTipeTransaksi as $val) {
-            $val->hexid = bin2hex($this->encrypter->encrypt($val->id));
-        }
-        $dataTransaksiJurnal = $this->transaksiJurnalModel
-            ->asObject()
-            ->where($condition2)
-            ->findAll();
-        foreach ($dataTransaksiJurnal as $val) {
-            $val->tipe_transaksi_hex = bin2hex($this->encrypter->encrypt($val->type_transaksi));
-        }
-        $dataJurnalUmum = $this->jurnalUmumModel
-            ->asObject()
-            ->select('*, sub_akuns.header_id as id_header, 
+            ->select("
+                jurnal_umum.*,
+                sub_akuns.no_sub,
+                sub_akuns.nama_sub,
+                transaksi_jurnal.valas,
+                transaksi_jurnal.exchange_rate,
+                transaksi_jurnal.id as id_transaksi,
+                transaksi_jurnal.no_bukti,
+                transaksi_jurnal.uraian_transaksi,
+                jurnal_umum.keterangan,
+                suppliers.name as supplier,
                 CASE 
-                    WHEN jurnal_umum.divisi_id = 0 THEN "ALL" 
-                    ELSE COALESCE(divisis.divisi, "ALL") 
-                END as nama_divisi')
-            ->join('sub_akuns', 'jurnal_umum.id_coa = sub_akuns.id', 'left')
-            ->join('transaksi_jurnal', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
-            ->join('metadata', 'transaksi_jurnal.type_transaksi = metadata.id', 'left')
-            ->join('divisis', 'jurnal_umum.divisi_id = divisis.id', 'left')
-            ->where($condition)
+                    WHEN jurnal_umum.divisi_id = 0 THEN 'ALL'
+                    WHEN jurnal_umum.divisi_id IS NULL THEN 'ALL'
+                    ELSE divisis.divisi 
+                END as nama_divisi
+            ")
+            ->join('sub_akuns','jurnal_umum.id_coa=sub_akuns.id','left')
+            ->join('transaksi_jurnal','jurnal_umum.id_transaksi=transaksi_jurnal.id','left')
+            ->join('divisis','jurnal_umum.divisi_id=divisis.id','left')
+            ->join('penerimaan_barang','penerimaan_barang.id=transaksi_jurnal.penerimaan_barang_id','left')
+            ->join('suppliers','suppliers.id=penerimaan_barang.supplier_id','left')
             ->whereIn('jurnal_umum.company_id', $companyId)
-            ->findAll();
-        // var_dump($dataJurnalUmumWithGroup);
+            ->where('tanggal_jurnal >=', date('Y-m-d', strtotime(str_replace('/', '-', $dateStart))))
+            ->where('tanggal_jurnal <=', date('Y-m-d', strtotime(str_replace('/', '-', $dateEnd))));
 
-        $data = [
-            "dataTransaksiJurnal" => $dataTransaksiJurnal,
-            "dataJurnalUmum" => $dataJurnalUmum,
-            "dataMetadataTipeTransaksi" => $dataMetadataTipeTransaksi,
-            "dateStart" => $dateStart ? date("d/m/Y", strtotime($dateStart)) : date('d/m/Y'),
-            "dateEnd" => $dateEnd ? date("d/m/Y", strtotime($dateEnd)) : date('d/m/Y'),
-        ];
-        $dompdf->loadHtml(view('Laporan/LaporanJurnalUmum/print', $data));
-        $dompdf->setPaper('A4', 'portrait');
-        $dompdf->render();
-        $dompdf->stream("Laporan Jurnal Umum ", array("Attachment" => false));
+        if ($typeTransaksi) {
+            $builder->where('transaksi_jurnal.type_transaksi', $this->encrypter->decrypt(hex2bin($typeTransaksi)));
+        }
+        if ($noBukti) {
+            $builder->where('transaksi_jurnal.id', $this->encrypter->decrypt(hex2bin($noBukti)));
+        }
+        if ($subsAkun) {
+            $builder->where('sub_akuns.id', $subsAkun);
+        }
 
-        exit(0);
+        $data = $builder->orderBy('tanggal_jurnal', 'asc')->findAll();
+
+        $formatted = [];
+        $lastGroup = null;
+
+        foreach ($data as $row) {
+
+            // IDENTIKAN KEY PEMBAGI GROUP
+            $currentGroup = $row->no_bukti . "-" . $row->keterangan;
+
+            if ($lastGroup !== $currentGroup) {
+                // HEADER ROW
+                $formatted[] = (object)[
+                    "is_header"     => true,
+                    "tanggal_jurnal"=> date('d/m/Y', strtotime($row->tanggal_jurnal)),
+                    "nama_divisi"   => $row->nama_divisi,
+                    "desc"          => $row->no_bukti . " - " . $row->keterangan,
+                    "reference"     => "",
+                    "supplier"      => "",
+                    "currency"      => "",
+                    "exchange_rate" => "",
+                    "debit"         => "",
+                    "kredit"        => ""
+                ];
+                $lastGroup = $currentGroup;
+            }
+
+            // DETAIL ROW
+            $formatted[] = (object)[
+                "is_header"     => false,
+                "tanggal_jurnal"=> '',
+                "nama_divisi"   => $row->nama_divisi,
+                "desc"          => $row->no_sub . " - " . $row->nama_sub,
+                "reference"     => '',
+                "supplier"      => $row->supplier ?? '',
+                "currency"      => $row->valas ?? 'IDR',
+                "exchange_rate" => $row->exchange_rate ?? '1.00',
+                "debit"         => (float)$row->debit,
+                "kredit"        => (float)$row->kredit,
+            ];
+        }
+
+        return $this->response->setJSON([
+            "data" => $formatted
+        ]);
     }
 
     public function exportExcel($tglAwal, $tglAkhir, $filter)
@@ -263,60 +205,35 @@ class JurnalUmum extends BaseController
         set_time_limit(0);
         ini_set('memory_limit', '512M');
         $spreadsheet = new Spreadsheet();
-        $dateStart = $tglAwal;
-        $dateEnd = $tglAkhir;
-        $Filter = $filter != "all" ? $this->encrypter->decrypt(hex2bin($filter)) : "";
 
-        if ($dateStart != "" && $dateEnd != "") {
-            $condition = [
+        $dateStart  = $tglAwal;
+        $dateEnd    = $tglAkhir;
+        $Filter     = $filter != "all" ? $this->encrypter->decrypt(hex2bin($filter)) : "";
+
+        if ($dateStart && $dateEnd) {
+            $conditionMain = [
                 'tanggal_jurnal >=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateStart))),
                 'tanggal_jurnal <=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateEnd))),
             ];
-            $condition2 = [
-                'tanggal_transaksi >=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateStart))),
-                'tanggal_transaksi <=' => date('Y-m-d', strtotime(str_replace('/', '-', $dateEnd))),
-            ];
-            $condition3 = [
-                'name' => 'tipe_transaksi',
-            ];
         } else {
-            $condition = [
+            $conditionMain = [
                 'tanggal_jurnal >=' => date('Y-m-01'),
-                'tanggal_jurnal <=' => date('Y-m-d')
-            ];
-            $condition2 = [
-                'tanggal_transaksi >=' => date('Y-m-01'),
-                'tanggal_transaksi <=' => date('Y-m-d')
-            ];
-            $condition3 = [
-                'name' => 'tipe_transaksi',
-            ];
-        }
-        if ($Filter != "") {
-            $condition = [
-                'transaksi_jurnal.type_transaksi' => $Filter,
-            ];
-            $condition2 = [
-                'type_transaksi' => $Filter,
-            ];
-            $condition3 = [
-                'name' => 'tipe_transaksi',
-                'id' => $Filter,
-            ];
-        } else {
-            $condition3 = [
-                'name' => 'tipe_transaksi',
+                'tanggal_jurnal <=' => date('Y-m-d'),
             ];
         }
 
-        if ($this->this_company_id == "1" || $this->this_company_id == "2") {
-            $companyId = [1, 2];
-        } else if ($this->this_company_id == "15") {
-            $companyId = [15];
-        } else {
-            $companyId = [16];
+        if ($Filter) {
+            $conditionMain['transaksi_jurnal.type_transaksi'] = $Filter;
         }
 
+        // === Company ID ===
+        $companyId = match ($this->this_company_id) {
+            "1", "2" => [1, 2],
+            "15"     => [15],
+            default  => [16],
+        };
+
+        // === Header Excel ===
         $spreadsheet->setActiveSheetIndex(0)
             ->setCellValue('A1', 'Tanggal')
             ->setCellValue('B1', 'Department')
@@ -329,61 +246,127 @@ class JurnalUmum extends BaseController
             ->setCellValue('J1', 'Kredit');
         $spreadsheet->getActiveSheet()->mergeCells('C1:D1');
 
-        $dataMetadataTipeTransaksi = $this->MetadataModel
+        // === QUERY MAIN DATA FOLLOW DATA TABLE ===
+        $dataJurnal = $this->jurnalUmumModel
             ->asObject()
-            ->where($condition3)
-            ->findAll();
-        $dataTransaksiJurnal = $this->transaksiJurnalModel
-            ->asObject()
-            ->where($condition2)
-            ->findAll();
-        $dataJurnalUmum = $this->jurnalUmumModel
-            ->asObject()
-            ->select('*, sub_akuns.header_id as id_header, 
-                    CASE 
-                        WHEN jurnal_umum.divisi_id = 0 THEN "ALL" 
-                        ELSE COALESCE(divisis.divisi, "ALL") 
-                    END as nama_divisi')
+            ->select("
+                jurnal_umum.*,
+                sub_akuns.no_sub,
+                sub_akuns.nama_sub,
+                transaksi_jurnal.valas,
+                transaksi_jurnal.exchange_rate,
+                transaksi_jurnal.id as id_transaksi,
+                transaksi_jurnal.no_bukti,
+                transaksi_jurnal.uraian_transaksi,
+                jurnal_umum.keterangan,
+                suppliers.name as supplier,
+                CASE 
+                    WHEN jurnal_umum.divisi_id = 0 THEN 'ALL'
+                    WHEN jurnal_umum.divisi_id IS NULL THEN 'ALL'
+                    ELSE divisis.divisi 
+                END as nama_divisi
+            ")
             ->join('sub_akuns', 'jurnal_umum.id_coa = sub_akuns.id', 'left')
             ->join('transaksi_jurnal', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
-            ->join('metadata', 'transaksi_jurnal.type_transaksi = metadata.id', 'left')
             ->join('divisis', 'jurnal_umum.divisi_id = divisis.id', 'left')
-            ->where($condition)
+            ->join('penerimaan_barang', 'penerimaan_barang.id = transaksi_jurnal.penerimaan_barang_id', 'left')
+            ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
+            ->where($conditionMain)
             ->whereIn('jurnal_umum.company_id', $companyId)
+            ->orderBy('tanggal_jurnal', 'asc')
             ->findAll();
 
-        function format_ribuan($nilai)
+        // === MATCH FORMAT DATATABLE ===
+        function format_currency($nilai)
         {
-            $nilaiFloat = floatval($nilai);
-            return "Rp " . number_format($nilaiFloat, 2, ',', '.');
+            return "Rp " . number_format((float)$nilai, 2, ',', '.');
         }
-        $flag = 0;
+
+        $formatted = [];
+        $lastGroup = null;
+
+        foreach ($dataJurnal as $row) {
+            $currentGroup = $row->no_bukti . "-" . $row->keterangan;
+
+            if ($lastGroup !== $currentGroup) {
+                $formatted[] = (object)[
+                    "is_header"      => true,
+                    "tanggal_jurnal" => date('d/m/Y', strtotime($row->tanggal_jurnal)),
+                    "nama_divisi"    => $row->nama_divisi,
+                    "desc"           => $row->no_bukti . " - " . $row->keterangan,
+                    "reference"      => '',
+                    "supplier"       => '',
+                    "currency"       => '',
+                    "exchange_rate"  => '',
+                    "debit"          => '',
+                    "kredit"         => ''
+                ];
+                $lastGroup = $currentGroup;
+            }
+
+            $formatted[] = (object)[
+                "is_header"     => false,
+                "tanggal_jurnal"=> '',
+                "nama_divisi"   => $row->nama_divisi,
+                "desc"          => $row->no_sub . " - " . $row->nama_sub,
+                "reference"     => '',
+                "supplier"      => $row->supplier ?? '',
+                "currency"      => $row->valas ?? 'IDR',
+                "exchange_rate" => $row->exchange_rate ?? '1.00',
+                "debit"         => (float)$row->debit,
+                "kredit"        => (float)$row->kredit,
+            ];
+        }
+
+        // === WRITE INTO EXCEL ===
         $column = 2;
-        foreach ($dataMetadataTipeTransaksi as $Tipe) :
-            foreach ($dataTransaksiJurnal as $transaksiJurnalData) :
-                $total_debit  = 0;
-                $total_kredit = 0;
-                foreach ($dataJurnalUmum as $jurnalUmumData) :
-                    $flag = 1;
-                    $total_debit  += $jurnalUmumData->debit;
-                    $total_kredit += $jurnalUmumData->kredit;
-                    if ($jurnalUmumData->id_transaksi == $transaksiJurnalData->id && $transaksiJurnalData->type_transaksi === $Tipe->id) :
-                        $spreadsheet->setActiveSheetIndex(0)
-                            ->setCellValue('A' . $column, $jurnalUmumData->tanggal_jurnal)
-                            ->setCellValue('B' . $column, $jurnalUmumData->nama_divisi)
-                            ->setCellValue('C' . $column, $jurnalUmumData->no_sub . " - " . $jurnalUmumData->nama_sub)
-                            ->setCellValue('E' . $column, '')
-                            ->setCellValue('F' . $column, '')
-                            ->setCellValue('G' . $column, format_ribuan($jurnalUmumData->debit + $jurnalUmumData->kredit))
-                            ->setCellValue('H' . $column, $jurnalUmumData->exchange_rate)
-                            ->setCellValue('I' . $column, format_ribuan($jurnalUmumData->debit))
-                            ->setCellValue('J' . $column, format_ribuan($jurnalUmumData->kredit));
-                        $spreadsheet->getActiveSheet()->mergeCells('C' . $column . ':D' . $column);
-                        $column++;
-                    endif;
-                endforeach;
-            endforeach;
-        endforeach;
+        $totalDebit = 0;
+        $totalKredit = 0;
+
+        foreach ($formatted as $row) {
+
+            if ($row->is_header) {
+                $spreadsheet->setActiveSheetIndex(0)
+                    ->setCellValue('A' . $column, $row->tanggal_jurnal)
+                    ->setCellValue('B' . '')
+                    ->setCellValue('C' . $column, $row->desc);
+                $spreadsheet->getActiveSheet()->mergeCells('C' . $column . ':J' . $column);
+
+                $spreadsheet->getActiveSheet()->getStyle("A{$column}:J{$column}")
+                    ->applyFromArray([
+                        'font' => ['bold' => true],
+                        'fill' => [
+                            'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                            'startColor' => ['argb' => 'FFF8E6']
+                        ]
+                    ]);
+            } else {
+                $spreadsheet->setActiveSheetIndex(0)
+                    ->setCellValue('A' . $column, $row->tanggal_jurnal)
+                    ->setCellValue('B' . $column, $row->nama_divisi)
+                    ->setCellValue('C' . $column, $row->desc)
+                    ->setCellValue('E' . $column, $row->reference)
+                    ->setCellValue('F' . $column, $row->supplier)
+                    ->setCellValue('G' . $column, $row->currency)
+                    ->setCellValue('H' . $column, $row->exchange_rate)
+                    ->setCellValue('I' . $column, format_currency($row->debit))
+                    ->setCellValue('J' . $column, format_currency($row->kredit));
+
+                $spreadsheet->getActiveSheet()->mergeCells('C' . $column . ':D' . $column);
+
+                $totalDebit  += $row->debit;
+                $totalKredit += $row->kredit;
+            }
+
+            $column++;
+        }
+
+        // === FOOTER TOTAL ===
+        $spreadsheet->setActiveSheetIndex(0)
+            ->setCellValue('A' . $column, "Total Transaksi")
+            ->mergeCells("A{$column}:H{$column}")
+            ->setCellValue("I{$column}", format_currency($totalDebit))
+            ->setCellValue("J{$column}", format_currency($totalKredit));
 
         $writer = new Xlsx($spreadsheet);
         $filename = 'Laporan-Jurnal';
@@ -393,6 +376,6 @@ class JurnalUmum extends BaseController
         header('Cache-Control: max-age=0');
 
         $writer->save('php://output');
-        die;
+        exit;
     }
 }
