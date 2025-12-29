@@ -202,6 +202,84 @@ class JasaVendorInKepitingKukus extends BaseController
         $this->dompdf->stream("Jasa Vendor Barang Masuk", array("Attachment" => false));
     }
 
+    public function printFilter()
+    {
+        // Ambil parameter filter
+        $divisiId = $this->request->getGet('divisi_id');
+        $warehouseId = $this->request->getGet('warehouse_id');
+        $status = $this->request->getGet('status');
+        $startDate = $this->request->getGet('start_date');
+        $endDate = $this->request->getGet('end_date');
+        $noPenerimaan = $this->request->getGet('no_penerimaan_surat_jalan');
+        $sort = $this->request->getGet('sort') ?? 'createdAt';
+        $sortType = $this->request->getGet('sortType') ?? 'desc';
+
+        // Konfigurasi filter
+        $addCondition = [
+            "sort" => $sort,
+            "sortType" => $sortType,
+            "divisi_id" => $divisiId,
+            "warehouse_id" => $warehouseId,
+            "status" => $status,
+            "start_date" => $startDate,
+            "end_date" => $endDate,
+            "no_penerimaan_surat_jalan" => $noPenerimaan,
+        ];
+
+        $divisiArr = [];
+        foreach ($this->divisiModel->getDivisiAccess() as $d) {
+            array_push($divisiArr, $d['id']);
+        }
+
+        // Ambil data berdasarkan filter
+        $dataQry = $this->jasaVendorInKepitingKukusModel->getList([
+            'jasa_vendor_in_kepiting_kukus.company_id' => $this->this_company_id,
+            'jasa_vendor_in_kepiting_kukus.deletedAt' => null,
+        ], $divisiArr, $addCondition, 0, 0); // 0,0 untuk ambil semua data
+
+        // Format data untuk print
+        $dataResult = [];
+        $no = 1;
+
+        foreach ($dataQry['data'] as $data) {
+            $jasaVendorInKepitingKukusDetail = $this->jasaVendorInKepitingKukusDetailModel
+                ->where('jasa_vendor_in_kepiting_kukus_id', $data->id)
+                ->where('deletedAt', null)
+                ->findAll();
+
+            $dataResult[] = [
+                "no" => $no++,
+                "no_penerimaan_surat_jalan" => $data->no_penerimaan_surat_jalan,
+                "tanggal" => date('d/m/Y', strtotime($data->tanggal)),
+                "divisi" => $data->divisi,
+                "warehouse_name" => $data->warehouse_name,
+                "no_surat_jalan" => str_replace(['"', ']', '['], "", $data->multiple_jasa_vendor_out_no),
+                "vendor_name" => $data->vendor_name,
+                "status_posting" => $data->status_posting == 1 ? 'POSTED' : 'WAITING',
+                "total_item" => count($jasaVendorInKepitingKukusDetail),
+                "no_surat_jalan_vendor" => $data->no_surat_jalan_vendor ?: '-',
+            ];
+        }
+
+        // Data untuk view print
+        $printData = [
+            'title' => 'Laporan Jasa Vendor Barang Masuk',
+            'data' => $dataResult,
+            'filter' => [
+                'divisi' => $divisiId ? $this->divisiModel->find($divisiId)->divisi ?? '-' : 'SEMUA',
+                'warehouse' => $warehouseId ? $this->warehouseModel->find($warehouseId)->warehouse_name ?? '-' : 'SEMUA',
+                'status' => $status === '1' ? 'POSTED' : ($status === '0' ? 'WAITING' : 'SEMUA'),
+                'periode' => $startDate && $endDate ? "$startDate s/d $endDate" : 'SEMUA',
+                'no_penerimaan' => $noPenerimaan ?: '-',
+                'total_record' => count($dataResult),
+                'printed_at' => date('d/m/Y H:i:s'),
+            ]
+        ];
+
+        // Load view print
+        return view('jasaVendor/inKepitingKukus/print_filter', $printData);
+    }
+
     public function createAction()
     {
         $barangs = json_decode($_POST['listBarang']);

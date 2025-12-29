@@ -225,7 +225,7 @@
     // ==================== GLOBAL VARIABLES ====================
 const csrfToken = '<?= csrf_token() ?>';
 const csrf = $(`[name="${csrfToken}"]`);
-let biayaKepiting = <?= json_encode($biayaKepiting); ?>;
+
 var listBarang = [];
 var listPerolehanGaji = [];
 var listBonus = [];
@@ -240,6 +240,7 @@ $(document).ready(function() {
         $('#vendor_id').val('<?= $biayaKepiting['vendor_id'] ?>').trigger('change');
         window.selectedSuratJalanId = biayaKepiting.jasa_vendor_in_kepiting_kukus_id;
         window.isEditMode = true;
+        let biayaKepiting = <?= json_encode($biayaKepiting); ?>;
         loadExistingData();
     <?php endif; ?>
 });
