@@ -2915,7 +2915,6 @@ $routes->get('/laporan-accounting/jurnalumum/printExcel/(:segment)/(:segment)/(:
 
 $routes->get('laporan-accounting/neracasaldo', 'Laporan\Accounting\NeracaSaldo::index', ['filter' => 'Auth']);
 $routes->get('laporan-accounting/neracasaldo/getData', 'Laporan\Accounting\NeracaSaldo::getData', ['filter' => 'Auth']);
-$routes->get('/laporan-accounting/neracasaldo/printPDF/(:segment)/(:segment)', 'Laporan\Accounting\NeracaSaldo::exportPDF/$1/$2', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/neracasaldo/printExcel/(:segment)/(:segment)', 'Laporan\Accounting\NeracaSaldo::exportExcel/$1/$2', ['filter' => 'Auth']);
 
 $routes->get('/laporan-accounting/rekap-kopek', 'Laporan\Accounting\RekapKopek::index', ['filter' => 'Auth']);

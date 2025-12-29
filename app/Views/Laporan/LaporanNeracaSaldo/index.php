@@ -4,20 +4,13 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <div class="col-md-10">
-            <h1>Neraca Saldo</h1>
-        </div>
-        <div class="col-md-2 text-right">
-            <div class="btn-group">
-                <button type="button" class="btn btn-warning">Export</button>
-                <button type="button" class="btn btn-warning dropdown-toggle dropdown-icon" data-toggle="dropdown">
-                    <span class="sr-only">Toggle Dropdown</span>
-                </button>
-                <div class="dropdown-menu" role="menu">
-                    <a class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-accounting/neracasaldo/printExcel"); ?>')">Excel</a>
-                </div>
-            </div>
-        </div>
+        <h1>Neraca Saldo</h1>
+        <button style="right: 10px;" class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+            Export
+        </button>
+        <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+            <a class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-accounting/neracasaldo/printExcel"); ?>')">Excel</a>
+        </ul>
     </div>
     <div class="card">
         <div class="card-body">
