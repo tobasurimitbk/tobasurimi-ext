@@ -109,11 +109,21 @@ class JurnalUmum extends BaseController
         $noBukti       = $request['no_bukti'] ?? null;
         $subsAkun      = $request['subs_akun'] ?? null;
 
-        $companyId = match($this->this_company_id){
-            "1","2" => [1,2],
-            "15" => [15],
-            default => [16],
-        };
+        // === Company ID ===
+        switch ($this->this_company_id) {
+            case "1":
+            case "2":
+                $companyId = [1, 2];
+                break;
+
+            case "15":
+                $companyId = [15];
+                break;
+
+            default:
+                $companyId = [16];
+                break;
+        }
 
         $builder = $this->jurnalUmumModel
             ->asObject()
@@ -227,11 +237,20 @@ class JurnalUmum extends BaseController
         }
 
         // === Company ID ===
-        $companyId = match ($this->this_company_id) {
-            "1", "2" => [1, 2],
-            "15"     => [15],
-            default  => [16],
-        };
+        switch ($this->this_company_id) {
+            case "1":
+            case "2":
+                $companyId = [1, 2];
+                break;
+
+            case "15":
+                $companyId = [15];
+                break;
+
+            default:
+                $companyId = [16];
+                break;
+        }
 
         // === Header Excel ===
         $spreadsheet->setActiveSheetIndex(0)
