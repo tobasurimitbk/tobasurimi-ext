@@ -149,6 +149,90 @@ class ImportPOPaymentModel extends Model
         return $poDataQry;
     }
 
+    public function getPuchaseOrderListImport($condition, $addCondition)
+    {
+        $isBaku = $addCondition['material_type'] == "BAKU";
+
+        $selectQry = "
+            barang_master.kode_barang,
+            barang_master.barang_name,
+            barang_master_spesifikasi.spesifikasi,
+            satuans.kode_satuan
+        ";
+
+        $table = $isBaku ? 'rm_import_po_details' : 'am_purchase_order_details';
+        $orderField = $isBaku
+            ? 'rm_import_po_details.createdAt'
+            : 'am_purchase_order_details.createdAt';
+
+        $poDataQry = $this->db->table($table)
+            ->select("$table.*, $selectQry")
+            ->where($condition)
+            ->join('barang_master', "$table.barang_id = barang_master.id", 'left')
+            ->join('barang_master_spesifikasi', "$table.spesifikasi_id = barang_master_spesifikasi.id", 'left')
+            ->join('satuans', "satuans.id = $table.unit", 'left')
+            ->orderBy($orderField, "DESC")
+            ->get()
+            ->getResult();
+
+        return $poDataQry;
+    }
+
+
+    public function getPuchaseOrderListLPB($condition, $addCondition)
+    {
+        $isBaku = $addCondition['material_type'] == "BAKU";
+
+        $poTable   = $isBaku ? 'rm_import_pos' : 'am_purchase_orders';
+        $poIdField = $isBaku ? 'rm_import_pos.id' : 'am_purchase_orders.id';
+
+        $selectQry = "
+            penerimaan_barang_detail.id,
+            penerimaan_barang_detail.purchase_order_details_id as detail_id,
+            penerimaan_barang_detail.qty,
+            penerimaan_barang_detail.sub_total AS total,
+            {$poIdField} AS purchase_order_id,
+            barang_master.kode_barang,
+            barang_master.barang_name,
+            barang_master_spesifikasi.spesifikasi,
+            satuans.kode_satuan
+        ";
+
+        return $this->db->table('penerimaan_barang_detail')
+            ->select($selectQry)
+            ->join(
+                'penerimaan_barang',
+                'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id',
+                'left'
+            )
+            ->join(
+                $poTable,
+                "{$poTable}.id = penerimaan_barang_detail.purchase_order_id",
+                'left'
+            )
+            ->join(
+                'barang_master',
+                'penerimaan_barang_detail.barang_id = barang_master.id',
+                'left'
+            )
+            ->join(
+                'barang_master_spesifikasi',
+                'penerimaan_barang_detail.spesifikasi_id = barang_master_spesifikasi.id',
+                'left'
+            )
+            ->join(
+                'satuans',
+                'satuans.id = penerimaan_barang_detail.unit',
+                'left'
+            )
+            ->where($condition)
+            ->orderBy('penerimaan_barang_detail.createdAt', 'DESC')
+            ->get()
+            ->getResult();
+    }
+
+
+
     public function getRiwayatPembayaranList($condition, $limit = 10, $offset = 0)
     {
         $poDataQry = $this->asObject()

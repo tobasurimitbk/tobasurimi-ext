@@ -4,11 +4,20 @@
 <section class="section">
     <div class="section-header">
         <h1>Jasa Vendor Barang Masuk</h1>
-        <?php if (can("Jasa Vendor", "Barang Masuk", "c")) : ?>
-            <a href="<?= base_url('jasa-vendor-in-kepiting-kukus/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
-                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-            </a>
-        <?php endif; ?>
+        
+        <div class="col-button-tambah-spp">
+             <?php if (can("Jasa Vendor", "Barang Masuk", "c")) : ?>
+                <a href="<?= base_url('jasa-vendor-in-kepiting-kukus/create') ?>" type="button" class="btn btn-show-form btn-save float-right btn-submit-parent" >
+                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                </a>
+            <?php endif; ?>
+            <!-- TAMBAHKAN TOMBOL PRINT DISINI -->
+            <?php if (can("Jasa Vendor", "Barang Masuk", "p")) : ?>
+                <button type="button" class="btn btn-warning btn-print float-right" onclick="printFiltered()">
+                    <i class="fa fa-print fa-sm mr-2" aria-hidden="true"></i>Print
+                </button>
+            <?php endif; ?>
+        </div>
     </div>
     <div class="card">
         <div class="card-body">
@@ -540,6 +549,78 @@
             sortType = sortType === "asc" ? "desc" : "asc";
         }
     }
+
+
+    // Fungsi untuk print dengan filter
+function printFiltered() {
+    // Ambil semua parameter filter
+    const divisiId = $('#divisi_id').val();
+    const warehouseId = $('#warehouse_id').val();
+    const status = $('#status').val();
+    const startDate = $('#start_date').val();
+    const endDate = $('#end_date').val();
+    const noPenerimaan = $('.no_penerimaan_surat_jalan').val();
+    
+    // Ambil sorting dari DataTable atau gunakan default
+    const currentSort = table.order()[0] || [4, 'desc']; // Default column 4, desc
+    const sortColumn = currentSort[0];
+    const sortDirection = currentSort[1];
+    
+    // Mapping column index ke field name
+    const columnMapping = {
+        0: 'no', // No (tidak perlu)
+        1: 'no_penerimaan_surat_jalan',
+        2: 'tanggal',
+        3: 'divisi_id',
+        4: 'createdAt', // Kolom tanggal biasanya
+        5: 'warehouse_id',
+        6: 'vendor_id'
+    };
+    
+    const sortField = columnMapping[sortColumn] || 'createdAt';
+    const sortType = sortDirection === 'asc' ? 'asc' : 'desc';
+
+    // Validasi tanggal jika diperlukan
+    if (startDate && endDate) {
+        const startParts = startDate.split('/');
+        const endParts = endDate.split('/');
+        
+        const start = new Date(startParts[2], startParts[1] - 1, startParts[0]);
+        const end = new Date(endParts[2], endParts[1] - 1, endParts[0]);
+        
+        if (start > end) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Perhatian',
+                text: 'Tanggal mulai tidak boleh lebih besar dari tanggal selesai',
+                confirmButtonColor: '#4e73df',
+            });
+            return;
+        }
+    }
+
+    // Buat URL dengan parameter filter
+    let printUrl = '<?= base_url("jasa-vendor-in-kepiting-kukus/print-filter") ?>?';
+    
+    // Tambahkan parameter ke URL
+    const params = [];
+    
+    if (divisiId) params.push(`divisi_id=${encodeURIComponent(divisiId)}`);
+    if (warehouseId) params.push(`warehouse_id=${encodeURIComponent(warehouseId)}`);
+    if (status !== '') params.push(`status=${encodeURIComponent(status)}`);
+    if (startDate) params.push(`start_date=${encodeURIComponent(startDate)}`);
+    if (endDate) params.push(`end_date=${encodeURIComponent(endDate)}`);
+    if (noPenerimaan) params.push(`no_penerimaan_surat_jalan=${encodeURIComponent(noPenerimaan)}`);
+    
+    // Tambahkan sorting parameter
+    params.push(`sort=${encodeURIComponent(sortField)}`);
+    params.push(`sortType=${encodeURIComponent(sortType)}`);
+    
+    printUrl += params.join('&');
+    
+    // Buka window baru untuk print
+    window.open(printUrl, '_blank');
+}
 </script>
 
 <?= $this->endSection(); ?>

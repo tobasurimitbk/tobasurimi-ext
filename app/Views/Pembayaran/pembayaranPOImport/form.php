@@ -1,6 +1,46 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
 
+
+<style>
+#terima-kembali-container .form-check-input {
+    width: 3em;
+    height: 1.5em;
+    margin-left: -2em;
+}
+
+#terima-kembali-container .form-check-label {
+    font-size: 1.1rem;
+    margin-left: 10px;
+    vertical-align: middle;
+    color: #333;
+    font-weight: 600;
+}
+
+#terima-kembali-container .form-text {
+    margin-left: 2.5em;
+    font-size: 0.85rem;
+}
+
+#terima-kembali-form .card-header {
+    background-color: #f8f9fa !important;
+    border-bottom: 2px solid #dee2e6;
+}
+
+#terima-kembali-form .card-title {
+    color: #495057;
+    font-size: 1.1rem;
+}
+
+.nominal-terima-kembali:focus,
+.debit-terima-kembali:focus,
+.kredit-terima-kembali:focus,
+.keterangan-terima-kembali:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+</style>
+
 <section class="section">
     <div class="section-header">
         <h1 class="title-name"><?= (!empty($paymentData) ? 'Update Pembayaran PO Import' : 'Tambah Pembayaran PO Import') ?></h1>
@@ -77,6 +117,16 @@
                                 <option value="BAHAN PENOLONG" <?= (!empty($paymentData) && $paymentData['po_type'] == 'BAHAN PENOLONG') ? 'selected' : '' ?>>BAHAN PENOLONG</option>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Tipe Purchase Order</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "disabled" : '')  : "" ?> class="form-select " name="payment_type" id="payment_type">
+                                <option disabled selected value=""></option>
+                                <option value="DOWN_PAYMENT" <?= (!empty($paymentData) && $paymentData['payment_type'] == 'DOWN_PAYMENT') ? 'selected' : '' ?>>DOWN PAYMENT</option>
+                                <option value="PELUNASAN" <?= (!empty($paymentData) && $paymentData['payment_type'] == 'PELUNASAN') ? 'selected' : '' ?>>PELUNASAN</option>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Tipe Pembayaran</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -252,6 +302,98 @@
                             <label for="floatingInput">Note</label>
                         </div>
                     </div>
+                    <!-- Tambahkan toggle di dalam form -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <!-- Toggle Terima Kembali - Hanya tampil untuk PELUNASAN -->
+                            <div class="form-check form-switch mb-3" id="terima-kembali-container" style="display: <?= (!empty($paymentData) && $paymentData['payment_type'] == 'PELUNASAN') ? 'block' : 'none' ?>; height: 50px; padding-top: 10px;">
+                                <input class="form-check-input" type="checkbox" 
+                                    name="terima_kembali" 
+                                    id="terima_kembali"
+                                    value="1"
+                                    <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "disabled" : '')  : "" ?>
+                                    <?= (!empty($paymentData) && $paymentData['terima_kembali'] == '1') ? 'checked' : '' ?>>
+                                <label class="form-check-label" for="terima_kembali">
+                                    <small class="form-text text-muted d-block">Centang jika ada kelebihan pembayaran yang harus dikembalikan</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                <!-- Form Tambahan yang Muncul saat Toggle Dicentang -->
+                <div class="row" id="terima-kembali-form" style="display: <?= (!empty($paymentData) && $paymentData['terima_kembali'] == '1') ? 'block' : 'none' ?>;">
+                    <div class="col-md-12">
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h5 class="card-title mb-0">Detail Terima Kembali</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-floating mb-3" style="height: 50px;">
+                                            <input <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "readonly" : '')  : "" ?>
+                                                autocomplete="one-time-code" 
+                                                oninput="preventNegativeInput(this); formatCurrency(this);" 
+                                                type="text" 
+                                                class="form-control nominal-terima-kembali" 
+                                                id="nominal_terima_kembali" 
+                                                name="nominal_terima_kembali" 
+                                                placeholder="0"
+                                                value="<?= !empty($paymentData['nominal_terima_kembali']) ? number_format($paymentData['nominal_terima_kembali'], 2, ',', '.') : '' ?>">
+                                            <label for="nominal_terima_kembali">Nominal Terima Kembali</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-floating mb-3" style="height: 50px;">
+                                            <select <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "disabled" : '')  : "" ?>
+                                                    class="form-select debit-terima-kembali" 
+                                                    name="debit_terima_kembali" 
+                                                    id="debit_terima_kembali">
+                                                <option disabled selected value="">Pilih Akun Debit</option>
+                                                <?php foreach ($subsAkuns as $subs) : ?>
+                                                    <option <?= !empty($paymentData) ? ($paymentData['debit_terima_kembali'] == $subs->id ? 'selected' : '') : '' ?> 
+                                                            value="<?= $subs->id ?>">
+                                                        <?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?>
+                                                    </option>
+                                                <?php endforeach ?>
+                                            </select>
+                                            <label for="debit_terima_kembali">Akun Debit</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-floating mb-3" style="height: 50px;">
+                                            <select <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "disabled" : '')  : "" ?>
+                                                    class="form-select kredit-terima-kembali" 
+                                                    name="kredit_terima_kembali" 
+                                                    id="kredit_terima_kembali">
+                                                <option disabled selected value="">Pilih Akun Kredit</option>
+                                                <?php foreach ($subsAkuns as $subs) : ?>
+                                                    <option <?= !empty($paymentData) ? ($paymentData['kredit_terima_kembali'] == $subs->id ? 'selected' : '') : '' ?> 
+                                                            value="<?= $subs->id ?>">
+                                                        <?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?>
+                                                    </option>
+                                                <?php endforeach ?>
+                                            </select>
+                                            <label for="kredit_terima_kembali">Akun Kredit</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-floating mb-3">
+                                            <textarea <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "readonly" : '')  : "" ?>
+                                                    autocomplete="one-time-code" 
+                                                    id="keterangan_terima_kembali" 
+                                                    name="keterangan_terima_kembali" 
+                                                    class="form-control keterangan-terima-kembali text-area-all"
+                                                    rows="3"
+                                                    placeholder="Keterangan terima kembali"><?= !empty($paymentData['keterangan_terima_kembali']) ? $paymentData['keterangan_terima_kembali'] : 'Terima kembali kelebihan pembayaran' ?></textarea>
+                                            <label for="keterangan_terima_kembali">Keterangan</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 </div>
                 <div class="row">
                     <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -315,23 +457,11 @@
                                         </tbody>
                                     </table>
                                 </div>
-                            </div>
-
-
-
+                            </div> 
                         </div>
-
                     </div>
-
                 </div>
-
-
-
-
             </form>
-
-
-
         </div>
     </div>
 </section>
@@ -348,7 +478,10 @@
             url: '<?= base_url('/pembayaran-po-import/get-item-list/') ?>' + id,
             method: "GET",
             data: {
-                status_pph: $('#status_pph').val(),
+                payment_type: $("#payment_type").val(),
+                po_id: $("#import_po").val(),
+                po_type: $("#po_type").val(),
+                status_pph: $("#status_pph").val(),
                 id: $('#id').val()
             },
             dataType: "json",
@@ -407,10 +540,26 @@
             }
     });
 
-    $('#tipe_pembayaran').select2({
+    $('#payment_type').select2({
         placeholder: "Pilih Tipe Pembayaran",
         theme: "bootstrap-5",
         allowClear: true
+    }).on('change', function () {
+
+        // kosongkan select import_po
+        $('#import_po')
+            .val(null)
+            .trigger('change'); // ⬅️ penting buat select2
+
+        // reset tabel biar gak ada data nyangkut
+        drawTable();
+
+        toggleTerimaKembali();
+        
+        // optional: drawTable hanya kalau import_po sudah dipilih
+        // if ($('#import_po').val()) {
+        //     drawTable();
+        // }
     });
 
     $('#payment_method').select2({
@@ -618,7 +767,7 @@
             no_pembayaran: {
                 required: true
             },
-            tipe_pembayaran: {
+            payment_type: {
                 required: true
             },
             po_type: {
@@ -668,7 +817,7 @@
             no_pembayaran: {
                 required: "No pembayaran wajib diisi"
             },
-            tipe_pembayaran: {
+            payment_type: {
                 required: "Pilih tipe pembayaran"
             },
             po_type: {
@@ -851,6 +1000,64 @@
         }
     })
 
+    function toggleTerimaKembali() {
+        const paymentType = document.getElementById('payment_type').value;
+        const terimaKembaliContainer = document.getElementById('terima-kembali-container');
+        const terimaKembaliForm = document.getElementById('terima-kembali-form');
+        const toggleCheckbox = document.getElementById('terima_kembali');
+        
+        if (paymentType === 'PELUNASAN') {
+            terimaKembaliContainer.style.display = 'block';
+            // Jika toggle checked, tampilkan form
+            if (toggleCheckbox && toggleCheckbox.checked) {
+                terimaKembaliForm.style.display = 'block';
+            } else {
+                terimaKembaliForm.style.display = 'none';
+            }
+        } else {
+            terimaKembaliContainer.style.display = 'none';
+            terimaKembaliForm.style.display = 'none';
+            // Reset toggle dan form ketika bukan pelunasan
+            if (toggleCheckbox) {
+                toggleCheckbox.checked = false;
+            }
+            resetTerimaKembaliForm();
+        }
+    }
+
+    // Fungsi untuk menampilkan/sembunyikan form terima kembali berdasarkan toggle
+    function toggleTerimaKembaliForm() {
+        const toggleCheckbox = document.getElementById('terima_kembali');
+        const terimaKembaliForm = document.getElementById('terima-kembali-form');
+        
+        if (toggleCheckbox.checked) {
+            terimaKembaliForm.style.display = 'block';
+            // Validasi: jika PELUNASAN baru bisa aktif
+            const paymentType = document.getElementById('payment_type').value;
+            if (paymentType !== 'PELUNASAN') {
+                alert('Terima Kembali hanya tersedia untuk tipe pembayaran PELUNASAN');
+                toggleCheckbox.checked = false;
+                terimaKembaliForm.style.display = 'none';
+            }
+        } else {
+            terimaKembaliForm.style.display = 'none';
+            resetTerimaKembaliForm();
+        }
+    }
+
+    // Fungsi untuk reset form terima kembali
+    function resetTerimaKembaliForm() {
+        const nominalField = document.getElementById('nominal_terima_kembali');
+        const debitField = document.getElementById('debit_terima_kembali');
+        const kreditField = document.getElementById('kredit_terima_kembali');
+        const keteranganField = document.getElementById('keterangan_terima_kembali');
+        
+        if (nominalField) nominalField.value = '';
+        if (debitField) debitField.selectedIndex = 0;
+        if (kreditField) kreditField.selectedIndex = 0;
+        if (keteranganField) keteranganField.value = 'Terima kembali kelebihan pembayaran';
+    }
+
     function changeStatus() {
         let value = document.getElementById('auto_generate').checked ? true : false;
         const csrfToken = '<?= csrf_token() ?>';
@@ -897,7 +1104,7 @@
 
     function generateKeteranganPembayaran(data) {
         let totalQty = 0;
-        let poNo = '';
+        let poNo = $('#import_po').text();
         let barang = '';
         let supplier = $('#supplier_id option:selected').text().trim();
 
@@ -1284,6 +1491,13 @@
     }
 
     function drawTable(valas) {
+        const table = $('#detailBarang');
+        // bersihin tbody
+        table.find('tbody').empty();
+        // reset variabel global kalau ada
+        listPembayaran = [];
+
+
         const csrfToken = '<?= csrf_token() ?>';
         const csrf = $(`[name="${csrfToken}"]`);
 
@@ -1292,6 +1506,7 @@
             method: "POST",
             dataSrc: "data",
             data: {
+                payment_type: $("#payment_type").val(),
                 po_id: $("#import_po").val(),
                 po_type: $("#po_type").val(),
                 status_pph: $("#status_pph").val()
@@ -1382,26 +1597,6 @@
         })
     }
 
-    function generateKeteranganPembayaran(data) {
-        let totalQty = 0;
-        let poNo = '';
-        let barang = '';
-        let supplier = $('#supplier_id option:selected').text().trim();
-
-        $.each(data, function(i, v) {
-            totalQty += parseFloat(v.qty_order || 0);
-            poNo = v.no_po || poNo;     
-            barang = v.nama_barang || barang;
-        });
-
-        let keterangan = `Pembayaran ${barang} ${supplier} sebanyak ${totalQty.toFixed(2)} KGM (No: ${poNo})`;
-
-        // Isi ke field note jika kosong atau masih default
-        if (!$('#note').val() || $('#note').val() === '-' || $('#note').val() === '') {
-            $('#note').val(keterangan);
-        }
-    }
-
 
     $(document).on("input", ".bayar_panjar", function() {
         var sum = 0;
@@ -1411,6 +1606,23 @@
         $(".total-bayar-panjar").val(greatFormatRupiah(sum));
         updateGrandTotal()
 
+    });
+
+
+    // Event listener untuk checkbox terima kembali
+    $(document).on('change', '#terima_kembali', function() {
+        toggleTerimaKembaliForm();
+    });
+
+    // Panggil saat halaman dimuat
+    $(document).ready(function() {
+        // Panggil trigger saat pertama kali load
+        toggleTerimaKembali();
+        
+        // Jika edit mode dan checkbox sudah checked, pastikan form ditampilkan
+        if ($('#terima_kembali').is(':checked')) {
+            $('#terima-kembali-form').show();
+        }
     });
 
     $(document).on("input", ".input_user", function() {
