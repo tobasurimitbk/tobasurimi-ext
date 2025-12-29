@@ -185,15 +185,15 @@
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select class="form-select" 
-                                    <?= !empty($paymentData) && $paymentData['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '' ?> 
+                                    <?= !empty($paymentData) && $paymentData['status_posting'] == 1 ? 'disabled' : '' ?> 
                                     name="jenis_pembayaran" 
                                     id="jenis_pembayaran"
                                     required>
-                                <?php if (empty($paymentData['pembayaranDetail']['jenis_bayar'])): ?>
+                                <?php if (empty($paymentData['jenis_bayar'])): ?>
                                     <option value="" selected disabled>Pilih Jenis Pembayaran</option>
                                 <?php endif; ?>
-                                <option value="MERAH" <?= !empty($paymentData['pembayaranDetail']['jenis_bayar']) && $paymentData['pembayaranDetail']['jenis_bayar'] == 'MERAH' ? 'selected' : '' ?>>MERAH</option>
-                                <option value="PUTIH" <?= !empty($paymentData['pembayaranDetail']['jenis_bayar']) && $paymentData['pembayaranDetail']['jenis_bayar'] == 'PUTIH' ? 'selected' : '' ?>>PUTIH</option>
+                                <option value="MERAH" <?= !empty($paymentData['jenis_bayar']) && $paymentData['jenis_bayar'] == 'MERAH' ? 'selected' : '' ?>>MERAH</option>
+                                <option value="PUTIH" <?= !empty($paymentData['jenis_bayar']) && $paymentData['jenis_bayar'] == 'PUTIH' ? 'selected' : '' ?>>PUTIH</option>
                             </select>
                             <label  for="floatingInput" style="z-index: 1;">Jenis Pembayaran</label>
                         </div>
@@ -1321,7 +1321,7 @@
                     newRow.append($('<td>').text(v.kode_barang));
                     newRow.append($('<td>').text(v.nama_barang));
                     newRow.append($('<td>').text(v.qty_order));
-                    newRow.append($('<td>').text(v.total_harga));
+                    newRow.append($('<td>').text(greatFormatRupiah(v.total_harga)));
                     newRow.append($('<td>').text(greatFormatRupiah(v.sisa_pembayaran)));
                     newRow.append($('<td>').html(
                         `
