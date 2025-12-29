@@ -1637,7 +1637,7 @@ class StockRevampModel extends Model
                 barang_master_spesifikasi.spesifikasi,
                 '' AS po_no,
                 '' AS po_date,
-                '' AS lpb_date,
+                inisiasi_stock_revamp.tanggal AS lpb_date,
                 '' AS supplier_name,
                 '' AS reference_no,
                 satuans.kode_satuan,
@@ -1665,6 +1665,7 @@ class StockRevampModel extends Model
             LEFT JOIN satuans ON satuans.id = stock_revamp.unit_id
             LEFT JOIN divisis ON divisis.id = stock_revamp.divisi_id
             LEFT JOIN warehouses ON warehouses.id = stock_revamp.warehouse_id
+            LEFT JOIN inisiasi_stock_revamp ON inisiasi_stock_revamp.stock_detail_id = stock_revamp_detail.id
             WHERE stock_revamp_detail.deletedAt IS NULL
             AND stock_revamp_detail.reference_type='INISIASI'
             $filterCondition

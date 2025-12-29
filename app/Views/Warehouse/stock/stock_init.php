@@ -89,6 +89,14 @@
                     <div class="col-md-4">
                         <div class="input-group">
                             <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control tanggal" id="tanggal" name="tanggal" placeholder="Tanggal">
+                                <label for="floatingInput">Tanggal Stok</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <div class="form-floating mb-3" style="height: 50px;">
                                 <input oninput="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control qty_inisiasi" id="qty_inisiasi" name="qty_inisiasi" placeholder="Qty Inisiasi">
                                 <label for="floatingInput">Qty Inisiasi</label>
                             </div>
@@ -127,6 +135,7 @@
                                 <th>Spesifikasi</th>
                                 <th>Qty</th>
                                 <th>Satuan</th>
+                                <th>Tanggal</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -135,7 +144,7 @@
                         </tbody>
                         <tfoot class="foot-detail-table" id="foot-detail-table">
                             <tr>
-                                <td style="text-align: left;" colspan="10">
+                                <td style="text-align: left;" colspan="11">
                                     Tidak ada data
                                 </td>
                             </tr>
@@ -172,6 +181,13 @@
         placeholder: "Pilih Warehouse",
         theme: "bootstrap-5",
         allowClear: true
+    });
+
+    $("#tanggal").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
     });
 
     $('#spesifikasi_id').select2({
@@ -262,6 +278,10 @@
             satuan_id: {
                 required: true
             },
+            tanggal: {
+                required: true,
+
+            },
             qty_inisiasi: {
                 required: true,
 
@@ -282,6 +302,9 @@
             },
             satuan_id: {
                 required: "Satuan wajib diisi"
+            },
+            tanggal: {
+                required: "Tanggal wajib diisi"
             },
             qty_inisiasi: {
                 required: "Qty wajib diisi",
@@ -383,6 +406,7 @@
             var barang_name = $('#spesifikasi_id option:selected').data('barang_name');
             var spesifikasi = $('#spesifikasi_id option:selected').data('spesifikasi');
             var satuan_id = $('#satuan_id option:selected').val();
+            var tanggal = $('#tanggal').val();
             var kode_satuan = $('#satuan_id option:selected').text();
             var qty_inisiasi = destroyFormatRupiah($('#qty_inisiasi').val());
 
@@ -407,6 +431,7 @@
                 listStock[index].spesifikasi = spesifikasi;
                 listStock[index].satuan_id = satuan_id;
                 listStock[index].kode_satuan = kode_satuan;
+                listStock[index].tanggal = tanggal;
                 listStock[index].qty_inisiasi = qty_inisiasi;
             } else {
                 // CREATE
@@ -444,6 +469,7 @@
                         spesifikasi: spesifikasi,
                         satuan_id: satuan_id,
                         kode_satuan: kode_satuan,
+                        tanggal: tanggal,
                         qty_inisiasi: qty_inisiasi
                     });
                     drawTable(listStock);
@@ -468,6 +494,7 @@
         $('#divisi_id').val(item.divisi_id).trigger('change.select2');
         $('#satuan_id').val(item.satuan_id).trigger('change');
         $('#qty_inisiasi').val(item.qty_inisiasi);
+        $('#tanggal').val(item.tanggal);
 
         // Reset dan isi warehouse
         const $warehouse = $("#warehouse_id");
@@ -508,6 +535,7 @@
         $('#warehouse_id').val(null).change();
         $('#spesifikasi_id').val(null).change();
         $('#satuan_id').val(null).change();
+        $('#tanggal').val(null).change();
         $('#qty_inisiasi').val(null).change();
     }
 
@@ -554,6 +582,7 @@
                 newRow.append($('<td>').text(v.spesifikasi));
                 newRow.append($('<td>').text(greatFormatRupiah(v.qty_inisiasi)));
                 newRow.append($('<td>').text(v.kode_satuan));
+                newRow.append($('<td>').text(v.tanggal));
                 newRow.append($('<td>').html(
                     `
                 <button class="btn btn-warning posting-spp mr-1" onclick="detailRow('${v.id}')">

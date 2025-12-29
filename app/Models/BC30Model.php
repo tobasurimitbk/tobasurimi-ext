@@ -414,9 +414,13 @@ class BC30Model extends Model
 
         $selectQry = "
             sales_contract_detail.barang_master_sales_id,
+            barang_master_sales.barang_master_id,
             barang_master_sales.barang_name,
+            barang_master.barang_name AS barang_name_inventori,
+            barang_master.kode_barang,
             SUM(sales_order_detail_export.qty) AS qty,
             satuans.kode_satuan,
+            sales_order_export.valas_id,
             metadata.value AS valas_name,
             SUM(sales_order_detail_export.total_harga_barang) AS total_harga_barang
         ";
@@ -427,6 +431,7 @@ class BC30Model extends Model
             ->join('barang_master_sales', 'barang_master_sales.id = sales_contract_detail.barang_master_sales_id', 'left')
             ->join('satuans', 'satuans.id = sales_order_detail_export.satuan_id', 'left')
             ->join('metadata', 'metadata.id = sales_order_export.valas_id', 'left')
+            ->join('barang_master', 'barang_master.id = barang_master_sales.barang_master_id', 'left')
             ->where('sales_order_detail_export.deletedAt', null)
             ->whereIn('sales_order_detail_export.sales_order_export_id', $multipleReferenceIds)
             ->groupBy(['barang_name', 'kode_satuan', 'metadata.value'])
@@ -441,9 +446,13 @@ class BC30Model extends Model
 
         $selectQry = "
             sample_detail.barang_master_sales_id,
+            barang_master_sales.barang_master_id,
             barang_master_sales.barang_name,
+            barang_master.barang_name AS barang_name_inventori,
+            barang_master.kode_barang,
             SUM(sample_detail.qty) AS qty,
             satuans.kode_satuan,
+            '30' AS valas_id,
             '' AS valas_name,
             '' AS total_harga_barang
         ";
@@ -451,6 +460,7 @@ class BC30Model extends Model
         $dataResult = $sampleDetailModel->select($selectQry)
             ->join('barang_master_sales', 'barang_master_sales.id = sample_detail.barang_master_sales_id', 'left')
             ->join('satuans', 'satuans.id = sample_detail.satuan_id', 'left')
+            ->join('barang_master', 'barang_master.id = barang_master_sales.barang_master_id', 'left')
             ->where('sample_detail.deletedAt', null)
             ->whereIn('sample_detail.sample_id', $multipleReferenceIds)
             ->groupBy(['barang_name', 'kode_satuan'])

@@ -133,13 +133,14 @@
                             <th>Satuan</th>
                             <th>Valas</th>
                             <th>Nilai Barang</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody class="body-table">
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td colspan="6">Tidak Ada Data</td>
+                            <td colspan="7">Tidak Ada Data</td>
                         </tr>
                     </tfoot>
                 </table>
@@ -1589,6 +1590,13 @@
                 newRow.append($('<td>').text(v.kode_satuan));
                 newRow.append($('<td>').text(v.valas_name));
                 newRow.append($('<td>').text(greatFormatRupiah(parseFloat(v.total_harga_barang).toFixed(2))));
+                newRow.append($('<td >').html(
+                    `
+                    <button type="button" class="btn btn-warning posting-spp mr-1" onclick="generateBarang('${v.barang_master_sales_id}')">
+                        Generate Barang
+                    </button>
+                `
+                ));
                 table.find('tbody').append(newRow);
 
                 totalNilaiBarang += parseFloat(v.total_harga_barang);
@@ -1717,6 +1725,58 @@
         satuanArr.forEach(function(item) {
             $("#unit_id_keluar").append(`<option data-konversi_satuan="${item.konversi_satuan}" value="${item.id}">${item.kode_satuan}</option>`)
         });
+    }
+
+    function generateBarang(barang_master_sales_id) {
+        var item = null;
+        for (let i = 0; i < listBarangSalesEkspor.length; i++) {
+            if (listBarangSalesEkspor[i].barang_master_sales_id == barang_master_sales_id) {
+                item = listBarangSalesEkspor[i];
+            }
+        }
+
+        if (item.barang_master_id == null || item.barang_master_id == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Alias barang belum ada !',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                reverseButtons: true,
+                confirmButtonText: 'Oke',
+            });
+            return;
+        } else {
+            var subTotalFifo = parseFloat(item.total_harga_barang).toFixed(2);
+            var qtyKeluarFifo = parseFloat(item.qty).toFixed(2);
+            var hargaSatuanFifo = (subTotalFifo / qtyKeluarFifo).toFixed(2);
+            $('#type_pengambilan_stock').val('FIFO').change();
+            $('#divisi_id').val('ALL').change();
+            $('#type_barang').val('bahan_jadi').change();
+            $('#valas_id_fifo').val(item.valas_id).change();
+            $('#nilai_tukar_fifo').val(1);
+            $('#harga_satuan_fifo').val(greatFormatRupiah(hargaSatuanFifo)).change();
+            $('#sub_total_fifo').val(greatFormatRupiah(subTotalFifo)).change();
+            $('#qty_keluar_fifo').val(greatFormatRupiah(qtyKeluarFifo)).change();
+
+            // Reset dan isi spesifikasi
+            const $barangId = $("#barang_id");
+            $barangId.empty()
+                .append('<option value=""></option>')
+                .append(`
+                    <option 
+                        selected 
+                        value="${item.barang_master_id}">
+                        (${item.kode_barang}) ${item.barang_name_inventori}
+                    </option>
+                `)
+                .val(item.barang_master_id)
+                .trigger('change');
+            $('#barang_id').val(item.barang_master_id).change();
+            table.ajax.reload();
+
+            $('#inventoriModal').modal('show');
+        }
+
     }
 
     $('#btnHideModalNoAju').click(function(e) {
