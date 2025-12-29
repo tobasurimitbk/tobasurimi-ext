@@ -135,7 +135,7 @@
                                 <th>Spesifikasi</th>
                                 <th>Qty</th>
                                 <th>Satuan</th>
-                                <th>Tanggal</th>
+                                <th>Tgl Stok</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
