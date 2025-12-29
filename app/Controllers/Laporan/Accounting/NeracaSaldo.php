@@ -57,6 +57,22 @@ class NeracaSaldo extends BaseController
             $end   = date('Y-m-d');
         }
 
+        // === Company ID ===
+        switch ($this->this_company_id) {
+            case "1":
+            case "2":
+                $companyId = [1, 2];
+                break;
+
+            case "15":
+                $companyId = [15];
+                break;
+
+            default:
+                $companyId = [16];
+                break;
+        }
+
         $rows = $this->db->table('sub_akuns sa')
             ->select("
                 CONCAT(sa.no_sub, ' ', sa.nama_sub) AS akun,
@@ -72,10 +88,10 @@ class NeracaSaldo extends BaseController
             ")
             ->join('jurnal_umum ju', 'ju.id_coa = sa.id', 'left')
             ->join('transaksi_jurnal tj', 'tj.id = ju.id_transaksi', 'left')
-            ->where('sa.company_id', $this->this_company_id)
+            ->whereIn('sa.company_id', $companyId)
             ->where('ju.tanggal_jurnal >=', $start)
             ->where('ju.tanggal_jurnal <=', $end)
-            ->groupBy('sa.id')
+            ->groupBy('sa.no_sub')
             ->orderBy('sa.no_sub')
             ->get()
             ->getResult();

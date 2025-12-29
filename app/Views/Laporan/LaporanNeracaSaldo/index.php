@@ -175,17 +175,24 @@
                     },
                 ],
                 footerCallback: function (row, data, start, end, display) {
+                    function toNumber(str){
+                        if(!str) return 0;
+                        return parseFloat(
+                            str.replace(/\./g, '')
+                            .replace(',', '.')
+                        ) || 0;
+                    }
 
-                    let sum = [2,3,4,5,6,7].map(i => 
-                        data.reduce((a,b)=> a + (parseFloat(b[i]) || 0), 0)
+                    let sum = [2,3,4,5,6,7].map(i =>
+                        data.reduce((a,b)=> a + toNumber(b[i]), 0)
                     );
 
-                    $('#total_saldo_awal_debit').text(sum[0]);
-                    $('#total_saldo_awal_kredit').text(sum[1]);
-                    $('#total_pergerakan_debit').text(sum[2]);
-                    $('#total_pergerakan_kredit').text(sum[3]);
-                    $('#total_saldo_akhir_debit').text(sum[4]);
-                    $('#total_saldo_akhir_kredit').text(sum[5]);
+                    $('#total_saldo_awal_debit').text(sum[0].toLocaleString('id-ID', {minimumFractionDigits: 2}));
+                    $('#total_saldo_awal_kredit').text(sum[1].toLocaleString('id-ID', {minimumFractionDigits: 2}));
+                    $('#total_pergerakan_debit').text(sum[2].toLocaleString('id-ID', {minimumFractionDigits: 2}));
+                    $('#total_pergerakan_kredit').text(sum[3].toLocaleString('id-ID', {minimumFractionDigits: 2}));
+                    $('#total_saldo_akhir_debit').text(sum[4].toLocaleString('id-ID', {minimumFractionDigits: 2}));
+                    $('#total_saldo_akhir_kredit').text(sum[5].toLocaleString('id-ID', {minimumFractionDigits: 2}));
                 }
             });
         }
