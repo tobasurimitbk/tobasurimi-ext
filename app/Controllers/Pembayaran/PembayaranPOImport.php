@@ -131,25 +131,63 @@ class PembayaranPOImport extends BaseController
     {
         $id = decrypt($id);
         $detailPembayaran = $this->importPOPaymentModel->asArray()->find($id);
+        $materialType = null;
+        // Sumber bisa dari po_type atau tipe_bahan
+        if ($this->request->getVar('po_type')) {
+            $materialType = $this->request->getVar('po_type') == "BAHAN BAKU"
+                ? "BAKU"
+                : "PENOLONG";
+        }
+
+        if ($this->request->getVar('tipe_bahan')) {
+            $materialType = $this->request->getVar('tipe_bahan') == "BAHAN BAKU"
+                ? "BAKU"
+                : "PENOLONG";
+        }
+
+        $responseData = [];
+
+        if ($this->request->getVar('payment_type') == "DOWN_PAYMENT") {
+
         $addCondition = [
-            'po_type' => $detailPembayaran['po_type'] == "BAHAN BAKU" ? "BAKU" : "PENOLONG",
+            'po_type' => $this->request->getVar('po_type') == "BAHAN BAKU" ? "BAKU" : "PENOLONG",
         ];
 
         if ($addCondition['po_type'] == "BAKU") {
-
+            // BB
             $condition = [
                 'rm_import_po_details.deletedAt' => null,
-                'rm_import_po_details.rm_import_po_id' => $detailPembayaran['po_id']
+                'rm_import_po_details.rm_import_po_id' => decrypt($this->request->getVar('po_id')),
+
             ];
         } else {
             // BP
             $condition = [
                 'am_purchase_order_details.deletedAt' => null,
-                'am_purchase_order_details.am_purchase_order_id' => $detailPembayaran['po_id']
+                'am_purchase_order_details.am_purchase_order_id' => decrypt($this->request->getVar('po_id')),
+
             ];
         }
 
-        $poList = $this->importPOPaymentModel->getPuchaseOrderList($condition, $addCondition);
+            $poList = $this->importPOPaymentModel
+                ->getPuchaseOrderList($condition, $addCondition);
+
+        } else {
+
+            $addCondition = [
+                'material_type' => $materialType,
+            ];
+
+            $condition = [
+                'penerimaan_barang_detail.deletedAt' => null,
+                'penerimaan_barang.status_penerimaan' => "IMPORT",
+                'penerimaan_barang_detail.purchase_order_id' => decrypt($this->request->getVar('po_id')),
+            ];
+
+            $poList = $this->importPOPaymentModel
+                ->getPuchaseOrderListLPB($condition, $addCondition);
+        }
+
         $responseData = [];
         foreach ($poList as $data) {
             $entry = [
@@ -160,7 +198,12 @@ class PembayaranPOImport extends BaseController
                 "total_harga"       => number_format($data->total),
                 "total_harga_number" => intval($data->total),
             ];
-            $addCondition['po_type'] == "BAKU" ? $entry["id"] = $data->rm_import_po_id : $entry["id"] = $data->am_purchase_order_id;
+            if ($materialType == "BAKU") {
+                $entry["id"] = encrypt($data->rm_import_po_id ?? $data->purchase_order_id);
+            } else {
+                $entry["id"] = encrypt($data->am_purchase_order_id ?? $data->purchase_order_id);
+            }
+            
             array_push($responseData, $entry);
         }
         //to find all pembayaran
@@ -362,6 +405,7 @@ class PembayaranPOImport extends BaseController
             'po_type' => $poType,
             'po_id' => $poId,
             'voucher_no' => $this->request->getVar('voucher_no'),
+            'payment_type' => $this->request->getVar('payment_type'),
             'currency' => $this->request->getVar('currency'),
             'valas_id' => $firstPo['currency'],
             'payment_amt' => intval(str_replace(',', '', $this->request->getVar('grand_total'))),
@@ -453,6 +497,7 @@ class PembayaranPOImport extends BaseController
             'po_type' => $poType,
             'po_id' => $poId,
             'voucher_no' => $this->request->getVar('voucher_no'),
+            'payment_type' => $this->request->getVar('payment_type'),
             'currency' => $this->request->getVar('currency'),
             'valas_id' => $poData['currency'],
             'payment_amt' => intval(str_replace(',', '', $this->request->getVar('grand_total'))),
@@ -681,7 +726,7 @@ class PembayaranPOImport extends BaseController
         foreach ($poList as $p) {
             $condition = [
                 'purchase_id' => $p->id,
-                // 'purchase_detail_id' => $p->detail_id,
+                'import_po_payments.status_posting' => 0,
                 'import_po_payments.deletedAt' => null,
                 'import_po_payments.po_type' => $this->request->getVar('po_type')
             ];

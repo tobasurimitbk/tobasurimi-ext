@@ -358,7 +358,10 @@
             url: '<?= base_url('/pembayaran-po-import/get-item-list/') ?>' + id,
             method: "GET",
             data: {
-                status_pph: $('#status_pph').val(),
+                payment_type: $("#payment_type").val(),
+                po_id: $("#import_po").val(),
+                po_type: $("#po_type").val(),
+                status_pph: $("#status_pph").val(),
                 id: $('#id').val()
             },
             dataType: "json",
@@ -421,6 +424,20 @@
         placeholder: "Pilih Tipe Pembayaran",
         theme: "bootstrap-5",
         allowClear: true
+    }).on('change', function () {
+
+        // kosongkan select import_po
+        $('#import_po')
+            .val(null)
+            .trigger('change'); // ⬅️ penting buat select2
+
+        // reset tabel biar gak ada data nyangkut
+        drawTable();
+
+        // optional: drawTable hanya kalau import_po sudah dipilih
+        // if ($('#import_po').val()) {
+        //     drawTable();
+        // }
     });
 
     $('#payment_method').select2({
@@ -1294,6 +1311,13 @@
     }
 
     function drawTable(valas) {
+        const table = $('#detailBarang');
+        // bersihin tbody
+        table.find('tbody').empty();
+        // reset variabel global kalau ada
+        listPembayaran = [];
+
+
         const csrfToken = '<?= csrf_token() ?>';
         const csrf = $(`[name="${csrfToken}"]`);
 

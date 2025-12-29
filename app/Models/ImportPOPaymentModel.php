@@ -188,8 +188,9 @@ class ImportPOPaymentModel extends Model
 
         $selectQry = "
             penerimaan_barang_detail.id,
+            penerimaan_barang_detail.purchase_order_details_id as detail_id,
             penerimaan_barang_detail.qty,
-            penerimaan_barang_detail.jml_masuk AS total,
+            penerimaan_barang_detail.sub_total AS total,
             {$poIdField} AS purchase_order_id,
             barang_master.kode_barang,
             barang_master.barang_name,
