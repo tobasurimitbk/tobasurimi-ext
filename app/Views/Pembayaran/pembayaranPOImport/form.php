@@ -81,6 +81,16 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "disabled" : '')  : "" ?> class="form-select " name="payment_type" id="payment_type">
+                                <option disabled selected value=""></option>
+                                <option value="DOWN_PAYMENT" <?= (!empty($paymentData) && $paymentData['payment_type'] == 'DOWN_PAYMENT') ? 'selected' : '' ?>>DOWN PAYMENT</option>
+                                <option value="PELUNASAN" <?= (!empty($paymentData) && $paymentData['payment_type'] == 'PELUNASAN') ? 'selected' : '' ?>>PELUNASAN</option>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Tipe Pembayaran</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "disabled" : '')  : "" ?> class="form-select " name="supplier_id" id="supplier_id">
                                 <option disabled selected value=""></option>
                                 <?php foreach ($supplierList ?? [] as $supplier) : ?>
@@ -407,7 +417,7 @@
             }
     });
 
-    $('#tipe_pembayaran').select2({
+    $('#payment_type').select2({
         placeholder: "Pilih Tipe Pembayaran",
         theme: "bootstrap-5",
         allowClear: true
@@ -618,7 +628,7 @@
             no_pembayaran: {
                 required: true
             },
-            tipe_pembayaran: {
+            payment_type: {
                 required: true
             },
             po_type: {
@@ -668,7 +678,7 @@
             no_pembayaran: {
                 required: "No pembayaran wajib diisi"
             },
-            tipe_pembayaran: {
+            payment_type: {
                 required: "Pilih tipe pembayaran"
             },
             po_type: {
@@ -897,7 +907,7 @@
 
     function generateKeteranganPembayaran(data) {
         let totalQty = 0;
-        let poNo = '';
+        let poNo = $('#import_po').text();
         let barang = '';
         let supplier = $('#supplier_id option:selected').text().trim();
 
@@ -1292,6 +1302,7 @@
             method: "POST",
             dataSrc: "data",
             data: {
+                payment_type: $("#payment_type").val(),
                 po_id: $("#import_po").val(),
                 po_type: $("#po_type").val(),
                 status_pph: $("#status_pph").val()
@@ -1380,26 +1391,6 @@
                 table.find('tbody').append(newRow4);
             }
         })
-    }
-
-    function generateKeteranganPembayaran(data) {
-        let totalQty = 0;
-        let poNo = '';
-        let barang = '';
-        let supplier = $('#supplier_id option:selected').text().trim();
-
-        $.each(data, function(i, v) {
-            totalQty += parseFloat(v.qty_order || 0);
-            poNo = v.no_po || poNo;     
-            barang = v.nama_barang || barang;
-        });
-
-        let keterangan = `Pembayaran ${barang} ${supplier} sebanyak ${totalQty.toFixed(2)} KGM (No: ${poNo})`;
-
-        // Isi ke field note jika kosong atau masih default
-        if (!$('#note').val() || $('#note').val() === '-' || $('#note').val() === '') {
-            $('#note').val(keterangan);
-        }
     }
 
 

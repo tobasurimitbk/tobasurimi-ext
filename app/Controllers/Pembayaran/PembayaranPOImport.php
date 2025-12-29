@@ -775,9 +775,26 @@ class PembayaranPOImport extends BaseController
     {
         $statusPph = $this->request->getVar('status_pph');
 
+        $materialType = null;
+        // Sumber bisa dari po_type atau tipe_bahan
+        if ($this->request->getVar('po_type')) {
+            $materialType = $this->request->getVar('po_type') == "BAHAN BAKU"
+                ? "BAKU"
+                : "PENOLONG";
+        }
+
+        if ($this->request->getVar('tipe_bahan')) {
+            $materialType = $this->request->getVar('tipe_bahan') == "BAHAN BAKU"
+                ? "BAKU"
+                : "PENOLONG";
+        }
+
+
         $pphNilai = $statusPph == '1' ? 0.0025 : 0;
 
         $responseData = [];
+
+        if ($this->request->getVar('payment_type') == "DOWN_PAYMENT") {
 
         $addCondition = [
             'po_type' => $this->request->getVar('po_type') == "BAHAN BAKU" ? "BAKU" : "PENOLONG",
@@ -799,7 +816,24 @@ class PembayaranPOImport extends BaseController
             ];
         }
 
-        $poList = $this->importPOPaymentModel->getPuchaseOrderList($condition, $addCondition);
+            $poList = $this->importPOPaymentModel
+                ->getPuchaseOrderList($condition, $addCondition);
+
+        } else {
+
+            $addCondition = [
+                'material_type' => $materialType,
+            ];
+
+            $condition = [
+                'penerimaan_barang_detail.deletedAt' => null,
+                'penerimaan_barang.status_penerimaan' => "IMPORT",
+                'penerimaan_barang_detail.purchase_order_id' => decrypt($this->request->getVar('po_id')),
+            ];
+
+            $poList = $this->importPOPaymentModel
+                ->getPuchaseOrderListLPB($condition, $addCondition);
+        }
 
 
         // $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
@@ -807,16 +841,23 @@ class PembayaranPOImport extends BaseController
 
         foreach ($poList as $data) {
             $entry = [
-                "detail_id"         => encrypt($data->id),
-                "kode_barang"       => $data->kode_barang,
-                "nama_barang"       => $data->barang_name . ' - ' . $data->spesifikasi,
-                "qty_order"         => $data->qty,
-                "total_harga"       => $data->total,
+                "detail_id"          => encrypt($data->id),
+                "kode_barang"        => $data->kode_barang,
+                "nama_barang"        => $data->barang_name . ' - ' . $data->spesifikasi,
+                "qty_order"          => $data->qty,
+                "total_harga"        => $data->total,
                 "total_harga_number" => $data->total,
             ];
-            $addCondition['po_type'] == "BAKU" ? $entry["id"] = encrypt($data->rm_import_po_id) : $entry["id"] = encrypt($data->am_purchase_order_id);
-            array_push($responseData, $entry);
+
+            if ($materialType == "BAKU") {
+                $entry["id"] = encrypt($data->rm_import_po_id ?? $data->purchase_order_id);
+            } else {
+                $entry["id"] = encrypt($data->am_purchase_order_id ?? $data->purchase_order_id);
+            }
+
+            $responseData[] = $entry;
         }
+
 
         foreach ($responseData as $r => $i) {
             $condition = [
