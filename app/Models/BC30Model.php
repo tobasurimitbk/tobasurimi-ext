@@ -270,13 +270,13 @@ class BC30Model extends Model
         ];
     }
 
-    public function getReferencePengeluaran(
+    public function getReferencePengeluaranOrderForm(
         $customerId,
         $companyId
     ) {
         $salesOrderExportModel = new SalesOrderExportModel();
 
-        $dataBc30All = $this->asArray()->where('company_id', $companyId)->where('deletedAt', null)->findAll();
+        $dataBc30All = $this->asArray()->where('company_id', $companyId)->where('jenis_pengeluaran', "ORDER FORM EKSPOR")->where('deletedAt', null)->findAll();
         $multipleReferenceId = array_column($dataBc30All, 'multiple_reference_id');
         $idUsed = [];
         foreach ($multipleReferenceId as $m) {
@@ -288,7 +288,9 @@ class BC30Model extends Model
         }
 
         $selectQry = "
-            sales_order_export.*
+            sales_order_export.sales_order_export_id AS id, 
+            sales_order_export.sales_order_export_no AS no_reference,
+            sales_order_export.no_invoice
         ";
         $dataQry = $salesOrderExportModel
             ->select($selectQry)
@@ -302,7 +304,7 @@ class BC30Model extends Model
         return $dataResult;
     }
 
-    public function getReferencePengeluaranSelected(
+    public function getReferencePengeluaranOrderFormSelected(
         $bc30Id,
         $companyId
     ) {
@@ -321,7 +323,9 @@ class BC30Model extends Model
         }
 
         $selectQry = "
-            sales_order_export.*
+            sales_order_export.sales_order_export_id AS id, 
+            sales_order_export.sales_order_export_no AS no_reference,
+            sales_order_export.no_invoice
         ";
         $dataQry = $salesOrderExportModel
             ->select($selectQry)
@@ -335,12 +339,81 @@ class BC30Model extends Model
     }
 
 
-    public function getListBarangSalesEkspor($multipleReferenceIds)
+    public function getReferencePengeluaranSample(
+        $customerId,
+        $companyId
+    ) {
+        $sampleModel = new SampleModel();
+
+        $dataBc30All = $this->asArray()->where('company_id', $companyId)->where('jenis_pengeluaran', "LAINNYA")->where('deletedAt', null)->findAll();
+        $multipleReferenceId = array_column($dataBc30All, 'multiple_reference_id');
+        $idUsed = [];
+        foreach ($multipleReferenceId as $m) {
+            if (is_array(json_decode($m))) {
+                foreach (json_decode($m) as $id) {
+                    array_push($idUsed, $id);
+                }
+            }
+        }
+
+        $selectQry = "
+            sample.id, 
+            sample.no_sample AS no_reference, 
+            sample.no_invoice
+        ";
+
+        $dataQry = $sampleModel
+            ->select($selectQry)
+            ->where('sample.customer_id', $customerId)
+            ->where('sample.company_id', $companyId);
+        if (count($idUsed) > 0) {
+            $dataQry->whereNotIn('id', $idUsed);
+        }
+        $dataResult = $dataQry->where('sample.deletedAt', null)->findAll();
+        return $dataResult;
+    }
+
+
+    public function getReferencePengeluaranSampleSelected(
+        $bc30Id,
+        $companyId
+    ) {
+        $sampleModel = new SampleModel();
+
+        $dataBc30All = $this->asArray()->where('id', $bc30Id)->findAll();
+        $multipleReferenceId = array_column($dataBc30All, 'multiple_reference_id');
+
+        $idUsed = [];
+        foreach ($multipleReferenceId as $m) {
+            if (is_array(json_decode($m))) {
+                foreach (json_decode($m) as $id) {
+                    array_push($idUsed, $id);
+                }
+            }
+        }
+
+        $selectQry = "
+            sample.id, 
+            sample.no_sample AS no_reference, 
+            sample.no_invoice
+        ";
+
+        $dataQry = $sampleModel
+            ->select($selectQry)
+            ->where('sample.company_id', $companyId);
+        if (count($idUsed) > 0) {
+            $dataQry->whereIn('id', $idUsed);
+        }
+        $dataResult = $dataQry->where('sample.deletedAt', null)->findAll();
+        return $dataResult;
+    }
+
+    public function getListBarangSalesOrderEkspor($multipleReferenceIds)
     {
         $salesOrderExportDetailModel = new SalesOrderExportDetailModel();
 
         $selectQry = "
-            sales_order_detail_export.sales_order_export_id,
+            sales_contract_detail.barang_master_sales_id,
             barang_master_sales.barang_name,
             SUM(sales_order_detail_export.qty) AS qty,
             satuans.kode_satuan,
@@ -361,6 +434,31 @@ class BC30Model extends Model
 
         return $dataResult;
     }
+
+    public function getListBarangSample($multipleReferenceIds)
+    {
+        $sampleDetailModel = new SampleDetailModel();
+
+        $selectQry = "
+            sample_detail.barang_master_sales_id,
+            barang_master_sales.barang_name,
+            SUM(sample_detail.qty) AS qty,
+            satuans.kode_satuan,
+            '' AS valas_name,
+            '' AS total_harga_barang
+        ";
+
+        $dataResult = $sampleDetailModel->select($selectQry)
+            ->join('barang_master_sales', 'barang_master_sales.id = sample_detail.barang_master_sales_id', 'left')
+            ->join('satuans', 'satuans.id = sample_detail.satuan_id', 'left')
+            ->where('sample_detail.deletedAt', null)
+            ->whereIn('sample_detail.sample_id', $multipleReferenceIds)
+            ->groupBy(['barang_name', 'kode_satuan'])
+            ->findAll();
+
+        return $dataResult;
+    }
+
 
     public function getListBarang($referenceId, $typeReference)
     {

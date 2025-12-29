@@ -221,8 +221,19 @@ class BcPengeluaranBarangModel extends Model
             ->where('deletedAt', null)
             ->findAll();
 
-        $salesOrderNoArr = array_column($result, 'sales_order_export_no');
+        $salesOrderNoArr = array_column($result, 'no_invoice');
         return json_encode($salesOrderNoArr, JSON_UNESCAPED_SLASHES);
+    }
+
+    public function getReferensiNoPengeluaranSample($sampleIds)
+    {
+        $sampleModel = new SampleModel();
+        $result = $sampleModel->whereIn('id', $sampleIds)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        $sampleNoArr = array_column($result, 'no_invoice');
+        return json_encode($sampleNoArr, JSON_UNESCAPED_SLASHES);
     }
 
     public function getDetailBarang(

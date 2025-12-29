@@ -276,11 +276,22 @@ class BC30 extends BaseController
             $noAju = $this->request->getVar('no_pengajuan');
             $noDaftar = $this->request->getVar('no_daftar');
             $multipleReferenceIdArr = $this->request->getVar('multiple_reference_id');
+            $bc30 = $this->bc30Model->where('id', $id)->first();
             $multipleReferenceNo = null;
             $multipleReferenceId = null;
 
             if (!empty($multipleReferenceIdArr) && count($multipleReferenceIdArr) != 0) {
-                $multipleReferenceNo = $this->bcPengeluaranBarangModel->getReferensiNoPengeluaranOrderFormEkspor($multipleReferenceIdArr);
+                if ($bc30['jenis_pengeluaran'] == "ORDER FORM EKSPOR") {
+                    // ORDER FORM EKSPOR
+                    $multipleReferenceNo = $this->bcPengeluaranBarangModel->getReferensiNoPengeluaranOrderFormEkspor(
+                        $multipleReferenceIdArr
+                    );
+                } else {
+                    // SAMPLE
+                    $multipleReferenceNo = $this->bcPengeluaranBarangModel->getReferensiNoPengeluaranSample(
+                        $multipleReferenceIdArr
+                    );
+                }
                 $multipleReferenceId = "[" . implode(",", $multipleReferenceIdArr) . "]";
             }
 
@@ -361,11 +372,12 @@ class BC30 extends BaseController
         $multipleReferenceIds = json_decode($bc30['multiple_reference_id'], true) ?? [];
 
         if ($bc30['jenis_pengeluaran'] == "ORDER FORM EKSPOR") {
-            $dataReferencePengeluaranNotUsed = $this->bc30Model->getReferencePengeluaran(
+            // TARIK DARI ORDER FORM
+            $dataReferencePengeluaranNotUsed = $this->bc30Model->getReferencePengeluaranOrderForm(
                 $bc30['reference_penerima_id'],
                 $bc30['company_id']
             );
-            $dataReferencePengeluaranUsed = $this->bc30Model->getReferencePengeluaranSelected(
+            $dataReferencePengeluaranUsed = $this->bc30Model->getReferencePengeluaranOrderFormSelected(
                 $bc30['id'],
                 $bc30['company_id']
             );
@@ -375,7 +387,27 @@ class BC30 extends BaseController
             );
 
             if (count($multipleReferenceIds) != 0) {
-                $dataBarangSalesEkspor = $this->bc30Model->getListBarangSalesEkspor(
+                $dataBarangSalesEkspor = $this->bc30Model->getListBarangSalesOrderEkspor(
+                    $multipleReferenceIds
+                );
+            }
+        } else {
+            // TARIK DARI SAMPLE
+            $dataReferencePengeluaranNotUsed = $this->bc30Model->getReferencePengeluaranSample(
+                $bc30['reference_penerima_id'],
+                $bc30['company_id']
+            );
+            $dataReferencePengeluaranUsed = $this->bc30Model->getReferencePengeluaranSampleSelected(
+                $bc30['id'],
+                $bc30['company_id']
+            );
+            $dataReferencePengeluaran = array_merge(
+                $dataReferencePengeluaranNotUsed,
+                $dataReferencePengeluaranUsed
+            );
+
+            if (count($multipleReferenceIds) != 0) {
+                $dataBarangSalesEkspor = $this->bc30Model->getListBarangSample(
                     $multipleReferenceIds
                 );
             }
@@ -478,6 +510,8 @@ class BC30 extends BaseController
     public function getListBarangSalesEkspor()
     {
         try {
+            $id = decrypt($this->request->getVar('id'));
+            $bc30 = $this->bc30Model->where('id', $id)->first();
             $multipleReferenceId = $this->request->getVar('multiple_reference_id');
             $multipleReferenceIdArr = json_decode($multipleReferenceId);
             if (count($multipleReferenceIdArr) == 0) {
@@ -488,9 +522,15 @@ class BC30 extends BaseController
                 ]);
             }
 
-            $dataResult = $this->bc30Model->getListBarangSalesEkspor(
-                $multipleReferenceIdArr
-            );
+            if ($bc30['jenis_pengeluaran'] == "ORDER FORM EKSPOR") {
+                $dataResult = $this->bc30Model->getListBarangSalesOrderEkspor(
+                    $multipleReferenceIdArr
+                );
+            } else {
+                $dataResult = $this->bc30Model->getListBarangSample(
+                    $multipleReferenceIdArr
+                );
+            }
 
             return response()->setJSON([
                 'data' => $dataResult,
