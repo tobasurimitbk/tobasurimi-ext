@@ -271,7 +271,7 @@ class StockRevampDetailModel extends Model
             ->select('
                 stock_revamp_detail.id AS id,
                 stock_revamp.spesifikasi_id,
-                suppliers.name AS supplier_name,
+                suppliers.name_alias AS supplier_name,
                 stock_revamp_detail.stock_id,
                 stock_revamp_detail.bc_id,
                 rm_import_pos.supplier_id,
@@ -519,7 +519,7 @@ class StockRevampDetailModel extends Model
             ->select('
                 stock_revamp_detail.id AS id,
                 stock_revamp.spesifikasi_id,
-                suppliers.name AS supplier_name,
+                suppliers.name_alias AS supplier_name,
                 stock_revamp_detail.stock_id,
                 stock_revamp_detail.bc_id,
                 stock_revamp_detail.type_bc,
