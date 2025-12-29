@@ -11,6 +11,7 @@ use App\Models\BC27Model;
 use App\Models\BC30Model;
 use App\Models\BC41Model;
 use App\Models\DivisisModel;
+use App\Models\InisiasiStockRevampModel;
 use App\Models\KemasanModel;
 use App\Models\MetadataModel;
 use App\Models\MutasiGlobalModel;
@@ -28,6 +29,7 @@ use App\Models\StockRevampLogModel;
 use App\Models\StockRevampModel;
 use App\Models\SupplierModel;
 use App\Models\WarehousesModel;
+use DateTime;
 use Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -65,6 +67,7 @@ class StokList extends BaseController
     protected $stockRevampModel;
     protected $stockRevampDetailModel;
     protected $stockRevampLogModel;
+    protected $inisiasiStockRevampModel;
 
     public function __construct()
     {
@@ -97,6 +100,7 @@ class StokList extends BaseController
         $this->stockRevampModel = new StockRevampModel();
         $this->stockRevampDetailModel = new StockRevampDetailModel();
         $this->stockRevampLogModel = new StockRevampLogModel();
+        $this->inisiasiStockRevampModel = new InisiasiStockRevampModel();
     }
 
     public function index()
@@ -270,6 +274,13 @@ class StokList extends BaseController
                 $divisi     = trim($val[4] ?? '');
                 $warehouse  = trim($val[5] ?? '');
                 $qty        = (float) ($val[6] ?? 0);
+                $raw = trim($val[8] ?? '');
+
+                if (is_numeric($raw)) {
+                    $tanggal = Date::excelToDateTimeObject($raw)->format('Y-m-d');
+                } else {
+                    $tanggal = trim($raw);
+                }
 
                 // =========================
                 // 🔸 Validasi master barang
@@ -344,6 +355,13 @@ class StokList extends BaseController
                     }
                 }
 
+                // VALIDASI STRING TANGGAL
+                $validTanggal = $this->validateTanggal($tanggal);
+                if (!$validTanggal) {
+                    $status = false;
+                    $message = "Tanggal stok tidak valid";
+                }
+
                 // =========================
                 // 💾 Simpan ke array result
                 // =========================
@@ -364,6 +382,7 @@ class StokList extends BaseController
                     'reference_type'   => 'INISIASI',
                     'status'           => 'IN',
                     'keterangan'       => 'INISIASI',
+                    'tanggal' => $tanggal
                 ];
 
                 $dataPreview[] = [
@@ -376,6 +395,7 @@ class StokList extends BaseController
                     'spesifikasi'   => $barangMasterSpesifikasi['spesifikasi'] ?? null,
                     'qty'           => $qty,
                     'kode_satuan'   => $barangMasterSpesifikasi['kode_satuan'] ?? null,
+                    'tanggal'       => $tanggal,
                     'status'        => $status,
                     'message'       => $message,
                 ];
@@ -408,10 +428,15 @@ class StokList extends BaseController
         try {
             foreach (json_decode($_POST['list_stock']) as $l) {
                 $data = (array)$l;
-                $this->stockRevampModel->insertStockRevamp(
+                unset($data['tanggal']);
+                $stockDetailId = $this->stockRevampModel->insertStockRevamp(
                     $db,
                     $data
                 );
+                $this->inisiasiStockRevampModel->insert([
+                    'stock_detail_id' => $stockDetailId,
+                    'tanggal' => $l->tanggal
+                ]);
             }
             $db->transCommit();
             return response()->setJSON([
@@ -524,10 +549,14 @@ class StokList extends BaseController
                     'keterangan'        => 'INISIASI'
                 ];
 
-                $this->stockRevampModel->insertStockRevamp(
+                $stockDetailId = $this->stockRevampModel->insertStockRevamp(
                     $db,
                     $data
                 );
+                $this->inisiasiStockRevampModel->insert([
+                    'stock_detail_id' => $stockDetailId,
+                    'tanggal' => formatDMYtoYMD($l->tanggal)
+                ]);
             }
             $db->transCommit();
             return response()->setJSON([
@@ -3390,5 +3419,11 @@ class StokList extends BaseController
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
         $writer->save("php://output");
         exit();
+    }
+
+    private function validateTanggal($date)
+    {
+        $d = DateTime::createFromFormat('Y-m-d', $date);
+        return $d && $d->format('Y-m-d') === $date;
     }
 }
