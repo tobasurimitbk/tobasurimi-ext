@@ -2903,8 +2903,8 @@ $routes->get('/laporan-accounting/jurnalumum', 'Laporan\Accounting\JurnalUmum::i
 $routes->get('/laporan-accounting/jurnalumum/getData', 'Laporan\Accounting\JurnalUmum::getData', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/jurnalumum/printExcel/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\JurnalUmum::exportExcel/$1/$2/$3', ['filter' => 'Auth']);
 
-$routes->get('/laporan-accounting/neracasaldo', 'Laporan\Accounting\NeracaSaldo::index', ['filter' => 'Auth']);
-$routes->post('/laporan-accounting/neracasaldo', 'Laporan\Accounting\NeracaSaldo::index', ['filter' => 'Auth']);
+$routes->get('laporan-accounting/neracasaldo', 'Laporan\Accounting\NeracaSaldo::index', ['filter' => 'Auth']);
+$routes->get('laporan-accounting/neracasaldo/getData', 'Laporan\Accounting\NeracaSaldo::getData', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/neracasaldo/printPDF/(:segment)/(:segment)', 'Laporan\Accounting\NeracaSaldo::exportPDF/$1/$2', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/neracasaldo/printExcel/(:segment)/(:segment)', 'Laporan\Accounting\NeracaSaldo::exportExcel/$1/$2', ['filter' => 'Auth']);
 
