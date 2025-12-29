@@ -137,6 +137,8 @@ class JurnalUmum extends BaseController
                 transaksi_jurnal.no_bukti,
                 transaksi_jurnal.uraian_transaksi,
                 jurnal_umum.keterangan,
+                SUM(jurnal_umum.debit) AS sum_debit,
+                SUM(jurnal_umum.kredit) AS sum_kredit,
                 suppliers.name as supplier,
                 CASE 
                     WHEN jurnal_umum.divisi_id = 0 THEN 'ALL'
@@ -144,12 +146,16 @@ class JurnalUmum extends BaseController
                     ELSE divisis.divisi 
                 END as nama_divisi
             ")
-            ->join('sub_akuns','jurnal_umum.id_coa=sub_akuns.id','left')
+            ->join('sub_akuns','jurnal_umum.id_coa = sub_akuns.id AND sub_akuns.is_header IS NULL','left')
             ->join('transaksi_jurnal','jurnal_umum.id_transaksi=transaksi_jurnal.id','left')
             ->join('divisis','jurnal_umum.divisi_id=divisis.id','left')
             ->join('penerimaan_barang','penerimaan_barang.id=transaksi_jurnal.penerimaan_barang_id','left')
             ->join('suppliers','suppliers.id=penerimaan_barang.supplier_id','left')
             ->whereIn('jurnal_umum.company_id', $companyId)
+            ->whereIn('sub_akuns.company_id', $companyId)
+            ->where('sub_akuns.is_header', null)
+            ->where('transaksi_jurnal.deleted_at', null)
+            ->where('jurnal_umum.deletedAt', null)
             ->where('tanggal_jurnal >=', date('Y-m-d', strtotime(str_replace('/', '-', $dateStart))))
             ->where('tanggal_jurnal <=', date('Y-m-d', strtotime(str_replace('/', '-', $dateEnd))));
 
@@ -163,7 +169,7 @@ class JurnalUmum extends BaseController
             $builder->where('sub_akuns.id', $subsAkun);
         }
 
-        $data = $builder->orderBy('tanggal_jurnal', 'asc')->findAll();
+        $data = $builder->groupBy('sub_akuns.no_sub')->orderBy('tanggal_jurnal', 'asc')->findAll();
 
         $formatted = [];
         $lastGroup = null;
@@ -200,8 +206,8 @@ class JurnalUmum extends BaseController
                 "supplier"      => $row->supplier ?? '',
                 "currency"      => $row->valas ?? 'IDR',
                 "exchange_rate" => $row->exchange_rate ?? '1.00',
-                "debit"         => (float)$row->debit,
-                "kredit"        => (float)$row->kredit,
+                "debit"         => (float)$row->sum_debit,
+                "kredit"        => (float)$row->sum_kredit,
             ];
         }
 
@@ -285,13 +291,17 @@ class JurnalUmum extends BaseController
                     ELSE divisis.divisi 
                 END as nama_divisi
             ")
-            ->join('sub_akuns', 'jurnal_umum.id_coa = sub_akuns.id', 'left')
+            ->join('sub_akuns', 'jurnal_umum.id_coa = sub_akuns.id AND sub_akuns.is_header IS NULL', 'left')
             ->join('transaksi_jurnal', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
             ->join('divisis', 'jurnal_umum.divisi_id = divisis.id', 'left')
             ->join('penerimaan_barang', 'penerimaan_barang.id = transaksi_jurnal.penerimaan_barang_id', 'left')
             ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
             ->where($conditionMain)
             ->whereIn('jurnal_umum.company_id', $companyId)
+            ->whereIn('sub_akuns.company_id', $companyId)
+            ->where('sub_akuns.is_header', null)
+            ->where('transaksi_jurnal.deleted_at', null)
+            ->where('jurnal_umum.deletedAt', null)
             ->orderBy('tanggal_jurnal', 'asc')
             ->findAll();
 
