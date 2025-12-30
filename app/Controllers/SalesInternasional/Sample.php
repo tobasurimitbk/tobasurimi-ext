@@ -103,6 +103,7 @@ class Sample extends BaseController
                 "no_sample"                 => $data->no_sample,
                 "no_invoice"                => $data->no_invoice,
                 "customer_name"             => $data->customer_name,
+                "recipient_details"         => $data->recipient_details,
                 "tanggal_invoice"           => date('d/m/Y', strtotime($data->tanggal_invoice)),
                 "tanggal"                   => date('d/m/Y', strtotime($data->tanggal)),
                 "total_berat_bersih"        => (float)$data->total_berat_bersih,
@@ -297,6 +298,7 @@ class Sample extends BaseController
                 'payment_term' => $this->request->getVar('payment_term'),
                 'nb' =>  trim($this->request->getVar('nb')),
                 'description_notes' => $this->request->getVar('description_notes'),
+                'recipient_details' => $this->request->getVar('recipient_details'),
                 'total_berat_bersih' => $this->request->getVar('total_berat_bersih'),
                 'total_berat_kotor' => $this->request->getVar('total_berat_kotor'),
                 'total_qty' => $this->request->getVar('total_qty')
@@ -381,6 +383,7 @@ class Sample extends BaseController
                 'payment_term' => $this->request->getVar('payment_term'),
                 'nb' =>  trim($this->request->getVar('nb')),
                 'description_notes' => $this->request->getVar('description_notes'),
+                'recipient_details' => $this->request->getVar('recipient_details'),
                 'total_berat_bersih' => $this->request->getVar('total_berat_bersih'),
                 'total_berat_kotor' => $this->request->getVar('total_berat_kotor'),
                 'total_qty' => $this->request->getVar('total_qty')
