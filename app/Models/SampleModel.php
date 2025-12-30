@@ -47,6 +47,7 @@ class SampleModel extends Model
             'no_invoice'            => 'sample.no_invoice',
             'customer_id'           => 'sample.customer_id',
             'tanggal'               => 'sample.tanggal',
+            'recipient_details'     => 'sample.recipient_details',
             'total_berat_kotor'     => 'sample.total_berat_kotor',
             'total_berat_bersih'    => 'sample.total_berat_bersih',
         ];
@@ -73,6 +74,7 @@ class SampleModel extends Model
                 ->orLike('sample.attn_no', $addCondition['search'])
                 ->orLike('customers.name', $addCondition['search'])
                 ->orLike('sample.no_invoice', $addCondition['search'])
+                ->orLike('sample.recipient_details', $addCondition['search'])
                 ->groupEnd();
         }
 

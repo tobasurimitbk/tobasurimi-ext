@@ -235,7 +235,7 @@
                                 <tr style="background-color:#dee2e6">
                                     <td style="white-space: nowrap; text-align: left;">REVISED-<?= $no++ ?></td>
                                     <td style="text-align: right;">:</td>
-                                    <td style="text-align: left;"><?= date('d-M-Y', strtotime($d['date_revision'])) ?></td>
+                                    <td style="text-align: left;"><?= strtoupper(date('d-M-Y', strtotime($d['date_revision']))) ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         </table>
