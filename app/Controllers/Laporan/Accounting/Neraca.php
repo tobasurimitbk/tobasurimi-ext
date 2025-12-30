@@ -112,7 +112,7 @@ class Neraca extends BaseController
                 if (!in_array($kelompok->id, $kategori['kelompok_ids'])) continue;
 
                 $total_kategori = 0;
-                $output[] = ["type"=>"kategori","name"=>$kategori['no_kategori']." - ".$kategori['nama_kategori'],"nominal"=>""];
+                $sub_rows = []; // tampung row sub terlebih dahulu
 
                 foreach ($dataSubAkuns as $sub) {
                     // cek apakah sub-akun ini termasuk kategori saat ini
@@ -120,18 +120,47 @@ class Neraca extends BaseController
 
                     $saldo = 0;
                     foreach ($dataJurnal as $j) {
-                        // cek apakah jurnal ini untuk sub-akun
                         if (!empty($sub['ids']) && in_array($j->id_coa, $sub['ids'])) {
-                            $saldo += stripos($kelompok->value, "Aktiva") !== false ? $j->debit - $j->kredit : $j->kredit - $j->debit;
+                            // hitung saldo
+                            $saldo += stripos($kelompok->value, "Aktiva") !== false
+                                ? $j->debit - $j->kredit
+                                : $j->kredit - $j->debit;
                         }
                     }
 
                     $saldo = max(0, $saldo);
-                    $output[] = ["type"=>"sub","name"=>$sub['no_sub']." - ".$sub['nama_sub'],"nominal"=>$saldo];
-                    $total_kategori += $saldo;
+                    if ($saldo != 0) {
+                        $sub_rows[] = [
+                            "type"   => "sub",
+                            "name"   => $sub['no_sub']." - ".$sub['nama_sub'],
+                            "nominal"=> $saldo
+                        ];
+                        $total_kategori += $saldo;
+                    }
                 }
 
-                $output[] = ["type"=>"total_kategori","name"=>"Total ".$kategori['nama_kategori'],"nominal"=>$total_kategori];
+                // === JANGAN OUTPUT KATEGORI KALAU TOTAL KOSONG ===
+                if ($total_kategori == 0) continue;
+
+                // tampilkan kategori
+                $output[] = [
+                    "type"   => "kategori",
+                    "name"   => $kategori['no_kategori']." - ".$kategori['nama_kategori'],
+                    "nominal"=> ""
+                ];
+
+                // tampilkan semua sub yg ada saldonya
+                foreach ($sub_rows as $sr) {
+                    $output[] = $sr;
+                }
+
+                // tampilkan total kategori
+                $output[] = [
+                    "type"   => "total_kategori",
+                    "name"   => "Total ".$kategori['nama_kategori'],
+                    "nominal"=> $total_kategori
+                ];
+
                 $total_kelompok[$kelompok->value] += $total_kategori;
             }
 
