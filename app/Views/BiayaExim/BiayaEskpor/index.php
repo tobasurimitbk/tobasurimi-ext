@@ -506,7 +506,7 @@
     }
 
     function edit(id) {
-        window.location.href = <?= base_url('biaya-eskpor/id') ?> `/${id}`;
+        window.location.href = " <?= base_url('biaya-ekspor/id') ?>" + "/" + id;
     }
 
     function detail(id) {
