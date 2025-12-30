@@ -68,21 +68,34 @@ class JurnalUmumModel extends Model
 
     public function getDataJurnal($where)
     {
-        $where['deletedAt'] = null;
         $builder = $this->db->table('jurnal_umum');
 
-        if (isset($where['tanggal_jurnal'])) {
-            $builder->like('tanggal_jurnal', $where['tanggal_jurnal']);
-            $builder->where('deletedAt', $where['deletedAt']);
-            $builder->where('id_coa', $where['id_coa']);
-            var_dump($where);
-        } else {
+        // handle company id (array → whereIn)
+        if (isset($where['jurnal_umum.company_id']) && is_array($where['jurnal_umum.company_id'])) {
+            $builder->whereIn('jurnal_umum.company_id', $where['jurnal_umum.company_id']);
+            unset($where['jurnal_umum.company_id']);
+        }
+
+        // handle tanggal >= dan <=
+        if (isset($where['tanggal_jurnal >='])) {
+            $builder->where('tanggal_jurnal >=', $where['tanggal_jurnal >=']);
+            unset($where['tanggal_jurnal >=']);
+        }
+
+        if (isset($where['tanggal_jurnal <='])) {
+            $builder->where('tanggal_jurnal <=', $where['tanggal_jurnal <=']);
+            unset($where['tanggal_jurnal <=']);
+        }
+
+        // handle deletedAt NULL
+        $builder->where('deletedAt', null);
+
+        // handle kondisi lain kalau masih ada
+        if (!empty($where)) {
             $builder->where($where);
         }
 
-        $query = $builder->get()->getResult();
-
-        return $query;
+        return $builder->get()->getResult();
     }
 
     public function getDataJurnalForCosting($where)

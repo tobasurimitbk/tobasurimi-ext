@@ -64,8 +64,7 @@ class KategoriAkunsModel extends Model
 
     public function getAPAR($company_id)
     {
-
-        if ($company_id != "") {
+        if ($company_id != "" && !is_array($company_id)) {
             $arrCondition = [
                 'deletedAt' => null,
                 'company_id' => $company_id
@@ -76,11 +75,32 @@ class KategoriAkunsModel extends Model
             ];
         }
 
-
         $builder = $this->db->table('kategori_akuns');
         $builder->where($arrCondition);
-        $query = $builder->get();
+        if (is_array($company_id)) {
+            $builder->whereIn('company_id', $company_id);
+        }
+        $query = $builder
+        ->get();
 
-        return $query->getResult();
+        $rows = $query->getResult();
+
+        /** ======== GROUP BY no_sub ========= **/
+        $grouped = [];
+        foreach ($rows as $row) {
+            if (!isset($grouped[$row->no_kategori])) {
+                $grouped[$row->no_kategori] = [
+                    'no_kategori'        => $row->no_kategori,
+                    'nama_kategori'      => $row->nama_kategori,
+                    'kelompok_id'        => $row->kelompok_id,
+                    'ids'                => [],
+                    'kelompok_ids'       => []
+                ];
+            }
+            $grouped[$row->no_kategori]['ids'][] = $row->id;
+            $grouped[$row->no_kategori]['kelompok_ids'][] = $row->kelompok_id;
+        }
+
+        return array_values($grouped); // reset index
     }
 }

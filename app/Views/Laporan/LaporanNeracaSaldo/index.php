@@ -82,32 +82,24 @@
 </section>
 
 <script>
+    
+
+    // Set default tanggal: awal bulan - hari ini
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    function formatDate(date) {
+        // Format dd/mm/yyyy
+        let dd = String(date.getDate()).padStart(2, '0');
+        let mm = String(date.getMonth() + 1).padStart(2, '0'); // Januari = 0
+        let yyyy = date.getFullYear();
+        return dd + '/' + mm + '/' + yyyy;
+    }
+
+    $(".dateStart").val(formatDate(firstDay));
+    $(".dateEnd").val(formatDate(today));
+
     $(document).ready(function() {
-        // Mendapatkan tanggal saat ini
-        var currentDate = new Date();
-
-        // Inisialisasi datepicker untuk dateStart dengan nilai default tanggal 1 di bulan berjalan
-        $(".dateStart").datepicker({
-            todayHighlight: true,
-            format: "dd/mm/yyyy",
-            orientation: "bottom auto",
-            autoclose: true,
-            // Atur nilai awal menjadi tanggal 1 di bulan berjalan
-            defaultViewDate: {
-                year: currentDate.getFullYear(),
-                month: currentDate.getMonth(),
-                day: 1
-            }
-        });
-
-        // Inisialisasi datepicker untuk dateEnd
-        $(".dateEnd").datepicker({
-            todayHighlight: true,
-            format: "dd/mm/yyyy",
-            orientation: "bottom auto",
-            autoclose: true
-        });
-
         // untuk me-load data tabel
         function loadTable(){
             $('#myTable').DataTable({
@@ -121,9 +113,15 @@
                 ajax: {
                     url: "<?= base_url('laporan-accounting/neracasaldo/getData') ?>",
                     data: {
-                        dateStart: $('#dateStart').val(),
-                        dateEnd: $('#dateEnd').val()
+                        dateStart: $('.dateStart').val(),
+                        dateEnd: $('.dateEnd').val()
                     }
+                },
+                beforeSend: function(xhr) {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
                 },
                 columns: [
                     { 
@@ -196,6 +194,28 @@
         $('button[type=submit]').click(function(e){
             e.preventDefault();
             loadTable();
+        });
+
+        $(".dateStart").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
+        $(".dateEnd").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
+        $('.icon-dateStart').click(function() {
+            $(".dateStart").focus();
+        });
+
+        $('.icon-dateEnd').click(function() {
+            $(".dateEnd").focus();
         });
     });
     const convertDateFormat = function(dateString) {

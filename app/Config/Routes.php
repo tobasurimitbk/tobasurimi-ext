@@ -2893,9 +2893,8 @@ $routes->get('laporan-accounting/piutang/detail/export-excel', 'Laporan\Accounti
 
 
 $routes->get('/laporan-accounting/neraca', 'Laporan\Accounting\Neraca::index', ['filter' => 'Auth']);
-$routes->post('/laporan-accounting/neraca', 'Laporan\Accounting\Neraca::index', ['filter' => 'Auth']);
-$routes->get('/laporan-accounting/neraca/printPDF/(:segment)/(:segment)', 'Laporan\Accounting\Neraca::exportPDF/$1/$2', ['filter' => 'Auth']);
-$routes->get('/laporan-accounting/neraca/printExcel/(:segment)/(:segment)', 'Laporan\Accounting\Neraca::exportExcel/$1/$2', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/neraca/getData', 'Laporan\Accounting\Neraca::getData', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/neraca/printExcel', 'Laporan\Accounting\Neraca::exportExcel', ['filter' => 'Auth']);
 
 $routes->get('/laporan-accounting/labarugi', 'Laporan\Accounting\LabaRugi::index', ['filter' => 'Auth']);
 $routes->post('/laporan-accounting/labarugi', 'Laporan\Accounting\LabaRugi::index', ['filter' => 'Auth']);

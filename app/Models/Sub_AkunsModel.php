@@ -84,31 +84,41 @@ class Sub_AkunsModel extends Model
 
     public function getAPAR($company_id)
     {
+        $builder = $this->db->table('sub_akuns');
+        $builder->select('no_sub, nama_sub, kategori_id, id');
+        $builder->where('deletedAt', null);
+        $builder->where('is_header', null);
 
-        if ($company_id != "") {
-            // if ($company_id == 1 || $company_id == 2) {
-            //     $arrCondition = [
-            //         'deletedAt' => null,
-            //         'company_id' => 1
-            //     ];
-            // } else {
-            $arrCondition = [
-                'deletedAt' => null,
-                'company_id' => $company_id
-            ];
-            // }
-        } else {
-            $arrCondition = [
-                'deletedAt' => null
-            ];
+        if (!empty($company_id)) {
+            if (is_array($company_id)) {
+                $builder->whereIn('company_id', $company_id);
+            } else {
+                $builder->where('company_id', $company_id);
+            }
         }
 
+        $query = $builder
+        ->orderBy('no_sub')
+        ->get();
+        $rows = $query->getResult();
 
-        $builder = $this->db->table('sub_akuns');
-        $builder->where($arrCondition);
-        $query = $builder->get();
+        /** ======== GROUP BY no_sub ========= **/
+        $grouped = [];
+        foreach ($rows as $row) {
+            if (!isset($grouped[$row->no_sub])) {
+                $grouped[$row->no_sub] = [
+                    'no_sub'        => $row->no_sub,
+                    'nama_sub'      => $row->nama_sub,
+                    'kategori_id'   => $row->kategori_id,
+                    'ids'           => [],
+                    'kategori_ids'  => []
+                ];
+            }
+            $grouped[$row->no_sub]['ids'][] = $row->id;
+            $grouped[$row->no_sub]['kategori_ids'][] = $row->kategori_id;
+        }
 
-        return $query->getResult();
+        return array_values($grouped); // reset index
     }
 
     public function searchSubAkun($query)

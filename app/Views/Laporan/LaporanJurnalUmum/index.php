@@ -103,31 +103,24 @@
 </section>
 
 <script>
+    
+
+    // Set default tanggal: awal bulan - hari ini
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    function formatDate(date) {
+        // Format dd/mm/yyyy
+        let dd = String(date.getDate()).padStart(2, '0');
+        let mm = String(date.getMonth() + 1).padStart(2, '0'); // Januari = 0
+        let yyyy = date.getFullYear();
+        return dd + '/' + mm + '/' + yyyy;
+    }
+
+    $(".dateStart").val(formatDate(firstDay));
+    $(".dateEnd").val(formatDate(today));
+
     $(document).ready(function() {
-        var currentDate = new Date();
-        $(".dateStart[readonly]").datepicker("destroy");
-        $(".dateEnd[readonly]").datepicker("destroy");
-
-        $(".dateStart").datepicker({
-            todayHighlight: true,
-            format: "dd/mm/yyyy",
-            orientation: "bottom auto",
-            autoclose: true
-        });
-
-        $(".dateEnd").datepicker({
-            todayHighlight: true,
-            format: "dd/mm/yyyy",
-            orientation: "bottom auto",
-            autoclose: true
-        });
-
-        $(".dateEnd").on("changeDate", function(e) {
-            var selectedDate = e.date;
-
-            $(".dateStart").datepicker("setDate", new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1));
-        });
-
         $('.type_transaksi, .subs_akun').select2({
             placeholder: "",
             theme: "bootstrap-5",
@@ -166,11 +159,16 @@
                 },
                 dataSrc: "data"
             },
+            beforeSend: function(xhr) {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
             paging: false,
             searching: false,
             info: false,
             order: [],
-
             columns: [
                 { data: "tanggal_jurnal" },
                 { data: "nama_divisi" },
@@ -212,6 +210,28 @@
                 $('#jumlahDebet').html('Rp ' + totalDebit.toLocaleString('id-ID',{minimumFractionDigits:2}));
                 $('#jumlahKredit').html('Rp ' + totalKredit.toLocaleString('id-ID',{minimumFractionDigits:2}));
             }
+        });
+
+        $(".dateStart").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
+        $(".dateEnd").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
+        $('.icon-dateStart').click(function() {
+            $(".dateStart").focus();
+        });
+
+        $('.icon-dateEnd').click(function() {
+            $(".dateEnd").focus();
         });
 
         $('#dateStart, #dateEnd, #type_transaksi, #subs_akun').change(function(){
