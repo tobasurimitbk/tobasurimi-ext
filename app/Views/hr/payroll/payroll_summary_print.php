@@ -104,19 +104,21 @@
             </thead>
             <tbody>
                 <?php foreach ($data['res'] as $d) : ?>
-                    <tr>
-                        <td><?= $d['bagian'] ?></td>
-                        <td><?= $d['payrollTotal'][0]['totalEmployee'] ?></td>
-                        <td><?= number_format($d['payrollTotal'][0]['upahBersih'], 2, ',', '.')  ?></td>
-                        <td><?= number_format(($d['payrollTotal'][0]['tunjangan'] + $d['payrollTotal'][0]['cadangan']), 2, ',', '.')  ?></td>
-                        <td><?= number_format(($d['payrollTotal'][0]['lembur']), 2, ',', '.')  ?></td>
-                        <!-- <td><?= number_format(0, 2, ',', '.')  ?></td> -->
-                        <td><?= number_format(($d['payrollTotal'][0]['upahBersih'] + $d['payrollTotal'][0]['tunjangan'] + $d['payrollTotal'][0]['cadangan']), 2, ',', '.')  ?></td>
-                        <td><?= number_format($d['payrollTotal'][0]['potongan'], 2, ',', '.')  ?></td>
-                        <td><?= number_format(($d['payrollTotal'][0]['upahBersih'] + $d['payrollTotal'][0]['tunjangan'] + $d['payrollTotal'][0]['cadangan'] - $d['payrollTotal'][0]['potongan']), 2, ',', '.')  ?></td>
-                        <td><?= number_format($d['totalJamKerja'], 2, ',', '.') ?></td>
-                        <td><?= number_format($d['totalJamLembur'], 2, ',', '.') ?></td>
-                    </tr>
+                    <?php if ($d['payrollTotal'][0]['totalEmployee'] != 0): ?>
+                        <tr>
+                            <td><?= $d['bagian'] ?></td>
+                            <td><?= $d['payrollTotal'][0]['totalEmployee'] ?></td>
+                            <td><?= number_format($d['payrollTotal'][0]['upahBersih'], 2, ',', '.')  ?></td>
+                            <td><?= number_format(($d['payrollTotal'][0]['tunjangan'] + $d['payrollTotal'][0]['cadangan']), 2, ',', '.')  ?></td>
+                            <td><?= number_format(($d['payrollTotal'][0]['lembur']), 2, ',', '.')  ?></td>
+                            <!-- <td><?= number_format(0, 2, ',', '.')  ?></td> -->
+                            <td><?= number_format(($d['payrollTotal'][0]['upahBersih'] + $d['payrollTotal'][0]['tunjangan'] + $d['payrollTotal'][0]['cadangan']), 2, ',', '.')  ?></td>
+                            <td><?= number_format($d['payrollTotal'][0]['potongan'], 2, ',', '.')  ?></td>
+                            <td><?= number_format(($d['payrollTotal'][0]['upahBersih'] + $d['payrollTotal'][0]['tunjangan'] + $d['payrollTotal'][0]['cadangan'] - $d['payrollTotal'][0]['potongan']), 2, ',', '.')  ?></td>
+                            <td><?= number_format($d['totalJamKerja'], 2, ',', '.') ?></td>
+                            <td><?= number_format($d['totalJamLembur'], 2, ',', '.') ?></td>
+                        </tr>
+                    <?php endif; ?>
                 <?php endforeach; ?>
                 <tr>
                     <td>Total</td>

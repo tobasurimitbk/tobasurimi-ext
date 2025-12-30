@@ -1080,6 +1080,7 @@ class Payroll extends BaseController
         $tunjanganCadangan = $this->tunjanganModel->where('company_id', $this->this_company_id)->where('is_cadangan', 1)->where('deletedAt', null)->first();
         $bagian = $this->bagianModel->getBagian($bagianID);
         $tipe = json_decode($this->request->getVar('tipe'), true) ?? [];
+        $divisi = $this->divisiModel->where('id', $divisionID)->first();
 
         $data = [
             'payrollData' => $this->payrollModel->getPayrollDetail(
@@ -1092,6 +1093,7 @@ class Payroll extends BaseController
             'tunjanganGajiPokok' => $tunjanganGajiPokok,
             'tunjanganCadangan' => $tunjanganCadangan,
             'bagian' => $bagian,
+            'divisi' => $divisi,
             'yearMonth' => $yearMonth,
         ];
 
@@ -1109,6 +1111,7 @@ class Payroll extends BaseController
         $yearMonth = $this->request->getVar('month');
         $divisionID = $this->request->getVar('divisi_id');
         $tipe = json_decode($this->request->getVar('tipe'), true) ?? [];
+        $bagianID = $this->request->getVar('bagian_id');
 
         $year = explode("-", $yearMonth)[0];
         $month = explode("-", $yearMonth)[1];
@@ -1122,6 +1125,7 @@ class Payroll extends BaseController
             $yearMonth,
             $this->this_company_id,
             $divisionID,
+            $bagianID,
             $tipe
         );
         $tipeStr = $this->getTipeStr($tipe);

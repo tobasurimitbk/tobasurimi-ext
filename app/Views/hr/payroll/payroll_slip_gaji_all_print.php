@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-<title>Payroll <?= $yearMonth ?>, Dept. <?= $bagian['divisi'] ?> Bag. <?= $bagian['nama_bagian'] ?></title>
+<title>Payroll <?= $yearMonth ?>, Dept. <?= $divisi['divisi'] ?> Bag. <?= $bagian == null ? 'All' : $bagian['nama_bagian'] ?></title>
 
 <head>
     <style>
