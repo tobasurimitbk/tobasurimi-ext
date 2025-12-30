@@ -327,7 +327,7 @@ class UpdateStockBahanBaku extends BaseController
             } elseif ($tipeSupplier['type'] == "INTERNASIONAL") {
                 // siapkan condition kosong dulu
                 $condition = [
-                    // 'rm_import_pos.warehouse_id' => $warehouse_id,
+                    'rm_import_pos.warehouse_id' => $warehouse_id,
                     'rm_import_pos.division_id' => $divisi_id,
                     'rm_import_pos.supplier_id' => $supplier_id,
                     'stock_revamp.barang_master_id' => $barang_id,

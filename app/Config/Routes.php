@@ -1251,6 +1251,7 @@ $routes->get('/jasa-vendor-in/id/(:segment)',  'JasaVendor\JasaVendorIn::detail/
 $routes->get('/jasa-vendor-in/print/(:segment)',  'JasaVendor\JasaVendorIn::print/$1', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-in/all',  'JasaVendor\JasaVendorIn::all', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-in/unposting', 'JasaVendor\JasaVendorIn::unPosting', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in/print-filter',  'JasaVendor\JasaVendorIn::printFilter', ['filter' => 'Auth']);
 
 
 // JASA VENDOR IN KEPITING
