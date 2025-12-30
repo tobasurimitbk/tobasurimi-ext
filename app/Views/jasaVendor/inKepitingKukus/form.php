@@ -1038,13 +1038,12 @@
     function format3Decimal(num) {
         if (num === null || num === undefined || num === "") return "0.000";
 
-        // Pastikan numeric
         num = parseFloat(num);
         if (isNaN(num)) return "0.000";
 
-        // Fix jadi 3 angka di belakang koma tanpa pembulatan
-        return (Math.floor(num * 1000) / 1000).toFixed(3);
+        return (Math.round((num + Number.EPSILON) * 1000) / 1000).toFixed(3);
     }
+
 
 
     function drawTable3(listBarangGroup) {
