@@ -688,6 +688,8 @@ class ProductionResult extends BaseController
             $barangScrap = json_decode($this->request->getVar("scrap"));
             $barangFilling = json_decode($this->request->getVar("filling"));
 
+            // var_dump($barangDigunakan);exit;
+
             $productionResData = $this->productionResultModel->find($productionResID);
 
             $this->productionResultModel->update($productionResID, $datas);

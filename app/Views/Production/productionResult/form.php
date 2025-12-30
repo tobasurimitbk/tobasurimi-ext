@@ -234,9 +234,7 @@
                                                 <th>Department</th>
                                                 <th>Warehouse</th>
                                                 <th>Jumlah</th>
-                                                <?php if (!isset($data)) : ?>
                                                     <th>Action</th>
-                                                <?php endif; ?>
                                             </tr>
                                         </thead>
                                         <tbody class="body-table-barang-scrap" id="body-table-barang-scrap" style="cursor: pointer;">
@@ -312,9 +310,7 @@
                                                 <th>Nama Barang</th>
                                                 <th>Kondisi</th>
                                                 <th>Jumlah</th>
-                                                <?php if (!isset($data)) : ?>
                                                     <th>Action</th>
-                                                <?php endif; ?>
                                             </tr>
                                         </thead>
                                         <tbody class="body-table-barang-filling" id="body-table-barang-filling" style="cursor: pointer;">
@@ -2142,15 +2138,13 @@
                 row += '<td>' + greatFormatRupiah(item.qty) + '</td>';
 
                 // Hanya tampilkan tombol delete jika data belum diposting
-                <?php if (!isset($data)) : ?>
                     row += `
                         <td>
-                            <button type="button" class="btn btn-danger" onclick="deleteRowDetailScrap('${item.barang_detail_id}')">
+                            <button type="button" class="btn btn-danger" onclick="deleteRowDetailScrap('${item.barang_detail_id}', '${item.production_result_detail_id}')">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
                         </td>
                     `;
-                <?php endif; ?>
 
                 no++;
             });
@@ -2183,15 +2177,13 @@
                 row += '<td>' + greatFormatRupiah(item.qty) + '</td>';
 
                 // Hanya tampilkan tombol delete jika data belum diposting
-                <?php if (!isset($data)) : ?>
                     row += `
                         <td>
-                            <button type="button" class="btn btn-danger" onclick="deleteRowDetailFilling('${item.barang_detail_id}')">
+                            <button type="button" class="btn btn-danger" onclick="deleteRowDetailFilling('${item.barang_detail_id}', '${item.production_result_detail_id}')">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
                         </td>
                     `;
-                <?php endif; ?>
 
                 no++;
             });
@@ -2257,12 +2249,58 @@
         }
     }
 
-    const deleteRowDetailScrap = function(id) {
-        const indexToRemove = list_items_barang_scrap.findIndex(item => item.barang_detail_id === id);
-        if (indexToRemove !== -1) {
-            list_items_barang_scrap.splice(indexToRemove, 1);
+    const deleteRowDetailScrap = function(id, iddetail) {
+        if (id && iddetail == "undefined") {
+            const indexToRemove = list_items_barang_scrap.findIndex(item => item.barang_detail_id === id);
+            if (indexToRemove !== -1) {
+                list_items_barang_scrap.splice(indexToRemove, 1);
+            }
+            drawTableBarangScrap();
         }
-        drawTableBarangScrap();
+        if (iddetail && iddetail != "undefined") {
+            Swal.fire({
+                icon: 'question',
+                title: 'Yakin akan di hapus?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Kembali',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const csrf = $(`[name="${csrfToken}"]`);
+                    $.ajax({
+                        url: "<?= base_url("production-result/delete-detail"); ?>",
+                        data: {
+                            id: iddetail,
+                        },
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        location.reload();
+                                    })
+                            }
+                        },
+                    });
+                }
+            })
+        }
     }
     const resetFormDetailScrap = function() {
         $(".kode_barang_scrap").val('').change()
@@ -2271,12 +2309,60 @@
         $(".warehouse_id_scrap").val('').change()
     }
 
-    const deleteRowDetailFilling = function(id) {
-        const indexToRemove = list_items_barang_filling.findIndex(item => item.barang_detail_id === id);
-        if (indexToRemove !== -1) {
-            list_items_barang_filling.splice(indexToRemove, 1);
+    const deleteRowDetailFilling = function(id, iddetail) {
+        console.log(id);
+        console.log(iddetail);
+        if (id && iddetail == "undefined") {
+            const indexToRemove = list_items_barang_filling.findIndex(item => item.barang_detail_id === id);
+            if (indexToRemove !== -1) {
+                list_items_barang_filling.splice(indexToRemove, 1);
+            }
+            drawTableBarangFilling();
         }
-        drawTableBarangFilling();
+        if (iddetail && iddetail != "undefined") {
+            Swal.fire({
+                icon: 'question',
+                title: 'Yakin akan di hapus?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Kembali',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const csrf = $(`[name="${csrfToken}"]`);
+                    $.ajax({
+                        url: "<?= base_url("production-result/delete-detail"); ?>",
+                        data: {
+                            id: iddetail,
+                        },
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        location.reload();
+                                    })
+                            }
+                        },
+                    });
+                }
+            })
+        }
     }
     const resetFormDetailFilling = function() {
         $(".kode_barang_filling").val('').change()
