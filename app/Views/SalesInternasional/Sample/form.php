@@ -122,19 +122,25 @@
                             <label for="floatingInput">Attn To</label>
                         </div>
                     </div> -->
-                    <div class="col-sm-4">
+                    <div class="col-md-3">
+                        <div class="form-floating mb-3">
+                            <input autocomplete="one-time-code" type="text" class="form-control recipient_details" id="recipient_details" name="recipient_details" placeholder="Recipient Details" value="<?= !empty($dataSample['recipient_details']) ? $dataSample['recipient_details'] : "" ?>">
+                            <label for="floatingInput">Recipient Details</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
                         <div class="form-floating mb-3">
                             <input autocomplete="one-time-code" value="<?= !empty($dataSample) ? $dataSample['approved_by'] : '' ?>" type="text" class="form-control approved_by" id="approved_by" name="approved_by" placeholder="Approved By">
                             <label for="floatingInput">Approved By</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="form-floating mb-3">
                             <input autocomplete="one-time-code" type="text" class="form-control an" id="an" name="an" placeholder="AN" value="<?= !empty($an) ? $an : "" ?>">
                             <label for="floatingInput">AN</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="form-floating mb-3">
                             <input autocomplete="one-time-code" type="text" class="form-control pickup_date" id="pickup_date" name="pickup_date" placeholder="Pickup Date (Optional)" value="<?= !empty($pickupDate) ? $pickupDate : "" ?>">
                             <label for="floatingInput">Pickup Date (Optional)</label>
@@ -572,9 +578,9 @@
                 customer_id: {
                     required: true
                 },
-                // delivery: {
-                //     required: true
-                // },
+                recipient_details: {
+                    required: true
+                },
                 // attn_no: {
                 //     required: true
                 // },
@@ -595,9 +601,9 @@
                 customer_id: {
                     required: "Delivery to required"
                 },
-                // delivery: {
-                //     required: "Delivery required"
-                // },
+                recipient_details: {
+                    required: "Recipient details required"
+                },
                 // attn_no: {
                 //     required: "Attn no required"
                 // },

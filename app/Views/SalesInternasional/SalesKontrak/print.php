@@ -321,7 +321,7 @@
                         <tr>
                             <td><label class="label-header">REV <?= $no ?></label></td>
                             <td><label class="label-header">:</label></td>
-                            <td><label class="label-header"><?= date('d-M-Y', strtotime($r['date_revision'])) ?></label></td>
+                            <td><label class="label-header"><?= strtoupper(date('d-M-Y', strtotime($r['date_revision']))) ?></label></td>
                         </tr>
                         <?php $no++ ?>
                     <?php endforeach; ?>
