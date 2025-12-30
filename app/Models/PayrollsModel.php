@@ -703,10 +703,12 @@ class PayrollsModel extends Model
         /* =====================================================
         * MASTER DATA
         * ===================================================== */
-        $bagianData = $db->table('bagian')
-            ->where('division_id', $divisionID)
-            ->where('deletedAt', null)
-            ->get()->getResultArray();
+        $bagianQry = $db->table('bagian')->where('division_id', $divisionID)->where('deletedAt', null);
+
+        if (!empty($bagianId) && $bagianId != '') {
+            $bagianQry->where('id', $bagianId);
+        }
+        $bagianData =  $bagianQry->get()->getResultArray();
 
         /* =====================================================
         * PAYROLL + EMPLOYEE (1 QUERY)
@@ -855,7 +857,7 @@ class PayrollsModel extends Model
 
                 foreach ($potonganSingle as $k => $v) {
                     if ($k !== 'totPotongan') {
-                        $potonganSingle[$k] += $dp[str_replace('tot', 'pot', $k)] ?? 0;
+                        $potonganSingle[$k] += $dp[lcfirst(str_replace('tot', '', $k))] ?? 0;
                     }
                 }
                 $potonganSingle['totPotongan'] += $dp['totPotongan'];
