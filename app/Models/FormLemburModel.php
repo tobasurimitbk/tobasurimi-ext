@@ -168,35 +168,83 @@ class FormLemburModel extends Model
         ];
     }
 
+    // public function getTotalLemburJamPertamaKeduaByDateRange($employeeID, $startDate, $endDate)
+    // {
+    //     $formLemburModel = new FormLemburModel();
+    //     $lemburList = $formLemburModel->rekapLemburDateRange($employeeID, $startDate, $endDate);
+
+    //     $lemburJamPertama = 0;
+    //     $lemburJamKedua = 0;
+
+    //     foreach ($lemburList as $lembur) {
+    //         $totalJamHariIni = (float) $lembur['total_jam_lembur'];
+
+    //         if ($totalJamHariIni <= 1) {
+    //             // seluruh lembur hari ini masuk jam pertama (maksimal 1 jam)
+    //             $lemburJamPertama += $totalJamHariIni;
+    //         } else {
+    //             // jam pertama maksimal 1
+    //             $lemburJamPertama += 1;
+
+    //             // jam kedua adalah sisanya
+    //             $lemburJamKedua += ($totalJamHariIni - 1);
+    //         }
+    //     }
+
+    //     return [
+    //         'jamPertama' => $lemburJamPertama,
+    //         'jamKedua'   => $lemburJamKedua,
+    //     ];
+    // }
+
     public function getTotalLemburJamPertamaKeduaByDateRange($employeeID, $startDate, $endDate)
     {
         $formLemburModel = new FormLemburModel();
         $lemburList = $formLemburModel->rekapLemburDateRange($employeeID, $startDate, $endDate);
 
-        $lemburJamPertama = 0;
-        $lemburJamKedua = 0;
+        $lemburJamPertamaMenit = 0;
+        $lemburJamKeduaMenit = 0;
 
         foreach ($lemburList as $lembur) {
-            $totalJamHariIni = (float) $lembur['total_jam_lembur'];
+            $totalMenit = $this->jamMenitKeMenit($lembur['total_jam_lembur']);
 
-            if ($totalJamHariIni <= 1) {
-                // seluruh lembur hari ini masuk jam pertama (maksimal 1 jam)
-                $lemburJamPertama += $totalJamHariIni;
+            if ($totalMenit <= 60) {
+                $lemburJamPertamaMenit += $totalMenit;
             } else {
-                // jam pertama maksimal 1
-                $lemburJamPertama += 1;
-
-                // jam kedua adalah sisanya
-                $lemburJamKedua += ($totalJamHariIni - 1);
+                $lemburJamPertamaMenit += 60;
+                $lemburJamKeduaMenit += ($totalMenit - 60);
             }
         }
 
         return [
-            'jamPertama' => $lemburJamPertama,
-            'jamKedua'   => $lemburJamKedua,
+            'jamPertama' => $this->menitKeJamMenit($lemburJamPertamaMenit),
+            'jamKedua'   => $this->menitKeJamMenit($lemburJamKeduaMenit),
         ];
     }
 
+    private function menitKeJamMenit($menit)
+    {
+        $jam = intdiv($menit, 60);
+        $sisaMenit = $menit % 60;
+
+        return (float) ($jam . '.' . str_pad($sisaMenit, 2, '0'));
+    }
+
+    private function jamMenitKeMenit($jam)
+    {
+        $jam = (string) $jam;
+
+        if (!str_contains($jam, '.')) {
+            return ((int) $jam) * 60;
+        }
+
+        [$j, $m] = explode('.', $jam);
+
+        // .3 = 30 menit, .5 = 50 menit, dll
+        $menit = (int) str_pad($m, 2, '0');
+
+        return ((int) $j * 60) + $menit;
+    }
 
     public function getFormLemburAmt($employeeIds, $startDate, $endDate)
     {
