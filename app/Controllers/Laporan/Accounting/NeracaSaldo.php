@@ -86,11 +86,15 @@ class NeracaSaldo extends BaseController
                 SUM(ju.debit)  AS total_debit,
                 SUM(ju.kredit) AS total_kredit
             ")
-            ->join('jurnal_umum ju', 'ju.id_coa = sa.id', 'left')
+            ->join('jurnal_umum ju', 'ju.id_coa = sa.id AND sa.is_header IS NULL', 'left')
             ->join('transaksi_jurnal tj', 'tj.id = ju.id_transaksi', 'left')
             ->whereIn('sa.company_id', $companyId)
+            ->whereIn('ju.company_id', $companyId)
             ->where('ju.tanggal_jurnal >=', $start)
             ->where('ju.tanggal_jurnal <=', $end)
+            ->where('sa.is_header', null)
+            ->where('tj.deleted_at', null)
+            ->where('ju.deletedAt', null)
             ->groupBy('sa.no_sub')
             ->orderBy('sa.no_sub')
             ->get()
