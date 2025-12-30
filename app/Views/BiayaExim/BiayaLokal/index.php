@@ -491,7 +491,7 @@
     }
 
     function edit(id) {
-        window.location.href = `/biaya-lokal/id/${id}`;
+        window.location.href = <?= base_url('biaya-lokal/id') ?> `/${id}`;
     }
 
     function detail(id) {
