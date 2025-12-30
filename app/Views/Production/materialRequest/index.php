@@ -5,11 +5,9 @@
 <section class="section">
     <div class="section-header">
         <h1>Material Request</h1>
-
         <a class="btn btn-show-form btn-add float-right" href="<?= base_url("material-request/create"); ?>">
             <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
         </a>
-        <?= csrf_field() ?>
     </div>
     <div class="card">
         <div class="card-body">
@@ -63,12 +61,26 @@
     const csrf = $(`[name="${csrfToken}"]`);
     let sort = "createdAt";
     let sortType = "desc";
+    
+    // Set default tanggal: awal bulan - hari ini
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    function formatDate(date) {
+        // Format dd/mm/yyyy
+        let dd = String(date.getDate()).padStart(2, '0');
+        let mm = String(date.getMonth() + 1).padStart(2, '0'); // Januari = 0
+        let yyyy = date.getFullYear();
+        return dd + '/' + mm + '/' + yyyy;
+    }
+
+    $(".dateStartRequest").val(formatDate(firstDay));
+    $(".dateEndRequest").val(formatDate(today));
 
     let search = $('.search').val();
     let currentPage = 1;
 
     const table = $('.dataTable').DataTable({
-
         processing: true,
         serverSide: true,
         ordering: true,
@@ -87,6 +99,8 @@
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
+                data.dateStart = $(".dateStartRequest").val();
+                data.dateEnd = $(".dateEndRequest").val();
                 data.sort = sort;
                 data.sortType = sortType;
             },

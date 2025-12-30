@@ -288,6 +288,8 @@ class MaterialRequest extends BaseController
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
+            "dateStart"     => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType")
         ];

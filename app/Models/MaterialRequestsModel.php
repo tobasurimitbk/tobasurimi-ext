@@ -102,16 +102,21 @@ class MaterialRequestsModel extends Model
 
         $totalData = $materialRequestsDataQry->countAllResults(false);
 
-        if ($addCondition['search']) {
-            $materialRequestsDataQry->groupStart();
+        // === FILTERING (search) ===
+        if (!empty($addCondition['search'])) {
+            $search = $addCondition['search'];
+            $materialRequestsDataQry->having("
+                material_requests.req_no LIKE '%{$search}%' 
+                OR barangName LIKE '%{$search}%'
+                OR wo_no LIKE '%{$search}%'
+            ");
         }
-        if ($addCondition['search']) {
-            $materialRequestsDataQry
-                ->like('material_requests.req_no', $addCondition['search']);
-            // ->orLike('material_request_details.nama_barang', $addCondition['search']);
+
+        if ($addCondition['dateStart']) {
+            $materialRequestsDataQry->where('material_requests.request_date >=',  $addCondition['dateStart']);
         }
-        if ($addCondition['search']) {
-            $materialRequestsDataQry->groupEnd();
+        if ($addCondition['dateEnd']) {
+            $materialRequestsDataQry->where('material_requests.request_date <=', $addCondition['dateEnd']);
         }
 
         $totalFilteredData = $materialRequestsDataQry->countAllResults(false);
