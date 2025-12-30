@@ -84,6 +84,35 @@ class Sub_AkunsModel extends Model
 
     public function getAPAR($company_id)
     {
+
+        if ($company_id != "") {
+            // if ($company_id == 1 || $company_id == 2) {
+            //     $arrCondition = [
+            //         'deletedAt' => null,
+            //         'company_id' => 1
+            //     ];
+            // } else {
+            $arrCondition = [
+                'deletedAt' => null,
+                'company_id' => $company_id
+            ];
+            // }
+        } else {
+            $arrCondition = [
+                'deletedAt' => null
+            ];
+        }
+
+
+        $builder = $this->db->table('sub_akuns');
+        $builder->where($arrCondition);
+        $query = $builder->get();
+
+        return $query->getResult();
+    }
+
+    public function getAPARS($company_id)
+    {
         $builder = $this->db->table('sub_akuns');
         $builder->select('no_sub, nama_sub, kategori_id, id');
         $builder->where('deletedAt', null);

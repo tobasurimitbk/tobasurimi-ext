@@ -92,7 +92,7 @@ class Neraca extends BaseController
             ->findAll();
 
         $dataKategoriAkun = $this->KategoriAkunsModel->getAPAR($companyId);
-        $dataSubAkuns     = $this->Sub_AkunsModel->getAPAR($companyId);
+        $dataSubAkuns     = $this->Sub_AkunsModel->getAPARS($companyId);
         $dataJurnal       = $this->jurnalUmumModel->getDataJurnal($condition);
 
         // var_dump($dataMetadata, $dataKategoriAkun, $dataSubAkuns, $dataJurnal);
