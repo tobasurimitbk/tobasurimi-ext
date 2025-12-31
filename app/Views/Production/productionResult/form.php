@@ -269,6 +269,7 @@
                                                         <option value=""></option>
                                                         <option value="ditapak" selected>Ditapak</option>
                                                         <option value="filling">Filling</option>
+                                                        <option value="frozen">FR40</option>
                                                     </select>
                                                     <label for="floatingInput">Kondisi Barang</label>
                                                 </div>
