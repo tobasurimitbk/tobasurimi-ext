@@ -1071,7 +1071,7 @@ function sendDataToServer(data, url) {
                     icon: 'success',
                     confirmButtonText: 'OK'
                 }).then(() => {
-                    window.location.href = '/biaya-kepiting/';
+                    window.location.href = "<?= base_url('biaya-kepiting') ?>";
                 });
             } else {
                 Swal.fire('Error', response.message, 'error');
