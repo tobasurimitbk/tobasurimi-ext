@@ -280,7 +280,7 @@ function handleVendorChange() {
     }
 
     $.ajax({
-        url: `/biaya-kepiting/get-jasa-vendor-in/${vendorId}`,
+        url: `biaya-kepiting/get-jasa-vendor-in/${vendorId}`,
         type: 'GET',
         dataType: 'json',
         success: function(response) {
