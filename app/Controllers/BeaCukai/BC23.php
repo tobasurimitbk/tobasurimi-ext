@@ -2035,7 +2035,7 @@ class BC23 extends BaseController
     public function posting()
     {
         $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
-        $bc40 = $this->bc23Model->where('bc_purchase_order_id', $bcPurchaseOrderID)->first();
+        $bc23 = $this->bc23Model->where('bc_purchase_order_id', $bcPurchaseOrderID)->first();
         $bcPurchaseOrder = $this->bcPurchaseOrderModel->where('id', $bcPurchaseOrderID)->first();
         $tanggalDokumen = date('Y-m-d', strtotime($bcPurchaseOrder['createdAt']));
 
@@ -2047,7 +2047,7 @@ class BC23 extends BaseController
             ]);
         }
 
-        if ($bc40 == null) {
+        if ($bc23 == null) {
             // insert
             $this->bc23Model->insert([
                 'bc_purchase_order_id' => $bcPurchaseOrderID,
@@ -2055,20 +2055,9 @@ class BC23 extends BaseController
             ]);
         }
 
-        $bc40 = $this->bc23Model->where('bc_purchase_order_id', $bcPurchaseOrderID)->first();
-        $status = $this->insertInventori($bcPurchaseOrderID);
-
-        if (!$status) {
-            return response()->setJSON([
-                'token' => csrf_hash(),
-                'status' => true,
-                'message' => "Terjadi kesalahan saat menambah stok inventori"
-            ]);
-        }
-
         $this->bcPurchaseOrderModel->update($bcPurchaseOrderID, [
             'status_posting' => '1',
-            'no_aju' => $bc40['no_aju'],
+            'no_aju' => $bc23['no_aju'],
             'bc_id' => 48,
             'bc_type' => "BC 2.3"
         ]);
@@ -2353,165 +2342,6 @@ class BC23 extends BaseController
         $this->dompdf->stream("BC 2.3 Purchase Order", array("Attachment" => false));
     }
 
-    private function insertInventoriRevamp($bcPurchaseOrderID)
-    {
-        try {
-            $bcPo = $this->bcPurchaseOrderModel->find($bcPurchaseOrderID);
-            $bc23 = $this->bc23Model->where('bc_purchase_order_id', $bcPurchaseOrderID)->first();
-
-            $poIdArr = array_unique(json_decode($bcPo['multiple_po_id']));
-            $lpbIdArr = array_unique(json_decode($bcPo['multiple_lpb_id']));
-            $typeBahan = $bcPo['po_type'] == "IMPORT BAKU" ? "bahan_baku" : "bahan_penolong";
-
-            foreach ($lpbIdArr as $lpbId) {
-
-                $penerimaanBarang = $this->penerimaanBarangModel->where('id', $lpbId)->first();
-                $penerimaanBarangList = $this->penerimaanBarangDetailModel
-                    ->where('penerimaan_barang_id', $lpbId)
-                    ->whereIn('purchase_order_id', $poIdArr)
-                    ->where('deletedAt', null)
-                    ->findAll();
-
-                // CHECK STOK APAKAH SUDAH DIINISASI (INISIASI HEADER BARANG)
-                foreach ($penerimaanBarangList as $p) {
-
-                    // CHECK STOK BARANG HEADER
-                    $stok = $this->stockModel->getStokMaster(
-                        $this->this_company_id,
-                        $penerimaanBarang['warehouse_id'],
-                        $penerimaanBarang['divisi_id'],
-                        $typeBahan,
-                        $p['barang_id'],
-                        $p['spesifikasi_id'],
-                    );
-
-                    if ($stok == null) {
-                        $stok = $this->stockModel->insertStok(
-                            $this->this_company_id,
-                            $penerimaanBarang['warehouse_id'],
-                            $penerimaanBarang['divisi_id'],
-                            $typeBahan,
-                            $p['barang_id'],
-                            $p['spesifikasi_id'],
-                            0
-                        );
-                    }
-                }
-
-                // CHECK STOK KEMASAN HEADER (INISIASI HEADER KEMASAN)
-                $stok = $this->stockModel->getStokMaster(
-                    $this->this_company_id,
-                    $penerimaanBarang['warehouse_id'],
-                    $penerimaanBarang['divisi_id'],
-                    "kemasan",
-                    0,
-                    $penerimaanBarang['kemasan_id'],
-                );
-
-                if ($stok == null) {
-                    $stok = $this->stockModel->insertStok(
-                        $this->this_company_id,
-                        $penerimaanBarang['warehouse_id'],
-                        $penerimaanBarang['divisi_id'],
-                        "kemasan",
-                        0,
-                        $penerimaanBarang['kemasan_id'],
-                        0
-                    );
-                }
-
-                // STOK BARANG DIINPUT (INSERT BARANG)
-                foreach ($penerimaanBarangList as $p) {
-                    // HEADER
-                    $stok = $this->stockModel->insertStok(
-                        $this->this_company_id,
-                        $penerimaanBarang['warehouse_id'],
-                        $penerimaanBarang['divisi_id'],
-                        $typeBahan,
-                        $p['barang_id'],
-                        $p['spesifikasi_id'],
-                        $p['jml_masuk_konversi']
-                    );
-
-                    // DETAIL
-                    $stokDetail = $this->stockDetailModel->insertStokDetail(
-                        $stok,
-                        $p['jml_masuk_konversi'],
-                        'In',
-                        date('Y-m-d'),
-                        $this->this_user_id,
-                        "LPB",
-                        $penerimaanBarang['no_penerimaan_barang'],
-                        "-",
-                    );
-
-                    // GET PURCHASE ORDER
-                    if ($typeBahan == "bahan_penolong") {
-                        // PO BAHAN PENOLONG
-                        $po = $this->amPurchaseOrderModel->find($p['purchase_order_id']);
-                    } else {
-                        // PO BAHAN BAKU
-                        $po = $this->rmImportPoModel->find($p['purchase_order_id']);
-                    }
-                    // SUB DETAIL
-                    $this->stockDetail2Model->insertStokDetail2(
-                        $penerimaanBarang['bc_type'],
-                        $stok,
-                        $stokDetail,
-                        $p['jml_masuk_konversi'],
-                        $bc23['no_aju'],
-                        $po['po_no'],
-                        $po['po_no'],
-                        $penerimaanBarang['supplier_id'],
-                        $p['harga'],
-                        $p['harga_harian'],
-                        $p['harga_bulanan'],
-                        $po['po_no']
-                    );
-                }
-
-                // INSERT KEMASAN
-                $stok = $this->stockModel->insertStok(
-                    $this->this_company_id,
-                    $penerimaanBarang['warehouse_id'],
-                    $penerimaanBarang['divisi_id'],
-                    "kemasan",
-                    0,
-                    $penerimaanBarang['kemasan_id'],
-                    $penerimaanBarang['jumlah_kemasan']
-                );
-
-                // DETAIL
-                $stokDetail = $this->stockDetailModel->insertStokDetail(
-                    $stok,
-                    $penerimaanBarang['jumlah_kemasan'],
-                    "In",
-                    date('Y-m-d', strtotime($bcPo['createdAt'])),
-                    $this->this_user_id,
-                    "LPB",
-                    $penerimaanBarang['no_penerimaan_barang'],
-                    "-",
-                );
-
-                // SUB DETAIL
-                $this->stockDetail2Model->insertStokDetail2(
-                    $penerimaanBarang['bc_type'],
-                    $stok,
-                    $stokDetail,
-                    $penerimaanBarang['jumlah_kemasan'],
-                    $bc23['no_aju'],
-                    $penerimaanBarang['no_penerimaan_barang'],
-                    $penerimaanBarang['no_penerimaan_barang'],
-                    $penerimaanBarang['supplier_id'],
-                );
-            }
-
-            return true;
-        } catch (Exception $e) {
-            var_dump($e->getMessage(), $e->getTrace());
-            return false;
-        }
-    }
 
     private function insertInventori($bcPurchaseOrderID)
     {
