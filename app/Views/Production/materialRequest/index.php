@@ -205,6 +205,32 @@
         $(".search").keyup(function() {
             table.ajax.reload();
         })
+
+        $(".dateStartRequest").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
+        $(".dateEndRequest").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
+        $('.icon-dateStart').click(function() {
+            $(".dateStart").focus();
+        });
+
+        $('.icon-dateEnd').click(function() {
+            $(".dateEnd").focus();
+        });
+
+        $(".dateStartRequest, .dateEndRequest, .search").change(function() {
+            table.ajax.reload();
+        });
     })
 
     const posting = function(id, status_posting) {
