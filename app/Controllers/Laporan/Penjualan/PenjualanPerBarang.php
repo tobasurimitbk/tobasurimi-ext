@@ -316,6 +316,7 @@ class PenjualanPerBarang extends BaseController
         $condition = [
             // "sales_order_invoice.id_company" => $this->this_company_id,
             "sales_order_invoice.deletedAt" => null,
+            "sales_order_invoice_detail.deletedAt" => null,
             "sales_order_invoice.tipe_invoice" => 'LOKAL'
         ];
 
@@ -387,6 +388,7 @@ class PenjualanPerBarang extends BaseController
         $condition = [
             // "sales_order_invoice.id_company" => $this->this_company_id,
             "sales_order_invoice.deletedAt" => null,
+            "sales_order_invoice_detail.deletedAt" => null,
             "sales_order_invoice.tipe_invoice" => 'LOKAL'
         ];
 
@@ -507,6 +509,7 @@ class PenjualanPerBarang extends BaseController
         $condition = [
             // "sales_order_invoice.id_company" => $this->this_company_id,
             "sales_order_invoice.deletedAt" => null,
+            "sales_order_invoice_detail.deletedAt" => null,
             "sales_order_invoice.tipe_invoice" => 'LOKAL'
         ];
 
@@ -578,6 +581,7 @@ class PenjualanPerBarang extends BaseController
         $condition = [
             // "sales_order_invoice.id_company" => $this->this_company_id,
             "sales_order_invoice.deletedAt" => null,
+            "sales_order_invoice_detail.deletedAt" => null,
             "sales_order_invoice.tipe_invoice" => 'LOKAL'
         ];
 

@@ -112,8 +112,10 @@ class RincianPenjualanPerBarang extends BaseController
 
             if ($data->jenis_penjualan == "1") {
                 $salesName = $data->salesName;
+            } elseif ($data->jenis_penjualan == 2) {
+                $salesName = "Office";
             } else {
-                $salesName = "OFFICE";
+                $salesName = "E-Commerce";
             }
 
             array_push($dataAllSalesOrderInvoice, [
@@ -224,8 +226,10 @@ class RincianPenjualanPerBarang extends BaseController
 
             if ($data->jenis_penjualan == "1") {
                 $salesName = $data->salesName;
+            } elseif ($data->jenis_penjualan == 2) {
+                $salesName = "Office";
             } else {
-                $salesName = "OFFICE";
+                $salesName = "E-Commerce";
             }
 
             $dataAllSalesOrderInvoice[] = [
@@ -363,8 +367,10 @@ class RincianPenjualanPerBarang extends BaseController
             
             if ($data->jenis_penjualan == "1") {
                 $salesName = $data->salesName;
+            } elseif ($data->jenis_penjualan == 2) {
+                $salesName = "Office";
             } else {
-                $salesName = "OFFICE";
+                $salesName = "E-Commerce";
             }
 
             $sheet->fromArray([
