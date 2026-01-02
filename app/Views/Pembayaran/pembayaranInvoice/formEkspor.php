@@ -12,24 +12,24 @@
 
             <?php if (!empty($detail)) : ?>
                 <?php if ($detail['status_posting'] == "0") : ?>
-                    <?php if (can('Transaksi Internasional', 'Pembayaran Invoice Export', 'd')) : ?>
+                    <?php if (can('Transaksi Internasional', 'Export', 'd')) : ?>
                         <button onclick="remove('<?= encrypt($detail['id']) ?>')" class="btn btn-hapus delete-parent float-right">
                             Hapus
                         </button>
                     <?php endif; ?>
-                    <?php if (can('Transaksi Internasional', 'Pembayaran Invoice Export', 'a')) : ?>
+                    <?php if (can('Transaksi Internasional', 'Export', 'a')) : ?>
                         <button onclick="posting('<?= encrypt($detail['id']) ?>')" class="btn btn-success posting-spp float-right posting">
                             Posting
                         </button>
                     <?php endif; ?>
-                    <?php if (can('Transaksi Internasional', 'Pembayaran Invoice Export', 'u')) : ?>
+                    <?php if (can('Transaksi Internasional', 'Export', 'u')) : ?>
                         <button class="btn btn-show-form btn-save float-right btn-submit-form">
                             Update
                         </button>
                     <?php endif; ?>
                 <?php endif; ?>
             <?php else : ?>
-                <?php if (can('Transaksi Internasional', 'Pembayaran Invoice Export', 'c')) : ?>
+                <?php if (can('Transaksi Internasional', 'Export', 'c')) : ?>
                     <button class="btn btn-show-form btn-save float-right btn-submit-form">
                         Simpan
                     </button>
