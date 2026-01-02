@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Surat Permintaan Pembelian</title>
+    <title><?= $dataSPP->spp_no ?></title>
 
     <style>
         /* ===============================
@@ -35,7 +35,7 @@
    BAGI HALAMAN JADI 2
 =============================== */
         .half-page {
-            height: 15.4cm;
+            height: 13.2cm;
             /* (31 - 0.2) / 2 */
             box-sizing: border-box;
             overflow: hidden;
@@ -47,7 +47,7 @@
         }
 
         .tear-line {
-            height: 0.2cm;
+            height: 0.4cm;
             border-top: 1px dashed #000;
             margin: 0;
         }
@@ -63,11 +63,6 @@
 
         .table-border {
             border: 1px solid #000;
-        }
-
-        .table-font-size {
-            font-size: 11px;
-            text-align: left;
         }
 
         .txt-center {
@@ -113,6 +108,11 @@
         .txt-center {
             text-align: center;
         }
+
+        .table-font-size {
+            font-size: 11px !important;
+            text-align: left;
+        }
     </style>
 </head>
 
@@ -145,28 +145,28 @@
             <table class="mt-5 table-border">
                 <thead>
                     <tr>
-                        <th class="table-border table-font-size">No</th>
-                        <th class="table-border table-font-size" style="width: 60px;">Kode</th>
-                        <th class="table-border table-font-size">Nama Barang</th>
-                        <th class="table-border table-font-size" style="width: 60px;">Qty</th>
-                        <th class="table-border table-font-size">Keterangan</th>
-                        <th class="table-border table-font-size" style="width: 70px;">Supplier</th>
-                        <th class="table-border table-font-size" style="width: 70px;">Harga</th>
+                        <th class="table-border table-font-size"><b class="table-font-size">No</b></th>
+                        <th class="table-border table-font-size" style="width: 60px;"><b class="table-font-size">Kode</b></th>
+                        <th class="table-border table-font-size"><b class="table-font-size">Nama Barang</b></th>
+                        <th class="table-border table-font-size" style="width: 60px;"><b class="table-font-size">Qty</b></th>
+                        <th class="table-border table-font-size"><b class="table-font-size">Keterangan</b></th>
+                        <th class="table-border table-font-size" style="width: 70px;"><b class="table-font-size">Supplier</b></th>
+                        <th class="table-border table-font-size" style="width: 70px;"><b class="table-font-size">Harga</b></th>
 
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($dataSPP->purchase_request_details as $d): ?>
                         <tr>
-                            <td class="table-border table-font-size"><?= $d->no ?></td>
-                            <td class="table-border table-font-size"><?= $d->kode_barang ?></td>
+                            <td class="table-border table-font-size"><b class="table-font-size"><?= $d->no ?></b></td>
+                            <td class="table-border table-font-size"><b class="table-font-size"><?= $d->kode_barang ?></b></td>
                             <td class="table-border table-font-size">
-                                <?= $d->barang_name ?> <?= $d->spesifikasi ?>
+                                <b class="table-font-size"> <?= $d->barang_name ?> <?= $d->spesifikasi ?> </b>
                             </td>
                             <td class="table-border table-font-size">
-                                <?= $d->qty ?> <?= $d->kode_satuan ?>
+                                <b class="table-font-size"> <?= $d->qty ?> <?= $d->kode_satuan ?> </b>
                             </td>
-                            <td class="table-border table-font-size"><?= $d->note ?></td>
+                            <td class="table-border table-font-size"><b class="table-font-size"><?= $d->note ?></b></td>
                             <td class="table-border table-font-size"></td>
                             <td class="table-border table-font-size"></td>
                         </tr>
@@ -248,28 +248,28 @@
         <table class="mt-5 table-border">
             <thead>
                 <tr>
-                    <th class="table-border table-font-size">No</th>
-                    <th class="table-border table-font-size" style="width: 60px;">Kode</th>
-                    <th class="table-border table-font-size">Nama Barang</th>
-                    <th class="table-border table-font-size" style="width: 60px;">Qty</th>
-                    <th class="table-border table-font-size">Keterangan</th>
-                    <th class="table-border table-font-size" style="width: 70px;">Supplier</th>
-                    <th class="table-border table-font-size" style="width: 70px;">Harga</th>
+                    <th class="table-border table-font-size"><b class="table-font-size">No</b></th>
+                    <th class="table-border table-font-size" style="width: 60px;"><b class="table-font-size">Kode</b></th>
+                    <th class="table-border table-font-size"><b class="table-font-size">Nama Barang</b></th>
+                    <th class="table-border table-font-size" style="width: 60px;"><b class="table-font-size">Qty</b></th>
+                    <th class="table-border table-font-size"><b class="table-font-size">Keterangan</b></th>
+                    <th class="table-border table-font-size" style="width: 70px;"><b class="table-font-size">Supplier</b></th>
+                    <th class="table-border table-font-size" style="width: 70px;"><b class="table-font-size">Harga</b></th>
 
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($dataSPP->purchase_request_details as $d): ?>
                     <tr>
-                        <td class="table-border table-font-size"><?= $d->no ?></td>
-                        <td class="table-border table-font-size"><?= $d->kode_barang ?></td>
+                        <td class="table-border table-font-size"><b class="table-font-size"><?= $d->no ?></b></td>
+                        <td class="table-border table-font-size"><b class="table-font-size"><?= $d->kode_barang ?></b></td>
                         <td class="table-border table-font-size">
-                            <?= $d->barang_name ?> <?= $d->spesifikasi ?>
+                            <b class="table-font-size"> <?= $d->barang_name ?> <?= $d->spesifikasi ?> </b>
                         </td>
                         <td class="table-border table-font-size">
-                            <?= $d->qty ?> <?= $d->kode_satuan ?>
+                            <b class="table-font-size"> <?= $d->qty ?> <?= $d->kode_satuan ?> </b>
                         </td>
-                        <td class="table-border table-font-size"><?= $d->note ?></td>
+                        <td class="table-border table-font-size"><b class="table-font-size"><?= $d->note ?></b></td>
                         <td class="table-border table-font-size"></td>
                         <td class="table-border table-font-size"></td>
                     </tr>
