@@ -10,6 +10,7 @@ use App\Models\AttendancesUnitOutsourceModel;
 use App\Models\DivisisModel;
 use App\Models\HROutsourcingCompanyModel;
 use App\Models\HROutsourcingEmployeeModel;
+use App\Models\MetadataModel;
 use CodeIgniter\I18n\Time;
 use DateInterval;
 use DatePeriod;
@@ -36,6 +37,7 @@ class Attendance extends BaseController
     protected $AttendancesUnitOutsourceModel;
     protected $Attendance;
     protected $divisiModel;
+    protected $metaDataModel;
     protected $AttendancesLogOutsourcingModel;
     
 
@@ -49,12 +51,14 @@ class Attendance extends BaseController
         $this->AttendancesLogOutsourcingModel = new AttendancesLogOutsourcingModel();
         $this->Attendance = new AttendancesUnit();
         $this->divisiModel = new DivisisModel();
+        $this->metadataModel = new MetadataModel();
     }
 
     public function index()
     {
         $data = [
             "dataDivisi" => $this->divisiModel->getDivisiAccess(),
+            "metadata" => $this->metadataModel->where('name', "tipe_karyawan_outsource")->where('deletedAt', NULL)->findAll(),
         ];
        
         return view('HROutsourcing/Attendance/index', $data);
@@ -457,14 +461,14 @@ class Attendance extends BaseController
     {
         try {
             // ===============================
-            // 1. AMBIL PARAMETER (SINGLE DATE)
+            // 1. AMBIL PARAMETER
             // ===============================
             $companyId = $this->request->getPost('company_id');
-            $date      = $this->request->getPost('date');    // Changed from start_date
+            $date      = $this->request->getPost('date');    // Tanggal referensi untuk ambil bulan
             $period    = $this->request->getPost('period'); // 1-15 / 16-31
             $type      = $this->request->getPost('type');   // harian / minggu
 
-            if (!$companyId || !$date || !$period) {
+            if (!$companyId || !$date || !$period || !$type) {
                 return $this->response->setJSON([
                     'success' => false,
                     'message' => 'Parameter tidak lengkap'
@@ -487,24 +491,37 @@ class Attendance extends BaseController
             }
 
             // ===============================
-            // 3. DATA KARYAWAN
+            // 3. TENTUKAN TANGGAL PERIODE BERDASARKAN BULAN DARI $date
             // ===============================
-            $allEmployees = $this->hrOutSourcingEmployeModel
-                ->where('company_id', $companyId)
-                ->findAll();
-
-            if (empty($allEmployees)) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'Tidak ada karyawan'
-                ]);
+            $referenceDate = strtotime($date);
+            $year = date('Y', $referenceDate);
+            $month = date('m', $referenceDate);
+            
+            // Tentukan start dan end date berdasarkan periode
+            if ($period === '1-15') {
+                $startDate = $year . '-' . $month . '-01';
+                $endDate = $year . '-' . $month . '-15';
+            } else {
+                // Periode 16-akhir bulan
+                $startDate = $year . '-' . $month . '-16';
+                $lastDay = date('t', strtotime($startDate)); // Tanggal terakhir bulan
+                $endDate = $year . '-' . $month . '-' . $lastDay;
             }
 
             // ===============================
-            // 4. AMBIL ABSENSI DARI DATABASE (SINGLE DATE)
+            // 4. DATA KARYAWAN BERDASARKAN TIPE
             // ===============================
-            $selectedDate = date('Y-m-d', strtotime($date));
-            
+            // Perhatikan: $type dari parameter harus sesuai dengan nilai di database
+            // Misal: $type = 'harian' atau $type = 'minggu' 
+            $allEmployees = $this->hrOutSourcingEmployeModel
+                ->where('tipe_karyawan', $type)
+                ->where('company_id', $companyId)
+                ->where('deletedAt', NULL)
+                ->findAll();
+
+            // ===============================
+            // 5. AMBIL ABSENSI DARI DATABASE (SELURUH PERIODE)
+            // ===============================
             $rawAttendance = $this->AttendancesLogOutsourcingModel
                 ->select('
                     attendance_log_outsource.employee_id AS pin,
@@ -524,12 +541,14 @@ class Attendance extends BaseController
                     'left'
                 )
                 ->where('hr_outsourcing_employee.company_id', $companyId)
-                ->where('DATE(attendance_log_outsource.datetime)', $selectedDate)
+                ->where('hr_outsourcing_employee.tipe_karyawan', $type)
+                ->where("DATE(attendance_log_outsource.datetime) >= '{$startDate}'")
+                ->where("DATE(attendance_log_outsource.datetime) <= '{$endDate}'")
                 ->orderBy('attendance_log_outsource.datetime', 'ASC')
                 ->findAll();
 
             // ===============================
-            // 5. FORMAT DATA ABSENSI (ADAPTER)
+            // 6. FORMAT DATA ABSENSI (ADAPTER)
             // ===============================
             $formattedAttendance = array_map(function ($row) {
                 return [
@@ -542,12 +561,13 @@ class Attendance extends BaseController
             }, $rawAttendance);
 
             // ===============================
-            // 6. GROUP ABSENSI PER KARYAWAN
+            // 7. GROUP ABSENSI PER KARYAWAN PER TANGGAL
             // ===============================
             $employeeAttendanceMap = [];
 
             foreach ($formattedAttendance as $att) {
                 $pin = (int)$att['pin'];
+                $attDate = $att['date'];
                 
                 if ($pin <= 0) continue;
 
@@ -555,58 +575,64 @@ class Attendance extends BaseController
                     $employeeAttendanceMap[$pin] = [];
                 }
 
-                $employeeAttendanceMap[$pin][] = [
+                if (!isset($employeeAttendanceMap[$pin][$attDate])) {
+                    $employeeAttendanceMap[$pin][$attDate] = [];
+                }
+
+                $employeeAttendanceMap[$pin][$attDate][] = [
                     'datetime'  => $att['datetime'],
                     'timestamp' => strtotime($att['datetime']),
                     'verified'  => (int)$att['verified'],
                     'status'    => (int)$att['status'],
-                    'workcode'  => 0,
-                    'date'      => $att['date']
+                    'workcode'  => 0
                 ];
             }
 
-            // Sort log per karyawan
-            foreach ($employeeAttendanceMap as $pin => $records) {
-                usort($employeeAttendanceMap[$pin], fn($a, $b) => $a['timestamp'] <=> $b['timestamp']);
+            // Sort log per tanggal per karyawan
+            foreach ($employeeAttendanceMap as $pin => $dateMap) {
+                foreach ($dateMap as $date => $records) {
+                    usort($employeeAttendanceMap[$pin][$date], fn($a, $b) => $a['timestamp'] <=> $b['timestamp']);
+                }
             }
 
             // ===============================
-            // 7. PROSES GAJI UNTUK SETIAP KARYAWAN
+            // 8. PROSES GAJI UNTUK SETIAP KARYAWAN (SELURUH PERIODE)
             // ===============================
             $processedEmployees = [];
 
             foreach ($allEmployees as $employee) {
                 $employeeId = (int)$employee['id'];
                 
-                // Default: Tidak masuk
                 $employeeAttendanceDays = [];
                 $workDays = 0;
 
-                // Cek apakah karyawan ini punya absensi
-                if (isset($employeeAttendanceMap[$employeeId]) && !empty($employeeAttendanceMap[$employeeId])) {
-                    $records = $employeeAttendanceMap[$employeeId];
-                    
-                    // Ambil check in pertama dan check out terakhir
-                    $firstRecord = $records[0];
-                    $lastRecord = end($records);
-                    
-                    // Cari check out dengan status = 1 (pulang) jika ada
-                    $finalCheckOut = $lastRecord['datetime'];
-                    foreach ($records as $r) {
-                        if ($r['status'] === 1) {
-                            $finalCheckOut = $r['datetime'];
-                            break;
+                // Cek apakah karyawan ini punya absensi dalam periode ini
+                if (isset($employeeAttendanceMap[$employeeId])) {
+                    foreach ($employeeAttendanceMap[$employeeId] as $date => $records) {
+                        if (!empty($records)) {
+                            // Ambil check in pertama dan check out terakhir untuk tanggal ini
+                            $firstRecord = $records[0];
+                            $lastRecord = end($records);
+                            
+                            // Cari check out dengan status = 1 (pulang) jika ada
+                            $finalCheckOut = $lastRecord['datetime'];
+                            foreach ($records as $r) {
+                                if ($r['status'] === 1) {
+                                    $finalCheckOut = $r['datetime'];
+                                    break;
+                                }
+                            }
+
+                            $employeeAttendanceDays[$date] = [
+                                'check_in'  => $firstRecord['datetime'],
+                                'check_out' => $finalCheckOut,
+                                'records'   => $records,
+                                'date'      => $date
+                            ];
+
+                            $workDays++; // Hitung hari kerja
                         }
                     }
-
-                    $employeeAttendanceDays[$selectedDate] = [
-                        'check_in'  => $firstRecord['datetime'],
-                        'check_out' => $finalCheckOut,
-                        'records'   => $records,
-                        'date'      => $selectedDate
-                    ];
-
-                    $workDays = 1; // Hanya 1 hari untuk single date
                 }
 
                 // Hitung gaji (meskipun tidak masuk, untuk ditampilkan)
@@ -622,30 +648,33 @@ class Attendance extends BaseController
             }
 
             // ===============================
-            // 8. GENERATE PDF
+            // 9. GENERATE PDF
             // ===============================
             $html = $this->generateHtmlContent(
                 $processedEmployees,
                 $period,
                 $type,
-                $date, // Single date
-                $date, // Start dan end sama
+                $startDate,
+                $endDate,
                 $company
             );
 
             $pdfContent = $this->generatePdf($html);
 
             // ===============================
-            // 9. RESPONSE
+            // 10. RESPONSE
             // ===============================
             return $this->response->setJSON([
                 'success'          => true,
                 'data'             => base64_encode($pdfContent),
-                'filename'         => "Payroll_{$company['name']}_{$selectedDate}_{$type}_" . date('Ymd_His') . ".pdf",
+                'filename'         => "Payroll_{$company['name']}_{$year}{$month}_{$period}_{$type}_" . date('Ymd_His') . ".pdf",
                 'total_employees'  => count($processedEmployees),
-                'date'             => $selectedDate,
+                'period'           => $period,
+                'start_date'       => $startDate,
+                'end_date'         => $endDate,
                 'present_count'    => count(array_filter($processedEmployees, fn($e) => !empty($e['attendance']))),
-                'absent_count'     => count(array_filter($processedEmployees, fn($e) => empty($e['attendance'])))
+                'absent_count'     => count(array_filter($processedEmployees, fn($e) => empty($e['attendance']))),
+                'total_salary'     => array_sum(array_column(array_column($processedEmployees, 'calculations'), 'total_salary'))
             ]);
 
         } catch (\Throwable $e) {
@@ -673,27 +702,34 @@ class Attendance extends BaseController
             'daily_rate' => 0,
             'overtime_rate' => 0,
             'longshift_rate' => 0,
-            'work_days' => count($attendanceDays),
+            'work_days' => 0, // Hanya hari dengan check in & check out
+            'valid_attendance_days' => 0, // Hari hadir yang valid (≥8 jam = hadir penuh)
+            'partial_days' => 0, // Hari dengan jam kurang
             'daily_details' => [] // Detail per hari
         ];
 
         // Tentukan rate berdasarkan jenis (harian/minggu)
         if ($type === 'harian') {
             // GAJI HARIAN (PER 15 HARI)
-            $daysInPeriod = $this->getWorkingDaysInPeriod($period);
-            
             // Rate sesuai permintaan
             $hourlyRate = 67166.67 / 8; // = 8,395.83375 per jam
             $dailyRate = 67166.67; // Rate harian penuh
-            $overtimeRate = $hourlyRate * 1.5; // Lembur 1.5x
+            $overtimeRate = $hourlyRate * 1.5; // Lembur 1.5x = 12,593.750625
+            $longshiftRate = 120000.00; // Longshift flat
+            
+        } else if ($type === 'minggu') {
+            // GAJI MINGGUAN
+            $hourlyRate = 15000.00;
+            $dailyRate = 120000.00; // 8 jam x 15,000
+            $overtimeRate = $hourlyRate * 1.5; // 22,500 per jam
             $longshiftRate = 120000.00; // Longshift flat
             
         } else {
-            // GAJI MINGGUAN
-            $hourlyRate = 15000.00;
-            $dailyRate = 120000.00;
-            $overtimeRate = $hourlyRate * 1.5; // 22,500 per jam
-            $longshiftRate = 120000.00; // Longshift flat
+            // GAJI BULANAN (default)
+            $hourlyRate = 20000.00;
+            $dailyRate = 160000.00; // 8 jam x 20,000
+            $overtimeRate = $hourlyRate * 1.5; // 30,000 per jam
+            $longshiftRate = 150000.00; // Longshift flat
         }
 
         $result['daily_rate'] = $dailyRate;
@@ -702,61 +738,91 @@ class Attendance extends BaseController
 
         // Hitung jam kerja untuk setiap hari hadir
         foreach ($attendanceDays as $date => $dayData) {
-            if (isset($dayData['check_in']) && isset($dayData['check_out'])) {
-                $hours = $this->calculateDailyHours($dayData);
-                
-                $dailyDetail = [
-                    'date' => $date,
-                    'check_in' => $dayData['check_in'],
-                    'check_out' => $dayData['check_out'],
-                    'total_hours' => $hours,
-                    'regular_hours' => 0,
-                    'overtime_hours' => 0,
-                    'is_longshift' => false
-                ];
-                
-                if ($hours > 0) {
-                    if ($hours <= 8) {
-                        $regularHours = $hours;
-                        $overtimeHours = 0;
-                    } else {
-                        $regularHours = 8;
-                        $overtimeHours = $hours - 8;
-                    }
-                    
-                    $dailyDetail['regular_hours'] = $regularHours;
-                    $dailyDetail['overtime_hours'] = $overtimeHours;
-                    
-                    $result['regular_hours'] += $regularHours;
-                    $result['regular_salary'] += ($regularHours * $hourlyRate);
-                    
-                    if ($overtimeHours > 0) {
-                        $result['overtime_hours'] += $overtimeHours;
-                        $result['overtime_salary'] += ($overtimeHours * $overtimeRate);
-                    }
-                    
-                    // Cek apakah longshift (kerja > 14 jam total)
-                    if ($hours > 14) {
-                        $dailyDetail['is_longshift'] = true;
-                        $result['longshift_hours'] += 1;
-                        $result['longshift_salary'] += $longshiftRate;
-                    }
-                }
-                
-                $result['daily_details'][] = $dailyDetail;
+            // HITUNG JAM KERJA HARIAN DENGAN RUMUS YANG SAMA DENGAN FE
+            $dailyHours = $this->calculateDailyHours($dayData);
+            
+            if ($dailyHours <= 0) {
+                continue; // Lewati hari tanpa jam kerja
             }
+            
+            $dailyDetail = [
+                'date' => $date,
+                'check_in' => $dayData['check_in'] ?? null,
+                'check_out' => $dayData['check_out'] ?? null,
+                'total_hours' => $dailyHours,
+                'regular_hours' => 0,
+                'overtime_hours' => 0,
+                'is_longshift' => false,
+                'is_valid_day' => false // Hari yang valid untuk gaji (≥8 jam)
+            ];
+            
+            // PEMBAGIAN JAM REGULAR vs OVERTIME
+            if ($dailyHours <= 8) {
+                $regularHours = $dailyHours;
+                $overtimeHours = 0;
+            } else {
+                $regularHours = 8;
+                $overtimeHours = $dailyHours - 8;
+            }
+            
+            $dailyDetail['regular_hours'] = $regularHours;
+            $dailyDetail['overtime_hours'] = $overtimeHours;
+            
+            // TANDAI JIKA HARI INI VALID (HADIR PENUH = ≥8 JAM)
+            if ($dailyHours >= 8) {
+                $dailyDetail['is_valid_day'] = true;
+                $result['valid_attendance_days']++;
+            } else {
+                $result['partial_days']++;
+            }
+            
+            // HITUNG GAJI REGULAR
+            $regularSalary = $regularHours * $hourlyRate;
+            $result['regular_hours'] += $regularHours;
+            $result['regular_salary'] += $regularSalary;
+            
+            // HITUNG GAJI OVERTIME
+            if ($overtimeHours > 0) {
+                $overtimeSalary = $overtimeHours * $overtimeRate;
+                $result['overtime_hours'] += $overtimeHours;
+                $result['overtime_salary'] += $overtimeSalary;
+            }
+            
+            // CEK LONGSHIFT (KERJA > 14 JAM)
+            if ($dailyHours > 14) {
+                $dailyDetail['is_longshift'] = true;
+                $result['longshift_hours'] += 1;
+                $result['longshift_salary'] += $longshiftRate;
+            }
+            
+            $result['daily_details'][] = $dailyDetail;
+            $result['work_days']++; // Total hari dengan check in & check out
         }
 
-        // Total semua
+        // TOTAL SEMUA JAM
         $result['total_hours'] = $result['regular_hours'] + $result['overtime_hours'];
-        $result['total_salary'] = $result['regular_salary'] + $result['overtime_salary'] + $result['longshift_salary'];
+        
+        // PERHITUNGAN TOTAL GAJI BERDASARKAN JENIS GAJI
+        if ($type === 'harian') {
+            // GAJI HARIAN: Total berdasarkan jumlah hari valid
+            $baseSalary = $result['valid_attendance_days'] * $dailyRate;
+            $result['total_salary'] = $baseSalary + $result['overtime_salary'] + $result['longshift_salary'];
+            
+        } else if ($type === 'minggu') {
+            // GAJI MINGGUAN: Total berdasarkan jam kerja
+            $result['total_salary'] = $result['regular_salary'] + $result['overtime_salary'] + $result['longshift_salary'];
+            
+        } else {
+            // GAJI BULANAN: Tetap berdasarkan jam kerja
+            $result['total_salary'] = $result['regular_salary'] + $result['overtime_salary'] + $result['longshift_salary'];
+        }
 
         return $result;
     }
 
     /**
      * HITUNG JAM KERJA HARIAN DARI CHECK-IN DAN CHECK-OUT
-     * (Diperbaiki untuk menghitung dengan benar)
+     * (SAMA DENGAN RUMUS DI FRONTEND)
      */
     private function calculateDailyHours($dayData)
     {
@@ -764,21 +830,19 @@ class Attendance extends BaseController
             return 0;
         }
         
+        // Format waktu dari database
         $checkIn = strtotime($dayData['check_in']);
         $checkOut = strtotime($dayData['check_out']);
         
-        if ($checkIn >= $checkOut) {
+        if ($checkIn === false || $checkOut === false || $checkIn >= $checkOut) {
             return 0;
         }
         
+        // Hitung selisih dalam detik
         $diff = $checkOut - $checkIn;
-        $hours = $diff / 3600;
+        $hours = $diff / 3600; // Konversi ke jam
         
-        // Kurangi istirahat 1 jam jika kerja > 6 jam
-        if ($hours > 6) {
-            $hours -= 1;
-        }
-        
+        // Format dengan 2 desimal
         return round($hours, 2);
     }
 
@@ -788,11 +852,18 @@ class Attendance extends BaseController
     private function generateHtmlContent($data, $period, $type, $startDate, $endDate, $company)
     {
         $periodText = $period === '1-15' ? '1-15' : '16-' . date('t', strtotime($startDate));
-        $title = $type === 'harian' ? "SLIP GAJI HARIAN PERIODE {$periodText}" : "SLIP GAJI MINGGUAN";
+        $title = $type === 'harian' ? "SLIP GAJI HARIAN PERIODE {$periodText}" : 
+                ($type === 'minggu' ? "SLIP GAJI MINGGUAN" : "SLIP GAJI BULANAN");
         
-        // WARNING: Jika data terlalu banyak, buat per page
-        $perPage = 30;
-        $totalPages = ceil(count($data) / $perPage);
+        // Hitung total keseluruhan
+        $totalEmployees = count($data);
+        $totalWorkDays = array_sum(array_column(array_column($data, 'calculations'), 'work_days'));
+        $totalValidDays = array_sum(array_column(array_column($data, 'calculations'), 'valid_attendance_days'));
+        $totalPartialDays = array_sum(array_column(array_column($data, 'calculations'), 'partial_days'));
+        $totalRegularHours = array_sum(array_column(array_column($data, 'calculations'), 'regular_hours'));
+        $totalOvertimeHours = array_sum(array_column(array_column($data, 'calculations'), 'overtime_hours'));
+        $totalLongshift = array_sum(array_column(array_column($data, 'calculations'), 'longshift_hours'));
+        $totalSalary = array_sum(array_column(array_column($data, 'calculations'), 'total_salary'));
         
         $html = '<!DOCTYPE html>
         <html>
@@ -820,6 +891,7 @@ class Attendance extends BaseController
                 .summary-label { font-weight: bold; }
                 .page-break { page-break-after: always; }
                 .page-number { text-align: center; margin-top: 10px; font-size: 9px; color: #666; }
+                .rate-info { background-color: #fff8e1; padding: 8px; border-radius: 5px; margin-bottom: 15px; border: 1px solid #ffd54f; }
                 @media print {
                     body { font-size: 9px; padding: 10px; }
                     .no-print { display: none; }
@@ -828,187 +900,175 @@ class Attendance extends BaseController
         </head>
         <body>';
 
-        // Jika banyak data, buat per page
-        if ($totalPages > 1) {
-            for ($page = 0; $page < $totalPages; $page++) {
-                $start = $page * $perPage;
-                $pageData = array_slice($data, $start, $perPage);
-                
-                $html .= $this->generatePageContent(
-                    $pageData, 
-                    $title, 
-                    $company, 
-                    $startDate, 
-                    $endDate, 
-                    $page + 1, 
-                    $totalPages,
-                    ($page == 0) // first page
-                );
-                
-                if ($page < $totalPages - 1) {
-                    $html .= '<div class="page-break"></div>';
-                }
-            }
-        } else {
-            $html .= $this->generatePageContent(
-                $data, 
-                $title, 
-                $company, 
-                $startDate, 
-                $endDate, 
-                1, 
-                1,
-                true
-            );
-        }
+        // HEADER
+        $html .= '<div class="header">
+            <h2>' . $title . '</h2>
+            <p>Perusahaan: <strong>' . ($company['name'] ?? 'N/A') . '</strong></p>
+            <p>Periode: ' . date('d/m/Y', strtotime($startDate)) . ' - ' . date('d/m/Y', strtotime($endDate)) . '</p>
+            <p>Tanggal Cetak: ' . date('d/m/Y H:i:s') . '</p>
+        </div>';
 
-        $html .= '</body></html>';
+        // COMPANY INFO
+        $html .= '<div class="company-info">
+            <p><strong>Informasi Perusahaan:</strong></p>
+            <p>Nama: ' . ($company['name'] ?? 'N/A') . '</p>
+            <p>Alamat: ' . ($company['address'] ?? 'N/A') . '</p>
+            <p>Telepon: ' . ($company['phone'] ?? 'N/A') . '</p>
+        </div>';
 
-        return $html;
-    }
-
-    /**
-     * GENERATE CONTENT PER PAGE
-     */
-    private function generatePageContent($pageData, $title, $company, $startDate, $endDate, $currentPage, $totalPages, $isFirstPage = false)
-    {
-        $html = '';
+        // INFORMASI RATE
+        $hourlyRate = 0;
+        $dailyRate = 0;
+        $overtimeRate = 0;
+        $longshiftRate = 0;
         
-        if ($isFirstPage) {
-            // HEADER hanya di page pertama
-            $html .= '<div class="header">
-                <h2>' . $title . '</h2>
-                <p>Perusahaan: <strong>' . ($company['name'] ?? 'N/A') . '</strong></p>
-                <p>Periode: ' . date('d/m/Y', strtotime($startDate)) . ' - ' . date('d/m/Y', strtotime($endDate)) . '</p>
-                <p>Tanggal Cetak: ' . date('d/m/Y H:i:s') . '</p>
-            </div>';
-
-            // COMPANY INFO hanya di page pertama
-            $html .= '<div class="company-info">
-                <p><strong>Informasi Perusahaan:</strong></p>
-                <p>Nama: ' . ($company['name'] ?? 'N/A') . '</p>
-                <p>Alamat: ' . ($company['address'] ?? 'N/A') . '</p>
-                <p>Telepon: ' . ($company['phone'] ?? 'N/A') . '</p>
-            </div>';
-
-            // SUMMARY hanya di page pertama
-            $totalEmployees = count($pageData) * $totalPages; // Estimasi
-            $totalRegularHours = array_sum(array_column(array_column($pageData, 'calculations'), 'regular_hours'));
-            $totalOvertimeHours = array_sum(array_column(array_column($pageData, 'calculations'), 'overtime_hours'));
-            $totalSalary = array_sum(array_column(array_column($pageData, 'calculations'), 'total_salary'));
-            $totalWorkDays = array_sum(array_column(array_column($pageData, 'calculations'), 'work_days'));
+        if ($type === 'harian') {
+            $hourlyRate = 67166.67 / 8;
+            $dailyRate = 67166.67;
+            $overtimeRate = $hourlyRate * 1.5;
+            $longshiftRate = 120000.00;
             
-            $html .= '<div class="summary-box">
-                <div class="summary-item"><span class="summary-label">Jumlah Karyawan:</span> ' . $totalEmployees . '</div>
-                <div class="summary-item"><span class="summary-label">Total Hari Kerja:</span> ' . $totalWorkDays . '</div>
-                <div class="summary-item"><span class="summary-label">Total Jam Kerja:</span> ' . number_format($totalRegularHours + $totalOvertimeHours, 2) . ' jam</div>
-                <div class="summary-item"><span class="summary-label">Total Gaji:</span> Rp ' . number_format($totalSalary, 2) . '</div>
+            $html .= '<div class="rate-info">
+                <p><strong>Rate Gaji Harian:</strong></p>
+                <p>• Gaji Harian Penuh (8 jam): Rp ' . number_format($dailyRate, 2) . '</p>
+                <p>• Rate per Jam: Rp ' . number_format($hourlyRate, 2) . '</p>
+                <p>• Rate Lembur (1.5x): Rp ' . number_format($overtimeRate, 2) . ' per jam</p>
+                <p>• Longshift (>14 jam): Rp ' . number_format($longshiftRate, 2) . ' flat per hari</p>
             </div>';
         }
 
-        // TABEL GAJI untuk page ini
+        // SUMMARY TOTAL
+        $html .= '<div class="summary-box">
+            <h3 style="margin-top: 0; color: #0056b3;">RINGKASAN TOTAL</h3>
+            <div class="summary-item"><span class="summary-label">Jumlah Karyawan:</span> ' . $totalEmployees . '</div>
+            <div class="summary-item"><span class="summary-label">Total Hari Absen:</span> ' . $totalWorkDays . '</div>
+            <div class="summary-item"><span class="summary-label">Hari Valid (≥8 jam):</span> ' . $totalValidDays . '</div>
+            <div class="summary-item"><span class="summary-label">Hari Kurang Jam:</span> ' . $totalPartialDays . '</div>
+            <div class="summary-item"><span class="summary-label">Total Jam Kerja:</span> ' . number_format($totalRegularHours + $totalOvertimeHours, 2) . ' jam</div>
+            <div class="summary-item"><span class="summary-label">Total Longshift:</span> ' . $totalLongshift . ' hari</div>
+            <div class="summary-item"><span class="summary-label">TOTAL GAJI:</span> <strong>Rp ' . number_format($totalSalary, 2) . '</strong></div>
+        </div>';
+
+        // TABEL DETAIL GAJI
         $html .= '<table>
             <thead>
                 <tr>
                     <th>NO</th>
                     <th>BADGE</th>
                     <th>NAMA KARYAWAN</th>
-                    <th>HARI KERJA</th>
+                    <th>HARI ABSEN</th>
+                    <th>HARI VALID</th>
                     <th>JAM NORMAL</th>
                     <th>JAM LEMBUR</th>
-                    <th>LONGSHIFT</th>
-                    <th>GAJI NORMAL</th>
-                    <th>GAJI LEMBUR</th>
+                    <th>LONGSHIFT</th>';
+        
+        if ($type === 'harian') {
+            $html .= '<th>GAJI HARIAN</th>';
+        } else {
+            $html .= '<th>GAJI NORMAL</th>';
+        }
+        
+        $html .= '<th>GAJI LEMBUR</th>
                     <th>GAJI LONGSHIFT</th>
                     <th>TOTAL GAJI</th>
                 </tr>
             </thead>
             <tbody>';
 
-        $no = (($currentPage - 1) * 30) + 1;
-        $pageTotalHours = 0;
-        $pageTotalSalary = 0;
-
-        foreach ($pageData as $item) {
+        $no = 1;
+        foreach ($data as $item) {
             $calc = $item['calculations'];
             $emp = $item['employee'];
+            
+            // Hitung gaji harian jika type harian
+            $dailySalary = 0;
+            if ($type === 'harian') {
+                $dailySalary = $calc['valid_attendance_days'] * $calc['daily_rate'];
+            } else {
+                $dailySalary = $calc['regular_salary'];
+            }
             
             $html .= '<tr class="employee-row">
                 <td>' . $no++ . '</td>
                 <td>' . ($emp['badge'] ?? $emp['badge_no'] ?? $emp['id'] ?? '-') . '</td>
                 <td class="text-left">' . $emp['nama'] . '</td>
                 <td>' . $calc['work_days'] . '</td>
+                <td>' . $calc['valid_attendance_days'] . '</td>
                 <td>' . number_format($calc['regular_hours'], 2) . '</td>
                 <td>' . number_format($calc['overtime_hours'], 2) . '</td>
-                <td>' . number_format($calc['longshift_hours'], 0) . '</td>
-                <td class="text-right">Rp ' . number_format($calc['regular_salary'], 2) . '</td>
-                <td class="text-right">Rp ' . number_format($calc['overtime_salary'], 2) . '</td>
+                <td>' . number_format($calc['longshift_hours'], 0) . '</td>';
+            
+            if ($type === 'harian') {
+                $html .= '<td class="text-right">Rp ' . number_format($dailySalary, 2) . '</td>';
+            } else {
+                $html .= '<td class="text-right">Rp ' . number_format($calc['regular_salary'], 2) . '</td>';
+            }
+            
+            $html .= '<td class="text-right">Rp ' . number_format($calc['overtime_salary'], 2) . '</td>
                 <td class="text-right">Rp ' . number_format($calc['longshift_salary'], 2) . '</td>
                 <td class="text-right"><strong>Rp ' . number_format($calc['total_salary'], 2) . '</strong></td>
             </tr>';
-
-            $pageTotalHours += $calc['total_hours'];
-            $pageTotalSalary += $calc['total_salary'];
         }
 
-        // TOTAL ROW untuk page ini
-        if (!empty($pageData)) {
-            $pageRegularHours = array_sum(array_column(array_column($pageData, 'calculations'), 'regular_hours'));
-            $pageOvertimeHours = array_sum(array_column(array_column($pageData, 'calculations'), 'overtime_hours'));
-            $pageWorkDays = array_sum(array_column(array_column($pageData, 'calculations'), 'work_days'));
-            $pageLongshift = array_sum(array_column(array_column($pageData, 'calculations'), 'longshift_hours'));
-            $pageRegularSalary = array_sum(array_column(array_column($pageData, 'calculations'), 'regular_salary'));
-            $pageOvertimeSalary = array_sum(array_column(array_column($pageData, 'calculations'), 'overtime_salary'));
-            $pageLongshiftSalary = array_sum(array_column(array_column($pageData, 'calculations'), 'longshift_salary'));
-            
-            $html .= '<tr class="total-row">
-                <td colspan="3"><strong>PAGE TOTAL (Halaman ' . $currentPage . ')</strong></td>
-                <td><strong>' . $pageWorkDays . '</strong></td>
-                <td><strong>' . number_format($pageRegularHours, 2) . '</strong></td>
-                <td><strong>' . number_format($pageOvertimeHours, 2) . '</strong></td>
-                <td><strong>' . number_format($pageLongshift, 0) . '</strong></td>
-                <td class="text-right"><strong>Rp ' . number_format($pageRegularSalary, 2) . '</strong></td>
-                <td class="text-right"><strong>Rp ' . number_format($pageOvertimeSalary, 2) . '</strong></td>
-                <td class="text-right"><strong>Rp ' . number_format($pageLongshiftSalary, 2) . '</strong></td>
-                <td class="text-right"><strong>Rp ' . number_format($pageTotalSalary, 2) . '</strong></td>
-            </tr>';
+        // TOTAL ROW
+        $html .= '<tr class="total-row">
+            <td colspan="3"><strong>TOTAL KESELURUHAN</strong></td>
+            <td><strong>' . $totalWorkDays . '</strong></td>
+            <td><strong>' . $totalValidDays . '</strong></td>
+            <td><strong>' . number_format($totalRegularHours, 2) . '</strong></td>
+            <td><strong>' . number_format($totalOvertimeHours, 2) . '</strong></td>
+            <td><strong>' . number_format($totalLongshift, 0) . '</strong></td>';
+        
+        if ($type === 'harian') {
+            $totalDailySalary = $totalValidDays * ($data[0]['calculations']['daily_rate'] ?? 0);
+            $html .= '<td class="text-right"><strong>Rp ' . number_format($totalDailySalary, 2) . '</strong></td>';
+        } else {
+            $html .= '<td class="text-right"><strong>Rp ' . number_format(array_sum(array_column(array_column($data, 'calculations'), 'regular_salary')), 2) . '</strong></td>';
         }
+        
+        $html .= '<td class="text-right"><strong>Rp ' . number_format(array_sum(array_column(array_column($data, 'calculations'), 'overtime_salary')), 2) . '</strong></td>
+            <td class="text-right"><strong>Rp ' . number_format(array_sum(array_column(array_column($data, 'calculations'), 'longshift_salary')), 2) . '</strong></td>
+            <td class="text-right"><strong>Rp ' . number_format($totalSalary, 2) . '</strong></td>
+        </tr>';
 
         $html .= '</tbody></table>';
 
-        // Page number
-        $html .= '<div class="page-number">Halaman ' . $currentPage . ' dari ' . $totalPages . '</div>';
-
-        // FOOTER & SIGNATURE hanya di halaman terakhir
-        if ($currentPage == $totalPages) {
-            $html .= '<div style="margin-top: 20px; padding: 15px; background-color: #e6f7ff; border: 2px solid #1890ff; border-radius: 5px;">
-                <h3 style="margin: 0; color: #0050b3; text-align: center;">
-                    TOTAL SELURUH KARYAWAN: Rp ' . number_format($pageTotalSalary, 2) . '
-                </h3>
-                <p style="text-align: center; margin: 5px 0 0 0;">*Termasuk jam normal, lembur, dan longshift</p>
-            </div>';
-
-            $html .= '<table class="signature">
-                <tr>
-                    <td>KARYAWAN</td>
-                    <td>HRD</td>
-                    <td>MANAJER</td>
-                    <td>DIREKTUR</td>
-                </tr>
-                <tr>
-                    <td style="padding-top: 60px;">(___________________)</td>
-                    <td style="padding-top: 60px;">(___________________)</td>
-                    <td style="padding-top: 60px;">(___________________)</td>
-                    <td style="padding-top: 60px;">(___________________)</td>
-                </tr>
-                <tr>
-                    <td>Nama & Tanda Tangan</td>
-                    <td>Verifikasi HRD</td>
-                    <td>Persetujuan Manager</td>
-                    <td>Persetujuan Direktur</td>
-                </tr>
-            </table>';
+        // FOOTER & SIGNATURE
+        $html .= '<div style="margin-top: 20px; padding: 15px; background-color: #e6f7ff; border: 2px solid #1890ff; border-radius: 5px;">
+            <h3 style="margin: 0; color: #0050b3; text-align: center;">
+                TOTAL SELURUH KARYAWAN: Rp ' . number_format($totalSalary, 2) . '
+            </h3>';
+        
+        if ($type === 'harian') {
+            $html .= '<p style="text-align: center; margin: 5px 0 0 0;">*Perhitungan: (' . $totalValidDays . ' hari valid × Rp ' . number_format($dailyRate, 2) . ') + Lembur + Longshift</p>';
+        } else {
+            $html .= '<p style="text-align: center; margin: 5px 0 0 0;">*Termasuk gaji normal, lembur, dan longshift</p>';
         }
+        
+        $html .= '</div>';
+
+        $html .= '<table class="signature">
+            <tr>
+                <td>KARYAWAN</td>
+                <td>HRD</td>
+                <td>MANAJER</td>
+                <td>DIREKTUR</td>
+            </tr>
+            <tr>
+                <td style="padding-top: 60px;">(___________________)</td>
+                <td style="padding-top: 60px;">(___________________)</td>
+                <td style="padding-top: 60px;">(___________________)</td>
+                <td style="padding-top: 60px;">(___________________)</td>
+            </tr>
+            <tr>
+                <td>Nama & Tanda Tangan</td>
+                <td>Verifikasi HRD</td>
+                <td>Persetujuan Manager</td>
+                <td>Persetujuan Direktur</td>
+            </tr>
+        </table>';
+
+        $html .= '</body></html>';
 
         return $html;
     }

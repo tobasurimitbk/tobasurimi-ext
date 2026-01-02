@@ -45,13 +45,16 @@
                     </div>
 
                     <!-- Jenis Gaji -->
-                    <div class="col-md-2 col-sm-6">
+                    <div class="col-md-3 col-sm-6">
                         <div class="form-group">
                             <label>Jenis Gaji</label>
                             <select class="form-control" id="payroll_type">
-                                <option value="harian">Harian</option>
-                                <option value="minggu">Mingguan</option>
-                                <option value="bulanan">Bulanan</option>
+                                 <option value=""></option>
+                                 <?php foreach ($metadata as $v) : ?>
+                                    <option value="<?= $v['id'] ?>">
+                                        <?= strtoupper($v['value']); ?>
+                                    </option>
+                                <?php endforeach; ?>
                             </select>
                         </div>
                     </div>
@@ -322,6 +325,29 @@
             allowClear: true,
             width: '100%'
         });
+
+        $('#payroll_type').select2({
+            placeholder: "Pilih Tipe Karyawan",
+            theme: "bootstrap-5",
+            allowClear: true,
+            width: '100%'
+        });
+
+
+        $('#print_period').select2({
+            placeholder: "Pilih Periode",
+            theme: "bootstrap-5",
+            allowClear: true,
+            width: '100%'
+        });
+
+        $('#print_type').select2({
+            placeholder: "Pilih Tipe Karyawan",
+            theme: "bootstrap-5",
+            allowClear: true,
+            width: '100%'
+        });
+
 
         $('#company_filter').select2({
             placeholder: "Pilih Perusahaan",
@@ -1187,9 +1213,11 @@
                 <div class="form-group mt-3">
                     <label>Jenis Gaji:</label>
                     <select id="print_type" class="form-control">
-                        <option value="harian">Harian</option>
-                        <option value="minggu">Mingguan</option>
-                        <option value="bulanan">Bulanan</option>
+                        <?php foreach ($metadata as $v) : ?>
+                            <option value="<?= $v['id'] ?>">
+                                <?= strtoupper($v['value']); ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
             `,
