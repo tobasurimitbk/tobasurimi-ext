@@ -1030,6 +1030,7 @@ class PenerimaanBarangLokalBP extends BaseController
         $selectQry = "divisis.*";
         $result = $this->divisiModel->select($selectQry)
             ->join('am_purchase_orders', 'am_purchase_orders.division_id = divisis.id', 'left')
+            ->where('DATE(am_purchase_orders.createdAt) >=', "2025-09-01")
             // ->whereIn('divisis.id', session()->get('login')->this_access_divisi_id)
             ->where($condition)
             ->groupBy('divisis.id')
