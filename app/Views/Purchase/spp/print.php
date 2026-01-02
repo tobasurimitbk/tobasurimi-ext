@@ -124,7 +124,9 @@
     <div class="half-page">
 
         <div class="txt-center txt-bold">
-            SURAT PERMINTAAN PEMBELIAN
+            SURAT PERMINTAAN PEMBELIAN <br>
+            <span style="font-size: 13px;">No. <?= $dataSPP->spp_no ?></span>
+
         </div>
 
         <?php if (!empty($dataSPP)) { ?>
@@ -132,11 +134,11 @@
             <table class="mt-5" style="font-size: 13px;">
                 <tr>
                     <td>Tanggal Order : <?= date("d-m-Y", strtotime($dataSPP->request_date)) ?></td>
-                    <td>Jenis Order : <?= $dataSPP->spp_type ?></td>
+                    <!-- <td>Jenis Order : <?= $dataSPP->spp_type ?></td> -->
                 </tr>
                 <tr>
                     <td>Departemen : <?= $dataSPP->divisiName ?></td>
-                    <td>No SPP : <?= $dataSPP->spp_no ?></td>
+                    <!-- <td>No SPP : <?= $dataSPP->spp_no ?></td> -->
                 </tr>
             </table>
 
@@ -226,7 +228,8 @@
     <div class="half-page">
 
         <div class="txt-center txt-bold">
-            SURAT PERMINTAAN PEMBELIAN
+            SURAT PERMINTAAN PEMBELIAN <br>
+            <span style="font-size: 13px;">No. <?= $dataSPP->spp_no ?></span>
         </div>
 
         <!-- ISI SAMA PERSIS DENGAN BAGIAN ATAS -->
@@ -234,11 +237,11 @@
         <table class="mt-5" style="font-size: 13px;">
             <tr>
                 <td>Tanggal Order : <?= date("d-m-Y", strtotime($dataSPP->request_date)) ?></td>
-                <td>Jenis Order : <?= $dataSPP->spp_type ?></td>
+                <!-- <td>Jenis Order : <?= $dataSPP->spp_type ?></td> -->
             </tr>
             <tr>
                 <td>Departemen : <?= $dataSPP->divisiName ?></td>
-                <td>No SPP : <?= $dataSPP->spp_no ?></td>
+                <!-- <td>No SPP : <?= $dataSPP->spp_no ?></td> -->
             </tr>
         </table>
 
