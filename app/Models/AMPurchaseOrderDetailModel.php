@@ -915,6 +915,7 @@ class AMPurchaseOrderDetailModel extends Model
             ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = am_purchase_order_details.spesifikasi_id', 'left')
             ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left')
+            ->where('DATE(purchase_requests.createdAt) >=', "2025-09-01")
             ->orderBy($sort, $sortType);
 
         $totalData = $poDataQry->countAllResults(false);
