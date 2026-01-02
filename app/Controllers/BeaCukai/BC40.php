@@ -1933,16 +1933,6 @@ class BC40 extends BaseController
             ]);
         }
 
-        $status = $this->insertInventori($bcPurchaseOrderID);
-
-        if (!$status) {
-            return response()->setJSON([
-                'token' => csrf_hash(),
-                'status' => true,
-                'message' => "Terjadi kesalahan saat menambah stok inventori"
-            ]);
-        }
-
         $this->bcPurchaseOrderModel->update($bcPurchaseOrderID, [
             'status_posting' => '1',
             'no_aju' => $bc40['no_aju'],
@@ -2639,176 +2629,6 @@ class BC40 extends BaseController
         return $result;
     }
 
-    private function insertInventoriBackup($bcPurchaseOrderID)
-    {
-        try {
-            $bcPo = $this->bcPurchaseOrderModel->find($bcPurchaseOrderID);
-            $bc40 = $this->bc40Model->where('bc_purchase_order_id', $bcPurchaseOrderID)->first();
-            $poIdArr = array_unique(json_decode($bcPo['multiple_po_id']));
-            $lpbIdArr = array_unique(json_decode($bcPo['multiple_lpb_id']));
-            $typeBahan = $bcPo['po_type'] == "LOKAL BAKU" ? "bahan_baku" : "bahan_penolong";
-
-            foreach ($lpbIdArr as $index => $lpbId) {
-                $statusInputStock = true;
-
-                if ($typeBahan == "bahan_baku") {
-                    $rmPurchaseOrder = $this->rmPurchaseOrderModel->where('id', $poIdArr[$index])->first();
-                    if ($rmPurchaseOrder['status_external'] == "yes") {
-                        // JIKA STATUS EKSTERNAL YES GA USAH INSERT KE INVENTORI
-                        $statusInputStock = false;
-                    }
-                }
-
-                $penerimaanBarang = $this->penerimaanBarangModel->where('id', $lpbId)->first();
-                $penerimaanBarangList = $this->penerimaanBarangDetailModel
-                    ->where('penerimaan_barang_id', $lpbId)
-                    ->whereIn('purchase_order_id', $poIdArr)
-                    ->where('deletedAt', null)
-                    ->findAll();
-
-                if ($statusInputStock) {
-                    // CHECK STOK APAKAH SUDAH DIINISASI (INISIASI HEADER BARANG)
-                    foreach ($penerimaanBarangList as $p) {
-
-                        // CHECK STOK BARANG HEADER
-                        $stok = $this->stockModel->getStokMaster(
-                            $this->this_company_id,
-                            $penerimaanBarang['warehouse_id'],
-                            $penerimaanBarang['divisi_id'],
-                            $typeBahan,
-                            $p['barang_id'],
-                            $p['spesifikasi_id'],
-                        );
-
-                        if ($stok == null) {
-                            $stok = $this->stockModel->insertStok(
-                                $this->this_company_id,
-                                $penerimaanBarang['warehouse_id'],
-                                $penerimaanBarang['divisi_id'],
-                                $typeBahan,
-                                $p['barang_id'],
-                                $p['spesifikasi_id'],
-                                0
-                            );
-                        }
-                    }
-
-                    // CHECK STOK KEMASAN HEADER (INISIASI HEADER KEMASAN)
-                    $stok = $this->stockModel->getStokMaster(
-                        $this->this_company_id,
-                        $penerimaanBarang['warehouse_id'],
-                        $penerimaanBarang['divisi_id'],
-                        "kemasan",
-                        0,
-                        $penerimaanBarang['kemasan_id'],
-                    );
-
-                    if ($stok == null) {
-                        $stok = $this->stockModel->insertStok(
-                            $this->this_company_id,
-                            $penerimaanBarang['warehouse_id'],
-                            $penerimaanBarang['divisi_id'],
-                            "kemasan",
-                            0,
-                            $penerimaanBarang['kemasan_id'],
-                            0
-                        );
-                    }
-
-                    // STOK BARANG DIINPUT (INSERT BARANG)
-                    foreach ($penerimaanBarangList as $p) {
-                        // HEADER
-                        $stok = $this->stockModel->insertStok(
-                            $this->this_company_id,
-                            $penerimaanBarang['warehouse_id'],
-                            $penerimaanBarang['divisi_id'],
-                            $typeBahan,
-                            $p['barang_id'],
-                            $p['spesifikasi_id'],
-                            $p['jml_masuk_konversi']
-                        );
-
-                        // DETAIL
-                        $stokDetail = $this->stockDetailModel->insertStokDetail(
-                            $stok,
-                            $p['jml_masuk_konversi'],
-                            'In',
-                            date('Y-m-d', strtotime($bcPo['createdAt'])),
-                            $this->this_user_id,
-                            "LPB",
-                            $penerimaanBarang['no_penerimaan_barang'],
-                            "-",
-                        );
-
-                        // GET PURCHASE ORDER
-                        if ($typeBahan == "bahan_penolong") {
-                            // PO BAHAN PENOLONG
-                            $po = $this->amPurchaseOrderModel->find($p['purchase_order_id']);
-                        } else {
-                            // PO BAHAN BAKU
-                            $po = $this->rmPurchaseOrderModel->find($p['purchase_order_id']);
-                        }
-                        // SUB DETAIL
-                        $this->stockDetail2Model->insertStokDetail2(
-                            $penerimaanBarang['bc_type'],
-                            $stok,
-                            $stokDetail,
-                            $p['jml_masuk_konversi'],
-                            $bc40['no_aju'],
-                            $po['po_no'],
-                            $po['po_no'],
-                            $penerimaanBarang['supplier_id'],
-                            $p['harga'],
-                            $p['harga_harian'],
-                            $p['harga_bulanan'],
-                            $po['po_no']
-                        );
-                    }
-
-                    // INSERT KEMASAN
-                    $stok = $this->stockModel->insertStok(
-                        $this->this_company_id,
-                        $penerimaanBarang['warehouse_id'],
-                        $penerimaanBarang['divisi_id'],
-                        "kemasan",
-                        0,
-                        $penerimaanBarang['kemasan_id'],
-                        $penerimaanBarang['jumlah_kemasan']
-                    );
-
-                    // DETAIL
-                    $stokDetail = $this->stockDetailModel->insertStokDetail(
-                        $stok,
-                        $penerimaanBarang['jumlah_kemasan'],
-                        "In",
-                        date('Y-m-d', strtotime($bcPo['createdAt'])),
-                        $this->this_user_id,
-                        "LPB",
-                        $penerimaanBarang['no_penerimaan_barang'],
-                        "-",
-                    );
-
-                    // SUB DETAIL
-                    $this->stockDetail2Model->insertStokDetail2(
-                        $penerimaanBarang['bc_type'],
-                        $stok,
-                        $stokDetail,
-                        $penerimaanBarang['jumlah_kemasan'],
-                        $bc40['no_aju'],
-                        $penerimaanBarang['no_penerimaan_barang'],
-                        $penerimaanBarang['no_penerimaan_barang'],
-                        $penerimaanBarang['supplier_id'],
-                    );
-                }
-            }
-
-            return true;
-        } catch (Exception $e) {
-            var_dump($e->getMessage());
-            return false;
-        }
-    }
-
     private function insertInventori($bcPurchaseOrderID)
     {
         try {
@@ -3368,103 +3188,17 @@ class BC40 extends BaseController
         exit;
     }
 
-    public function unPostingBackup()
-    {
-        try {
-            $db = Database::connect();
-            $db->transBegin();
-
-            // BC PURCHASE ORDER ID
-            $id = decrypt($this->request->getVar('id'));
-            $bcPurchaseOrder = $this->bcPurchaseOrderModel->where('id', $id)->first();
-            $lpbIdArr = json_decode($bcPurchaseOrder['multiple_lpb_id']);
-            $penerimaanBarang = $this->penerimaanBarangModel->whereIn('id', $lpbIdArr)->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll();
-
-            $message = '';
-            foreach ($penerimaanBarang as $p) {
-                $cekStockLpbUsed = $this->stockModel->checkStockLpbUsed(
-                    $p['id']
-                );
-
-                if ($cekStockLpbUsed != null) {
-                    $message = $cekStockLpbUsed;
-                    break;
-                }
-            }
-
-            if ($message != '') {
-                return response()->setJSON([
-                    'status' => false,
-                    'message' => "Gagal UnPosting : " . $cekStockLpbUsed,
-                    'token' => csrf_hash()
-                ]);
-            }
-
-            // \var_dump($penerimaanBarang);
-            // die;
-
-            foreach ($penerimaanBarang as $p) {
-                $this->stockModel->unPostingStockLPB(
-                    $p['id']
-                );
-            }
-
-            $this->bcPurchaseOrderModel->update($bcPurchaseOrder['id'], [
-                'status_posting' => '0'
-            ]);
-
-            $db->transCommit();
-            return response()->setJSON([
-                'status' => true,
-                'message' => "Dokumen berhasil di unpost ",
-                'token' => csrf_hash()
-            ]);
-        } catch (Exception $e) {
-            $db->transRollback();
-            return response()->setJSON([
-                'status' => false,
-                'message' => "Gagal Posting : Terjadi kesalahan saat unposting lpb",
-                'error' => $e->getTrace(),
-                'token' => csrf_hash()
-            ]);
-        }
-    }
 
     public function unPosting()
     {
         try {
             $db = Database::connect();
             $db->transBegin();
-
             // BC PURCHASE ORDER ID
             $id = decrypt($this->request->getVar('id'));
-            $bcPurchaseOrder = $this->bcPurchaseOrderModel->where('id', $id)->first();
-            $lpbIdArr = json_decode($bcPurchaseOrder['multiple_lpb_id']);
-            $penerimaanBarang = $this->penerimaanBarangModel->whereIn('id', $lpbIdArr)->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll();
-
-            $cekStockLpbUsed = true;
-            foreach ($penerimaanBarang as $p) {
-                $cekStockLpbUsed = $this->penerimaanBarangLokalBp->unposting_stock_pembelian_revamp(
-                    $p['id']
-                );
-
-                if (!$cekStockLpbUsed) {
-                    break;
-                }
-            }
-
-            if (!$cekStockLpbUsed) {
-                return response()->setJSON([
-                    'status' => false,
-                    'message' => "Gagal UnPosting : Stock sudah digunakan",
-                    'token' => csrf_hash()
-                ]);
-            }
-
-            $this->bcPurchaseOrderModel->update($bcPurchaseOrder['id'], [
+            $this->bcPurchaseOrderModel->update($id, [
                 'status_posting' => '0'
             ]);
-
             $db->transCommit();
             return response()->setJSON([
                 'status' => true,
@@ -3475,7 +3209,7 @@ class BC40 extends BaseController
             $db->transRollback();
             return response()->setJSON([
                 'status' => false,
-                'message' => "Gagal Posting : Terjadi kesalahan saat unposting lpb",
+                'message' => $e->getMessage(),
                 'error' => $e->getTrace(),
                 'token' => csrf_hash()
             ]);
