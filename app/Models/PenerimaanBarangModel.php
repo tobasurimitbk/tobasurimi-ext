@@ -1126,7 +1126,7 @@ class PenerimaanBarangModel extends Model
 
         // TAMBAJKAN STOK DISINI
         $penerimaanBarang = $penerimaanBarangModel->where('id', $lpbID)->first();
-        if ($penerimaanBarang['bc_type'] == 0 && $rmDetail['status_external'] == "no") {
+        if ($rmDetail['status_external'] == "no") {
 
             $res = $penerimaaanBarangLokalBp->insert_stock_pembelian_revamp(
                 $penerimaanBarang['id']

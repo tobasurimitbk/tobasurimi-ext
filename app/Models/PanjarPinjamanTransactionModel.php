@@ -122,6 +122,7 @@ class PanjarPinjamanTransactionModel extends Model
         $totalData = $builder->countAllResults(false); // total semua
 
         $builder->orderBy($sort, $sortType);
+        $builder->orderBy('ppt.tanggal', 'DESC');
         $data = $builder->get($limit, $offset)->getResult();
 
         $totalFilteredData = $totalData; // jika pakai search lebih kompleks, bisa dihitung ulang
