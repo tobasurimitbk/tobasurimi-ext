@@ -325,6 +325,7 @@ class AMPurchaseOrderModel extends Model
         ];
 
         $builder = $this->db->table('am_purchase_orders');
+        $builder->where('DATE(am_purchase_orders.createdAt) >=', "2025-09-01"); // DIATAS BULAN 9
         $builder->where($arrCondition);
         $query = $builder->get();
 
@@ -829,7 +830,7 @@ class AMPurchaseOrderModel extends Model
                 SUM(DISTINCT penerimaan_barang_detail.sub_total) AS sum_total, 
                 SUM(DISTINCT local_po_payments.amount) AS sum_remaining
             ";
-        }else{
+        } else {
             $selectQry = "am_purchase_orders.id AS id, 
                     am_purchase_orders.po_date AS tanggal_invoice, 
                     am_purchase_orders.po_no AS no_invoice, 
@@ -856,12 +857,12 @@ class AMPurchaseOrderModel extends Model
             ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_id = am_purchase_orders.id AND penerimaan_barang_detail.purchase_order_details_id = am_purchase_order_details.id', 'right')
             ->join('penerimaan_barang', "penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id AND penerimaan_barang.tipe_bahan = 'PENOLONG'", 'right')
             ->join('local_po_payments', 'FIND_IN_SET(am_purchase_orders.id, REPLACE(REPLACE(local_po_payments.multiple_po_id, "[", ""), "]", ""))', 'left');
-            if (isset($addCondition['summary']) && $addCondition['summary'] == "summary") {
-                $poDataQry->groupBy('suppliers.name');
-            } else {
-                $poDataQry->groupBy('am_purchase_orders.id');
-            }
-            $poDataQry->orderBy($sort, $sortType);
+        if (isset($addCondition['summary']) && $addCondition['summary'] == "summary") {
+            $poDataQry->groupBy('suppliers.name');
+        } else {
+            $poDataQry->groupBy('am_purchase_orders.id');
+        }
+        $poDataQry->orderBy($sort, $sortType);
 
         $totalData = $poDataQry->countAllResults(false);
 

@@ -75,6 +75,7 @@ class SppModel extends Model
         $purchaseRequestsDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
+            ->where('DATE(purchase_requests.createdAt) >=', "2025-09-01") // hanya diatas bulan 9
             ->join('divisis', 'purchase_requests.divisi_id = divisis.id', 'left')
             ->join('companies', 'purchase_requests.company_id = companies.id', 'left')
             ->join('purchase_request_details', 'purchase_requests.id = purchase_request_details.purchase_request_id', 'left')
@@ -244,6 +245,8 @@ class SppModel extends Model
             ->where('am_purchase_orders.is_posted', 1)
             ->where('am_purchase_orders.status_penerimaan', 0)
             ->where('purchase_requests.deletedAt', null)
+            ->where('DATE(purchase_requests.request_date) >=', "2025-09-01")
+            ->orderBy('purchase_requests.id', "DESC")
             ->groupBy('purchase_requests.id')
             ->having('SUM(am_purchase_order_details.remaining_qty) > 0') // Langsung filter yang masih ada sisa qty
             ->findAll();
@@ -271,17 +274,18 @@ class SppModel extends Model
     }
     public function getSppNotUsedForPOBp($divisiId, $companyId)
     {
+        $db = \Config\Database::connect();
         $amPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
         $sppDetailModel = new SppDetailModel();
 
         $selectQrySppDetail = "
-        purchase_requests.id,
-        purchase_requests.spp_no,
-        purchase_request_details.note,
-        purchase_request_details.qty,
-        purchase_request_details.barang1_id,
-        purchase_request_details.barang2_id
-    ";
+            purchase_requests.id,
+            purchase_requests.spp_no,
+            purchase_request_details.note,
+            purchase_request_details.qty,
+            purchase_request_details.barang1_id,
+            purchase_request_details.barang2_id
+        ";
 
         $sppDetail = $sppDetailModel
             ->select($selectQrySppDetail)
@@ -292,7 +296,10 @@ class SppModel extends Model
             ->where('purchase_requests.company_id', $companyId)
             ->where('purchase_requests.spp_type', "Lokal BP")
             ->where('purchase_requests.divisi_id', $divisiId)
-            ->findAll();
+            ->where('DATE(purchase_requests.createdAt) >=', "2025-09-01") // DIATAS BULAN 9
+            ->orderBy('purchase_requests.id', "ASC")
+            ->get()
+            ->getResultArray();
 
         $mapSppDetail = [];
 
@@ -311,23 +318,24 @@ class SppModel extends Model
 
 
         $selectQryPoDetail = "
-        SUM(am_purchase_order_details.qty) as total_qty,
-        am_purchase_order_details.barang_id,
-        am_purchase_order_details.spesifikasi_id,
-        am_purchase_order_details.note,
-        am_purchase_orders.purchase_request_id
-    ";
+            SUM(am_purchase_order_details.qty) as total_qty,
+            am_purchase_order_details.barang_id,
+            am_purchase_order_details.spesifikasi_id,
+            am_purchase_order_details.note,
+            am_purchase_orders.purchase_request_id
+        ";
 
         $poDetail = $amPurchaseOrderDetailModel
             ->select($selectQryPoDetail)
             ->join('am_purchase_orders', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
             ->where('am_purchase_orders.po_type', "Lokal")
             ->where('am_purchase_orders.company_id', $companyId)
+            ->where('DATE(am_purchase_orders.createdAt) >=', "2025-09-01")  // DIATAS BULAN 9
             ->where('am_purchase_orders.deletedAt', null)
             ->where('am_purchase_order_details.deletedAt', null)
             ->groupBy('am_purchase_order_details.barang_id, am_purchase_order_details.spesifikasi_id, am_purchase_orders.purchase_request_id, am_purchase_order_details.note')
-            ->findAll();
-
+            ->get()
+            ->getResultArray();
 
         $sppIdNotUsedFull = [];
 
