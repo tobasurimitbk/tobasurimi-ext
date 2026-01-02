@@ -86,6 +86,9 @@ class RincianPenjualanPerBarang extends BaseController
                 }
 
                 $currentBarang = $data->id_barang_invoice;
+                $totalPerBarang = 0;
+                $totalHPPPerBarang = 0;
+                $totalLabaPerBarang = 0;
 
                 array_push($dataAllSalesOrderInvoice, [
                     "no" => '',
