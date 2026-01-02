@@ -176,8 +176,9 @@
                                 <th width="80">Badge</th>
                                 <th>Nama Karyawan</th>
                                 <th>Divisi</th>
-                                <th width="120">Check In</th>
-                                <th width="120">Check Out</th>
+                                <th width="100">Check In</th>
+                                <th width="100">Check Out</th>
+                                <th width="100">Total Jam</th>
                                 <th width="100">Status</th>
                                 <th width="100">Perusahaan</th>
                                 <th width="150" class="text-center">Aksi</th>
@@ -186,7 +187,7 @@
                         <tbody id="table-body">
                             <!-- Data will load here -->
                             <tr id="no-data">
-                                <td colspan="9" class="text-center py-5">
+                                <td colspan="10" class="text-center py-5">
                                     <div class="empty-state">
                                         <div class="empty-state-icon">
                                             <i class="fas fa-database fa-3x text-muted"></i>
@@ -460,7 +461,7 @@
         function clearAttendanceData() {
             $('#table-body').html(`
                 <tr id="no-data">
-                    <td colspan="9" class="text-center py-5">
+                    <td colspan="10" class="text-center py-5">
                         <div class="empty-state">
                             <div class="empty-state-icon">
                                 <i class="fas fa-database fa-3x text-muted"></i>
@@ -555,7 +556,6 @@
                 });
             });
         }
-
 
         // =========================
         // EXPORT TO EXCEL
@@ -665,7 +665,7 @@
             if (!data || data.length === 0) {
                 tbody.html(`
                     <tr id="no-data">
-                        <td colspan="9" class="text-center py-5">
+                        <td colspan="10" class="text-center py-5">
                             <div class="empty-state">
                                 <div class="empty-state-icon">
                                     <i class="fas fa-database fa-3x text-muted"></i>
@@ -696,12 +696,60 @@
                         <div class="time-display">${emp.check_out}</div>
                     </div>`
                     : '<span class="text-muted">-</span>';
+                
+                // Format Work Hours
+                let workHoursDisplay = '<span class="text-muted">-</span>';
+                let workHoursClass = '';
+                
+                if (emp.work_hours && emp.work_hours !== '0:00') {
+                    const [hours, minutes] = emp.work_hours.split(':').map(Number);
+                    workHoursDisplay = `
+                        <div class="text-center">
+                            <div class="work-hours-display ${hours >= 8 ? 'text-success' : hours >= 5 ? 'text-warning' : 'text-danger'}">
+                                <i class="fas fa-clock mr-1"></i>${emp.work_hours}
+                            </div>
+                            <small class="text-muted">${hours} jam ${minutes} menit</small>
+                        </div>
+                    `;
+                    
+                    if (hours >= 8) {
+                        workHoursClass = 'bg-success-light';
+                    } else if (hours >= 5) {
+                        workHoursClass = 'bg-warning-light';
+                    } else {
+                        workHoursClass = 'bg-danger-light';
+                    }
+                }
 
-                // Status badge
-                const statusClass = getStatusClass(emp.status);
+                // Tentukan Status berdasarkan jam kerja dan check in/out
+                let status = 'Tidak Masuk';
+                let statusClass = 'danger';
+                
+                if (emp.check_in) {
+                    if (emp.check_out) {
+                        // Ada check in dan check out
+                        const [hours, minutes] = emp.work_hours ? emp.work_hours.split(':').map(Number) : [0, 0];
+                        const totalMinutes = (hours * 60) + minutes;
+                        
+                        if (totalMinutes >= 480) { // 8 jam
+                            status = 'Hadir';
+                            statusClass = 'success';
+                        } else if (totalMinutes > 0) {
+                            status = 'Kurang Jam';
+                            statusClass = 'warning';
+                        } else {
+                            status = 'Belum Checkout';
+                            statusClass = 'warning';
+                        }
+                    } else {
+                        // Hanya check in
+                        status = 'Belum Checkout';
+                        statusClass = 'warning';
+                    }
+                }
                 
                 tbody.append(`
-                    <tr>
+                    <tr class="${workHoursClass}">
                         <td class="text-center">${no++}</td>
                         <td class="text-center">
                             <span class="badge badge-light border" style="font-size: 0.9em; padding: 5px 10px;">
@@ -715,9 +763,10 @@
                         <td>${emp.divisi_name || '-'}</td>
                         <td>${checkInDisplay}</td>
                         <td>${checkOutDisplay}</td>
+                        <td class="text-center">${workHoursDisplay}</td>
                         <td class="text-center">
                             <span class="badge badge-${statusClass}">
-                                ${emp.status || 'Belum Absen'}
+                                ${status}
                             </span>
                         </td>
                         <td>${emp.company_name}</td>
@@ -766,8 +815,7 @@
             const checkInCount = data.filter(item => item.check_in !== null).length;
             const checkOutCount = data.filter(item => item.check_out !== null).length;
             const missingCount = data.filter(item => 
-                item.status === 'Tidak Masuk' || 
-                (!item.check_in && !item.check_out)
+                item.check_in === null && item.check_out === null
             ).length;
 
             $('#total-employees').text(totalEmployees);
@@ -795,6 +843,31 @@
                 success: function(response) {
                     if (response.success) {
                         const emp = response.data;
+                        const [hours, minutes] = emp.work_hours ? emp.work_hours.split(':') : [0, 0];
+                        const totalMinutes = (parseInt(hours) * 60) + parseInt(minutes);
+                        
+                        // Tentukan status untuk detail modal
+                        let status = 'Tidak Masuk';
+                        let statusClass = 'danger';
+                        
+                        if (emp.check_in) {
+                            if (emp.check_out) {
+                                if (totalMinutes >= 480) {
+                                    status = 'Hadir';
+                                    statusClass = 'success';
+                                } else if (totalMinutes > 0) {
+                                    status = 'Kurang Jam';
+                                    statusClass = 'warning';
+                                } else {
+                                    status = 'Belum Checkout';
+                                    statusClass = 'warning';
+                                }
+                            } else {
+                                status = 'Belum Checkout';
+                                statusClass = 'warning';
+                            }
+                        }
+                        
                         const detailContent = `
                             <div class="row">
                                 <div class="col-md-4 text-center mb-3">
@@ -803,6 +876,12 @@
                                     </div>
                                     <h5 class="mt-2">${emp.name}</h5>
                                     <p class="text-muted">${emp.position || '-'}</p>
+                                    <div class="work-summary mt-3">
+                                        <h3 class="text-${totalMinutes >= 480 ? 'success' : totalMinutes >= 300 ? 'warning' : 'danger'}">
+                                            ${emp.work_hours || '0:00'}
+                                        </h3>
+                                        <p class="text-muted">Total Jam Kerja</p>
+                                    </div>
                                 </div>
                                 <div class="col-md-8">
                                     <table class="table table-bordered">
@@ -843,10 +922,33 @@
                                             </td>
                                         </tr>
                                         <tr>
+                                            <th>Total Jam Kerja</th>
+                                            <td>
+                                                <strong class="text-${totalMinutes >= 480 ? 'success' : totalMinutes >= 300 ? 'warning' : 'danger'}">
+                                                    ${emp.work_hours || '0:00'}
+                                                </strong>
+                                                ${emp.work_hours && emp.work_hours !== '0:00' ? `
+                                                    <div class="progress mt-1" style="height: 8px;">
+                                                        <div class="progress-bar bg-${totalMinutes >= 480 ? 'success' : totalMinutes >= 300 ? 'warning' : 'danger'}" 
+                                                            role="progressbar" 
+                                                            style="width: ${Math.min((totalMinutes / 480) * 100, 100)}%"
+                                                            aria-valuenow="${totalMinutes}" 
+                                                            aria-valuemin="0" 
+                                                            aria-valuemax="480">
+                                                        </div>
+                                                    </div>
+                                                    <small class="text-muted">
+                                                        ${Math.floor(totalMinutes / 60)} jam ${totalMinutes % 60} menit
+                                                        / 8 jam (${((totalMinutes / 480) * 100).toFixed(1)}%)
+                                                    </small>
+                                                ` : ''}
+                                            </td>
+                                        </tr>
+                                        <tr>
                                             <th>Status</th>
                                             <td>
-                                                <span class="badge badge-${getStatusClass(emp.status)}">
-                                                    ${emp.status}
+                                                <span class="badge badge-${statusClass}">
+                                                    ${status}
                                                 </span>
                                             </td>
                                         </tr>
@@ -1001,11 +1103,11 @@
         function getStatusClass(status) {
             const statusMap = {
                 'Hadir': 'success',
-                'Complete': 'success',
                 'Terlambat': 'warning',
                 'Pulang Awal': 'info',
                 'Tidak Masuk': 'danger',
-                'Belum Absen': 'secondary',
+                'Belum Checkout': 'warning',
+                'Kurang Jam': 'warning',
                 'Izin': 'primary',
                 'Sakit': 'info',
                 'Cuti': 'warning'
@@ -1020,7 +1122,7 @@
         function clearTable() {
             $('#table-body').html(`
                 <tr id="no-data">
-                    <td colspan="9" class="text-center py-5">
+                    <td colspan="10" class="text-center py-5">
                         <div class="empty-state">
                             <div class="empty-state-icon">
                                 <i class="fas fa-database fa-3x text-muted"></i>
@@ -1249,6 +1351,32 @@
     background-color: rgba(0,123,255,0.05);
 }
 
+/* Work Hours Highlight */
+.bg-success-light {
+    background-color: rgba(40, 167, 69, 0.05) !important;
+}
+.bg-warning-light {
+    background-color: rgba(255, 193, 7, 0.05) !important;
+}
+.bg-danger-light {
+    background-color: rgba(220, 53, 69, 0.05) !important;
+}
+
+.work-hours-display {
+    font-weight: 600;
+    font-size: 14px;
+    font-family: 'Courier New', monospace;
+}
+.work-hours-display.text-success {
+    color: #28a745 !important;
+}
+.work-hours-display.text-warning {
+    color: #ffc107 !important;
+}
+.work-hours-display.text-danger {
+    color: #dc3545 !important;
+}
+
 /* Badge Styles */
 .badge {
     padding: 5px 10px;
@@ -1307,6 +1435,30 @@
 .modal-footer {
     border-top: 1px solid #e3e3e3;
     padding: 15px 20px;
+}
+
+/* Progress Bar */
+.progress {
+    background-color: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.progress-bar {
+    background-color: #28a745;
+    transition: width 0.6s ease;
+}
+
+/* Detail Modal Work Summary */
+.work-summary {
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e3e3e3;
+}
+.work-summary h3 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 5px;
 }
 
 /* Responsive Design */
