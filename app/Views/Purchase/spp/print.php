@@ -21,6 +21,8 @@
             height: 31cm;
             margin: 0;
             padding: 0;
+            margin-left: 10px;
+            margin-right: 10px;
         }
 
         body {
@@ -146,7 +148,7 @@
                 <thead>
                     <tr>
                         <th class="table-border table-font-size"><b class="table-font-size">No</b></th>
-                        <th class="table-border table-font-size" style="width: 60px;"><b class="table-font-size">Kode</b></th>
+                        <th class="table-border table-font-size" style="width: 70px;"><b class="table-font-size">Kode</b></th>
                         <th class="table-border table-font-size"><b class="table-font-size">Nama Barang</b></th>
                         <th class="table-border table-font-size" style="width: 60px;"><b class="table-font-size">Qty</b></th>
                         <th class="table-border table-font-size"><b class="table-font-size">Keterangan</b></th>
@@ -249,7 +251,7 @@
             <thead>
                 <tr>
                     <th class="table-border table-font-size"><b class="table-font-size">No</b></th>
-                    <th class="table-border table-font-size" style="width: 60px;"><b class="table-font-size">Kode</b></th>
+                    <th class="table-border table-font-size" style="width: 70px;"><b class="table-font-size">Kode</b></th>
                     <th class="table-border table-font-size"><b class="table-font-size">Nama Barang</b></th>
                     <th class="table-border table-font-size" style="width: 60px;"><b class="table-font-size">Qty</b></th>
                     <th class="table-border table-font-size"><b class="table-font-size">Keterangan</b></th>
@@ -316,6 +318,10 @@
             </table>
         </div>
     </div>
+    <!-- ===============================
+     GARIS SOBEK
+=============================== -->
+    <div class="tear-line"></div>
 
 </body>
 
