@@ -834,7 +834,7 @@ class POLokalBahanPenolong extends BaseController
         if (empty($sppIdArr)) {
             return response()->setJSON(['data' => []]);
         } else {
-            $result = $this->sppModel->whereIn('id', $sppIdArr)->where('divisi_id', $divisiId)->findAll();
+            $result = $this->sppModel->whereIn('id', $sppIdArr)->where('divisi_id', $divisiId)->where('DATE(createdAt) >=', "2025-09-01")->findAll();
             return response()->setJSON(['data' => $result]);
         }
     }

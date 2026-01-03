@@ -52,6 +52,7 @@ class HistoriPesananPenjualan extends BaseController
         $condition = [
             // "sales_order_invoice.id_company" => $this->this_company_id,
             "sales_order_invoice.deletedAt" => null,
+            "sales_order_invoice_detail.deletedAt" => null,
             "sales_order_invoice.tipe_invoice" => 'LOKAL'
         ];
 
@@ -163,6 +164,7 @@ class HistoriPesananPenjualan extends BaseController
         ob_start();
         $condition = [
             "sales_order_invoice.deletedAt" => null,
+            "sales_order_invoice_detail.deletedAt" => null,
             "sales_order_invoice.tipe_invoice" => 'LOKAL'
         ];
 
@@ -275,6 +277,7 @@ class HistoriPesananPenjualan extends BaseController
 
         $condition = [
             "sales_order_invoice.deletedAt" => null,
+            "sales_order_invoice_detail.deletedAt" => null,
             "sales_order_invoice.tipe_invoice" => 'LOKAL'
         ];
 

@@ -306,28 +306,28 @@
     }).change(function() {
 
         // GET WAREHOUSES
-        $.ajax({
-            url: `<?= base_url('penerimaan-barang-lokal-bp/warehouse'); ?>`,
-            method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            data: {
-                divisi_id: $(".divisi_id option:selected").val(),
-            },
-            dataType: "json",
-            success: function(res) {
-                $(".warehouse_id").empty()
-                $(".warehouse_id").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $(".warehouse_id").append(`<option value="${item.id}">${item.warehouse_name}</option>`)
-                })
-                $(".warehouse_id").val();
-            }
-        });
+        // $.ajax({
+        //     url: `<?= base_url('penerimaan-barang-lokal-bp/warehouse'); ?>`,
+        //     method: "GET",
+        //     beforeSend: function() {
+        //         setLoading();
+        //     },
+        //     complete: function() {
+        //         stopLoading();
+        //     },
+        //     data: {
+        //         divisi_id: $(".divisi_id option:selected").val(),
+        //     },
+        //     dataType: "json",
+        //     success: function(res) {
+        //         $(".warehouse_id").empty()
+        //         $(".warehouse_id").append(`<option value=""></option>`)
+        //         res.data.forEach(function(item) {
+        //             $(".warehouse_id").append(`<option value="${item.id}">${item.warehouse_name}</option>`)
+        //         })
+        //         $(".warehouse_id").val();
+        //     }
+        // });
         listData = [];
         drawTable(listData);
     });
@@ -387,6 +387,13 @@
                     })
                     $(".supplier_id").change();
 
+                    // set warehouse
+                    $(".warehouse_id").empty()
+                    $(".warehouse_id").append(`<option value=""></option>`)
+                    res.dataWarehouse.forEach(function(item) {
+                        $(".warehouse_id").append(`<option value="${item.id}">${item.warehouse_name}</option>`)
+                    })
+                    $(".warehouse_id").val();
                 }
             });
         <?php else: ?>

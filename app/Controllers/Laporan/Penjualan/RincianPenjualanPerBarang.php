@@ -49,6 +49,7 @@ class RincianPenjualanPerBarang extends BaseController
         $condition = [
             // "sales_order_invoice.id_company" => $this->this_company_id,
             "sales_order_invoice.deletedAt" => null,
+            "sales_order_invoice_detail.deletedAt" => null,
             "sales_order_invoice.tipe_invoice" => 'LOKAL'
         ];
 
@@ -85,6 +86,9 @@ class RincianPenjualanPerBarang extends BaseController
                 }
 
                 $currentBarang = $data->id_barang_invoice;
+                $totalPerBarang = 0;
+                $totalHPPPerBarang = 0;
+                $totalLabaPerBarang = 0;
 
                 array_push($dataAllSalesOrderInvoice, [
                     "no" => '',
@@ -108,8 +112,10 @@ class RincianPenjualanPerBarang extends BaseController
 
             if ($data->jenis_penjualan == "1") {
                 $salesName = $data->salesName;
+            } elseif ($data->jenis_penjualan == 2) {
+                $salesName = "Office";
             } else {
-                $salesName = "OFFICE";
+                $salesName = "E-Commerce";
             }
 
             array_push($dataAllSalesOrderInvoice, [
@@ -165,6 +171,7 @@ class RincianPenjualanPerBarang extends BaseController
         ob_start();
         $condition = [
             "sales_order_invoice.deletedAt" => null,
+            "sales_order_invoice_detail.deletedAt" => null,
             "sales_order_invoice.tipe_invoice" => 'LOKAL'
         ];
 
@@ -184,6 +191,9 @@ class RincianPenjualanPerBarang extends BaseController
         $totalPerBarang = 0;
         $totalHPPPerBarang = 0;
         $totalLabaPerBarang = 0;
+        $grandTotalInvoice = 0;
+        $grandTotalHPP = 0;
+        $grandTotalLaba = 0;
 
         foreach ($dataSalesOrderInvoice['data'] as $data) {
             if ($currentBarang !== $data->id_barang_invoice) {
@@ -209,11 +219,17 @@ class RincianPenjualanPerBarang extends BaseController
             }
 
             $laba = floatval($data->sum_amount_invoice) - floatval($data->amt_harga_pokok);
+            
+            $grandTotalInvoice += floatval($data->sum_amount_invoice);
+            $grandTotalHPP     += floatval($data->amt_harga_pokok);
+            $grandTotalLaba    += $laba;
 
             if ($data->jenis_penjualan == "1") {
                 $salesName = $data->salesName;
+            } elseif ($data->jenis_penjualan == 2) {
+                $salesName = "Office";
             } else {
-                $salesName = "OFFICE";
+                $salesName = "E-Commerce";
             }
 
             $dataAllSalesOrderInvoice[] = [
@@ -243,6 +259,14 @@ class RincianPenjualanPerBarang extends BaseController
             ];
         }
 
+        $dataAllSalesOrderInvoice[] = [
+            "is_grand_total" => true,
+            "total_invoice"  => number_format($grandTotalInvoice, 0, ',', '.'),
+            "total_hpp"      => number_format($grandTotalHPP, 0, ',', '.'),
+            "total_laba"     => number_format($grandTotalLaba, 0, ',', '.'),
+        ];
+
+
         $data = [
             "data" => $dataAllSalesOrderInvoice,
             "dateStart" => $tglAwal != "all" ? date("d/m/Y", strtotime($tglAwal)) : "All",
@@ -263,8 +287,10 @@ class RincianPenjualanPerBarang extends BaseController
         set_time_limit(0);
         ob_end_clean();
         ob_start();
+
         $condition = [
             "sales_order_invoice.deletedAt" => null,
+            "sales_order_invoice_detail.deletedAt" => null,
             "sales_order_invoice.tipe_invoice" => 'LOKAL'
         ];
 
@@ -304,6 +330,9 @@ class RincianPenjualanPerBarang extends BaseController
         $totalPerBarang = 0;
         $totalHPPPerBarang = 0;
         $totalLabaPerBarang = 0;
+        $grandTotalInvoice = 0;
+        $grandTotalHPP = 0;
+        $grandTotalLaba = 0;
 
         foreach ($dataSalesOrderInvoice['data'] as $data) {
             if ($currentBarang !== $data->id_barang_invoice) {
@@ -332,10 +361,16 @@ class RincianPenjualanPerBarang extends BaseController
 
             $laba = floatval($data->sum_amount_invoice) - floatval($data->amt_harga_pokok);
 
+            $grandTotalInvoice += floatval($data->sum_amount_invoice);
+            $grandTotalHPP     += floatval($data->amt_harga_pokok);
+            $grandTotalLaba    += $laba;
+            
             if ($data->jenis_penjualan == "1") {
                 $salesName = $data->salesName;
+            } elseif ($data->jenis_penjualan == 2) {
+                $salesName = "Office";
             } else {
-                $salesName = "OFFICE";
+                $salesName = "E-Commerce";
             }
 
             $sheet->fromArray([
@@ -367,6 +402,17 @@ class RincianPenjualanPerBarang extends BaseController
             $sheet->setCellValue('H' . $row, $totalLabaPerBarang);
             $sheet->getStyle('A' . $row . ':K' . $row)->getFont()->setBold(true);
         }
+
+        $row++;
+
+        // GRAND TOTAL
+        $sheet->setCellValue('A' . $row, 'GRAND TOTAL');
+        $sheet->mergeCells('A' . $row . ':E' . $row);
+        $sheet->setCellValue('F' . $row, $grandTotalInvoice);
+        $sheet->setCellValue('G' . $row, $grandTotalHPP);
+        $sheet->setCellValue('H' . $row, $grandTotalLaba);
+
+        $sheet->getStyle('A' . $row . ':K' . $row)->getFont()->setBold(true);
 
         // Format kolom angka
         $sheet->getStyle('F5:F' . $row)->getNumberFormat()->setFormatCode('#,##0');

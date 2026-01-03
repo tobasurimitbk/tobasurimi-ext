@@ -1186,63 +1186,63 @@
         });
     }
 
-    function getListBarang() {
-        $.ajax({
-            url: "<?= base_url("po-lokal-bahan-penolong/dropdown/get-barang"); ?>",
-            data: {
-                divisi_id: $('.division_id').val(),
-                spp_type: "Lokal BP"
-            },
-            beforeSend: function() {
-                $.LoadingOverlay("show", {
-                    image: "",
-                    fontawesomeColor: "#222FCC",
-                    fontawesome: "fa fa-cog fa-spin"
-                });
-            },
-            complete: function() {
-                $.LoadingOverlay("hide", {
-                    image: "",
-                    fontawesomeColor: "#222FCC",
-                    fontawesome: "fa fa-cog fa-spin"
-                });
-            },
-            method: "GET",
-            success: function(response) {
-                var barangSelect = $("select[name='barang_id']");
-                barangSelect.empty();
+    // function getListBarang() {
+    //     $.ajax({
+    //         url: "<?= base_url("po-lokal-bahan-penolong/dropdown/get-barang"); ?>",
+    //         data: {
+    //             divisi_id: $('.division_id').val(),
+    //             spp_type: "Lokal BP"
+    //         },
+    //         beforeSend: function() {
+    //             $.LoadingOverlay("show", {
+    //                 image: "",
+    //                 fontawesomeColor: "#222FCC",
+    //                 fontawesome: "fa fa-cog fa-spin"
+    //             });
+    //         },
+    //         complete: function() {
+    //             $.LoadingOverlay("hide", {
+    //                 image: "",
+    //                 fontawesomeColor: "#222FCC",
+    //                 fontawesome: "fa fa-cog fa-spin"
+    //             });
+    //         },
+    //         method: "GET",
+    //         success: function(response) {
+    //             var barangSelect = $("select[name='barang_id']");
+    //             barangSelect.empty();
 
-                var emptyOption = $("<option></option>")
-                    .attr("value", "")
-                    .text("Pilih Barang");
-                barangSelect.append(emptyOption);
-                $.each(response.data, function(index, data) {
-                    var option = $("<option></option>")
-                        .attr("data-barang_id", data.id)
-                        .attr("data-parent_name", data.parent_name)
-                        .attr("data-spesifikasi_id", data.spesifikasi_id)
-                        .attr("data-spesifikasi_name", data.spesifikasi_name)
-                        .attr("data-satuan_id", data.satuan_id)
-                        .attr("data-satuan_2", data.satuan_2)
-                        .attr("data-satuan_3", data.satuan_3)
-                        .attr("data-nama_barang", data.barang_name_master)
-                        .attr("data-kode_barang", data.kode_barang)
-                        .attr("value", data.barang_master_spesifikasi_id)
-                        .text(data.kode_barang + " { " + data.barang_name_master + " - " + data.spesifikasi + " }");
-                    barangSelect.append(option);
-                });
+    //             var emptyOption = $("<option></option>")
+    //                 .attr("value", "")
+    //                 .text("Pilih Barang");
+    //             barangSelect.append(emptyOption);
+    //             $.each(response.data, function(index, data) {
+    //                 var option = $("<option></option>")
+    //                     .attr("data-barang_id", data.id)
+    //                     .attr("data-parent_name", data.parent_name)
+    //                     .attr("data-spesifikasi_id", data.spesifikasi_id)
+    //                     .attr("data-spesifikasi_name", data.spesifikasi_name)
+    //                     .attr("data-satuan_id", data.satuan_id)
+    //                     .attr("data-satuan_2", data.satuan_2)
+    //                     .attr("data-satuan_3", data.satuan_3)
+    //                     .attr("data-nama_barang", data.barang_name_master)
+    //                     .attr("data-kode_barang", data.kode_barang)
+    //                     .attr("value", data.barang_master_spesifikasi_id)
+    //                     .text(data.kode_barang + " { " + data.barang_name_master + " - " + data.spesifikasi + " }");
+    //                 barangSelect.append(option);
+    //             });
 
-            },
-            onError: function(response) {
-                alert("ERROR")
-            }
-        });
-    }
+    //         },
+    //         onError: function(response) {
+    //             alert("ERROR")
+    //         }
+    //     });
+    // }
 
     function getDetailSPP() {
         var spp_id = $('.spp_id').val();
         // Load Ulang Master Barang Ketika SPP Dipilih
-        getListBarang();
+        // getListBarang();
         if (spp_id !== '') {
             $.ajax({
                 url: "<?= base_url("po-lokal-bahan-penolong/dropdown/get-detail-barang-spp"); ?>",

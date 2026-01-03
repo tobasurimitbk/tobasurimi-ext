@@ -51,6 +51,7 @@ class PesananPenjualanPerPelanggan extends BaseController
 
         $condition = [
             "sales_order.deletedAt"        => null,
+            "sales_order_detail.deletedAt"        => null,
             "sales_order.tipe_sales_order" => 'LOKAL'
         ];
 
@@ -165,6 +166,7 @@ class PesananPenjualanPerPelanggan extends BaseController
 
         $condition = [
             "sales_order.deletedAt"        => null,
+            "sales_order_detail.deletedAt"        => null,
             "sales_order.tipe_sales_order" => 'LOKAL'
         ];
 
@@ -279,6 +281,7 @@ class PesananPenjualanPerPelanggan extends BaseController
         ob_start();
         $condition = [
             "sales_order.deletedAt"        => null,
+            "sales_order_detail.deletedAt"        => null,
             "sales_order.tipe_sales_order" => 'LOKAL'
         ];
 

@@ -80,6 +80,14 @@
             <td class="text-right"><?= $row['total_laba'] ?></td>
             <td colspan="2"></td>
           </tr>
+        <?php elseif (isset($row['is_grand_total']) && $row['is_grand_total']): ?>
+          <tr class="grand-total-row">
+              <td colspan="5"><strong>GRAND TOTAL</strong></td>
+              <td class="text-right"><strong><?= $row['total_invoice'] ?></strong></td>
+              <td class="text-right"><strong><?= $row['total_hpp'] ?></strong></td>
+              <td class="text-right"><strong><?= $row['total_laba'] ?></strong></td>
+              <td colspan="2"></td>
+          </tr>
         <?php else: ?>
           <tr>
             <td><?= $row['no_faktur'] ?></td>

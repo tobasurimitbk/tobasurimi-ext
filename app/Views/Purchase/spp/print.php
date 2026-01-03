@@ -2,45 +2,84 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Surat Permintaan Pembelian</title>
+    <meta charset="UTF-8">
+    <title><?= $dataSPP->spp_no ?></title>
+
     <style>
-        body {
-            font-size: 12px;
-            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        /* ===============================
+   KERTAS F4 – PAKSA 1 HALAMAN
+=============================== */
+        @page {
+            size: 21.6cm 33cm;
+            /* F4 */
+            margin: 1cm;
         }
 
-        .table-font-size {
-            font-size: 11px !important;
+        /* tinggi area cetak = 33 - 2 = 31cm */
+        html,
+        body {
+            height: 31cm;
+            margin: 0;
+            padding: 0;
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+        body {
+            font-size: 12px;
+            font-family: 'Gill Sans', Calibri, sans-serif;
+
+            page-break-before: avoid;
+            page-break-after: avoid;
+        }
+
+        /* ===============================
+   BAGI HALAMAN JADI 2
+=============================== */
+        .half-page {
+            height: 13.2cm;
+            /* (31 - 0.2) / 2 */
+            box-sizing: border-box;
+            overflow: hidden;
+            padding: 0.3cm;
+
+            page-break-inside: avoid;
+            page-break-before: avoid;
+            page-break-after: avoid;
+        }
+
+        .tear-line {
+            height: 0.4cm;
+            border-top: 1px dashed #000;
+            margin: 0;
+        }
+
+        /* ===============================
+   TABLE & TEXT
+=============================== */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            page-break-inside: avoid;
+        }
+
+        .table-border {
+            border: 1px solid #000;
+        }
+
+        .txt-center {
             text-align: center;
         }
 
-        /* @page {
-            size: 8.27in 5.50in landscape;
-            margin: 25px;
-            padding: 25px;
-        } */
-
-        .table-border {
-            border: 1px solid black;
-            /* padding-left: 3px; */
-            /* padding-right: 3px; */
-        }
-
-        table {
-            border-collapse: collapse;
-            width: 100%;
+        .txt-bold {
+            font-weight: bold;
+            font-size: 16px;
         }
 
         .mt-5 {
-            margin-top: 2px;
+            margin-top: 5px;
         }
 
-        .mt-3 {
-            margin-top: 3rem;
-        }
 
         .sign-table td:not(:last-child) {
             border: 1px solid;
@@ -72,66 +111,76 @@
             text-align: center;
         }
 
-        /* .footer {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 90px;
-        } */
-
-        tbody {
-            font-size: 12px;
+        .table-font-size {
+            font-size: 11px !important;
+            text-align: left;
         }
     </style>
 </head>
 
 <body>
-    <?php for ($i = 0; $i < 2; $i++): ?>
-        <div class="txt-center txt-bold" style="margin-top:-30px;"> <b>SURAT PERMINTAAN PEMBELIAN </b></div>
+
+    <!-- ===============================
+     BAGIAN ATAS
+=============================== -->
+    <div class="half-page">
+
+        <div class="txt-center txt-bold">
+            SURAT PERMINTAAN PEMBELIAN <br>
+            <span style="font-size: 13px;">No. <?= $dataSPP->spp_no ?></span>
+
+        </div>
+
         <?php if (!empty($dataSPP)) { ?>
-            <table class="mt-5">
+
+            <table class="mt-5" style="font-size: 13px;">
                 <tr>
                     <td>Tanggal Order : <?= date("d-m-Y", strtotime($dataSPP->request_date)) ?></td>
-                    <td>Jenis Order : <?= $dataSPP->spp_type ?></td>
+                    <!-- <td>Jenis Order : <?= $dataSPP->spp_type ?></td> -->
                 </tr>
                 <tr>
-                    <td>Departemen: <?= $dataSPP->divisiName ?></td>
-                    <td>No Spp: <?= $dataSPP->spp_no ?></td>
+                    <td>Departemen : <?= $dataSPP->divisiName ?></td>
+                    <!-- <td>No SPP : <?= $dataSPP->spp_no ?></td> -->
                 </tr>
-            </table><br>
+            </table>
+
             <table class="mt-5 table-border">
-                <thead class="table-border">
+                <thead>
                     <tr>
-                        <td class="table-border" style="width: 5px;"><b class="table-font-size">No</b></td>
-                        <td class="table-border" style="width: 70px;"><b class="table-font-size">Kode Barang</b></td>
-                        <td class="table-border" style="width: 250px;"><b class="table-font-size">Nama Barang</b></td>
-                        <td class="table-border" style="width: 50px;"><b class="table-font-size">Qty</b></td>
-                        <td class="table-border" style="width: 140px;"><b class="table-font-size">Keterangan</b></td>
-                        <td class="table-border" style="width: 40px;"><b class="table-font-size">Supplier</b></td>
-                        <td class="table-border" style="width: 80px;"><b class="table-font-size">Harga</b></td>
-                        <!-- <td class="table-border" style="width: 40px;"><b class="table-font-size">PBP</b></td> -->
+                        <th class="table-border table-font-size"><b class="table-font-size">No</b></th>
+                        <th class="table-border table-font-size" style="width: 70px;"><b class="table-font-size">Kode</b></th>
+                        <th class="table-border table-font-size"><b class="table-font-size">Nama Barang</b></th>
+                        <th class="table-border table-font-size" style="width: 60px;"><b class="table-font-size">Qty</b></th>
+                        <th class="table-border table-font-size"><b class="table-font-size">Keterangan</b></th>
+                        <th class="table-border table-font-size" style="width: 70px;"><b class="table-font-size">Supplier</b></th>
+                        <th class="table-border table-font-size" style="width: 70px;"><b class="table-font-size">Harga</b></th>
+
                     </tr>
                 </thead>
                 <tbody>
-                    <?php
-                    foreach ($dataSPP->purchase_request_details as $detail) {
-                    ?>
+                    <?php foreach ($dataSPP->purchase_request_details as $d): ?>
                         <tr>
-                            <td class="table-border"><b class="table-font-size"><?= $detail->no ?></b></td>
-                            <td class="table-border"><b class="table-font-size"><?= $detail->kode_barang ?></b></td>
-                            <td class="table-border"><b class="table-font-size"><?= $detail->barang_name . " " . $detail->spesifikasi ?></b></td>
-                            <td class="table-border"><b class="table-font-size"><?= $detail->qty . " " . $detail->kode_satuan ?></b></td>
-                            <td class="table-border"><b class="table-font-size"><?= $detail->note ?></b></td>
-                            <td class="table-border"></td>
-                            <td class="table-border"></td>
-                            <!-- <td class="table-border"></td> -->
+                            <td class="table-border table-font-size"><b class="table-font-size"><?= $d->no ?></b></td>
+                            <td class="table-border table-font-size"><b class="table-font-size"><?= $d->kode_barang ?></b></td>
+                            <td class="table-border table-font-size">
+                                <b class="table-font-size"> <?= $d->barang_name ?> <?= $d->spesifikasi ?> </b>
+                            </td>
+                            <td class="table-border table-font-size">
+                                <b class="table-font-size"> <?= $d->qty ?> <?= $d->kode_satuan ?> </b>
+                            </td>
+                            <td class="table-border table-font-size"><b class="table-font-size"><?= $d->note ?></b></td>
+                            <td class="table-border table-font-size"></td>
+                            <td class="table-border table-font-size"></td>
                         </tr>
-                    <?php } ?>
+                    <?php endforeach; ?>
                 </tbody>
             </table>
-            <div>
-                <div class="mt-5">Keterangan: <?= $dataSPP->note ?></div>
+
+            <div class="mt-5">
+                Keterangan: <?= $dataSPP->note ?>
             </div>
+
+            <!-- TANDA TANGAN -->
             <div class="footer" style="margin-top:0px;">
                 <div style="text-align:left">
                     <div>Barang tersebut agar kami terima dalam keadaan baik.</div>
@@ -165,19 +214,115 @@
                     </tr>
                 </table>
             </div>
-        <?php } ?>
-        <br> <br>
-        <?php if ($i != 2): ?>
 
-            <br>
-            <br>
-            <br>
-            <hr style="border: none; border-top: 1px dashed #000;">
-            <br>
-            <br>
-            <br>
-        <?php endif; ?>
-    <?php endfor; ?>
+        <?php } ?>
+
+    </div>
+
+    <!-- ===============================
+     GARIS SOBEK
+=============================== -->
+    <div class="tear-line"></div>
+
+    <!-- ===============================
+     BAGIAN BAWAH
+=============================== -->
+    <div class="half-page">
+
+        <div class="txt-center txt-bold">
+            SURAT PERMINTAAN PEMBELIAN <br>
+            <span style="font-size: 13px;">No. <?= $dataSPP->spp_no ?></span>
+        </div>
+
+        <!-- ISI SAMA PERSIS DENGAN BAGIAN ATAS -->
+        <!-- (copy ulang isi dokumen atas di sini) -->
+        <table class="mt-5" style="font-size: 13px;">
+            <tr>
+                <td>Tanggal Order : <?= date("d-m-Y", strtotime($dataSPP->request_date)) ?></td>
+                <!-- <td>Jenis Order : <?= $dataSPP->spp_type ?></td> -->
+            </tr>
+            <tr>
+                <td>Departemen : <?= $dataSPP->divisiName ?></td>
+                <!-- <td>No SPP : <?= $dataSPP->spp_no ?></td> -->
+            </tr>
+        </table>
+
+        <table class="mt-5 table-border">
+            <thead>
+                <tr>
+                    <th class="table-border table-font-size"><b class="table-font-size">No</b></th>
+                    <th class="table-border table-font-size" style="width: 70px;"><b class="table-font-size">Kode</b></th>
+                    <th class="table-border table-font-size"><b class="table-font-size">Nama Barang</b></th>
+                    <th class="table-border table-font-size" style="width: 60px;"><b class="table-font-size">Qty</b></th>
+                    <th class="table-border table-font-size"><b class="table-font-size">Keterangan</b></th>
+                    <th class="table-border table-font-size" style="width: 70px;"><b class="table-font-size">Supplier</b></th>
+                    <th class="table-border table-font-size" style="width: 70px;"><b class="table-font-size">Harga</b></th>
+
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($dataSPP->purchase_request_details as $d): ?>
+                    <tr>
+                        <td class="table-border table-font-size"><b class="table-font-size"><?= $d->no ?></b></td>
+                        <td class="table-border table-font-size"><b class="table-font-size"><?= $d->kode_barang ?></b></td>
+                        <td class="table-border table-font-size">
+                            <b class="table-font-size"> <?= $d->barang_name ?> <?= $d->spesifikasi ?> </b>
+                        </td>
+                        <td class="table-border table-font-size">
+                            <b class="table-font-size"> <?= $d->qty ?> <?= $d->kode_satuan ?> </b>
+                        </td>
+                        <td class="table-border table-font-size"><b class="table-font-size"><?= $d->note ?></b></td>
+                        <td class="table-border table-font-size"></td>
+                        <td class="table-border table-font-size"></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+
+        <div class="mt-5">
+            Keterangan: <?= $dataSPP->note ?>
+        </div>
+
+        <!-- TANDA TANGAN -->
+        <div class="footer" style="margin-top:0px;">
+            <div style="text-align:left">
+                <div>Barang tersebut agar kami terima dalam keadaan baik.</div>
+                <div>Pada tanggal:</div>
+            </div>
+            <table class="w-100 sign-table border-collapse signed-info" style="border: 0px;">
+                <tr style="border: 0px;">
+                    <td style="height: 25px; border: 0px;">Diterima Oleh</td>
+                    <td style="border: 0px;">Disetujui Oleh</td>
+                    <td style="border: 0px;">Diorder Oleh</td>
+                </tr>
+                <tr>
+                    <th>
+                        <div class="sign-row txt-left">
+                            <br>
+                            <div></div>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="sign-row txt-left">
+                            <br>
+                            <div></div>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="sign-row txt-left">
+                            <br>
+                            <div><?= $dataSPP->createdByName ?></div>
+                        </div>
+                    </th>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <!-- ===============================
+     GARIS SOBEK
+=============================== -->
+    <div class="tear-line"></div>
+
 </body>
 
 </html>

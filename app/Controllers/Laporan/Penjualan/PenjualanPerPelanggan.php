@@ -48,6 +48,7 @@ class PenjualanPerPelanggan extends BaseController
         $condition = [
             // "sales_order_invoice.id_company" => $this->this_company_id,
             "sales_order_invoice.deletedAt" => null,
+            "sales_order_invoice_detail.deletedAt" => null,
             "sales_order_invoice.tipe_invoice" => 'LOKAL'
         ];
 
@@ -108,6 +109,7 @@ class PenjualanPerPelanggan extends BaseController
         $condition = [
             // "sales_order_invoice.id_company" => $this->this_company_id,
             "sales_order_invoice.deletedAt" => null,
+            "sales_order_invoice_detail.deletedAt" => null,
             "sales_order_invoice.tipe_invoice" => 'LOKAL'
         ];
 
@@ -167,6 +169,7 @@ class PenjualanPerPelanggan extends BaseController
         $condition = [
             // "sales_order_invoice.id_company" => $this->this_company_id,
             "sales_order_invoice.deletedAt" => null,
+            "sales_order_invoice_detail.deletedAt" => null,
             "sales_order_invoice.tipe_invoice" => 'LOKAL'
         ];
 
@@ -272,6 +275,7 @@ class PenjualanPerPelanggan extends BaseController
         ob_start();
         $condition = [
             "sales_order_invoice.deletedAt" => null,
+            "sales_order_invoice_detail.deletedAt" => null,
             "sales_order_invoice.tipe_invoice" => 'LOKAL'
         ];
 
@@ -297,9 +301,9 @@ class PenjualanPerPelanggan extends BaseController
             if ($data->jenis_penjualan == 1) {
                 $namaPenjual = $data->salesName;
             } elseif ($data->jenis_penjualan == 2) {
-                $namaPenjual = "E-Commerce";
-            } else {
                 $namaPenjual = "Office";
+            } else {
+                $namaPenjual = "E-Commerce";
             }
 
             $groupedData[$namaPenjual][] = [
@@ -337,6 +341,7 @@ class PenjualanPerPelanggan extends BaseController
 
         $condition = [
             "sales_order_invoice.deletedAt" => null,
+            "sales_order_invoice_detail.deletedAt" => null,
             "sales_order_invoice.tipe_invoice" => 'LOKAL'
         ];
 
