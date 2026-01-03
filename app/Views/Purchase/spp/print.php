@@ -115,6 +115,16 @@
             font-size: 11px !important;
             text-align: left;
         }
+
+        .copy-text {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 25px;
+            font-weight: bold;
+            opacity: 0.35;
+            /* transparan */
+            letter-spacing: 2px;
+        }
     </style>
 </head>
 
@@ -316,7 +326,12 @@
                     </th>
                 </tr>
             </table>
+            <!-- COPY -->
+            <div class="copy-text">
+                COPY
+            </div>
         </div>
+
     </div>
     <!-- ===============================
      GARIS SOBEK

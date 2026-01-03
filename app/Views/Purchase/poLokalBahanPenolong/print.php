@@ -206,7 +206,7 @@
                 <!-- <th>Biaya Tambahan</th> -->
                 <!-- <th>PPN</th> -->
                 <!-- <th>PPH</th> -->
-                <th class="txt-left" style="padding-left: 5px; width: 120px;">QTY</th>
+                <th class="txt-left" style="padding-left: 5px; width: 50px;">QTY</th>
                 <th class="txt-left" style="padding-left: 5px; width: 120px;">KODE BARANG</th>
                 <th class="txt-left" style="padding-left: 5px;">NAMA BARANG</th>
                 <th class="txt-left" style="padding-left: 5px; width: 80px;">HARGA</th>
