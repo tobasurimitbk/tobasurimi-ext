@@ -2898,9 +2898,8 @@ $routes->get('/laporan-accounting/neraca/getData', 'Laporan\Accounting\Neraca::g
 $routes->get('/laporan-accounting/neraca/printExcel', 'Laporan\Accounting\Neraca::exportExcel', ['filter' => 'Auth']);
 
 $routes->get('/laporan-accounting/labarugi', 'Laporan\Accounting\LabaRugi::index', ['filter' => 'Auth']);
-$routes->post('/laporan-accounting/labarugi', 'Laporan\Accounting\LabaRugi::index', ['filter' => 'Auth']);
-$routes->get('/laporan-accounting/labarugi/printPDF/(:segment)/(:segment)', 'Laporan\Accounting\LabaRugi::exportPDF/$1/$2', ['filter' => 'Auth']);
-$routes->get('/laporan-accounting/labarugi/printExcel/(:segment)/(:segment)', 'Laporan\Accounting\LabaRugi::exportExcel/$1/$2', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/labarugi/getData', 'Laporan\Accounting\LabaRugi::getData', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/labarugi/printExcel', 'Laporan\Accounting\LabaRugi::exportExcel', ['filter' => 'Auth']);
 
 $routes->get('/laporan-accounting/bukubesar', 'Laporan\Accounting\BukuBesar::index', ['filter' => 'Auth']);
 // $routes->post('/laporan-accounting/bukubesarData', 'Laporan\Accounting\BukuBesar::index', ['filter' => 'Auth']);
