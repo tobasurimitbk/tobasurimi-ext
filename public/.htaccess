@@ -4,8 +4,7 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    RewriteCond %{REQUEST_URI} ^/lyrid/?$ [NC]
-    RewriteRule ^$ / [R=301,L]
+    RewriteRule ^lyrid/?$ / [R=301,L]
 </IfModule>
 
 # Disable directory browsing
