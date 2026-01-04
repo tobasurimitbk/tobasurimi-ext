@@ -273,7 +273,7 @@
                                     <i class="fas fa-sign-in-alt"></i>
                                 </span>
                             </div>
-                            <input type="datetime-local" class="form-control" id="edit-checkin" name="check_in">
+                            <input type="datetime-local" class="form-control" id="edit-checkin" name="check_in_rounded">
                         </div>
                     </div>
                     
@@ -285,7 +285,7 @@
                                     <i class="fas fa-sign-out-alt"></i>
                                 </span>
                             </div>
-                            <input type="datetime-local" class="form-control" id="edit-checkout" name="check_out">
+                            <input type="datetime-local" class="form-control" id="edit-checkout" name="check_out_rounded">
                         </div>
                     </div>
                     
@@ -710,16 +710,16 @@
             let no = 1;
             $.each(data, function(index, emp) {
                 // Format Check In
-                const checkInDisplay = emp.check_in 
+                const checkInDisplay = emp.check_in_rounded 
                     ? `<div class="text-center">
-                        <div class="time-display">${emp.check_in}</div>
+                        <div class="time-display">${emp.check_in_rounded}</div>
                     </div>`
                     : '<span class="text-muted">-</span>';
                 
                 // Format Check Out
-                const checkOutDisplay = emp.check_out 
+                const checkOutDisplay = emp.check_out_rounded 
                     ? `<div class="text-center">
-                        <div class="time-display">${emp.check_out}</div>
+                        <div class="time-display">${emp.check_out_rounded}</div>
                     </div>`
                     : '<span class="text-muted">-</span>';
                 
@@ -751,8 +751,8 @@
                 let status = 'Tidak Masuk';
                 let statusClass = 'danger';
                 
-                if (emp.check_in) {
-                    if (emp.check_out) {
+                if (emp.check_in_rounded) {
+                    if (emp.check_out_rounded) {
                         // Ada check in dan check out
                         const [hours, minutes] = emp.work_hours ? emp.work_hours.split(':').map(Number) : [0, 0];
                         const totalMinutes = (hours * 60) + minutes;
@@ -838,10 +838,10 @@
             }
 
             const totalEmployees = data.length;
-            const checkInCount = data.filter(item => item.check_in !== null).length;
-            const checkOutCount = data.filter(item => item.check_out !== null).length;
+            const checkInCount = data.filter(item => item.check_in_rounded !== null).length;
+            const checkOutCount = data.filter(item => item.check_out_rounded !== null).length;
             const missingCount = data.filter(item => 
-                item.check_in === null && item.check_out === null
+                item.check_in_rounded === null && item.check_out_rounded === null
             ).length;
 
             $('#total-employees').text(totalEmployees);
@@ -876,8 +876,8 @@
                         let status = 'Tidak Masuk';
                         let statusClass = 'danger';
                         
-                        if (emp.check_in) {
-                            if (emp.check_out) {
+                        if (emp.check_in_rounded) {
+                            if (emp.check_out_rounded) {
                                 if (totalMinutes >= 480) {
                                     status = 'Hadir';
                                     statusClass = 'success';
@@ -934,16 +934,16 @@
                                         <tr>
                                             <th>Check In</th>
                                             <td>
-                                                ${emp.check_in ? `
-                                                    <span class="text-success">${emp.check_in}</span>
+                                                ${emp.check_in_rounded ? `
+                                                    <span class="text-success">${emp.check_in_rounded}</span>
                                                 ` : '<span class="text-muted">-</span>'}
                                             </td>
                                         </tr>
                                         <tr>
                                             <th>Check Out</th>
                                             <td>
-                                                ${emp.check_out ? `
-                                                    <span class="text-warning">${emp.check_out}</span>
+                                                ${emp.check_out_rounded ? `
+                                                    <span class="text-warning">${emp.check_out_rounded}</span>
                                                 ` : '<span class="text-muted">-</span>'}
                                             </td>
                                         </tr>
@@ -1027,15 +1027,15 @@
                         $('#edit-date').val(date);
                         
                         // Format datetime for input fields
-                        if (data.check_in) {
-                            const checkInDate = new Date(date + 'T' + data.check_in);
+                        if (data.check_in_rounded) {
+                            const checkInDate = new Date(date + 'T' + data.check_in_rounded);
                             $('#edit-checkin').val(checkInDate.toISOString().slice(0, 16));
                         } else {
                             $('#edit-checkin').val('');
                         }
                         
-                        if (data.check_out) {
-                            const checkOutDate = new Date(date + 'T' + data.check_out);
+                        if (data.check_out_rounded) {
+                            const checkOutDate = new Date(date + 'T' + data.check_out_rounded);
                             $('#edit-checkout').val(checkOutDate.toISOString().slice(0, 16));
                         } else {
                             $('#edit-checkout').val('');

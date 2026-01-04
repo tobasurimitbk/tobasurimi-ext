@@ -2209,7 +2209,7 @@ $routes->post('/big-days/delete', 'Master\BigDays::deleteBigDay', ['filter' => '
 
 // Absensi Unit
 $routes->get('/attendances-unit', 'Master\AttendancesUnit::ListData', ['filter' => 'Auth']);
-$routes->get('/attendances-cunit/all', 'Master\AttendancesUnit::allData', ['filter' => 'Auth']);
+$routes->get('/attendances-unit/all', 'Master\AttendancesUnit::allData', ['filter' => 'Auth']);
 $routes->get('/attendances-unit/id/(:segment)', 'Master\AttendancesUnit::getById/$1', ['filter' => 'Auth']);
 $routes->post('/attendances-unit/save', 'Master\AttendancesUnit::saveData', ['filter' => 'Auth']);
 $routes->post('/attendances-unit/update', 'Master\AttendancesUnit::updateData', ['filter' => 'Auth']);

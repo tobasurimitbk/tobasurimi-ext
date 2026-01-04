@@ -21,6 +21,8 @@
             height: 31cm;
             margin: 0;
             padding: 0;
+            margin-left: 10px;
+            margin-right: 10px;
         }
 
         body {
@@ -113,6 +115,16 @@
             font-size: 11px !important;
             text-align: left;
         }
+
+        .copy-text {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 25px;
+            font-weight: bold;
+            opacity: 0.35;
+            /* transparan */
+            letter-spacing: 2px;
+        }
     </style>
 </head>
 
@@ -146,7 +158,7 @@
                 <thead>
                     <tr>
                         <th class="table-border table-font-size"><b class="table-font-size">No</b></th>
-                        <th class="table-border table-font-size" style="width: 60px;"><b class="table-font-size">Kode</b></th>
+                        <th class="table-border table-font-size" style="width: 70px;"><b class="table-font-size">Kode</b></th>
                         <th class="table-border table-font-size"><b class="table-font-size">Nama Barang</b></th>
                         <th class="table-border table-font-size" style="width: 60px;"><b class="table-font-size">Qty</b></th>
                         <th class="table-border table-font-size"><b class="table-font-size">Keterangan</b></th>
@@ -249,7 +261,7 @@
             <thead>
                 <tr>
                     <th class="table-border table-font-size"><b class="table-font-size">No</b></th>
-                    <th class="table-border table-font-size" style="width: 60px;"><b class="table-font-size">Kode</b></th>
+                    <th class="table-border table-font-size" style="width: 70px;"><b class="table-font-size">Kode</b></th>
                     <th class="table-border table-font-size"><b class="table-font-size">Nama Barang</b></th>
                     <th class="table-border table-font-size" style="width: 60px;"><b class="table-font-size">Qty</b></th>
                     <th class="table-border table-font-size"><b class="table-font-size">Keterangan</b></th>
@@ -314,8 +326,17 @@
                     </th>
                 </tr>
             </table>
+            <!-- COPY -->
+            <div class="copy-text">
+                COPY
+            </div>
         </div>
+
     </div>
+    <!-- ===============================
+     GARIS SOBEK
+=============================== -->
+    <div class="tear-line"></div>
 
 </body>
 
