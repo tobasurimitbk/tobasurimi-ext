@@ -37,7 +37,7 @@
    BAGI HALAMAN JADI 2
 =============================== */
         .half-page {
-            height: 13.2cm;
+            height: 10.2cm;
             /* (31 - 0.2) / 2 */
             box-sizing: border-box;
             overflow: hidden;
@@ -52,6 +52,7 @@
             height: 0.4cm;
             border-top: 1px dashed #000;
             margin: 0;
+            margin-top: 10px;
         }
 
         /* ===============================
@@ -65,6 +66,13 @@
 
         .table-border {
             border: 1px solid #000;
+            /* line-height: 30px; */
+        }
+
+        .table-border td,
+        .table-border th {
+            text-align: left;
+            /* kalau mau horizontal juga */
         }
 
         .txt-center {
@@ -114,11 +122,12 @@
         .table-font-size {
             font-size: 11px !important;
             text-align: left;
+            height: 30px !important;
         }
 
         .copy-text {
             text-align: center;
-            margin-top: 15px;
+            margin-top: 0px;
             font-size: 25px;
             font-weight: bold;
             opacity: 0.35;
@@ -137,7 +146,7 @@
 
         <div class="txt-center txt-bold">
             SURAT PERMINTAAN PEMBELIAN <br>
-            <span style="font-size: 13px;">No. <?= $dataSPP->spp_no ?></span>
+            <span style="font-size: 16px;">No. <?= $dataSPP->spp_no ?></span>
 
         </div>
 
@@ -162,8 +171,8 @@
                         <th class="table-border table-font-size"><b class="table-font-size">Nama Barang</b></th>
                         <th class="table-border table-font-size" style="width: 60px;"><b class="table-font-size">Qty</b></th>
                         <th class="table-border table-font-size"><b class="table-font-size">Keterangan</b></th>
-                        <th class="table-border table-font-size" style="width: 70px;"><b class="table-font-size">Supplier</b></th>
-                        <th class="table-border table-font-size" style="width: 70px;"><b class="table-font-size">Harga</b></th>
+                        <th class="table-border table-font-size" style="width: 80px;"><b class="table-font-size">Supplier</b></th>
+                        <th class="table-border table-font-size" style="width: 80px;"><b class="table-font-size">Harga</b></th>
 
                     </tr>
                 </thead>
@@ -186,52 +195,53 @@
                 </tbody>
             </table>
 
-            <div class="mt-5">
-                Keterangan: <?= $dataSPP->note ?>
-            </div>
 
-            <!-- TANDA TANGAN -->
-            <div class="footer" style="margin-top:0px;">
-                <div style="text-align:left">
-                    <div>Barang tersebut agar kami terima dalam keadaan baik.</div>
-                    <div>Pada tanggal:</div>
-                </div>
-                <table class="w-100 sign-table border-collapse signed-info" style="border: 0px;">
-                    <tr style="border: 0px;">
-                        <td style="height: 25px; border: 0px;">Diterima Oleh</td>
-                        <td style="border: 0px;">Disetujui Oleh</td>
-                        <td style="border: 0px;">Diorder Oleh</td>
-                    </tr>
-                    <tr>
-                        <th>
-                            <div class="sign-row txt-left">
-                                <br>
-                                <div></div>
-                            </div>
-                        </th>
-                        <th>
-                            <div class="sign-row txt-left">
-                                <br>
-                                <div></div>
-                            </div>
-                        </th>
-                        <th>
-                            <div class="sign-row txt-left">
-                                <br>
-                                <div><?= $dataSPP->createdByName ?></div>
-                            </div>
-                        </th>
-                    </tr>
-                </table>
-            </div>
 
         <?php } ?>
 
     </div>
+    <!-- COPY -->
+    <div class="copy-text mt-5">
+        &#160;
+    </div>
+    <div>
+        Keterangan: <?= $dataSPP->note ?>
+    </div>
 
-    <!-- ===============================
-     GARIS SOBEK
-=============================== -->
+    <!-- TANDA TANGAN -->
+    <div class="footer" style="margin-top:0px;">
+        <div style="text-align:left">
+            <div>Barang tersebut agar kami terima dalam keadaan baik.</div>
+            <div>Pada tanggal:</div>
+        </div>
+        <table class="w-100 sign-table border-collapse signed-info" style="border: 0px;">
+            <tr style="border: 0px;">
+                <td style="height: 25px; border: 0px;">Diterima Oleh</td>
+                <td style="border: 0px;">Disetujui Oleh</td>
+                <td style="border: 0px;">Diorder Oleh</td>
+            </tr>
+            <tr>
+                <th>
+                    <div class="sign-row txt-left">
+                        <br>
+                        <div></div>
+                    </div>
+                </th>
+                <th>
+                    <div class="sign-row txt-left">
+                        <br>
+                        <div></div>
+                    </div>
+                </th>
+                <th>
+                    <div class="sign-row txt-left">
+                        <br>
+                        <div><?= $dataSPP->createdByName ?></div>
+                    </div>
+                </th>
+            </tr>
+        </table>
+    </div>
     <div class="tear-line"></div>
 
     <!-- ===============================
@@ -241,7 +251,7 @@
 
         <div class="txt-center txt-bold">
             SURAT PERMINTAAN PEMBELIAN <br>
-            <span style="font-size: 13px;">No. <?= $dataSPP->spp_no ?></span>
+            <span style="font-size: 16px;">No. <?= $dataSPP->spp_no ?></span>
         </div>
 
         <!-- ISI SAMA PERSIS DENGAN BAGIAN ATAS -->
@@ -265,8 +275,8 @@
                     <th class="table-border table-font-size"><b class="table-font-size">Nama Barang</b></th>
                     <th class="table-border table-font-size" style="width: 60px;"><b class="table-font-size">Qty</b></th>
                     <th class="table-border table-font-size"><b class="table-font-size">Keterangan</b></th>
-                    <th class="table-border table-font-size" style="width: 70px;"><b class="table-font-size">Supplier</b></th>
-                    <th class="table-border table-font-size" style="width: 70px;"><b class="table-font-size">Harga</b></th>
+                    <th class="table-border table-font-size" style="width: 80px;"><b class="table-font-size">Supplier</b></th>
+                    <th class="table-border table-font-size" style="width: 80px;"><b class="table-font-size">Harga</b></th>
 
                 </tr>
             </thead>
@@ -289,48 +299,51 @@
             </tbody>
         </table>
 
-        <div class="mt-5">
-            Keterangan: <?= $dataSPP->note ?>
-        </div>
 
-        <!-- TANDA TANGAN -->
-        <div class="footer" style="margin-top:0px;">
-            <div style="text-align:left">
-                <div>Barang tersebut agar kami terima dalam keadaan baik.</div>
-                <div>Pada tanggal:</div>
-            </div>
-            <table class="w-100 sign-table border-collapse signed-info" style="border: 0px;">
-                <tr style="border: 0px;">
-                    <td style="height: 25px; border: 0px;">Diterima Oleh</td>
-                    <td style="border: 0px;">Disetujui Oleh</td>
-                    <td style="border: 0px;">Diorder Oleh</td>
-                </tr>
-                <tr>
-                    <th>
-                        <div class="sign-row txt-left">
-                            <br>
-                            <div></div>
-                        </div>
-                    </th>
-                    <th>
-                        <div class="sign-row txt-left">
-                            <br>
-                            <div></div>
-                        </div>
-                    </th>
-                    <th>
-                        <div class="sign-row txt-left">
-                            <br>
-                            <div><?= $dataSPP->createdByName ?></div>
-                        </div>
-                    </th>
-                </tr>
-            </table>
-            <!-- COPY -->
-            <div class="copy-text">
-                COPY
-            </div>
+
+    </div>
+    <!-- COPY -->
+    <div class="copy-text mt-5">
+        COPY
+    </div>
+    <div>
+        Keterangan: <?= $dataSPP->note ?>
+    </div>
+
+
+    <!-- TANDA TANGAN -->
+    <div class="footer" style="margin-top:0px;">
+        <div style="text-align:left">
+            <div>Barang tersebut agar kami terima dalam keadaan baik.</div>
+            <div>Pada tanggal:</div>
         </div>
+        <table class="w-100 sign-table border-collapse signed-info" style="border: 0px;">
+            <tr style="border: 0px;">
+                <td style="height: 25px; border: 0px;">Diterima Oleh</td>
+                <td style="border: 0px;">Disetujui Oleh</td>
+                <td style="border: 0px;">Diorder Oleh</td>
+            </tr>
+            <tr>
+                <th>
+                    <div class="sign-row txt-left">
+                        <br>
+                        <div></div>
+                    </div>
+                </th>
+                <th>
+                    <div class="sign-row txt-left">
+                        <br>
+                        <div></div>
+                    </div>
+                </th>
+                <th>
+                    <div class="sign-row txt-left">
+                        <br>
+                        <div><?= $dataSPP->createdByName ?></div>
+                    </div>
+                </th>
+            </tr>
+        </table>
 
     </div>
     <!-- ===============================
