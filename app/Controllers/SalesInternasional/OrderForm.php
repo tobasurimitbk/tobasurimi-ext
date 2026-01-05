@@ -950,7 +950,7 @@ class OrderForm extends BaseController
             ->findAll();
 
         $formatter = new IntlDateFormatter(
-            'id_ID',
+            'en_US',
             IntlDateFormatter::LONG,
             IntlDateFormatter::NONE,
             'Asia/Jakarta',
