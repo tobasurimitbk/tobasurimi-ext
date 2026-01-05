@@ -17,6 +17,7 @@ class AttendancesLogOutsourcingModel extends Model
     protected $allowedFields    = [
         'employee_id',
         'attendance_unit',
+        'breaktime',
         'datetime',
     ];
 

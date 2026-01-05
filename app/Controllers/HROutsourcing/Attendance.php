@@ -64,6 +64,8 @@ class Attendance extends BaseController
         return view('HROutsourcing/Attendance/index', $data);
     }
 
+    
+
     public function allData()
     {
         // =============================
@@ -102,12 +104,14 @@ class Attendance extends BaseController
             $selectedDate = date('Y-m-d', strtotime($date));
 
             // =============================
-            // 2. AMBIL PRESENSI DARI DATABASE
+            // 2. AMBIL PRESENSI DARI DATABASE + BREAKTIME
             // =============================
             $rawAttendance = $this->AttendancesLogOutsourcingModel
                     ->select('
+                        attendance_log_outsource.id,
                         attendance_log_outsource.employee_id AS pin,
                         attendance_log_outsource.datetime,
+                        attendance_log_outsource.breaktime,
                         hr_outsourcing_employee.nama,
                         hr_outsourcing_employee.badge
                     ')
@@ -133,10 +137,11 @@ class Attendance extends BaseController
              */
             $attendanceData = array_map(function ($row) {
                 return [
-                    'pin'      => (string) $row['pin'],
-                    'datetime' => $row['datetime'],
-                    'status'   => '0',   // dummy (logic kita yg nentuin)
-                    'verified' => '1'    // trusted karena dari DB
+                    'pin'        => (string) $row['pin'],
+                    'datetime'   => $row['datetime'],
+                    'status'     => '0',
+                    'verified'   => '1',
+                    'breaktime' => $row['breaktime'] ?? 0  // TAMBAHAN
                 ];
             }, $rawAttendance);
 
@@ -158,9 +163,10 @@ class Attendance extends BaseController
             }
 
             // =============================
-            // 5. Group attendance per employee
+            // 5. Group attendance per employee + break time
             // =============================
             $employeeAttendanceMap = [];
+            $employeeBreakTimeMap = [];  // TAMBAHAN: Map break time per employee
 
             foreach ($attendanceData as $att) {
                 $pin = (int) $att['pin'];
@@ -175,6 +181,11 @@ class Attendance extends BaseController
                     'type'      => $this->getAttendanceType($att['status']),
                     'verified'  => $att['verified']
                 ];
+
+                // Simpan breaktime jika ada (ambil dari record pertama yang ada breaktime)
+                if (!isset($employeeBreakTimeMap[$pin]) && isset($att['breaktime']) && $att['breaktime'] > 0) {
+                    $employeeBreakTimeMap[$pin] = (float) $att['breaktime'];
+                }
             }
 
             // Sort waktu
@@ -183,15 +194,18 @@ class Attendance extends BaseController
             }
 
             // =============================
-            // 6. Proses SEMUA karyawan dengan perhitungan jam kerja
+            // 6. Proses SEMUA karyawan dengan perhitungan jam kerja + break time
             // =============================
             $processedData = [];
             $counter = 1;
 
             foreach ($allEmployees as $employee) {
                 $pin = (int) $employee['id'];
+                
+                // Ambil break time untuk employee ini
+                $breakTime = $employeeBreakTimeMap[$pin] ?? 0;
 
-                // Default data
+                // Default data + breaktime
                 $empData = [
                     'no'               => $counter++,
                     'user_id'          => $pin,
@@ -199,9 +213,10 @@ class Attendance extends BaseController
                     'badge_no'         => $employee['badge'],
                     'check_in'         => null,
                     'check_out'        => null,
-                    'work_hours'       => '0:00', // Format jam:menit
-                    'work_minutes'     => 0,      // Total menit (setelah pembulatan)
-                    'decimal_hours'    => 0,      // Jam desimal (setelah pembulatan)
+                    'breaktime'       => $breakTime,  // TAMBAHAN
+                    'work_hours'       => '0:00',
+                    'work_minutes'     => 0,
+                    'decimal_hours'    => 0,
                     'verified_in'      => 'Not Verified',
                     'verified_out'     => 'Not Verified',
                     'status'           => 'Tidak Masuk',
@@ -236,25 +251,41 @@ class Attendance extends BaseController
                         // Gunakan rumus pembulatan SS
                         $hoursCalculation = $this->calculateHoursWithRounding($checkInStr, $checkOutStr);
                         
-                        $empData['work_minutes'] = $hoursCalculation['total_minutes'];
-                        $empData['work_hours'] = $hoursCalculation['formatted'];
-                        $empData['decimal_hours'] = $hoursCalculation['decimal_hours'];
+                        // =============================
+                        // MODIFIKASI: KURANGI BREAK TIME DARI TOTAL MENIT
+                        // =============================
+                        $breakMinutes = $breakTime * 60;  // Konversi jam ke menit
+                        $netMinutes = max(0, $hoursCalculation['total_minutes'] - $breakMinutes);
+                        
+                        // Format jam:menit setelah dikurangi break
+                        $hours = floor($netMinutes / 60);
+                        $minutes = $netMinutes % 60;
+                        $formattedNetHours = sprintf("%d:%02d", $hours, $minutes);
+                        $decimalNetHours = round($netMinutes / 60, 2);
+                        
+                        $empData['work_minutes'] = $netMinutes;  // PAKAI YANG SUDAH DIKURANGI BREAK
+                        $empData['work_hours'] = $formattedNetHours;
+                        $empData['decimal_hours'] = $decimalNetHours;
                         $empData['check_in_rounded'] = date('H:i', strtotime($checkInStr)) . ' → ' . number_format($hoursCalculation['jam_masuk_decimal'], 2);
                         $empData['check_out_rounded'] = date('H:i', strtotime($checkOutStr)) . ' → ' . number_format($hoursCalculation['jam_keluar_decimal'], 2);
 
-                        // Tentukan status berdasarkan jam kerja (dengan pembulatan)
-                        // Konversi jam desimal ke menit untuk pengecekan
-                        $roundedMinutes = $empData['work_minutes'];
-                        
-                        if ($roundedMinutes >= 480) { // 8 jam = 480 menit
+                        // =============================
+                        // MODIFIKASI: TENTUKAN STATUS BERDASARKAN NET MINUTES
+                        // =============================
+                        if ($netMinutes >= 480) { // 8 jam = 480 menit
                             $empData['status'] = 'Hadir';
                             $empData['status_class'] = 'success';
-                        } elseif ($roundedMinutes >= 300) { // 5 jam = 300 menit
+                        } elseif ($netMinutes >= 300) { // 5 jam = 300 menit
                             $empData['status'] = 'Kurang Jam';
                             $empData['status_class'] = 'warning';
                         } else {
                             $empData['status'] = 'Jam Tidak Cukup';
                             $empData['status_class'] = 'danger';
+                        }
+                        
+                        // Tambahkan info break time di status jika ada
+                        if ($breakTime > 0) {
+                            $empData['status'] .= " (Istirahat: " . number_format($breakTime, 1) . " jam)";
                         }
                     } else {
                         // Hanya check in
@@ -265,12 +296,20 @@ class Attendance extends BaseController
                         $checkInStr = $firstRecord['datetime'];
                         $jamMasukDecimal = $this->convertJamMasuk($this->formatToHourMinute($checkInStr));
                         $empData['check_in_rounded'] = date('H:i', strtotime($checkInStr)) . ' → ' . number_format($jamMasukDecimal, 2);
+                        
+                        // Tambahkan info break time jika ada
+                        if ($breakTime > 0) {
+                            $empData['status'] .= " (Istirahat: " . number_format($breakTime, 1) . " jam)";
+                        }
                     }
 
                     // Multiple records
                     if (count($records) > 2) {
                         $empData['status'] = 'Multiple Records (' . count($records) . ')';
                         $empData['status_class'] = 'info';
+                        if ($breakTime > 0) {
+                            $empData['status'] .= " + Istirahat: " . number_format($breakTime, 1) . " jam";
+                        }
                     }
                 }
 
@@ -286,20 +325,37 @@ class Attendance extends BaseController
             }
 
             // =============================
-            // 8. Statistik (GUNAKAN WORK_MINUTES YANG SUDAH DIBULATKAN)
+            // 8. Statistik (GUNAKAN NET WORK_MINUTES YANG SUDAH DIKURANGI BREAK)
             // =============================
             $totalWorkMinutes = array_sum(array_column($processedData, 'work_minutes'));
+            $totalBreakMinutes = array_sum(array_column($processedData, 'breaktime')) * 60;
             $avgHours = count($processedData) > 0 ? floor($totalWorkMinutes / count($processedData) / 60) : 0;
             $avgMinutes = count($processedData) > 0 ? floor(($totalWorkMinutes / count($processedData)) % 60) : 0;
+            
+            // Hitung statistik status
+            $presentCount = 0;
+            $kurangJamCount = 0;
+            $tidakCukupCount = 0;
+            
+            foreach ($processedData as $data) {
+                if (strpos($data['status'], 'Hadir') === 0) {
+                    $presentCount++;
+                } elseif (strpos($data['status'], 'Kurang Jam') === 0) {
+                    $kurangJamCount++;
+                } elseif (strpos($data['status'], 'Jam Tidak Cukup') === 0) {
+                    $tidakCukupCount++;
+                }
+            }
 
             $stats = [
                 'total_employees' => count($allEmployees),
-                'present'         => count(array_filter($processedData, fn ($d) => $d['status'] === 'Hadir')),
+                'present'         => $presentCount,
                 'absent'          => count(array_filter($processedData, fn ($d) => $d['status'] === 'Tidak Masuk')),
-                'late'            => count(array_filter($processedData, fn ($d) => $d['status'] === 'Kurang Jam')),
+                'late'            => $kurangJamCount + $tidakCukupCount,
                 'total_hours'     => floor($totalWorkMinutes / 60) . ' jam ' . ($totalWorkMinutes % 60) . ' menit',
+                'total_break'     => number_format($totalBreakMinutes / 60, 1) . ' jam',
                 'avg_hours'       => sprintf("%d:%02d", $avgHours, $avgMinutes),
-                'note'            => 'Perhitungan menggunakan rumus pembulatan SS'
+                'note'            => 'Perhitungan menggunakan rumus pembulatan SS (setelah dikurangi jam istirahat)'
             ];
 
             return $this->response->setJSON([
@@ -321,6 +377,229 @@ class Attendance extends BaseController
         }
     }
 
+    public function updateBreakTime()
+    {
+        // =============================
+        // 1. Validasi AJAX
+        // =============================
+        if (! $this->request->isAJAX()) {
+            return $this->response->setStatusCode(405)->setJSON([
+                'success' => false,
+                'message' => 'Method not allowed'
+            ]);
+        }
+
+        // =============================
+        // 2. Ambil input
+        // =============================
+        $userId    = $this->request->getPost('user_id');
+        $date      = $this->request->getPost('date');
+        $companyId = $this->request->getPost('company_id');
+        $rawBreak  = $this->request->getPost('break_time');
+
+        if (empty($userId) || empty($date) || empty($companyId)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Data tidak lengkap'
+            ]);
+        }
+
+    
+        $breakTime = is_numeric($rawBreak)
+            ? round((float) $rawBreak, 2)
+            : 0.00;
+
+        // batas wajar (0–5 jam)
+        if ($breakTime < 0 || $breakTime > 5) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Jam istirahat tidak valid'
+            ]);
+        }
+
+        $selectedDate = date('Y-m-d', strtotime($date));
+
+        try {
+            // =============================
+            // 4. VALIDASI EMPLOYEE
+            // =============================
+            $employee = $this->hrOutSourcingEmployeModel
+                ->where('id', $userId)
+                ->where('company_id', $companyId)
+                ->first();
+
+            if (! $employee) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Karyawan tidak ditemukan'
+                ]);
+            }
+
+            // =============================
+            // 5. AMBIL ATTENDANCE HARI ITU
+            // =============================
+            $attendanceRecords = $this->AttendancesLogOutsourcingModel
+                ->where('employee_id', $userId)
+                ->where('DATE(datetime)', $selectedDate)
+                ->orderBy('datetime', 'ASC')
+                ->findAll();
+
+            if (empty($attendanceRecords)) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Data presensi belum ada, tidak bisa set istirahat'
+                ]);
+            }
+
+            // =============================
+            // 6. UPDATE BREAKTIME (SEMUA RECORD HARI ITU)
+            // =============================
+            foreach ($attendanceRecords as $row) {
+                $this->AttendancesLogOutsourcingModel
+                    ->where('id', $row['id'])
+                    ->set('breaktime', $breakTime)
+                    ->update();
+            }
+
+            // =============================
+            // 7. HITUNG ULANG JAM KERJA (OPTIONAL, UNTUK LOGIC)
+            // =============================
+            if (count($attendanceRecords) >= 2) {
+                $first = $attendanceRecords[0];
+                $last  = end($attendanceRecords);
+
+                $hoursCalc = $this->calculateHoursWithRounding(
+                    $first['datetime'],
+                    $last['datetime']
+                );
+
+                $totalMinutes = $hoursCalc['total_minutes'];
+                $netMinutes   = max(0, $totalMinutes - ($breakTime * 60));
+
+                log_message(
+                    'info',
+                    "Breaktime updated | User: {$userId} | Date: {$selectedDate} | Break: {$breakTime} jam | NetMinutes: {$netMinutes}"
+                );
+            }
+
+            // =============================
+            // 8. RESPONSE
+            // =============================
+            return $this->response->setJSON([
+                'success'    => true,
+                'message'    => 'Jam istirahat berhasil diperbarui',
+                'breaktime'  => number_format($breakTime, 2),
+                'user_id'    => $userId,
+                'date'       => $selectedDate
+            ]);
+
+        } catch (\Throwable $e) {
+            log_message('error', 'Update breaktime error: ' . $e->getMessage());
+
+            return $this->response->setStatusCode(500)->setJSON([
+                'success' => false,
+                'message' => 'Terjadi kesalahan server'
+            ]);
+        }
+    }
+
+
+    /**
+     * Untuk JAM KELUAR (Pulang) - rumus dari "Jam kelvar" YANG BENAR
+     */
+    private function convertJamKeluar($timeFormat)
+    {
+        $timeParts = explode(':', $timeFormat);
+        if (count($timeParts) < 2) return 0;
+        
+        $hours = (int)$timeParts[0];
+        $minutes = (int)$timeParts[1];
+        
+        if ($minutes >= 45 && $minutes <= 60) {
+            return $hours + 0.75;
+        } elseif ($minutes >= 30 && $minutes <= 44) {
+            return $hours + 0.5;
+        } elseif ($minutes >= 15 && $minutes <= 29) {
+            return $hours + 0.25;
+        } else {
+            return $hours + 0;
+        }
+    }
+
+    /**
+     * Untuk JAM MASUK - rumus dari "Jam masuke" YANG BENAR
+     */
+    private function convertJamMasuk($timeFormat)
+    {
+        $timeParts = explode(':', $timeFormat);
+        if (count($timeParts) < 2) return 0;
+        
+        $hours = (int)$timeParts[0];
+        $minutes = (int)$timeParts[1];
+        
+        if ($minutes >= 46 && $minutes <= 60) {
+            return $hours + 1;
+        } elseif ($minutes >= 31 && $minutes <= 45) {
+            return $hours + 0.75;
+        } elseif ($minutes >= 15 && $minutes <= 30) {
+            return $hours + 0.5;
+        } else {
+            return $hours + 0.25;
+        }
+    }
+
+    /**
+     * Konversi format 24 jam (H:i:s) ke format HH:MM
+     */
+    private function formatToHourMinute($timeString)
+    {
+        $time = strtotime($timeString);
+        if (!$time) return '00:00';
+        return date('H:i', $time);
+    }
+
+    /**
+     * Hitung jam kerja dengan rumus pembulatan SS
+     */
+    private function calculateHoursWithRounding($checkIn, $checkOut)
+    {
+        if (empty($checkIn) || empty($checkOut)) {
+            return [
+                'decimal_hours' => 0,
+                'total_minutes' => 0,
+                'formatted' => "0:00",
+                'jam_masuk_decimal' => 0,
+                'jam_keluar_decimal' => 0
+            ];
+        }
+        
+        $checkInFormatted = $this->formatToHourMinute($checkIn);
+        $checkOutFormatted = $this->formatToHourMinute($checkOut);
+        
+        $jamMasukDecimal = $this->convertJamMasuk($checkInFormatted);
+        $jamKeluarDecimal = $this->convertJamKeluar($checkOutFormatted);
+        
+        $totalDecimalHours = $jamKeluarDecimal - $jamMasukDecimal;
+        
+        if ($totalDecimalHours < 0) {
+            $totalDecimalHours = 0;
+        }
+        
+        $totalMinutes = round($totalDecimalHours * 60);
+        
+        $hours = floor($totalDecimalHours);
+        $minutes = round(($totalDecimalHours - $hours) * 60);
+        
+        return [
+            'decimal_hours' => $totalDecimalHours,
+            'total_minutes' => $totalMinutes,
+            'formatted' => sprintf("%d:%02d", $hours, $minutes),
+            'jam_masuk_decimal' => $jamMasukDecimal,
+            'jam_keluar_decimal' => $jamKeluarDecimal
+        ];
+    }
+
+
     // ============================================================================
     // HELPER FUNCTIONS UNTUK RUMUS PEMBULATAN SS
     // ============================================================================
@@ -337,121 +616,222 @@ class Attendance extends BaseController
         return $types[$status] ?? 'Unknown';
     }
 
-    /**
-     * Untuk JAM KELUAR (Pulang) - rumus dari "Jam kelvar"
-     * @param string $timeFormat HH:MM
-     * @return float Jam dalam desimal
-     */
-    /**
-     * Untuk JAM KELUAR (Pulang) - rumus dari "Jam kelvar" YANG BENAR
-     * @param string $timeFormat HH:MM
-     * @return float Jam dalam desimal (DENGAN PEMBULATAN JAM)
-     */
-    private function convertJamKeluar($timeFormat)
-    {
-        $timeParts = explode(':', $timeFormat);
-        if (count($timeParts) < 2) return 0;
-        
-        $hours = (int)$timeParts[0];
-        $minutes = (int)$timeParts[1];
-        
-        // Logika pembulatan menit sesuai SS, dan JAM ikut berubah!
-        if ($minutes >= 45 && $minutes <= 60) {
-            return $hours + 0.75;  // Contoh: 18:49 → 18.75
-        } elseif ($minutes >= 30 && $minutes <= 44) {
-            return $hours + 0.5;   // Contoh: 18:40 → 18.5
-        } elseif ($minutes >= 15 && $minutes <= 29) {
-            return $hours + 0.25;  // Contoh: 18:17 → 18.25
-        } else { // 0-14 menit
-            return $hours + 0;     // Contoh: 18:09 → 18.00
-        }
-    }
+    // public function updateBreakTime()
+    // {
+    //     // Validasi request AJAX
+    //     if (!$this->request->isAJAX()) {
+    //         return $this->response->setStatusCode(405)->setJSON([
+    //             'success' => false,
+    //             'message' => 'Method not allowed'
+    //         ]);
+    //     }
 
-    /**
-     * Untuk JAM MASUK - rumus dari "Jam masuke" YANG BENAR
-     * @param string $timeFormat HH:MM
-     * @return float Jam dalam desimal (DENGAN PEMBULATAN JAM)
-     */
-    private function convertJamMasuk($timeFormat)
-    {
-        $timeParts = explode(':', $timeFormat);
-        if (count($timeParts) < 2) return 0;
-        
-        $hours = (int)$timeParts[0];
-        $minutes = (int)$timeParts[1];
-        
-        // Logika pembulatan menit (ASIMETRIS) sesuai SS, JAM ikut berubah!
-        if ($minutes >= 46 && $minutes <= 60) {
-            return $hours + 1;     // Contoh: 08:46 → 9.00 (8 + 1)
-        } elseif ($minutes >= 31 && $minutes <= 45) {
-            return $hours + 0.75;  // Contoh: 08:31 → 8.75
-        } elseif ($minutes >= 15 && $minutes <= 30) {
-            return $hours + 0.5;   // Contoh: 08:15 → 8.50
-        } else { // 0-14 menit
-            return $hours + 0.25;  // Contoh: 08:07 → 8.25
-        }
-    }
+    //     // Get data from POST
+    //     $userId = $this->request->getPost('user_id');
+    //     $date = $this->request->getPost('date');
+    //     $companyId = $this->request->getPost('company_id');
+    //     $breakTime = $this->request->getPost('breaktime');
 
-    /**
-     * Konversi format 24 jam (H:i:s) ke format HH:MM
-     */
-    private function formatToHourMinute($timeString)
-    {
-        $time = strtotime($timeString);
-        if (!$time) return '00:00';
-        return date('H:i', $time);
-    }
+    //     // Validasi input
+    //     if (empty($userId) || empty($date) || empty($companyId)) {
+    //         return $this->response->setJSON([
+    //             'success' => false,
+    //             'message' => 'Data tidak lengkap'
+    //         ]);
+    //     }
 
-    /**
-     * Hitung jam kerja dengan rumus pembulatan SS
-     * @param string $checkIn Waktu check-in (format H:i:s)
-     * @param string $checkOut Waktu check-out (format H:i:s)
-     * @return array [total_jam_desimal, total_menit_aktual]
-     */
-    private function calculateHoursWithRounding($checkIn, $checkOut)
-    {
-        // Validasi input
-        if (empty($checkIn) || empty($checkOut)) {
-            return [
-                'decimal_hours' => 0,
-                'total_minutes' => 0,
-                'formatted' => "0:00",
-                'jam_masuk_decimal' => 0,
-                'jam_keluar_decimal' => 0
-            ];
-        }
+    //     // Validasi break time
+    //     $breakTime = str_replace(',', '.', $breakTime); // Ganti koma dengan titik
+    //     if (!is_numeric($breakTime) || $breakTime < 0 || $breakTime > 8) {
+    //         return $this->response->setJSON([
+    //             'success' => false,
+    //             'message' => 'Jam istirahat harus angka antara 0-8 jam'
+    //         ]);
+    //     }
+
+    //     try {
+    //         // Format break time
+    //         $breakTime = round(floatval($breakTime), 2);
+    //         $selectedDate = date('Y-m-d', strtotime($date));
+
+    //         // =============================
+    //         // CARI RECORD ATTENDANCE UNTUK USER INI
+    //         // =============================
+    //         // Pertama cari employee_id dari hr_outsourcing_employee
+    //         $employee = $this->hrOutSourcingEmployeModel
+    //             ->where('id', $userId)
+    //             ->where('company_id', $companyId)
+    //             ->first();
+
+    //         if (!$employee) {
+    //             return $this->response->setJSON([
+    //                 'success' => false,
+    //                 'message' => 'Karyawan tidak ditemukan'
+    //             ]);
+    //         }
+
+    //         // Cari attendance record berdasarkan employee_id
+    //         $existingAttendance = $this->AttendancesLogOutsourcingModel
+    //             ->where('employee_id', $userId)
+    //             ->where('DATE(datetime)', $selectedDate)
+    //             ->first();
+
+    //         if ($existingAttendance) {
+    //             // Update breaktime pada record yang ada
+    //             $this->AttendancesLogOutsourcingModel
+    //                 ->set('breaktime', $breakTime)
+    //                 ->where('id', $existingAttendance['id'])
+    //                 ->update();
+                    
+    //             log_message('info', "Break time updated - User: {$userId}, Date: {$selectedDate}, Break: {$breakTime} jam");
+                
+    //             // Hitung ulang work_hours untuk user ini
+    //             // $this->recalculateWorkHoursForUser($userId, $companyId, $selectedDate, $breakTime);
+    //         } else {
+    //             // Buat minimal record jika belum ada
+    //             $attendanceData = [
+    //                 'employee_id' => $userId,
+    //                 'datetime' => $selectedDate . ' 00:00:00',
+    //                 'breaktime' => $breakTime,
+    //                 'work_hours' => '0:00',
+    //                 'status' => 'Tidak Masuk',
+    //                 'created_at' => date('Y-m-d H:i:s')
+    //             ];
+                
+    //             $this->AttendancesLogOutsourcingModel->insert($attendanceData);
+    //             log_message('info', "New attendance record created - User: {$userId}, Break: {$breakTime} jam");
+    //         }
+
+    //         return $this->response->setJSON([
+    //             'success' => true,
+    //             'message' => 'Jam istirahat berhasil diperbarui',
+    //             'breaktime' => $breakTime
+    //         ]);
+
+    //     } catch (\Exception $e) {
+    //         log_message('error', 'Error updating break time: ' . $e->getMessage());
+    //         return $this->response->setStatusCode(500)->setJSON([
+    //             'success' => false,
+    //             'message' => 'Terjadi kesalahan server: ' . $e->getMessage()
+    //         ]);
+    //     }
+    // }
+
+    // /**
+    //  * Untuk JAM KELUAR (Pulang) - rumus dari "Jam kelvar"
+    //  * @param string $timeFormat HH:MM
+    //  * @return float Jam dalam desimal
+    //  */
+    // /**
+    //  * Untuk JAM KELUAR (Pulang) - rumus dari "Jam kelvar" YANG BENAR
+    //  * @param string $timeFormat HH:MM
+    //  * @return float Jam dalam desimal (DENGAN PEMBULATAN JAM)
+    //  */
+    // private function convertJamKeluar($timeFormat)
+    // {
+    //     $timeParts = explode(':', $timeFormat);
+    //     if (count($timeParts) < 2) return 0;
         
-        // Format ke HH:MM
-        $checkInFormatted = $this->formatToHourMinute($checkIn);
-        $checkOutFormatted = $this->formatToHourMinute($checkOut);
+    //     $hours = (int)$timeParts[0];
+    //     $minutes = (int)$timeParts[1];
         
-        // Konversi dengan rumus SS
-        $jamMasukDecimal = $this->convertJamMasuk($checkInFormatted);
-        $jamKeluarDecimal = $this->convertJamKeluar($checkOutFormatted);
+    //     // Logika pembulatan menit sesuai SS, dan JAM ikut berubah!
+    //     if ($minutes >= 45 && $minutes <= 60) {
+    //         return $hours + 0.75;  // Contoh: 18:49 → 18.75
+    //     } elseif ($minutes >= 30 && $minutes <= 44) {
+    //         return $hours + 0.5;   // Contoh: 18:40 → 18.5
+    //     } elseif ($minutes >= 15 && $minutes <= 29) {
+    //         return $hours + 0.25;  // Contoh: 18:17 → 18.25
+    //     } else { // 0-14 menit
+    //         return $hours + 0;     // Contoh: 18:09 → 18.00
+    //     }
+    // }
+
+    // /**
+    //  * Untuk JAM MASUK - rumus dari "Jam masuke" YANG BENAR
+    //  * @param string $timeFormat HH:MM
+    //  * @return float Jam dalam desimal (DENGAN PEMBULATAN JAM)
+    //  */
+    // private function convertJamMasuk($timeFormat)
+    // {
+    //     $timeParts = explode(':', $timeFormat);
+    //     if (count($timeParts) < 2) return 0;
         
-        // Hitung selisih jam desimal
-        $totalDecimalHours = $jamKeluarDecimal - $jamMasukDecimal;
+    //     $hours = (int)$timeParts[0];
+    //     $minutes = (int)$timeParts[1];
         
-        // Pastikan tidak negatif
-        if ($totalDecimalHours < 0) {
-            $totalDecimalHours = 0;
-        }
+    //     // Logika pembulatan menit (ASIMETRIS) sesuai SS, JAM ikut berubah!
+    //     if ($minutes >= 46 && $minutes <= 60) {
+    //         return $hours + 1;     // Contoh: 08:46 → 9.00 (8 + 1)
+    //     } elseif ($minutes >= 31 && $minutes <= 45) {
+    //         return $hours + 0.75;  // Contoh: 08:31 → 8.75
+    //     } elseif ($minutes >= 15 && $minutes <= 30) {
+    //         return $hours + 0.5;   // Contoh: 08:15 → 8.50
+    //     } else { // 0-14 menit
+    //         return $hours + 0.25;  // Contoh: 08:07 → 8.25
+    //     }
+    // }
+
+    // /**
+    //  * Konversi format 24 jam (H:i:s) ke format HH:MM
+    //  */
+    // private function formatToHourMinute($timeString)
+    // {
+    //     $time = strtotime($timeString);
+    //     if (!$time) return '00:00';
+    //     return date('H:i', $time);
+    // }
+
+    // /**
+    //  * Hitung jam kerja dengan rumus pembulatan SS
+    //  * @param string $checkIn Waktu check-in (format H:i:s)
+    //  * @param string $checkOut Waktu check-out (format H:i:s)
+    //  * @return array [total_jam_desimal, total_menit_aktual]
+    //  */
+    // private function calculateHoursWithRounding($checkIn, $checkOut)
+    // {
+    //     // Validasi input
+    //     if (empty($checkIn) || empty($checkOut)) {
+    //         return [
+    //             'decimal_hours' => 0,
+    //             'total_minutes' => 0,
+    //             'formatted' => "0:00",
+    //             'jam_masuk_decimal' => 0,
+    //             'jam_keluar_decimal' => 0
+    //         ];
+    //     }
         
-        // Konversi ke menit untuk reporting
-        $totalMinutes = round($totalDecimalHours * 60);
+    //     // Format ke HH:MM
+    //     $checkInFormatted = $this->formatToHourMinute($checkIn);
+    //     $checkOutFormatted = $this->formatToHourMinute($checkOut);
         
-        // Format jam:menit untuk display
-        $hours = floor($totalDecimalHours);
-        $minutes = round(($totalDecimalHours - $hours) * 60);
+    //     // Konversi dengan rumus SS
+    //     $jamMasukDecimal = $this->convertJamMasuk($checkInFormatted);
+    //     $jamKeluarDecimal = $this->convertJamKeluar($checkOutFormatted);
         
-        return [
-            'decimal_hours' => $totalDecimalHours,
-            'total_minutes' => $totalMinutes,
-            'formatted' => sprintf("%d:%02d", $hours, $minutes),
-            'jam_masuk_decimal' => $jamMasukDecimal,
-            'jam_keluar_decimal' => $jamKeluarDecimal
-        ];
-    }
+    //     // Hitung selisih jam desimal
+    //     $totalDecimalHours = $jamKeluarDecimal - $jamMasukDecimal;
+        
+    //     // Pastikan tidak negatif
+    //     if ($totalDecimalHours < 0) {
+    //         $totalDecimalHours = 0;
+    //     }
+        
+    //     // Konversi ke menit untuk reporting
+    //     $totalMinutes = round($totalDecimalHours * 60);
+        
+    //     // Format jam:menit untuk display
+    //     $hours = floor($totalDecimalHours);
+    //     $minutes = round(($totalDecimalHours - $hours) * 60);
+        
+    //     return [
+    //         'decimal_hours' => $totalDecimalHours,
+    //         'total_minutes' => $totalMinutes,
+    //         'formatted' => sprintf("%d:%02d", $hours, $minutes),
+    //         'jam_masuk_decimal' => $jamMasukDecimal,
+    //         'jam_keluar_decimal' => $jamKeluarDecimal
+    //     ];
+    // }
 
     public function pullFromFingerprint()
     {
