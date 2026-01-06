@@ -1126,7 +1126,8 @@ class Payroll extends BaseController
             $this->this_company_id,
             $divisionID,
             $bagianID,
-            $tipe
+            $tipe,
+            $payrollLimit['id']
         );
         $tipeStr = $this->getTipeStr($tipe);
 
