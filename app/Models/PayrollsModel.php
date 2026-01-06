@@ -1038,7 +1038,7 @@ class PayrollsModel extends Model
         foreach ($bagianData as $i => $b) {
             $selectQry = "
                 COUNT(DISTINCT payrolls.employee_id) AS totalEmployee, 
-                SUM(nominal_uang_gaji) AS upahPokok, 
+                SUM(nominal_gaji_harian * hadir_final) AS upahPokok, 
                 SUM(nominal_penambahan_gaji) AS tunjangan,
                 SUM(nominal_cadangan) AS skala_upah,
                 SUM(nominal_uang_lembur) AS lembur,
@@ -1059,8 +1059,8 @@ class PayrollsModel extends Model
             if ($employeePayrollTotal[0]['totalEmployee'] != 0) {
 
                 // update value
-                $totalUpahSingle = $employeePayrollTotal[0]['upahPokok'] + $employeePayrollTotal[0]['potongan'];
                 $totalUpahBersihSingle = $employeePayrollTotal[0]['upahPokok'] - $employeePayrollTotal[0]['potongan'];
+                $totalUpahSingle = $totalUpahBersihSingle + $employeePayrollTotal[0]['potongan'];
 
 
                 $employeePayrollTotal[0]['total_upah'] = $totalUpahSingle;
