@@ -173,6 +173,7 @@
                 <!-- Table -->
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped table-hover" id="attendanceTable">
+                        <!-- Table Header -->
                         <thead class="thead-dark">
                             <tr>
                                 <th width="50">No</th>
@@ -181,6 +182,7 @@
                                 <th>Divisi</th>
                                 <th width="100">Check In</th>
                                 <th width="100">Check Out</th>
+                                <th width="100">Jam Istirahat</th> <!-- TAMBAHAN -->
                                 <th width="100">Total Jam</th>
                                 <th width="100">Status</th>
                                 <th width="100">Perusahaan</th>
@@ -190,7 +192,7 @@
                         <tbody id="table-body">
                             <!-- Data will load here -->
                             <tr id="no-data">
-                                <td colspan="10" class="text-center py-5">
+                                <td colspan="11" class="text-center py-5">
                                     <div class="empty-state">
                                         <div class="empty-state-icon">
                                             <i class="fas fa-database fa-3x text-muted"></i>
@@ -709,6 +711,28 @@
 
             let no = 1;
             $.each(data, function(index, emp) {
+
+                // TAMBAHAN: Format Break Time Input
+                const breakTimeValue = emp.breaktime || 0;
+                const breakTimeDisplay = `
+                    <div class="break-time-input-container">
+                        <input type="text" 
+                            class="form-control form-control-sm break-time-input" 
+                            value="${breakTimeValue}"
+                            data-user-id="${emp.user_id}"
+                            data-original="${breakTimeValue}"
+                            placeholder="0.5"
+                            style="width: 80px; text-align: center;"
+                            onchange="updateBreakTime(this, '${emp.user_id}')">
+                        <div class="small text-muted mt-1">jam</div>
+                        ${breakTimeValue > 0 ? `
+                            <div class="text-info small">
+                                <i class="fas fa-clock"></i> ${Math.round(breakTimeValue * 60)} menit
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+
                 // Format Check In
                 const checkInDisplay = emp.check_in_rounded 
                     ? `<div class="text-center">
@@ -789,6 +813,7 @@
                         <td>${emp.divisi_name || '-'}</td>
                         <td>${checkInDisplay}</td>
                         <td>${checkOutDisplay}</td>
+                        <td class="text-center">${breakTimeDisplay}</td> <!-- TAMBAHAN -->
                         <td class="text-center">${workHoursDisplay}</td>
                         <td class="text-center">
                             <span class="badge badge-${statusClass}">
@@ -1167,6 +1192,88 @@
         }
     });
 
+
+    // Global function untuk update break time
+    function updateBreakTime(inputElement, userId) {
+            const input = $(inputElement);
+            const breakTimeValue = parseFloat(input.val()) || 0;
+            const originalValue = parseFloat(input.data('original')) || 0;
+            
+            // Validasi: maksimal 8 jam istirahat
+            if (breakTimeValue > 8) {
+                showAlert('warning', 'Jam istirahat maksimal 8 jam', 3000);
+                input.val(originalValue);
+                return;
+            }
+            
+            // Jika tidak ada perubahan
+            if (breakTimeValue === originalValue) {
+                return;
+            }
+            
+            // Tampilkan loading di input
+            input.prop('disabled', true).addClass('bg-warning-light');
+            
+            // Ambil tanggal dari filter
+            const date = $('#date_filter').val();
+            const companyId = $('#company_filter').val();
+            
+            $.ajax({
+                url: '<?= base_url("hr-outsourcing-attendance/updateBreakTime") ?>',
+                type: 'POST',
+                data: {
+                    user_id: userId,
+                    date: date,
+                    company_id: companyId,
+                    break_time: breakTimeValue,
+                    '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
+                },
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        // Update original value
+                        input.data('original', breakTimeValue);
+                        
+                        // Update tampilan
+                        const container = input.closest('.break-time-input-container');
+                        const preview = container.find('.text-info');
+                        
+                        if (breakTimeValue > 0) {
+                            if (preview.length) {
+                                preview.html(`<i class="fas fa-clock"></i> ${Math.round(breakTimeValue * 60)} menit`);
+                            } else {
+                                container.append(`
+                                    <div class="text-info small">
+                                        <i class="fas fa-clock"></i> ${Math.round(breakTimeValue * 60)} menit
+                                    </div>
+                                `);
+                            }
+                        } else {
+                            preview.remove();
+                        }
+                        
+                        // Recalculate work hours
+                        recalculateWorkHours(userId, breakTimeValue);
+                        
+                        // Tampilkan notifikasi sukses
+                        showAlert('success', `Jam istirahat diperbarui: ${breakTimeValue} jam`, 2000);
+                    } else {
+                        // Kembalikan ke nilai semula
+                        input.val(originalValue);
+                        showAlert('danger', response.message || 'Gagal memperbarui jam istirahat', 3000);
+                    }
+                },
+                error: function() {
+                    // Kembalikan ke nilai semula
+                    input.val(originalValue);
+                    showAlert('danger', 'Error saat memperbarui jam istirahat', 3000);
+                },
+                complete: function() {
+                    input.prop('disabled', false).removeClass('bg-warning-light');
+                }
+            });
+    }
+
     // Global functions
     function showAlert(type, message, duration = 5000) {
         const alert = $('#status-alert');
@@ -1487,6 +1594,48 @@
     font-size: 28px;
     font-weight: 700;
     margin-bottom: 5px;
+}
+
+/* Tambahkan di bagian style */
+.break-time-input-container {
+    max-width: 100px;
+    margin: 0 auto;
+}
+
+.break-time-input {
+    font-size: 14px;
+    font-weight: 500;
+    padding: 4px 8px;
+    height: 30px;
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+}
+
+.break-time-input:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+.break-time-input:disabled {
+    background-color: #f8f9fa;
+    cursor: not-allowed;
+}
+
+.bg-warning-light {
+    background-color: rgba(255, 193, 7, 0.1) !important;
+}
+
+/* Responsive untuk input break time */
+@media (max-width: 768px) {
+    .break-time-input-container {
+        max-width: 70px;
+    }
+    
+    .break-time-input {
+        width: 60px;
+        font-size: 12px;
+        padding: 2px 4px;
+    }
 }
 
 /* Responsive Design */
