@@ -276,7 +276,7 @@ class StokAdjusment extends BaseController
                 $bc_all = $d['type_bc'];
             }
             if ($d['po_type'] == "LOKAL PENOLONG") {
-                $keterangan = $mapKeterangan[$d['po_id']][$d['spesifikasi_id']];
+                $keterangan = $mapKeterangan[$d['po_id']][$d['spesifikasi_id']] ?? '';
             }
             array_push($dataResult, [
                 'no' => $no++,
