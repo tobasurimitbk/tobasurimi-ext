@@ -178,10 +178,10 @@
                                     <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <button class="btn btn-warning" onclick="handlePrint('${id}')">
+                                    <button class="btn btn-warning" onclick="handlePrint('${id}')" data-toggle="tooltip" title="Print">
                                         <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                     </button>
-                                    <button class="btn btn-success" onclick="handlePrintCanning('${id}')">
+                                    <button class="btn btn-success" onclick="handlePrintCanning('${id}')" data-toggle="tooltip" title="Print Canning">
                                         <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                     </button>
                                 </div>
