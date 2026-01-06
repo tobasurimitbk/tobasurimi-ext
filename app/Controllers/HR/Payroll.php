@@ -1000,8 +1000,8 @@ class Payroll extends BaseController
             'year' => explode("-", $payrollDetail['year_month'])[0],
             'month' => explode("-", $payrollDetail['year_month'])[1],
             'uangMakan' => $uangMakan,
-            'totalLemburJamPertama' => $splitJamLembur['jamPertama'],
-            'totalLemburJamKedua' => $splitJamLembur['jamKedua'],
+            'totalLemburJamPertama' => number_format($splitJamLembur['jamPertama'], 1),
+            'totalLemburJamKedua' => number_format($splitJamLembur['jamKedua'], 1),
             'perhitunganGaji' => $perhitunganGaji,
             'company' => $company,
             'tunjanganGajiPokok' => $tunjanganGajiPokok,
@@ -1126,7 +1126,8 @@ class Payroll extends BaseController
             $this->this_company_id,
             $divisionID,
             $bagianID,
-            $tipe
+            $tipe,
+            $payrollLimit['id']
         );
         $tipeStr = $this->getTipeStr($tipe);
 

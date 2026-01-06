@@ -651,7 +651,7 @@ class PayrollsModel extends Model
             ->where('employees.company_id', $companyID)
             ->where('employees.division_id', $divisionID);
 
-        if ($bagianID != '' && empty($bagianID)) {
+        if ($bagianID != '' && !empty($bagianID)) {
             $employeePayroll->where('employees.bagian_id', $bagianID);
         }
 
@@ -677,8 +677,8 @@ class PayrollsModel extends Model
             $data[] = [
                 'payroll' => $payrollDetail,
                 'employee' => $employee,
-                'totalLemburJamPertama' => $splitJamLembur['jamPertama'],
-                'totalLemburJamKedua' => $splitJamLembur['jamKedua'],
+                'totalLemburJamPertama' => number_format($splitJamLembur['jamPertama'], 1),
+                'totalLemburJamKedua' => number_format($splitJamLembur['jamKedua'], 1),
                 'perhitunganGaji' => $perhitunganGaji,
                 'totalPinjamanDiambil' => $totalPinjamanDiambil,
                 'uangMakan' => $uangMakan
@@ -1011,7 +1011,8 @@ class PayrollsModel extends Model
         $companyID,
         $divisionID,
         $bagianID,
-        $tipes
+        $tipes,
+        $payrollId
     ) {
         $divisiModel = new DivisisModel();
         $companyModel = new CompaniesModel();
@@ -1025,7 +1026,7 @@ class PayrollsModel extends Model
 
         $res = [];
         $upahPokok = 0;
-        $tunjanganPlusCadangan = 0;
+        $tunjanganPlusSkalaUpah = 0;
         $lemburTotal = 0;
         $totalUpah = 0;
         $potongan = 0;
@@ -1034,12 +1035,12 @@ class PayrollsModel extends Model
         $lembur = 0;
         $jamKerja = 0;
 
-        foreach ($bagianData as $b) {
+        foreach ($bagianData as $i => $b) {
             $selectQry = "
                 COUNT(DISTINCT payrolls.employee_id) AS totalEmployee, 
-                SUM(nominal_uang_gaji) AS upahBersih, 
+                SUM(nominal_uang_gaji) AS upahPokok, 
                 SUM(nominal_penambahan_gaji) AS tunjangan,
-                SUM(nominal_cadangan) AS cadangan,
+                SUM(nominal_cadangan) AS skala_upah,
                 SUM(nominal_uang_lembur) AS lembur,
                 SUM(nominal_gaji_diterima) AS total_upah,
                 SUM(nominal_pengurangan_gaji) AS potongan
@@ -1053,34 +1054,45 @@ class PayrollsModel extends Model
             if (count($tipes) > 0) {
                 $employeePayrolQry->whereIn('employees.tipe', $tipes);
             }
-            $employeePayrollTotal =  $employeePayrolQry->findAll();
+            $employeePayrollTotal =  $employeePayrolQry->groupBy('employees.bagian_id')->findAll();
 
             if ($employeePayrollTotal[0]['totalEmployee'] != 0) {
+
+                // update value
+                $totalUpahSingle = $employeePayrollTotal[0]['upahPokok'] + $employeePayrollTotal[0]['potongan'];
+                $totalUpahBersihSingle = $employeePayrollTotal[0]['upahPokok'] - $employeePayrollTotal[0]['potongan'];
+
+
+                $employeePayrollTotal[0]['total_upah'] = $totalUpahSingle;
+                $employeePayrollTotal[0]['upahBersih'] = $totalUpahBersihSingle;
+
                 // set total
-                $upahPokok += $employeePayrollTotal[0]['upahBersih'];
-                $tunjanganPlusCadangan += ($employeePayrollTotal[0]['cadangan'] + $employeePayrollTotal[0]['tunjangan']);
+                $upahPokok += $employeePayrollTotal[0]['upahPokok'];
+                $tunjanganPlusSkalaUpah += ($employeePayrollTotal[0]['skala_upah']);
                 $lemburTotal += $employeePayrollTotal[0]['lembur'];
-                $totalUpah += $employeePayrollTotal[0]['total_upah'];
+                $totalUpah += $totalUpahSingle;
                 $potongan += $employeePayrollTotal[0]['potongan'];
-                $upahBersih += $employeePayrollTotal[0]['upahBersih'];
+                $upahBersih += $totalUpahBersihSingle;
                 $orangTotal += $employeePayrollTotal[0]['totalEmployee'];
-                $lembur +=  static::getTotalJamLemburInOnePeriode($divisionID, $b['id'], $yearMonth);
-                $jamKerja += static::getTotalJamKerjaInOnePeriode($divisionID, $b['id'], $yearMonth);
+                $lembur +=  static::getTotalJamLemburInOnePeriode($divisionID, $b['id'], $payrollId);
+                $jamKerja += static::getTotalJamKerjaInOnePeriode($divisionID, $b['id'], $payrollId);
 
                 $res[] = [
                     'bagian' => $b['nama_bagian'],
                     'payrollTotal' => $employeePayrollTotal,
-                    'totalJamKerja' => static::getTotalJamKerjaInOnePeriode($divisionID, $b['id'], $yearMonth),
-                    'totalJamLembur' => static::getTotalJamLemburInOnePeriode($divisionID, $b['id'], $yearMonth),
+                    'totalJamKerja' => static::getTotalJamKerjaInOnePeriode($divisionID, $b['id'], $payrollId),
+                    'totalJamLembur' => static::getTotalJamLemburInOnePeriode($divisionID, $b['id'], $payrollId),
                 ];
             }
         }
+
+        // dd($res);
 
         return [
             'res' => $res,
             'upahPokokTotal' => $upahPokok,
             'orangTotal' => $orangTotal,
-            'tunjanganPlusCadangan' => $tunjanganPlusCadangan,
+            'tunjanganPlusSkalaUpah' => $tunjanganPlusSkalaUpah,
             'lemburTotal' => $lemburTotal,
             'totalUpah' => $totalUpah,
             'potongan' => $potongan,
@@ -1156,12 +1168,17 @@ class PayrollsModel extends Model
         return $res == null ? 0 : $res['nominal'];
     }
 
-    static function getTotalJamLemburInOnePeriode($divisionID, $bagianID, $yearMonth)
-    {
+    static function getTotalJamLemburInOnePeriode(
+        $divisionID,
+        $bagianID,
+        $payrollId
+    ) {
         $formLemburModel = new FormLemburModel();
+        $payrollModel = new PayrollsModel();
+        $payroll = $payrollModel->where('id', $payrollId)->first();
 
-        $startDate = $yearMonth . '-01';
-        $endDate   = date('Y-m-d', strtotime("$startDate +1 month"));
+        $startDate = $payroll['start_date'];
+        $endDate   = $payroll['end_date'];
 
         $result = $formLemburModel
             ->select("SUM(form_lembur.total_jam_lembur) AS totalJamLembur")
@@ -1175,12 +1192,17 @@ class PayrollsModel extends Model
         return $result['totalJamLembur'] ?? 0;
     }
 
-    static function getTotalJamKerjaInOnePeriode($divisionID, $bagianID, $yearMonth)
-    {
+    static function getTotalJamKerjaInOnePeriode(
+        $divisionID,
+        $bagianID,
+        $payrollId
+    ) {
         $db = db_connect();
+        $payrollModel = new PayrollsModel();
+        $payroll = $payrollModel->where('id', $payrollId)->first();
 
-        $startDate = $yearMonth . '-01';
-        $endDate   = date('Y-m-d', strtotime("$startDate +1 month"));
+        $startDate = $payroll['start_date'];
+        $endDate   = $payroll['end_date'];
 
         $builder = $db->table('attendances')
             ->select("FLOOR(SUM(TIME_TO_SEC(TIMEDIFF(attendances.checkout, attendances.checkin)) / 3600)) AS totalJamKerja")

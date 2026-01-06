@@ -1710,6 +1710,179 @@ class MaterialRequest extends BaseController
         exit(0);
     }
 
+    // public function printMaterialRequestCanningPDF($id)
+    // {
+    //     $id = decrypt($id);
+    //     $dompdf = new Dompdf();
+
+    //     /*
+    //     |--------------------------------------------------------------------------
+    //     | Ambil Data Jasa Vendor + qty + spesifikasi (LOGIKA ASLI)
+    //     |--------------------------------------------------------------------------
+    //     */
+    //     $dataJasaVendorDetail = $this->materialRequestDetailsModel
+    //         ->asObject()
+    //         ->select('
+    //             material_request_details.id,
+    //             material_request_details.stock_detail_id,
+    //             material_request_details.barang1_id,
+    //             material_request_details.barang2_id,
+    //             material_request_details.qty2,
+
+    //             barang_master_spesifikasi.spesifikasi as size_name,
+
+    //             vendors.id as vendor_id,
+    //             vendors.name as vendor_name,
+
+    //             material_request_details.keterangan,
+    //             material_request_details.stock_date,
+
+    //             COALESCE(jvi1.multiple_jasa_vendor_out_id, jvi2.multiple_jasa_vendor_out_id) as jasa_vendor_out_id,
+
+    //             CONCAT(
+    //                 TRIM(material_request_details.keterangan), " ",
+    //                 DAY(material_request_details.stock_date), " ",
+    //                 TRIM(vendors.name)
+    //             ) as keterangan_full
+    //         ')
+    //         ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = material_request_details.barang2_id')
+    //         ->join('stock_revamp_detail', 'stock_revamp_detail.id = material_request_details.stock_detail_id')
+
+    //         // reference JASA VENDOR
+    //         ->join(
+    //             'jasa_vendor_in jvi1',
+    //             "jvi1.id = stock_revamp_detail.reference_id
+    //             AND stock_revamp_detail.reference_type = 'JASA VENDOR'",
+    //             'left'
+    //         )
+
+    //         // reference PROSES REBUS
+    //         ->join(
+    //             'proses_rebus_detail',
+    //             "proses_rebus_detail.stock_detail_hasil_rebus_id = stock_revamp_detail.id
+    //             AND stock_revamp_detail.reference_type = 'PROSES REBUS'
+    //             AND proses_rebus_detail.jasa_vendor_id IS NOT NULL",
+    //             'left'
+    //         )
+    //         ->join('jasa_vendor_in jvi2', 'jvi2.id = proses_rebus_detail.jasa_vendor_id', 'left')
+
+    //         // vendor dari jvi1 / jvi2
+    //         ->join('vendors', 'vendors.id = COALESCE(jvi1.vendor_id, jvi2.vendor_id)', 'left')
+
+    //         ->where('material_request_details.material_request_id', $id)
+    //         ->whereIn('stock_revamp_detail.reference_type', ['JASA VENDOR', 'PROSES REBUS'])
+    //         ->where('material_request_details.deletedAt', null)
+    //         ->orderBy('keterangan_full', 'ASC')
+    //         ->get()
+    //         ->getResult();
+
+    //     /*
+    //     |--------------------------------------------------------------------------
+    //     | PIVOT: SIZE -> VENDOR -> SUPPLIER + PO DAY -> TOTAL
+    //     |--------------------------------------------------------------------------
+    //     */
+    //     $pivotJasaVendor = [];
+
+    //     foreach ($dataJasaVendorDetail as $row) {
+
+    //         /*
+    //         |--------------------------------------------------------------------------
+    //         | Ambil supplier + tanggal PO (LOGIKA ASLI)
+    //         |--------------------------------------------------------------------------
+    //         */
+    //         $supplierList = [];
+
+    //         if (!empty($row->jasa_vendor_out_id)) {
+
+    //             foreach (json_decode($row->jasa_vendor_out_id) as $outId) {
+
+    //                 $outDetail = $this->jasaVendorOutDetailModel
+    //                     ->asObject()
+    //                     ->select('
+    //                         suppliers.id as supplier_id,
+    //                         suppliers.name as supplier_name,
+    //                         DAY(rm_purchase_orders.po_date) as po_day
+    //                     ')
+    //                     ->join('rm_purchase_orders', 'rm_purchase_orders.id = jasa_vendor_out_detail.po_id')
+    //                     ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id')
+    //                     ->where('jasa_vendor_out_detail.jasa_vendor_out_id', $outId)
+    //                     ->where('jasa_vendor_out_detail.deletedAt', null)
+    //                     ->first();
+
+    //                 if ($outDetail) {
+    //                     $supplierList[] = [
+    //                         'supplier_id'   => $outDetail->supplier_id,
+    //                         'supplier_name' => $outDetail->supplier_name,
+    //                         'po_day'        => $outDetail->po_day
+    //                     ];
+    //                 }
+    //             }
+    //         }
+
+    //         /*
+    //         |--------------------------------------------------------------------------
+    //         | KEY UTAMA
+    //         |--------------------------------------------------------------------------
+    //         */
+    //         $sizeId   = $row->barang2_id;
+    //         $vendorId = $row->vendor_id;
+
+    //         // SIZE
+    //         if (!isset($pivotJasaVendor[$sizeId])) {
+    //             $pivotJasaVendor[$sizeId] = [
+    //                 'size_name' => $row->size_name,
+    //                 'vendors'   => []
+    //             ];
+    //         }
+
+    //         // VENDOR
+    //         if (!isset($pivotJasaVendor[$sizeId]['vendors'][$vendorId])) {
+    //             $pivotJasaVendor[$sizeId]['vendors'][$vendorId] = [
+    //                 'vendor_name' => $row->vendor_name,
+    //                 'suppliers'   => []
+    //             ];
+    //         }
+
+    //         // SUPPLIER + PO DAY
+    //         foreach ($supplierList as $sup) {
+
+    //             $supplierKey = $sup['supplier_id'] . '_' . $sup['po_day'];
+
+    //             if (!isset($pivotJasaVendor[$sizeId]['vendors'][$vendorId]['suppliers'][$supplierKey])) {
+    //                 $pivotJasaVendor[$sizeId]['vendors'][$vendorId]['suppliers'][$supplierKey] = [
+    //                     'supplier_label' => $sup['supplier_name'] . ' (' . $sup['po_day'] . ')',
+    //                     'total'          => 0
+    //                 ];
+    //             }
+
+    //             $pivotJasaVendor[$sizeId]['vendors'][$vendorId]['suppliers'][$supplierKey]['total']
+    //                 += $row->qty2;
+    //         }
+    //     }
+
+    //     /*
+    //     |--------------------------------------------------------------------------
+    //     | KIRIM KE VIEW
+    //     |--------------------------------------------------------------------------
+    //     */
+    //     $data = [
+    //         'pivotJasaVendor' => $pivotJasaVendor
+    //     ];
+
+    //     /*
+    //     |--------------------------------------------------------------------------
+    //     | RENDER PDF
+    //     |--------------------------------------------------------------------------
+    //     */
+    //     $dompdf->loadHtml(
+    //         view('Production/materialRequest/printMaterialRequestCanning', $data)
+    //     );
+    //     $dompdf->setPaper('A4', 'portrait');
+    //     $dompdf->render();
+    //     $dompdf->stream('Material Request Canning', ['Attachment' => false]);
+    //     exit;
+    // }
+
     public function printMaterialRequestCanningPDF($id)
     {
         $id = decrypt($id);
@@ -1717,7 +1890,7 @@ class MaterialRequest extends BaseController
 
         /*
         |--------------------------------------------------------------------------
-        | Ambil Data Jasa Vendor + qty + spesifikasi (LOGIKA ASLI)
+        | AMBIL DATA DASAR
         |--------------------------------------------------------------------------
         */
         $dataJasaVendorDetail = $this->materialRequestDetailsModel
@@ -1729,26 +1902,25 @@ class MaterialRequest extends BaseController
                 material_request_details.barang2_id,
                 material_request_details.qty2,
 
-                barang_master_spesifikasi.spesifikasi as size_name,
+                barang_master_spesifikasi.spesifikasi AS size_name,
 
-                vendors.id as vendor_id,
-                vendors.name as vendor_name,
+                vendors.id   AS vendor_id,
+                vendors.name AS vendor_name,
 
                 material_request_details.keterangan,
                 material_request_details.stock_date,
 
-                COALESCE(jvi1.multiple_jasa_vendor_out_id, jvi2.multiple_jasa_vendor_out_id) as jasa_vendor_out_id,
+                suppliers.id   AS supplier_id,
+                suppliers.name AS supplier_name,
+                DAY(rm_purchase_orders.po_date) AS po_day,
 
-                CONCAT(
-                    TRIM(material_request_details.keterangan), " ",
-                    DAY(material_request_details.stock_date), " ",
-                    TRIM(vendors.name)
-                ) as keterangan_full
+                COALESCE(jvi1.multiple_jasa_vendor_out_id, jvi2.multiple_jasa_vendor_out_id)
+                    AS jasa_vendor_out_id
             ')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = material_request_details.barang2_id')
             ->join('stock_revamp_detail', 'stock_revamp_detail.id = material_request_details.stock_detail_id')
 
-            // reference JASA VENDOR
+            // JASA VENDOR
             ->join(
                 'jasa_vendor_in jvi1',
                 "jvi1.id = stock_revamp_detail.reference_id
@@ -1756,7 +1928,7 @@ class MaterialRequest extends BaseController
                 'left'
             )
 
-            // reference PROSES REBUS
+            // PROSES REBUS
             ->join(
                 'proses_rebus_detail',
                 "proses_rebus_detail.stock_detail_hasil_rebus_id = stock_revamp_detail.id
@@ -1766,34 +1938,52 @@ class MaterialRequest extends BaseController
             )
             ->join('jasa_vendor_in jvi2', 'jvi2.id = proses_rebus_detail.jasa_vendor_id', 'left')
 
-            // vendor dari jvi1 / jvi2
+            // vendor (boleh NULL)
             ->join('vendors', 'vendors.id = COALESCE(jvi1.vendor_id, jvi2.vendor_id)', 'left')
 
+            // supplier dari PO (LPB / direct)
+            ->join('rm_purchase_orders', 'rm_purchase_orders.id = stock_revamp_detail.po_id', 'left')
+            ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
+
             ->where('material_request_details.material_request_id', $id)
-            ->whereIn('stock_revamp_detail.reference_type', ['JASA VENDOR', 'PROSES REBUS'])
+            ->whereIn('stock_revamp_detail.reference_type', ['JASA VENDOR', 'PROSES REBUS', 'LPB'])
             ->where('material_request_details.deletedAt', null)
-            ->orderBy('keterangan_full', 'ASC')
+            ->orderBy('barang_master_spesifikasi.spesifikasi', 'ASC')
             ->get()
             ->getResult();
 
         /*
         |--------------------------------------------------------------------------
-        | PIVOT: SIZE -> VENDOR -> SUPPLIER + PO DAY -> TOTAL
+        | PIVOT : SIZE -> VENDOR (NULL OK) -> SUPPLIER + PO DAY -> TOTAL
         |--------------------------------------------------------------------------
         */
         $pivotJasaVendor = [];
 
         foreach ($dataJasaVendorDetail as $row) {
+            $sizeId   = $row->barang2_id;
+            $vendorId = $row->vendor_id ?? 'NO_VENDOR';
+            $vendorName = $row->vendor_name ?? '-';
 
-            /*
-            |--------------------------------------------------------------------------
-            | Ambil supplier + tanggal PO (LOGIKA ASLI)
-            |--------------------------------------------------------------------------
-            */
-            $supplierList = [];
+            // SIZE
+            if (!isset($pivotJasaVendor[$sizeId])) {
+                $pivotJasaVendor[$sizeId] = [
+                    'size_name' => $row->size_name,
+                    'vendors'   => []
+                ];
+            }
 
+            // VENDOR
+            if (!isset($pivotJasaVendor[$sizeId]['vendors'][$vendorId])) {
+                $pivotJasaVendor[$sizeId]['vendors'][$vendorId] = [
+                    'vendor_name' => $vendorName,
+                    'suppliers'   => []
+                ];
+            }
+
+            // cek apakah ada jasa_vendor_out_id
             if (!empty($row->jasa_vendor_out_id)) {
-
+                // LOGIKA LAMA: ambil supplier dari JSON
+                $supplierList = [];
                 foreach (json_decode($row->jasa_vendor_out_id) as $outId) {
 
                     $outDetail = $this->jasaVendorOutDetailModel
@@ -1817,46 +2007,36 @@ class MaterialRequest extends BaseController
                         ];
                     }
                 }
+            } else {
+                // LOGIKA BARU: ambil supplier dari LEFT JOIN
+                $supplierList = [[
+                    'supplier_id'   => $row->supplier_id ?? 'NO_SUPPLIER',
+                    'supplier_name' => $row->supplier_name ?? '-',
+                    'po_day'        => $row->po_day ?? '-'
+                ]];
             }
 
-            /*
-            |--------------------------------------------------------------------------
-            | KEY UTAMA
-            |--------------------------------------------------------------------------
-            */
-            $sizeId   = $row->barang2_id;
-            $vendorId = $row->vendor_id;
-
-            // SIZE
-            if (!isset($pivotJasaVendor[$sizeId])) {
-                $pivotJasaVendor[$sizeId] = [
-                    'size_name' => $row->size_name,
-                    'vendors'   => []
-                ];
-            }
-
-            // VENDOR
-            if (!isset($pivotJasaVendor[$sizeId]['vendors'][$vendorId])) {
-                $pivotJasaVendor[$sizeId]['vendors'][$vendorId] = [
-                    'vendor_name' => $row->vendor_name,
-                    'suppliers'   => []
-                ];
-            }
-
-            // SUPPLIER + PO DAY
+            // pivot supplier
             foreach ($supplierList as $sup) {
+                $supplierId   = $sup['supplier_id'];
+                $supplierName = $sup['supplier_name'];
+                $poDay        = $sup['po_day'];
 
-                $supplierKey = $sup['supplier_id'] . '_' . $sup['po_day'];
-
-                if (!isset($pivotJasaVendor[$sizeId]['vendors'][$vendorId]['suppliers'][$supplierKey])) {
-                    $pivotJasaVendor[$sizeId]['vendors'][$vendorId]['suppliers'][$supplierKey] = [
-                        'supplier_label' => $sup['supplier_name'] . ' (' . $sup['po_day'] . ')',
-                        'total'          => 0
+                if (!isset($pivotJasaVendor[$sizeId]['vendors'][$vendorId]['suppliers'][$supplierId])) {
+                    $pivotJasaVendor[$sizeId]['vendors'][$vendorId]['suppliers'][$supplierId] = [
+                        'supplier_label' => $supplierName . ' (' . $poDay . ')',
+                        'total'          => 0,
+                        'po_days'        => [$poDay]
                     ];
+                } else {
+                    if (!in_array($poDay, $pivotJasaVendor[$sizeId]['vendors'][$vendorId]['suppliers'][$supplierId]['po_days'])) {
+                        $pivotJasaVendor[$sizeId]['vendors'][$vendorId]['suppliers'][$supplierId]['po_days'][] = $poDay;
+                    }
+                    $pivotJasaVendor[$sizeId]['vendors'][$vendorId]['suppliers'][$supplierId]['supplier_label'] =
+                        $supplierName . ' (' . implode(', ', $pivotJasaVendor[$sizeId]['vendors'][$vendorId]['suppliers'][$supplierId]['po_days']) . ')';
                 }
 
-                $pivotJasaVendor[$sizeId]['vendors'][$vendorId]['suppliers'][$supplierKey]['total']
-                    += $row->qty2;
+                $pivotJasaVendor[$sizeId]['vendors'][$vendorId]['suppliers'][$supplierId]['total'] += (float) $row->qty2;
             }
         }
 
@@ -1879,7 +2059,7 @@ class MaterialRequest extends BaseController
         );
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
-        $dompdf->stream('Material Request Canning', ['Attachment' => false]);
+        $dompdf->stream('Material_Request_Canning', ['Attachment' => false]);
         exit;
     }
 
