@@ -109,12 +109,12 @@
                             <td><?= $d['bagian'] ?></td>
                             <td><?= $d['payrollTotal'][0]['totalEmployee'] ?></td>
                             <td><?= number_format($d['payrollTotal'][0]['upahBersih'], 2, ',', '.')  ?></td>
-                            <td><?= number_format(($d['payrollTotal'][0]['tunjangan'] + $d['payrollTotal'][0]['cadangan']), 2, ',', '.')  ?></td>
+                            <td><?= number_format(($d['payrollTotal'][0]['tunjangan'] + $d['payrollTotal'][0]['skala_upah']), 2, ',', '.')  ?></td>
                             <td><?= number_format(($d['payrollTotal'][0]['lembur']), 2, ',', '.')  ?></td>
                             <!-- <td><?= number_format(0, 2, ',', '.')  ?></td> -->
-                            <td><?= number_format(($d['payrollTotal'][0]['upahBersih'] + $d['payrollTotal'][0]['tunjangan'] + $d['payrollTotal'][0]['cadangan']), 2, ',', '.')  ?></td>
+                            <td><?= number_format($d['payrollTotal'][0]['total_upah'], 2, ',', '.')  ?></td>
                             <td><?= number_format($d['payrollTotal'][0]['potongan'], 2, ',', '.')  ?></td>
-                            <td><?= number_format(($d['payrollTotal'][0]['upahBersih'] + $d['payrollTotal'][0]['tunjangan'] + $d['payrollTotal'][0]['cadangan'] - $d['payrollTotal'][0]['potongan']), 2, ',', '.')  ?></td>
+                            <td><?= number_format($d['payrollTotal'][0]['upahBersih'], 2, ',', '.')  ?></td>
                             <td><?= number_format($d['totalJamKerja'], 2, ',', '.') ?></td>
                             <td><?= number_format($d['totalJamLembur'], 2, ',', '.') ?></td>
                         </tr>
@@ -124,7 +124,7 @@
                     <td>Total</td>
                     <td><?= $data['orangTotal'] ?></td>
                     <td><?= number_format($data['upahPokokTotal'], 2, ',', '.')  ?></td>
-                    <td><?= number_format($data['tunjanganPlusCadangan'], 2, ',', '.')  ?></td>
+                    <td><?= number_format($data['tunjanganPlusSkalaUpah'], 2, ',', '.')  ?></td>
                     <td><?= number_format($data['lemburTotal'], 2, ',', '.')  ?></td>
                     <!-- <td><?= number_format(0, 2, ',', '.') ?></td> -->
                     <td><?= number_format($data['totalUpah'], 2, ',', '.') ?></td>
