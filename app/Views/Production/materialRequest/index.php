@@ -164,6 +164,9 @@
                                     <button class="btn btn-warning" onclick="handlePrint('${id}')">
                                         <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                     </button>
+                                    <button class="btn btn-success" onclick="handlePrintCanning('${id}')">
+                                        <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                    </button>
                                     <button type="button" class="btn btn-success" onclick="posting('${id}', 1)">
                                         <i class="fa fa-paper-plane" aria-hidden="true"></i>
                                     </button>
@@ -176,6 +179,9 @@
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <button class="btn btn-warning" onclick="handlePrint('${id}')">
+                                        <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                    </button>
+                                    <button class="btn btn-success" onclick="handlePrintCanning('${id}')">
                                         <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                     </button>
                                 </div>
@@ -420,6 +426,10 @@
 
     const handlePrint = function(id) {
         window.open("<?= base_url("material-request/print"); ?>" + '/' + id, "_blank");
+    }
+
+    const handlePrintCanning = function(id) {
+        window.open("<?= base_url("material-request/print-canning"); ?>" + '/' + id, "_blank");
     }
 
     const changeSort = function(val) {

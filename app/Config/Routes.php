@@ -998,6 +998,7 @@ $routes->get('/request-stock/data-detail-material', 'Production\MaterialRequest:
 $routes->get('/material-request', 'Production\MaterialRequest::index', ['filter' => 'Auth']);
 $routes->get('/material-request/details/(:segment)', 'Production\MaterialRequest::getById/$1', ['filter' => 'Auth']);
 $routes->get('/material-request/print/(:segment)', 'Production\MaterialRequest::printMaterialRequestPDF/$1', ['filter' => 'Auth']);
+$routes->get('/material-request/print-canning/(:segment)', 'Production\MaterialRequest::printMaterialRequestCanningPDF/$1', ['filter' => 'Auth']);
 $routes->get('/material-request/create', 'Production\MaterialRequest::createView', ['filter' => 'Auth']);
 $routes->get('/material-request/all', 'Production\MaterialRequest::all', ['filter' => 'Auth']);
 $routes->post('/material-request/delete', 'Production\MaterialRequest::deleteMR', ['filter' => 'Auth']);

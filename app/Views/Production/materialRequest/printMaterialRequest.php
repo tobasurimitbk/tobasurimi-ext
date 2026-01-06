@@ -62,8 +62,7 @@
         <thead>
             <tr>
                 <th rowspan="2">No</th>
-                <th rowspan="2">Vendor</th>
-                <th rowspan="2">Supplier</th>
+                <th rowspan="2">Vendor/Supplier</th>
                 <th colspan="<?= $banyakHeader ?>">Spesifikasi</th>
                 <th rowspan="2">Total</th>
             </tr>
@@ -82,7 +81,6 @@
             <?php foreach ($pivotSupplier as $supplier): ?>
                 <tr>
                     <td><?= $no++ ?></td>
-                    <td style="text-align:left"></td>
                     <td style="text-align:left"><?= $supplier['supplier_name'] ?></td>
 
                     <?php foreach ($dataHeader as $h): ?>
@@ -117,8 +115,7 @@
                 <tr>
                     <td><?= $noVendor++ ?></td>
                     <td style="text-align:left"><?= $jasavendor['keterangan_full'] ?? $jasavendor['vendor_name'] ?></td>
-                    <td style="text-align:left"><?= $jasavendor['supplier_name'] ?? '' ?> (<?= $jasavendor['supplier_po_day'] ?? '' ?>)</td>
-
+                    
                     <?php foreach ($dataHeader as $h): ?>
                         <td style="text-align:center">
                             <?= $jasavendor['specs'][$h->barang2_id] ?? 0 ?>
@@ -131,7 +128,7 @@
             <?php if ($counterPivotJasaVendor > 0): ?>
                 <tr>
                     <td></td>
-                    <td style="text-align:right; font-weight:bold;" colspan="2">TOTAL</td>
+                    <td style="text-align:right; font-weight:bold;">TOTAL</td>
 
                     <?php foreach ($dataHeader as $h): ?>
                         <td style="text-align:center; font-weight:bold;">
