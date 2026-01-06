@@ -115,7 +115,7 @@
                             </div>
                             <div class="card-wrap">
                                 <div class="card-header">
-                                    <h4>Total Karyawan</h4>
+                                    <h4>Karyawan</h4>
                                 </div>
                                 <div class="card-body" id="total-employees">
                                     0
@@ -1188,6 +1188,7 @@
     font-weight: 600;
     color: #6c757d;
     margin-bottom: 5px;
+    width: 200px;
 }
 .card-statistic-1 .card-body {
     font-size: 20px;
