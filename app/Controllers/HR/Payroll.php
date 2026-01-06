@@ -92,7 +92,7 @@ class Payroll extends BaseController
 
         $condition = [
             'employees.company_id' => $this->this_company_id,
-            "employees.deletedAt" => null,
+            // "employees.deletedAt" => null,
             "year_month" => $this->request->getVar('month'),
         ];
 

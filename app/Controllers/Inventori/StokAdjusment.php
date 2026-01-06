@@ -1054,7 +1054,8 @@ class StokAdjusment extends BaseController
                         $divisiId,
                         $warehouseId,
                         $barangMasterSpesifikasi['id'],
-                        $barangMasterSpesifikasi['satuan_1']
+                        $barangMasterSpesifikasi['satuan_1'],
+                        null
                     );
 
                     if ($validasiStokInisiasi == null) {

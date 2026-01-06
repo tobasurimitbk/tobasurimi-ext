@@ -288,7 +288,7 @@ class StokList extends BaseController
                 $barangMasterFirst = $this->barangMasterModel
                     ->where('company_id', $this->this_company_id)
                     ->where('kode_barang', $kodeBarang)
-                    ->where('barang_name', $barangName)
+                    //->where('barang_name', $barangName)
                     ->where('deletedAt', null)
                     ->first();
 
@@ -346,7 +346,8 @@ class StokList extends BaseController
                         $divisiFirst['id'],
                         $warehouseFirst['id'],
                         $barangMasterSpesifikasi['id'],
-                        $barangMasterSpesifikasi['satuan_1']
+                        $barangMasterSpesifikasi['satuan_1'],
+                        $tanggal
                     );
 
                     if ($validasiStokInisiasi != null) {
@@ -2456,6 +2457,14 @@ class StokList extends BaseController
             $qty_awal =  $stock_in_awal - $stock_out_awal;
             $qty_akhir = $qty_awal + $qty_masuk - $qty_keluar;
 
+            // $kartuStock = $dataKartuStock[$d['id']] ? '' : '';
+
+            // $qty_masuk = isset($masuk[$d['id']]) ? (float)$masuk[$d['id']] ?? 0 : 0;
+            // $qty_keluar = isset($keluar[$d['id']]) ? (float)$keluar[$d['id']] ?? 0 : 0;
+
+            // $qty_awal =  $stock_in_awal - $stock_out_awal;
+            // $qty_akhir = $qty_awal + $qty_masuk - $qty_keluar;
+
             array_push($dataResult, [
                 'no' => $no++,
                 'id' => encrypt($d['id']),
@@ -2501,6 +2510,95 @@ class StokList extends BaseController
             ]);
         }
     }
+
+    private function getKartuStockResult($start_date, $end_date)
+    {
+        $baseDate = '2025-09-01';
+
+        //-----------------------------------------
+        // AMBIL DATA MASUK
+        //-----------------------------------------
+        $allMasuk = $this->stockRevampLogModel->getKartuStockMasuk(
+            [
+                'company_id' => $this->this_company_id,
+                'dateStart'  => $baseDate,
+                'dateEnd'    => $end_date,
+                'stock_id'   => "",
+            ],
+            0,
+            "asc",
+            100000000,
+            0
+        );
+
+        //-----------------------------------------
+        // AMBIL DATA KELUAR
+        //-----------------------------------------
+        $allKeluar = $this->stockRevampLogModel->getKartuStockKeluar(
+            [
+                'company_id' => $this->this_company_id,
+                'dateStart'  => $baseDate,
+                'dateEnd'    => $end_date,
+                'stock_id'   => "",
+            ],
+            0,
+            "asc",
+            100000000,
+            0
+        );
+
+        //-----------------------------------------
+        // HITUNG TOTAL PER STOCK
+        //-----------------------------------------
+        $dataMap = [];
+
+        // ===== MASUK =====
+        foreach ($allMasuk['data'] as $d) {
+            $stockId = $d['stock_id'];
+            $tgl     = $d['lpb_date'];
+            $qty     = (float) $d['qty_diterima'];
+
+            if (!isset($dataMap[$stockId])) {
+                $dataMap[$stockId] = [
+                    'masuk_awal'  => 0,
+                    'keluar_awal' => 0,
+                    'masuk'       => 0,
+                    'keluar'      => 0,
+                ];
+            }
+
+            if ($tgl < $start_date) {
+                $dataMap[$stockId]['masuk_awal'] += $qty;
+            } else {
+                $dataMap[$stockId]['masuk'] += $qty;
+            }
+        }
+
+        // ===== KELUAR =====
+        foreach ($allKeluar['data'] as $d) {
+            $stockId = $d['stock_id'];
+            $tgl     = $d['tanggal_keluar'];
+            $qty     = (float) $d['qty_keluar'];
+
+            if (!isset($dataMap[$stockId])) {
+                $dataMap[$stockId] = [
+                    'masuk_awal'  => 0,
+                    'keluar_awal' => 0,
+                    'masuk'       => 0,
+                    'keluar'      => 0,
+                ];
+            }
+
+            if ($tgl < $start_date) {
+                $dataMap[$stockId]['keluar_awal'] += $qty;
+            } else {
+                $dataMap[$stockId]['keluar'] += $qty;
+            }
+        }
+
+        return $dataMap;
+    }
+
 
     private function getTotalKartuStockMasuk($start_date, $end_date)
     {
