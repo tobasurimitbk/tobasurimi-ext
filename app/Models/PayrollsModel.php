@@ -1040,7 +1040,7 @@ class PayrollsModel extends Model
                 COUNT(DISTINCT payrolls.employee_id) AS totalEmployee, 
                 SUM(nominal_gaji_harian * hadir_final) AS upahPokok, 
                 SUM(nominal_penambahan_gaji) AS tunjangan,
-                SUM(nominal_cadangan) AS skala_upah,
+                SUM(nominal_cadangan * hadir_final) AS skala_upah,
                 SUM(nominal_uang_lembur) AS lembur,
                 SUM(nominal_gaji_diterima) AS total_upah,
                 SUM(nominal_pengurangan_gaji) AS potongan
