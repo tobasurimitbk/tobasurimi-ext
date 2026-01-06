@@ -1035,12 +1035,12 @@ class PayrollsModel extends Model
         $lembur = 0;
         $jamKerja = 0;
 
-        foreach ($bagianData as $b) {
+        foreach ($bagianData as $i => $b) {
             $selectQry = "
                 COUNT(DISTINCT payrolls.employee_id) AS totalEmployee, 
-                SUM(nominal_uang_gaji) AS upahBersih, 
+                SUM(nominal_uang_gaji) AS upahPokok, 
                 SUM(nominal_penambahan_gaji) AS tunjangan,
-                SUM(nominal_gaji_harian) AS skala_upah,
+                SUM(nominal_cadangan) AS skala_upah,
                 SUM(nominal_uang_lembur) AS lembur,
                 SUM(nominal_gaji_diterima) AS total_upah,
                 SUM(nominal_pengurangan_gaji) AS potongan
@@ -1057,13 +1057,22 @@ class PayrollsModel extends Model
             $employeePayrollTotal =  $employeePayrolQry->groupBy('employees.bagian_id')->findAll();
 
             if ($employeePayrollTotal[0]['totalEmployee'] != 0) {
+
+                // update value
+                $totalUpahSingle = $employeePayrollTotal[0]['upahPokok'] + $employeePayrollTotal[0]['potongan'];
+                $totalUpahBersihSingle = $employeePayrollTotal[0]['upahPokok'] - $employeePayrollTotal[0]['potongan'];
+
+
+                $employeePayrollTotal[0]['total_upah'] = $totalUpahSingle;
+                $employeePayrollTotal[0]['upahBersih'] = $totalUpahBersihSingle;
+
                 // set total
-                $upahPokok += $employeePayrollTotal[0]['upahBersih'];
-                $tunjanganPlusSkalaUpah += ($employeePayrollTotal[0]['tunjangan'] + $employeePayrollTotal[0]['skala_upah']);
+                $upahPokok += $employeePayrollTotal[0]['upahPokok'];
+                $tunjanganPlusSkalaUpah += ($employeePayrollTotal[0]['skala_upah']);
                 $lemburTotal += $employeePayrollTotal[0]['lembur'];
-                $totalUpah += $employeePayrollTotal[0]['total_upah'];
+                $totalUpah += $totalUpahSingle;
                 $potongan += $employeePayrollTotal[0]['potongan'];
-                $upahBersih += $employeePayrollTotal[0]['upahBersih'];
+                $upahBersih += $totalUpahBersihSingle;
                 $orangTotal += $employeePayrollTotal[0]['totalEmployee'];
                 $lembur +=  static::getTotalJamLemburInOnePeriode($divisionID, $b['id'], $payrollId);
                 $jamKerja += static::getTotalJamKerjaInOnePeriode($divisionID, $b['id'], $payrollId);
