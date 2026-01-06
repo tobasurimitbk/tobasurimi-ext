@@ -651,7 +651,7 @@ class PayrollsModel extends Model
             ->where('employees.company_id', $companyID)
             ->where('employees.division_id', $divisionID);
 
-        if ($bagianID != '' && empty($bagianID)) {
+        if ($bagianID != '' && !empty($bagianID)) {
             $employeePayroll->where('employees.bagian_id', $bagianID);
         }
 
@@ -677,8 +677,8 @@ class PayrollsModel extends Model
             $data[] = [
                 'payroll' => $payrollDetail,
                 'employee' => $employee,
-                'totalLemburJamPertama' => $splitJamLembur['jamPertama'],
-                'totalLemburJamKedua' => $splitJamLembur['jamKedua'],
+                'totalLemburJamPertama' => number_format($splitJamLembur['jamPertama'], 1),
+                'totalLemburJamKedua' => number_format($splitJamLembur['jamKedua'], 1),
                 'perhitunganGaji' => $perhitunganGaji,
                 'totalPinjamanDiambil' => $totalPinjamanDiambil,
                 'uangMakan' => $uangMakan
