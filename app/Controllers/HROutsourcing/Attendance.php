@@ -88,8 +88,17 @@ class Attendance extends BaseController
             // 1. Ambil company
             // =============================
             $company = $this->hrOutSourcingCompanyModel
-                ->where('id', $companyId)
-                ->where('deletedAt', null)
+                ->select('
+                    hr_outsourcing_company.*,
+                    divisis.divisi as divisi_name
+                ')
+                ->join(
+                    'divisis',
+                    'divisis.id = hr_outsourcing_company.divisi_id',
+                    'left'
+                )
+                ->where('hr_outsourcing_company.id', $companyId)
+                ->where('hr_outsourcing_company.deletedAt', null)
                 ->first();
 
             if (!$company) {
@@ -221,6 +230,7 @@ class Attendance extends BaseController
                     'verified_out'     => 'Not Verified',
                     'status'           => 'Tidak Masuk',
                     'status_class'     => 'danger',
+                    'divisi_name'      => $company['divisi_name'],
                     'company_name'     => $company['name'],
                     'company_id'       => $companyId,
                     'attendance_count' => 0,

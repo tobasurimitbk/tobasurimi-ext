@@ -115,7 +115,7 @@
                             </div>
                             <div class="card-wrap">
                                 <div class="card-header">
-                                    <h4>Total Karyawan</h4>
+                                    <h4>Karyawan</h4>
                                 </div>
                                 <div class="card-body" id="total-employees">
                                     0
@@ -186,7 +186,7 @@
                                 <th width="100">Total Jam</th>
                                 <th width="100">Status</th>
                                 <th width="100">Perusahaan</th>
-                                <th width="150" class="text-center">Aksi</th>
+                                <!-- <th width="150" class="text-center">Aksi</th> -->
                             </tr>
                         </thead>
                         <tbody id="table-body">
@@ -684,7 +684,7 @@
         }
 
         // =========================
-        // RENDER TABLE FUNCTION
+        // RENDER TABLE FUNCTION (REVISED)
         // =========================
         function renderTable(data) {
             const tbody = $('#table-body');
@@ -710,7 +710,15 @@
             }
 
             let no = 1;
+            let totalRows = 0; // Untuk menghitung baris yang benar-benar ditampilkan
+            
             $.each(data, function(index, emp) {
+                // Skip jika tidak ada check_in (tidak masuk)
+                if (!emp.check_in) {
+                    return; // continue ke data berikutnya
+                }
+                
+                totalRows++; // Hitung baris yang ditampilkan
 
                 // TAMBAHAN: Format Break Time Input
                 const breakTimeValue = emp.breaktime || 0;
@@ -747,55 +755,64 @@
                     </div>`
                     : '<span class="text-muted">-</span>';
                 
-                // Format Work Hours
+                // Hitung jam kerja dalam menit
+                let workHoursInMinutes = 0;
                 let workHoursDisplay = '<span class="text-muted">-</span>';
                 let workHoursClass = '';
                 
                 if (emp.work_hours && emp.work_hours !== '0:00') {
                     const [hours, minutes] = emp.work_hours.split(':').map(Number);
+                    workHoursInMinutes = (hours * 60) + minutes;
+                    
+                    // Tentukan warna berdasarkan jam kerja (4 jam = 240 menit)
+                    let workHoursColor = 'danger'; // default merah untuk < 4 jam
+                    if (workHoursInMinutes >= 240) {
+                        workHoursColor = 'success'; // hijau untuk ≥ 4 jam
+                    }
+                    
                     workHoursDisplay = `
                         <div class="text-center">
-                            <div class="work-hours-display ${hours >= 8 ? 'text-success' : hours >= 5 ? 'text-warning' : 'text-danger'}">
+                            <div class="work-hours-display text-${workHoursColor}">
                                 <i class="fas fa-clock mr-1"></i>${emp.work_hours}
                             </div>
                             <small class="text-muted">${hours} jam ${minutes} menit</small>
                         </div>
                     `;
                     
-                    if (hours >= 8) {
+                    // Background color untuk row
+                    if (workHoursInMinutes >= 240) {
                         workHoursClass = 'bg-success-light';
-                    } else if (hours >= 5) {
-                        workHoursClass = 'bg-warning-light';
-                    } else {
+                    } else if (workHoursInMinutes > 0) {
                         workHoursClass = 'bg-danger-light';
                     }
                 }
 
-                // Tentukan Status berdasarkan jam kerja dan check in/out
-                let status = 'Tidak Masuk';
-                let statusClass = 'danger';
+                // Tentukan Status sesuai permintaan user
+                let status = '';
+                let statusClass = '';
                 
                 if (emp.check_in_rounded) {
                     if (emp.check_out_rounded) {
                         // Ada check in dan check out
-                        const [hours, minutes] = emp.work_hours ? emp.work_hours.split(':').map(Number) : [0, 0];
-                        const totalMinutes = (hours * 60) + minutes;
-                        
-                        if (totalMinutes >= 480) { // 8 jam
+                        if (workHoursInMinutes >= 240) { // 4 jam atau lebih
                             status = 'Hadir';
-                            statusClass = 'success';
-                        } else if (totalMinutes > 0) {
+                            statusClass = 'success'; // hijau
+                        } else if (workHoursInMinutes > 0) {
                             status = 'Kurang Jam';
-                            statusClass = 'warning';
+                            statusClass = 'danger'; // merah
                         } else {
                             status = 'Belum Checkout';
-                            statusClass = 'warning';
+                            statusClass = 'warning'; // kuning
                         }
                     } else {
-                        // Hanya check in
+                        // Hanya check in (belum checkout)
                         status = 'Belum Checkout';
-                        statusClass = 'warning';
+                        statusClass = 'warning'; // kuning
                     }
+                } else {
+                    // Tidak ada check in (tidak masuk)
+                    status = 'Tidak Masuk';
+                    statusClass = 'secondary'; // abu-abu (bisa diganti 'danger' jika mau merah)
                 }
                 
                 tbody.append(`
@@ -813,7 +830,7 @@
                         <td>${emp.divisi_name || '-'}</td>
                         <td>${checkInDisplay}</td>
                         <td>${checkOutDisplay}</td>
-                        <td class="text-center">${breakTimeDisplay}</td> <!-- TAMBAHAN -->
+                        <td class="text-center">${breakTimeDisplay}</td>
                         <td class="text-center">${workHoursDisplay}</td>
                         <td class="text-center">
                             <span class="badge badge-${statusClass}">
@@ -821,33 +838,28 @@
                             </span>
                         </td>
                         <td>${emp.company_name}</td>
-                        <td class="text-center">
-                            <div class="btn-group" role="group">
-                                <button class="btn btn-sm btn-info view-detail" 
-                                    data-id="${emp.id}"
-                                    data-user-id="${emp.user_id}"
-                                    title="Detail">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="btn btn-sm btn-warning edit-attendance" 
-                                    data-id="${emp.id}"
-                                    data-user-id="${emp.user_id}"
-                                    data-name="${emp.name}"
-                                    data-date="${$('#date_filter').val()}"
-                                    title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-sm btn-danger delete-attendance" 
-                                    data-id="${emp.id}"
-                                    data-name="${emp.name}"
-                                    title="Hapus">
-                                    <i class="fas fa-trash"></i>
-                                </button>
+                    </tr>
+                `);
+            });
+            
+            // Jika tidak ada data yang ditampilkan (semua skip karena !emp.check_in)
+            if (totalRows === 0) {
+                tbody.html(`
+                    <tr id="no-data">
+                        <td colspan="10" class="text-center py-5">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">
+                                    <i class="fas fa-user-slash fa-3x text-muted"></i>
+                                </div>
+                                <h2 class="mt-3">Semua Karyawan Tidak Masuk</h2>
+                                <p class="lead">
+                                    Tidak ada karyawan yang check in pada tanggal ini
+                                </p>
                             </div>
                         </td>
                     </tr>
                 `);
-            });
+            }
         }
 
         // =========================
@@ -863,10 +875,10 @@
             }
 
             const totalEmployees = data.length;
-            const checkInCount = data.filter(item => item.check_in_rounded !== null).length;
-            const checkOutCount = data.filter(item => item.check_out_rounded !== null).length;
+            const checkInCount = data.filter(item => item.check_in !== null).length;
+            const checkOutCount = data.filter(item => item.check_out !== null).length;
             const missingCount = data.filter(item => 
-                item.check_in_rounded === null && item.check_out_rounded === null
+                item.check_in === null && item.check_out === null
             ).length;
 
             $('#total-employees').text(totalEmployees);
@@ -876,289 +888,19 @@
         }
 
         // =========================
-        // VIEW DETAIL MODAL
+        // HELPER FUNCTIONS
         // =========================
-        $(document).on('click', '.view-detail', function() {
-            const userId = $(this).data('user-id');
-            const date = $('#date_filter').val();
-            
-            $.ajax({
-                url: '<?= base_url("hr-outsourcing-attendance/detail") ?>',
-                type: 'POST',
-                data: {
-                    user_id: userId,
-                    date: date,
-                    '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
-                },
-                dataType: 'json',
-                success: function(response) {
-                    if (response.success) {
-                        const emp = response.data;
-                        const [hours, minutes] = emp.work_hours ? emp.work_hours.split(':') : [0, 0];
-                        const totalMinutes = (parseInt(hours) * 60) + parseInt(minutes);
-                        
-                        // Tentukan status untuk detail modal
-                        let status = 'Tidak Masuk';
-                        let statusClass = 'danger';
-                        
-                        if (emp.check_in_rounded) {
-                            if (emp.check_out_rounded) {
-                                if (totalMinutes >= 480) {
-                                    status = 'Hadir';
-                                    statusClass = 'success';
-                                } else if (totalMinutes > 0) {
-                                    status = 'Kurang Jam';
-                                    statusClass = 'warning';
-                                } else {
-                                    status = 'Belum Checkout';
-                                    statusClass = 'warning';
-                                }
-                            } else {
-                                status = 'Belum Checkout';
-                                statusClass = 'warning';
-                            }
-                        }
-                        
-                        const detailContent = `
-                            <div class="row">
-                                <div class="col-md-4 text-center mb-3">
-                                    <div class="detail-icon">
-                                        <i class="fas fa-user-circle fa-4x text-primary"></i>
-                                    </div>
-                                    <h5 class="mt-2">${emp.name}</h5>
-                                    <p class="text-muted">${emp.position || '-'}</p>
-                                    <div class="work-summary mt-3">
-                                        <h3 class="text-${totalMinutes >= 480 ? 'success' : totalMinutes >= 300 ? 'warning' : 'danger'}">
-                                            ${emp.work_hours || '0:00'}
-                                        </h3>
-                                        <p class="text-muted">Total Jam Kerja</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-8">
-                                    <table class="table table-bordered">
-                                        <tr>
-                                            <th width="40%">User ID</th>
-                                            <td>${emp.user_id}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Badge Number</th>
-                                            <td>${emp.badge_no || '-'}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Perusahaan</th>
-                                            <td>${emp.company_name}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Divisi</th>
-                                            <td>${emp.divisi_name || '-'}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Tanggal</th>
-                                            <td>${date}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Check In</th>
-                                            <td>
-                                                ${emp.check_in_rounded ? `
-                                                    <span class="text-success">${emp.check_in_rounded}</span>
-                                                ` : '<span class="text-muted">-</span>'}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th>Check Out</th>
-                                            <td>
-                                                ${emp.check_out_rounded ? `
-                                                    <span class="text-warning">${emp.check_out_rounded}</span>
-                                                ` : '<span class="text-muted">-</span>'}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th>Total Jam Kerja</th>
-                                            <td>
-                                                <strong class="text-${totalMinutes >= 480 ? 'success' : totalMinutes >= 300 ? 'warning' : 'danger'}">
-                                                    ${emp.work_hours || '0:00'}
-                                                </strong>
-                                                ${emp.work_hours && emp.work_hours !== '0:00' ? `
-                                                    <div class="progress mt-1" style="height: 8px;">
-                                                        <div class="progress-bar bg-${totalMinutes >= 480 ? 'success' : totalMinutes >= 300 ? 'warning' : 'danger'}" 
-                                                            role="progressbar" 
-                                                            style="width: ${Math.min((totalMinutes / 480) * 100, 100)}%"
-                                                            aria-valuenow="${totalMinutes}" 
-                                                            aria-valuemin="0" 
-                                                            aria-valuemax="480">
-                                                        </div>
-                                                    </div>
-                                                    <small class="text-muted">
-                                                        ${Math.floor(totalMinutes / 60)} jam ${totalMinutes % 60} menit
-                                                        / 8 jam (${((totalMinutes / 480) * 100).toFixed(1)}%)
-                                                    </small>
-                                                ` : ''}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th>Status</th>
-                                            <td>
-                                                <span class="badge badge-${statusClass}">
-                                                    ${status}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th>Keterangan</th>
-                                            <td>${emp.keterangan || '-'}</td>
-                                        </tr>
-                                    </table>
-                                </div>
-                            </div>
-                        `;
-                        
-                        $('#detail-content').html(detailContent);
-                        $('#detailModal').modal('show');
-                    } else {
-                        showAlert('danger', response.message || 'Gagal memuat detail', 3000);
-                    }
-                },
-                error: function() {
-                    showAlert('danger', 'Error memuat detail data', 3000);
-                }
-            });
-        });
-
-        // =========================
-        // EDIT ATTENDANCE MODAL
-        // =========================
-        $(document).on('click', '.edit-attendance', function() {
-            const userId = $(this).data('user-id');
-            const name = $(this).data('name');
-            const date = $('#date_filter').val();
-            
-            // Set modal title
-            $('#editModalLabel').html(`<i class="fas fa-edit"></i> Edit Presensi - ${name}`);
-            
-            // Load existing data
-            $.ajax({
-                url: '<?= base_url("hr-outsourcing-attendance/getAttendance") ?>',
-                type: 'POST',
-                data: {
-                    user_id: userId,
-                    date: date,
-                    '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
-                },
-                dataType: 'json',
-                success: function(response) {
-                    if (response.success) {
-                        const data = response.data;
-                        $('#edit-user-id').val(userId);
-                        $('#edit-date').val(date);
-                        
-                        // Format datetime for input fields
-                        if (data.check_in_rounded) {
-                            const checkInDate = new Date(date + 'T' + data.check_in_rounded);
-                            $('#edit-checkin').val(checkInDate.toISOString().slice(0, 16));
-                        } else {
-                            $('#edit-checkin').val('');
-                        }
-                        
-                        if (data.check_out_rounded) {
-                            const checkOutDate = new Date(date + 'T' + data.check_out_rounded);
-                            $('#edit-checkout').val(checkOutDate.toISOString().slice(0, 16));
-                        } else {
-                            $('#edit-checkout').val('');
-                        }
-                        
-                        $('#edit-status').val(data.status || 'Hadir');
-                        $('#edit-keterangan').val(data.keterangan || '');
-                        
-                        $('#editModal').modal('show');
-                    } else {
-                        showAlert('danger', response.message || 'Gagal memuat data', 3000);
-                    }
-                },
-                error: function() {
-                    showAlert('danger', 'Error memuat data', 3000);
-                }
-            });
-        });
-
-        // Submit edit form
-        $('#edit-form').on('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = $(this).serialize();
-            
-            $.ajax({
-                url: '<?= base_url("hr-outsourcing-attendance/update") ?>',
-                type: 'POST',
-                data: formData + '&<?= csrf_token() ?>=<?= csrf_hash() ?>',
-                dataType: 'json',
-                success: function(response) {
-                    if (response.success) {
-                        $('#editModal').modal('hide');
-                        showAlert('success', 'Data berhasil diperbarui', 3000);
-                        loadAttendanceData(); // Reload data
-                    } else {
-                        showAlert('danger', response.message || 'Gagal memperbarui data', 3000);
-                    }
-                },
-                error: function() {
-                    showAlert('danger', 'Error memperbarui data', 3000);
-                }
-            });
-        });
-
-        // =========================
-        // DELETE ATTENDANCE
-        // =========================
-        $(document).on('click', '.delete-attendance', function() {
-            const id = $(this).data('id');
-            const name = $(this).data('name');
-            
-            Swal.fire({
-                title: 'Hapus Data Presensi',
-                html: `Apakah Anda yakin ingin menghapus presensi <strong>${name}</strong>?`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, Hapus!',
-                cancelButtonText: 'Batal',
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: '<?= base_url("hr-outsourcing-attendance/delete") ?>',
-                        type: 'POST',
-                        data: {
-                            id: id,
-                            '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
-                        },
-                        dataType: 'json',
-                        success: function(response) {
-                            if (response.success) {
-                                showAlert('success', 'Data berhasil dihapus', 3000);
-                                loadAttendanceData(); // Reload data
-                            } else {
-                                showAlert('danger', response.message || 'Gagal menghapus data', 3000);
-                            }
-                        },
-                        error: function() {
-                            showAlert('danger', 'Error menghapus data', 3000);
-                        }
-                    });
-                }
-            });
-        });
-
         // =========================
         // HELPER FUNCTIONS
         // =========================
         function getStatusClass(status) {
             const statusMap = {
-                'Hadir': 'success',
+                'Hadir': 'success',          // hijau
+                'Belum Checkout': 'warning', // kuning
+                'Kurang Jam': 'danger',      // merah
+                'Tidak Masuk': 'secondary',  // abu-abu (bisa diganti 'danger' jika mau merah)
                 'Terlambat': 'warning',
                 'Pulang Awal': 'info',
-                'Tidak Masuk': 'danger',
-                'Belum Checkout': 'warning',
-                'Kurang Jam': 'warning',
                 'Izin': 'primary',
                 'Sakit': 'info',
                 'Cuti': 'warning'
@@ -1446,6 +1188,7 @@
     font-weight: 600;
     color: #6c757d;
     margin-bottom: 5px;
+    width: 200px;
 }
 .card-statistic-1 .card-body {
     font-size: 20px;
