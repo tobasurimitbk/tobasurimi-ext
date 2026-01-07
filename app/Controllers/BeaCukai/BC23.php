@@ -2075,6 +2075,9 @@ class BC23 extends BaseController
     {
         $beacukaiApi = new BeaCukaiApi($this->akunCeisa['username'], $this->akunCeisa['password']);
         $kodeValuta = decrypt($this->request->getVar('harga_kode_valuta'));
+        if ($kodeValuta == false) {
+            $kodeValuta = $this->request->getVar('harga_kode_valuta');
+        }
         $res = $beacukaiApi->getNilaiValuta($kodeValuta);
 
         return response()->setJSON([
