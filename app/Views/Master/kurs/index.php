@@ -23,7 +23,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" onkeyup="formatNumber(this)" class="form-control nilai_kurs" id="nilai_kurs" name="nilai_kurs" placeholder="Nilai Kurs">
+                                <input autocomplete="one-time-code" type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control nilai_kurs" id="nilai_kurs" name="nilai_kurs" placeholder="Nilai Kurs">
                                 <label for="floatingInput">Nilai Kurs</label>
                             </div>
                         </div>
@@ -48,7 +48,7 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <div class="input-group input-group-password">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="one-time-code" class="form-control input-picker end_date" id="end_date" name="end_date" placeholder="Tanggal Akhir">
+                                        <input autocomplete="one-time-code" class="form-control input-picker end_date" id="end_date" name="end_date" placeholder="Tanggal Akhir" value="<?= date('d/m/Y') ?>">
                                         <label for="floatingInput">Tanggal Akhir</label>
                                     </div>
                                     <div class="input-group-prepend group-prepend-password align-items-center">
@@ -58,6 +58,17 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                    <div class="row justify-content-start">
+                        <div class="col-sm-6">
+                            <a href="#" id="btn-sesuai-valuta-terbaru" class="btn btn-warning btn-block" style="float: right;">
+                                Ambil Kurs Otomatis
+                            </a>
+                            <button class="btn btn-warning btn-block" type="button" disabled id="btn-sesuai-valuta-terbaru-loading" style="float: right;">
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                Loading
+                            </button>
                         </div>
                     </div>
                 </form>
@@ -84,7 +95,7 @@
             <div class="row justify-content-end row-col-spp">
                 <div class="col mb-3">
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Awal">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Awal" value="">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
                         </div>
@@ -107,11 +118,11 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No.</th>
+                                <th>No</th>
                                 <th onclick="changeSort('valas')" class="sort">Valas</th>
                                 <th onclick="changeSort('nilai_kurs')" class="sort">Nilai Kurs</th>
-                                <th class="sort">Tanggal Mulai</th>
-                                <th class="sort">Tanggal Akhir</th>
+                                <th onclick="changeSort('start_date')" class="sort">Tgl Mulai</th>
+                                <th onclick="changeSort('end_date')" class="sort">Tgl Akhir</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -129,6 +140,7 @@
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "valas";
     let sortType = "desc";
+    $('#btn-sesuai-valuta-terbaru-loading').hide();
 
     const table = $('.dataTable').DataTable({
 
@@ -149,8 +161,6 @@
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
-                console.log($(".dateStart").val());
-                console.log($(".dateEnd").val());
                 data.dateStart = $(".dateStart").val();
                 data.dateEnd = $(".dateEnd").val();
                 data.sort = sort;
@@ -168,27 +178,25 @@
         searching: false,
         columns: [{
                 data: "no",
-                className: "text-center",
+                className: "text-left",
                 orderable: false,
                 width: "5%"
             },
             {
                 data: "valas",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "nilai_kurs",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "start_date",
-                className: "text-center",
-                orderable: false,
+                className: "text-left",
             },
             {
                 data: "end_date",
-                className: "text-center",
-                orderable: false,
+                className: "text-left",
             }
         ],
         columnDefs: [{
@@ -353,12 +361,12 @@
         $(".btn-show-form").click(function() {
             $(".id").val("");
             $(".title-name").text("Tambah");
-
-            validator.resetForm();
-            validator.reset();
-
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', 'none');
+
+            // reset form
+            $('#metadata_id').val(null).change();
+            $('#nilai_kurs,#start_date').val(null).change();
 
             $.ajax({
                 url: `<?= base_url("metadata/dropdown"); ?>`,
@@ -530,105 +538,98 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         const csrf = $(`[name="${csrfToken}"]`);
-                        setLoading()
                         let data = new FormData(document.querySelector(".create-form"));
-
                         let id = $(".id").val();
-                        // UPDATE
-                        if (id) {
-                            $.ajax({
-                                url: "<?= base_url("kurs/update"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        stopLoading()
-                                        Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                table.ajax.reload()
-                                                $(".add-modal").modal("hide")
-                                            })
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
+                        let url = id == '' ? "<?= base_url("kurs/save"); ?>" : "<?= base_url("kurs/update"); ?>";
+                        let nilai_kurs = destroyFormatRupiah($('#nilai_kurs').val());
+                        data.set('nilai_kurs', nilai_kurs);
+
+                        $.ajax({
+                            url: url,
+                            data: data,
+                            beforeSend: (xhr) => {
+                                setLoading();
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            },
+                            complete: () => {
+                                stopLoading();
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    stopLoading()
+                                    Swal.fire({
+                                            icon: 'success',
                                             title: response.message,
                                             confirmButtonColor: '#4e73df',
                                         })
-                                        stopLoading()
-                                    }
-                                },
-                                onError: function(response) {
-                                    csrf.val(response.token);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Data Gagal Disimpan, coba Lagi',
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    stopLoading()
-                                }
-                            });
-                        }
-                        // CREATE
-                        else {
-                            $.ajax({
-                                url: "<?= base_url("kurs/save"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        stopLoading()
-                                        Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                table.ajax.reload()
-                                                $(".add-modal").modal("hide")
-                                            })
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
+                                        .then(() => {
+                                            table.ajax.reload()
+                                            $(".add-modal").modal("hide")
                                         })
-                                        stopLoading()
-                                    }
-                                },
-                                onError: function(response) {
-                                    csrf.val(response.token);
+                                } else {
                                     Swal.fire({
                                         icon: 'error',
-                                        title: 'Data Gagal Disimpan, coba Lagi',
+                                        title: response.message,
                                         confirmButtonColor: '#4e73df',
                                     })
-                                    stopLoading()
                                 }
-                            });
-                        }
+                            },
+                        });
                     }
                 })
             }
         })
-    })
+    });
+
+    $('#btn-sesuai-valuta-terbaru').click(function(e) {
+        e.preventDefault();
+        if ($('#metadata_id').val()) {
+            $.ajax({
+                url: `<?= base_url("kurs/tarik-otomatis"); ?>`,
+                method: "GET",
+                data: {
+                    harga_kode_valuta: $('#metadata_id option:selected').text()
+                },
+                beforeSend: function() {
+                    $('#btn-sesuai-valuta-terbaru-loading').show();
+                    $('#btn-sesuai-valuta-terbaru').hide();
+                },
+                complete: function() {
+                    $('#btn-sesuai-valuta-terbaru').show();
+                    $('#btn-sesuai-valuta-terbaru-loading').hide();
+                },
+                dataType: "json",
+                success: function(res) {
+                    if (res.status) {
+                        if (res.data.status) {
+                            $("#nilai_kurs").val((greatFormatRupiah(res.data.data)));
+                        }
+                    }
+
+                    if (res.data.status === false) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: res.data.message,
+                            confirmButtonColor: '#4e73df',
+                            confirmButtonText: 'Ok'
+                        });
+                    }
+                }
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: "Pilih valuta dahulu",
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Ok'
+            });
+        }
+    });
 
     const changeSort = function(val) {
         if (sort !== val) {
