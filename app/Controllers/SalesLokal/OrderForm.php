@@ -950,110 +950,250 @@ class OrderForm extends BaseController
     }
 
 
+    // public function printOrder($id)
+    // {
+    //     $domPdf = new Dompdf();
+
+    //     $fileName = 'Order Form';
+
+    //     $id = decrypt($id);
+
+    //     $soSelectQry = "
+    //         sales_order.*,
+    //         CONCAT(
+    //             LPAD(DAY(sales_order.order_date), 2, '0'), ' ',
+    //             CASE MONTH(sales_order.order_date)
+    //                 WHEN 1 THEN 'JAN'
+    //                 WHEN 2 THEN 'FEB'
+    //                 WHEN 3 THEN 'MAR'
+    //                 WHEN 4 THEN 'APR'
+    //                 WHEN 5 THEN 'MEI'
+    //                 WHEN 6 THEN 'JUNI'
+    //                 WHEN 7 THEN 'JULI'
+    //                 WHEN 8 THEN 'AGUS'
+    //                 WHEN 9 THEN 'SEPT'
+    //                 WHEN 10 THEN 'OKT'
+    //                 WHEN 11 THEN 'NOV'
+    //                 WHEN 12 THEN 'DES'
+    //             END,
+    //             ' ',
+    //             YEAR(sales_order.order_date)
+    //         ) AS order_date,
+
+    //         CONCAT(
+    //             LPAD(DAY(sales_order.shipping_date), 2, '0'), ' ',
+    //             CASE MONTH(sales_order.shipping_date)
+    //                 WHEN 1 THEN 'JAN'
+    //                 WHEN 2 THEN 'FEB'
+    //                 WHEN 3 THEN 'MAR'
+    //                 WHEN 4 THEN 'APR'
+    //                 WHEN 5 THEN 'MEI'
+    //                 WHEN 6 THEN 'JUNI'
+    //                 WHEN 7 THEN 'JULI'
+    //                 WHEN 8 THEN 'AGUS'
+    //                 WHEN 9 THEN 'SEPT'
+    //                 WHEN 10 THEN 'OKT'
+    //                 WHEN 11 THEN 'NOV'
+    //                 WHEN 12 THEN 'DES'
+    //             END,
+    //             ' ',
+    //             YEAR(sales_order.shipping_date)
+    //         ) AS shipping_date,
+
+    //         customers.name AS customerName,
+    //         customers.phone AS customerPhone,
+    //         customers.address AS customerAddress,
+    //         metadata.value AS termin,
+    //         companies.company
+    //     ";
+    //     $salesOrderData = $this->SalesOrderModel->asObject()
+    //         ->select($soSelectQry)
+    //         ->join('customers', 'customers.id = sales_order.id_customer', 'left')
+    //         ->join('metadata', 'metadata.id = sales_order.payment_terms', 'left')
+    //         ->join('companies', 'companies.id = sales_order.id_company', 'left')
+    //         ->find($id);
+
+    //     $soDet = $this->SalesOrderDetailModel->asObject()
+    //         ->select('barang_master_sales.barang_name AS namaBarang, barang_master_sales.kode_barang AS kodeBarang, sales_order_detail.qty AS qty, satuans.kode_satuan AS kodeSatuan')
+    //         ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail.id_barang')
+    //         ->join('satuans', 'satuans.id = barang_master_sales.satuan_id')
+    //         ->where('tipe_input', "order_form")
+    //         ->where('id_sales_order', $id)
+    //         ->findAll();
+
+    //     $data = [
+    //         'companyName'   => $salesOrderData->company,
+    //         'soData'        => $salesOrderData,
+    //         'soDet'         => $soDet
+    //     ];
+
+
+    //     $this->SalesOrderModel->update($id, ['counter_print' => $salesOrderData->counter_print + 1]);
+
+
+    //     // return view('SalesLokal/OrderForm/print', $data);
+
+    //     $options = new Options();
+    //     $options->set('isHtml5ParserEnabled', true);
+    //     $options->set('isRemoteEnabled', true);
+    //     $options->set('defaultFont', 'DejaVu Sans Mono');
+
+    //     $domPdf = new Dompdf($options);
+    //     // $domPdf->loadHtml($html);
+    //     $domPdf->loadHtml(view('SalesLokal/OrderForm/print', $data));
+
+    //     // (optional) setup the paper size and orientation
+    //     $domPdf->setPaper('A4', 'landscape');
+    //     $domPdf->set_option('defaultFont', 'DejaVu Sans Mono');
+
+    //     // render html as PDF
+    //     $domPdf->render();
+
+    //     // output the generated pdf
+    //     $domPdf->stream($fileName, array("Attachment" => false));
+
+    //     exit();
+    // }
     public function printOrder($id)
-    {
-        $domPdf = new Dompdf();
+{
+    $id = decrypt($id);
 
-        $fileName = 'Order Form';
+    /* =========================
+     * AMBIL DATA SALES ORDER
+     * ========================= */
+    $soSelectQry = "
+        sales_order.*,
+        CONCAT(
+            LPAD(DAY(sales_order.order_date), 2, '0'), ' ',
+            CASE MONTH(sales_order.order_date)
+                WHEN 1 THEN 'JAN'
+                WHEN 2 THEN 'FEB'
+                WHEN 3 THEN 'MAR'
+                WHEN 4 THEN 'APR'
+                WHEN 5 THEN 'MEI'
+                WHEN 6 THEN 'JUNI'
+                WHEN 7 THEN 'JULI'
+                WHEN 8 THEN 'AGUS'
+                WHEN 9 THEN 'SEPT'
+                WHEN 10 THEN 'OKT'
+                WHEN 11 THEN 'NOV'
+                WHEN 12 THEN 'DES'
+            END,
+            ' ',
+            YEAR(sales_order.order_date)
+        ) AS order_date,
 
-        $id = decrypt($id);
+        CONCAT(
+            LPAD(DAY(sales_order.shipping_date), 2, '0'), ' ',
+            CASE MONTH(sales_order.shipping_date)
+                WHEN 1 THEN 'JAN'
+                WHEN 2 THEN 'FEB'
+                WHEN 3 THEN 'MAR'
+                WHEN 4 THEN 'APR'
+                WHEN 5 THEN 'MEI'
+                WHEN 6 THEN 'JUNI'
+                WHEN 7 THEN 'JULI'
+                WHEN 8 THEN 'AGUS'
+                WHEN 9 THEN 'SEPT'
+                WHEN 10 THEN 'OKT'
+                WHEN 11 THEN 'NOV'
+                WHEN 12 THEN 'DES'
+            END,
+            ' ',
+            YEAR(sales_order.shipping_date)
+        ) AS shipping_date,
 
-        $soSelectQry = "
-            sales_order.*,
-            CONCAT(
-                LPAD(DAY(sales_order.order_date), 2, '0'), ' ',
-                CASE MONTH(sales_order.order_date)
-                    WHEN 1 THEN 'JAN'
-                    WHEN 2 THEN 'FEB'
-                    WHEN 3 THEN 'MAR'
-                    WHEN 4 THEN 'APR'
-                    WHEN 5 THEN 'MEI'
-                    WHEN 6 THEN 'JUNI'
-                    WHEN 7 THEN 'JULI'
-                    WHEN 8 THEN 'AGUS'
-                    WHEN 9 THEN 'SEPT'
-                    WHEN 10 THEN 'OKT'
-                    WHEN 11 THEN 'NOV'
-                    WHEN 12 THEN 'DES'
-                END,
-                ' ',
-                YEAR(sales_order.order_date)
-            ) AS order_date,
+        customers.name AS customerName,
+        customers.phone AS customerPhone,
+        customers.address AS customerAddress,
+        metadata.value AS termin,
+        companies.company
+    ";
 
-            CONCAT(
-                LPAD(DAY(sales_order.shipping_date), 2, '0'), ' ',
-                CASE MONTH(sales_order.shipping_date)
-                    WHEN 1 THEN 'JAN'
-                    WHEN 2 THEN 'FEB'
-                    WHEN 3 THEN 'MAR'
-                    WHEN 4 THEN 'APR'
-                    WHEN 5 THEN 'MEI'
-                    WHEN 6 THEN 'JUNI'
-                    WHEN 7 THEN 'JULI'
-                    WHEN 8 THEN 'AGUS'
-                    WHEN 9 THEN 'SEPT'
-                    WHEN 10 THEN 'OKT'
-                    WHEN 11 THEN 'NOV'
-                    WHEN 12 THEN 'DES'
-                END,
-                ' ',
-                YEAR(sales_order.shipping_date)
-            ) AS shipping_date,
+    $salesOrderData = $this->SalesOrderModel->asObject()
+        ->select($soSelectQry)
+        ->join('customers', 'customers.id = sales_order.id_customer', 'left')
+        ->join('metadata', 'metadata.id = sales_order.payment_terms', 'left')
+        ->join('companies', 'companies.id = sales_order.id_company', 'left')
+        ->find($id);
 
-            customers.name AS customerName,
-            customers.phone AS customerPhone,
-            customers.address AS customerAddress,
-            metadata.value AS termin,
-            companies.company
-        ";
-        $salesOrderData = $this->SalesOrderModel->asObject()
-            ->select($soSelectQry)
-            ->join('customers', 'customers.id = sales_order.id_customer', 'left')
-            ->join('metadata', 'metadata.id = sales_order.payment_terms', 'left')
-            ->join('companies', 'companies.id = sales_order.id_company', 'left')
-            ->find($id);
+    /* =========================
+     * FILENAME AMAN
+     * ========================= */
+    $fileNameRaw = 'Order Form_' . $salesOrderData->no_sales_order . '_' . $salesOrderData->customerName;
+    $fileName = preg_replace('/[\/\\\\]+/', '-', $fileNameRaw) . '.pdf';
 
-        $soDet = $this->SalesOrderDetailModel->asObject()
-            ->select('barang_master_sales.barang_name AS namaBarang, barang_master_sales.kode_barang AS kodeBarang, sales_order_detail.qty AS qty, satuans.kode_satuan AS kodeSatuan')
-            ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail.id_barang')
-            ->join('satuans', 'satuans.id = barang_master_sales.satuan_id')
-            ->where('tipe_input', "order_form")
-            ->where('id_sales_order', $id)
-            ->findAll();
+    /* =========================
+     * DETAIL ITEM
+     * ========================= */
+    $soDet = $this->SalesOrderDetailModel->asObject()
+        ->select('
+            barang_master_sales.barang_name AS namaBarang,
+            barang_master_sales.kode_barang AS kodeBarang,
+            sales_order_detail.qty AS qty,
+            satuans.kode_satuan AS kodeSatuan
+        ')
+        ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail.id_barang')
+        ->join('satuans', 'satuans.id = barang_master_sales.satuan_id')
+        ->where('tipe_input', "order_form")
+        ->where('id_sales_order', $id)
+        ->findAll();
 
-        $data = [
-            'companyName'   => $salesOrderData->company,
-            'soData'        => $salesOrderData,
-            'soDet'         => $soDet
-        ];
+    $data = [
+        'companyName' => $salesOrderData->company,
+        'soData'      => $salesOrderData,
+        'soDet'       => $soDet
+    ];
 
+    /* =========================
+     * COUNTER PRINT
+     * ========================= */
+    $this->SalesOrderModel->update(
+        $id,
+        ['counter_print' => $salesOrderData->counter_print + 1]
+    );
 
-        $this->SalesOrderModel->update($id, ['counter_print' => $salesOrderData->counter_print + 1]);
+    /* =========================
+     * DOMPDF OPTION (TIDAK DIUBAH)
+     * ========================= */
+    $options = new \Dompdf\Options();
+    $options->set('isHtml5ParserEnabled', true);
+    $options->set('isRemoteEnabled', true);
+    $options->set('defaultFont', 'DejaVu Sans Mono');
 
+    $domPdf = new \Dompdf\Dompdf($options);
+    $domPdf->loadHtml(view('SalesLokal/OrderForm/print', $data));
+    $domPdf->setPaper('A4', 'landscape');
+    $domPdf->set_option('defaultFont', 'DejaVu Sans Mono');
 
-        // return view('SalesLokal/OrderForm/print', $data);
+    /* =========================
+     * RENDER PDF
+     * ========================= */
+    $domPdf->render();
 
-        $options = new Options();
-        $options->set('isHtml5ParserEnabled', true);
-        $options->set('isRemoteEnabled', true);
-        $options->set('defaultFont', 'DejaVu Sans Mono');
-
-        $domPdf = new Dompdf($options);
-        // $domPdf->loadHtml($html);
-        $domPdf->loadHtml(view('SalesLokal/OrderForm/print', $data));
-
-        // (optional) setup the paper size and orientation
-        $domPdf->setPaper('A4', 'landscape');
-        $domPdf->set_option('defaultFont', 'DejaVu Sans Mono');
-
-        // render html as PDF
-        $domPdf->render();
-
-        // output the generated pdf
-        $domPdf->stream($fileName, array("Attachment" => false));
-
-        exit();
+    /* =========================
+     * SIMPAN KE CACHE SERVER
+     * ========================= */
+    $cacheDir = WRITEPATH . 'pdf_cache/';
+    if (!is_dir($cacheDir)) {
+        mkdir($cacheDir, 0755, true);
     }
+
+    $fullPath = $cacheDir . $fileName;
+    file_put_contents($fullPath, $domPdf->output());
+
+    /* =========================
+     * PREVIEW PDF ASLI (INLINE)
+     * ========================= */
+    return response()
+        ->setHeader('Content-Type', 'application/pdf')
+        ->setHeader('Content-Disposition', 'inline; filename="'.$fileName.'"')
+        ->setHeader('Content-Length', filesize($fullPath))
+        ->setHeader('X-Content-Type-Options', 'nosniff')
+        ->setHeader('Cache-Control', 'private, max-age=0, must-revalidate')
+        ->setHeader('Pragma', 'public')
+        ->setBody(file_get_contents($fullPath));
+}
 
     public function generateNomorSalesOrder()
     {
