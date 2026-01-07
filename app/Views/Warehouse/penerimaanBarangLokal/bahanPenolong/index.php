@@ -77,7 +77,7 @@
                                 <th onclick="changeSort('createdAt')">Tanggal</th>
                                 <th onclick="changeSort('supplier_name')" class="sort">Supplier</th>
                                 <th onclick="changeSort('metadata.value')" class="sort">Dokumen</th>
-                                <th>Jml Item</th>
+                                <!-- <th>Jml Item</th> -->
                                 <th>COA</th>
                                 <th>Action</th>
                             </tr>
@@ -191,12 +191,12 @@
                 data: "bc_type_name",
                 className: "text-left"
             },
-            {
-                data: "itemCount",
-                className: "text-left",
-                searchable: false,
-                sortable: false
-            },
+            // {
+            //     data: "itemCount",
+            //     className: "text-left",
+            //     searchable: false,
+            //     sortable: false
+            // },
             {
                 data: "akun_coa",
                 className: "text-center",

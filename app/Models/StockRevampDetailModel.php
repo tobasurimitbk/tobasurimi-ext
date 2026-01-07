@@ -2928,16 +2928,19 @@ class StockRevampDetailModel extends Model
                 CASE 
                     WHEN stock_revamp_detail.reference_type = 'LPB' THEN concat(penerimaan_barang.no_penerimaan_barang, ' (', am_purchase_orders.po_no, ')')
                     WHEN stock_revamp_detail.reference_type = 'HASIL PRODUKSI' THEN production_results.pr_no
+                    WHEN stock_revamp_detail.reference_type = 'INISIASI' THEN 'INISIASI'
                     ELSE penerimaan_barang.no_penerimaan_barang
                 END AS stock_dokumen,
                 CASE 
                     WHEN stock_revamp_detail.reference_type = 'LPB' THEN penerimaan_barang.tanggal
                     WHEN stock_revamp_detail.reference_type = 'HASIL PRODUKSI' THEN production_results.receive_date
+                    WHEN stock_revamp_detail.reference_type = 'INISIASI' THEN inisiasi_stock_revamp.tanggal
                     ELSE penerimaan_barang.tanggal
                 END AS stock_date,
                 CASE 
                     WHEN stock_revamp_detail.reference_type = 'LPB' THEN bc_purchase_order.no_daftar
                     WHEN stock_revamp_detail.reference_type = 'HASIL PRODUKSI' THEN production_result_details.no_ref
+                    WHEN stock_revamp_detail.reference_type = 'INISIASI' THEN inisiasi_stock_revamp.no_daftar
                     ELSE bc_purchase_order.no_daftar
                 END AS no_daftar,
                 stock_revamp_detail.type_bc as type_bc,
@@ -2955,6 +2958,8 @@ class StockRevampDetailModel extends Model
             ->join('bc_purchase_order_lpb', 'bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id', 'left')
             ->join('bc_purchase_order', 'bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id', 'left')
 
+            ->join('inisiasi_stock_revamp', 'inisiasi_stock_revamp.stock_detail_id = stock_revamp_detail.id', 'left')
+            
             ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id', 'left')
             ->join('barang_master', 'barang_master.id = stock_revamp.barang_master_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock_revamp.spesifikasi_id', 'left')
