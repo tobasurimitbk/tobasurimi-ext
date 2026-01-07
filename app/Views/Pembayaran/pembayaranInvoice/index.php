@@ -12,7 +12,7 @@
 <section class="section">
     <div class="section-header">
         <h1>Pembayaran Invoice</h1>
-        <?php if (can('Transaksi Internasional', 'Pembayaran Invoice', 'c')) : ?>
+        <?php if (can('Transaksi Lokal', 'Pembayaran Invoice', 'c')) : ?>
             <button class="btn btn-discard float-right" 
                     type="button" 
                     id="dropdownMenuButtonExport"
