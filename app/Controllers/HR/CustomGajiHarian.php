@@ -91,11 +91,10 @@ class CustomGajiHarian extends BaseController
                 "divisi" => $p->divisi,
                 "nama_bagian" => $p->nama_bagian,
                 "tanggal" => date('d/m/Y', strtotime($p->tanggal)),
-                "checkin" => $p->checkin,
-                "checkout" => $p->checkout,
+                "nominal_gaji_harian" => (float)$p->nominal_gaji_harian,
+                "nominal_cadangan" => (float)$p->nominal_cadangan,
                 "nominal" => (float)$p->nominal,
                 "keterangan" => $p->keterangan,
-                "total_jam" => (float)$p->total_jam
             ]);
         }
         $data = [
@@ -118,6 +117,8 @@ class CustomGajiHarian extends BaseController
             $tanggal = formatDMYtoYMD($this->request->getVar('tanggal'));
             $keterangan = $this->request->getVar('keterangan');
             $nominal = $this->request->getVar('nominal');
+            $nominalGajiHarian = $this->request->getVar('nominal_gaji_harian');
+            $nominalCadangan = $this->request->getVar('nominal_cadangan');
             $checkIn = $this->request->getVar('checkin');
             $checkOut = $this->request->getVar('checkout');
             $totalJam = $this->request->getVar('total_jam');
@@ -142,6 +143,8 @@ class CustomGajiHarian extends BaseController
                 'tanggal' => $tanggal,
                 'keterangan' => $keterangan,
                 'nominal' => $nominal,
+                'nominal_gaji_harian' => $nominalGajiHarian,
+                'nominal_cadangan' => $nominalCadangan,
                 'checkin' => $checkIn,
                 'checkout' => $checkOut,
                 'total_jam' => $totalJam
@@ -173,6 +176,8 @@ class CustomGajiHarian extends BaseController
             $tanggal = formatDMYtoYMD($this->request->getVar('tanggal'));
             $keterangan = $this->request->getVar('keterangan');
             $nominal = $this->request->getVar('nominal');
+            $nominalGajiHarian = $this->request->getVar('nominal_gaji_harian');
+            $nominalCadangan = $this->request->getVar('nominal_cadangan');
             $checkIn = $this->request->getVar('checkin');
             $checkOut = $this->request->getVar('checkout');
             $totalJam = $this->request->getVar('total_jam');
@@ -198,6 +203,8 @@ class CustomGajiHarian extends BaseController
                 'tanggal' => $tanggal,
                 'keterangan' => $keterangan,
                 'nominal' => $nominal,
+                'nominal_gaji_harian' => $nominalGajiHarian,
+                'nominal_cadangan' => $nominalCadangan,
                 'checkin' => $checkIn,
                 'checkout' => $checkOut,
                 'total_jam' => $totalJam
@@ -327,7 +334,9 @@ class CustomGajiHarian extends BaseController
                     'checkin'   => $checkIn,
                     'checkout'  => $checkOut,
                     'total_jam' => $totalJamKerja,
-                    'nominal'   => round($nominal, 2),
+                    'nominal_gaji_harian' => (float)$gajiHarian,
+                    'nominal_cadangan' => (float)$cadangan,
+                    'nominal'   => (float)round($nominal, 2),
                 ],
                 'token'  => csrf_hash()
             ]);
