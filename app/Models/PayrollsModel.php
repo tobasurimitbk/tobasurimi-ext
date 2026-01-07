@@ -1036,31 +1036,49 @@ class PayrollsModel extends Model
         $lembur = 0;
         $jamKerja = 0;
 
+        //         SUM(CASE
+        //     WHEN COALESCE(payroll_gaji_harian.nominal_diterima, 0) = 0 THEN 0
+        //     ELSE
+        //         COALESCE(payroll_gaji_harian.nominal_diterima, 0)
+        //         - COALESCE(payroll_gaji_harian.nominal_cadangan, 0)
+        // END) AS upahPokok
+
         foreach ($bagianData as $i => $b) {
             //----------------------------------------------------
             $selectQry = "
-                SUM(CASE
-                    WHEN COALESCE(payroll_gaji_harian.nominal_diterima, 0) = 0 THEN 0
-                    ELSE
-                        COALESCE(payroll_gaji_harian.nominal_diterima, 0)
-                        - COALESCE(payroll_gaji_harian.nominal_cadangan, 0)
-                END) AS upahPokok
+                SUM(
+                    CASE
+                        WHEN COALESCE(payroll_gaji_harian.nominal_diterima, 0) = 0 THEN 0
+
+                        WHEN payroll_custom_gaji_harian.id IS NOT NULL THEN
+                            COALESCE(payroll_gaji_harian.nominal_diterima, 0)
+
+                        ELSE
+                            COALESCE(payroll_gaji_harian.nominal_diterima, 0)
+                            - COALESCE(payroll_gaji_harian.nominal_cadangan, 0)
+                    END
+                ) AS upahPokok
             ";
 
-
-            $upahPokokQry = $payrollGajiHarianModel->select($selectQry)
+            $upahPokokQry = $payrollGajiHarianModel
+                ->select($selectQry)
                 ->join('payrolls', 'payrolls.id = payroll_gaji_harian.payroll_id', 'left')
                 ->join('employees', 'employees.id = payrolls.employee_id', 'left')
+                ->join(
+                    'payroll_custom_gaji_harian',
+                    'payroll_custom_gaji_harian.employee_id = payroll_gaji_harian.employee_id
+                    AND payroll_custom_gaji_harian.tanggal = payroll_gaji_harian.tanggal',
+                    'left'
+                )
                 ->where('payrolls.year_month', $yearMonth)
                 ->where('employees.company_id', $companyID)
                 ->where('employees.bagian_id', $b['id']);
-
 
             if (count($tipes) > 0) {
                 $upahPokokQry->whereIn('employees.tipe', $tipes);
             }
 
-            $employeeUpahPokokTotal = $upahPokokQry->groupBy('employees.bagian_id')->findAll();
+            $employeeUpahPokokTotal = $upahPokokQry->findAll();
 
             //---------------------------------------------------
             $selectQry = "
