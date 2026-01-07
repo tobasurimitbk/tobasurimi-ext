@@ -1017,6 +1017,7 @@ class PayrollsModel extends Model
         $divisiModel = new DivisisModel();
         $companyModel = new CompaniesModel();
         $bagianModel = new BagianModel();
+        $payrollGajiHarianModel = new PayrollGajiHarianModel();
 
         $bagianQry = $bagianModel->where('division_id', $divisionID)->where('deletedAt', null);
         if (!empty($bagianID) && $bagianID != '') {
@@ -1036,9 +1037,35 @@ class PayrollsModel extends Model
         $jamKerja = 0;
 
         foreach ($bagianData as $i => $b) {
+            //----------------------------------------------------
+            $selectQry = "
+                SUM(CASE
+                    WHEN COALESCE(payroll_gaji_harian.nominal_diterima, 0) = 0 THEN 0
+                    ELSE
+                        COALESCE(payroll_gaji_harian.nominal_diterima, 0)
+                        - COALESCE(payroll_gaji_harian.nominal_cadangan, 0)
+                END) AS upahPokok
+            ";
+
+
+            $upahPokokQry = $payrollGajiHarianModel->select($selectQry)
+                ->join('payrolls', 'payrolls.id = payroll_gaji_harian.payroll_id', 'left')
+                ->join('employees', 'employees.id = payrolls.employee_id', 'left')
+                ->where('payrolls.year_month', $yearMonth)
+                ->where('employees.company_id', $companyID)
+                ->where('employees.bagian_id', $b['id']);
+
+
+            if (count($tipes) > 0) {
+                $upahPokokQry->whereIn('employees.tipe', $tipes);
+            }
+
+            $employeeUpahPokokTotal = $upahPokokQry->groupBy('employees.bagian_id')->findAll();
+
+            //---------------------------------------------------
             $selectQry = "
                 COUNT(DISTINCT payrolls.employee_id) AS totalEmployee, 
-                SUM(nominal_gaji_harian * hadir_final) AS upahPokok, 
+                '0' AS upahPokok, 
                 SUM(nominal_penambahan_gaji) AS tunjangan,
                 SUM(nominal_cadangan * hadir_final) AS skala_upah,
                 SUM(nominal_uang_lembur) AS lembur,
@@ -1059,9 +1086,9 @@ class PayrollsModel extends Model
             if ($employeePayrollTotal[0]['totalEmployee'] != 0) {
 
                 // update value
-                $totalUpahBersihSingle = $employeePayrollTotal[0]['upahPokok'] - $employeePayrollTotal[0]['potongan'];
-                $totalUpahSingle = $totalUpahBersihSingle + $employeePayrollTotal[0]['potongan'];
-
+                $employeePayrollTotal[0]['upahPokok'] = $employeeUpahPokokTotal[0]['upahPokok'];
+                $totalUpahSingle =  $employeePayrollTotal[0]['upahPokok'] + $employeePayrollTotal[0]['skala_upah']; // Total Upah = Upah Pokok + skala
+                $totalUpahBersihSingle = $totalUpahSingle - $employeePayrollTotal[0]['potongan']; // uPAH BERSIH = total upah - potongan
 
                 $employeePayrollTotal[0]['total_upah'] = $totalUpahSingle;
                 $employeePayrollTotal[0]['upahBersih'] = $totalUpahBersihSingle;
