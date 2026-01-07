@@ -122,8 +122,8 @@ class Kurs extends BaseController
                 $valas =  $this->request->getPost("valas");
 
                 // VALIDATION DATE STRAT AND END
-                $startDate = $this->request->getPost("start_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("start_date")))) : "";
-                $endDate = $this->request->getPost("end_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("end_date")))) : "";
+                $startDate = formatDMYtoYMD($this->request->getPost("start_date"));
+                $endDate = formatDMYtoYMD($this->request->getPost("end_date"));
                 if (strtotime($startDate) > strtotime($endDate)) {
                     $data = [
                         "status"            => false,
@@ -147,13 +147,13 @@ class Kurs extends BaseController
 
                 $values = [
                     "metadata_id" => $id_metadata,
-                    "nilai_kurs" => formatter($this->request->getPost("nilai_kurs"), "CURR_TO_INT"),
-                    "start_date" => $this->request->getPost("start_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("start_date")))) : "",
-                    "end_date" => $this->request->getPost("end_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("end_date")))) : "",
+                    "nilai_kurs" => $this->request->getPost("nilai_kurs"),
+                    "start_date" => formatDMYtoYMD($this->request->getPost("start_date")),
+                    "end_date" => formatDMYtoYMD($this->request->getPost("end_date")),
                 ];
 
                 // CHECK CURRENT KURS
-                $check = $this->KursModel->check_current("", $id_metadata, $this->request->getPost("end_date"));
+                $check = $this->KursModel->check_current("", $id_metadata, $endDate);
 
                 if ($check > 0) {
                     $message = 'Kurs Sedang Berjalan';
@@ -243,8 +243,8 @@ class Kurs extends BaseController
                 $valas =  $this->request->getPost("valas");
 
                 // VALIDATION DATE STRAT AND END
-                $startDate = $this->request->getPost("start_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("start_date")))) : "";
-                $endDate = $this->request->getPost("end_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("end_date")))) : "";
+                $startDate = formatDMYtoYMD($this->request->getPost("start_date"));
+                $endDate = formatDMYtoYMD($this->request->getPost("end_date"));
                 if (strtotime($startDate) > strtotime($endDate)) {
                     $data = [
                         "status"            => false,
@@ -268,13 +268,13 @@ class Kurs extends BaseController
 
                 $values = [
                     "metadata_id" => $id_metadata,
-                    "nilai_kurs" => formatter($this->request->getPost("nilai_kurs"), "CURR_TO_INT"),
-                    "start_date" => $this->request->getPost("start_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("start_date")))) : "",
-                    "end_date" => $this->request->getPost("end_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getPost("end_date")))) : "",
+                    "nilai_kurs" => $this->request->getPost("nilai_kurs"),
+                    "start_date" => formatDMYtoYMD($this->request->getPost("start_date")),
+                    "end_date" => formatDMYtoYMD($this->request->getPost("end_date")),
                 ];
 
                 // CHECK CURRENT KURS
-                $check = $this->KursModel->check_current($id, $id_metadata, $this->request->getPost("end_date"));
+                $check = $this->KursModel->check_current($id, $id_metadata, $endDate);
 
                 if ($check > 0) {
                     $message = 'Kurs Sedang Berjalan';

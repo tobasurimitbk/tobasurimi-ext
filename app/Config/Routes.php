@@ -44,8 +44,8 @@ $routes->get('/403', function () {
     return view('errors/html/error_403');
 });
 
-$routes->get('/repair-stock-mutasi', 'Warehouse\Penomoran_::repairStockMutasi');
-$routes->get('/stock-bp', 'Warehouse\Penomoran_::stockBpView');
+$routes->post('/update-tgl-stock', 'Warehouse\Penomoran_::updateTglStock');
+$routes->get('/generate-tgl-stock-view', 'Warehouse\Penomoran_::generateTglStockView');
 $routes->post('/stock-bp', 'Warehouse\Penomoran_::stockBpAction');
 
 // $routes->get('/generate-stock-revamp-nonpabean', 'Warehouse\Penomoran_::generateStokRevampNonPabean');
@@ -162,7 +162,7 @@ $routes->post('/penomoran-rak/save', 'Master\PenomoranRak::savePenomoranRak', ['
 $routes->post('/penomoran-rak/update', 'Master\PenomoranRak::updatePenomoranRak', ['filter' => 'Auth']);
 $routes->post('/penomoran-rak/delete', 'Master\PenomoranRak::deletePenomoranRak', ['filter' => 'Auth']);
 
-// ACCOUNT
+// ACCOUNT  
 $routes->get('/account', 'Master\Account::account', ['filter' => 'Auth']);
 
 $routes->get('/kategori-account/all', 'Master\Account::allKategoriAccount', ['filter' => 'Auth']);
@@ -227,6 +227,7 @@ $routes->get('/kurs/getNilaiKurs/(:segment)', 'Master\Kurs::getKurs/$1', ['filte
 $routes->post('/kurs/save', 'Master\Kurs::save', ['filter' => 'Auth']);
 $routes->post('/kurs/update', 'Master\Kurs::update', ['filter' => 'Auth']);
 $routes->post('/kurs/delete', 'Master\Kurs::delete', ['filter' => 'Auth']);
+$routes->get('/kurs/tarik-otomatis', 'BeaCukai\BC23::getValuta', ['filter' => 'Auth']);
 
 // KAWASAN
 // $routes->get('/kawasan-warehouse', 'Master\Kawasan::index', ['filter' => 'Auth']);
