@@ -1903,17 +1903,37 @@ class StockRevampModel extends Model
         $divisi_id,
         $warehouse_id,
         $spesifikasi_id,
-        $unit_id
+        $unit_id,
+        $tanggal = null
     ) {
-        $stockSudahInisiasi = $this->asArray()
-            ->select('stock_revamp.*')
-            ->where('stock_revamp.company_id', $company_id)
-            ->where('stock_revamp.divisi_id', $divisi_id)
-            ->where('stock_revamp.warehouse_id', $warehouse_id)
-            ->where('stock_revamp.spesifikasi_id', $spesifikasi_id)
-            ->where('stock_revamp.unit_id', $unit_id)
-            ->where('stock_revamp.deletedAt', null)
-            ->first();
+        if ($tanggal == null) {
+            // cek parent
+            $stockSudahInisiasi = $this->asArray()
+                ->select('stock_revamp.*')
+                ->where('stock_revamp.company_id', $company_id)
+                ->where('stock_revamp.divisi_id', $divisi_id)
+                ->where('stock_revamp.warehouse_id', $warehouse_id)
+                ->where('stock_revamp.spesifikasi_id', $spesifikasi_id)
+                ->where('stock_revamp.unit_id', $unit_id)
+                ->where('stock_revamp.deletedAt', null)
+                ->first();
+        } else {
+            // inisiasi beda tanggal
+            $stockSudahInisiasi = $this->asArray()
+                ->select('stock_revamp.*')
+                ->join('stock_revamp_detail', 'stock_revamp_detail.stock_id = stock_revamp.id', 'left')
+                ->join('inisiasi_stock_revamp', 'inisiasi_stock_revamp.stock_detail_id = stock_revamp_detail.id', 'left')
+                ->where('stock_revamp_detail.reference_type', "INISIASI")
+                ->where('inisiasi_stock_revamp.tanggal', $tanggal)
+                ->where('stock_revamp.company_id', $company_id)
+                ->where('stock_revamp.divisi_id', $divisi_id)
+                ->where('stock_revamp.warehouse_id', $warehouse_id)
+                ->where('stock_revamp.spesifikasi_id', $spesifikasi_id)
+                ->where('stock_revamp.unit_id', $unit_id)
+                ->where('stock_revamp.deletedAt', null)
+                ->first();
+        }
+
         return $stockSudahInisiasi;
     }
 

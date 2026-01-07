@@ -108,8 +108,8 @@
                         <tr>
                             <td><?= $d['bagian'] ?></td>
                             <td><?= $d['payrollTotal'][0]['totalEmployee'] ?></td>
-                            <td><?= number_format($d['payrollTotal'][0]['upahBersih'], 2, ',', '.')  ?></td>
-                            <td><?= number_format(($d['payrollTotal'][0]['tunjangan'] + $d['payrollTotal'][0]['skala_upah']), 2, ',', '.')  ?></td>
+                            <td><?= number_format($d['payrollTotal'][0]['upahPokok'], 2, ',', '.')  ?></td>
+                            <td><?= number_format(($d['payrollTotal'][0]['skala_upah']), 2, ',', '.')  ?></td>
                             <td><?= number_format(($d['payrollTotal'][0]['lembur']), 2, ',', '.')  ?></td>
                             <!-- <td><?= number_format(0, 2, ',', '.')  ?></td> -->
                             <td><?= number_format($d['payrollTotal'][0]['total_upah'], 2, ',', '.')  ?></td>
