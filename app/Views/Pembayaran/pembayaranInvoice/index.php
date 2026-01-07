@@ -226,7 +226,7 @@
                     form += ` <div class="mt-0">`;
                     if (status_posting == '0') {
                         form += `
-                            <?php if (can('Transaksi Internasional', 'Pembayaran Invoice', 'd')) : ?>
+                            <?php if (can('Transaksi Lokal', 'Pembayaran Invoice', 'd')) : ?>
                                 <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
                                     <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                                 </button>
@@ -234,7 +234,7 @@
                         `;
 
                         form += `
-                            <?php if (can('Transaksi Internasional', 'Pembayaran Invoice', 'a')) : ?>
+                            <?php if (can('Transaksi Lokal', 'Pembayaran Invoice', 'a')) : ?>
                                 <button data-toggle="tooltip" title="Posting" onclick="posting('${id}', 1)" class="btn btn-success posting-spp">
                                     <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
                                 </button>
@@ -242,7 +242,7 @@
                         `;
                     } else {
                         form += `
-                            <?php if (can('Transaksi Internasional', 'Pembayaran Invoice', 'a')) : ?>
+                            <?php if (can('Transaksi Lokal', 'Pembayaran Invoice', 'a')) : ?>
                                 <button data-toggle="tooltip" title="Unposting" onclick="unposting('${id}', 1)" class="btn btn-warning unposting-spp">
                                     <i class="fa fa-undo fa-sm" aria-hidden="true"></i>
                                 </button>
