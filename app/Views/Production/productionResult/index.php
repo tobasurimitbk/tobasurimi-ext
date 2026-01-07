@@ -188,10 +188,13 @@
                     if (status != 1) {
                         return `
                                 <div class="mt-0">
+                                    <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
                                     <button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash">
                                         <i class="fa fa-trash"></i>
                                     </button>
-                                    <button class="btn btn-warning">
+                                    <button class="btn btn-warning" onclick="handlePrint('${id}')">
                                         <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                     </button>
                                     <button type="button" class="btn btn-success" onclick="posting('${id}', 1)">
@@ -202,7 +205,10 @@
                     } else {
                         return `
                                 <div class="mt-0">
-                                    <button class="btn btn-warning">
+                                    <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button class="btn btn-warning" onclick="handlePrint('${id}')">
                                         <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                     </button>
                                 </div>
@@ -250,13 +256,6 @@
 
         $('.btn-hide-form').on('click', function() {
             $('#export_hasil_produksi').modal('hide');
-        });
-
-        $('.dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-            const data = table.row(this).data();
-            if (data) {
-                location.replace(`<?= base_url("production-result/details/"); ?>${data.id}`);
-            }
         });
     })
 
@@ -332,6 +331,15 @@
                 });
             }
         })
+    }
+
+    const handlePrint = function(id) {
+        window.open("<?= base_url("production-result/print"); ?>" + '/' + id, "_blank");
+    }
+    
+    // Simpan state sebelum navigasi
+    function edit(id) {
+        location.replace(`<?= base_url("production-result/details"); ?>/${id}`);
     }
 
     // delete

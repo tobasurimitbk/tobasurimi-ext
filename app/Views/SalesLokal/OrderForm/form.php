@@ -1732,8 +1732,14 @@
                                             cancelButtonColor: '#dc3545', // Merah
                                         }).then((result) => {
                                             if (result.isConfirmed) {
-                                                // Cetak
-                                                window.location.href = `<?= base_url("order-form-lokal/print"); ?>/${response.id}`;
+                                                const link = document.createElement('a');
+                                                link.href = `<?= base_url("order-form-lokal/print"); ?>/${response.id}`;
+                                                link.target = '_blank';
+                                                document.body.appendChild(link);
+                                                link.click();
+                                                document.body.removeChild(link);
+
+                                                window.location.href = `<?= base_url("order-form-lokal/create"); ?>`;
                                             } else if (result.isDenied) {
                                                 // Buat baru
                                                 window.location.href = `<?= base_url("order-form-lokal/create"); ?>`;
@@ -1806,8 +1812,14 @@
                                             cancelButtonColor: '#dc3545', // Merah
                                         }).then((result) => {
                                             if (result.isConfirmed) {
-                                                // Cetak
-                                                window.location.href = `<?= base_url("order-form-lokal/print"); ?>/${response.id}`;
+                                                const link = document.createElement('a');
+                                                link.href = `<?= base_url("order-form-lokal/print"); ?>/${response.id}`;
+                                                link.target = '_blank';
+                                                document.body.appendChild(link);
+                                                link.click();
+                                                document.body.removeChild(link);
+
+                                                window.location.href = `<?= base_url("order-form-lokal/create"); ?>`;
                                             } else if (result.isDenied) {
                                                 // Buat baru
                                                 window.location.reload();

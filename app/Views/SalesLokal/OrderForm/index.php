@@ -562,7 +562,7 @@
             let filter_surat_jalan = $(".filter_surat_jalan").val();
             let filter_invoice = $(".filter_invoice").val();
 
-            let exportUrl = `/lyrid/order-form-lokal/export-excel?search=${encodeURIComponent(search)}&sort=${sort}&sortType=${sortType}&dateStart=${encodeURIComponent(dateStart)}&dateEnd=${encodeURIComponent(dateEnd)}&filter_customer=${filter_customer}&filter_company=${filter_company}&filter_surat_jalan=${filter_surat_jalan}&filter_invoice=${filter_invoice}`;
+            let exportUrl = `/order-form-lokal/export-excel?search=${encodeURIComponent(search)}&sort=${sort}&sortType=${sortType}&dateStart=${encodeURIComponent(dateStart)}&dateEnd=${encodeURIComponent(dateEnd)}&filter_customer=${filter_customer}&filter_company=${filter_company}&filter_surat_jalan=${filter_surat_jalan}&filter_invoice=${filter_invoice}`;
 
             window.open(exportUrl, '_blank');
         });
