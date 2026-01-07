@@ -190,18 +190,18 @@ class JurnalUmumModel extends Model
         // 3️⃣ Query ke jurnal umum pakai semua id dan scope company
         $row = $this
             ->select('COALESCE(SUM(jurnal_umum.debit),0) AS total_debit, COALESCE(SUM(jurnal_umum.kredit),0) AS total_kredit')
-            ->where('jurnal_umum.tanggal_jurnal <', $where['tanggal_awal'])
+            ->join('transaksi_jurnal', 'transaksi_jurnal.id = jurnal_umum.id_transaksi')
             ->whereIn('jurnal_umum.id_coa', $relatedSubIds)
             ->whereIn('jurnal_umum.company_id', $companyId)
+            ->where('transaksi_jurnal.type_transaksi', 1404)
             ->where('jurnal_umum.deletedAt', null)
+            ->where('transaksi_jurnal.deleted_at', null)
             ->get()
             ->getRowArray();
 
         $totalDebit  = (float) ($row['total_debit'] ?? 0);
         $totalKredit = (float) ($row['total_kredit'] ?? 0);
 
-        // var_dump($totalDebit, $totalKredit);
-        // die;
 
         return $totalDebit - $totalKredit;
     }
