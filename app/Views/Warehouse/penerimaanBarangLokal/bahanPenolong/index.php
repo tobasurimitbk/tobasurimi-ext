@@ -173,7 +173,23 @@
                 data: "spp_no",
                 className: "text-left",
                 searchable: false,
-                sortable: false
+                sortable: false,
+                render: function(data, type, row) {
+                    if (!data) return "";
+
+                    let list = data.split(",").map(v => v.trim());
+                    let result = "";
+                    for (let i = 0; i < list.length; i++) {
+                        result += list[i];
+                        if ((i + 1) % 2 === 0) {
+                            result += "<br>"; // turun ke bawah
+                        } else if (i < list.length - 1) {
+                            result += ", ";
+                        }
+                    }
+
+                    return result;
+                }
             },
             {
                 data: "warehouse_name",
