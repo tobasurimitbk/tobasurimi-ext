@@ -171,9 +171,8 @@
                         <th class="table-border table-font-size"><b class="table-font-size">Nama Barang</b></th>
                         <th class="table-border table-font-size" style="width: 60px;"><b class="table-font-size">Qty</b></th>
                         <th class="table-border table-font-size"><b class="table-font-size">Keterangan</b></th>
-                        <th class="table-border table-font-size" style="width: 80px;"><b class="table-font-size">Supplier</b></th>
-                        <th class="table-border table-font-size" style="width: 80px;"><b class="table-font-size">Harga</b></th>
-
+                        <!-- <th class="table-border table-font-size" style="width: 80px;"><b class="table-font-size">Supplier</b></th> -->
+                        <th class="table-border table-font-size" style="width: 160px; text-align:center" colspan="2"><b class="table-font-size">Harga</b></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -275,9 +274,8 @@
                     <th class="table-border table-font-size"><b class="table-font-size">Nama Barang</b></th>
                     <th class="table-border table-font-size" style="width: 60px;"><b class="table-font-size">Qty</b></th>
                     <th class="table-border table-font-size"><b class="table-font-size">Keterangan</b></th>
-                    <th class="table-border table-font-size" style="width: 80px;"><b class="table-font-size">Supplier</b></th>
-                    <th class="table-border table-font-size" style="width: 80px;"><b class="table-font-size">Harga</b></th>
-
+                    <!-- <th class="table-border table-font-size" style="width: 80px;"><b class="table-font-size">Supplier</b></th> -->
+                    <th class="table-border table-font-size" style="width: 160px; text-align:center" colspan="2"><b class="table-font-size">Harga</b></th>
                 </tr>
             </thead>
             <tbody>

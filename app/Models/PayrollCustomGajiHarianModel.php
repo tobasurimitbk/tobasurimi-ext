@@ -48,11 +48,10 @@ class PayrollCustomGajiHarianModel extends Model
             'employees.division_id' => 'employees.division_id',
             'employees.bagian_id' => 'employees.bagian_id',
             'payroll_custom_gaji_harian.tanggal' => 'payroll_custom_gaji_harian.tanggal',
+            'payroll_custom_gaji_harian.nominal_gaji_harian' => 'payroll_custom_gaji_harian.nominal_gaji_harian',
+            'payroll_custom_gaji_harian.nominal_cadangan' => 'payroll_custom_gaji_harian.nominal_cadangan',
             'payroll_custom_gaji_harian.nominal' => 'payroll_custom_gaji_harian.nominal',
             'payroll_custom_gaji_harian.keterangan' => 'payroll_custom_gaji_harian.keterangan',
-            'payroll_custom_gaji_harian.checkin' => 'payroll_custom_gaji_harian.checkin',
-            'payroll_custom_gaji_harian.checkout' => 'payroll_custom_gaji_harian.checkout',
-            'payroll_custom_gaji_harian.total_jam' => 'payroll_custom_gaji_harian.total_jam',
         ];
 
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
@@ -141,7 +140,11 @@ class PayrollCustomGajiHarianModel extends Model
         $mapCustomGajiHarian = [];
         foreach ($gajiHarianCustom as $g) {
             if (!isset($mapCustomGajiHarian[$g['employee_id']][$g['tanggal']])) {
-                $mapCustomGajiHarian[$g['employee_id']][$g['tanggal']] = $g['nominal'];
+                $mapCustomGajiHarian[$g['employee_id']][$g['tanggal']] = [
+                    'nominal' => $g['nominal'],
+                    'nominal_gaji_harian' => $g['nominal_gaji_harian'],
+                    'nominal_cadangan' => $g['nominal_cadangan']
+                ];
             }
         }
 

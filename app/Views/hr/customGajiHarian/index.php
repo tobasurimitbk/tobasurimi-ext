@@ -45,11 +45,10 @@
                                 <th onclick="changeSort('employees.nip')" class="sort">NIP</th>
                                 <th onclick="changeSort('employees.name')" class="sort">Karyawan</th>
                                 <th onclick="changeSort('employees.division_id')" class="sort">Dept</th>
-                                <th onclick="changeSort('employees.division_id')" class="sort">Bagian</th>
+                                <th onclick="changeSort('employees.bagian_id')" class="sort">Bagian</th>
                                 <th onclick="changeSort('payroll_custom_gaji_harian.tanggal')" class="sort">Tgl</th>
-                                <th onclick="changeSort('payroll_custom_gaji_harian.checkin')" class="sort">Masuk</th>
-                                <th onclick="changeSort('payroll_custom_gaji_harian.checkout')" class="sort">Pulang</th>
-                                <th onclick="changeSort('payroll_custom_gaji_harian.total_jam')" class="sort">Total Jam</th>
+                                <th onclick="changeSort('payroll_custom_gaji_harian.nominal_gaji_harian')" class="sort">Gaji Harian</th>
+                                <th onclick="changeSort('payroll_custom_gaji_harian.nominal_cadangan')" class="sort">Skala Upah</th>
                                 <th onclick="changeSort('payroll_custom_gaji_harian.nominal')" class="sort">Nominal</th>
                                 <th onclick="changeSort('payroll_custom_gaji_harian.keterangan')" class="sort">Keterangan</th>
                                 <th class="sort">Action</th>
@@ -122,14 +121,17 @@
             data: "tanggal",
             className: "text-left"
         }, {
-            data: "checkin",
-            className: "text-left"
+            data: "nominal_gaji_harian",
+            className: "text-left",
+            render: function(data) {
+                return greatFormatRupiah(data);
+            }
         }, {
-            data: "checkout",
-            className: "text-left"
-        }, {
-            data: "total_jam",
-            className: "text-left"
+            data: "nominal_cadangan",
+            className: "text-left",
+            render: function(data) {
+                return greatFormatRupiah(data);
+            }
         }, {
             data: "nominal",
             className: "text-left",
