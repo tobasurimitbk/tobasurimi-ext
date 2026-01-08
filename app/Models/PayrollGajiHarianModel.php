@@ -142,22 +142,25 @@ class PayrollGajiHarianModel extends Model
             }
 
             // nominal gaji harian & cadangan per employee (fallback 0)
-            $nominalGajiHarian = $mapGajiHarian[$employeeID] ?? 0;
-            $nominalGajiCadangan = $mapGajiCadangan[$employeeID] ?? 0;
-
-            // rumus yang kamu pakai: ((gajiHarian + gajiCadangan) / 7) * totalJamKerja
-            // $nominalDiterima = (($nominalGajiHarian + $nominalGajiCadangan) / 7) * $totalJamKerja;
+            // $nominalGajiHarian = $mapGajiHarian[$employeeID] ?? 0;
+            // $nominalGajiCadangan = $mapGajiCadangan[$employeeID] ?? 0;
+            // $nominalDiterima =  $nominalGajiHarian + $nominalGajiCadangan;
 
             if ($p['isApproved'] && !in_array($p['status'], ["LIBUR_L", "ALPHA_A"]) && $statusLibur == false) {
                 // Di Approved Wajib Dibayar
                 // gaji harian + tambahan
                 // $nominalDiterima = $nominalGajiHarian + $nominalGajiCadangan;
-                $nominalDiterima = $mapCustomGajiHarian[$employeeID][$tanggal] ?? $nominalGajiHarian + $nominalGajiCadangan;
+                $customGajiHarian = $mapCustomGajiHarian[$employeeID][$tanggal] ?? null;
+
+                $nominalGajiHarian = $customGajiHarian != null ? $customGajiHarian['nominal_gaji_harian'] : ($mapGajiHarian[$employeeID] ?? 0);
+                $nominalGajiCadangan = $customGajiHarian != null ? $customGajiHarian['nominal_cadangan'] : ($mapGajiCadangan[$employeeID] ?? 0);
+                $nominalDiterima = $customGajiHarian != null ? $customGajiHarian['nominal'] : ($nominalGajiHarian + $nominalGajiCadangan);
             } else {
                 // ga di approve 
                 $nominalDiterima = 0;
+                $nominalGajiHarian = 0;
+                $nominalGajiCadangan = 0;
             }
-
 
             $insertRows[] = [
                 'company_id' => $companyId,

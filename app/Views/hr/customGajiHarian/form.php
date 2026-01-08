@@ -77,6 +77,18 @@
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
+                            <input value="<?= (!empty($customGajiHarian)) ? number_format($customGajiHarian['nominal_gaji_harian'], 2) : "" ?>" type="text" class="form-control nominal_gaji_harian" oninput="this.value = greatFormatRupiah(this.value)" id="nominal_gaji_harian" name="nominal_gaji_harian" placeholder="Gaji Harian">
+                            <label for="floatingInput">Gaji Harian</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input value="<?= (!empty($customGajiHarian)) ? number_format($customGajiHarian['nominal_cadangan'], 2) : "" ?>" type="text" class="form-control nominal_cadangan" oninput="this.value = greatFormatRupiah(this.value)" id="nominal_cadangan" name="nominal_cadangan" placeholder="Cadangan">
+                            <label for="floatingInput">Skala Upah</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating mb-3" style="height: 50px;">
                             <input value="<?= (!empty($customGajiHarian)) ? number_format($customGajiHarian['nominal'], 2) : "" ?>" type="text" class="form-control nominal" oninput="this.value = greatFormatRupiah(this.value)" id="nominal" name="nominal" placeholder="Nominal">
                             <label for="floatingInput">Nominal</label>
                         </div>
@@ -149,6 +161,14 @@
         autoclose: true
     });
 
+    $('#nominal_gaji_harian,#nominal_cadangan').keyup((e) => {
+        e.preventDefault();
+        var nominalGajiHarian = destroyFormatRupiah($('#nominal_gaji_harian').val());
+        var nominalCadangan = destroyFormatRupiah($('#nominal_cadangan').val());
+        var result = parseFloat(nominalCadangan + nominalGajiHarian).toFixed(2);
+        $('#nominal').val(greatFormatRupiah(result));
+    })
+
     var validator = $(".create-form").validate({
         rules: {
             employee_id: {
@@ -160,9 +180,12 @@
             checkin: {
                 required: true
             },
-            // checkout: {
-            //     required: true
-            // },
+            nominal_gaji_harian: {
+                required: true
+            },
+            nominal_cadangan: {
+                required: true
+            },
             nominal: {
                 required: true
             },
@@ -177,9 +200,12 @@
             checkin: {
                 required: "Checkin wajib diisi"
             },
-            // checkout: {
-            //     required: "Checkout wajib diisi"
-            // },
+            nominal_gaji_harian: {
+                required: "Gaji harian wajib diisi"
+            },
+            nominal_cadangan: {
+                required: "Skala upah wajib diisi"
+            },
             nominal: {
                 required: "Nominal wajib diisi"
             },
@@ -212,7 +238,11 @@
             let data = new FormData(document.querySelector(".create-form"));
             let url = id == '' ? "<?= base_url("custom-gaji-harian/save"); ?>" : "<?= base_url("custom-gaji-harian/update"); ?>";
             let nominal = destroyFormatRupiah($('#nominal').val());
+            let nominalGajiHarian = destroyFormatRupiah($('#nominal_gaji_harian').val());
+            let nominalCadangan = destroyFormatRupiah($('#nominal_cadangan').val());
             data.set('nominal', nominal);
+            data.set("nominal_gaji_harian", nominalGajiHarian);
+            data.set("nominal_cadangan", nominalCadangan);
 
             $.ajax({
                 url: url,
@@ -245,6 +275,8 @@
                                 // Tidak Buat Lagi Reset Form
                                 $('#employee_id').val(null).change();
                                 $('#tanggal').val(null);
+                                $('#nominal_gaji_harian').val(null);
+                                $('#nominal_cadangan').val(null);
                                 $('#nominal').val(null);
                                 $('#checkin').val(null);
                                 $('#checkout').val(null);
@@ -303,6 +335,9 @@
                         });
                         $('#checkout').val(null);
                         $('#checkin').val(null);
+                        $('#nominal_gaji_harian').val(null);
+                        $('#nominal_cadangan').val(null);
+                        $('#nominal').val(null);
                         $('#total_jam').val(null);
 
                         return;
@@ -311,6 +346,8 @@
                         var totalJam = parseFloat(data.total_jam).toFixed(2);
                         $('#checkout').val(data.checkout);
                         $('#checkin').val(data.checkin);
+                        $('#nominal_gaji_harian').val(greatFormatRupiah(data.nominal_gaji_harian));
+                        $('#nominal_cadangan').val(greatFormatRupiah(data.nominal_cadangan));
                         $('#total_jam').val(totalJam);
                         $('#nominal').val(greatFormatRupiah(data.nominal));
                     }

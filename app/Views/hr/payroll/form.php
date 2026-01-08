@@ -186,13 +186,13 @@
                 <div class="col-sm-3 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input disabled autocomplete="one-time-code" onkeyup="this.value = greatFormatRupiah(this.value);" type="text" id="gajiPerHari" class="form-control target input-picker" value="<?= " " . number_format($payrollDetail['nominal_gaji_harian'], 2) ?>">
-                        <label for="floatingInput">Gaji (Per Hari)</label>
+                        <label for="floatingInput">Gaji (Per Hari), Default</label>
                     </div>
                 </div>
                 <div class="col-sm-3 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input disabled autocomplete="one-time-code" onkeyup="this.value = greatFormatRupiah(this.value);" type="text" id="cadanganPerHari" class="form-control target input-picker" value="<?= " " . number_format($payrollDetail['nominal_cadangan'], 2) ?>">
-                        <label for="floatingInput">Cadangan (Per Hari)</label>
+                        <label for="floatingInput">Skala Upah (Per Hari), Default</label>
                     </div>
                 </div>
                 <div class="col-sm-3 mt-1">
@@ -214,7 +214,7 @@
                         <button class="nav-link" id="contact-tab" data-toggle="tab" data-target="#rekapLembur" type="button" role="tab" aria-selected="false">Rekap Lembur</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link <?= (@$_GET['location'] == "rekapPerizinanTidakDisetujui") ? 'active' : '' ?>" id="contact-tab" data-toggle="tab" data-target="#perizinanNotApproved" type="button" role="tab" aria-selected="false">Rekap Perizinan Tidak Disetujui</button>
+                        <button class="nav-link <?= (@$_GET['location'] == "rekapPerizinanTidakDisetujui") ? 'active' : '' ?>" id="contact-tab" data-toggle="tab" data-target="#perizinanNotApproved" type="button" role="tab" aria-selected="false">Form Ijin Tidak Disetujui</button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link <?= (@$_GET['location'] == "pinjamanKaryawan") ? 'active' : '' ?>" id="contact-tab" data-toggle="tab" data-target="#pinjamanKaryawan" type="button" role="tab" aria-selected="false">Pinjaman Karyawan (Tgl 15)</button>
@@ -380,7 +380,7 @@
                             <thead class="thead-dark">
                                 <tr>
                                     <th style="width: 10px; text-align:center;" class="sort">No</th>
-                                    <th style="text-align: center;" class="sort">Tanggal Ambil Pinjaman</th>
+                                    <th class="sort">Tanggal Ambil Pinjaman</th>
                                     <th class="sort">Nominal</th>
                                 </tr>
                             </thead>
@@ -393,7 +393,7 @@
                                     <?php $totalPinjaman = $rekapPinjaman['nominal']; ?>
                                     <tr>
                                         <td><?= $no++; ?></td>
-                                        <td style="text-align: center;"><?= date('d/m/Y', strtotime($rekapPinjaman['tanggal_ambil'])) ?></td>
+                                        <td><?= date('d/m/Y', strtotime($rekapPinjaman['tanggal_ambil'])) ?></td>
                                         <td style="font-weight:bold;" class="text-danger"><b>(-) <?= " " . number_format($rekapPinjaman['nominal'],  2) ?></b></td>
                                     </tr>
                                     <tr class="bg-secondary">
@@ -408,36 +408,36 @@
                         <table class="table nowrap table-hover-tobasurimi dataTable" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th style="width: 10px; text-align:center;" class="sort">No</th>
-                                    <th style="text-align: center;" class="sort">Tanggal</th>
-                                    <th style="text-align: center;" class="sort">Jam Kerja</th>
-                                    <th style="text-align: center;" class="sort">CheckIn</th>
-                                    <!-- <th style="text-align: center;" class="sort">Mulai Istirahat</th> -->
-                                    <!-- <th style="text-align: center;" class="sort">Selesai Istirahat</th> -->
-                                    <th style="text-align: center;" class="sort">CheckOut</th>
-                                    <th style="text-align: center;" class="sort">Total Jam</th>
-                                    <th style="text-align: center;" class="sort">Nominal (GP + CADANGAN)</th>
+                                    <th style="width: 10px;" class="sort">No</th>
+                                    <th class="sort">Tanggal</th>
+                                    <th class="sort">Jam Kerja</th>
+                                    <th class="sort">IN</th>
+                                    <th class="sort">OUT</th>
+                                    <th class="sort">Total Jam</th>
+                                    <th class="sort">GP</th>
+                                    <th class="sort">Skala Upah</th>
+                                    <th class="sort">Nominal</th>
                                 </tr>
                             </thead>
                             <tbody class="body-table" id="body-table">
                                 <?php $i = 1; ?>
                                 <?php Carbon::setLocale('id'); ?>
                                 <?php foreach ($rekapGajiHarian as $r) : ?>
-                                    <tr style="color: whitesmoke; text-align:center;">
+                                    <tr style="color: whitesmoke;">
                                         <td><?= $i++ ?></td>
                                         <td><?= Carbon::createFromFormat('Y-m-d', $r['tanggal'])->translatedFormat('l, d F Y'); ?></td>
                                         <td><?= $r['jenis'] ?></td>
                                         <td><?= $r['jam_masuk'] ?? "-" ?></td>
-                                        <!-- <td><?= $r['jam_istirahat_mulai'] ?? "-" ?></td>
-                                        <td><?= $r['jam_istirahat_selesai'] ?? "-" ?></td> -->
                                         <td><?= $r['jam_pulang'] ?? "-"     ?></td>
                                         <td><?= number_format($r['total_jam'], 2) ?></td>
+                                        <td><?= number_format($r['nominal_gaji_harian'], 2) ?></td>
+                                        <td><?= number_format($r['nominal_cadangan'], 2) ?></td>
                                         <td style="font-weight: bold;"><?= number_format($r['nominal_diterima'], 2) ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                                 <tr>
-                                    <td colspan="6" style="text-align:right;"><b>Total Gaji Berdasarkan Jam Kerja</b></td>
-                                    <td style=" text-align:center;">
+                                    <td colspan="8" style="text-align:right;"><b>Total</b></td>
+                                    <td>
                                         <b><?= number_format($payrollDetail['nominal_uang_gaji'], 2) ?></b>
                                     </td>
                                 </tr>
