@@ -205,12 +205,16 @@ class PembayaranPOLokal extends BaseController
 
     public function updatePembayaranPOLokalBPAction()
     {
+        $db = \Config\Database::connect();
+
         try {
             $localPOPaymentDetailModel = new LocalPOPaymentDetailModel();
-            $localPOPaymentBPModel = new LocalPOPaymentBPModel();
-            $tandaTerimaFakturModel = new TandaTerimaFakturModel();
+            $localPOPaymentBPModel     = new LocalPOPaymentBPModel();
+            $tandaTerimaFakturModel    = new TandaTerimaFakturModel();
 
-            // Validasi input
+            // ===============================
+            // VALIDASI INPUT
+            // ===============================
             if (!$this->request->getVar('id') || !$this->request->getVar('pembayaranList')) {
                 throw new \Exception("Data input tidak lengkap");
             }
@@ -218,90 +222,112 @@ class PembayaranPOLokal extends BaseController
             $id = decrypt($this->request->getVar('id'));
             $pembayaranList = json_decode($this->request->getVar('pembayaranList'));
 
-            // Validasi JSON
             if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new \Exception("Format data pembayaran tidak valid");
+                throw new \Exception("Format pembayaranList tidak valid");
             }
 
-            // var_dump($this->request->getVar());
-            // die;
+            // ===============================
+            // START TRANSACTION
+            // ===============================
+            $db->transBegin();
 
-            // Mulai transaction
-            $db = \Config\Database::connect();
-            $db->transStart();
-
-            // Update data utama
+            // ===============================
+            // 1️⃣ UPDATE HEADER
+            // ===============================
             $updateData = [
-                'payment_no' => $this->request->getVar('no_bukti_pembayaran'),
-                'company_id' => $this->this_company_id,
-                'divisi_id' => $this->request->getVar('divisi_id'),
-                'bank_id' => $this->request->getVar('bank_id'),
-                'supplier_id' => $this->request->getVar('supplier_id'),
-                'jenis_pembayaran' => $this->request->getVar('jenis_pembayaran'),
-                'amount' => $this->request->getVar('total_pembayaran'),
-                'payment_method' => $this->request->getVar('payment_method'),
-                'keterangan' => $this->request->getVar('keterangan'),
-                'supplier' => $this->request->getVar('supplier'),
-                'akun_kas' => $this->request->getVar('akun_kas'),
-                'akun_selisih' => $this->request->getVar('akun_selisih'),
-                'supplier' => $this->request->getVar('supplier'),
-                'status_posting' => '0',
+                'payment_no'        => $this->request->getVar('no_bukti_pembayaran'),
+                'company_id'        => $this->this_company_id,
+                'divisi_id'         => $this->request->getVar('divisi_id'),
+                'bank_id'           => $this->request->getVar('bank_id'),
+                'supplier_id'       => $this->request->getVar('supplier_id'),
+                'jenis_pembayaran'  => $this->request->getVar('jenis_pembayaran'),
+                'amount'            => repairDouble($this->request->getVar('total_pembayaran')),
+                'payment_method'    => $this->request->getVar('payment_method'),
+                'keterangan'        => $this->request->getVar('keterangan'),
+                'supplier'          => $this->request->getVar('supplier'),
+                'akun_kas'          => $this->request->getVar('akun_kas'),
+                'akun_selisih'      => $this->request->getVar('akun_selisih'),
+                'status_posting'    => '0',
                 'pembayaran_oleh'   => $this->request->getVar('pembayaran_oleh'),
-                'payment_date'      => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('payment_date')))),
+                'payment_date'      => date(
+                    'Y-m-d',
+                    strtotime(str_replace('/', '-', $this->request->getVar('payment_date')))
+                ),
             ];
 
             if (!$localPOPaymentBPModel->update($id, $updateData)) {
-                throw new \Exception("Gagal mengupdate data pembayaran utama");
+                throw new \Exception("Gagal update pembayaran utama");
             }
 
-            // Hapus detail lama sebelum insert yang baru
-            $localPOPaymentDetailModel->where('local_po_payment_id', $id)->delete();
+            // ===============================
+            // 2️⃣ HAPUS DETAIL LAMA (SOFT DELETE)
+            // ===============================
+            $localPOPaymentDetailModel
+                ->where('local_po_payment_id', $id)
+                ->delete();
 
-            // Insert detail pembayaran baru
+            // ===============================
+            // 3️⃣ INSERT DETAIL BARU
+            // ===============================
+            $affectedTTF = [];
+
             foreach ($pembayaranList as $l) {
+                $nominal = repairDouble($l->nominal_pembayaran);
+
+                if ($nominal <= 0) continue;
+
                 $localPOPaymentDetailModel->insert([
                     "local_po_payment_id"    => $id,
                     "tanda_terima_faktur_id" => $l->id,
                     "tipe"                   => "BP",
-                    "total"                  => repairDouble($l->nominal_pembayaran)
+                    "total"                  => $nominal
                 ]);
 
-                $current = $tandaTerimaFakturModel->select('total_paid')->where('id', $l->id)->first();
-        
-                if (!$current) continue; // skip kalau gak ketemu
-
-                $totalPaidLama = repairDouble($current['total_paid']) ?? 0;
-                $totalBaru = $totalPaidLama + repairDouble($l->nominal_pembayaran);
-
-                if ($totalBaru != $totalPaidLama) {
-                    $tandaTerimaFakturModel->update($l->id, [
-                        'total_paid' => $totalBaru
-                    ]);
-                }
+                $affectedTTF[] = $l->id;
             }
 
-            $db->transComplete();
+            // ===============================
+            // 4️⃣ RECALCULATE total_paid (ANTI ERROR)
+            // ===============================
+            $affectedTTF = array_unique($affectedTTF);
 
+            foreach ($affectedTTF as $ttfId) {
+
+                $totalPaid = $localPOPaymentDetailModel
+                    ->selectSum('total')
+                    ->where('tanda_terima_faktur_id', $ttfId)
+                    ->where('deletedAt', null)
+                    ->first()['total'] ?? 0;
+
+                $tandaTerimaFakturModel->update($ttfId, [
+                    'total_paid' => $totalPaid
+                ]);
+            }
+
+            // ===============================
+            // COMMIT
+            // ===============================
             if ($db->transStatus() === false) {
-                throw new \Exception("Terjadi kesalahan dalam proses transaksi");
+                throw new \Exception("Transaksi gagal");
             }
+
+            $db->transCommit();
 
             return response()->setJSON([
-                'message' => "Kwitansi pembayaran lokal bahan penolong berhasil diupdate",
-                'status' => true,
-                'token' => csrf_hash(),
-                'id' => encrypt($id)
+                'message' => "Kwitansi pembayaran lokal BP berhasil diupdate",
+                'status'  => true,
+                'token'   => csrf_hash(),
+                'id'      => encrypt($id)
             ]);
+
         } catch (\Exception $e) {
-            // Rollback transaction jika terjadi error
-            if (isset($db)) {
-                $db->transRollback();
-            }
+
+            $db->transRollback();
 
             return response()->setJSON([
                 'message' => "Terjadi kesalahan: " . $e->getMessage(),
-                'status' => false,
-                'token' => csrf_hash()
+                'status'  => false,
+                'token'   => csrf_hash()
             ]);
         }
     }
