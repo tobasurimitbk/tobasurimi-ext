@@ -1059,7 +1059,8 @@ class StockRevampLogModel extends Model
         $orderColumnIndex,
         $orderDir,
         $limit = 10,
-        $offset = 0
+        $offset = 0,
+        $isTotal = true
     ) {
 
         $db = \Config\Database::connect();
@@ -1613,8 +1614,11 @@ class StockRevampLogModel extends Model
         // 📊 COUNT + PAGINATION
         // ============================
 
-        $countQuery = "SELECT COUNT(*) AS cnt FROM ($baseQuery) AS x";
-        $totalFiltered = (int) $db->query($countQuery)->getRow()->cnt;
+        $totalFiltered = 0;
+        if ($isTotal) {
+            $countQuery = "SELECT COUNT(*) AS cnt FROM ($baseQuery) AS x";
+            $totalFiltered = (int) $db->query($countQuery)->getRow()->cnt;
+        }
 
         $mainQuery = "
             SELECT * FROM ($baseQuery) AS x
@@ -1642,7 +1646,8 @@ class StockRevampLogModel extends Model
         $orderColumnIndex,
         $orderDir,
         $limit = 10,
-        $offset = 0
+        $offset = 0,
+        $isTotal = true
     ) {
 
         $db = \Config\Database::connect();
@@ -2090,8 +2095,12 @@ class StockRevampLogModel extends Model
         // 📊 COUNT + PAGINATION
         // ============================
 
-        $countQuery = "SELECT COUNT(*) AS cnt FROM ($baseQuery) AS x";
-        $totalFiltered = (int) $db->query($countQuery)->getRow()->cnt;
+        $totalFiltered = 0;
+        if ($isTotal) {
+            $countQuery = "SELECT COUNT(*) AS cnt FROM ($baseQuery) AS x";
+            $totalFiltered = (int) $db->query($countQuery)->getRow()->cnt;
+        }
+
 
         $mainQuery = "
             SELECT * FROM ($baseQuery) AS x

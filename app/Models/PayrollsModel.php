@@ -1018,6 +1018,7 @@ class PayrollsModel extends Model
         $companyModel = new CompaniesModel();
         $bagianModel = new BagianModel();
         $payrollGajiHarianModel = new PayrollGajiHarianModel();
+        $payrollGajiConjunctionModel = new PayrollGajiConjunctionModel();
 
         $bagianQry = $bagianModel->where('division_id', $divisionID)->where('deletedAt', null);
         if (!empty($bagianID) && $bagianID != '') {
@@ -1040,8 +1041,29 @@ class PayrollsModel extends Model
         foreach ($bagianData as $i => $b) {
             //----------------------------------------------------
             $selectQry = "
+                SUM(nominal) AS uangMakan
+            ";
+
+            $uangMakanQry = $payrollGajiConjunctionModel
+                ->select($selectQry)
+                ->join('tunjangan', 'payroll_gaji_conjunction.tunjangan_id = tunjangan.id', 'left')
+                ->join('payrolls', 'payrolls.id = payroll_gaji_conjunction.payroll_id', 'left')
+                ->join('employees', 'employees.id = payrolls.employee_id', 'left')
+                ->where('payroll_gaji_conjunction.year_month', $yearMonth)
+                ->where('employees.company_id', $companyID)
+                ->where('employees.bagian_id', $b['id'])
+                ->where('tunjangan.name', "UANG MAKAN");
+
+            if (count($tipes) > 0) {
+                $uangMakanQry->whereIn('employees.tipe', $tipes);
+            }
+
+            $employeeUangMakan = $uangMakanQry->findAll();
+
+            $selectQry = "
                 SUM(payroll_gaji_harian.nominal_gaji_harian) AS upahPokok,
-                SUM(payroll_gaji_harian.nominal_cadangan) AS skala_upah
+                SUM(payroll_gaji_harian.nominal_cadangan) AS skala_upah,
+                SUM(payroll_gaji_harian.total_jam) AS total_jam
             ";
 
             $upahPokokSkalaQry = $payrollGajiHarianModel
@@ -1085,9 +1107,11 @@ class PayrollsModel extends Model
                     // update value
                     $employeePayrollTotal[0]['upahPokok'] = $employeeUpahPokokSkalaTotal[0]['upahPokok'];
                     $employeePayrollTotal[0]['skala_upah'] = $employeeUpahPokokSkalaTotal[0]['skala_upah'];
+                    $employeePayrollTotal[0]['lembur'] = $employeePayrollTotal[0]['lembur'] + $employeeUangMakan[0]['uangMakan'];
                     // end update
                     $totalUpahSingle =  $employeePayrollTotal[0]['upahPokok'] + $employeePayrollTotal[0]['skala_upah']; // Total Upah = Upah Pokok + skala
                     $totalUpahBersihSingle = $totalUpahSingle - $employeePayrollTotal[0]['potongan']; // uPAH BERSIH = total upah - potongan
+                    $totalJam = $employeeUpahPokokSkalaTotal[0]['total_jam'];
 
                     $employeePayrollTotal[0]['total_upah'] = $totalUpahSingle;
                     $employeePayrollTotal[0]['upahBersih'] = $totalUpahBersihSingle;
@@ -1101,12 +1125,12 @@ class PayrollsModel extends Model
                     $upahBersih += $totalUpahBersihSingle;
                     $orangTotal += $employeePayrollTotal[0]['totalEmployee'];
                     $lembur +=  static::getTotalJamLemburInOnePeriode($divisionID, $b['id'], $payrollId);
-                    $jamKerja += static::getTotalJamKerjaInOnePeriode($divisionID, $b['id'], $payrollId);
+                    $jamKerja += $totalJam;
 
                     $res[] = [
                         'bagian' => $b['nama_bagian'],
                         'payrollTotal' => $employeePayrollTotal,
-                        'totalJamKerja' => static::getTotalJamKerjaInOnePeriode($divisionID, $b['id'], $payrollId),
+                        'totalJamKerja' => $totalJam,
                         'totalJamLembur' => static::getTotalJamLemburInOnePeriode($divisionID, $b['id'], $payrollId),
                     ];
                 }

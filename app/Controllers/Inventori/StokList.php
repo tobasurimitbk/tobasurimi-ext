@@ -2600,13 +2600,13 @@ class StokList extends BaseController
     }
 
 
-    private function getTotalKartuStockMasuk($start_date, $end_date)
+    private function getTotalKartuStockMasuk($start_date, $end_date, $stock_id = "")
     {
         $condition = [
             'company_id' => $this->this_company_id,
             'dateStart'  => $start_date,
             'dateEnd'    => $end_date,
-            'stock_id'   => "",
+            'stock_id'   => $stock_id,
         ];
 
         $dataTotal =  $this->stockRevampLogModel->getKartuStockMasuk(
@@ -2614,7 +2614,8 @@ class StokList extends BaseController
             0,
             "desc",
             100000000,
-            0
+            0,
+            false
         );
 
         $dataMap = [];
@@ -2630,13 +2631,13 @@ class StokList extends BaseController
         return $dataMap;
     }
 
-    private function getTotalKartuStockKeluar($start_date, $end_date)
+    private function getTotalKartuStockKeluar($start_date, $end_date, $stock_id = "")
     {
         $condition = [
             'company_id' => $this->this_company_id,
             'dateStart'  => $start_date,
             'dateEnd'    => $end_date,
-            'stock_id'   => "",
+            'stock_id'   => $stock_id,
         ];
 
         $dataTotal =  $this->stockRevampLogModel->getKartuStockKeluar(
@@ -2644,7 +2645,8 @@ class StokList extends BaseController
             0,
             "desc",
             100000000,
-            0
+            0,
+            false
         );
 
         $dataMap = [];
@@ -2705,7 +2707,8 @@ class StokList extends BaseController
                 $orderColumnIndex,
                 $orderDir,
                 100000000,
-                0
+                0,
+                false
             );
         } else {
             $dataTotal =  $this->stockRevampLogModel->getKartuStockMasuk(
@@ -2713,7 +2716,8 @@ class StokList extends BaseController
                 $orderColumnIndex,
                 $orderDir,
                 $length,
-                $start
+                $start,
+                false
             );
         }
 
@@ -2804,7 +2808,8 @@ class StokList extends BaseController
                 $orderColumnIndex,
                 $orderDir,
                 100000000,
-                0
+                0,
+                false
             );
         } else {
             $dataTotal =  $this->stockRevampLogModel->getKartuStockKeluar(
@@ -3053,7 +3058,8 @@ class StokList extends BaseController
             null,
             'asc',
             100000000,
-            0
+            0,
+            false
         );
 
         $rows = $data['data'];
@@ -3161,7 +3167,8 @@ class StokList extends BaseController
             null,
             'asc',
             100000000,
-            0
+            0,
+            false
         );
 
         $rows = $data['data'];
@@ -3271,22 +3278,26 @@ class StokList extends BaseController
         $masuk = $this->getTotalKartuStockMasuk(
             $condition['dateStart'],
             $condition['dateEnd'],
+            $condition['stock_id']
         );
 
         $keluar = $this->getTotalKartuStockKeluar(
             $condition['dateStart'],
-            $condition['dateEnd']
+            $condition['dateEnd'],
+            $condition['stock_id']
         );
 
         // get stok awal
         $stockMasukAwal = $this->getTotalKartuStockMasuk(
             "2025-09-01",
-            $condition['dateStart']
+            $condition['dateStart'],
+            $condition['stock_id']
         );
 
         $stockKeluarAwal = $this->getTotalKartuStockKeluar(
             "2025-09-01",
-            $condition['dateStart']
+            $condition['dateStart'],
+            $condition['stock_id']
         );
 
         $stock_in_awal =  isset($stockMasukAwal[$condition['stock_id']]) ?  $stockMasukAwal[$condition['stock_id']] : 0;
