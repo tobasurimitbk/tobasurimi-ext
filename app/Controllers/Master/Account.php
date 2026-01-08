@@ -201,6 +201,7 @@ class Account extends BaseController
                 $checkKodeAkun = $this->KategoriAkunsModel
                 ->where('no_kategori', $this->request->getPost("kode_akun_kategori"))
                 ->where('company_id', $this->this_company_id)
+                ->where('deletedAt', null)
                 ->first();
 
                 if ($checkKodeAkun) {
@@ -602,6 +603,7 @@ class Account extends BaseController
                 $checkKodeAkun = $this->HeaderAkunsModel
                 ->where('no_header', $this->request->getPost("kode_akun_header"))
                 ->where('company_id', $this->this_company_id)
+                ->where('deletedAt', null)
                 ->first();
 
                 if ($checkKodeAkun) {
@@ -1021,6 +1023,7 @@ class Account extends BaseController
                 $checkKodeAkun = $this->Sub_AkunsModel
                 ->where('no_sub', $this->request->getPost("kode_akun_sub"))
                 ->where('company_id', $this->this_company_id)
+                ->where('deletedAt', null)
                 ->first();
 
                 if ($checkKodeAkun) {
