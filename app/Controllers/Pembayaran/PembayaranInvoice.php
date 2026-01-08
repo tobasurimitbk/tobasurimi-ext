@@ -624,14 +624,15 @@ class PembayaranInvoice extends BaseController
             $condition = [
                 'pembayaran_invoice.company_id' => $this->this_company_id,
                 "pembayaran_invoice.deletedAt" => null,
-                "pembayaran_invoice.user_id" => $this->user_id, // kecualikan admin yg akses
+                // "pembayaran_invoice.user_id" => $this->user_id, // kecualikan admin yg akses
             ];
         }
 
         $typeInvoice = [];
         $type = $this->request->getGet('type_invoice');
         if ($type == "ALL") {
-            $typeInvoice = ['EKSPOR', 'LOKAL', 'LAIN-LAIN', 'RETURN', 'PROFORMA INVOICE'];
+            // $typeInvoice = ['EKSPOR', 'LOKAL', 'LAIN-LAIN', 'RETURN', 'PROFORMA INVOICE'];
+            $typeInvoice = ['LOKAL'];
         } else {
             $typeInvoice = [$type];
         }
