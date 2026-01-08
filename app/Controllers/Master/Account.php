@@ -70,29 +70,26 @@ class Account extends BaseController
 
     public function dropdownHeaderAccount()
     {
-        // $search = $this->request->getGet('search');
-        // $page = $this->request->getGet('page') ?? 1;
-        // $limit = 10;
-        // $offset = ($page - 1) * 10;
+        $search = $this->request->getGet('search');
 
-        $dataQry = $this->HeaderAkunsModel;
+        $builder = $this->HeaderAkunsModel
+            ->where('company_id', $this->this_company_id);
 
-        // if (!empty($search)) {
-        //     $dataQry->like('nama_header', $search);
-        // }
+        if (!empty($search)) {
+            $builder->groupStart()
+                ->like('nama_header', $search)
+                ->orLike('no_header', $search)
+                ->groupEnd();
+        }
 
-        $totalData = $dataQry->countAllResults(false);
-        $subAccData = $dataQry->select('id, nama_header AS text, no_header AS no')
-            ->where('company_id', $this->this_company_id)
+        $subAccData = $builder
+            ->select("id, CONCAT(no_header, ' - ', nama_header) AS text")
             ->orderBy('nama_header', 'asc')
             ->findAll();
 
-        $data = [
-            "results"   => $subAccData
-        ];
-
-        echo json_encode($data);
-        return;
+        return $this->response->setJSON([
+            'results' => $subAccData
+        ]);
     }
 
     public function dropdownSubAccount()

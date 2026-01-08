@@ -9,7 +9,7 @@
             </div>
             <div class="modal-body">
                 <div class="alert alert-secondary text-black" role="alert">
-                    UNDUH TEMPLEATE EXCEL <a id="link-import-excel" href="<?= base_url('assets/import/IMPORT_EXCEL_KATEGORI_AKUN.xlsx') ?>" style="text-decoration: none;"><b style="color: black;">DISINI</b></a>
+                    UNDUH TEMPLATE EXCEL <a id="link-import-excel" href="<?= base_url('assets/import/IMPORT_EXCEL_KATEGORI_AKUN.xlsx') ?>" style="text-decoration: none;"><b style="color: black;">DISINI</b></a>
                 </div>
                 <form class="form-excel" method="post">
                     <div class="form-floating" style="height: 50px;">
@@ -629,12 +629,6 @@
             dropdownParent: $(".add-modal-header .modal-content")
         })
 
-        $('.header_id_sub').select2({
-            placeholder: "",
-            theme: "bootstrap-5",
-            dropdownParent: $(".add-modal-sub .modal-content")
-        })
-
         $('.coa_id_sub').select2({
             placeholder: "",
             theme: "bootstrap-5",
@@ -1102,20 +1096,26 @@
 
             $(".status_sub").prop("checked", true);
 
-            $.ajax({
-                url: `<?= base_url("header-account/dropdown"); ?>`,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    $(".header_id_sub").empty()
-                    $(".header_id_sub").val('').change();
-                    $(".header_id_sub").append(`<option value=""></option>`)
-                    res.results.forEach(function(item) {
-                        console.log(item);
-                        $(".header_id_sub").append(`<option data-kategori="${item.kategori_id}" value="${item.id}">${item.no} - ${item.text}</option>`)
-                    })
+            $('.header_id_sub').select2({
+                dropdownParent: $(".add-modal-sub .modal-content"),
+                placeholder: 'Pilih Header Account',
+                allowClear: true,
+                ajax: {
+                    url: `<?= base_url("header-account/dropdown"); ?>`,
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            search: params.term // keyword search
+                        };
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data.results
+                        };
+                    }
                 }
-            })
+            });
             // $('.header_id_sub').select2(select2header_id_sub);
 
             $.ajax({
