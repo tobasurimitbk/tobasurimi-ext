@@ -264,6 +264,7 @@ class PembayaranPOLokal extends BaseController
             // ===============================
             $localPOPaymentDetailModel
                 ->where('local_po_payment_id', $id)
+                ->where('tipe', 'BP')
                 ->delete();
 
             // ===============================
