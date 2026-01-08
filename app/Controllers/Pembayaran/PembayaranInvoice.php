@@ -471,18 +471,24 @@ class PembayaranInvoice extends BaseController
             ->where('sales_order_invoice.deletedAt', null)
             ->where('sales_order_invoice.status_posting', "1")
             ->groupBy('sales_order_invoice.id, sales_order_invoice.no_faktur, sales_order_invoice.total_invoice');
+        
+        // var_dump($builder->findAll());
+        // die;
 
         if ($pembayaran_invoice_id_decrypt) {
-            // 🧠 Mode edit → tampilkan:
-            // - invoice yang masih ada sisa bayar
-            // - invoice yang terikat dengan pembayaran_invoice_id ini (meskipun sudah lunas)
-            $builder->groupStart()
-                ->orWhereIn('sales_order_invoice.id', function($sub) use ($pembayaran_invoice_id_decrypt) {
-                    $sub->select('sales_order_invoice_id')
-                        ->from('pembayaran_invoice_detail')
-                        ->where('pembayaran_invoice_id', $pembayaran_invoice_id_decrypt);
-                })
-                ->groupEnd();
+                    
+            // $builder->groupStart()
+            //     ->having('sisa_bayar >', 0)
+            //     ->orWhereIn('sales_order_invoice.id', function ($sub) use ($pembayaran_invoice_id_decrypt) {
+            //         $sub->select('sales_order_invoice_id')
+            //             ->from('pembayaran_invoice_detail')
+            //             ->where('pembayaran_invoice_id', $pembayaran_invoice_id_decrypt)
+            //             ->where('deletedAt', null);
+            //     })
+            // ->groupEnd();
+
+            // var_dump($builder->findAll());
+            // die;
         } else {
             // 🧾 Mode normal → hanya invoice belum lunas
             $builder->having('sisa_bayar >', 0)
@@ -1261,19 +1267,21 @@ class PembayaranInvoice extends BaseController
         $dataBarang = [];
         $isImport = false;
         $totalPembayaran = 0;
-        if (!empty($idArray)) {
+        $pembayaranInvoiceData = null;
 
+        if (!empty($idArray)) {
             $idArray = array_map('intval', $idArray);
+            
             // ambil dulu tipe dokumennya
-                $firstInvoice = $this->salesOrderInvoiceModel
-                    ->select('document_type')
-                    ->where('id', $idArray[0])
-                    ->where('deletedAt', NULL)
+            $firstInvoice = $this->salesOrderInvoiceModel
+                ->select('document_type')
+                ->where('id', $idArray[0])
+                ->where('deletedAt', NULL)
                 ->first();
 
             $documentType = $firstInvoice['document_type'] ?? 'lokal';
 
-            // Jika tidak ada pembayaran_invoice_id → ambil dari invoice detail biasa
+            // Jika tidak ada pembayaran_invoice_id → mode baru, ambil dari invoice detail biasa
             if (empty($pembayaranInvoiceId)) {
                 if ($documentType == 'import') {
                     $isImport = true;
@@ -1313,7 +1321,6 @@ class PembayaranInvoice extends BaseController
                             sales_order_invoice_detail.amount_invoice,
                             barang_master_sales.kode_barang,
                             barang_master_sales.barang_name,
-                            pembayaran_invoice_detail.harga_dibayar,
                             COALESCE(SUM(pembayaran_invoice_detail.harga_dibayar), 0) AS total_bayar_detail,
                             (sales_order_invoice_detail.amount_invoice - COALESCE(SUM(pembayaran_invoice_detail.harga_dibayar), 0)) AS sisa_bayar
                         ')
@@ -1327,7 +1334,10 @@ class PembayaranInvoice extends BaseController
                             sales_order_invoice_detail.id_sales_order_invoice,
                             sales_order_invoice.no_faktur,
                             barang_master_sales.kode_barang,
-                            barang_master_sales.barang_name
+                            barang_master_sales.barang_name,
+                            sales_order_invoice_detail.qty_invoice,
+                            sales_order_invoice_detail.harga_barang_invoice,
+                            sales_order_invoice_detail.amount_invoice
                         ')
                         ->having('sisa_bayar >', 0)
                         ->findAll();
@@ -1342,17 +1352,20 @@ class PembayaranInvoice extends BaseController
                             'amount_invoice'                => $s['amount_invoice'],
                             'kode_barang'                   => $s['kode_barang'],
                             'barang_name'                   => $s['barang_name'],
-                            'harga_dibayar'                 => $s['harga_dibayar'],
+                            'harga_dibayar'                 => 0, // default 0 untuk mode baru
                             'sisa_bayar'                    => $s['sisa_bayar'],
                         ];
                     }
                 }
-            }
+            } else {
+                // MODE EDIT: Ada pembayaran_invoice_id
+                // 1. Ambil data pembayaran yang sudah ada
+                $pembayaranInvoiceData = $this->pembayaranInvoiceModel
+                    ->select('total_bayar, jenis_data')
+                    ->where('id', $pembayaranInvoiceId)
+                    ->first();
 
-            // Jika ada pembayaran_invoice_id → ambil dari detail pembayaran
-            if (!empty($pembayaranInvoiceId)) {
                 if ($documentType == 'import') {
-                    
                     $isImport = true;
 
                     // ambil langsung dari sales_order_invoice
@@ -1380,6 +1393,10 @@ class PembayaranInvoice extends BaseController
                         ];
                     }
                 } else {
+                    // Gabungkan data: item yang sudah dibayar + item yang belum dibayar dari invoice yang dipilih
+                    
+                    // 1. Ambil data barang yang sudah ada di pembayaran
+                    $existingPayments = [];
                     $pembayaranInvoiceDetail = $this->pembayaranInvoiceDetailModel
                         ->join('sub_akuns AS akun_kas', 'pembayaran_invoice_detail.akun_kredit = akun_kas.id', 'left')
                         ->join('sub_akuns AS akun_selisih', 'pembayaran_invoice_detail.akun_debit = akun_selisih.id', 'left')
@@ -1392,6 +1409,9 @@ class PembayaranInvoice extends BaseController
                             sales_order_invoice.no_faktur,
                             sales_order_invoice_detail.id AS sales_order_invoice_detail_id,
                             sales_order_invoice_detail.id_sales_order_invoice AS sales_order_invoice_id,
+                            sales_order_invoice_detail.qty_invoice,
+                            sales_order_invoice_detail.harga_barang_invoice,
+                            sales_order_invoice_detail.amount_invoice,
                             akun_kas.id AS id_akun_kas,
                             akun_selisih.id AS id_akun_selisih,
                             akun_kas.nama_sub AS nama_sub_kas,
@@ -1408,16 +1428,20 @@ class PembayaranInvoice extends BaseController
                         ->findAll();
 
                     foreach ($pembayaranInvoiceDetail as $p) {
+                        $key = $p['sales_order_invoice_detail_id'];
+                        $existingPayments[$key] = $p;
+                        
                         $dataBarang[] = [
                             "sales_order_invoice_detail_id" => $p['sales_order_invoice_detail_id'],
                             "sales_order_invoice_id" => $p['sales_order_invoice_id'],
                             "no_faktur" => $p['no_faktur'],
-                            "qty_invoice" => $p['qty'] ?? null,
-                            "harga_barang_invoice" => $p['harga_satuan'] ?? null,
-                            "amount_invoice" => $p['harga_total'],
-                            "harga_dibayar" => $p['harga_dibayar'], // <== nilai parsial yang dibayar
+                            "qty_invoice" => $p['qty_invoice'],
+                            "harga_barang_invoice" => $p['harga_barang_invoice'],
+                            "amount_invoice" => $p['amount_invoice'],
+                            "harga_dibayar" => $p['harga_dibayar'],
                             "kode_barang" => $p['kode_barang'],
                             "barang_name" => $p['barang_name'],
+                            "sisa_bayar" => $p['amount_invoice'] - $p['harga_dibayar'],
                             "keterangan" => $p['keterangan'],
                             "keterangan_pajak" => $p['keterangan_pajak'],
                             "nominal_pajak" => $p['nominal_pajak'],
@@ -1425,21 +1449,69 @@ class PembayaranInvoice extends BaseController
                             "id_akun_debit" => $p['id_akun_selisih'],
                             "akun_kredit" => $p['no_sub_kas'] . ' - ' . $p['nama_sub_kas'],
                             "akun_debit" => $p['no_sub_selisih'] . ' - ' . $p['nama_sub_selisih'],
+                            "is_existing_payment" => true,
                         ];
                     }
 
-                    $pembayaranInvoiceData = $this->pembayaranInvoiceModel
-                        ->select('total_bayar, jenis_data')
-                        ->where('id', $pembayaranInvoiceId)
-                        ->first();
-                }
-            }
+                    // 2. Ambil sisa barang yang belum dibayar dari invoice yang dipilih
+                    $unpaidItems = $this->salesOrderInvoiceDetailModel
+                        ->select('
+                            sales_order_invoice.no_faktur,
+                            sales_order_invoice_detail.id AS sales_order_invoice_detail_id,
+                            sales_order_invoice_detail.id_sales_order_invoice AS sales_order_invoice_id,
+                            sales_order_invoice_detail.qty_invoice,
+                            sales_order_invoice_detail.harga_barang_invoice,
+                            sales_order_invoice_detail.amount_invoice,
+                            barang_master_sales.kode_barang,
+                            barang_master_sales.barang_name,
+                            COALESCE(SUM(pembayaran_invoice_detail.harga_dibayar), 0) AS total_bayar_detail,
+                            (sales_order_invoice_detail.amount_invoice - COALESCE(SUM(pembayaran_invoice_detail.harga_dibayar), 0)) AS sisa_bayar
+                        ')
+                        ->join('barang_master_sales', 'sales_order_invoice_detail.id_barang_invoice = barang_master_sales.id', 'left')
+                        ->join('sales_order_invoice', 'sales_order_invoice_detail.id_sales_order_invoice = sales_order_invoice.id', 'left')
+                        ->join('pembayaran_invoice_detail', 'pembayaran_invoice_detail.sales_order_invoice_detail_id = sales_order_invoice_detail.id AND pembayaran_invoice_detail.deletedAt IS NULL', 'left')
+                        ->whereIn('sales_order_invoice_detail.id_sales_order_invoice', $idArray)
+                        ->where('sales_order_invoice_detail.deletedAt', null)
+                        ->groupBy('
+                            sales_order_invoice_detail.id,
+                            sales_order_invoice_detail.id_sales_order_invoice,
+                            sales_order_invoice.no_faktur,
+                            barang_master_sales.kode_barang,
+                            barang_master_sales.barang_name,
+                            sales_order_invoice_detail.qty_invoice,
+                            sales_order_invoice_detail.harga_barang_invoice,
+                            sales_order_invoice_detail.amount_invoice
+                        ')
+                        ->having('sisa_bayar >', 0)
+                        ->findAll();
 
+                    foreach ($unpaidItems as $item) {
+                        // Jika item ini belum ada di data pembayaran yang sudah ada
+                        if (!isset($existingPayments[$item['sales_order_invoice_detail_id']])) {
+                            $dataBarang[] = [
+                                'sales_order_invoice_detail_id' => $item['sales_order_invoice_detail_id'],
+                                'sales_order_invoice_id'        => $item['sales_order_invoice_id'],
+                                'no_faktur'                     => $item['no_faktur'],
+                                'qty_invoice'                   => $item['qty_invoice'],
+                                'harga_barang_invoice'          => $item['harga_barang_invoice'],
+                                'amount_invoice'                => $item['amount_invoice'],
+                                'kode_barang'                   => $item['kode_barang'],
+                                'barang_name'                   => $item['barang_name'],
+                                'harga_dibayar'                 => 0, // default 0 untuk item baru
+                                'sisa_bayar'                    => $item['sisa_bayar'],
+                                'is_existing_payment'           => false,
+                            ];
+                        }
+                    }
+                }
+                
+                $totalPembayaran = $pembayaranInvoiceData['total_bayar'] ?? 0;
+            }
         }
 
         return $this->response->setJSON([
             'data' => $dataBarang,
-            'totalPembayaran' => $pembayaranInvoiceData['total_bayar'] ?? 0,
+            'totalPembayaran' => $totalPembayaran,
             'status' => true,
             'isImport' => $isImport,
         ]);
