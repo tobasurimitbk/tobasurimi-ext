@@ -112,10 +112,10 @@ class MaterialRequestsModel extends Model
             ");
         }
 
-        if ($addCondition['dateStart']) {
+        if (!empty($addCondition['dateStart'])) {
             $materialRequestsDataQry->where('material_requests.request_date >=',  $addCondition['dateStart']);
         }
-        if ($addCondition['dateEnd']) {
+        if (!empty($addCondition['dateEnd'])) {
             $materialRequestsDataQry->where('material_requests.request_date <=', $addCondition['dateEnd']);
         }
 

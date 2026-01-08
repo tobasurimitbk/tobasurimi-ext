@@ -88,15 +88,15 @@ class MaterialRequestsPenolongModel extends Model
 
         $totalData = $materialRequestsDataQry->countAllResults(false);
 
-        if ($addCondition['search']) {
+        if (!empty($addCondition['search'])) {
             $materialRequestsDataQry->groupStart();
         }
-        if ($addCondition['search']) {
+        if (!empty($addCondition['search'])) {
             $materialRequestsDataQry
                 ->like('material_requests_penolong.req_no', $addCondition['search'])
                 ->orLike('material_request_penolong_details.nama_barang', $addCondition['search']);
         }
-        if ($addCondition['search']) {
+        if (!empty($addCondition['search'])) {
             $materialRequestsDataQry->groupEnd();
         }
 
