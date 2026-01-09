@@ -1160,12 +1160,14 @@ class OrderForm extends BaseController
         $options->set('isHtml5ParserEnabled', true);
         $options->set('isRemoteEnabled', true);
         $options->set('defaultFont', 'DejaVu Sans Mono');
-        $options->set('dpi', 96); // PENTING
+        $options->set('dpi', 72); // DOT MATRIX SCALE
         $options->set('isFontSubsettingEnabled', true);
+
 
         $domPdf = new \Dompdf\Dompdf($options);
         $domPdf->loadHtml(view('SalesLokal/OrderForm/print', $data));
-        $domPdf->setPaper('A4', 'landscape');
+        // $domPdf->setPaper('A4', 'landscape');
+        $domPdf->setPaper([0, 0, 649, 482]);
 
         /* =========================
         * RENDER PDF
