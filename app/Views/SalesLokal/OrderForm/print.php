@@ -7,22 +7,16 @@
     <title>Order Form <?= $soData->customerName ?></title>
     <style>
         body {
-            /* font-size: 11px;
-            font-family: Courier, monospace;
-            font-weight: 500; */
-            font-family: 'DejaVu Sans Mono', monospace;
-            font-size: 9.5pt;   /* ideal utk DejaVu di LX */
-            line-height: 12pt;  /* 6 LPI */
-            margin: 0;
-            padding: 0;
+            font-size: 9px;
+            font-family: 'DejaVu Sans Mono';
+            font-weight: 500;
         }
 
         @page {
-            /* size: 8.27in 5.50in landscape;
+            /* size: 8.27in 5.50in landscape; */
             margin-top: 10px !important;
             margin: 25px;
-            padding: 25px; */
-            margin: 5mm;
+            padding: 25px;
         }
 
         .dot-matrix-bold {
@@ -40,7 +34,7 @@
             margin-bottom: 5px;
             display: inline-block;
             min-width: 70px;
-            font-size: 14px;
+            font-size: 10px;
         }
 
         .description-container {
