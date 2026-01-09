@@ -154,7 +154,13 @@
                     </tr>
                     <tr>
                         <td>DIBAYAR KEPADA</td>
-                        <td>: <?= $data->supplier_name ?></td>
+                        <td style="vertical-align: top;">:
+                            <?php
+                            $words = explode(' ', $data->supplier_name);
+                            $chunks = array_chunk($words, 5);
+                            echo implode('<br>', array_map(fn($c) => implode(' ', $c), $chunks));
+                            ?>
+                        </td>
                     </tr>
                 </table>
             </div>
