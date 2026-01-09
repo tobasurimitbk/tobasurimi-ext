@@ -373,9 +373,9 @@
                 payment_method: {
                     required: true
                 },
-                akun_kas: {
-                    required: true
-                },
+                // akun_kas: {
+                //     required: true
+                // },
                 akun_selisih: {
                     required: true
                 },
@@ -418,9 +418,9 @@
                 payment_method: {
                     required: "Metode pembayaran wajib diisi"
                 },
-                akun_kas: {
-                    required: "Akun kas wajib diisi"
-                },
+                // akun_kas: {
+                //     required: "Akun kas wajib diisi"
+                // },
                 akun_selisih: {
                     required: "Akun selisih wajib diisi"
                 },

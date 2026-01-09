@@ -140,26 +140,30 @@ class JurnalUmumModel extends Model
 
     public function getTotalSaldoLama($where)
     {
-        if (empty($where['tanggal_awal']) || empty($where['id_coa'])) {
+        if (empty($where['id_coa'])) {
             return 0;
         }
 
-        // Tentukan company scope
+        /* ===============================
+        * COMPANY SCOPE
+        * =============================== */
         if ($where['company_id'] == 1 || $where['company_id'] == 2) {
-            $companyId = [1, 2];
+            $companyId    = [1, 2];
             $companyScope = [1, 2];
-        } else if ($where['company_id'] == 15) {
-            $companyId = [15];
+        } elseif ($where['company_id'] == 15) {
+            $companyId    = [15];
             $companyScope = [15];
         } else {
-            $companyId = [16];
+            $companyId    = [16];
             $companyScope = [16];
         }
 
-        $subModel = new \App\Models\Sub_AkunsModel(); // sesuaikan namespace model lu
-        $idCoa = is_array($where['id_coa']) ? $where['id_coa'] : [$where['id_coa']];
+        $subModel = new \App\Models\Sub_AkunsModel();
+        $idCoa    = is_array($where['id_coa']) ? $where['id_coa'] : [$where['id_coa']];
 
-        // 1️⃣ Ambil semua no_sub dari id_coa yang dikirim
+        /* ===============================
+        * AMBIL no_sub DARI COA
+        * =============================== */
         $subList = $subModel
             ->select('no_sub')
             ->whereIn('id', $idCoa)
@@ -167,15 +171,15 @@ class JurnalUmumModel extends Model
             ->where('deletedAt', null)
             ->findAll();
 
-
-
         if (empty($subList)) {
             return 0;
         }
 
         $noSubs = array_column($subList, 'no_sub');
 
-        // 2️⃣ Ambil semua id yang punya no_sub yang sama (karena bisa duplicate antar divisi)
+        /* ===============================
+        * AMBIL SEMUA SUB ID TERKAIT
+        * =============================== */
         $relatedSubIds = $subModel
             ->select('id')
             ->whereIn('no_sub', $noSubs)
@@ -187,9 +191,14 @@ class JurnalUmumModel extends Model
             return 0;
         }
 
-        // 3️⃣ Query ke jurnal umum pakai semua id dan scope company
-        $row = $this
-            ->select('COALESCE(SUM(jurnal_umum.debit),0) AS total_debit, COALESCE(SUM(jurnal_umum.kredit),0) AS total_kredit')
+        /* ==================================================
+        * 1️⃣ SALDO AWAL (TANPA TANGGAL)
+        * ================================================== */
+        $saldoAwalRow = $this
+            ->select('
+                COALESCE(SUM(jurnal_umum.debit),0)  AS total_debit,
+                COALESCE(SUM(jurnal_umum.kredit),0) AS total_kredit
+            ')
             ->join('transaksi_jurnal', 'transaksi_jurnal.id = jurnal_umum.id_transaksi')
             ->whereIn('jurnal_umum.id_coa', $relatedSubIds)
             ->whereIn('jurnal_umum.company_id', $companyId)
@@ -199,11 +208,46 @@ class JurnalUmumModel extends Model
             ->get()
             ->getRowArray();
 
-        $totalDebit  = (float) ($row['total_debit'] ?? 0);
-        $totalKredit = (float) ($row['total_kredit'] ?? 0);
+        $saldoAwal = 
+            (float) $saldoAwalRow['total_debit'] 
+            - (float) $saldoAwalRow['total_kredit'];
+
+        /* ==================================================
+        * 2️⃣ MUTASI SEBELUM TANGGAL
+        * ================================================== */
+        $mutasiSebelum = 0;
+
+        if (!empty($where['tanggal_awal'])) {
+            $mutasiRow = $this
+            ->select('
+                COALESCE(SUM(jurnal_umum.debit),0)  AS total_debit,
+                COALESCE(SUM(jurnal_umum.kredit),0) AS total_kredit
+            ')
+            ->join(
+                'transaksi_jurnal',
+                'transaksi_jurnal.id = jurnal_umum.id_transaksi',
+                'left'
+            )
+            ->where(
+                "STR_TO_DATE(jurnal_umum.tanggal_jurnal, '%Y-%m-%d') <",
+                $where['tanggal_awal']
+            )
+            ->whereIn('jurnal_umum.id_coa', $relatedSubIds)
+            ->where('jurnal_umum.deletedAt', null)
+            ->where('transaksi_jurnal.deleted_at', null)
+            ->get()
+            ->getRowArray();
 
 
-        return $totalDebit - $totalKredit;
+            $mutasiSebelum = round(
+                (float) $mutasiRow['total_kredit']
+                - (float) $mutasiRow['total_debit'],
+            );
+
+        }
+      
+
+        return $saldoAwal - $mutasiSebelum;
     }
 
 
