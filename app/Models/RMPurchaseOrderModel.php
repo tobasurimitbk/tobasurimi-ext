@@ -161,26 +161,29 @@ class RMPurchaseOrderModel extends Model
             ->groupBy(('rm_purchase_orders.id'))
             ->orderBy($sort, $sortType);
 
+        if ($addCondition['is_posted'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $bbLokalDataQry->groupStart();
+            if ($addCondition['is_posted']) {
+                if ($addCondition['is_posted'] == "SUDAH POSTING") {
+                    $bbLokalDataQry->where('is_posted', 1);
+                } else {
+                    $bbLokalDataQry->where('is_posted', 0);
+                }
+            }
+
+            if ($addCondition['dateStart']) {
+                $bbLokalDataQry->where('rm_purchase_orders.po_date >=',  $addCondition['dateStart']);
+            }
+            if ($addCondition['dateEnd']) {
+                $bbLokalDataQry->where('rm_purchase_orders.po_date <=', $addCondition['dateEnd']);
+            }
+            $bbLokalDataQry->groupEnd();
+        }
+
         $totalData = $bbLokalDataQry->countAllResults(false);
 
-        if ($addCondition['is_posted']) {
-            if ($addCondition['is_posted'] == "SUDAH POSTING") {
-                $bbLokalDataQry->where('is_posted', 1);
-            } else {
-                $bbLokalDataQry->where('is_posted', 0);
-            }
-        }
-
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+        if ($addCondition['search']) {
             $bbLokalDataQry->groupStart();
-        }
-
-
-        if ($addCondition['dateStart']) {
-            $bbLokalDataQry->where('rm_purchase_orders.po_date >=',  $addCondition['dateStart']);
-        }
-        if ($addCondition['dateEnd']) {
-            $bbLokalDataQry->where('rm_purchase_orders.po_date <=', $addCondition['dateEnd']);
         }
 
         if ($addCondition['search']) {
@@ -191,7 +194,7 @@ class RMPurchaseOrderModel extends Model
             $bbLokalDataQry->orLike('divisis.divisi', $addCondition['search'])
                 ->groupEnd();
         }
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+        if ($addCondition['search']) {
             $bbLokalDataQry->groupEnd();
         }
 
