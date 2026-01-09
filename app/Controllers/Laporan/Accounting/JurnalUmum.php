@@ -271,6 +271,12 @@ class JurnalUmum extends BaseController
             ->setCellValue('J1', 'Kredit');
         $spreadsheet->getActiveSheet()->mergeCells('C1:D1');
 
+        $spreadsheet->getActiveSheet()
+            ->getStyle("A1:J1")
+            ->applyFromArray([
+                'font' => ['bold' => true],
+            ]);
+
         // === QUERY MAIN DATA FOLLOW DATA TABLE ===
         $dataJurnal = $this->jurnalUmumModel
             ->asObject()
@@ -357,17 +363,12 @@ class JurnalUmum extends BaseController
             if ($row->is_header) {
                 $spreadsheet->setActiveSheetIndex(0)
                     ->setCellValue('A' . $column, $row->tanggal_jurnal)
-                    ->setCellValue('B' . '')
                     ->setCellValue('C' . $column, $row->desc);
                 $spreadsheet->getActiveSheet()->mergeCells('C' . $column . ':J' . $column);
 
                 $spreadsheet->getActiveSheet()->getStyle("A{$column}:J{$column}")
                     ->applyFromArray([
                         'font' => ['bold' => true],
-                        'fill' => [
-                            'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                            'startColor' => ['argb' => 'FFF8E6']
-                        ]
                     ]);
             } else {
                 $spreadsheet->setActiveSheetIndex(0)
@@ -396,6 +397,12 @@ class JurnalUmum extends BaseController
             ->mergeCells("A{$column}:H{$column}")
             ->setCellValue("I{$column}", format_currency($totalDebit))
             ->setCellValue("J{$column}", format_currency($totalKredit));
+
+        $spreadsheet->getActiveSheet()
+            ->getStyle("A{$column}:J{$column}")
+            ->applyFromArray([
+                'font' => ['bold' => true],
+            ]);
 
         $writer = new Xlsx($spreadsheet);
         $filename = 'Laporan-Jurnal';

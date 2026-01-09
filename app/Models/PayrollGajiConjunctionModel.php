@@ -133,7 +133,7 @@ class PayrollGajiConjunctionModel extends Model
             } else {
                 if ($g['tipe'] == "MINUS") {
                     $gajiHistory = $mapKomponenGajiHistory[$g['employee_id']][$g['tunjangan_id']][$yearMonth] ?? 0;
-                    if ($gajiHistory == 0 && $g['tunjangan_name'] == "DENDA") {
+                    if ($g['tunjangan_name'] == "DENDA") {
                         // DENDA BELUM ADA DAN HARUS DI RECALCULATE
                         if (empty($mapDendaAbsenHarian[$g['employee_id']])) {
                             $nominal = $g['nominal'];
