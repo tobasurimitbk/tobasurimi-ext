@@ -202,10 +202,10 @@ class RincianPenjualanPerBarang extends BaseController
                 if ($currentBarang !== null) {
                     $dataAllSalesOrderInvoice[] = [
                         "is_total" => true,
-                        "total_qty" => number_format($qtyPerBarang, 0, ',', '.'),
-                        "total_invoice" => number_format($totalPerBarang, 0, ',', '.'),
-                        "total_hpp" => number_format($totalHPPPerBarang, 0, ',', '.'),
-                        "total_laba" => number_format($totalLabaPerBarang, 0, ',', '.'),
+                        "total_qty" => number_format($qtyPerBarang, 2, ',', '.'),
+                        "total_invoice" => number_format($totalPerBarang, 2, ',', '.'),
+                        "total_hpp" => number_format($totalHPPPerBarang, 2, ',', '.'),
+                        "total_laba" => number_format($totalLabaPerBarang, 2, ',', '.'),
                     ];
                 }
 
@@ -243,8 +243,8 @@ class RincianPenjualanPerBarang extends BaseController
                 "keterangan" => $data->keterangan,
                 "qty_invoice" => $data->qty_invoice,
                 "kode_satuan" => $data->kode_satuan,
-                "total_invoice" => number_format($data->sum_amount_invoice, 0, ',', '.'),
-                "amt_harga_pokok" => number_format($data->amt_harga_pokok, 0, ',', '.'),
+                "total_invoice" => number_format($data->sum_amount_invoice, 2, ',', '.'),
+                "amt_harga_pokok" => number_format($data->amt_harga_pokok, 2, ',', '.'),
                 "amt_laba" => number_format($laba, 0, ',', '.'),
                 "nama_pelanggan" => $data->nama_pelanggan,
                 "nama_sales" => $salesName,
@@ -259,19 +259,19 @@ class RincianPenjualanPerBarang extends BaseController
         if ($currentBarang !== null) {
             $dataAllSalesOrderInvoice[] = [
                 "is_total" => true,
-                "total_qty" => number_format($qtyPerBarang, 0, ',', '.'),
-                "total_invoice" => number_format($totalPerBarang, 0, ',', '.'),
-                "total_hpp" => number_format($totalHPPPerBarang, 0, ',', '.'),
-                "total_laba" => number_format($totalLabaPerBarang, 0, ',', '.'),
+                "total_qty" => number_format($qtyPerBarang, 2, ',', '.'),
+                "total_invoice" => number_format($totalPerBarang, 2, ',', '.'),
+                "total_hpp" => number_format($totalHPPPerBarang, 2, ',', '.'),
+                "total_laba" => number_format($totalLabaPerBarang, 2, ',', '.'),
             ];
         }
 
         $dataAllSalesOrderInvoice[] = [
             "is_grand_total" => true,
-            "total_qty"      => number_format($grandQtyPerBarang, 0, ',', '.'),
-            "total_invoice"  => number_format($grandTotalInvoice, 0, ',', '.'),
-            "total_hpp"      => number_format($grandTotalHPP, 0, ',', '.'),
-            "total_laba"     => number_format($grandTotalLaba, 0, ',', '.'),
+            "total_qty"      => number_format($grandQtyPerBarang, 2, ',', '.'),
+            "total_invoice"  => number_format($grandTotalInvoice, 2, ',', '.'),
+            "total_hpp"      => number_format($grandTotalHPP, 2, ',', '.'),
+            "total_laba"     => number_format($grandTotalLaba, 2, ',', '.'),
         ];
 
 
