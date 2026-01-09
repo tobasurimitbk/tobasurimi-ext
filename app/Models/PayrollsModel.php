@@ -1109,7 +1109,7 @@ class PayrollsModel extends Model
                     $employeePayrollTotal[0]['skala_upah'] = $employeeUpahPokokSkalaTotal[0]['skala_upah'];
                     $employeePayrollTotal[0]['lembur'] = $employeePayrollTotal[0]['lembur'] + $employeeUangMakan[0]['uangMakan'];
                     // end update
-                    $totalUpahSingle =  $employeePayrollTotal[0]['upahPokok'] + $employeePayrollTotal[0]['skala_upah']; // Total Upah = Upah Pokok + skala
+                    $totalUpahSingle =  $employeePayrollTotal[0]['upahPokok'] + $employeePayrollTotal[0]['skala_upah'] + $employeePayrollTotal[0]['lembur']; // Total Upah = Upah Pokok + skala + lembur (udah include uang makan)
                     $totalUpahBersihSingle = $totalUpahSingle - $employeePayrollTotal[0]['potongan']; // uPAH BERSIH = total upah - potongan
                     $totalJam = $employeeUpahPokokSkalaTotal[0]['total_jam'];
 

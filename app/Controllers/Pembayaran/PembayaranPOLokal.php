@@ -614,7 +614,22 @@ class PembayaranPOLokal extends BaseController
                 $total_pembayaran = $payment['amount'];
             }
 
-            $totalFinalBayar = $total_pembayaran - $potongan;
+            $totalFinalBayar = 0;
+            $totalFinalPPH   = 0;
+
+            $validPembayaranList = array_filter($pembayaranList, function ($item) {
+                return isset($item['rm_purchase_order_id']);
+            });
+
+            foreach ($validPembayaranList as $l) {
+                $totalFinalBayar += floatval($l['total_paid'] ?? 0);
+                $totalFinalPPH   += floatval($l['total_paid_pph'] ?? 0);
+            }
+
+            // potongan
+            $potongan = floatval($this->request->getVar('potongan') ?? 0);
+            $totalFinalBayar = max(0, $totalFinalBayar - $potongan);
+
 
 
             $localPOPaymentModel->update($id, [
