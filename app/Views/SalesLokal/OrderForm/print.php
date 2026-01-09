@@ -7,8 +7,8 @@
     <title>Order Form <?= $soData->customerName ?></title>
     <style>
         body {
-            font-size: 11px;
-            font-family: Courier, monospace;
+            font-size: 9px;
+            font-family: 'DejaVu Sans Mono';
             font-weight: 500;
         }
 
@@ -34,7 +34,7 @@
             margin-bottom: 5px;
             display: inline-block;
             min-width: 70px;
-            font-size: 14px;
+            font-size: 10px;
         }
 
         .description-container {

@@ -1,6 +1,18 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
+<style>
+    .dataTable th:nth-child(36),
+    .dataTable td:nth-child(6) {
+        width: 202px !important;
+        max-width: 202px;
+    }
 
+    .wrap-text {
+        white-space: normal !important;
+        word-wrap: break-word;
+        word-break: break-word;
+    }
+</style>
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
@@ -201,7 +213,8 @@
             },
             {
                 data: "supplier_name",
-                className: "text-left"
+                className: "text-left wrap-text",
+
             },
             {
                 data: "bc_type_name",
