@@ -28,6 +28,7 @@ class SalesOrderDetailModel extends Model
         'discount_unit',
         'tax',
         'harga_barang',
+        'hpp',
         'amount',
         'id_warehouse',
         'dept',

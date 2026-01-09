@@ -12,6 +12,7 @@ use App\Models\SalesOrderModel;
 use App\Models\SalesOrderDetailModel;
 use App\Models\CustomerModel;
 use App\Models\AllNoModel;
+use App\Models\BarangMasterSalesModel;
 use App\Models\SuratJalanModel;
 use App\Models\SuratJalanDetailModel;
 use App\Models\EmployeesModel;
@@ -39,6 +40,7 @@ class SuratJalan extends BaseController
     private $EmployeesModel;
     private $AllNoModel;
     private $metaDataModel;
+    private $barangMasterSalesModel;
 
     public function __construct()
     {
@@ -58,6 +60,7 @@ class SuratJalan extends BaseController
         $this->SuratJalanDetailModel = new SuratJalanDetailModel();
         $this->EmployeesModel = new EmployeesModel();
         $this->metaDataModel = new MetadataModel();
+        $this->barangMasterSalesModel = new BarangMasterSalesModel();
     }
 
     public function index()
@@ -282,6 +285,7 @@ class SuratJalan extends BaseController
             }
 
             foreach ($listItems as $key => $value) {
+                $dataBarang = $this->barangMasterSalesModel->find($value['id_barang']);
                 $valueBarang = [
                     "id_surat_jalan"        => $dataSuratJalan,
                     "id_barang"             => $value['id_barang'],
@@ -290,6 +294,7 @@ class SuratJalan extends BaseController
                     "qty"                   => number_format($value['qty'], 2, '.', ''),
                     "qty_sekarang"          => number_format($value['qty'], 2, '.', ''),
                     "harga_barang"          => number_format($value['harga_barang'], 2, '.', ''),
+                    "hpp"                   => number_format($dataBarang['harga_pokok'], 2, '.', ''),
                     "amount"                => number_format($value['total_harga_barang'], 2, '.', ''),
                     "keterangan"            => $value['keterangan'],
                     "discount_percentage"   => number_format($value['disc'], 2, '.', ''),
@@ -471,7 +476,7 @@ class SuratJalan extends BaseController
             $dataSuratJalan =  $this->SuratJalanModel->update($id, $values);
 
             foreach ($listItems as $key => $value) {
-                // var_dump($value);
+                $dataBarang = $this->barangMasterSalesModel->find($value['id_barang']);
                 if (isset($value['id_detail_sj'])) {
                     $valueBarang = [
                         "id_barang"             => $value['id_barang'],
@@ -480,6 +485,7 @@ class SuratJalan extends BaseController
                         "qty"                   => number_format($value['qty'], 2, '.', ''),
                         "qty_sekarang"          => number_format($value['qty'], 2, '.', ''),
                         "harga_barang"          => number_format($value['harga_barang'], 2, '.', ''),
+                        "hpp"                   => number_format($dataBarang['harga_pokok'], 2, '.', ''),
                         "amount"                => number_format($value['total_harga_barang'], 2, '.', ''),
                         "keterangan"            => $value['keterangan'],
                         "discount_percentage"   => number_format($value['disc'], 2, '.', ''),
@@ -497,6 +503,7 @@ class SuratJalan extends BaseController
                         "qty"                   => number_format($value['qty'], 2, '.', ''),
                         "qty_sekarang"          => number_format($value['qty'], 2, '.', ''),
                         "harga_barang"          => number_format($value['harga_barang'], 2, '.', ''),
+                        "hpp"                   => number_format($dataBarang['harga_pokok'], 2, '.', ''),
                         "amount"                => number_format($value['total_harga_barang'], 2, '.', ''),
                         "keterangan"            => $value['keterangan'],
                         "discount_percentage"   => number_format($value['disc'], 2, '.', ''),

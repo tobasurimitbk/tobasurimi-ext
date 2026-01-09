@@ -381,8 +381,8 @@ class SalesOrderInvoiceModel extends Model
             customers.kode AS kode_pelanggan,
             employees.name AS salesName,
             IFNULL(sales_order.no_sales_order, surat_jalan_so.no_surat_jalan) AS document_no,
-            SUM(barang_master_sales.harga_pokok) AS sum_harga_pokok,
-            SUM(barang_master_sales.harga_pokok * sales_order_invoice_detail.qty_invoice) AS amt_harga_pokok,
+            SUM(sales_order_invoice_detail.hpp) AS sum_harga_pokok,
+            SUM(sales_order_invoice_detail.hpp * sales_order_invoice_detail.qty_invoice) AS amt_harga_pokok,
             SUM(sales_order_invoice_detail.qty_invoice) AS sum_qty_invoice,
             SUM(sales_order_invoice_detail.amount_invoice) AS sum_amount_invoice
         ";
@@ -397,7 +397,7 @@ class SalesOrderInvoiceModel extends Model
             ->join('barang_master_sales', 'barang_master_sales.id = sales_order_invoice_detail.id_barang_invoice')
             ->join('satuans', 'satuans.id = barang_master_sales.satuan_id')
             ->where($condition)
-            ->groupBy('sales_order_invoice_detail.id_barang_invoice')
+            ->groupBy('sales_order_invoice_detail.id_barang_invoice, sales_order_invoice_detail.id_sales_order_invoice')
             ->orderBy($sort, $sortType);
 
         $totalData = $salesOrderInvoiceLokal->countAllResults(false);

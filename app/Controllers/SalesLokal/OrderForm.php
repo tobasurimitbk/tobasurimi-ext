@@ -397,21 +397,17 @@ class OrderForm extends BaseController
             $totalQty = 0;
             $totalSO = 0;
             foreach ($items as $row) {
-
-                // $this->BarangModel->builder()->decrement('stok', $row->qty);
-                // $this->stockDetailModel->addOrReduceStock($row->id_barang, $row->warehouse_id, 'New', $row->qty, 'Out', '');
-
                 $totalQty = $totalQty + $row->qty;
                 $totalSO = $totalSO + $row->discountedAmt;
-                // var_dump($row->amount);
-                // var_dump($amountValue);
-                // exit;
+                
+                $dataBarang = $this->BarangMasterSalesModel->find($row->id_barang);
                 $valueBarang = [
                     "id_sales_order"        => $dataSalesOrder,
                     "id_barang"             => $row->id_barang,
                     "qty"                   => number_format($row->qty, 2, '.', ''),
                     "qty_sekarang"          => number_format($row->qty, 2, '.', ''),
                     "harga_barang"          => number_format($row->harga_barang, 2, '.', ''),
+                    "hpp"                   => number_format($dataBarang['harga_pokok'], 2, '.', ''),
                     "amount"                => number_format($row->discountedAmt, 2, '.', ''),
                     "keterangan"            => $row->keterangan,
                     "discount_percentage"   => number_format($row->disc, 2, '.', ''),
@@ -628,13 +624,16 @@ class OrderForm extends BaseController
 
                 $amountValue = $row->amount ? (float) str_replace(",", "", $row->amount) : 0;
                 $total_harga +=  $amountValue;
+                $dataBarang = $this->BarangMasterSalesModel->find($row->id_barang);
+
                 if (!isset($row->id_detail)) {
                     $valueBarang = [
                         "id_sales_order"        => $id,
                         "id_barang"             => $row->id_barang,
                         "qty"                   => $row->qty,
-                        "qty_sekarang"                   => $row->qty,
+                        "qty_sekarang"          => $row->qty,
                         "harga_barang"          => str_replace(',', '', $row->harga_barang),
+                        "hpp"                   => number_format($dataBarang['harga_pokok'], 2, '.', ''),
                         "amount"                => number_format($amountValue, 2, '.', ''),
                         "keterangan"            => $row->keterangan,
                         "tax"                   => $row->statusppn,
@@ -651,8 +650,9 @@ class OrderForm extends BaseController
                         "id_sales_order"        => $id,
                         "id_barang"             => $row->id_barang,
                         "qty"                   => $row->qty,
-                        "qty_sekarang"                   => $row->qty,
+                        "qty_sekarang"          => $row->qty,
                         "harga_barang"          => str_replace(',', '', $row->harga_barang),
+                        "hpp"                   => number_format($dataBarang['harga_pokok'], 2, '.', ''),
                         "amount"                => number_format($amountValue, 2, '.', ''),
                         "keterangan"            => $row->keterangan,
                         "tax"                   => $row->statusppn,
@@ -1159,8 +1159,9 @@ class OrderForm extends BaseController
         $options = new \Dompdf\Options();
         $options->set('isHtml5ParserEnabled', true);
         $options->set('isRemoteEnabled', true);
-        $options->set('defaultFont', 'DejaVu Sans Mono');
-        $options->set('dpi', 96); // PENTING
+        // $options->set('defaultFont', 'DejaVu Sans Mono');
+        $options->set('defaultFont', 'Courier');
+        $options->set('dpi', 72); // PENTING
         $options->set('isFontSubsettingEnabled', true);
 
         $domPdf = new \Dompdf\Dompdf($options);

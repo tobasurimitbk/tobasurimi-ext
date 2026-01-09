@@ -364,6 +364,7 @@ class Invoice extends BaseController
             $dataSalesOrderInvoice =  $this->SalesOrderInvoiceModel->insert($values);
 
             foreach ($postItemsData as $value) {
+                $dataBarang = $this->BarangMasterSalesModel->find($value['id_barang']);
                 if ($value['qty_input'] != 0) {
                     $valuesDetail = [
                         "id_sales_order_invoice"        => $dataSalesOrderInvoice,
@@ -375,6 +376,7 @@ class Invoice extends BaseController
                         "discount_percentage_invoice"   => $value['disc'],
                         "discount_unit_invoice"         => $value['discUnit'],
                         "harga_barang_invoice"          => str_replace(',', '', $value['harga_barang']),
+                        "hpp"                           => number_format($dataBarang['harga_pokok'], 2, '.', ''),
                         "tax_invoice"                   => str_replace(',', '', ($value['tax'] ?? ($value['taxAmt'] ?? 0))),
                         "amount_invoice"                => str_replace(',', '', $value['amount']),
                     ];
@@ -739,6 +741,7 @@ class Invoice extends BaseController
                 // Periksa apakah $postItemsData tidak kosong sebelum melakukan iterasi
                 foreach ($postItemsData as $value) {
                     if (isset($value['id_detail_invoice'])) {
+                        $dataBarang = $this->BarangMasterSalesModel->find($value['id_barang']);
                         if ($value['qty_input'] != 0) {
                             $valuesDetail = [
                                 "id_barang_invoice"             => $value['id_barang'],
@@ -748,6 +751,7 @@ class Invoice extends BaseController
                                 "keterangan_invoice"            => "-",
                                 "discount_percentage_invoice"   => $value['disc'],
                                 "harga_barang_invoice"          => str_replace(',', '', $value['harga_barang']),
+                                "hpp"                           => number_format($dataBarang['harga_pokok'], 2, '.', ''),
                                 "tax_invoice"                   => str_replace(',', '', $value['tax']),
                                 "amount_invoice"                => str_replace(',', '', $value['amount']),
                             ];
@@ -777,6 +781,7 @@ class Invoice extends BaseController
                     }
                 }
                 foreach ($postItemsData as $value) {
+                    $dataBarang = $this->BarangMasterSalesModel->find($value['id_barang']);
                     if ($value['qty_input'] != 0) {
                         $valuesDetail = [
                             "id_sales_order_invoice"        => decrypt($payload['id']),
@@ -787,6 +792,7 @@ class Invoice extends BaseController
                             "keterangan_invoice"            => "-",
                             "discount_percentage_invoice"   => $value['disc'],
                             "harga_barang_invoice"          => str_replace(',', '', $value['harga_barang']),
+                            "hpp"                           => number_format($dataBarang['harga_pokok'], 2, '.', ''),
                             "tax_invoice"                   => str_replace(',', '', $value['tax']),
                             "amount_invoice"                => str_replace(',', '', $value['amount']),
                         ];

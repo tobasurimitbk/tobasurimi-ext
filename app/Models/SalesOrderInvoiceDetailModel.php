@@ -25,6 +25,7 @@ class SalesOrderInvoiceDetailModel extends Model
         'keterangan_invoice',
         'discount_percentage_invoice',
         'harga_barang_invoice',
+        'hpp',
         'tax_invoice',
         'amount_invoice',
         'id_sales_order',
