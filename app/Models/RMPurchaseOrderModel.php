@@ -1090,10 +1090,19 @@ class RMPurchaseOrderModel extends Model
 
         $poBBLokalData->orderBy($sort, $sortType);
 
+        if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
+            if (!empty($addCondition['dateStart'])) {
+                $poBBLokalData->where('rm_purchase_orders.po_date >=', $addCondition['dateStart']);
+            }
+
+            if (!empty($addCondition['dateEnd'])) {
+                $poBBLokalData->where('rm_purchase_orders.po_date <=', $addCondition['dateEnd']);
+            }
+        }
 
         $totalData = $poBBLokalData->countAllResults(false);
 
-        if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd']) || !empty($addCondition['supplierId']) || !empty($addCondition['barangId']) || !empty($addCondition['warehouseId']) || !empty($addCondition['poNo']) || !empty($addCondition['divisiId'])) {
+        if (!empty($addCondition['supplierId']) || !empty($addCondition['barangId']) || !empty($addCondition['warehouseId']) || !empty($addCondition['poNo']) || !empty($addCondition['divisiId'])) {
             $poBBLokalData->groupStart();
         }
 
@@ -1117,15 +1126,7 @@ class RMPurchaseOrderModel extends Model
             $poBBLokalData->where('rm_purchase_orders.po_no', $addCondition['poNo']);
         }
 
-        if (!empty($addCondition['dateStart'])) {
-            $poBBLokalData->where('rm_purchase_orders.po_date >=', $addCondition['dateStart']);
-        }
-
-        if (!empty($addCondition['dateEnd'])) {
-            $poBBLokalData->where('rm_purchase_orders.po_date <=', $addCondition['dateEnd']);
-        }
-
-        if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd']) || !empty($addCondition['supplierId']) || !empty($addCondition['barangId']) || !empty($addCondition['warehouseId']) || !empty($addCondition['poNo']) || !empty($addCondition['divisiId'])) {
+        if (!empty($addCondition['supplierId']) || !empty($addCondition['barangId']) || !empty($addCondition['warehouseId']) || !empty($addCondition['poNo']) || !empty($addCondition['divisiId'])) {
             $poBBLokalData->groupEnd();
         }
 
