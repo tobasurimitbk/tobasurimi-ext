@@ -92,6 +92,31 @@ class Account extends BaseController
         ]);
     }
 
+    public function dropdownSubAccountNew()
+    {
+        $search = $this->request->getGet('search');
+
+        $builder = $this->Sub_AkunsModel
+            ->where('company_id', $this->this_company_id)
+            ->where('is_header', 'true');
+
+        if (!empty($search)) {
+            $builder->groupStart()
+                ->like('nama_sub', $search)
+                ->orLike('no_sub', $search)
+                ->groupEnd();
+        }
+
+        $subAccData = $builder
+            ->select("id, CONCAT(no_sub, ' - ', nama_sub) AS text")
+            ->orderBy('no_sub', 'asc')
+            ->findAll();
+
+        return $this->response->setJSON([
+            'results' => $subAccData
+        ]);
+    }
+
     public function dropdownSubAccount()
     {
         $search = $this->request->getGet('search');
@@ -102,7 +127,8 @@ class Account extends BaseController
         $dataQry = $this->Sub_AkunsModel;
 
         if (!empty($search)) {
-            $dataQry->like('nama_sub', $search);
+            $dataQry->like('nama_sub', $search)
+                ->orLike('no_sub', $search);
         }
 
         $totalData = $dataQry->countAllResults(false);
@@ -1017,6 +1043,8 @@ class Account extends BaseController
                     "coa_id" => formatter($this->request->getPost("coa_id_sub"), "STR_TO_INT"),
                     "no_sub" => $this->request->getPost("kode_akun_sub"),
                     "nama_sub" => $this->request->getPost("nama_akun_sub"),
+                    "is_header" => !empty($this->request->getPost("is_parent")) ? "true" : "false",
+                    "id_parent" => !empty($this->request->getPost("is_parent")) ? $this->request->getPost("parent_id_sub") : 0,
                     "status" => !empty($this->request->getPost("status_sub")) ? "Aktif" : "Void"
                 ];
 
@@ -1098,6 +1126,8 @@ class Account extends BaseController
                     "coa_id" => formatter($this->request->getPost("coa_id_sub"), "STR_TO_INT"),
                     "no_sub" => $this->request->getPost("kode_akun_sub"),
                     "nama_sub" => $this->request->getPost("nama_akun_sub"),
+                    "is_header" => !empty($this->request->getPost("is_parent")) ? "true" : "false",
+                    "id_parent" => !empty($this->request->getPost("is_parent")) ? $this->request->getPost("parent_id_sub") : 0,
                     "status" => !empty($this->request->getPost("status_sub")) ? "Aktif" : "Void"
                 ];
 
@@ -1178,6 +1208,8 @@ class Account extends BaseController
     {
         if (!empty($id)) {
             $res = $this->Sub_AkunsModel->get_by_id($id);
+            // var_dump($res);
+            // exit;
 
             if (count($res)) {
 

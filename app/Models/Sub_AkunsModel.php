@@ -17,6 +17,8 @@ class Sub_AkunsModel extends Model
         'no_sub',
         'nama_sub',
         'coa_id',
+        'is_header',
+        'id_parent',
         'status',
         'createdAt',
         'updatedAt',

@@ -179,7 +179,29 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col">
+                            <div class="mb-3" style="height: 50px;">
+                                <label for="floatingInput">Is Parent</label>
+                                <div>
+                                    <label class="switch">
+                                        <input autocomplete="one-time-code" class="is_parent" name="is_parent" id="is_parent" type="checkbox" checked>
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                    <div class="row parent_id_form">
+                        <div class="col">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select parent_id_sub" name="parent_id_sub" id="parent_id_sub">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput">Parent Akun</label>
+                            </div>
+                        </div>
+                    </div>
+
                 </form>
             </div>
             <div class="modal-footer">
@@ -944,6 +966,7 @@
         })
 
         $('#subDataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+            setLoading();
             const data = subTable.row(this).data();
             $(".create-form-sub")[0].reset()
             $(".delete-btn-sub").css('display', '');
@@ -954,6 +977,9 @@
                 url: "<?= base_url("sub-account/id"); ?>" + "/" + id,
                 method: "GET",
                 dataType: "json",
+                complete: function() {
+                    stopLoading();
+                },
                 success: function(res) {
                     if (res.status) {
                         $(".id_sub").val(id);
@@ -961,24 +987,17 @@
                         $(".kode_akun_sub").val(res.data.no_sub);
                         $(".nama_akun_sub").val(res.data.nama_sub);
                         $(".status_sub").prop("checked", res.data.status === "Aktif" ? true : false);
+                        $(".is_parent").prop("checked", res.data.is_header === "true" ? true : false);
+                        if (res.data.is_header === "true") {
+                            $(".parent_id_form").hide();
+                        } else {
+                            $(".parent_id_form").show();
+                        }
+                        $(".parent_id_sub").val(res.data.id_parent).change();
 
                         validator_sub.resetForm();
                         validator_sub.reset();
 
-                        // $.ajax({
-                        //     url: `<?= base_url("header-account/dropdown"); ?>`,
-                        //     method: "GET",
-                        //     dataType: "json",
-                        //     success: function(result) {
-                        //         $(".header_id_sub").empty()
-                        //         $(".header_id_sub").append(`<option value=""></option>`)
-                        //         result.data.forEach(function(item) {
-                        //             $(".header_id_sub").append(`<option data-kategori="${item.kategori_id}" value="${item.id}">${item.nama_header}</option>`)
-                        //         })
-
-                        //         $(".header_id_sub").val(res.data.header_id).change();
-                        //     }
-                        // })
                         $('.header_id_sub').select2(select2header_id_sub);
                         const $apOption = $("<option selected='selected'></option>").val(res.data.header_id).text(res.data.nama_header);
                         $(".header_id_sub").append($apOption).trigger('change');
@@ -1026,6 +1045,14 @@
 
         $(".status").change(function() {
             subTable.ajax.reload();
+        })
+
+        $(".is_parent").change(function() {
+            if ($(this).is(':checked')) {
+                $(".parent_id_form").hide();
+            } else {
+                $(".parent_id_form").show();
+            }
         })
 
         $(".header_id_sub").on("change", function() {
@@ -1085,6 +1112,7 @@
         })
 
         $(".btn-show-form-sub").click(function() {
+            setLoading();
             $(".id_sub").val("");
             $(".header_id_sub").val("").change();
 
@@ -1095,6 +1123,7 @@
             $(".create-form-sub")[0].reset()
 
             $(".status_sub").prop("checked", true);
+            $(".parent_id_form").hide();
 
             $('.header_id_sub').select2({
                 dropdownParent: $(".add-modal-sub .modal-content"),
@@ -1116,25 +1145,49 @@
                     }
                 }
             });
+
+            $('.parent_id_sub').select2({
+                dropdownParent: $(".add-modal-sub .modal-content"),
+                placeholder: 'Pilih Parent Account',
+                allowClear: true,
+                ajax: {
+                    url: `<?= base_url("sub-account/dropdown-new"); ?>`,
+                    dataType: 'json',
+                    delay: 250,
+                    complete: function() {
+                        stopLoading(); // hentikan loading ketika ajax selesai
+                    },
+                    data: function (params) {
+                        return {
+                            search: params.term // keyword search
+                        };
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data.results
+                        };
+                    }
+                }
+            });
             // $('.header_id_sub').select2(select2header_id_sub);
 
-            $.ajax({
-                url: `<?= base_url("metadata/dropdown"); ?>`,
-                method: "GET",
-                data: {
-                    name: 'akun_coa'
-                },
-                dataType: "json",
-                success: function(result) {
-                    $(".coa_id_sub").empty()
-                    $(".coa_id_sub").append(`<option value=""></option>`)
-                    result.data.forEach(function(item) {
-                        $(".coa_id_sub").append(`<option value="${item.id}">${item.value}</option>`)
-                    })
-                    $(".delete-btn-sub").css('display', 'none');
+            // $.ajax({
+            //     url: `<?= base_url("metadata/dropdown"); ?>`,
+            //     method: "GET",
+            //     data: {
+            //         name: 'akun_coa'
+            //     },
+            //     dataType: "json",
+            //     success: function(result) {
+            //         $(".coa_id_sub").empty()
+            //         $(".coa_id_sub").append(`<option value=""></option>`)
+            //         result.data.forEach(function(item) {
+            //             $(".coa_id_sub").append(`<option value="${item.id}">${item.value}</option>`)
+            //         })
+            //         $(".delete-btn-sub").css('display', 'none');
 
-                }
-            })
+            //     }
+            // })
             $(".add-modal-sub").modal("show")
         })
 
