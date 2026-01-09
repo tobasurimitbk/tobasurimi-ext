@@ -37,7 +37,7 @@
    BAGI HALAMAN JADI 2
 =============================== */
         .half-page {
-            height: 10.2cm;
+            height: 9.2cm;
             /* (31 - 0.2) / 2 */
             box-sizing: border-box;
             overflow: hidden;
@@ -52,7 +52,7 @@
             height: 0.4cm;
             border-top: 1px dashed #000;
             margin: 0;
-            margin-top: 10px;
+            margin-top: 30px;
         }
 
         /* ===============================
