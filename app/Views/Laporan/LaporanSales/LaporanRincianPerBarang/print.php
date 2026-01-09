@@ -74,7 +74,9 @@
           </tr>
         <?php elseif (isset($row['is_total']) && $row['is_total']): ?>
           <tr class="total-row">
-            <td colspan="5">Total Invoice</td>
+            <td colspan="3"></td>
+            <td class="text-right"><?= $row['total_qty'] ?></td>
+            <td class="text-right"></td>
             <td class="text-right"><?= $row['total_invoice'] ?></td>
             <td class="text-right"><?= $row['total_hpp'] ?></td>
             <td class="text-right"><?= $row['total_laba'] ?></td>
@@ -82,7 +84,9 @@
           </tr>
         <?php elseif (isset($row['is_grand_total']) && $row['is_grand_total']): ?>
           <tr class="grand-total-row">
-              <td colspan="5"><strong>GRAND TOTAL</strong></td>
+              <td colspan="3"><strong>GRAND TOTAL</strong></td>
+              <td class="text-right"><strong><?= $row['total_qty'] ?></strong></td>
+              <td class="text-right"></td>
               <td class="text-right"><strong><?= $row['total_invoice'] ?></strong></td>
               <td class="text-right"><strong><?= $row['total_hpp'] ?></strong></td>
               <td class="text-right"><strong><?= $row['total_laba'] ?></strong></td>
