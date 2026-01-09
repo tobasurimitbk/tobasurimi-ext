@@ -1143,7 +1143,6 @@
     })
 
 
-
     $('#tipe_pembayaran').select2({
         placeholder: "Pilih Tipe Bayar",
         theme: "bootstrap-5"
@@ -1519,7 +1518,18 @@
             newRow.append($('<td style="text-align:center;">').text(greatFormatRupiahPayment(v.total_tagihan_pph)));
             newRow.append($('<td style="text-align:center;">').text(greatFormatRupiahPayment(v.total_tagihan)));
             newRow.append($('<td style="text-align:center;">').text(greatFormatRupiahPayment(v.total_paid_pph)));
-            newRow.append($('<td style="text-align:center;">').text(greatFormatRupiahPayment(v.total_paid)));
+            newRow.append($('<td style="text-align:center;">').html(`
+                <input
+                    onchange="this.value = greatFormatRupiahPayment(this.value)"
+                    oninput="limitInputBayar(this, ${v.total_tagihan})"
+                    autocomplete="one-time-code"
+                    data-id="${v.group_key}"
+                    class="form-control total_po_dibayar"
+                    type="text"
+                    value="${greatFormatRupiahPayment(v.total_paid)}"
+                    style="height:40px"
+                >
+            `));
             newRow.append($('<td class="hidden" style="display:none;">').html(
                 `
                         <input <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?>  onchange="this.value = greatFormatRupiahPayment(this.value)"  oninput="limitInputBayar(this, ${v.sisa_tagihan})" autocomplete="one-time-code" data-id="${v.penerimaan_barang_detail_id}"  class="form-control pembayaran" type="text" value="${greatFormatRupiahPayment(v.sisa_tagihan)}" name = "pembayaran" style="height:40px">
