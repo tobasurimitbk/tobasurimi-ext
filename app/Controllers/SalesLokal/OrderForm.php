@@ -1159,8 +1159,9 @@ class OrderForm extends BaseController
         $options = new \Dompdf\Options();
         $options->set('isHtml5ParserEnabled', true);
         $options->set('isRemoteEnabled', true);
-        $options->set('defaultFont', 'DejaVu Sans Mono');
-        $options->set('dpi', 96); // PENTING
+        // $options->set('defaultFont', 'DejaVu Sans Mono');
+        $options->set('defaultFont', 'Courier');
+        $options->set('dpi', 72); // PENTING
         $options->set('isFontSubsettingEnabled', true);
 
         $domPdf = new \Dompdf\Dompdf($options);

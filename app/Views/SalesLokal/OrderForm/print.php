@@ -8,12 +8,12 @@
     <style>
         body {
             font-size: 11px;
-            font-family: 'DejaVu Sans Mono';
+            font-family: Courier, monospace;
             font-weight: 500;
         }
 
         @page {
-            size: 8.27in 5.50in landscape;
+            /* size: 8.27in 5.50in landscape; */
             margin-top: 10px !important;
             margin: 25px;
             padding: 25px;
