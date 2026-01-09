@@ -238,7 +238,7 @@ class AMPurchaseOrderDetailModel extends Model
             $sisaDiterima = $b['qty'] - $jmlMasukAll;
 
             $diskonHarga = ($b['disc'] / 100) * ($b['price']);
-            $harga = ($b['price'] - $diskonHarga) + $b['additional_cost'];
+            $harga = $b['price'] - $diskonHarga;
 
             if ($penerimaanBarangID == null) {
                 // CREATE
