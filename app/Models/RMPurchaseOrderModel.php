@@ -1055,6 +1055,7 @@ class RMPurchaseOrderModel extends Model
         rm_purchase_orders.nilai_total_tambahan AS sum_nilai_total_tambahan, 
         rm_purchase_orders.nilai_total_qty AS sum_qtyPO, 
         
+        rm_purchase_order_details.note AS keterangan, 
         rm_purchase_order_details.dpp_harian AS dpp_harian, 
         rm_purchase_order_details.pph_harian AS pph_harian, 
         rm_purchase_order_details.nilai_total_harian AS nilai_total_harian, 
