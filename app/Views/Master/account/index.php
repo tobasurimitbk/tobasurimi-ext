@@ -1112,7 +1112,6 @@
         })
 
         $(".btn-show-form-sub").click(function() {
-            setLoading();
             $(".id_sub").val("");
             $(".header_id_sub").val("").change();
 
@@ -1154,9 +1153,6 @@
                     url: `<?= base_url("sub-account/dropdown-new"); ?>`,
                     dataType: 'json',
                     delay: 250,
-                    complete: function() {
-                        stopLoading(); // hentikan loading ketika ajax selesai
-                    },
                     data: function (params) {
                         return {
                             search: params.term // keyword search
