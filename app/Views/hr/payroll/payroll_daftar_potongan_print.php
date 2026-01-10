@@ -14,7 +14,7 @@
         }
 
         @page {
-            size: 9.5in 13in landscape;
+            size: 9.5in 15in landscape;
             margin: 100px 25px 25px 25px;
         }
 
