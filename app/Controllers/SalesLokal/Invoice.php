@@ -126,7 +126,7 @@ class Invoice extends BaseController
             "sortType"      => $this->request->getGet("sortType"),
         ];
 
-        if ($this->is_admin == '1') {
+        if ($this->is_admin == '1' || session()->get("login")->this_role_name == "KASIR") {
             $condition = [
                 "sales_order_invoice.deletedAt" => null,
                 "sales_order_invoice.tipe_invoice" => 'LOKAL',
