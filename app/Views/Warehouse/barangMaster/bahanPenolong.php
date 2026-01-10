@@ -4,15 +4,15 @@
 <section class="section">
     <div class="section-header">
         <h1>Bahan Penolong</h1>
-        <?php if (can('Master Barang', 'Bahan Penolong', 'c')) : ?>
-            <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
-                Import / Export
-            </button>
-            <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+        <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+            Import / Export
+        </button>
+        <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+            <?php if (can('Master Barang', 'Bahan Penolong', 'c')) : ?>
                 <li><button class="dropdown-item btn-upload-excel">Import Excel</button></li>
-                <li><button class="dropdown-item" onclick="excel('<?= base_url("barang-master/export-excel"); ?>')">Export Excel</button></li>
-            </ul>
-        <?php endif; ?>
+            <?php endif; ?>
+            <li><button class="dropdown-item" onclick="excel('<?= base_url("barang-master/export-excel"); ?>')">Export Excel</button></li>
+        </ul>
         <?php if (can('Master Barang', 'Bahan Penolong', 'c')) : ?>
             <button class="btn btn-show-form btn-add btn-add-barang float-right">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
