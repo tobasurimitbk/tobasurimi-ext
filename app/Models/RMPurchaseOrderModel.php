@@ -161,26 +161,29 @@ class RMPurchaseOrderModel extends Model
             ->groupBy(('rm_purchase_orders.id'))
             ->orderBy($sort, $sortType);
 
+        if ($addCondition['is_posted'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $bbLokalDataQry->groupStart();
+            if ($addCondition['is_posted']) {
+                if ($addCondition['is_posted'] == "SUDAH POSTING") {
+                    $bbLokalDataQry->where('is_posted', 1);
+                } else {
+                    $bbLokalDataQry->where('is_posted', 0);
+                }
+            }
+
+            if ($addCondition['dateStart']) {
+                $bbLokalDataQry->where('rm_purchase_orders.po_date >=',  $addCondition['dateStart']);
+            }
+            if ($addCondition['dateEnd']) {
+                $bbLokalDataQry->where('rm_purchase_orders.po_date <=', $addCondition['dateEnd']);
+            }
+            $bbLokalDataQry->groupEnd();
+        }
+
         $totalData = $bbLokalDataQry->countAllResults(false);
 
-        if ($addCondition['is_posted']) {
-            if ($addCondition['is_posted'] == "SUDAH POSTING") {
-                $bbLokalDataQry->where('is_posted', 1);
-            } else {
-                $bbLokalDataQry->where('is_posted', 0);
-            }
-        }
-
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+        if ($addCondition['search']) {
             $bbLokalDataQry->groupStart();
-        }
-
-
-        if ($addCondition['dateStart']) {
-            $bbLokalDataQry->where('rm_purchase_orders.po_date >=',  $addCondition['dateStart']);
-        }
-        if ($addCondition['dateEnd']) {
-            $bbLokalDataQry->where('rm_purchase_orders.po_date <=', $addCondition['dateEnd']);
         }
 
         if ($addCondition['search']) {
@@ -191,7 +194,7 @@ class RMPurchaseOrderModel extends Model
             $bbLokalDataQry->orLike('divisis.divisi', $addCondition['search'])
                 ->groupEnd();
         }
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+        if ($addCondition['search']) {
             $bbLokalDataQry->groupEnd();
         }
 
@@ -1052,6 +1055,7 @@ class RMPurchaseOrderModel extends Model
         rm_purchase_orders.nilai_total_tambahan AS sum_nilai_total_tambahan, 
         rm_purchase_orders.nilai_total_qty AS sum_qtyPO, 
         
+        rm_purchase_order_details.note AS keterangan, 
         rm_purchase_order_details.dpp_harian AS dpp_harian, 
         rm_purchase_order_details.pph_harian AS pph_harian, 
         rm_purchase_order_details.nilai_total_harian AS nilai_total_harian, 
@@ -1070,12 +1074,12 @@ class RMPurchaseOrderModel extends Model
             ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
             ->join('companies', 'companies.id = rm_purchase_orders.company_id', 'left')
             ->join('users', 'rm_purchase_orders.createdBy = users.id', 'left')
-            ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
+            ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id AND rm_purchase_order_details.deletedAt IS NULL', 'left')
             ->join('barang_master', 'rm_purchase_order_details.barang1_id = barang_master.id', 'left')
             ->join('barang_master_spesifikasi', 'rm_purchase_order_details.barang2_id = barang_master_spesifikasi.id', 'left')
-            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_details_id = rm_purchase_order_details.id AND penerimaan_barang_detail.purchase_order_id = rm_purchase_orders.id', 'left')
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_details_id = rm_purchase_order_details.id AND penerimaan_barang_detail.purchase_order_id = rm_purchase_orders.id AND penerimaan_barang_detail.deletedAt IS NULL', 'left')
             ->join('satuans', 'satuans.id = rm_purchase_order_details.satuan_id', 'left')
-            ->join('penerimaan_barang', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->join('penerimaan_barang', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id AND penerimaan_barang.deletedAt IS NULL', 'left')
             ->join('warehouses', 'penerimaan_barang.warehouse_id = warehouses.id', 'left')
             ->join('supplier_harga', 'supplier_harga.id = rm_purchase_order_details.supplier_harga_id', 'left')
             ->join('divisis', 'divisis.id = rm_purchase_orders.divisi_id', 'left')
@@ -1087,10 +1091,19 @@ class RMPurchaseOrderModel extends Model
 
         $poBBLokalData->orderBy($sort, $sortType);
 
+        if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
+            if (!empty($addCondition['dateStart'])) {
+                $poBBLokalData->where('rm_purchase_orders.po_date >=', $addCondition['dateStart']);
+            }
+
+            if (!empty($addCondition['dateEnd'])) {
+                $poBBLokalData->where('rm_purchase_orders.po_date <=', $addCondition['dateEnd']);
+            }
+        }
 
         $totalData = $poBBLokalData->countAllResults(false);
 
-        if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd']) || !empty($addCondition['supplierId']) || !empty($addCondition['barangId']) || !empty($addCondition['warehouseId']) || !empty($addCondition['poNo']) || !empty($addCondition['divisiId'])) {
+        if (!empty($addCondition['supplierId']) || !empty($addCondition['barangId']) || !empty($addCondition['warehouseId']) || !empty($addCondition['poNo']) || !empty($addCondition['divisiId'])) {
             $poBBLokalData->groupStart();
         }
 
@@ -1114,15 +1127,7 @@ class RMPurchaseOrderModel extends Model
             $poBBLokalData->where('rm_purchase_orders.po_no', $addCondition['poNo']);
         }
 
-        if (!empty($addCondition['dateStart'])) {
-            $poBBLokalData->where('rm_purchase_orders.po_date >=', $addCondition['dateStart']);
-        }
-
-        if (!empty($addCondition['dateEnd'])) {
-            $poBBLokalData->where('rm_purchase_orders.po_date <=', $addCondition['dateEnd']);
-        }
-
-        if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd']) || !empty($addCondition['supplierId']) || !empty($addCondition['barangId']) || !empty($addCondition['warehouseId']) || !empty($addCondition['poNo']) || !empty($addCondition['divisiId'])) {
+        if (!empty($addCondition['supplierId']) || !empty($addCondition['barangId']) || !empty($addCondition['warehouseId']) || !empty($addCondition['poNo']) || !empty($addCondition['divisiId'])) {
             $poBBLokalData->groupEnd();
         }
 

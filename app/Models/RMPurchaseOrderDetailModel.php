@@ -732,9 +732,155 @@ class RMPurchaseOrderDetailModel extends Model
         // Format output sesuai permintaan
         $output = [];
         foreach ($rmPurchaseOrderDetail as $detail) {
-            $output[] = "PEMB. {$detail['barang_name']} {$detail['spesifikasi_tergabung']}; {$detail['qty_diterima_total']} {$detail['kode_satuan']}; {$detail['nama_supplier']}; {$detail['po_no']}";
+            $qtyFormatted = number_format($detail['qty_diterima_total'], 2, '.', '');
+            $output[] = "PEMB. {$detail['barang_name']} {$detail['spesifikasi_tergabung']}; {$qtyFormatted} {$detail['kode_satuan']}; {$detail['nama_supplier']}; {$detail['po_no']}";
         }
 
         return implode('; ', $output); // Jika ada banyak barang, pisahkan dengan titik koma
+    }
+
+    public function getPoBBLokalForSupplierNew($availableSort, $condition, $addCondition, $limit = 10, $offset = 0, $isGroupBy = null)
+    {
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        if (!empty($addCondition['sort'])) {
+            if ($addCondition['sort'] == "rm_purchase_orders.po_date" || $addCondition['sort'] == "poDate") {
+                $sort = 'rm_purchase_orders.po_date, rm_purchase_orders.po_no';
+                $sortType = 'ASC';
+            } else {
+                $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'rm_purchase_orders.updatedAt';
+                $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+            }
+            if ($addCondition['sort'] == "rm_purchase_orders.po_date, divisis.id") {
+                $sort = 'divisis.id, rm_purchase_orders.po_date, rm_purchase_orders.po_no';
+                $sortType = 'ASC';
+            } else {
+                $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'rm_purchase_orders.updatedAt';
+                $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+            }
+        } else {
+            $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'rm_purchase_orders.updatedAt';
+            $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+        }
+
+        $selectQry = "
+        suppliers.no_npwp AS supplierNpwp,
+        suppliers.name AS supplierName, 
+        rm_purchase_orders.id AS po_id, 
+        rm_purchase_orders.po_no AS poNum, 
+        rm_purchase_orders.po_date AS poDate, 
+        rm_purchase_orders.barang_id,
+        rm_purchase_orders.supplier_id,
+        barang_master.barang_name AS barangName, 
+        warehouses.warehouse_name AS warehouseName, 
+        satuans.kode_satuan AS satuanName, 
+        companies.company AS companyName, 
+        rm_purchase_orders.pph AS poPPH,
+        barang_master_spesifikasi.spesifikasi AS spekName,
+        divisis.divisi AS divisiName,
+        divisis.id AS divisi_id,
+        rm_purchase_orders.dpp_harian AS sum_dpp_harian, 
+        rm_purchase_orders.pph_harian AS sum_pph_harian, 
+        rm_purchase_orders.nilai_total_harian AS sum_nilai_total_harian, 
+        rm_purchase_orders.dpp_bulanan AS sum_dpp_bulanan, 
+        rm_purchase_orders.pph_bulanan AS sum_pph_bulanan, 
+        rm_purchase_orders.nilai_total_bulanan AS sum_nilai_total_bulanan, 
+        rm_purchase_orders.dpp_umum AS sum_dpp_umum, 
+        rm_purchase_orders.pph_umum AS sum_pph_umum, 
+        rm_purchase_orders.nilai_total_umum AS sum_nilai_total_umum, 
+        rm_purchase_orders.dpp_tambahan AS sum_dpp_tambahan, 
+        rm_purchase_orders.pph_tambahan AS sum_pph_tambahan, 
+        rm_purchase_orders.nilai_total_tambahan AS sum_nilai_total_tambahan, 
+        rm_purchase_orders.nilai_total_qty AS sum_qtyPO, 
+        
+        rm_purchase_order_details.dpp_harian AS dpp_harian, 
+        rm_purchase_order_details.note AS keterangan, 
+        rm_purchase_order_details.pph_harian AS pph_harian, 
+        rm_purchase_order_details.nilai_total_harian AS nilai_total_harian, 
+        rm_purchase_order_details.dpp_bulanan AS dpp_bulanan, 
+        rm_purchase_order_details.pph_bulanan AS pph_bulanan, 
+        rm_purchase_order_details.nilai_total_bulanan AS nilai_total_bulanan, 
+        rm_purchase_order_details.dpp_umum AS dpp_umum, 
+        rm_purchase_order_details.pph_umum AS pph_umum, 
+        rm_purchase_order_details.nilai_total_umum AS nilai_total_umum, 
+        rm_purchase_order_details.qty AS qtyPO, 
+        ";
+
+        $poBBLokalData = $this->asObject()
+            ->distinct()
+            ->select($selectQry)
+            ->join('rm_purchase_orders', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
+            ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
+            ->join('companies', 'companies.id = rm_purchase_orders.company_id', 'left')
+            ->join('users', 'rm_purchase_orders.createdBy = users.id', 'left')
+            ->join('barang_master', 'rm_purchase_order_details.barang1_id = barang_master.id', 'left')
+            ->join('barang_master_spesifikasi', 'rm_purchase_order_details.barang2_id = barang_master_spesifikasi.id', 'left')
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_details_id = rm_purchase_order_details.id AND penerimaan_barang_detail.purchase_order_id = rm_purchase_orders.id', 'left')
+            ->join('satuans', 'satuans.id = rm_purchase_order_details.satuan_id', 'left')
+            ->join('penerimaan_barang', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->join('warehouses', 'penerimaan_barang.warehouse_id = warehouses.id', 'left')
+            ->join('supplier_harga', 'supplier_harga.id = rm_purchase_order_details.supplier_harga_id', 'left')
+            ->join('divisis', 'divisis.id = rm_purchase_orders.divisi_id', 'left')
+            ->where($condition);
+
+        if ($isGroupBy == "PO") {
+            $poBBLokalData->groupBy('rm_purchase_orders.id');
+        }
+
+        $poBBLokalData->orderBy($sort, $sortType);
+
+        if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
+            if (!empty($addCondition['dateStart'])) {
+                $poBBLokalData->where('rm_purchase_orders.po_date >=', $addCondition['dateStart']);
+            }
+
+            if (!empty($addCondition['dateEnd'])) {
+                $poBBLokalData->where('rm_purchase_orders.po_date <=', $addCondition['dateEnd']);
+            }
+        }
+
+        $totalData = $poBBLokalData->countAllResults(false);
+
+        if (!empty($addCondition['supplierId']) || !empty($addCondition['barangId']) || !empty($addCondition['warehouseId']) || !empty($addCondition['poNo']) || !empty($addCondition['divisiId'])) {
+            $poBBLokalData->groupStart();
+        }
+
+        if (!empty($addCondition['supplierId'])) {
+            $poBBLokalData->where('rm_purchase_orders.supplier_id', $addCondition['supplierId']);
+        }
+
+        if (!empty($addCondition['barangId'])) {
+            $poBBLokalData->where('rm_purchase_orders.barang_id', $addCondition['barangId']);
+        }
+
+        if (!empty($addCondition['warehouseId'])) {
+            $poBBLokalData->where('penerimaan_barang.warehouse_id', $addCondition['warehouseId']);
+        }
+
+        if (!empty($addCondition['divisiId'])) {
+            $poBBLokalData->where('penerimaan_barang.divisi_id', $addCondition['divisiId']);
+        }
+
+        if (!empty($addCondition['poNo'])) {
+            $poBBLokalData->where('rm_purchase_orders.po_no', $addCondition['poNo']);
+        }
+
+        if (!empty($addCondition['supplierId']) || !empty($addCondition['barangId']) || !empty($addCondition['warehouseId']) || !empty($addCondition['poNo']) || !empty($addCondition['divisiId'])) {
+            $poBBLokalData->groupEnd();
+        }
+
+        $totalFilteredData = $poBBLokalData->countAllResults(false);
+        if ($limit == null && $offset == null) {
+            $data = $poBBLokalData->findAll();
+        } else {
+            $data = $poBBLokalData->findAll($limit, $offset);
+        }
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
     }
 }

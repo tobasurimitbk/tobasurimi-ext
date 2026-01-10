@@ -415,7 +415,7 @@ class AttendancesModel extends Model
     //     }
     // }
 
-    public function generate($employeeData, $startDate, $endDate, $year, $month, $companyID)
+    public function generateBackup($employeeData, $startDate, $endDate, $year, $month, $companyID)
     {
         $AttendanceModel     = new AttendancesModel();
         $FormPerijinanModel  = new FormPerijinanModel();
@@ -624,6 +624,274 @@ class AttendancesModel extends Model
             // --- 6. insert batch biar cepat
             if ($batchInsert) {
                 $AttendanceModel->insertBatch($batchInsert, 500);
+            }
+
+            // insert batch keterangan
+            if ($batchKeterangan) {
+                $AttendanceKeteranganModel->insertKeteranganBatch($batchKeterangan, 500);
+            }
+
+            return ['status' => true, 'message' => ''];
+        } catch (\Exception $e) {
+            return ['status' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+    public function generate($employeeData, $startDate, $endDate, $year, $month, $companyID)
+    {
+        $AttendanceModel     = new AttendancesModel();
+        $FormPerijinanModel  = new FormPerijinanModel();
+        $hariLiburModel      = new BigDaysModel();
+        $AttendancesLogModel = new AttendancesLogModel();
+        $EmployeeJamKerjaModel = new EmployeeJamKerjaModel();
+        $AttendanceKeteranganModel = new AttendanceKeteranganModel();
+
+        try {
+            $employeeIds = array_column($employeeData, 'id');
+
+            // Siapkan yang diabaikan dulu
+            $attendanceAbaikan =  $AttendanceModel
+                ->where('periode >=', $startDate)
+                ->where('periode <=', $endDate)
+                ->whereIn('employee_id', $employeeIds)
+                ->where('abaikan_sync_log', "yes")
+                ->findAll();
+
+            $abaikanMap = [];
+            foreach ($attendanceAbaikan as $a) {
+                $abaikanMap[$a['employee_id']][$a['periode']] = true;
+            }
+
+            // --- 1. siapkan range tanggal
+            $allDates = [];
+            $startDateTimestamp = strtotime($startDate);
+            $endDateTimestamp   = strtotime($endDate);
+
+            while ($startDateTimestamp <= $endDateTimestamp) {
+                $allDates[] = date('Y-m-d', $startDateTimestamp);
+                $startDateTimestamp += 86400;
+            }
+
+            // --- 2. load semua perizinan (sekali query)
+            $formPerizinanAll = $FormPerijinanModel
+                ->whereIn('employee_id', $employeeIds)
+                ->where('deletedAt', null)
+                ->where('periode >=', $startDate)
+                ->where('periode <=', $endDate)
+                ->findAll();
+
+            $mapPerizinan = [];
+            foreach ($formPerizinanAll as $izin) {
+                $mapPerizinan[$izin['employee_id']][$izin['periode']] = $izin;
+            }
+
+            // --- 3. load semua hari libur (sekali query)
+            $hariLiburAll = $hariLiburModel
+                ->where('date >=', $startDate)
+                ->where('date <=', $endDate)
+                ->findAll();
+
+            $setHariLibur = array_column($hariLiburAll, 'date');
+            $setHariLibur = array_flip($setHariLibur); // untuk cepat cek isset()
+
+            // --- 4. load semua log attendance (sekali query)
+            // === 1️⃣ Ambil semua log absensi untuk jam kerja normal (bukan lintas hari)
+            $logsNormal = $AttendancesLogModel
+                ->select("
+                    employees_id,
+                    DATE(date_create) as tgl,
+                    DATE_FORMAT(MIN(date_create), '%H:%i:%s') AS checkin,
+                    DATE_FORMAT(MAX(date_create), '%H:%i:%s') AS checkout
+                ")
+                ->whereIn('employees_id', $employeeIds)
+                ->where('date_create >=', $startDate . ' 00:00:00')
+                ->where('date_create <=', $endDate . ' 23:59:59')
+                ->groupBy('employees_id, DATE(date_create)')
+                ->findAll();
+
+
+            // =======================================
+            // 1️⃣ Ambil semua jam kerja lintas hari
+            // =======================================
+            $jamkerjaLintasHari = $EmployeeJamKerjaModel
+                ->select('employees_jam_kerja.employee_id, employees_jam_kerja.tanggal')
+                ->join('jam_kerja', 'jam_kerja.id = employees_jam_kerja.jam_kerja_id', 'left')
+                ->whereIn('employee_id', $employeeIds)
+                ->where('jam_kerja.lintas_hari', "yes")
+                ->where('employees_jam_kerja.deletedAt', null)
+                ->groupStart()
+                ->where('employees_jam_kerja.tanggal >=', $startDate)
+                ->where('employees_jam_kerja.tanggal <=', $endDate)
+                ->groupEnd()
+                ->findAll();
+
+            // ====================================================
+            // 2️⃣ Buat mapping tanggal lintas hari per employee
+            // ====================================================
+            $mapLintas = [];
+            foreach ($jamkerjaLintasHari as $j) {
+                $mapLintas[$j['employee_id']][] = $j['tanggal'];
+            }
+
+            // ====================================================
+            // 3️⃣ Ambil semua logs untuk employees dan tanggal lintas
+            // ====================================================
+            $allDates = [];
+            $allLogs = [];
+            foreach ($mapLintas as $tgls) {
+                foreach ($tgls as $tgl) {
+                    $allDates[] = $tgl;
+                    $allDates[] = date('Y-m-d', strtotime($tgl . ' +1 day')); // include next day
+                }
+            }
+
+            if (count($mapLintas) > 0) {
+
+                // Ambil min/max tanggal untuk query
+                $minTanggal = min($allDates) . ' 00:00:00';
+                $maxTanggal = max($allDates) . ' 23:59:59';
+
+                // Ambil semua logs sekaligus
+                $allLogs = $AttendancesLogModel
+                    ->select('employees_id, date_create')
+                    ->whereIn('employees_id', $employeeIds)
+                    ->where('date_create >=', $minTanggal)
+                    ->where('date_create <=', $maxTanggal)
+                    ->orderBy('employees_id, date_create')
+                    ->findAll();
+            }
+
+
+            // ====================================================
+            // 4️⃣ Proses logs di PHP menjadi checkin/checkout per tanggal
+            // ====================================================
+            $logsLintas = [];
+
+            foreach ($mapLintas as $empId => $tgls) {
+                foreach ($tgls as $tgl) {
+                    $startToday = strtotime($tgl . ' 00:00:00');
+                    $endToday   = strtotime($tgl . ' 23:59:59');
+                    $startNext  = strtotime($tgl . ' +1 day 00:00:00');
+                    $endNext    = strtotime($tgl . ' +1 day 23:59:59');
+
+                    $checkin  = null;
+                    $checkout = null;
+
+                    // Loop semua logs untuk employee ini
+                    foreach ($allLogs as $log) {
+                        if ($log['employees_id'] != $empId) continue;
+
+                        $logTime = strtotime($log['date_create']);
+
+                        // Checkin = MAX di hari pertama
+                        if ($logTime >= $startToday && $logTime <= $endToday) {
+                            if (!$checkin || $logTime > strtotime($checkin)) {
+                                $checkin = $log['date_create'];
+                            }
+                        }
+
+                        // Checkout = MIN di hari berikutnya
+                        if ($logTime >= $startNext && $logTime <= $endNext) {
+                            if (!$checkout || $logTime < strtotime($checkout)) {
+                                $checkout = $log['date_create'];
+                            }
+                        }
+                    }
+
+                    if ($checkin || $checkout) {
+                        $logsLintas[] = [
+                            'employees_id' => $empId,
+                            'tgl_kerja'    => $tgl,
+                            'checkin'      => $checkin ? date('H:i:s', strtotime($checkin)) : null,
+                            'checkout'     => $checkout ? date('H:i:s', strtotime($checkout)) : null
+                        ];
+                    }
+                }
+            }
+
+
+            // === 5️⃣ Gabungkan hasil log normal dan lintas hari ke satu struktur
+            $mapLog = [];
+
+            // log normal
+            foreach ($logsNormal as $l) {
+                $mapLog[$l['employees_id']][$l['tgl']] = [
+                    'checkin'  => $l['checkin'],
+                    'checkout' => $l['checkout']
+                ];
+            }
+
+            // log lintas hari
+            foreach ($logsLintas as $l) {
+                $mapLog[$l['employees_id']][$l['tgl_kerja']] = [
+                    'checkin'  => $l['checkin'],
+                    'checkout' => $l['checkout']
+                ];
+            }
+
+            // --- 5. loop employee × tanggal (tanpa query)
+            $batchInsert = [];
+            $batchKeterangan = [];
+
+            foreach ($employeeData as $e) {
+                foreach ($allDates as $dates) {
+                    $izin  = $mapPerizinan[$e['id']][$dates] ?? null;
+                    $log   = $mapLog[$e['id']][$dates] ?? null;
+                    $libur = isset($setHariLibur[$dates]) || date('w', strtotime($dates)) == 0;
+
+                    if ($libur && !$izin && !$log) {
+                        $status = "LIBUR_L";
+                        $reason = "";
+                        $checkin = $checkout = null;
+                    } elseif ($izin) {
+
+                        $status  = $izin['status'];
+                        $reason  = $izin['reason'];
+                        $checkin = $checkout = null;
+                    } elseif (!$log) {
+                        $status = "ALPHA_A";
+                        $reason = "";
+                        $checkin = $checkout = null;
+                    } else {
+                        if ($log['checkin'] == null && $log['checkout'] == null) {
+                            $status  = "ALPHA_A";
+                        } else {
+                            $status  = "HADIR_H";
+                        }
+                        $reason  = "";
+                        $checkin = $log['checkin'];
+                        $checkout = $log['checkout'];
+                    }
+
+                    if (empty($abaikanMap[$e['id']][$dates])) {
+                        // yang 
+                        $batchInsert[] = [
+                            'company_id'  => $companyID,
+                            'division_id' => $e['division_id'],
+                            'employee_id' => $e['id'],
+                            'periode'     => $dates,
+                            'checkin'     => $checkin,
+                            'checkout'    => $checkout,
+                            'status'      => $status,
+                            'reason'      => $reason,
+                            'year_month'  => $year . "-" . $month,
+                            'isApproved'  => $izin['is_approval'] ?? 1
+                        ];
+
+                        if ($reason != '' && $reason != null && $reason != '-') {
+                            $batchKeterangan[] =  [
+                                'employee_id' => $e['id'],
+                                'tanggal' => $dates,
+                                'reason' => $reason
+                            ];
+                        }
+                    }
+                }
+            }
+
+            // --- 6. insert batch biar cepat
+            if ($batchInsert) {
+                $AttendanceModel->insertBatch($batchInsert, 1000);
             }
 
             // insert batch keterangan

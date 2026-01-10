@@ -80,8 +80,6 @@ class LaporanSupplierLokalBB extends BaseController
 
         $condition = [
             'rm_purchase_orders.deletedAt' => null,
-            // 'rm_purchase_orders.is_posted' => '1',
-            // 'rm_purchase_orders.status_penerimaan' => '1',
             'rm_purchase_order_details.deletedAt' => null,
             'rm_purchase_orders.company_id' => $this->this_company_id,
             'rm_purchase_orders.status_external' => 'no',
@@ -1610,23 +1608,21 @@ class LaporanSupplierLokalBB extends BaseController
 
         $grouped = [];
         foreach ($allData as &$row) {
-            $supplier = $row->supplierName ?? '-';
-            $barang   = $row->barangName ?? '-';
-            $key = $supplier . '||' . $barang;
+            // Normalize strings
+            $supplier = trim(preg_replace('/\s+/', ' ', $row->supplierName ?? '-'));
+            $barang   = trim(preg_replace('/\s+/', ' ', $row->barangName ?? '-'));
+            
+            // Atau gunakan case-insensitive jika perlu
+            $key = strtolower($supplier) . '||' . strtolower($barang);
 
             $qtyDetail   = floatval($row->qtyPO ?? 0);
             $qtyTotalPO  = floatval($row->sum_qtyPO ?? 0);
             $proporsi    = ($qtyTotalPO > 0) ? ($qtyDetail / $qtyTotalPO) : 0;
 
             // Tambahan (hasil proporsional)
-            $row->dpp_tambahan =
-                floatval($row->sum_dpp_tambahan ?? 0) * $proporsi;
-
-            $row->pph_tambahan =
-                floatval($row->sum_pph_tambahan ?? 0) * $proporsi;
-
-            $row->nilai_total_tambahan =
-                floatval($row->sum_nilai_total_tambahan ?? 0) * $proporsi;
+            $row->dpp_tambahan = floatval($row->sum_dpp_tambahan ?? 0) * $proporsi;
+            $row->pph_tambahan = floatval($row->sum_pph_tambahan ?? 0) * $proporsi;
+            $row->nilai_total_tambahan = floatval($row->sum_nilai_total_tambahan ?? 0) * $proporsi;
 
             if (!isset($grouped[$key])) {
                 $grouped[$key] = [
