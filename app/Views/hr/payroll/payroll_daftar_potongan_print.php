@@ -90,7 +90,7 @@
         <table width="100%" border="1" id="dashed-border-table" style="margin-top: 30px;">
             <?php foreach ($payrollData['res'] as $payroll) : ?>
                 <tr>
-                    <td colspan="19" style="font-weight: bold; text-align:left;">
+                    <td colspan="20" style="font-weight: bold; text-align:left;">
                         BAGIAN : <?= $payroll['bagian'] ?>
                     </td>
                 </tr>
@@ -99,20 +99,22 @@
                     <td>Kode</td>
                     <td>Kode Kop</td>
                     <td>Nama Karyawan</td>
-                    <td>Pot. Bon Koperasi</td>
-                    <td>Pot. BPJS</td>
-                    <td>Pot. Denda</td>
                     <td>Pot. Iuran Koperasi</td>
-                    <td>Pot. Kantin</td>
-                    <td>Pot. Pinjaman Koperasi</td>
-                    <td>Pot. Pinjaman Lain-lain</td>
+                    <td>Pot. Stm</td>
+                    <td>Pot. BPJS</td>
+                    <td>Pot. Spm</td>
+                    <td>Pot. Tutup Mulut</td>
                     <td>Pot. Baju Seragam</td>
                     <td>Pot. Sepatu, Celana, Topi</td>
-                    <td>Pot. Tutup Mulut</td>
-                    <td>Pot. Spm</td>
-                    <td>Pot. Stm</td>
-                    <td>Pot. Uang Makan</td>
+                    <td>Pot. Denda</td>
+                    <td>Pot. Kartu</td>
+                    <td>Pot. Bon Koperasi</td>
+                    <td>Pot. Pinjaman Koperasi</td>
                     <td>Pot. Pinjaman</td>
+
+                    <td>Pot. Kantin</td>
+                    <td>Pot. Pinjaman Lain-lain</td>
+                    <td>Pot. Uang Makan</td>
                     <td>Total Potongan</td>
                 </tr>
                 <?php $no = 1; ?>
@@ -122,39 +124,43 @@
                         <td><?= $pd['employee']['nip'] ?></td>
                         <td></td>
                         <td><?= $pd['employee']['name'] ?></td>
-                        <td><?= number_format($pd['potBonKoperasi'], 2, ',', '.')  ?></td>
-                        <td><?= number_format($pd['potBpjs'], 2, ',', '.')  ?></td>
-                        <td><?= number_format($pd['potDenda'], 2, ',', '.')  ?></td>
                         <td><?= number_format($pd['potIuranKoperasi'], 2, ',', '.')  ?></td>
-                        <td><?= number_format($pd['potKantin'], 2, ',', '.')  ?></td>
-                        <td><?= number_format($pd['potPinjamanKoperasi'], 2, ',', '.')  ?></td>
-                        <td><?= number_format($pd['potPinjamanLainLain'], 2, ',', '.')  ?></td>
+                        <td><?= number_format($pd['potStm'], 2, ',', '.')  ?></td>
+                        <td><?= number_format($pd['potBpjs'], 2, ',', '.')  ?></td>
+                        <td><?= number_format($pd['potSpm'], 2, ',', '.')  ?></td>
+                        <td><?= number_format($pd['potTutupMulut'], 2, ',', '.')  ?></td>
                         <td><?= number_format($pd['potBajuSeragam'], 2, ',', '.')  ?></td>
                         <td><?= number_format($pd['potSepatuCelanaTopi'], 2, ',', '.')  ?></td>
-                        <td><?= number_format($pd['potTutupMulut'], 2, ',', '.')  ?></td>
-                        <td><?= number_format($pd['potSpm'], 2, ',', '.')  ?></td>
-                        <td><?= number_format($pd['potStm'], 2, ',', '.')  ?></td>
-                        <td><?= number_format($pd['potUangMakan'], 2, ',', '.')  ?></td>
+                        <td><?= number_format($pd['potDenda'], 2, ',', '.')  ?></td>
+                        <td>0</td>
+                        <td><?= number_format($pd['potBonKoperasi'], 2, ',', '.')  ?></td>
+                        <td><?= number_format($pd['potPinjamanKoperasi'], 2, ',', '.')  ?></td>
                         <td><?= number_format($pd['potPinjaman'], 2, ',', '.')  ?></td>
+
+                        <td><?= number_format($pd['potKantin'], 2, ',', '.')  ?></td>
+                        <td><?= number_format($pd['potPinjamanLainLain'], 2, ',', '.')  ?></td>
+                        <td><?= number_format($pd['potUangMakan'], 2, ',', '.')  ?></td>
                         <td><?= number_format($pd['totPotongan'], 2, ',', '.')  ?></td>
                     </tr>
                 <?php endforeach; ?>
                 <tr>
                     <td colspan="4" style="text-align: right;">Total</td>
-                    <td><?= number_format($payroll['totPotonganSingle']['totPotBonKoperasi'], 2, ',', '.') ?></td>
-                    <td><?= number_format($payroll['totPotonganSingle']['totPotBpjs'], 2, ',', '.') ?></td>
-                    <td><?= number_format($payroll['totPotonganSingle']['totPotDenda'], 2, ',', '.') ?></td>
                     <td><?= number_format($payroll['totPotonganSingle']['totPotIuranKoperasi'], 2, ',', '.') ?></td>
-                    <td><?= number_format($payroll['totPotonganSingle']['totPotKantin'], 2, ',', '.') ?></td>
-                    <td><?= number_format($payroll['totPotonganSingle']['totPinjamanKoperasi'], 2, ',', '.') ?></td>
-                    <td><?= number_format($payroll['totPotonganSingle']['totPotPinjamanLainLain'], 2, ',', '.') ?></td>
+                    <td><?= number_format($payroll['totPotonganSingle']['totPotStm'], 2, ',', '.') ?></td>
+                    <td><?= number_format($payroll['totPotonganSingle']['totPotBpjs'], 2, ',', '.') ?></td>
+                    <td><?= number_format($payroll['totPotonganSingle']['totPotSpm'], 2, ',', '.') ?></td>
+                    <td><?= number_format($payroll['totPotonganSingle']['totPotTutupMulut'], 2, ',', '.') ?></td>
                     <td><?= number_format($payroll['totPotonganSingle']['totPotBajuSeragam'], 2, ',', '.') ?></td>
                     <td><?= number_format($payroll['totPotonganSingle']['totPotSepatuCelanaTopi'], 2, ',', '.') ?></td>
-                    <td><?= number_format($payroll['totPotonganSingle']['totPotTutupMulut'], 2, ',', '.') ?></td>
-                    <td><?= number_format($payroll['totPotonganSingle']['totPotSpm'], 2, ',', '.') ?></td>
-                    <td><?= number_format($payroll['totPotonganSingle']['totPotStm'], 2, ',', '.') ?></td>
-                    <td><?= number_format($payroll['totPotonganSingle']['totPotUangMakan'], 2, ',', '.') ?></td>
+                    <td><?= number_format($payroll['totPotonganSingle']['totPotDenda'], 2, ',', '.') ?></td>
+                    <td>0</td>
+                    <td><?= number_format($payroll['totPotonganSingle']['totPotBonKoperasi'], 2, ',', '.') ?></td>
+                    <td><?= number_format($payroll['totPotonganSingle']['totPinjamanKoperasi'], 2, ',', '.') ?></td>
                     <td><?= number_format($payroll['totPotonganSingle']['totPotPinjaman'], 2, ',', '.') ?></td>
+
+                    <td><?= number_format($payroll['totPotonganSingle']['totPotKantin'], 2, ',', '.') ?></td>
+                    <td><?= number_format($payroll['totPotonganSingle']['totPotPinjamanLainLain'], 2, ',', '.') ?></td>
+                    <td><?= number_format($payroll['totPotonganSingle']['totPotUangMakan'], 2, ',', '.') ?></td>
                     <td><?= number_format($payroll['totPotonganSingle']['totPotongan'], 2, ',', '.') ?></td>
 
                 </tr>
@@ -163,20 +169,22 @@
                 <td colspan="4" style="text-align: right;">
                     Total Keseluruhan
                 </td>
-                <td><?= number_format($payrollData['potAll']['totPotBonKoperasi'], 2, ',', '.') ?></td>
-                <td><?= number_format($payrollData['potAll']['totPotBpjs'], 2, ',', '.') ?></td>
-                <td><?= number_format($payrollData['potAll']['totPotDenda'], 2, ',', '.') ?></td>
                 <td><?= number_format($payrollData['potAll']['totPotIuranKoperasi'], 2, ',', '.') ?></td>
-                <td><?= number_format($payrollData['potAll']['totPotKantin'], 2, ',', '.') ?></td>
-                <td><?= number_format($payrollData['potAll']['totPinjamanKoperasi'], 2, ',', '.') ?></td>
-                <td><?= number_format($payrollData['potAll']['totPotPinjamanLainLain'], 2, ',', '.') ?></td>
+                <td><?= number_format($payrollData['potAll']['totPotStm'], 2, ',', '.') ?></td>
+                <td><?= number_format($payrollData['potAll']['totPotBpjs'], 2, ',', '.') ?></td>
+                <td><?= number_format($payrollData['potAll']['totPotSpm'], 2, ',', '.') ?></td>
+                <td><?= number_format($payrollData['potAll']['totPotTutupMulut'], 2, ',', '.') ?></td>
                 <td><?= number_format($payrollData['potAll']['totPotBajuSeragam'], 2, ',', '.') ?></td>
                 <td><?= number_format($payrollData['potAll']['totPotSepatuCelanaTopi'], 2, ',', '.') ?></td>
-                <td><?= number_format($payrollData['potAll']['totPotTutupMulut'], 2, ',', '.') ?></td>
-                <td><?= number_format($payrollData['potAll']['totPotSpm'], 2, ',', '.') ?></td>
-                <td><?= number_format($payrollData['potAll']['totPotStm'], 2, ',', '.') ?></td>
-                <td><?= number_format($payrollData['potAll']['totPotUangMakan'], 2, ',', '.') ?></td>
+                <td><?= number_format($payrollData['potAll']['totPotDenda'], 2, ',', '.') ?></td>
+                <td>0</td>
+                <td><?= number_format($payrollData['potAll']['totPotBonKoperasi'], 2, ',', '.') ?></td>
+                <td><?= number_format($payrollData['potAll']['totPinjamanKoperasi'], 2, ',', '.') ?></td>
                 <td><?= number_format($payrollData['potAll']['totPotPinjaman'], 2, ',', '.') ?></td>
+
+                <td><?= number_format($payrollData['potAll']['totPotKantin'], 2, ',', '.') ?></td>
+                <td><?= number_format($payrollData['potAll']['totPotPinjamanLainLain'], 2, ',', '.') ?></td>
+                <td><?= number_format($payrollData['potAll']['totPotUangMakan'], 2, ',', '.') ?></td>
                 <td><?= number_format($payrollData['potAll']['totPotongan'], 2, ',', '.') ?></td>
 
             </tr>
