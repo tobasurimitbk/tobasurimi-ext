@@ -164,6 +164,7 @@ class Bank extends BaseController
         //     ]);
         // }
         $this->banksModel->update($id, [
+            'kode_bank' => $kodeBank,
             'name' => $this->request->getVar('name'),
             'atas_nama' => $this->request->getVar('atas_nama'),
             'no_rekening' => $this->request->getVar('no_rekening')
