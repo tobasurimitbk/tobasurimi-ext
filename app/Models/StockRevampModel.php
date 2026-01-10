@@ -2102,4 +2102,22 @@ class StockRevampModel extends Model
             'totalFilteredData' => $totalFilteredData,
         ];
     }
+
+    public function updateParentStock($stockId)
+    {
+        $stockRevampDetailModel = new StockRevampDetailModel();
+
+        $selectQry = "SUM(qty_diterima) AS qty_diterima";
+        $dataResult = $stockRevampDetailModel->select($selectQry)
+            ->where('stock_id', $stockId)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        $qtyParent = 0;
+        if (count($dataResult) > 0) {
+            $qtyParent = $dataResult[0]['qty_diterima'];
+        }
+
+        return $qtyParent;
+    }
 }
