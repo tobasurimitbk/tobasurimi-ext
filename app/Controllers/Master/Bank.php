@@ -57,6 +57,7 @@ class Bank extends BaseController
                 "no"                    => $no++,
                 "id"                    => encrypt($data['id']),
                 "kode_bank"             => $data['kode_bank'],
+                "pay_code"              => $data['pay_code'],
                 "name"                  => $data['name'],
                 "atas_nama"             => $data['atas_nama'],
                 "no_rekening"           => $data['no_rekening']
