@@ -80,8 +80,6 @@ class LaporanSupplierLokalBB extends BaseController
 
         $condition = [
             'rm_purchase_orders.deletedAt' => null,
-            // 'rm_purchase_orders.is_posted' => '1',
-            // 'rm_purchase_orders.status_penerimaan' => '1',
             'rm_purchase_order_details.deletedAt' => null,
             'rm_purchase_orders.company_id' => $this->this_company_id,
             'rm_purchase_orders.status_external' => 'no',
