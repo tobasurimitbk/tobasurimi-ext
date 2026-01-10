@@ -475,23 +475,23 @@ class Mutasi extends BaseController
                 ->getResultArray();
 
 
-            $isFailed = false;
-            foreach ($mutasiDetail as $m) {
-                $stockDetail = $this->stockRevampDetailModel
-                    ->where('id', $m['stock_detail_id'])
-                    ->first();
+            // $isFailed = false;
+            // foreach ($mutasiDetail as $m) {
+            //     $stockDetail = $this->stockRevampDetailModel
+            //         ->where('id', $m['stock_detail_id'])
+            //         ->first();
 
-                if ($stockDetail['qty_diterima'] != $m['hasil_mutasi']) {
-                    // sudah ga sama dengan hasil mutasi gagal unpost
-                    $isFailed = true;
-                    break;
-                }
-            }
+            //     if ($stockDetail['qty_diterima'] != $m['hasil_mutasi']) {
+            //         // sudah ga sama dengan hasil mutasi gagal unpost
+            //         $isFailed = true;
+            //         break;
+            //     }
+            // }
 
-            if ($isFailed) {
-                $db->transRollback();
-                return false;
-            }
+            // if ($isFailed) {
+            //     $db->transRollback();
+            //     return false;
+            // }
 
             $mutasiDetail = $this->mutasiDetailModel
                 ->select('mutasi_detail.stock_detail_id,SUM(qty_konversi) AS qty_konversi')
@@ -502,16 +502,10 @@ class Mutasi extends BaseController
 
             // Aman Stock Belum Digunakan
             foreach ($mutasiDetail as $m) {
+                // UPDATE DETAIL
                 $stockDetail = $this->stockRevampDetailModel
                     ->where('id', $m['stock_detail_id'])
                     ->first();
-
-                $stock = $this->stockRevampModel->where('id', $stockDetail['stock_id'])->first();
-
-                if ($stock) {
-                    $qtyNow = $stock['qty_diterima'] + $m['qty_konversi'];
-                    $this->stockRevampModel->update($stock['id'], ['qty_bersih' => $qtyNow, 'qty_diterima' => $qtyNow]);
-                }
 
                 if ($stockDetail) {
                     $qtyNow = $stockDetail['qty_diterima'] + $m['qty_konversi'];
@@ -521,11 +515,19 @@ class Mutasi extends BaseController
                     ]);
                 }
 
+                // HAPUS LOG
                 $this->stockRevampLogModel
                     ->where('stock_detail_id', $stockDetail['id'])
                     ->where('reference_tujuan_id', $mutasiId)
                     ->where('reference_tujuan_type', "MUTASI")
                     ->delete(null, true);
+
+                // UPDATE PARENT
+                $stock = $this->stockRevampModel->where('id', $stockDetail['stock_id'])->first();
+                if ($stock) {
+                    $qtyNow = $this->stockRevampModel->updateParentStock($stock['id']);
+                    $this->stockRevampModel->update($stock['id'], ['qty_bersih' => $qtyNow, 'qty_diterima' => $qtyNow]);
+                }
             }
 
             $db->transCommit();

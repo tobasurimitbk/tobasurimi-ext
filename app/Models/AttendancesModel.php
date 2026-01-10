@@ -415,7 +415,7 @@ class AttendancesModel extends Model
     //     }
     // }
 
-    public function generateBackup($employeeData, $startDate, $endDate, $year, $month, $companyID)
+    public function generate($employeeData, $startDate, $endDate, $year, $month, $companyID)
     {
         $AttendanceModel     = new AttendancesModel();
         $FormPerijinanModel  = new FormPerijinanModel();
@@ -494,6 +494,10 @@ class AttendancesModel extends Model
                 ->join('jam_kerja', 'jam_kerja.id = employees_jam_kerja.jam_kerja_id', 'left')
                 ->whereIn('employee_id', $employeeIds)
                 ->where('jam_kerja.lintas_hari', "yes")
+                ->groupStart()
+                ->where('employees_jam_kerja.tanggal >=', $startDate)
+                ->where('employees_jam_kerja.tanggal <=', $endDate)
+                ->groupEnd()
                 ->where('employees_jam_kerja.deletedAt', null)
                 ->findAll();
 
@@ -623,7 +627,7 @@ class AttendancesModel extends Model
 
             // --- 6. insert batch biar cepat
             if ($batchInsert) {
-                $AttendanceModel->insertBatch($batchInsert, 500);
+                $AttendanceModel->insertBatch($batchInsert, 1000);
             }
 
             // insert batch keterangan
@@ -637,7 +641,7 @@ class AttendancesModel extends Model
         }
     }
 
-    public function generate($employeeData, $startDate, $endDate, $year, $month, $companyID)
+    public function generateBackup($employeeData, $startDate, $endDate, $year, $month, $companyID)
     {
         $AttendanceModel     = new AttendancesModel();
         $FormPerijinanModel  = new FormPerijinanModel();
@@ -904,7 +908,6 @@ class AttendancesModel extends Model
             return ['status' => false, 'message' => $e->getMessage()];
         }
     }
-
 
     public function getTriwulan($yearMonth, $divisionID, $companyID)
     {

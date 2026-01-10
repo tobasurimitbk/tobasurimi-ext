@@ -177,7 +177,7 @@
                     if (status == 0) {
                         return `
                         <div class="mt-0">
-                          <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                          <a href="<?= base_url('mutasi/id-global/') ?>${id}" data-toggle="tooltip" title="Edit" class="btn btn-primary">
                                 <i class="fas fa-edit"></i>
                             </a>
                         <?php if (can('Inventori', 'Mutasi', 'a')) : ?>
@@ -195,7 +195,7 @@
                     } else {
                         if (row.no_ppbkb == null) {
                             return `
-                                <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                <a href="<?= base_url('mutasi/id-global/') ?>${id}" data-toggle="tooltip" title="Edit" class="btn btn-primary">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <?php if (can('Inventori', 'Mutasi', 'ua')) : ?>
@@ -206,7 +206,7 @@
                             `;
                         } else {
                             return `
-                              <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                              <a href="<?= base_url('mutasi/id-global/') ?>${id}" data-toggle="tooltip" title="Edit" class="btn btn-primary">
                                     <i class="fas fa-edit"></i>
                                 </a>
                             `;

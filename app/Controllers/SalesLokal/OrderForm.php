@@ -1167,7 +1167,8 @@ class OrderForm extends BaseController
         $domPdf = new \Dompdf\Dompdf($options);
         $domPdf->loadHtml(view('SalesLokal/OrderForm/print', $data));
         // $domPdf->setPaper('A4', 'landscape');
-        $domPdf->setPaper([0, 0, 649, 482]);
+        // $domPdf->setPaper([0, 0, 649, 482]);
+        $domPdf->setPaper([0, 0, 592, 425]);
 
         /* =========================
         * RENDER PDF

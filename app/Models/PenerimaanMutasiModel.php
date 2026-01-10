@@ -188,7 +188,7 @@ class PenerimaanMutasiModel extends Model
 
             if ($tipeMutasi == "PPBKB") {
                 // PPBKB
-                $checkPPBKB = $ppbkbModel->where('mutasi_id', $mutasi['id'])->first();
+                $checkPPBKB = $ppbkbModel->like('multiple_mutasi_id', $mutasi['id'])->first();
                 if ($checkPPBKB) {
                     if (count($penerimaanTotal) == 0) {
                         array_push($mutasiResult, $mutasi);
