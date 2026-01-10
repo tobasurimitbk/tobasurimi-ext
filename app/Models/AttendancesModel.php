@@ -494,6 +494,10 @@ class AttendancesModel extends Model
                 ->join('jam_kerja', 'jam_kerja.id = employees_jam_kerja.jam_kerja_id', 'left')
                 ->whereIn('employee_id', $employeeIds)
                 ->where('jam_kerja.lintas_hari', "yes")
+                ->groupStart()
+                ->where('employees_jam_kerja.tanggal >=', $startDate)
+                ->where('employees_jam_kerja.tanggal <=', $endDate)
+                ->groupEnd()
                 ->where('employees_jam_kerja.deletedAt', null)
                 ->findAll();
 
@@ -623,7 +627,7 @@ class AttendancesModel extends Model
 
             // --- 6. insert batch biar cepat
             if ($batchInsert) {
-                $AttendanceModel->insertBatch($batchInsert, 500);
+                $AttendanceModel->insertBatch($batchInsert, 1000);
             }
 
             // insert batch keterangan
@@ -863,8 +867,6 @@ class AttendancesModel extends Model
                         $checkout = $log['checkout'];
                     }
 
-                    var_dump($log);
-                    die;
                     if (empty($abaikanMap[$e['id']][$dates])) {
                         // yang 
                         $batchInsert[] = [
