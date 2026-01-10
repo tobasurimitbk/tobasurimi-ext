@@ -274,7 +274,6 @@ class RincianPenjualanPerBarang extends BaseController
             "total_laba"     => number_format($grandTotalLaba, 2, ',', '.'),
         ];
 
-
         $data = [
             "data" => $dataAllSalesOrderInvoice,
             "dateStart" => $tglAwal != "all" ? date("d/m/Y", strtotime($tglAwal)) : "All",

@@ -85,7 +85,8 @@
                                 <th class="text-center">Nama Pelanggan</th>
                                 <th class="text-center">Nama Penjual</th>
                                 <th class="text-center">Jumlah Data</th>
-                                <th class="text-center">Jumlah</th>
+                                <th class="text-center">Jumlah Dengan Pajak</th>
+                                <th class="text-center">Jumlah Tanpa Pajak</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -176,6 +177,10 @@
                 },
                 {
                     data: "total_invoice",
+                    className: "text-center"
+                },
+                {
+                    data: "total_invoice_before_ppn",
                     className: "text-center"
                 },
             ],

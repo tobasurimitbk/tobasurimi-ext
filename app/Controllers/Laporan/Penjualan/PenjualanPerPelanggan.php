@@ -80,7 +80,8 @@ class PenjualanPerPelanggan extends BaseController
             array_push($dataAllSalesOrderInvoice, [
                 "no" => $no++,
                 "id" => encrypt($data->id),
-                "total_invoice" => number_format(floatval($data->sum_amount_invoice)),
+                "total_invoice" => number_format(floatval($data->total_invoice)),
+                "total_invoice_before_ppn" => number_format(floatval($data->total_invoice) - floatval($data->ppn)),
                 "nama_pelanggan" => $data->nama_pelanggan,
                 "kode_pelanggan" => $data->kode_pelanggan,
                 "nama_penjual" => $namaPenjual,
@@ -128,14 +129,18 @@ class PenjualanPerPelanggan extends BaseController
         $dataAllSalesOrderInvoice = [];
         $no = 1;
         $totalAllInvoice = 0;
+        $totalAllInvoiceBeforePPN = 0;
 
         foreach ($dataSalesOrderInvoice['data'] as $data) {
-            $totalInvoice = floatval($data->sum_amount_invoice);
+            $totalInvoice = floatval($data->total_invoice);
+            $totalInvoiceBeforePPN = floatval($data->total_invoice) - floatval($data->ppn);
             $totalAllInvoice += $totalInvoice;
+            $totalAllInvoiceBeforePPN += $totalInvoiceBeforePPN;
 
             array_push($dataAllSalesOrderInvoice, [
                 "no" => $no++,
-                "total_invoice" => number_format($totalInvoice),
+                "total_invoice" => number_format(floatval($totalInvoice)),
+                "total_invoice_before_ppn" => number_format(floatval($totalInvoiceBeforePPN)),
                 "nama_pelanggan" => $data->nama_pelanggan,
                 "kode_pelanggan" => $data->kode_pelanggan,
                 "count_invoice" => $data->count_invoice,
@@ -146,6 +151,7 @@ class PenjualanPerPelanggan extends BaseController
         $data = [
             "data" => $dataAllSalesOrderInvoice,
             "totalAllInvoice" => number_format($totalAllInvoice),
+            "totalAllInvoiceBeforePPN" => number_format($totalAllInvoiceBeforePPN),
             "dateStart" => $tglAwal != "all" ? date("d/m/Y", strtotime($tglAwal)) : "All",
             "dateEnd" => $tglAkhir != "now" ? date("d/m/Y", strtotime($tglAkhir)) : "Now",
             "filter_customer" => $filter != "all" ? $this->customerModel->find($filter)['name'] : "All",
@@ -191,14 +197,14 @@ class PenjualanPerPelanggan extends BaseController
         // Set judul laporan
         $sheet->setCellValue('A1', 'TOBA FISH');
         $sheet->setCellValue('A2', 'LAPORAN PENJUALAN PER PELANGGAN');
-        $sheet->mergeCells('A1:E1');
-        $sheet->mergeCells('A2:E2');
+        $sheet->mergeCells('A1:F1');
+        $sheet->mergeCells('A2:F2');
         $sheet->getStyle('A1:A2')->getFont()->setBold(true)->setSize(14);
         $sheet->getStyle('A1:A2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
         // Set informasi filter
         $sheet->setCellValue('A3', 'Periode: ' . ($tglAwal != "all" ? date("d/m/Y", strtotime($tglAwal)) : "All") . ' - ' . ($tglAkhir != "now" ? date("d/m/Y", strtotime($tglAkhir)) : "Now"));
-        $sheet->mergeCells('A3:E3');
+        $sheet->mergeCells('A3:F3');
         $sheet->getStyle('A3:A3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
         // Set header tabel
@@ -206,7 +212,8 @@ class PenjualanPerPelanggan extends BaseController
         $sheet->setCellValue('B5', 'Nama Pelanggan');
         $sheet->setCellValue('C5', 'Kode Pelanggan');
         $sheet->setCellValue('D5', 'Jumlah Data');
-        $sheet->setCellValue('E5', 'Jumlah');
+        $sheet->setCellValue('E5', 'Jumlah Dengan Pajak');
+        $sheet->setCellValue('F5', 'Jumlah Tanpa Pajak');
 
         // Style header tabel
         $headerStyle = [
@@ -217,22 +224,26 @@ class PenjualanPerPelanggan extends BaseController
                 'startColor' => ['argb' => 'FFE0E0E0']
             ]
         ];
-        $sheet->getStyle('A5:E5')->applyFromArray($headerStyle);
+        $sheet->getStyle('A5:F5')->applyFromArray($headerStyle);
 
         // Isi data
         $row = 6;
         $no = 1;
         $totalAllInvoice = 0;
+        $totalAllInvoiceBeforePPN = 0;
 
         foreach ($dataSalesOrderInvoice['data'] as $data) {
-            $totalInvoice = floatval($data->sum_amount_invoice);
+            $totalInvoice = floatval($data->total_invoice);
+            $totalInvoiceBeforePPN = floatval($data->total_invoice) - floatval($data->ppn);
             $totalAllInvoice += $totalInvoice;
+            $totalAllInvoiceBeforePPN += $totalInvoiceBeforePPN;
 
             $sheet->setCellValue('A' . $row, $no++);
             $sheet->setCellValue('B' . $row, $data->nama_pelanggan);
             $sheet->setCellValue('C' . $row, $data->kode_pelanggan);
             $sheet->setCellValue('D' . $row, $data->count_invoice);
             $sheet->setCellValue('E' . $row, $totalInvoice);
+            $sheet->setCellValue('F' . $row, $totalInvoiceBeforePPN);
 
             $row++;
         }
@@ -241,17 +252,18 @@ class PenjualanPerPelanggan extends BaseController
         $sheet->setCellValue('A' . $row, 'TOTAL');
         $sheet->mergeCells('A' . $row . ':D' . $row);
         $sheet->setCellValue('E' . $row, $totalAllInvoice);
+        $sheet->setCellValue('F' . $row, $totalAllInvoiceBeforePPN);
 
-        $sheet->getStyle('A' . $row . ':E' . $row)->getFont()->setBold(true);
-        $sheet->getStyle('A' . $row . ':E' . $row)->getFill()
+        $sheet->getStyle('A' . $row . ':F' . $row)->getFont()->setBold(true);
+        $sheet->getStyle('A' . $row . ':F' . $row)->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB('FFE0E0E0');
 
         // Format kolom jumlah
-        $sheet->getStyle('E7:E' . $row)->getNumberFormat()->setFormatCode('#,##0');
+        $sheet->getStyle('E6:F' . $row)->getNumberFormat()->setFormatCode('#,##0');
 
         // Auto size columns
-        foreach (range('A', 'E') as $columnID) {
+        foreach (range('A', 'F') as $columnID) {
             $sheet->getColumnDimension($columnID)->setAutoSize(true);
         }
 
@@ -293,9 +305,12 @@ class PenjualanPerPelanggan extends BaseController
         // Kelompokkan data per penjual
         $groupedData = [];
         $totalAllInvoice = 0;
+        $totalAllInvoiceBeforePPN = 0;
         foreach ($dataSalesOrderInvoice['data'] as $data) {
-            $totalInvoice = floatval($data->sum_amount_invoice);
+            $totalInvoice = floatval($data->total_invoice);
+            $totalInvoiceBeforePPN = floatval($data->total_invoice) - floatval($data->ppn);
             $totalAllInvoice += $totalInvoice;
+            $totalAllInvoiceBeforePPN += $totalInvoiceBeforePPN;
 
             $namaPenjual = "";
             if ($data->jenis_penjualan == 1) {
@@ -311,13 +326,16 @@ class PenjualanPerPelanggan extends BaseController
                 "kode_pelanggan" => $data->kode_pelanggan,
                 "count_invoice" => $data->count_invoice,
                 "total_invoice" => number_format($totalInvoice),
-                "raw_total" => $totalInvoice
+                "total_invoice_before_ppn" => number_format(floatval($totalInvoiceBeforePPN)),
+                "raw_total" => $totalInvoice,
+                "raw_total_before_ppn" => $totalInvoiceBeforePPN,
             ];
         }
 
         $data = [
             "groupedData" => $groupedData,
             "totalAllInvoice" => number_format($totalAllInvoice),
+            "totalAllInvoiceBeforePPN" => number_format($totalAllInvoiceBeforePPN),
             "dateStart" => $tglAwal != "all" ? date("d/m/Y", strtotime($tglAwal)) : "All",
             "dateEnd" => $tglAkhir != "now" ? date("d/m/Y", strtotime($tglAkhir)) : "Now",
             "filter_customer" => $filter != "all" ? $this->customerModel->find($filter)['name'] : "All",
@@ -362,14 +380,14 @@ class PenjualanPerPelanggan extends BaseController
         // Set judul laporan
         $sheet->setCellValue('A1', 'TOBA FISH');
         $sheet->setCellValue('A2', 'LAPORAN PENJUALAN PER PELANGGAN');
-        $sheet->mergeCells('A1:E1');
-        $sheet->mergeCells('A2:E2');
+        $sheet->mergeCells('A1:F1');
+        $sheet->mergeCells('A2:F2');
         $sheet->getStyle('A1:A2')->getFont()->setBold(true)->setSize(14);
         $sheet->getStyle('A1:A2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
         // Set informasi filter
         $sheet->setCellValue('A3', 'Periode: ' . ($tglAwal != "all" ? date("d/m/Y", strtotime($tglAwal)) : "All") . ' - ' . ($tglAkhir != "now" ? date("d/m/Y", strtotime($tglAkhir)) : "Now"));
-        $sheet->mergeCells('A3:E3');
+        $sheet->mergeCells('A3:F3');
         $sheet->getStyle('A3:A3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
         $row = 5;
@@ -402,7 +420,8 @@ class PenjualanPerPelanggan extends BaseController
             $sheet->setCellValue('B' . $row, 'Nama Pelanggan');
             $sheet->setCellValue('C' . $row, 'Kode Pelanggan');
             $sheet->setCellValue('D' . $row, 'Jumlah Data');
-            $sheet->setCellValue('E' . $row, 'Jumlah');
+            $sheet->setCellValue('E' . $row, 'Jumlah Dengan Pajak');
+            $sheet->setCellValue('F' . $row, 'Jumlah Tanpa Pajak');
 
             $headerStyle = [
                 'font' => ['bold' => true],
@@ -412,22 +431,25 @@ class PenjualanPerPelanggan extends BaseController
                     'startColor' => ['argb' => 'FFE0E0E0']
                 ]
             ];
-            $sheet->getStyle('A' . $row . ':E' . $row)->applyFromArray($headerStyle);
+            $sheet->getStyle('A' . $row . ':F' . $row)->applyFromArray($headerStyle);
             $row++;
 
             $no = 1;
             $totalPerPenjual = 0;
+            $totalPerPenjualBeforePPN = 0;
 
             foreach ($pelangganList as $data) {
-                $totalInvoice = floatval($data->sum_amount_invoice);
+                $totalInvoice = floatval($data->total_invoice);
+                $totalInvoiceBeforePPN = floatval($data->total_invoice) - floatval($data->ppn);
                 $totalPerPenjual += $totalInvoice;
-                $totalAllInvoice += $totalInvoice;
+                $totalPerPenjualBeforePPN += $totalInvoiceBeforePPN;
 
                 $sheet->setCellValue('A' . $row, $no++);
                 $sheet->setCellValue('B' . $row, $data->nama_pelanggan);
                 $sheet->setCellValue('C' . $row, $data->kode_pelanggan);
                 $sheet->setCellValue('D' . $row, $data->count_invoice);
                 $sheet->setCellValue('E' . $row, $totalInvoice);
+                $sheet->setCellValue('F' . $row, $totalInvoiceBeforePPN);
 
                 $row++;
             }
@@ -436,9 +458,10 @@ class PenjualanPerPelanggan extends BaseController
             $sheet->setCellValue('A' . $row, 'TOTAL ' . $penjual);
             $sheet->mergeCells('A' . $row . ':D' . $row);
             $sheet->setCellValue('E' . $row, $totalPerPenjual);
+            $sheet->setCellValue('F' . $row, $totalInvoiceBeforePPN);
 
-            $sheet->getStyle('A' . $row . ':E' . $row)->getFont()->setBold(true);
-            $sheet->getStyle('A' . $row . ':E' . $row)->getFill()
+            $sheet->getStyle('A' . $row . ':F' . $row)->getFont()->setBold(true);
+            $sheet->getStyle('A' . $row . ':F' . $row)->getFill()
                 ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                 ->getStartColor()->setARGB('FFD9D9D9');
 
@@ -446,12 +469,12 @@ class PenjualanPerPelanggan extends BaseController
         }
 
         // Auto size columns
-        foreach (range('A', 'E') as $columnID) {
+        foreach (range('A', 'F') as $columnID) {
             $sheet->getColumnDimension($columnID)->setAutoSize(true);
         }
 
         // Set format kolom jumlah
-        $sheet->getStyle('E6:E' . $row)->getNumberFormat()->setFormatCode('#,##0');
+        $sheet->getStyle('E6:F' . $row)->getNumberFormat()->setFormatCode('#,##0');
 
         $filename = "Laporan Penjualan Per Pelanggan.xlsx";
 

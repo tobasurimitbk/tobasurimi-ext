@@ -236,6 +236,8 @@ class SalesOrderInvoiceModel extends Model
                     SUM(barang_master_sales.harga_pokok * sales_order_invoice_detail.qty_invoice) AS amt_harga_pokok,
                     SUM(sales_order_invoice_detail.qty_invoice) AS sum_qty_invoice,
                     SUM(sales_order_invoice_detail.amount_invoice) AS sum_amount_invoice,
+                    sales_order_invoice.total_invoice,
+                    sales_order_invoice.ppn,
                     COUNT(DISTINCT sales_order_invoice.id) AS count_invoice,
                     employees.name AS salesName";
 

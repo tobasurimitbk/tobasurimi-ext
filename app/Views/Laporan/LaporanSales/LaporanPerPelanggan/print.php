@@ -57,10 +57,11 @@
         <thead>
             <tr>
                 <th width="5%">No</th>
-                <th width="40%">Nama Pelanggan</th>
+                <th width="25%">Nama Pelanggan</th>
                 <th width="15%">Kode Pelanggan</th>
-                <th width="15%">Jumlah Data</th>
-                <th width="25%">Jumlah</th>
+                <th width="5%">Jumlah Data</th>
+                <th width="25%">Jumlah Dengan Pajak</th>
+                <th width="25%">Jumlah Tanpa Pajak</th>
             </tr>
         </thead>
         <tbody>
@@ -72,12 +73,14 @@
                     <td class="text-center"><?= $row['kode_pelanggan'] ?></td>
                     <td class="text-center"><?= $row['count_invoice'] ?></td>
                     <td class="text-right"><?= $row['total_invoice'] ?></td>
+                    <td class="text-right"><?= $row['total_invoice_before_ppn'] ?></td>
                 </tr>
                 <?php endforeach; ?>
                 <tr class="total-row">
                     <td colspan="3" class="text-center">TOTAL</td>
                     <td class="text-center"><?= array_sum(array_column($data, 'count_invoice')) ?></td>
                     <td class="text-right"><?= $totalAllInvoice ?></td>
+                    <td class="text-right"><?= $totalAllInvoiceBeforePPN ?></td>
                 </tr>
             <?php else: ?>
                 <tr>
