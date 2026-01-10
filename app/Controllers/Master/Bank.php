@@ -111,6 +111,7 @@ class Bank extends BaseController
             'company_id' => $this->this_company_id,
             'kode_bank' => $kodeBank,
             'name' => $this->request->getVar('name'),
+            'pay_code' => $this->request->getVar('pay_code'),
             'atas_nama' => $this->request->getVar('atas_nama'),
             'no_rekening' => $this->request->getVar('no_rekening')
         ]);
@@ -166,6 +167,7 @@ class Bank extends BaseController
         $this->banksModel->update($id, [
             'kode_bank' => $kodeBank,
             'name' => $this->request->getVar('name'),
+            'pay_code' => $this->request->getVar('pay_code'),
             'atas_nama' => $this->request->getVar('atas_nama'),
             'no_rekening' => $this->request->getVar('no_rekening')
         ]);

@@ -20,6 +20,12 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control pay_code" id="pay_code" name="pay_code" placeholder="Kode Pembayaran">
+                                <label for="floatingInput">Kode Pembayaran</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control name" id="name" name="name" placeholder="Nama Bank">
                                 <label for="floatingInput">Nama Bank</label>
                             </div>
@@ -76,6 +82,7 @@
                             <tr>
                                 <th style="width: 10px;">No</th>
                                 <th onclick="changeSort('kode_bank')" class="sort">Kode Bank</th>
+                                <th onclick="changeSort('pay_code')" class="sort">Kode Pembayaran</th>
                                 <th onclick="changeSort('name')" class="sort">Bank</th>
                                 <th onclick="changeSort('atas_nama')" class="sort">Atas Nama</th>
                                 <th onclick="changeSort('no_rekening')" class="sort">No Rekening</th>
@@ -139,6 +146,10 @@
                 className: "text-center",
             },
             {
+                data: "pay_code",
+                className: "text-center",
+            },
+            {
                 data: "name",
                 className: "text-center",
             },
@@ -176,6 +187,9 @@
                 kode_bank: {
                     required: true
                 },
+                pay_code: {
+                    required: true
+                },
                 name: {
                     required: true
                 },
@@ -189,6 +203,9 @@
             messages: {
                 kode_bank: {
                     required: "Kode Bank wajib diisi"
+                },
+                pay_code: {
+                    required: "Kode Pembayaran"
                 },
                 name: {
                     required: "Nama Bank wajib diisi"
@@ -259,6 +276,7 @@
                     if (res.status) {
                         $(".id").val(id);
                         $("#kode_bank").val(res.data.kode_bank);
+                        $("#pay_code").val(res.data.pay_code);
                         $('#name').val(res.data.name);
                         $('#atas_nama').val(res.data.atas_nama);
                         $('#no_rekening').val(res.data.no_rekening);
