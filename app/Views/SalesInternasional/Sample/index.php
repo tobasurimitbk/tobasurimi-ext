@@ -43,7 +43,6 @@
                                 <th>No</th>
                                 <th onclick="changeSort('no_sample')" class="sort">No. Sample</th>
                                 <th onclick="changeSort('tanggal')" class="sort">Sample Date</th>
-                                <th onclick="changeSort('delivery')" class="sort">Delivery To</th>
                                 <th onclick="changeSort('recipient_details')" class="sort">Recipient Detail</th>
                                 <th onclick="changeSort('total_berat_kotor')" class="sort">Gross Weight (Kg)</th>
                                 <th onclick="changeSort('total_berat_bersih')" class="sort">Net Weight (Kg)</th>
@@ -105,9 +104,6 @@
                 className: "text-left"
             }, {
                 data: "tanggal",
-                className: "text-left",
-            }, {
-                data: "customer_name",
                 className: "text-left",
             }, {
                 data: "recipient_details",

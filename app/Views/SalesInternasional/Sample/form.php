@@ -80,91 +80,24 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="input-group">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select
-                                    class="form-select customer_id"
-                                    aria-label="Floating label select example"
-                                    name="customer_id"
-                                    id="customer_id">
-                                    <option value=""></option>
-                                    <?php foreach ($dataCustomer as $d) : ?>
-                                        <option value="<?= $d['id'] ?>"
-                                            <?= !empty($dataSample['customer_id']) && $dataSample['customer_id'] == $d['id'] ? 'selected' : '' ?>>
-                                            <?= "(" . $d['kode'] . ") " . $d['name'] ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Delivery To</label>
-                            </div>
-                            <?php if (can('Penjualan Ekspor', 'Customer', 'c')) : ?>
-                                <div class="input-group-append" style="height:50px;">
-                                    <?php if (!empty($dataSample)) : ?>
-
-                                    <?php else : ?>
-                                        <button class="btn btn-success btn-customer-add" id="btn-customer-add" data-toggle="modal" type="button">
-                                            <i class="fas fa-plus"></i>
-                                        </button>
-                                    <?php endif; ?>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                    <!-- <div class="col-sm-4">
-                        <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" value="<?= !empty($dataSample) ? $dataSample['delivery'] : '' ?>" type="text" class="form-control delivery" id="delivery" name="delivery" placeholder="Delivery">
-                            <label for="floatingInput">Delivery</label>
-                        </div>
-                    </div> -->
-                    <!-- <div class="col-sm-4">
-                        <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" value="<?= !empty($dataSample) ? $dataSample['attn_no'] : '' ?>" type="text" class="form-control attn_no" id="attn_no" name="attn_no" placeholder="Attn No">
-                            <label for="floatingInput">Attn To</label>
-                        </div>
-                    </div> -->
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control recipient_details" id="recipient_details" name="recipient_details" placeholder="Recipient Details" value="<?= !empty($dataSample['recipient_details']) ? $dataSample['recipient_details'] : "" ?>">
-                            <label for="floatingInput">Recipient Details</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" value="<?= !empty($dataSample) ? $dataSample['approved_by'] : '' ?>" type="text" class="form-control approved_by" id="approved_by" name="approved_by" placeholder="Approved By">
-                            <label for="floatingInput">Approved By</label>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control an" id="an" name="an" placeholder="AN" value="<?= !empty($an) ? $an : "" ?>">
-                            <label for="floatingInput">AN</label>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
                         <div class="form-floating mb-3">
                             <input autocomplete="one-time-code" type="text" class="form-control pickup_date" id="pickup_date" name="pickup_date" placeholder="Pickup Date (Optional)" value="<?= !empty($pickupDate) ? $pickupDate : "" ?>">
                             <label for="floatingInput">Pickup Date (Optional)</label>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            <textarea class="full-textarea form-control recipient_details" id="recipient_details" name="recipient_details" placeholder="Recipient Detail"><?= !empty($dataSample) ? $dataSample['recipient_details'] : ""; ?></textarea>
+                            <label for="floatingInput">Recipient Detail</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
                         <div class="form-floating mb-3">
                             <textarea class="full-textarea form-control" id="via" name="via" placeholder="Via (Optional)"><?= !empty($via) ? $via : ""; ?></textarea>
                             <label for="floatingInput">Via (Optional)</label>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3">
-                            <textarea class="full-textarea form-control delivery_address" id="delivery_address" name="delivery_address" placeholder="Delivery Address"><?= !empty($dataSample) ? $dataSample['delivery_address'] : ""; ?></textarea>
-                            <label for="floatingInput">Delivery Address (Optional)</label>
-                        </div>
-                    </div>
 
-                    <div class="col-md-3">
-                        <div class="form-floating mb-3">
-                            <textarea class="full-textarea form-control nb" id="nb" name="nb" placeholder="NB (Optional)"><?= !empty($dataSample) ? $dataSample['nb'] : ""; ?></textarea>
-                            <label for="floatingInput">NB (Optional)</label>
-                        </div>
-                    </div>
 
                 </div>
 
@@ -494,14 +427,6 @@
 
         <?php } ?>
 
-        // Sales Kontrak
-        $('.sales_contract_id').select2({
-            placeholder: "Select Sales Kontrak",
-            theme: "bootstrap-5"
-        }).change(function() {
-            listBarang = [];
-            getDetailSalesKontrak();
-        });
 
         $("#tanggal").datepicker({
             todayHighlight: true,
@@ -546,14 +471,14 @@
         }).change(function() {});
 
         //CSS SELECT2 FLOATING LABEL
-        $('.sales_contract_id, .customer_id,.barang_master_sales_id,.satuan_id,.satuan_additional,.divisi_barang_id,.country_id')
+        $('.customer_id,.barang_master_sales_id,.satuan_id,.satuan_additional,.divisi_barang_id,.country_id')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.sales_contract_id, .customer_id,.barang_master_sales_id,.satuan_id,.satuan_additional,.divisi_barang_id,.country_id')
+        $('.customer_id,.barang_master_sales_id,.satuan_id,.satuan_additional,.divisi_barang_id,.country_id')
             .parent('div')
             .children('span')
             .children('span')
@@ -561,7 +486,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.sales_contract_id, .customer_id,.barang_master_sales_id,.satuan_id,.satuan_additional,.divisi_barang_id,.country_id')
+        $('.customer_id,.barang_master_sales_id,.satuan_id,.satuan_additional,.divisi_barang_id,.country_id')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -575,19 +500,7 @@
                 tanggal: {
                     required: true
                 },
-                customer_id: {
-                    required: true
-                },
                 recipient_details: {
-                    required: true
-                },
-                // attn_no: {
-                //     required: true
-                // },
-                approved_by: {
-                    required: true
-                },
-                delivery_address: {
                     required: true
                 },
             },
@@ -598,20 +511,8 @@
                 tanggal: {
                     required: "Tanggal required"
                 },
-                customer_id: {
-                    required: "Delivery to required"
-                },
                 recipient_details: {
                     required: "Recipient details required"
-                },
-                // attn_no: {
-                //     required: "Attn no required"
-                // },
-                approved_by: {
-                    required: "Approved by required"
-                },
-                delivery_address: {
-                    required: "Delivery required"
                 },
             },
             errorElement: 'span',
