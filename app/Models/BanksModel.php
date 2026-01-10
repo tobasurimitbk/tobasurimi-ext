@@ -14,6 +14,7 @@ class BanksModel extends Model
         'company_id',
         'kode_bank',
         'name',
+        'pay_code',
         'atas_nama',
         'no_rekening'
     ];
@@ -22,6 +23,7 @@ class BanksModel extends Model
     {
         $availableSort = [
             'kode_bank' => 'kode_bank',
+            'pay_code' => 'pay_code',
             'name' => 'name',
             'atas_nama' => 'atas_nama',
             'no_rekening' => 'no_rekening'

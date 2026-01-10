@@ -219,7 +219,7 @@ class PembayaranInvoiceModel extends Model
         return $detail;
     }
 
-      public function get_new_no(
+    public function get_new_no(
         $id = null,
         $jenis,
         $divisi,
@@ -243,19 +243,19 @@ class PembayaranInvoiceModel extends Model
         $targetMonth = $tanggalObj->format('m');
         $lastDayOfMonth = $tanggalObj->format('t');
 
-        // Get bank code
+        // Get bank code (DINAMIS)
         $kodeBank = '';
         if (!empty($bank_id) && strtoupper($paymentMethod) !== 'CASH') {
-            $bankData = $banksModel->select('kode_bank')->where('id', $bank_id)->first();
-            if ($bankData) {
-                $kode = strtoupper($bankData['kode_bank']);
-                if (strpos($kode, 'BBRI') !== false) $kodeBank = 'BRI';
-                elseif (strpos($kode, 'BMRIIDJA') !== false) $kodeBank = 'MND';
-                elseif (strpos($kode, 'BBNI') !== false) $kodeBank = 'KBA';
-                elseif (strpos($kode, 'BBCA') !== false) $kodeBank = 'BCI';
-                elseif (strpos($kode, 'BBNL') !== false) $kodeBank = 'BNL';
+            $bankData = $banksModel
+                ->select('pay_code')
+                ->where('id', $bank_id)
+                ->first();
+
+            if (!empty($bankData['pay_code'])) {
+                $kodeBank = strtoupper(trim($bankData['pay_code']));
             }
         }
+
 
         // Get divisi code
         $kodeDivisi = '';

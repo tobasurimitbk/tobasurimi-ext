@@ -66,9 +66,9 @@
                 <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd;width:300px;">
                     DIKIRIM KE
                 </th>
-                <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd; width:50px;">
+                <!-- <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd; width:50px;">
                     A/N
-                </th>
+                </th> -->
                 <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd;width:50px;">
                     TGL
                 </th>
@@ -115,18 +115,15 @@
                                 <u><?= $dataSample['recipient_details'] ?></u>
                             </b>
                             <b><?= $dataSample['delivery_address'] ?></b><br>
-                            <?php if (!empty($dataSample['attn_no'])): ?>
-                                <b>Attn To : <?= $dataSample['attn_no'] ?></b><br>
-                            <?php endif; ?>
                             <?php if (!empty($dataSample['nb'])): ?>
                                 <b>NB : <?= $dataSample['nb'] ?></b>
                             <?php endif; ?>
                         </td>
 
-                        <td style="padding:3px; border:1px solid #ddd; text-align:left; vertical-align: top;"
+                        <!-- <td style="padding:3px; border:1px solid #ddd; text-align:left; vertical-align: top;"
                             rowspan="<?= count($dataBarangList) ?>">
                             <?= $d['an'] ?>
-                        </td>
+                        </td> -->
 
                         <td style="padding:3px; border:1px solid #ddd; text-align:left; vertical-align: top;"
                             rowspan="<?= count($dataBarangList) ?>">
@@ -143,7 +140,7 @@
             <?php endforeach; ?>
             <?php if ($dataSample['total_berat_bersih'] != 0 && !empty($dataSample['total_berat_bersih'])): ?>
                 <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;" colspan="<?= $note['totalCols'] ?>">
-                    <td colspan="2" style="padding: 6px; border: 1px solid #ddd;"></td>
+                    <td colspan="1" style="padding: 6px; border: 1px solid #ddd;"></td>
                     <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
                         TOTAL NET WEIGHT (KG)
                     </td>
@@ -154,7 +151,7 @@
             <?php endif; ?>
             <?php if ($dataSample['total_berat_kotor'] != 0 && !empty($dataSample['total_berat_kotor'])): ?>
                 <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;" colspan="<?= $note['totalCols'] ?>">
-                    <td colspan="2" style="padding: 6px; border: 1px solid #ddd;"></td>
+                    <td colspan="1" style="padding: 6px; border: 1px solid #ddd;"></td>
                     <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
                         TOTAL GROSS WEIGHT (KG)
                     </td>

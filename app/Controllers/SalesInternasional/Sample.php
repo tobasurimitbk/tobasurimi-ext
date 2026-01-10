@@ -133,18 +133,11 @@ class Sample extends BaseController
             ->where('deletedAt', null)
             ->orderBy('barang_name', "asc")
             ->findAll();
-        $dataCustomer = $this->customerModel->getCustomerEkspor(
-            $this->this_user_id,
-            $this->is_admin
-        );
-        $dataCountry = $this->countryModel->findAll();
 
         $data = [
             'dataSatuan' => $dataSatuan,
             "dataDivisi" => $dataDivisi,
             'dataBarang' => $dataBarang,
-            "dataCustomer" => $dataCustomer,
-            "dataCountry" => $dataCountry
         ];
 
         return view('SalesInternasional/Sample/form', $data);
@@ -224,7 +217,7 @@ class Sample extends BaseController
         $note = [
             'totalCols' => 10,
             'totalColsBeratBersih' => 7,
-            'note' => false
+            'isNote' => false
         ];
 
         foreach ($dataBarangList as $d) {
@@ -289,22 +282,14 @@ class Sample extends BaseController
                 "tanggal" => $tanggal,
                 "tanggal_invoice" => $tanggal,
                 "no_invoice" => $noInvoice, // auto generate
-                "customer_id" => $this->request->getVar('customer_id'),
-                'divisi_id' => $this->request->getVar('divisi_id'),
-                'delivery' => trim($this->request->getVar('delivery')),
-                'delivery_address' => trim($this->request->getVar('delivery_address')),
-                'attn_no' => $this->request->getVar('attn_no'),
-                'approved_by' => $this->request->getVar('approved_by'),
-                'payment_term' => $this->request->getVar('payment_term'),
-                'nb' =>  trim($this->request->getVar('nb')),
                 'description_notes' => $this->request->getVar('description_notes'),
                 'recipient_details' => $this->request->getVar('recipient_details'),
                 'total_berat_bersih' => $this->request->getVar('total_berat_bersih'),
                 'total_berat_kotor' => $this->request->getVar('total_berat_kotor'),
-                'total_qty' => $this->request->getVar('total_qty')
+                'total_qty' => $this->request->getVar('total_qty'),
+                "approved_by" => $this->getApprovedBy()
             ]);
 
-            $an = $this->request->getVar('an');
             $pickupDate = $this->request->getVar('pickup_date');
             $via = $this->request->getVar('via');
 
@@ -314,7 +299,6 @@ class Sample extends BaseController
                     'barang_master_sales_id' => $l->barang_master_sales_id,
                     'satuan_id' => $l->satuan_id,
                     'grade' => $l->grade,
-                    'an' => $an,
                     'pickup_date' => $pickupDate,
                     'via' => $via,
                     'qty' => $l->qty,
@@ -374,22 +358,14 @@ class Sample extends BaseController
                 'company_id' => $this->this_company_id,
                 'no_sample' => $noSample,
                 "tanggal" => $tanggal,
-                "customer_id" => $this->request->getVar('customer_id'),
-                'divisi_id' => $this->request->getVar('divisi_id'),
-                'delivery' => trim($this->request->getVar('delivery')),
-                'delivery_address' => trim($this->request->getVar('delivery_address')),
-                'attn_no' => $this->request->getVar('attn_no'),
-                'approved_by' => $this->request->getVar('approved_by'),
-                'payment_term' => $this->request->getVar('payment_term'),
-                'nb' =>  trim($this->request->getVar('nb')),
                 'description_notes' => $this->request->getVar('description_notes'),
                 'recipient_details' => $this->request->getVar('recipient_details'),
                 'total_berat_bersih' => $this->request->getVar('total_berat_bersih'),
                 'total_berat_kotor' => $this->request->getVar('total_berat_kotor'),
-                'total_qty' => $this->request->getVar('total_qty')
+                'total_qty' => $this->request->getVar('total_qty'),
+                "approved_by" => $this->getApprovedBy()
             ]);
 
-            $an = $this->request->getVar('an');
             $pickupDate = $this->request->getVar('pickup_date');
             $via = $this->request->getVar('via');
 
@@ -401,7 +377,6 @@ class Sample extends BaseController
                     'barang_master_sales_id' => $l->barang_master_sales_id,
                     'satuan_id' => $l->satuan_id,
                     'grade' => $l->grade,
-                    'an' => $an,
                     'pickup_date' => $pickupDate,
                     'via' => $via,
                     'qty' => $l->qty,
@@ -488,5 +463,18 @@ class Sample extends BaseController
         $templeate = "SAM/" . $bulanF . "/" . $tahunF . "/" . $formattedNumber;
 
         return $templeate;
+    }
+
+    private function getApprovedBy()
+    {
+        if ($this->this_company_id == 1) {
+            return "PAK IRSAN";
+        } elseif ($this->this_company_id == 2) {
+            return "PAK TONY";
+        } elseif ($this->this_company_id == 15) {
+            return "PAK AKIONG";
+        } else {
+            return "PAK TONY";
+        }
     }
 }

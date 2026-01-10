@@ -711,7 +711,7 @@ class PayrollsModel extends Model
         if (!empty($bagianId) && $bagianId != '') {
             $bagianQry->where('id', $bagianId);
         }
-        $bagianData =  $bagianQry->get()->getResultArray();
+        $bagianData =  $bagianQry->orderBy('nama_bagian', "ASC")->get()->getResultArray();
 
         /* =====================================================
         * PAYROLL + EMPLOYEE (1 QUERY)
@@ -1020,7 +1020,7 @@ class PayrollsModel extends Model
         $payrollGajiHarianModel = new PayrollGajiHarianModel();
         $payrollGajiConjunctionModel = new PayrollGajiConjunctionModel();
 
-        $bagianQry = $bagianModel->where('division_id', $divisionID)->where('deletedAt', null);
+        $bagianQry = $bagianModel->where('division_id', $divisionID)->orderBy('nama_bagian', "ASC")->where('deletedAt', null);
         if (!empty($bagianID) && $bagianID != '') {
             $bagianQry->where('id', $bagianID);
         }
