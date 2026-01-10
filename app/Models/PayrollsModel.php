@@ -711,7 +711,7 @@ class PayrollsModel extends Model
         if (!empty($bagianId) && $bagianId != '') {
             $bagianQry->where('id', $bagianId);
         }
-        $bagianData =  $bagianQry->get()->getResultArray();
+        $bagianData =  $bagianQry->orderBy('nama_bagian', "ASC")->get()->getResultArray();
 
         /* =====================================================
         * PAYROLL + EMPLOYEE (1 QUERY)
