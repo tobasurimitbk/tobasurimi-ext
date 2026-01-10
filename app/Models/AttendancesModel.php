@@ -415,7 +415,7 @@ class AttendancesModel extends Model
     //     }
     // }
 
-    public function generateBackup($employeeData, $startDate, $endDate, $year, $month, $companyID)
+    public function generate($employeeData, $startDate, $endDate, $year, $month, $companyID)
     {
         $AttendanceModel     = new AttendancesModel();
         $FormPerijinanModel  = new FormPerijinanModel();
@@ -637,7 +637,7 @@ class AttendancesModel extends Model
         }
     }
 
-    public function generate($employeeData, $startDate, $endDate, $year, $month, $companyID)
+    public function generateBackup($employeeData, $startDate, $endDate, $year, $month, $companyID)
     {
         $AttendanceModel     = new AttendancesModel();
         $FormPerijinanModel  = new FormPerijinanModel();
@@ -863,6 +863,8 @@ class AttendancesModel extends Model
                         $checkout = $log['checkout'];
                     }
 
+                    var_dump($log);
+                    die;
                     if (empty($abaikanMap[$e['id']][$dates])) {
                         // yang 
                         $batchInsert[] = [
@@ -904,7 +906,6 @@ class AttendancesModel extends Model
             return ['status' => false, 'message' => $e->getMessage()];
         }
     }
-
 
     public function getTriwulan($yearMonth, $divisionID, $companyID)
     {
