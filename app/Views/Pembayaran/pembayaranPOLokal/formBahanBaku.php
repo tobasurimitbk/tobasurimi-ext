@@ -911,18 +911,34 @@
         });
 
 
-        $.each(listPembayaran, function(i, v) {
-            var element = $('input[data-id="' + v.group_key + '"].total_po_dibayar');
-            var input_user = destroyFormatRupiahPayment(element.val());
+        // $.each(listPembayaran, function(i, v) {
+        //     var element = $('input[data-id="' + v.group_key + '"].total_po_dibayar');
+        //     var input_user = destroyFormatRupiahPayment(element.val());
 
-            listPembayaran[i].total_paid = parseFloat(input_user) || 0;
-        });
+        //     listPembayaran[i].total_paid = parseFloat(input_user) || 0;
+        // });
 
         $.each(listPembayaran, function(i, v) {
             var element = $('input[data-id="' + v.group_key + '"].total_pph_po_dibayar');
             var input_user = destroyFormatRupiahPayment(element.val());
 
             listPembayaran[i].total_paid_pph = parseFloat(input_user) || 0;
+        });
+
+        $.each(listPembayaran, function(i, v) {
+            var element = $('input[data-id="' + v.group_key + '"].total_po_dibayar_edit'); // GANTI
+            var input_user = destroyFormatRupiahPayment(element.val());
+            listPembayaran[i].total_paid = parseFloat(input_user) || 0;
+        });
+
+        // Untuk CREATE mode (jika ada logic yang perlu):
+        // Tambahkan jika perlu parsing untuk create mode
+        $.each(listPembayaran, function(i, v) {
+            var element = $('input[data-id="' + v.group_key + '"].total_po_dibayar_create'); // GANTI
+            if(element.length) {
+                var input_user = destroyFormatRupiahPayment(element.val());
+                listPembayaran[i].total_paid = parseFloat(input_user) || 0;
+            }
         });
 
 
@@ -1528,12 +1544,14 @@
                     oninput="limitInputBayar(this, ${v.total_tagihan})"
                     autocomplete="one-time-code"
                     data-id="${v.group_key}"
-                    class="form-control total_po_dibayar"
+                    class="form-control total_po_dibayar_edit" 
+                    name="total_po_dibayar_edit[]"            
                     type="text"
                     value="${greatFormatRupiahPayment(v.total_paid)}"
                     style="height:40px"
                 >
             `));
+
             newRow.append($('<td class="hidden" style="display:none;">').html(
                 `
                         <input <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?>  onchange="this.value = greatFormatRupiahPayment(this.value)"  oninput="limitInputBayar(this, ${v.sisa_tagihan})" autocomplete="one-time-code" data-id="${v.penerimaan_barang_detail_id}"  class="form-control pembayaran" type="text" value="${greatFormatRupiahPayment(v.sisa_tagihan)}" name = "pembayaran" style="height:40px">
@@ -1545,11 +1563,18 @@
                         <input <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?>  onchange="this.value = greatFormatRupiahPayment(this.value)"  oninput="limitInputBayar(this, ${v.total_tagihan_pph})" autocomplete="one-time-code" data-id="${v.group_key}" class="form-control total_pph_po_dibayar" type="text" value="${greatFormatRupiahPayment(v.sisa_tagihan_pph)}" name = "total_pph_po_dibayar" style="height:40px">
                                 `
             ));
-            newRow.append($('<td style="text-align:center;">').html(
-                `
-                        <input ${disableBottom} <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?>  onchange="this.value = greatFormatRupiahPayment(this.value)"  oninput="limitInputBayar(this, ${v.total_tagihan})" autocomplete="one-time-code" data-id="${v.group_key}" class="form-control total_po_dibayar" type="text" value="${greatFormatRupiahPayment(v.sisa_tagihan)}" name = "total_po_dibayar" style="height:40px">
-                                `
-            ));
+            newRow.append($('<td style="text-align:center;">').html(`
+                <input ${disableBottom} 
+                    onchange="this.value = greatFormatRupiahPayment(this.value)"  
+                    oninput="limitInputBayar(this, ${v.total_tagihan})" 
+                    autocomplete="one-time-code" 
+                    data-id="${v.group_key}" 
+                    class="form-control total_po_dibayar_create"  
+                    name="total_po_dibayar_create[]"             
+                    type="text" 
+                    value="${greatFormatRupiahPayment(v.sisa_tagihan)}" 
+                    style="height:40px">
+            `));
 
             table.find('tbody').append(newRow);
 
@@ -1956,9 +1981,27 @@
     }
 
 
-    $(document).on("input", ".total_po_dibayar", function() {
+    // $(document).on("input", ".total_po_dibayar", function() {
+    //     var sum = 0;
+    //     $(".total_po_dibayar").each(function() {
+    //         sum += destroyFormatRupiahPayment($(this).val());
+    //     });
+    //     $(".total-pembayaran").val(greatFormatRupiahPayment(sum));
+    //     updateGrandTotal()
+    // });
+
+    $(document).on("input", ".total_po_dibayar_edit", function() {
         var sum = 0;
-        $(".total_po_dibayar").each(function() {
+        $(".total_po_dibayar_edit").each(function() {
+            sum += destroyFormatRupiahPayment($(this).val());
+        });
+        $(".total-pembayaran").val(greatFormatRupiahPayment(sum));
+        updateGrandTotal()
+    });
+
+    $(document).on("input", ".total_po_dibayar_create", function() {
+        var sum = 0;
+        $(".total_po_dibayar_create").each(function() {
             sum += destroyFormatRupiahPayment($(this).val());
         });
         $(".total-pembayaran").val(greatFormatRupiahPayment(sum));
