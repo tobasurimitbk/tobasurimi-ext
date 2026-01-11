@@ -49,8 +49,8 @@ class RincianPenjualanPerPelanggan extends BaseController
         ];
 
         $condition = [
-            // "sales_order_invoice.id_company" => $this->this_company_id,
             "sales_order_invoice.deletedAt" => null,
+            "sales_order_invoice_detail.deletedAt" => null,
             "sales_order_invoice.tipe_invoice" => 'LOKAL'
         ];
 
@@ -83,14 +83,14 @@ class RincianPenjualanPerPelanggan extends BaseController
                     array_push($dataAllSalesOrderInvoice, [
                         "no" => '',
                         "id" => '',
-                        "no_faktur" => 'Total Invoice: Rp ' . number_format(floatval($totalPerCustomer)),
+                        "no_faktur" => '',
                         "tanggal_faktur" => '',
-                        "keterangan" => '',
-                        "total_invoice" => '',
+                        "keterangan" => 'TOTAL',
+                        "total_invoice" => number_format(floatval($totalPerCustomer)),
+                        "amt_harga_pokok" => number_format(floatval($totalHPPPerCustomer)),
+                        "amt_laba" => number_format(floatval($totalLabaPerCustomer)),
                         "nama_pelanggan" => '',
                         "nama_sales" => '',
-                        "amt_harga_pokok" => 'Total HPP: Rp ' . number_format(floatval($totalHPPPerCustomer)),
-                        "amt_laba" => 'Total Laba: Rp ' . number_format(floatval($totalLabaPerCustomer)),
                         "is_total" => true,
                     ]);
                 }
@@ -145,14 +145,14 @@ class RincianPenjualanPerPelanggan extends BaseController
             array_push($dataAllSalesOrderInvoice, [
                 "no" => '',
                 "id" => '',
-                "no_faktur" => 'Total Invoice: Rp ' . number_format(floatval($totalPerCustomer)),
+                "no_faktur" => '',
                 "tanggal_faktur" => '',
-                "keterangan" => '',
-                "total_invoice" => '',
+                "keterangan" => 'TOTAL',
+                "total_invoice" => number_format(floatval($totalPerCustomer)),
+                "amt_harga_pokok" => number_format(floatval($totalHPPPerCustomer)),
+                "amt_laba" => number_format(floatval($totalLabaPerCustomer)),
                 "nama_pelanggan" => '',
                 "nama_sales" => '',
-                "amt_harga_pokok" => 'Total HPP: Rp ' . number_format(floatval($totalHPPPerCustomer)),
-                "amt_laba" => 'Total Laba: Rp ' . number_format(floatval($totalLabaPerCustomer)),
                 "is_total" => true,
             ]);
         }
@@ -180,13 +180,14 @@ class RincianPenjualanPerPelanggan extends BaseController
         $condition = [
             // "sales_order_invoice.id_company" => $this->this_company_id,
             "sales_order_invoice.deletedAt" => null,
+            "sales_order_invoice_detail.deletedAt" => null,
             "sales_order_invoice.tipe_invoice" => 'LOKAL'
         ];
 
         $addCondition = [
             "search" => $search == "all" ? null : $search,
-            "sort" => $this->request->getGet("sort"),
-            "sortType" => $this->request->getGet("sortType"),
+            "sort" => $this->request->getGet("sort") ?? "nama_pelanggan",
+            "sortType" => $this->request->getGet("sortType") ?? "asc",
             "filter_jenis_dokumen" => $this->request->getGet("filter_jenis_dokumen"),
             "filter_customer" => $filter == "all" ? null : $filter,
             "filter_company" => $this->request->getGet("filter_company") ?? null,
@@ -214,14 +215,14 @@ class RincianPenjualanPerPelanggan extends BaseController
                     array_push($dataAllSalesOrderInvoice, [
                         "no" => '',
                         "id" => '',
-                        "no_faktur" => 'Total Invoice: Rp ' . number_format(floatval($totalPerCustomer)),
+                        "no_faktur" => '',
                         "tanggal_faktur" => '',
-                        "keterangan" => '',
-                        "total_invoice" => '',
+                        "keterangan" => 'TOTAL',
+                        "total_invoice" => number_format(floatval($totalPerCustomer)),
+                        "amt_harga_pokok" => number_format(floatval($totalHPPPerCustomer)),
+                        "amt_laba" => number_format(floatval($totalLabaPerCustomer)),
                         "nama_pelanggan" => '',
                         "nama_sales" => '',
-                        "amt_harga_pokok" => '',
-                        "amt_laba" => '',
                         "is_total" => true,
                     ]);
                 }
@@ -276,14 +277,14 @@ class RincianPenjualanPerPelanggan extends BaseController
             array_push($dataAllSalesOrderInvoice, [
                 "no" => '',
                 "id" => '',
-                "no_faktur" => 'Total Invoice: Rp ' . number_format(floatval($totalPerCustomer)),
+                "no_faktur" => '',
                 "tanggal_faktur" => '',
-                "keterangan" => '',
-                "total_invoice" => '',
+                "keterangan" => 'TOTAL',
+                "total_invoice" => number_format(floatval($totalPerCustomer)),
+                "amt_harga_pokok" => number_format(floatval($totalHPPPerCustomer)),
+                "amt_laba" => number_format(floatval($totalLabaPerCustomer)),
                 "nama_pelanggan" => '',
                 "nama_sales" => '',
-                "amt_harga_pokok" => 'Total HPP: Rp ' . number_format(floatval($totalHPPPerCustomer)),
-                "amt_laba" => 'Total Laba: Rp ' . number_format(floatval($totalLabaPerCustomer)),
                 "is_total" => true,
             ]);
         }
@@ -311,13 +312,14 @@ class RincianPenjualanPerPelanggan extends BaseController
         $condition = [
             // "sales_order_invoice.id_company" => $this->this_company_id,
             "sales_order_invoice.deletedAt" => null,
+            "sales_order_invoice_detail.deletedAt" => null,
             "sales_order_invoice.tipe_invoice" => 'LOKAL'
         ];
 
         $addCondition = [
             "search" => $search == "all" ? null : $search,
-            "sort" => $this->request->getGet("sort"),
-            "sortType" => $this->request->getGet("sortType"),
+            "sort" => $this->request->getGet("sort") ?? "nama_pelanggan",
+            "sortType" => $this->request->getGet("sortType") ?? "asc",
             "filter_jenis_dokumen" => $this->request->getGet("filter_jenis_dokumen"),
             "filter_customer" => $filter == "all" ? "" : $filter,
             "filter_company" => $this->request->getGet("filter_company") ?? null,
@@ -344,14 +346,15 @@ class RincianPenjualanPerPelanggan extends BaseController
                 if ($currentCustomer !== null) {
                     array_push($dataAllSalesOrderInvoice, [
                         "no" => '',
-                        "no_faktur" => 'Total Invoice: Rp ' . number_format(floatval($totalPerCustomer)),
+                        "id" => '',
+                        "no_faktur" => '',
                         "tanggal_faktur" => '',
-                        "keterangan" => '',
-                        "total_invoice" => '',
+                        "keterangan" => 'TOTAL',
+                        "total_invoice" => number_format(floatval($totalPerCustomer)),
+                        "amt_harga_pokok" => number_format(floatval($totalHPPPerCustomer)),
+                        "amt_laba" => number_format(floatval($totalLabaPerCustomer)),
                         "nama_pelanggan" => '',
                         "nama_sales" => '',
-                        "amt_harga_pokok" => '',
-                        "amt_laba" => '',
                         "is_total" => true,
                     ]);
                 }
@@ -403,14 +406,15 @@ class RincianPenjualanPerPelanggan extends BaseController
         if ($currentCustomer !== null) {
             array_push($dataAllSalesOrderInvoice, [
                 "no" => '',
-                "no_faktur" => 'Total Invoice: Rp ' . number_format(floatval($totalPerCustomer)),
+                "id" => '',
+                "no_faktur" => '',
                 "tanggal_faktur" => '',
-                "keterangan" => '',
-                "total_invoice" => '',
+                "keterangan" => 'TOTAL',
+                "total_invoice" => number_format(floatval($totalPerCustomer)),
+                "amt_harga_pokok" => number_format(floatval($totalHPPPerCustomer)),
+                "amt_laba" => number_format(floatval($totalLabaPerCustomer)),
                 "nama_pelanggan" => '',
                 "nama_sales" => '',
-                "amt_harga_pokok" => '',
-                "amt_laba" => '',
                 "is_total" => true,
             ]);
         }
@@ -472,10 +476,12 @@ class RincianPenjualanPerPelanggan extends BaseController
                 $sheet->getStyle('A' . $row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFE6E6E6');
             } elseif (isset($item['is_total']) && $item['is_total']) {
                 // Total row - bold and with background
-                $sheet->setCellValue('A' . $row, $item['no_faktur']);
+                $sheet->setCellValue('E' . $row, $item['total_invoice']);
                 $sheet->setCellValue('F' . $row, $item['amt_harga_pokok']);
                 $sheet->setCellValue('G' . $row, $item['amt_laba']);
 
+                $sheet->mergeCells('A' . $row . ':D' . $row);
+                $sheet->mergeCells('H' . $row . ':I' . $row);
                 $sheet->getStyle('A' . $row . ':I' . $row)->getFont()->setBold(true);
                 $sheet->getStyle('A' . $row . ':I' . $row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFF2F2F2');
             } else {

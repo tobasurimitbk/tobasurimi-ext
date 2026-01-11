@@ -41,7 +41,11 @@
                     </tr>
                 <?php elseif (isset($row['is_total']) && $row['is_total']): ?>
                     <tr class="total-row">
-                        <td class="text-left txt-bold" colspan="8"><?= $row['no_faktur'] ?></td>
+                        <td class="text-left txt-bold" colspan="3"></td>
+                        <td class="text-right txt-bold"><?= $row['total_invoice'] ?></td>
+                        <td class="text-right txt-bold"><?= $row['amt_harga_pokok'] ?></td>
+                        <td class="text-right txt-bold"><?= $row['amt_laba'] ?></td>
+                        <td class="text-left txt-bold" colspan="2"></td>
                     </tr>
                 <?php else: ?>
                     <tr>

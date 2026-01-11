@@ -100,8 +100,8 @@
 </section>
 
 <script>
-    let sort = "createdAt";
-    let sortType = "desc";
+    let sort = "nama_pelanggan";
+    let sortType = "asc";
 
     // Set default tanggal: awal bulan - hari ini
     const today = new Date();
@@ -153,25 +153,32 @@
             },
             display: "stripe",
             searching: false,
-            createdRow: function(row, data, dataIndex) {
+            createdRow: function (row, data) {
                 if (data.is_customer) {
-                    $(row).addClass('customer-row')
+                    $(row)
+                        .addClass('customer-row')
                         .find('td')
                         .attr('colspan', 8)
                         .removeClass('text-center')
                         .addClass('text-left txt-bold')
-                        .css('cssText', 'font-weight:700 !important;');
+                        .css('font-weight', '700');
 
-                    $(row).find('td:not(:first)').remove(); // Remove other cells
+                    $(row).find('td:not(:first)').remove();
                 } else if (data.is_total) {
-                    $(row).addClass('total-row')
-                        .find('td')
-                        .attr('colspan', 8)
-                        .removeClass('text-center')
-                        .addClass('text-left txt-bold')
-                        .css('cssText', 'font-weight:700 !important;');
 
-                    $(row).find('td:not(:first)').remove(); // Remove other cells
+                    // gabungkan kolom no_faktur + tanggal_faktur + keterangan
+                    const $td0 = $(row).find('td:eq(0)');
+                    $td0
+                        .attr('colspan', 3)
+                        .addClass('text-left txt-bold')
+                        .text('')
+                        .css('font-weight', '700');
+
+                    // hapus td ke-1 & ke-2 (tanggal & keterangan)
+                    $(row).find('td:eq(1)').remove();
+                    $(row).find('td:eq(1)').remove();
+
+                    $(row).addClass('total-row');
                 }
             },
             columns: [{
