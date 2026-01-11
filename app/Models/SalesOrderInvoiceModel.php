@@ -78,7 +78,8 @@ class SalesOrderInvoiceModel extends Model
             'company_name'       => 'companies.company',
             'nama_pelanggan'     => 'customers.name',
             'kode_pelanggan'     => 'customers.kode',
-            'tanggal_faktur'          => 'sales_order_invoice.tanggal_faktur',
+            'tanggal_faktur'     => 'sales_order_invoice.tanggal_faktur',
+            'tanggal_jatuh_tempo'=> 'tanggal_jatuh_tempo',
             'no_faktur'          => 'sales_order_invoice.no_faktur',
             'total_invoice'      => 'sales_order_invoice.total_invoice',
             'keterangan'         => 'sales_order_invoice.keterangan',
@@ -102,6 +103,17 @@ class SalesOrderInvoiceModel extends Model
         sales_order_invoice.document_no AS doc_no,
         sales_order_invoice.document_type AS doc_type,
         sales_order_invoice.document_id AS document_id,
+        sales_order_invoice.pay_amount AS pay_amount,
+        termin_data.value AS termin,
+        DATE_ADD(
+            sales_order_invoice.tanggal_faktur,
+            INTERVAL
+                CASE
+                    WHEN termin_data.value = 'COD' THEN 0
+                    ELSE CAST(termin_data.value AS UNSIGNED)
+                END
+            DAY
+        ) AS tanggal_jatuh_tempo,
         DATE_FORMAT(sales_order_invoice.tanggal_faktur, '%d/%m/%Y') AS tanggal_faktur,
         customers.name AS nama_pelanggan,
         customers.kode AS kode_pelanggan,
@@ -126,6 +138,7 @@ class SalesOrderInvoiceModel extends Model
             ->join('sales_order_invoice_detail', 'sales_order_invoice_detail.id_sales_order_invoice = sales_order_invoice.id', 'LEFT')
             ->join('barang_master_sales', 'barang_master_sales.id = sales_order_invoice_detail.id_barang_invoice', 'LEFT')
             ->join('companies', 'companies.id = sales_order_invoice.id_company', 'left')
+            ->join('metadata as termin_data', 'termin_data.id = sales_order_invoice.terms', 'left')
             ->where($condition)
             ->groupBy('sales_order_invoice.id');
         $totalData = $salesOrderInvoiceLokal->countAllResults(false);
@@ -192,19 +205,6 @@ class SalesOrderInvoiceModel extends Model
         } else {
             $data = $salesOrderInvoiceLokal->findAll();
         }
-
-        // foreach ($data as &$row) {
-        //     if (isset($row->no_sales_order)) {
-        //         $decoded = json_decode($row->no_sales_order, true);
-        //         if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-        //             // Gabungkan jadi string dipisah koma
-        //             $row->no_sales_order = implode(', ', $decoded);
-        //         } else {
-        //             // Kalau bukan JSON valid, tetap pakai value aslinya (trim biar bersih)
-        //             $row->no_sales_order = trim($row->no_sales_order);
-        //         }
-        //     }
-        // }
 
         return [
             'data'              => $data,
