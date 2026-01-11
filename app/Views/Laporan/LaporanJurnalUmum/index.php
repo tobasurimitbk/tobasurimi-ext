@@ -103,8 +103,6 @@
 </section>
 
 <script>
-    
-
     // Set default tanggal: awal bulan - hari ini
     const today = new Date();
     const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);

@@ -112,6 +112,8 @@ class JurnalUmum extends BaseController
         // === Company ID ===
         switch ($this->this_company_id) {
             case "1":
+                $companyId = [1, 2];
+                break;
             case "2":
                 $companyId = [1, 2];
                 break;
@@ -128,32 +130,30 @@ class JurnalUmum extends BaseController
         $builder = $this->jurnalUmumModel
             ->asObject()
             ->select("
-                jurnal_umum.*,
-                sub_akuns.no_sub,
-                sub_akuns.nama_sub,
-                transaksi_jurnal.valas,
-                transaksi_jurnal.exchange_rate,
                 transaksi_jurnal.id as id_transaksi,
                 transaksi_jurnal.no_bukti,
-                transaksi_jurnal.uraian_transaksi,
-                jurnal_umum.keterangan,
+                jurnal_umum.tanggal_jurnal,
+                sub_akuns.no_sub,
+                sub_akuns.nama_sub,
                 SUM(jurnal_umum.debit) AS sum_debit,
                 SUM(jurnal_umum.kredit) AS sum_kredit,
+                transaksi_jurnal.valas,
+                transaksi_jurnal.exchange_rate,
                 suppliers.name as supplier,
+                jurnal_umum.keterangan,
                 CASE 
-                    WHEN jurnal_umum.divisi_id = 0 THEN 'ALL'
-                    WHEN jurnal_umum.divisi_id IS NULL THEN 'ALL'
+                    WHEN jurnal_umum.divisi_id = 0 OR jurnal_umum.divisi_id IS NULL THEN 'ALL'
                     ELSE divisis.divisi 
                 END as nama_divisi
             ")
-            ->join('sub_akuns','jurnal_umum.id_coa = sub_akuns.id AND sub_akuns.is_header IS NULL','left')
+            ->join('sub_akuns','jurnal_umum.id_coa = sub_akuns.id','left')
             ->join('transaksi_jurnal','jurnal_umum.id_transaksi=transaksi_jurnal.id','left')
             ->join('divisis','jurnal_umum.divisi_id=divisis.id','left')
             ->join('penerimaan_barang','penerimaan_barang.id=transaksi_jurnal.penerimaan_barang_id','left')
             ->join('suppliers','suppliers.id=penerimaan_barang.supplier_id','left')
             ->whereIn('jurnal_umum.company_id', $companyId)
             ->whereIn('sub_akuns.company_id', $companyId)
-            ->where('sub_akuns.is_header', null)
+            ->where('sub_akuns.deletedAt', null)
             ->where('transaksi_jurnal.deleted_at', null)
             ->where('jurnal_umum.deletedAt', null)
             ->where('tanggal_jurnal >=', date('Y-m-d', strtotime(str_replace('/', '-', $dateStart))))
@@ -169,7 +169,13 @@ class JurnalUmum extends BaseController
             $builder->where('sub_akuns.id', $subsAkun);
         }
 
-        $data = $builder->groupBy('sub_akuns.no_sub')->orderBy('tanggal_jurnal', 'asc')->findAll();
+        $data = $builder
+        ->groupBy([
+            'transaksi_jurnal.id',
+            'sub_akuns.no_sub'
+        ])
+        ->orderBy('tanggal_jurnal', 'asc')
+        ->findAll();
 
         $formatted = [];
         $lastGroup = null;
@@ -245,6 +251,8 @@ class JurnalUmum extends BaseController
         // === Company ID ===
         switch ($this->this_company_id) {
             case "1":
+                $companyId = [1, 2];
+                break;
             case "2":
                 $companyId = [1, 2];
                 break;
@@ -281,23 +289,23 @@ class JurnalUmum extends BaseController
         $dataJurnal = $this->jurnalUmumModel
             ->asObject()
             ->select("
-                jurnal_umum.*,
-                sub_akuns.no_sub,
-                sub_akuns.nama_sub,
-                transaksi_jurnal.valas,
-                transaksi_jurnal.exchange_rate,
                 transaksi_jurnal.id as id_transaksi,
                 transaksi_jurnal.no_bukti,
-                transaksi_jurnal.uraian_transaksi,
-                jurnal_umum.keterangan,
+                jurnal_umum.tanggal_jurnal,
+                sub_akuns.no_sub,
+                sub_akuns.nama_sub,
+                SUM(jurnal_umum.debit) AS sum_debit,
+                SUM(jurnal_umum.kredit) AS sum_kredit,
+                transaksi_jurnal.valas,
+                transaksi_jurnal.exchange_rate,
                 suppliers.name as supplier,
+                jurnal_umum.keterangan,
                 CASE 
-                    WHEN jurnal_umum.divisi_id = 0 THEN 'ALL'
-                    WHEN jurnal_umum.divisi_id IS NULL THEN 'ALL'
+                    WHEN jurnal_umum.divisi_id = 0 OR jurnal_umum.divisi_id IS NULL THEN 'ALL'
                     ELSE divisis.divisi 
                 END as nama_divisi
             ")
-            ->join('sub_akuns', 'jurnal_umum.id_coa = sub_akuns.id AND sub_akuns.is_header IS NULL', 'left')
+            ->join('sub_akuns', 'jurnal_umum.id_coa = sub_akuns.id', 'left')
             ->join('transaksi_jurnal', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
             ->join('divisis', 'jurnal_umum.divisi_id = divisis.id', 'left')
             ->join('penerimaan_barang', 'penerimaan_barang.id = transaksi_jurnal.penerimaan_barang_id', 'left')
@@ -305,9 +313,13 @@ class JurnalUmum extends BaseController
             ->where($conditionMain)
             ->whereIn('jurnal_umum.company_id', $companyId)
             ->whereIn('sub_akuns.company_id', $companyId)
-            ->where('sub_akuns.is_header', null)
+            ->where('sub_akuns.deletedAt', null)
             ->where('transaksi_jurnal.deleted_at', null)
             ->where('jurnal_umum.deletedAt', null)
+            ->groupBy([
+                'transaksi_jurnal.id',
+                'sub_akuns.no_sub'
+            ])
             ->orderBy('tanggal_jurnal', 'asc')
             ->findAll();
 
@@ -348,8 +360,8 @@ class JurnalUmum extends BaseController
                 "supplier"      => $row->supplier ?? '',
                 "currency"      => $row->valas ?? 'IDR',
                 "exchange_rate" => $row->exchange_rate ?? '1.00',
-                "debit"         => (float)$row->debit,
-                "kredit"        => (float)$row->kredit,
+                "debit"         => (float)$row->sum_debit,
+                "kredit"        => (float)$row->sum_kredit,
             ];
         }
 
