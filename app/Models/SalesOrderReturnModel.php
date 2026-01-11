@@ -256,10 +256,10 @@ class SalesOrderReturnModel extends Model
         }
 
         if ($addCondition['dateStart']) {
-            $salesOrderReturnLokal->where('sales_order_return.tanggal_faktur >=',  $addCondition['dateStart']);
+            $salesOrderReturnLokal->where('sales_order_return.tanggal_return >=',  $addCondition['dateStart']);
         }
         if ($addCondition['dateEnd']) {
-            $salesOrderReturnLokal->where('sales_order_return.tanggal_faktur <=', $addCondition['dateEnd']);
+            $salesOrderReturnLokal->where('sales_order_return.tanggal_return <=', $addCondition['dateEnd']);
         }
 
         if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_customer']) {
@@ -346,10 +346,10 @@ class SalesOrderReturnModel extends Model
         }
 
         if ($addCondition['dateStart']) {
-            $salesOrderReturnLokal->where('sales_order_return.tanggal_faktur >=',  $addCondition['dateStart']);
+            $salesOrderReturnLokal->where('sales_order_return.tanggal_return >=',  $addCondition['dateStart']);
         }
         if ($addCondition['dateEnd']) {
-            $salesOrderReturnLokal->where('sales_order_return.tanggal_faktur <=', $addCondition['dateEnd']);
+            $salesOrderReturnLokal->where('sales_order_return.tanggal_return <=', $addCondition['dateEnd']);
         }
 
         if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_customer']) {
