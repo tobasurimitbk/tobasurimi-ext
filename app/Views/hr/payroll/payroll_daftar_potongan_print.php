@@ -14,7 +14,7 @@
         }
 
         @page {
-            /* size: 9.5in 15in landscape; */
+            size: 8.5in 15in landscape;
             margin-top: 100px;
         }
 
