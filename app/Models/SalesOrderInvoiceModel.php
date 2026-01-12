@@ -213,6 +213,93 @@ class SalesOrderInvoiceModel extends Model
         ];
     }
 
+    public function getCustomerItemDetail($condition, $addCondition) {
+        $builder = $this->db->table('sales_order_invoice_detail d')
+            ->select([
+                'h.id_customer as customer_id',
+                'c.name as customer_name',
+                'bms.id as barang_id',
+                'bms.barang_name as nama_barang',
+                'SUM(d.qty_invoice) as qty',
+                'SUM(d.amount_invoice) as amount'
+            ])
+            ->join('sales_order_invoice h','h.id=d.id_sales_order_invoice')
+            ->join('customers c','c.id=h.id_customer')
+            ->join('barang_master_sales bms','bms.id=d.id_barang_invoice')
+            ->where($condition);
+
+        if(!empty($addCondition['dateStart'])) $builder->where('h.tanggal_faktur >=', $addCondition['dateStart']);
+        if(!empty($addCondition['dateEnd'])) $builder->where('h.tanggal_faktur <=', $addCondition['dateEnd']);
+        if(!empty($addCondition['filter_customer'])) $builder->where('h.id_customer', $addCondition['filter_customer']);
+
+        return $builder->groupBy(['h.id_customer','c.name','bms.id','bms.barang_name'])
+                    ->orderBy('bms.barang_name', 'ASC')
+                    ->orderBy('c.name', 'ASC')
+                    ->get()->getResult();
+    }
+
+    public function getPivotHeader($condition, $addCondition)
+{
+    $builder = $this->db->table('sales_order_invoice_detail d')
+        ->select([
+            'bms.id as barang_id',
+            'bms.barang_name as nama_barang',
+            'SUM(d.amount_invoice) as amount'
+        ])
+        ->join('sales_order_invoice h','h.id=d.id_sales_order_invoice')
+        ->join('barang_master_sales bms','bms.id=d.id_barang_invoice')
+        ->where($condition);
+
+    if (!empty($addCondition['dateStart'])) {
+        $builder->where('h.tanggal_faktur >=', $addCondition['dateStart']);
+    }
+
+    if (!empty($addCondition['dateEnd'])) {
+        $builder->where('h.tanggal_faktur <=', $addCondition['dateEnd']);
+    }
+
+    if (!empty($addCondition['filter_customer'])) {
+        $builder->where('h.id_customer', $addCondition['filter_customer']);
+    }
+
+    return $builder
+        ->groupBy(['bms.id','bms.barang_name'])
+        ->orderBy('bms.barang_name','ASC') // ⭐ SORT BARANG
+        ->get()->getResult();
+}
+
+public function getPivotCustomerData($condition, $addCondition)
+{
+    $builder = $this->db->table('sales_order_invoice_detail d')
+        ->select([
+            'h.id_customer as customer_id',
+            'c.name as customer_name',
+            'bms.id as barang_id',
+            'SUM(d.amount_invoice) as amount'
+        ])
+        ->join('sales_order_invoice h','h.id=d.id_sales_order_invoice')
+        ->join('customers c','c.id=h.id_customer')
+        ->join('barang_master_sales bms','bms.id=d.id_barang_invoice')
+        ->where($condition);
+
+    if (!empty($addCondition['dateStart'])) {
+        $builder->where('h.tanggal_faktur >=', $addCondition['dateStart']);
+    }
+
+    if (!empty($addCondition['dateEnd'])) {
+        $builder->where('h.tanggal_faktur <=', $addCondition['dateEnd']);
+    }
+
+    if (!empty($addCondition['filter_customer'])) {
+        $builder->where('h.id_customer', $addCondition['filter_customer']);
+    }
+
+    return $builder
+        ->groupBy(['h.id_customer','c.name','bms.id'])
+        ->orderBy('c.name','ASC') // ⭐ SORT CUSTOMER
+        ->get()->getResult();
+}
+
     public function getLaporanPenjualanPerPelanggan($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [

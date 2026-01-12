@@ -160,7 +160,48 @@
                 </div>
             </a>
         </div>
-
+        <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+            <a href="<?= base_url('laporan-sales/customers-sales-by-items') ?>">
+                <div class="card card-statistic-1">
+                    <div class="card-icon bg-danger">
+                        <i class="far fa-file"></i>
+                    </div>
+                    <div class="card-wrap">
+                        <div class="card-header">
+                            <h4>Customers Sales By Items</h4>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+            <a href="<?= base_url('laporan-sales/items-sales-by-customers') ?>">
+                <div class="card card-statistic-1">
+                    <div class="card-icon bg-danger">
+                        <i class="far fa-file"></i>
+                    </div>
+                    <div class="card-wrap">
+                        <div class="card-header">
+                            <h4>Item Sales By Customers</h4>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+            <a href="<?= base_url('laporan-sales/aging-receivable-summary') ?>">
+                <div class="card card-statistic-1">
+                    <div class="card-icon bg-danger">
+                        <i class="far fa-file"></i>
+                    </div>
+                    <div class="card-wrap">
+                        <div class="card-header">
+                            <h4>Aging Receivable Summary</h4>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
 
     </div>
 </section>
