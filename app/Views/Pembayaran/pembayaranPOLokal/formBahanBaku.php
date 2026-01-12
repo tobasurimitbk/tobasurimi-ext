@@ -925,24 +925,16 @@
             listPembayaran[i].total_paid_pph = parseFloat(input_user) || 0;
         });
 
-        $.each(listPembayaran, function(i, v) {
-            var element = $('input[data-id="' + v.group_key + '"].total_po_dibayar_edit'); // GANTI
-            var input_user = destroyFormatRupiahPayment(element.val());
-            listPembayaran[i].total_paid = parseFloat(input_user) || 0;
-        });
+        if (id) {
 
-        // Untuk CREATE mode (jika ada logic yang perlu):
-        // Tambahkan jika perlu parsing untuk create mode
-        $.each(listPembayaran, function(i, v) {
-            var element = $('input[data-id="' + v.group_key + '"].total_po_dibayar_create'); // GANTI
-            if(element.length) {
+            // Untuk CREATE mode (jika ada logic yang perlu):
+            // Tambahkan jika perlu parsing untuk create mode
+            $.each(listPembayaran, function(i, v) {
+                var element = $('input[data-id="' + v.group_key + '"].total_po_dibayar_edit'); // GANTI
                 var input_user = destroyFormatRupiahPayment(element.val());
                 listPembayaran[i].total_paid = parseFloat(input_user) || 0;
-            }
-        });
+            });
 
-
-        if (id) {
             // UPDATE
             if ($(".create-form").valid()) {
                 Swal.fire({
@@ -1051,6 +1043,14 @@
         } else {
             // CREATE
             // VALIDASI BARANG LIST
+            $.each(listPembayaran, function(i, v) {
+                var element = $('input[data-id="' + v.group_key + '"].total_po_dibayar_create'); // GANTI
+                if(element.length) {
+                    var input_user = destroyFormatRupiahPayment(element.val());
+                    listPembayaran[i].total_paid = parseFloat(input_user) || 0;
+                }
+            });
+
             if (listPoID.length == 0) {
                 Swal.fire({
                     icon: 'error',
