@@ -599,6 +599,9 @@ class PembayaranPOLokal extends BaseController
 
             $poIDAmt = json_decode($this->request->getVar('poIDList'));
             $poNOAmt = json_decode($this->request->getVar('poNoList'));
+            $poIDArr = [];
+            $poNoArr = [];
+
 
             // =========================
             // VALIDASI DATA UTAMA
