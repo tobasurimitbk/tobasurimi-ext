@@ -14,8 +14,8 @@
         }
 
         @page {
-            size: 9.5in 15in landscape;
-            margin: 100px 25px 25px 25px;
+            size: 8.5in 15in landscape;
+            margin-top: 100px;
         }
 
         h4 {
@@ -90,7 +90,7 @@
         <table width="100%" border="1" id="dashed-border-table" style="margin-top: 30px;">
             <?php foreach ($payrollData['res'] as $payroll) : ?>
                 <tr>
-                    <td colspan="20" style="font-weight: bold; text-align:left;">
+                    <td colspan="19" style="font-weight: bold; text-align:left;">
                         BAGIAN : <?= $payroll['bagian'] ?>
                     </td>
                 </tr>
@@ -114,7 +114,6 @@
 
                     <td>Pot. Kantin</td>
                     <td>Pot. Pinjaman Lain-lain</td>
-                    <td>Pot. Uang Makan</td>
                     <td>Total Potongan</td>
                 </tr>
                 <?php $no = 1; ?>
@@ -139,7 +138,6 @@
 
                         <td><?= number_format($pd['potKantin'], 2, ',', '.')  ?></td>
                         <td><?= number_format($pd['potPinjamanLainLain'], 2, ',', '.')  ?></td>
-                        <td><?= number_format($pd['potUangMakan'], 2, ',', '.')  ?></td>
                         <td><?= number_format($pd['totPotongan'], 2, ',', '.')  ?></td>
                     </tr>
                 <?php endforeach; ?>
@@ -160,7 +158,6 @@
 
                     <td><?= number_format($payroll['totPotonganSingle']['totPotKantin'], 2, ',', '.') ?></td>
                     <td><?= number_format($payroll['totPotonganSingle']['totPotPinjamanLainLain'], 2, ',', '.') ?></td>
-                    <td><?= number_format($payroll['totPotonganSingle']['totPotUangMakan'], 2, ',', '.') ?></td>
                     <td><?= number_format($payroll['totPotonganSingle']['totPotongan'], 2, ',', '.') ?></td>
 
                 </tr>
@@ -184,7 +181,6 @@
 
                 <td><?= number_format($payrollData['potAll']['totPotKantin'], 2, ',', '.') ?></td>
                 <td><?= number_format($payrollData['potAll']['totPotPinjamanLainLain'], 2, ',', '.') ?></td>
-                <td><?= number_format($payrollData['potAll']['totPotUangMakan'], 2, ',', '.') ?></td>
                 <td><?= number_format($payrollData['potAll']['totPotongan'], 2, ',', '.') ?></td>
 
             </tr>

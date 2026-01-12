@@ -75,9 +75,7 @@ class SppDetailModel extends Model
             $poRes = $amPurchaseOrderDetailModel
                 ->select('am_purchase_orders.po_no,am_purchase_order_details.*')
                 ->join('am_purchase_orders', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
-                ->where('am_purchase_order_details.barang_id', $d->barang1_id)
-                ->where('am_purchase_order_details.spesifikasi_id', $d->barang2_id)
-                ->where('am_purchase_order_details.note', $d->note)
+                ->where('am_purchase_order_details.purchase_request_detail_id', $d->id)
                 ->where('am_purchase_orders.purchase_request_id', $id)
                 ->where('am_purchase_order_details.deletedAt', null)
                 ->where('am_purchase_orders.is_posted', 1)
@@ -97,5 +95,27 @@ class SppDetailModel extends Model
             ->first();
 
         return $result;
+    }
+
+    public function updateNoteDetailSpp($amPurchaseOrderId)
+    {
+        $amPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
+        // get po detail
+        $dataPoDetail = $amPurchaseOrderDetailModel
+            ->where('am_purchase_order_id', $amPurchaseOrderId)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        $dataSppDetailUpdate = [];
+        foreach ($dataPoDetail as $d) {
+            array_push($dataSppDetailUpdate, [
+                'id' => $d['purchase_request_detail_id'],
+                'note' => $d['note']
+            ]);
+        }
+
+        if (count($dataSppDetailUpdate) > 0) {
+            $this->updateBatch($dataSppDetailUpdate, 'id');
+        }
     }
 }

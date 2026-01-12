@@ -218,11 +218,27 @@ class AMPurchaseOrderModel extends Model
         }
 
         // --- Total Data tanpa filter ---
-        $totalData = $this->db->table('am_purchase_orders')
+        $totalDataQry = $this->db->table('am_purchase_orders')
             ->select("(SELECT COUNT(*) FROM am_purchase_order_details od WHERE od.am_purchase_order_id = am_purchase_orders.id AND od.deletedAt IS NULL) AS itemCount")
             ->join('purchase_requests', 'purchase_requests.id = am_purchase_orders.purchase_request_id', 'left')
-            ->where($condition)
-            ->countAllResults();
+            ->where($condition);
+
+        if (isset($addCondition['is_posted'])) {
+            $totalDataQry->where('am_purchase_orders.is_posted', $addCondition['is_posted'] === "SUDAH POSTING" ? 1 : 0);
+        }
+        if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
+            $totalDataQry->groupStart();
+            if (!empty($addCondition['dateStart'])) {
+                $totalDataQry->where('am_purchase_orders.po_date >=', $addCondition['dateStart']);
+            }
+            if (!empty($addCondition['dateEnd'])) {
+                $totalDataQry->where('am_purchase_orders.po_date <=', $addCondition['dateEnd']);
+            }
+            $totalDataQry->groupEnd();
+        }
+
+
+        $totalData = $totalDataQry->countAllResults();
 
         // --- Total Data dengan filter ---
         $filterDataQry = $this->db->table('am_purchase_orders')

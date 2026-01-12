@@ -1177,7 +1177,7 @@ class Payroll extends BaseController
         ];
 
         $dompdf->loadHtml(view('hr/payroll/payroll_daftar_potongan_print', $data));
-        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->setPaper('legal', 'landscape');
         $dompdf->render();
         $dompdf->stream("Daftar Potongan " . $yearMonth, array("Attachment" => false));
 

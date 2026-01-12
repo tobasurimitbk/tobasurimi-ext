@@ -67,8 +67,10 @@
                         <thead class="thead-dark">
                             <tr style="text-align: left;">
                                 <th style="width: 10px;">No</th>
-                                <th>Tujuan Pengeluaran</th>
-                                <th>Tanggal</th>
+                                <th>Tujuan Ekspor</th>
+                                <th>Tgl Order Form</th>
+                                <th>Tgl Invoice</th>
+                                <th>No Invoice</th>
                                 <th>Reference No</th>
                                 <th>Customer</th>
                                 <th>Kode</th>
@@ -123,6 +125,12 @@
             },
             {
                 data: 'tanggal'
+            },
+            {
+                data: 'tanggal_invoice'
+            },
+            {
+                data: 'no_invoice'
             },
             {
                 data: 'reference_no'

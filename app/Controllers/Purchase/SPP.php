@@ -12,6 +12,7 @@ use App\Models\MetadataModel;
 use App\Models\DivisisModel;
 use App\Models\CompaniesModel;
 use App\Models\ParentBarangModel;
+use App\Models\PenerimaanBarangModel;
 use App\Models\RMImportPOModel;
 use App\Models\RMPurchaseOrderModel;
 use App\Models\SatuansModel;
@@ -32,7 +33,7 @@ class SPP extends BaseController
     protected $RmImportPoModel;
     protected $barangMasterModel;
     protected $amPurchaseOrderDetailModel;
-
+    protected $penerimaanBarangModel;
     protected $this_company_id;
     protected $this_user_id;
     protected $is_admin;
@@ -44,7 +45,6 @@ class SPP extends BaseController
         $this->role_id = session()->get("login")->this_role_id;
         $this->SppModel = new SppModel();
         $this->SppDetailModel = new SppDetailModel();
-
         $this->MetadataModel = new MetadataModel();
         $this->DivisisModel = new DivisisModel();
         $this->CompaniesModel = new CompaniesModel();
@@ -53,7 +53,7 @@ class SPP extends BaseController
         $this->RmPurchaseOrderModel = new RMPurchaseOrderModel();
         $this->RmImportPoModel = new RMImportPOModel();
         $this->barangMasterModel = new BarangMasterModel();
-
+        $this->penerimaanBarangModel = new PenerimaanBarangModel();
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->this_user_id = session()->get("login")->user_id;
         $this->is_admin = session()->get("login")->is_admin;
@@ -286,21 +286,42 @@ class SPP extends BaseController
             'note' => $this->request->getVar('note'),
         ]);
 
-        // delete first in detail
-        $this->SppDetailModel->where('purchase_request_id', $id)->delete();
         $spp_detail = json_decode($this->request->getVar("items"));
+        $id_detail_all = [];
 
         foreach ($spp_detail as $s) {
-            $this->SppDetailModel->insert([
-                'purchase_request_id' => $id,
-                'barang1_id' => decrypt($s->barang_id),
-                'barang2_id' => decrypt($s->barang_spesifikasi_id),
-                'nama_barang' => $s->nama_barang,
-                'qty' => $s->qty,
-                'unit' => $s->satuan_id,
-                'note' => trim(str_replace(["\r", "\n"], '', $s->keterangan)),
-            ]);
+            $check = $this->SppDetailModel->where('id', $s->barang_detail_id)->first();
+            if ($check != null) {
+                $this->SppDetailModel->update($check['id'], [
+                    'purchase_request_id' => $id,
+                    'barang1_id' => decrypt($s->barang_id),
+                    'barang2_id' => decrypt($s->barang_spesifikasi_id),
+                    'nama_barang' => $s->nama_barang,
+                    'qty' => $s->qty,
+                    'unit' => $s->satuan_id,
+                    'note' => trim(str_replace(["\r", "\n"], '', $s->keterangan)),
+                ]);
+
+                array_push($id_detail_all, $check['id']);
+            } else {
+                // NEW BARANG
+                $id_detail_new = $this->SppDetailModel->insert([
+                    'purchase_request_id' => $id,
+                    'barang1_id' => decrypt($s->barang_id),
+                    'barang2_id' => decrypt($s->barang_spesifikasi_id),
+                    'nama_barang' => $s->nama_barang,
+                    'qty' => $s->qty,
+                    'unit' => $s->satuan_id,
+                    'note' => trim(str_replace(["\r", "\n"], '', $s->keterangan)),
+                ]);
+                array_push($id_detail_all, $id_detail_new);
+            }
         }
+
+        $this->SppDetailModel
+            ->where('purchase_request_id', $id)
+            ->whereNotIn('id', $id_detail_all)
+            ->delete();
 
         $this->updateKeteranganPo($id);
 
@@ -313,30 +334,36 @@ class SPP extends BaseController
 
     public function updateKeteranganPo($sppId)
     {
-        $amPurchaseOrderList = $this->AmPurchaseOrderModel
-            ->where('purchase_request_id', $sppId)
-            ->where('deletedAt', null)
+        // update keterangan di po
+        $selectQry = "
+            am_purchase_order_details.id,
+            am_purchase_order_details.am_purchase_order_id,
+            purchase_request_details.note
+        ";
+        $amPurchaseOrderDetailList = $this->amPurchaseOrderDetailModel
+            ->select($selectQry)
+            ->join('am_purchase_orders', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
+            ->join('purchase_request_details', 'purchase_request_details.id = am_purchase_order_details.purchase_request_detail_id', 'left')
+            ->where('am_purchase_orders.purchase_request_id', $sppId)
+            ->where('am_purchase_order_details.deletedAt', null)
             ->findAll();
 
-        foreach ($amPurchaseOrderList as $po) {
-            $amPurchaseOrderDetailList = $this->amPurchaseOrderDetailModel
-                ->where('am_purchase_order_details.am_purchase_order_id', $po['id'])
-                ->where('deletedAt', null)
-                ->findAll();
+        $poIds = array();
+        $dataUpdated = array();
+        foreach ($amPurchaseOrderDetailList as $poDetail) {
+            array_push($poIds, $poDetail['am_purchase_order_id']);
+            array_push($dataUpdated, [
+                'id' => $poDetail['id'],
+                'note' => trim(str_replace(["\r", "\n"], '', $poDetail['note']))
+            ]);
+        }
 
-            foreach ($amPurchaseOrderDetailList as $poDetail) {
-                $poDetailBarang = $this->SppDetailModel->getDetailByPo(
-                    $sppId,
-                    $poDetail['barang_id'],
-                    $poDetail['spesifikasi_id']
-                );
+        if (count($dataUpdated) > 0) {
+            $this->amPurchaseOrderDetailModel->updateBatch($dataUpdated, 'id');
+        }
 
-                if ($poDetailBarang) {
-                    $this->amPurchaseOrderDetailModel->update($poDetail['id'], [
-                        'note' => trim(str_replace(["\r", "\n"], '', $poDetailBarang['note']))
-                    ]);
-                }
-            }
+        if (count($poIds) > 0) {
+            $this->penerimaanBarangModel->updateHargalpbByPoIds($poIds, $this->this_company_id);
         }
     }
 

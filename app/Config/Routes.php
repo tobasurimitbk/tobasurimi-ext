@@ -562,7 +562,7 @@ $routes->post('/pembayaran-invoice/save', 'Pembayaran\PembayaranInvoice::saveLok
 $routes->post('/pembayaran-invoice/update', 'Pembayaran\PembayaranInvoice::updateInvoice', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/get-customer', 'Pembayaran\PembayaranInvoice::getCustomer', ['filter' => 'Auth']);
 $routes->post('/pembayaran-invoice/delete', 'Pembayaran\PembayaranInvoice::deletePembayaranInvoice', ['filter' => 'Auth']);
-$routes->post('/pembayaran-invoice/posting', 'Pembayaran\PembayaranInvoice::posting', ['filter' => 'Auth']);
+$routes->post('/pembayaran-invoice/posting', 'Pembayaran\PembayaranInvoice::postingLokal', ['filter' => 'Auth']);
 $routes->post('/pembayaran-invoice/unposting', 'Pembayaran\PembayaranInvoice::unposting', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/all-invoice', 'Pembayaran\PembayaranInvoice::getAllDataInvoice', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/check-unpaid', 'Pembayaran\PembayaranInvoice::checkUnpaidInvoice', ['filter' => 'Auth']);
