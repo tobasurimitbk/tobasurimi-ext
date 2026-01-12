@@ -946,9 +946,9 @@
         let barang_id = "";
         let barang_spesifikasi_id = "";
         let barang_detail_id = $(this).data('barang_detail_id');
-
+        console.log(barang_detail_id);
         $.each(list_items, function(i, v) {
-            if (v.barang_detail_id === barang_detail_id) {
+            if (v.barang_detail_id == barang_detail_id) {
                 $(".barang_detail_id").val(v.barang_detail_id);
                 $(".barang_id").val(v.barang_id);
                 $(".barang_spesifikasi_id").val(v.barang_spesifikasi_id);
@@ -2258,7 +2258,7 @@
     <?php if (!empty($dataSPP)) : ?>
         <?php foreach ($dataSPPDetail as $i => $d) : ?>
             list_items.push({
-                'barang_detail_id': getID(),
+                'barang_detail_id': "<?= $d->id ?>",
                 'purchase_detail_id': "<?= encrypt($d->id) ?>",
                 'barang_id': "<?= encrypt($d->barang1_id) ?>",
                 'barang_spesifikasi_id': "<?= encrypt($d->barang2_id) ?>",

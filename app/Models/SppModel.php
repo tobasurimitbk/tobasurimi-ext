@@ -82,17 +82,8 @@ class SppModel extends Model
             ->groupBy(('purchase_requests.id'))
             ->orderBy($sort, $sortType);
 
-        $totalData = $purchaseRequestsDataQry->countAllResults(false);
 
-        if ($addCondition['is_posted']) {
-            if ($addCondition['is_posted'] == "SUDAH POSTING") {
-                $purchaseRequestsDataQry->where('is_posted', 1);
-            } else {
-                $purchaseRequestsDataQry->where('is_posted', 0);
-            }
-        }
-
-        if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
+        if ($addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['divisi_id'] || $addCondition['is_posted']) {
             $purchaseRequestsDataQry->groupStart();
         }
 
@@ -103,28 +94,36 @@ class SppModel extends Model
             $purchaseRequestsDataQry->where('purchase_requests.request_date <=', $addCondition['dateEnd']);
         }
 
-        if ($addCondition['dateStart'] || $addCondition['dateEnd']) {
-            $purchaseRequestsDataQry->groupEnd();
-        }
-
-        if ($addCondition['search'] || $addCondition['divisi_id'] || $addCondition['spp_type']) {
-            $purchaseRequestsDataQry->groupStart();
-        }
         if ($addCondition['divisi_id']) {
             $purchaseRequestsDataQry->where('purchase_requests.divisi_id', $addCondition['divisi_id']);
         }
+
+        if ($addCondition['is_posted']) {
+            if ($addCondition['is_posted'] == "SUDAH POSTING") {
+                $purchaseRequestsDataQry->where('is_posted', 1);
+            } else {
+                $purchaseRequestsDataQry->where('is_posted', 0);
+            }
+        }
+
+        if ($addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['divisi_id'] || $addCondition['is_posted']) {
+            $purchaseRequestsDataQry->groupEnd();
+        }
+
+        $totalData = $purchaseRequestsDataQry->countAllResults(false);
+
+
+        if ($addCondition['search']) {
+            $purchaseRequestsDataQry->groupStart();
+        }
+
         if ($addCondition['search']) {
             $purchaseRequestsDataQry
                 ->like('spp_no', $addCondition['search'])
                 ->orLike('divisis.divisi', $addCondition['search']);
         }
 
-        if ($addCondition['spp_type']) {
-            $purchaseRequestsDataQry
-                ->like('spp_type', $addCondition['spp_type']);
-        }
-
-        if ($addCondition['search'] || $addCondition['divisi_id'] || $addCondition['spp_type']) {
+        if ($addCondition['search']) {
             $purchaseRequestsDataQry->groupEnd();
         }
 

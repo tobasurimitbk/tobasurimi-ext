@@ -19,6 +19,7 @@ class AMPurchaseOrderDetailModel extends Model
         'am_purchase_order_id',
         'spesifikasi_id',
         'barang_id',
+        'purchase_request_detail_id',
         'item_desc',
         'note',
         'unit',

@@ -181,6 +181,7 @@ class POLokalBahanPenolong extends BaseController
 
                 $this->aMPurchaseOrderDetailModel->insert([
                     'am_purchase_order_id' => $poID,
+                    'purchase_request_detail_id' => $d->purchase_request_detail_id,
                     'barang_id' => $d->barang_id,
                     'spesifikasi_id' => $d->spesifikasi_id,
                     'note' => trim($d->keterangan),
@@ -196,6 +197,9 @@ class POLokalBahanPenolong extends BaseController
                 ]);
                 $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $d->barang_id, $d->spesifikasi_id);
             }
+
+            // update keterangan spp
+            $this->sppDetailModel->updateNoteDetailSpp($poID);
 
             $db->transCommit();
             return response()->setJSON([
@@ -315,6 +319,7 @@ class POLokalBahanPenolong extends BaseController
         ];
 
         $selectQryPurchaseOrderDetail = "
+            purchase_request_details.id AS purchase_request_detail_id,
             am_purchase_order_details.barang_id,
             am_purchase_order_details.spesifikasi_id,
             am_purchase_order_details.additional_cost AS biaya_tambahan,
@@ -340,9 +345,10 @@ class POLokalBahanPenolong extends BaseController
             ->first();
         $listBarang = $this->aMPurchaseOrderDetailModel
             ->select($selectQryPurchaseOrderDetail)
-            ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id')
-            ->join('barang_master_spesifikasi', 'am_purchase_order_details.spesifikasi_id = barang_master_spesifikasi.id')
-            ->join('satuans', 'am_purchase_order_details.unit = satuans.id')
+            ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id', 'left')
+            ->join('barang_master_spesifikasi', 'am_purchase_order_details.spesifikasi_id = barang_master_spesifikasi.id', 'left')
+            ->join('satuans', 'am_purchase_order_details.unit = satuans.id', 'left')
+            ->join('purchase_request_details', 'purchase_request_details.id = am_purchase_order_details.purchase_request_detail_id', 'left')
             ->where($amPurchaseOrderDetailCondition)
             ->findAll();
 
@@ -433,15 +439,14 @@ class POLokalBahanPenolong extends BaseController
                 // UPDATE
                 $check = $this->aMPurchaseOrderDetailModel
                     ->where('am_purchase_order_details.am_purchase_order_id', $id)
-                    ->where('spesifikasi_id', $d->spesifikasi_id)
-                    ->where('barang_id', $d->barang_id)
-                    ->where('note', trim($d->keterangan))
+                    ->where('purchase_request_detail_id', $d->purchase_request_detail_id)
                     ->first();
 
                 if ($check != null) {
                     // UPDATE
                     $this->aMPurchaseOrderDetailModel->update($check['id'], [
                         'am_purchase_order_id' => $id,
+                        'purchase_request_detail_id' => $d->purchase_request_detail_id,
                         'barang_id' => $d->barang_id,
                         'spesifikasi_id' => $d->spesifikasi_id,
                         'note' => trim($d->keterangan),
@@ -463,14 +468,13 @@ class POLokalBahanPenolong extends BaseController
                     // DELETE
                     $this->aMPurchaseOrderDetailModel
                         ->where('am_purchase_order_details.am_purchase_order_id', $id)
-                        ->where('spesifikasi_id', $d->spesifikasi_id)
-                        ->where('barang_id', $d->barang_id)
-                        ->where('note', trim($d->keterangan))
+                        ->where('purchase_request_detail_id', $d->purchase_request_detail_id)
                         ->delete();
 
                     // INSERT NEW
                     $id_detail_new = $this->aMPurchaseOrderDetailModel->insert([
                         'am_purchase_order_id' => $id,
+                        'purchase_request_detail_id' => $d->purchase_request_detail_id,
                         'barang_id' => $d->barang_id,
                         'spesifikasi_id' => $d->spesifikasi_id,
                         'note' => trim($d->keterangan),
@@ -522,48 +526,18 @@ class POLokalBahanPenolong extends BaseController
             }
 
             // Auto Update Harga di LPB
-            $penerimaanBarang = $this->penerimaanBarangModel
-                ->where('penerimaan_barang.deletedAt', null)
-                ->where('tipe_bahan', "PENOLONG")
-                ->where('status_penerimaan', "LOKAL")
-                ->where('company_id', $this->this_company_id)
-                ->like('multiple_po_id', $id)
-                ->findAll();
-            $penerimaanBarangIds = array();
-            foreach ($penerimaanBarang as $p) {
-                array_push($penerimaanBarangIds, $p['id']);
-            }
-
-            if (count($penerimaanBarangIds) != 0) {
-
-                $poDetail = $this->aMPurchaseOrderDetailModel
-                    ->where('am_purchase_order_details.deletedAt', null)
-                    ->where('am_purchase_order_details.am_purchase_order_id', $id)
-                    ->findAll();
-
-                foreach ($poDetail as $p) {
-
-                    // PO SUDAH DIBUATKAN LPB NYA
-                    $penerimaanBarangDetail = $this->penerimaanBarangDetailModel
-                        ->whereIn('penerimaan_barang_id', $penerimaanBarangIds)
-                        ->where('purchase_order_id', $p['am_purchase_order_id'])
-                        ->where('purchase_order_details_id', $p['id'])
-                        ->where('penerimaan_barang_detail.deletedAt', null)
-                        ->findAll();
-
-                    foreach ($penerimaanBarangDetail as $pbd) {
-                        $this->penerimaanBarangDetailModel->update($pbd['id'], [
-                            'harga' => $p['price'],
-                            'sub_total' => ($p['price'] * $pbd['jml_masuk_konversi']),
-                        ]);
-                    }
-                }
-            }
+            $this->penerimaanBarangModel->updateHargalpbByPoIds(
+                [$id],
+                $this->this_company_id
+            );
 
             $this->aMPurchaseOrderDetailModel
                 ->where('am_purchase_order_id', $id)
                 ->whereNotIn('id', $id_detail_all)
                 ->delete();
+
+            // UPDATE KETERANGAN DETAIL SPP
+            $this->sppDetailModel->updateNoteDetailSpp($id);
 
             $db->transCommit();
 
@@ -902,20 +876,19 @@ class POLokalBahanPenolong extends BaseController
             ->join('barang_master', 'purchase_request_details.barang1_id = barang_master.id', 'left')
             ->join('barang_master_spesifikasi', 'purchase_request_details.barang2_id=barang_master_spesifikasi.id', 'left')
             ->join('satuans', 'satuans.id = purchase_request_details.unit', 'left')
-            ->where($condition)->findAll();
+            ->where($condition)
+            ->findAll();
 
         $result = [];
 
         foreach ($sppDetail as $s) {
 
             $totalQtyPO = $this->aMPurchaseOrderDetailModel->select('SUM(qty) AS qty_po')
-                ->join('am_purchase_orders', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id')
+                ->join('am_purchase_orders', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
                 ->where('am_purchase_orders.deletedAt', null)
                 ->where('am_purchase_order_details.deletedAt', null)
                 ->where('am_purchase_orders.purchase_request_id', $id)
-                ->where('barang_id', $s['barang1_id'])
-                ->where('spesifikasi_id', $s['barang2_id'])
-                ->where('am_purchase_order_details.note', trim($s['note']))
+                ->where('purchase_request_detail_id', $s['id'])
                 ->first();
 
             $totalQtyPO = ($totalQtyPO == null) ? 0 : $totalQtyPO['qty_po'];
@@ -931,6 +904,7 @@ class POLokalBahanPenolong extends BaseController
                 );
 
                 $result[] = [
+                    'purchase_request_detail_id' => $s['id'],
                     'barang_id' => $s['barang1_id'],
                     'spesifikasi_id' => $s['barang2_id'],
                     'kode_barang' => $s['kode_barang'],
@@ -967,6 +941,7 @@ class POLokalBahanPenolong extends BaseController
 
             foreach ($poDetail as $s) {
                 $result[] = [
+                    'purchase_request_detail_id' => $s['id'],
                     'barang_id' => $s['barang_id'],
                     'spesifikasi_id' => $s['spesifikasi_id'],
                     'kode_barang' => $s['kode_barang'],

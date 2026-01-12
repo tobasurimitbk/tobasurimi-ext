@@ -189,6 +189,7 @@
                 </div>
             </div>
             <form class="detail-form" role="form" method="POST" enctype="multipart/form-data" style="<?= !empty($poDetail) ? ($poDetail['is_posted'] ? "display: none;" : "") : ""; ?>">
+                <input type="hidden" name="purchase_request_detail_id" id="purchase_request_detail_id" class="purchase_request_detail_id">
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
@@ -347,25 +348,25 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th style="text-align: center; width:10px">No.</th>
-                                <th style="text-align: center;">Kode</th>
-                                <th style="text-align: center;">Barang</th>
-                                <th style="text-align: center;">Qty</th>
-                                <th style="text-align: center;">Satuan</th>
-                                <th style="text-align: center;">Harga Satuan</th>
-                                <th style="text-align: center;">Diskon (%)</th>
-                                <th style="text-align: center;">Tambahan</th>
-                                <th style="text-align: center;">Total</th>
-                                <th style="text-align: center;">Action</th>
+                                <th style="text-align: left;">Kode</th>
+                                <th style="text-align: left;">Barang</th>
+                                <th style="text-align: left;">Qty</th>
+                                <th style="text-align: left;">Satuan</th>
+                                <th style="text-align: left;">Harga Satuan</th>
+                                <th style="text-align: left;">Diskon (%)</th>
+                                <th style="text-align: left;">Tambahan</th>
+                                <th style="text-align: left;">Total</th>
+                                <th style="text-align: left;">Action</th>
                             </tr>
                         </thead>
-                        <tbody style="text-align:center;">
+                        <tbody style="text-align:left;">
                         </tbody>
                         <tfoot class="foot-detail-table" id="foot-detail-table">
                             <tr>
                                 <td style="text-align: right;" colspan="8">
                                     <b>TOTAL</b>
                                 </td>
-                                <td style="text-align: center;">
+                                <td style="text-align: left;">
                                     <b>0.00</b>
                                 </td>
                                 <td></td>
@@ -474,12 +475,15 @@
 
         try {
             const match = selectedNamaBarang.match(/\{([^}]*)\}/);
+            var namaBarang = match[1].trim();
             if (!match) {
-                $('#nama_barang').val($(this).find("option:selected").data("nama_barang") + " - " + $(this).find("option:selected").data("spesifikasi_name"));
+                namaBarang = ($(this).find("option:selected").data("nama_barang") + " - " + $(this).find("option:selected").data("spesifikasi_name")).trim();
+                $('#nama_barang').val(namaBarang);
             }
-            $('#nama_barang').val(match[1]);
+            $('#nama_barang').val(namaBarang);
         } catch (error) {
-            $('#nama_barang').val($(this).find("option:selected").data("nama_barang") + " - " + $(this).find("option:selected").data("spesifikasi_name"));
+            var namaBarang = ($(this).find("option:selected").data("nama_barang") + " - " + $(this).find("option:selected").data("spesifikasi_name")).trim();
+            $('#nama_barang').val(namaBarang);
         }
     });
 
@@ -759,6 +763,7 @@
 
                         listBarang[indexToUpdate] = {
                             id: id,
+                            purchase_request_detail_id: $('#purchase_request_detail_id').val(),
                             barang_id: $('#barang_id').find("option:selected").data("barang_id"),
                             spesifikasi_id: $('#barang_id').val(),
                             kode_barang: $('#barang_id').find("option:selected").data("kode_barang"),
@@ -828,134 +833,70 @@
                 })
             } else {
                 var id = $('#id').val();
-                if (id) {
-                    var id = $('#id').val();
-                    var poDate = $('#po_date').val();
-                    var poNo = $('#po_no').val();
-                    var divisionID = $('#division_id').val();
-                    var supplierID = $('#supplier_id').val();
-                    var paymentDate = $('#payment_date').val();
-                    var sppID = $('#spp_id').val();
-                    var note = $('#note').val();
-                    var statusClosedSpp = $('#status_closed_spp option:selected').val();
-                    var formId = $('#form_id').val();
-                    // append
-                    var formData = new FormData();
-                    formData.append("id", id);
-                    formData.append("spp_id", sppID);
-                    formData.append("poDate", poDate);
-                    formData.append("poNo", poNo);
-                    formData.append("divisionID", divisionID);
-                    formData.append("supplierID", supplierID);
-                    formData.append("paymentDate", paymentDate);
-                    formData.append("total", totalHarga);
-                    formData.append("note", note);
-                    formData.append("status_closed_spp", statusClosedSpp);
-                    formData.append("form_id", formId);
-                    formData.append("listBarang", JSON.stringify(listBarang));
+                var url = id == '' ? "<?= base_url("po-lokal-bahan-penolong/save"); ?>" : "<?= base_url("po-lokal-bahan-penolong/update"); ?>";
+                var poDate = $('#po_date').val();
+                var poNo = $('#po_no').val();
+                var divisionID = $('#division_id').val();
+                var supplierID = $('#supplier_id').val();
+                var paymentDate = $('#payment_date').val();
+                var sppID = $('#spp_id').val();
+                var note = $('#note').val();
+                var statusClosedSpp = $('#status_closed_spp option:selected').val();
+                var formId = $('#form_id').val();
+                // append
+                var formData = new FormData();
+                formData.append("id", id);
+                formData.append("spp_id", sppID);
+                formData.append("poDate", poDate);
+                formData.append("poNo", poNo);
+                formData.append("divisionID", divisionID);
+                formData.append("supplierID", supplierID);
+                formData.append("paymentDate", paymentDate);
+                formData.append("total", totalHarga);
+                formData.append("note", note);
+                formData.append("status_closed_spp", statusClosedSpp);
+                formData.append("form_id", formId);
+                formData.append("listBarang", JSON.stringify(listBarang));
 
-                    $.ajax({
-                        url: "<?= base_url("po-lokal-bahan-penolong/update"); ?>",
-                        data: formData,
-                        method: "POST",
-                        dataType: "json",
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            setLoading();
-                        },
-                        complete: function() {
-                            stopLoading();
-                        },
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            if (response.status) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                    reverseButtons: true,
-                                    confirmButtonText: 'Oke',
-                                }).then((result) => {
-                                    window.location.href = "<?= base_url('po-lokal-bahan-penolong') ?>"
-                                })
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                    cancelButtonColor: '#d33',
-                                    reverseButtons: true,
-                                    confirmButtonText: 'Oke',
-                                })
-                            }
-
+                $.ajax({
+                    url: url,
+                    data: formData,
+                    method: "POST",
+                    dataType: "json",
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        if (response.status) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                                reverseButtons: true,
+                                confirmButtonText: 'Oke',
+                            }).then((result) => {
+                                window.location.href = "<?= base_url('po-lokal-bahan-penolong') ?>"
+                            })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                                cancelButtonColor: '#d33',
+                                reverseButtons: true,
+                                confirmButtonText: 'Oke',
+                            });
+                            csrf.val(response.token);
                         }
-                    });
-                } else {
-                    var poDate = $('#po_date').val();
-                    var poNo = $('#po_no').val();
-                    var divisionID = $('#division_id').val();
-                    var supplierID = $('#supplier_id').val();
-                    var paymentDate = $('#payment_date').val();
-                    var sppID = $('#spp_id').val();
-                    var note = $('#note').val();
-                    var statusClosedSpp = $('#status_closed_spp option:selected').val();
-                    var formId = $('#form_id').val();
-                    // append
-                    var formData = new FormData();
-                    formData.append("poDate", poDate);
-                    formData.append("spp_id", sppID);
-                    formData.append("poNo", poNo);
-                    formData.append("divisionID", divisionID);
-                    formData.append("supplierID", supplierID);
-                    formData.append("paymentDate", paymentDate);
-                    formData.append("total", totalHarga);
-                    formData.append("note", note);
-                    formData.append("status_closed_spp", statusClosedSpp);
-                    formData.append("form_id", formId);
-                    formData.append("listBarang", JSON.stringify(listBarang));
 
-                    $.ajax({
-                        url: "<?= base_url("po-lokal-bahan-penolong/save"); ?>",
-                        data: formData,
-                        method: "POST",
-                        dataType: "json",
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            setLoading();
-                        },
-                        complete: function() {
-                            stopLoading();
-                        },
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            if (response.status) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                    reverseButtons: true,
-                                    confirmButtonText: 'Oke',
-                                }).then((result) => {
-                                    window.location.href = "<?= base_url('po-lokal-bahan-penolong') ?>"
-
-                                })
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                    cancelButtonColor: '#d33',
-                                    reverseButtons: true,
-                                    confirmButtonText: 'Oke',
-                                })
-                            }
-
-                        }
-                    });
-                }
+                    }
+                });
             }
         }
     });
@@ -963,6 +904,7 @@
     function insertList() {
         listBarang.push({
             id: getID(),
+            purchase_request_detail_id: $('#purchase_request_detail_id').val(),
             barang_id: $('#barang_id').find("option:selected").data("barang_id"),
             spesifikasi_id: $('#barang_id').val(),
             kode_barang: $('#barang_id').find("option:selected").data("kode_barang"),
@@ -1039,7 +981,7 @@
         table.find('tfoot').empty();
         var newRow = $('<tr>');
         newRow.append($('<td style="text-align:right;" colspan="8"><b>Total</b></td>'));
-        newRow.append($('<td style="text-align:center;"><b>' + greatFormatRupiah(totalHarga) + '</b></td>'));
+        newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(totalHarga) + '</b></td>'));
         newRow.append($('<td></td>'));
         table.find('tfoot').append(newRow);
     }
@@ -1115,6 +1057,7 @@
 
         $('#id_detail').val(item.id);
         $('#barang_id, #barang_update_id').val(item.spesifikasi_id).change();
+        $('#purchase_request_detail_id').val(item.purchase_request_detail_id);
         $('#harga_satuan').val(item.harga_satuan == 0 ? '' : greatFormatRupiah(item.harga_satuan));
         $('#qty').val(parseFloat(item.qty));
         $('#diskon').val(parseFloat(item.diskon));
@@ -1140,6 +1083,7 @@
         $(".barang_id").val("").change();
         $(".diskon").val('0');
         $(".nama_barang").val(null);
+        $('.purchase_request_detail_id').val(null);
     }
 
     function getListSPP() {
@@ -1269,6 +1213,7 @@
                     $.each(response.data, function(i, v) {
                         listBarang.push({
                             id: getID(),
+                            purchase_request_detail_id: v.purchase_request_detail_id,
                             barang_id: v.barang_id,
                             spesifikasi_id: v.spesifikasi_id,
                             kode_barang: v.kode_barang,
@@ -1372,6 +1317,7 @@
             listBarang.push({
                 id: getID(),
                 barang_id: "<?= $l['barang_id'] ?>",
+                purchase_request_detail_id: "<?= $l['purchase_request_detail_id'] ?>",
                 spesifikasi_id: "<?= $l['spesifikasi_id'] ?>",
                 kode_barang: "<?= $l['kode_barang'] ?>",
                 nama_barang: "<?= str_replace('"', '\"', $l['nama_barang']) . " - " . str_replace('"', '\"', $l['spesifikasi_name'])  ?>",

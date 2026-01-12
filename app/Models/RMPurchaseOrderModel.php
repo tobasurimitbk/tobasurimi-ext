@@ -2190,7 +2190,7 @@ class RMPurchaseOrderModel extends Model
                 SUM(DISTINCT penerimaan_barang_detail.sub_total) AS sum_total, 
                 SUM(DISTINCT local_po_payments.amount) AS sum_remaining
             ";
-        }else{
+        } else {
             $selectQry = "rm_purchase_orders.id AS id, 
                     rm_purchase_orders.po_date AS tanggal_invoice, 
                     rm_purchase_orders.po_no AS no_invoice, 
@@ -2216,12 +2216,12 @@ class RMPurchaseOrderModel extends Model
             ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_id = rm_purchase_orders.id AND penerimaan_barang_detail.purchase_order_details_id = rm_purchase_order_details.id', 'right')
             ->join('penerimaan_barang', "penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id AND penerimaan_barang.status_penerimaan = 'LOKAL' AND penerimaan_barang.tipe_bahan = 'BAKU'")
             ->join('local_po_payments', 'FIND_IN_SET(rm_purchase_orders.id, REPLACE(REPLACE(local_po_payments.multiple_po_id, "[", ""), "]", ""))', 'left');
-            if (isset($addCondition['summary']) && $addCondition['summary'] == "summary") {
-                $poDataQry->groupBy('suppliers.name');
-            } else {
-                $poDataQry->groupBy('rm_purchase_orders.id');
-            }
-            $poDataQry->orderBy($sort, $sortType);
+        if (isset($addCondition['summary']) && $addCondition['summary'] == "summary") {
+            $poDataQry->groupBy('suppliers.name');
+        } else {
+            $poDataQry->groupBy('rm_purchase_orders.id');
+        }
+        $poDataQry->orderBy($sort, $sortType);
 
         $totalData = $poDataQry->countAllResults(false);
 

@@ -108,6 +108,7 @@ class PenerimaanBarangModel extends Model
 
         // --- Filter search ---
         if (!empty($addCondition['search'])) {
+            $addCondition['search'] = trim($addCondition['search']); // hapus spasi
             $baseQuery->groupStart()
                 ->like('penerimaan_barang.no_penerimaan_barang', $addCondition['search'])
                 ->orLike('suppliers.name', $addCondition['search'])
@@ -137,6 +138,15 @@ class PenerimaanBarangModel extends Model
         // --- Hitung totalData (tanpa filter search/status/date) ---
         $totalDataQuery = $this->db->table('penerimaan_barang')
             ->where($condition);
+        if (!empty($addCondition['status'])) {
+            $totalDataQuery->where('penerimaan_barang.status_post', $addCondition['status']);
+        }
+        if (!empty($addCondition['startdate'])) {
+            $totalDataQuery->where('penerimaan_barang.tanggal >=', $addCondition['startdate']);
+        }
+        if (!empty($addCondition['lastdate'])) {
+            $totalDataQuery->where('penerimaan_barang.tanggal <=', $addCondition['lastdate']);
+        }
         $totalData = $totalDataQuery->countAllResults();
 
         // --- Ambil data utama dengan limit/offset ---
@@ -2074,5 +2084,53 @@ class PenerimaanBarangModel extends Model
             'totalFilteredData' => $totalFilteredData,
             'grandTotalHarga'   => (float)$grandTotalHarga['total_harga']
         ];
+    }
+
+    public function updateHargalpbByPoIds($poIds, $companyId)
+    {
+        $amPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
+        $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
+
+        foreach ($poIds as $id) {
+            // Auto Update Harga di LPB
+            $penerimaanBarang = $this->asArray()
+                ->where('penerimaan_barang.deletedAt', null)
+                ->where('tipe_bahan', "PENOLONG")
+                ->where('status_penerimaan', "LOKAL")
+                ->where('company_id', $companyId)
+                ->like('multiple_po_id', $id)
+                ->findAll();
+            $penerimaanBarangIds = array();
+            foreach ($penerimaanBarang as $p) {
+                array_push($penerimaanBarangIds, $p['id']);
+            }
+
+            if (count($penerimaanBarangIds) != 0) {
+
+                $poDetail = $amPurchaseOrderDetailModel
+                    ->where('am_purchase_order_details.deletedAt', null)
+                    ->where('am_purchase_order_details.am_purchase_order_id', $id)
+                    ->findAll();
+
+                foreach ($poDetail as $p) {
+
+                    // PO SUDAH DIBUATKAN LPB NYA
+                    $penerimaanBarangDetail = $penerimaanBarangDetailModel
+                        ->whereIn('penerimaan_barang_id', $penerimaanBarangIds)
+                        ->where('purchase_order_id', $p['am_purchase_order_id'])
+                        ->where('purchase_order_details_id', $p['id'])
+                        ->where('penerimaan_barang_detail.deletedAt', null)
+                        ->findAll();
+
+                    foreach ($penerimaanBarangDetail as $pbd) {
+                        $penerimaanBarangDetailModel->update($pbd['id'], [
+                            'harga' => $p['price'],
+                            'sub_total' => ($p['price'] * $pbd['jml_masuk_konversi']),
+                            'keterangan' => $p['note']
+                        ]);
+                    }
+                }
+            }
+        }
     }
 }
