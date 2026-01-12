@@ -481,6 +481,8 @@
             const csrfToken = '<?= csrf_token() ?>';
             const csrf = $(`[name="${csrfToken}"]`);
 
+            console.log(dataList);
+
 
 
             if (id) {
@@ -972,11 +974,13 @@
     }
 
     // ✅ FIX: Improved drawTable function
-    function drawTable(dataList, totalPembayaran = 0, totalSudahDiBayar = 0) {
+    function drawTable(localDataList, totalPembayaran = 0, totalSudahDiBayar = 0) {
         const table = $('#dataTable');
         
         // ✅ FIX: Clear existing content and event handlers
         table.find('tbody').empty().off('keyup');
+
+        dataList = [...localDataList]; // Copy data ke global variable
         
         let globalIndex = 0;
         let totalTagihan = 0;
@@ -1132,29 +1136,6 @@
     }
 
 
-    // 🔥 Fungsi baru buat hitung ulang total
-    // function updateTotal(table, totalPembayaran, totalSudahDiBayar) {
-    //     let totalInput = 0;
-
-    //     // Loop semua input total_bayar
-    //     table.find('input.total-bayar').each(function() {
-    //         let rawValue = $(this).val().replace(/[^0-9]/g, '');
-    //         let val = parseFloat(rawValue) || 0;
-    //         totalInput += val;
-    //     });
-
-    //     // Update tampilan total
-    //     table.find('.total_pembayaran').text(greatFormatRupiah(totalInput));
-
-    //     // Hitung sisa pembayaran
-    //     let sisa = totalInput - totalPembayaran;
-    //     table.find('.sisa_pembayaran').text(greatFormatRupiah(sisa));
-
-    //     // Optional: validasi batas maksimal
-    //     if (totalInput < 0) totalInput = 0;
-    // }
-
-
     function deleteBarang(id) {
         var indexToRemove = -1;
         for (let i = 0; i < dataList.length; i++) {
@@ -1169,24 +1150,6 @@
             drawTable(dataList)
         }
     }
-
-    // function getCustomer() {
-    //     let invoice_id = $("#no_dokumen").val();
-    //     let type_invoice = $("#tipe_invoice").val();
-
-    //     $.ajax({
-    //         url: '<?= base_url('pembayaran-invoice/get-customer') ?>',
-    //         method: "GET",
-    //         data: {
-    //             invoice_id: invoice_id,
-    //             type_invoice: type_invoice
-    //         },
-    //         dataType: "json",
-    //         success: function(res) {
-    //             $('#customer').val(res);
-    //         }
-    //     })
-    // }
 
     function getID() {
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
