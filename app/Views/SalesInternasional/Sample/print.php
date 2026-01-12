@@ -33,7 +33,7 @@
                     :
                 </td>
                 <td>
-                    <?= strtoupper(date('F d, Y', strtotime($dataSample['tanggal']))); ?>
+                    <?= strtoupper(date('d F Y', strtotime($dataSample['tanggal']))); ?>
                 </td>
             </tr>
         </table>
@@ -112,7 +112,7 @@
                         <td style="padding:3px; border:1px solid #ddd; text-align:left; vertical-align: top;"
                             rowspan="<?= count($dataBarangList) ?>">
                             <b style="display:block;">
-                                <u><?= $dataSample['recipient_details'] ?></u>
+                                <u><?= nl2br(($dataSample['recipient_details'])) ?></u>
                             </b>
                             <b><?= $dataSample['delivery_address'] ?></b><br>
                             <?php if (!empty($dataSample['nb'])): ?>

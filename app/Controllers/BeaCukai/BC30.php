@@ -676,6 +676,8 @@ class BC30 extends BaseController
                 'sales_order_export_id' => encrypt($d['sales_order_export_id']),
                 'tujuan_pengeluaran' => $d['tujuan_pengeluaran'],
                 'tanggal' => date('d/m/Y', strtotime($d['tanggal'])),
+                'tanggal_invoice' => date('d/m/Y', strtotime($d['tanggal_invoice'])),
+                'no_invoice' => $d['no_invoice'],
                 'reference_no' => $d['reference_no'],
                 'customer_name' => $d['customer_name'],
                 'kode_barang' => $d['kode_barang'],
@@ -728,7 +730,7 @@ class BC30 extends BaseController
 
         // ================================
         // Header kolom
-        $headers = ['No', 'Tujuan Pengeluaran', 'Tanggal', 'Reference No', 'Customer', 'Kode Barang', 'Barang', 'Qty', 'Satuan', 'Valas', 'Nilai Barang'];
+        $headers = ['No', 'Tujuan Ekspor', 'Tgl', 'Tgl Invoice', 'No Invoice', 'Reference No', 'Customer', 'Kode Barang', 'Barang', 'Qty', 'Satuan', 'Valas', 'Nilai Barang'];
         $col = 'A';
         foreach ($headers as $header) {
             $sheet->setCellValue($col . '2', $header);
@@ -745,23 +747,25 @@ class BC30 extends BaseController
             $sheet->setCellValue('A' . $row, $no++);
             $sheet->setCellValue('B' . $row, $d['tujuan_pengeluaran']);
             $sheet->setCellValue('C' . $row, date('d/m/Y', strtotime($d['tanggal'])));
-            $sheet->setCellValue('D' . $row, $d['reference_no']);
-            $sheet->setCellValue('E' . $row, $d['customer_name']);
-            $sheet->setCellValue('F' . $row, $d['kode_barang']);
-            $sheet->setCellValue('G' . $row, $d['barang_name']);
-            $sheet->setCellValue('H' . $row, (float)$d['qty']);
-            $sheet->setCellValue('I' . $row, $d['kode_satuan']);
-            $sheet->setCellValue('J' . $row, $d['valas_name']);
-            $sheet->setCellValue('K' . $row, (float)$d['total_harga_barang']);
+            $sheet->setCellValue('D' . $row, date('d/m/Y', strtotime($d['tanggal_invoice'])));
+            $sheet->setCellValue('E' . $row, $d['no_invoice']);
+            $sheet->setCellValue('F' . $row, $d['reference_no']);
+            $sheet->setCellValue('G' . $row, $d['customer_name']);
+            $sheet->setCellValue('H' . $row, $d['kode_barang']);
+            $sheet->setCellValue('I' . $row, $d['barang_name']);
+            $sheet->setCellValue('J' . $row, (float)$d['qty']);
+            $sheet->setCellValue('K' . $row, $d['kode_satuan']);
+            $sheet->setCellValue('L' . $row, $d['valas_name']);
+            $sheet->setCellValue('M' . $row, (float)$d['total_harga_barang']);
 
             // Rata kanan & format angka
-            $sheet->getStyle('K' . $row)
+            $sheet->getStyle('J' . $row)
                 ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-            $sheet->getStyle('K' . $row)
+            $sheet->getStyle('J' . $row)
                 ->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
 
             // Border untuk setiap sel
-            foreach (range('A', 'K') as $c) {
+            foreach (range('A', 'M') as $c) {
                 $sheet->getStyle($c . $row)
                     ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
             }
@@ -771,7 +775,7 @@ class BC30 extends BaseController
 
         // ================================
         // Auto width kolom
-        foreach (range('A', 'K') as $col) {
+        foreach (range('A', 'M') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 

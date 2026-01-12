@@ -193,6 +193,7 @@ class BC30Model extends Model
                     OR barang_master_sales.barang_name LIKE '%{$search}%'
                     OR customers.name LIKE '%{$search}%'
                     OR sales_order_export.sales_order_export_no LIKE '%{$search}%'
+                    OR sales_order_export.no_invoice LIKE '%{$search}%'
                 )
             ";
         }
@@ -203,6 +204,8 @@ class BC30Model extends Model
             'sales_order_export_id',
             'tujuan_pengeluaran',
             'tanggal',
+            'tanggal_invoice',
+            'no_invoice',
             'reference_no',
             'customer_name',
             'kode_barang',
@@ -225,6 +228,8 @@ class BC30Model extends Model
                 sales_order_detail_export.sales_order_export_id,
                 'ORDER FORM EKSPOR' AS tujuan_pengeluaran,
                 sales_order_export.tanggal,
+                sales_order_export.tanggal_invoice,
+                sales_order_export.no_invoice,
                 sales_order_export.sales_order_export_no AS reference_no,
                 customers.name AS customer_name,
                 barang_master_sales.kode_barang,
