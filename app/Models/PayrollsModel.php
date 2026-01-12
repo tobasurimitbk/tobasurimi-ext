@@ -792,7 +792,7 @@ class PayrollsModel extends Model
             'totPotSpm' => 0,
             'totPotStm' => 0,
             'totPotAstek' => 0,
-            'totPotUangMakan' => 0,
+            // 'totPotUangMakan' => 0,
             'totPotPinjaman' => 0,
             'totPotongan' => 0
         ];
@@ -814,7 +814,7 @@ class PayrollsModel extends Model
                 'totPotSpm' => 0,
                 'totPotStm' => 0,
                 'totPotAstek' => 0,
-                'totPotUangMakan' => 0,
+                // 'totPotUangMakan' => 0,
                 'totPotPinjaman' => 0,
                 'totPotongan' => 0
             ];
@@ -837,7 +837,7 @@ class PayrollsModel extends Model
                     'potTutupMulut' => $pots['POTONGAN TUTUP MULUT'] ?? 0,
                     'potSpm' => $pots['SPM'] ?? 0,
                     'potStm' => $pots['STM'] ?? 0,
-                    'potUangMakan' => $pots['UANG MAKAN'] ?? 0,
+                    // 'potUangMakan' => $pots['UANG MAKAN'] ?? 0,
                     'potPinjaman' => (float)$ep['nominal_pinjaman_karyawan'],
                     'totPotongan' => 0
                 ];
@@ -855,7 +855,7 @@ class PayrollsModel extends Model
                     $dp['potTutupMulut'] +
                     $dp['potSpm'] +
                     $dp['potStm'] +
-                    $dp['potUangMakan'] +
+                    // $dp['potUangMakan'] +
                     $dp['potPinjaman'];
 
                 foreach ($potonganSingle as $k => $v) {
