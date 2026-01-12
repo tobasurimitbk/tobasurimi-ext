@@ -165,10 +165,14 @@
             <?php
             $no = 1;
             $jml_sub_total = 0;
+            $jml_qty = 0;
+            $jml_harga = 0;
             ?>
             <?php foreach ($dataPenerimaanBarangDetail as $detail) : ?>
                 <?php
                 $jml_sub_total += $detail['sub_total'];
+                $jml_qty += $detail['jml_masuk'];
+                $jml_harga += $detail['harga'];
                 ?>
                 <tr>
                     <td class="txt-center" style="text-align:center;"><?= $no++; ?></td>
@@ -187,13 +191,19 @@
                 <td colspan="2"></td>
             </tr> -->
             <tr>
-                <td class="txt-left" style="padding-left: 5px" colspan="5"><b>ONGKOS KIRIM</b></td>
+                <td class="txt-left" style="padding-left: 5px" colspan="2"><b>ONGKOS KIRIM</b></td>
+                <td></td>
+                <td></td>
+                <td></td>
                 <td class="txt-right" style="text-align:center;"><?= number_format($dataPenerimaanBarang->ongkos_kirim, 2, '.', ','); ?></td>
                 <td colspan="2"></td>
 
             </tr>
             <tr>
-                <td class="txt-left" style="padding-left: 5px" colspan="5"><b>TOTAL</b></td>
+                <td class="txt-left" style="padding-left: 5px" colspan="2"><b>TOTAL</b></td>
+                <td class="txt-right" style="text-align:center;"><?= number_format($jml_qty, 2, '.', ','); ?></td>
+                <td class="txt-right" style="text-align:center;"></td>
+                <td class="txt-right" style="text-align:center;"><?= number_format($jml_harga, 2, '.', ','); ?></td>
                 <td class="txt-right" style="text-align:center;"><?= number_format($jml_sub_total + $dataPenerimaanBarang->ongkos_kirim, 2, '.', ','); ?></td>
                 <td colspan="2"></td>
             </tr>
