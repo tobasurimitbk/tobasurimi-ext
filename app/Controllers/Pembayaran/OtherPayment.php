@@ -393,7 +393,7 @@ class OtherPayment extends BaseController
         $tanggalPembayaran = $this->request->getGet('tanggalPembayaran');
         $noTransaksi = $this->request->getGet('noTransaksi');
         $id = decrypt($this->request->getGet('id'));
-        $parentData = $this->otherPaymentModel->where('id', $id)->first();
+        $parentData = $this->otherPaymentModel->where('id', $id)->where('deletedAt', NULL)->first();
 
         $paymentNo = $otherPaymentModel->get_new_no(
             $id,
@@ -407,7 +407,7 @@ class OtherPayment extends BaseController
             $this->this_company_id,
             $tanggalPembayaran,
             $divisiId ?? null,
-            $parentData['no_pembayaram'] ?? null,
+            $parentData['no_pembayaran'] ?? null,
             $parentData['divisi_id'] ?? null,
         );
 

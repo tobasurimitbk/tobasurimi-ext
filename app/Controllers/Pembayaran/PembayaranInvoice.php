@@ -579,8 +579,8 @@ class PembayaranInvoice extends BaseController
         $tanggalPembayaran = $this->request->getGet('tanggalPembayaran');
         $noTransaksi = $this->request->getGet('noTransaksi');
         $id = decrypt($this->request->getGet('id'));
-        $invoceData = $this->pembayaranInvoiceModel->where('id', $id)->first();
-
+        $invoceData = $this->pembayaranInvoiceModel->where('id', $id)->where('deletedAt', NULL)->first();
+        
         $paymentNo = $pembayaranInvoiceModel->get_new_no(
             $id,
             $jenis,

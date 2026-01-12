@@ -878,7 +878,7 @@ class PanjarSupplier extends BaseController
         $tanggalPembayaran = $this->request->getGet('tanggalPembayaran');
         $noTransaksi = $this->request->getGet('noTransaksi');
         $id = decrypt($this->request->getGet('id'));
-        $panjarPinjaman = $this->panjarPinjamanTransactionModel->where('id',$id)->first();
+        $panjarPinjaman = $this->panjarPinjamanTransactionModel->where('id', $id)->where('deletedAt', NULL)->first();
 
         $paymentNo = $panjarPinjamanSupplierModel->get_new_no(
             $id,

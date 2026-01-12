@@ -1760,7 +1760,7 @@ class PembayaranPOLokal extends BaseController
         $tanggalPembayaran = $this->request->getGet('tanggalPembayaran');
         $noTransaksi = $this->request->getGet('noTransaksi');
         $id = decrypt($this->request->getGet('id'));
-        $payData = $localPOPaymentModel->where('id', $id)->first();
+        $payData = $localPOPaymentModel->where('id', $id)->where('deletedAt', NULL)->first();
         
 
         $paymentNo = $localPOPaymentModel->get_new_no(
@@ -1829,7 +1829,7 @@ class PembayaranPOLokal extends BaseController
         $tanggalPembayaran = $this->request->getGet('tanggalPembayaran');
         $noTransaksi = $this->request->getGet('noTransaksi');
         $id = decrypt($this->request->getGet('id'));
-        $payData = $localPOPaymentBPModel->where('id', $id)->first();
+        $payData = $localPOPaymentBPModel->where('id', $id)->where('deletedAt', NULL)->first();
 
         $paymentNo = $localPOPaymentBPModel->get_new_no(
             $id,

@@ -1735,28 +1735,13 @@ class LocalPOPaymentModel extends Model
         $displayPrefix .= "/$targetYear/$targetMonth/";
 
         // 4. Jika edit mode DAN hanya ganti jenis merah/putih
-        if (!empty($id) && (empty($bank_id) || $bank_id === 'undefined')) {
+        // ================= MODE EDIT: JANGAN LANJUT NOMOR =================
+        if (!empty($id)) {
 
-            if ($divisiId == $originalDivisi) {
+            // ===== 1. Ambil nomor existing (prioritas currentNumber) =====
+            $existingNumber = $currentNumber;
 
-                if (!empty($currentNumber)) {
-                    $parts = explode('/', $currentNumber);
-                    if (count($parts) >= 4) {
-                        $oldPrefix = $parts[0];
-                        $tahun = $parts[1];
-                        $bulan = $parts[2];
-                        $lastNumber = $parts[3];
-
-                        $newPrefix = strtoupper($paymentMethod) === 'CASH'
-                            ? $kodeDivisi
-                            : ($kodeBank ?: $kodeDivisi);
-
-                        $finalPrefix = ($oldPrefix !== $newPrefix) ? $newPrefix : $oldPrefix;
-
-                        return "{$finalPrefix}/{$tahun}/{$bulan}/{$lastNumber}";
-                    }
-                }
-
+            if (empty($existingNumber)) {
                 $tablesToCheckForId = [
                     'other_payment' => 'no_pembayaran',
                     'local_po_payments' => 'payment_no',
@@ -1772,25 +1757,40 @@ class LocalPOPaymentModel extends Model
                     } catch (\Exception $e) {
                         continue;
                     }
-                    if (!in_array('id', $fields) || !in_array($numberColumn, $fields)) continue;
 
-                    $row = $db->table($table)->select($numberColumn)->where('id', $id)->get()->getRowArray();
-                    if ($row && !empty($row[$numberColumn])) {
-                        $parts = explode('/', $row[$numberColumn]);
-                        if (count($parts) >= 4) {
-                            $oldPrefix = $parts[0];
-                            $tahun = $parts[1];
-                            $bulan = $parts[2];
-                            $lastNumber = $parts[3];
-
-                            $newPrefix = strtoupper($paymentMethod) === 'CASH'
-                                ? $kodeDivisi
-                                : ($kodeBank ?: $kodeDivisi);
-                            $finalPrefix = ($oldPrefix !== $newPrefix) ? $newPrefix : $oldPrefix;
-
-                            return "{$finalPrefix}/{$tahun}/{$bulan}/{$lastNumber}";
-                        }
+                    if (!in_array('id', $fields) || !in_array($numberColumn, $fields)) {
+                        continue;
                     }
+
+                    $row = $db->table($table)
+                        ->select($numberColumn)
+                        ->where('id', $id)
+                        ->get()
+                        ->getRowArray();
+
+                    if (!empty($row[$numberColumn])) {
+                        $existingNumber = $row[$numberColumn];
+                        break;
+                    }
+                }
+            }
+
+            // ===== 2. Kalau ketemu nomor lama → ganti prefix saja =====
+            if (!empty($existingNumber)) {
+
+                $parts = explode('/', $existingNumber);
+                if (count($parts) >= 4) {
+
+                    $tahun      = $parts[1];
+                    $bulan      = $parts[2];
+                    $lastNumber = $parts[3];
+
+                    // prefix baru (bank / cash / merah / putih)
+                    $newPrefix = (strtoupper($paymentMethod) === 'CASH')
+                        ? $kodeDivisi
+                        : ($kodeBank ?: $kodeDivisi);
+
+                    return "{$newPrefix}/{$tahun}/{$bulan}/{$lastNumber}";
                 }
             }
         }
