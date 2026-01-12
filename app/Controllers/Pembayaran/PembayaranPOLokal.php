@@ -1394,7 +1394,7 @@ class PembayaranPOLokal extends BaseController
         if (!$id) {
             return response()->setJSON([
                 'message' => 'ID tidak valid',
-                'status' => false
+                'status'  => false
             ]);
         }
 
@@ -1402,66 +1402,74 @@ class PembayaranPOLokal extends BaseController
         $db->transBegin();
 
         try {
-            $localPOPaymentBPModel       = new LocalPOPaymentBPModel();
-            $localPOPaymentDetailModel   = new LocalPOPaymentDetailModel(); // pastikan model ini benar
-            $tandaTerimaFakturModel     = new TandaTerimaFakturModel();
+            $localPOPaymentBPModel     = new LocalPOPaymentBPModel();
+            $localPOPaymentDetailModel = new LocalPOPaymentDetailModel();
+            $tandaTerimaFakturModel    = new TandaTerimaFakturModel();
 
-            // Ambil semua detail yang terkait dengan payment ini
+            // ===============================
+            // 1️⃣ AMBIL SEMUA TTF YANG TERKAIT
+            // ===============================
             $details = $localPOPaymentDetailModel
+                ->select('tanda_terima_faktur_id')
                 ->where('local_po_payment_id', $id)
+                ->where('tipe', 'BP')
                 ->findAll();
 
-            // Untuk tiap detail: kurangi total_paid di tanda_terima_faktur
-            if (!empty($details)) {
-                foreach ($details as $d) {
-                    $fakturId = $d['tanda_terima_faktur_id'] ?? $d->tanda_terima_faktur_id ?? null;
-                    $amount = repairDouble($d['total'] ?? $d->total ?? 0);
+            $ttfIds = [];
 
-                    if (!$fakturId) continue;
-
-                    // ambil current total_paid
-                    $current = $tandaTerimaFakturModel->select('total_paid')->find($fakturId);
-                    $currentTotal = (float) (repairDouble($current['total_paid'] ?? $current->total_paid ?? 0) ?: 0);
-
-                    // hitung total baru (jangan sampai negatif)
-                    $totalBaru = $currentTotal - (float) $amount;
-                    if ($totalBaru < 0) $totalBaru = 0;
-
-                    // pakai set+where supaya tidak error "There is no data to update"
-                    $tandaTerimaFakturModel
-                        ->set('total_paid', $totalBaru)
-                        ->where('id', $fakturId)
-                        ->update();
+            foreach ($details as $d) {
+                if (!empty($d['tanda_terima_faktur_id'])) {
+                    $ttfIds[] = $d['tanda_terima_faktur_id'];
                 }
             }
 
-            // Hapus detail pembayaran
-            $localPOPaymentDetailModel->where('local_po_payment_id', $id)->delete();
+            $ttfIds = array_unique($ttfIds);
 
-            // Hapus header pembayaran (BP)
+            // ===============================
+            // 2️⃣ SET total_paid = 0
+            // ===============================
+            if (!empty($ttfIds)) {
+                $tandaTerimaFakturModel
+                    ->whereIn('id', $ttfIds)
+                    ->set('total_paid', 0)
+                    ->update();
+            }
+
+            // ===============================
+            // 3️⃣ DELETE DETAIL
+            // ===============================
+            $localPOPaymentDetailModel
+                ->where('local_po_payment_id', $id)
+                ->where('tipe', 'BP')
+                ->delete();
+
+            // ===============================
+            // 4️⃣ DELETE HEADER
+            // ===============================
             $localPOPaymentBPModel->delete($id);
 
-            // Commit transaction
+            // ===============================
+            // COMMIT
+            // ===============================
             if ($db->transStatus() === false) {
-                $db->transRollback();
-                return response()->setJSON([
-                    'message' => 'Gagal menghapus pembayaran (transaksi gagal).',
-                    'status' => false
-                ]);
+                throw new \Exception('Transaksi gagal');
             }
 
             $db->transCommit();
+
             return response()->setJSON([
-                'message' => "Pembayaran lokal bahan baku berhasil dihapus",
-                'status' => true
+                'message' => 'Pembayaran lokal BP berhasil dihapus',
+                'status'  => true
             ]);
+
         } catch (\Throwable $e) {
-            // rollback & return error
+
             $db->transRollback();
-            log_message('error', 'deleteBP error: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+            log_message('error', 'deleteBP error: ' . $e->getMessage());
+
             return response()->setJSON([
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
-                'status' => false
+                'status'  => false
             ]);
         }
     }
