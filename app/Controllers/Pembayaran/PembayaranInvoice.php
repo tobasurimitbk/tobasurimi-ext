@@ -1987,110 +1987,110 @@ class PembayaranInvoice extends BaseController
             if ($tipe_invoice == "LOKAL") {
                 $no_dokumen_req = $this->request->getVar("no_dokumen");
 
-                // Validasi bahwa data adalah array
-            $no_dokumen_req = $this->request->getVar('no_dokumen');
-            if (!is_array($no_dokumen_req)) {
-                $no_dokumen_req = $no_dokumen_req ? [$no_dokumen_req] : [];
-            }
-
-            // Gunakan implode jika array tidak kosong
-            if (!empty($no_dokumen_req)) {
-                $no_dokumen_implode = "[" . implode("','", $no_dokumen_req) . "]";
-            } else {
-                $no_dokumen_implode = "[]";
-            }
-
-            // Decode list barang
-            $listBarang = json_decode($this->request->getVar('list_barang'));
-
-            // --- Hitung total keseluruhan (karena dari frontend dikirim array) ---
-            $totalAmountInvoiceArr = $this->request->getVar('total_amount_invoice');
-            $sisaBayarArr         = $this->request->getVar('sisa_bayar');
-
-            // Pastikan selalu array
-            $totalAmountInvoiceArr = is_array($totalAmountInvoiceArr) ? $totalAmountInvoiceArr : [$totalAmountInvoiceArr];
-            $sisaBayarArr         = is_array($sisaBayarArr) ? $sisaBayarArr : [$sisaBayarArr];
-
-            // Hitung total keseluruhan tanpa fungsi tambahan
-            $totalAmountInvoice = array_sum(array_map(function ($v) {
-                return (float) preg_replace('/[^\d.]/', '', str_replace(',', '', $v));
-            }, $totalAmountInvoiceArr));
-
-            $sisaBayar = array_sum(array_map(function ($v) {
-                return (float) preg_replace('/[^\d.]/', '', str_replace(',', '', $v));
-            }, $sisaBayarArr));
-
-            // Cek apakah semua data bertipe import
-            $isImport = array_reduce($listBarang, function ($carry, $item) {
-                return $carry && isset($item->document_type) && stripos($item->document_type, 'import') !== false;
-            }, true) ? 'import' : null;
-
-            // Insert ke tabel pembayaran utama
-            $id = $this->pembayaranInvoiceModel->insert([
-                'company_id'       => $this->this_company_id,
-                'user_id'          => $this->user_id,
-                'divisi_id'        => $this->request->getVar('divisi_id'),
-                'payment_method'   => $this->request->getVar('payment_methods'),
-                'customer_id'      => decrypt($this->request->getVar('customer')),
-                'invoice_id'       => $no_dokumen_implode,
-                'no_pembayaran'    => $this->request->getVar('no_bukti_pembayaran'),
-                'keterangan'       => $this->request->getVar('keterangan'),
-                'type_invoice'     => "LOKAL",
-                'tanggal'          => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('payment_date')))),
-                'total_invoice'    => $totalAmountInvoice,
-                'potongan'         => $this->request->getVar('potongan') ? repairDouble($this->request->getVar('potongan')) : 0,
-                'total_bayar'      => $sisaBayar,
-                'akun_kas'         => $this->request->getVar('akun_kas'),
-                'akun_selisih'     => $this->request->getVar('akun_selisih'),
-                'status_posting'   => '0',
-                'bank_id'          => $this->request->getVar('bank_id'),
-                'jenis_data'       => $isImport,
-                'pembayaran_dari' => $this->request->getVar('pembayaran_dari'),
-            ]);
-
-            // --- Buat map untuk tracking total per invoice ---
-            $invoiceTotals = [];
-
-            // Loop detail barang
-            foreach ($listBarang as $l) {
-                $this->pembayaranInvoiceDetailModel->insert([
-                    'pembayaran_invoice_id'         => $id,
-                    'sales_order_invoice_id'        => $l->sales_order_invoice_id,
-                    'sales_order_invoice_detail_id' => $l->sales_order_invoice_detail_id,
-                    'type_invoice'                  => "LOKAL",
-                    'nama_barang'                   => $l->barang_name,
-                    'qty'                           => $l->qty_invoice,
-                    'harga_satuan'                  => $l->harga_barang_invoice,
-                    'harga_total'                   => $l->amount_invoice,
-                    'harga_dibayar'                 => $l->total_bayar,
-                ]);
-
-                $invoiceId = $l->sales_order_invoice_id;
-
-                if (!isset($invoiceTotals[$invoiceId])) {
-                    $invoiceTotals[$invoiceId] = ['tagihan' => 0, 'bayar' => 0];
+                    // Validasi bahwa data adalah array
+                $no_dokumen_req = $this->request->getVar('no_dokumen');
+                if (!is_array($no_dokumen_req)) {
+                    $no_dokumen_req = $no_dokumen_req ? [$no_dokumen_req] : [];
                 }
 
-                $invoiceTotals[$invoiceId]['tagihan'] += (float) $l->total_amount_invoice;
-                $invoiceTotals[$invoiceId]['bayar']   += (float) $l->total_bayar;
-            }
+                // Gunakan implode jika array tidak kosong
+                if (!empty($no_dokumen_req)) {
+                    $no_dokumen_implode = "[" . implode("','", $no_dokumen_req) . "]";
+                } else {
+                    $no_dokumen_implode = "[]";
+                }
 
-            // --- Update status PAID / UNPAID ---
-            foreach ($invoiceTotals as $invoiceId => $totals) {
-                $isPaid = ($totals['bayar'] >= $totals['tagihan']);
+                // Decode list barang
+                $listBarang = json_decode($this->request->getVar('list_barang'));
 
-                $this->salesOrderInvoiceModel->update($invoiceId, [
-                    "status_pelunasan" => $isPaid ? "PAID" : "UNPAID",
-                    "pay_amount" => $sisaBayar
+                // --- Hitung total keseluruhan (karena dari frontend dikirim array) ---
+                $totalAmountInvoiceArr = $this->request->getVar('total_amount_invoice');
+                $sisaBayarArr         = $this->request->getVar('sisa_bayar');
+
+                // Pastikan selalu array
+                $totalAmountInvoiceArr = is_array($totalAmountInvoiceArr) ? $totalAmountInvoiceArr : [$totalAmountInvoiceArr];
+                $sisaBayarArr         = is_array($sisaBayarArr) ? $sisaBayarArr : [$sisaBayarArr];
+
+                // Hitung total keseluruhan tanpa fungsi tambahan
+                $totalAmountInvoice = array_sum(array_map(function ($v) {
+                    return (float) preg_replace('/[^\d.]/', '', str_replace(',', '', $v));
+                }, $totalAmountInvoiceArr));
+
+                $sisaBayar = array_sum(array_map(function ($v) {
+                    return (float) preg_replace('/[^\d.]/', '', str_replace(',', '', $v));
+                }, $sisaBayarArr));
+
+                // Cek apakah semua data bertipe import
+                $isImport = array_reduce($listBarang, function ($carry, $item) {
+                    return $carry && isset($item->document_type) && stripos($item->document_type, 'import') !== false;
+                }, true) ? 'import' : null;
+
+                // Insert ke tabel pembayaran utama
+                $id = $this->pembayaranInvoiceModel->insert([
+                    'company_id'       => $this->this_company_id,
+                    'user_id'          => $this->user_id,
+                    'divisi_id'        => $this->request->getVar('divisi_id'),
+                    'payment_method'   => $this->request->getVar('payment_methods'),
+                    'customer_id'      => decrypt($this->request->getVar('customer')),
+                    'invoice_id'       => $no_dokumen_implode,
+                    'no_pembayaran'    => $this->request->getVar('no_bukti_pembayaran'),
+                    'keterangan'       => $this->request->getVar('keterangan'),
+                    'type_invoice'     => "LOKAL",
+                    'tanggal'          => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('payment_date')))),
+                    'total_invoice'    => $totalAmountInvoice,
+                    'potongan'         => $this->request->getVar('potongan') ? repairDouble($this->request->getVar('potongan')) : 0,
+                    'total_bayar'      => $sisaBayar,
+                    'akun_kas'         => $this->request->getVar('akun_kas'),
+                    'akun_selisih'     => $this->request->getVar('akun_selisih'),
+                    'status_posting'   => '0',
+                    'bank_id'          => $this->request->getVar('bank_id'),
+                    'jenis_data'       => $isImport,
+                    'pembayaran_dari' => $this->request->getVar('pembayaran_dari'),
                 ]);
-            }
 
-            return response()->setJSON([
-                'id'      => encrypt($id),
-                'status'  => true,
-                'message' => "Pembayaran Invoice Lokal berhasil disimpan",
-                'token'   => csrf_hash()
-            ]);
+                // --- Buat map untuk tracking total per invoice ---
+                $invoiceTotals = [];
+
+                // Loop detail barang
+                foreach ($listBarang as $l) {
+                    $this->pembayaranInvoiceDetailModel->insert([
+                        'pembayaran_invoice_id'         => $id,
+                        'sales_order_invoice_id'        => $l->sales_order_invoice_id,
+                        'sales_order_invoice_detail_id' => $l->sales_order_invoice_detail_id,
+                        'type_invoice'                  => "LOKAL",
+                        'nama_barang'                   => $l->barang_name,
+                        'qty'                           => $l->qty_invoice,
+                        'harga_satuan'                  => $l->harga_barang_invoice,
+                        'harga_total'                   => $l->amount_invoice,
+                        'harga_dibayar'                 => $l->total_bayar,
+                    ]);
+
+                    $invoiceId = $l->sales_order_invoice_id;
+
+                    if (!isset($invoiceTotals[$invoiceId])) {
+                        $invoiceTotals[$invoiceId] = ['tagihan' => 0, 'bayar' => 0];
+                    }
+
+                    $invoiceTotals[$invoiceId]['tagihan'] += (float) $l->total_amount_invoice;
+                    $invoiceTotals[$invoiceId]['bayar']   += (float) $l->total_bayar;
+                }
+
+                // --- Update status PAID / UNPAID ---
+                foreach ($invoiceTotals as $invoiceId => $totals) {
+                    $isPaid = ($totals['bayar'] >= $totals['tagihan']);
+
+                    $this->salesOrderInvoiceModel->update($invoiceId, [
+                        "status_pelunasan" => $isPaid ? "PAID" : "UNPAID",
+                        "pay_amount" => $sisaBayar
+                    ]);
+                }
+
+                return response()->setJSON([
+                    'id'      => encrypt($id),
+                    'status'  => true,
+                    'message' => "Pembayaran Invoice Lokal berhasil disimpan",
+                    'token'   => csrf_hash()
+                ]);
 
 
             } elseif ($tipe_invoice == "LAIN-LAIN") {
@@ -2317,7 +2317,7 @@ class PembayaranInvoice extends BaseController
             }, $sisaBayarArr));
 
 
-            $listBarang = json_decode($_POST['list_barang']);
+            $listBarang = json_decode($this->request->getVar('list_barang'));
 
             $isImport = array_reduce($listBarang, function ($carry, $item) {
                 return $carry && isset($item->document_type) && stripos($item->document_type, 'import') !== false;
@@ -2346,7 +2346,7 @@ class PembayaranInvoice extends BaseController
 
             $pembayaranInvoiceFirst = $this->pembayaranInvoiceModel->find($id);
             $this->pembayaranInvoiceDetailModel->where('pembayaran_invoice_id', $id)->delete();
-            foreach (json_decode($_POST['list_barang']) as $l) {
+            foreach (json_decode($this->request->getVar('list_barang')) as $l) {
                 $this->pembayaranInvoiceDetailModel->insert([
                     'pembayaran_invoice_id' => $id,
                     'sales_order_invoice_id' => $l->sales_order_invoice_id,
@@ -2356,6 +2356,7 @@ class PembayaranInvoice extends BaseController
                     'qty' => $l->qty_invoice,
                     'harga_satuan' => $l->harga_barang_invoice,
                     'harga_total' => $l->amount_invoice,
+                    'harga_dibayar' => $l->total_bayar,
                 ]);
             }
 
@@ -2898,6 +2899,127 @@ class PembayaranInvoice extends BaseController
         }
     }
 
+    public function postingLokal()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $data = $this->pembayaranInvoiceModel->where('id', $id)->where('deletedAt', NULL)->first();
+
+        if ($data) {
+            // ambil semua invoice yang terlibat di pembayaran ini
+            $invoiceIds = $this->pembayaranInvoiceDetailModel
+                ->select('sales_order_invoice_id')
+                ->where('pembayaran_invoice_id', $id)
+                ->where('deletedAt', NULL)
+                ->groupBy('sales_order_invoice_id')
+                ->findAll();
+
+            foreach ($invoiceIds as $inv) {
+
+                $invoiceId = $inv['sales_order_invoice_id'];
+
+                // TOTAL TAGIHAN
+                $totalTagihan = $this->salesOrderInvoiceDetailModel
+                    ->where('id_sales_order_invoice', $invoiceId)
+                    ->selectSum('amount_invoice')
+                    ->first()['amount_invoice'] ?? 0;
+
+                // TOTAL DIBAYAR
+                $totalBayar = $this->pembayaranInvoiceDetailModel
+                    ->where('sales_order_invoice_id', $invoiceId)
+                    ->selectSum('harga_dibayar')
+                    ->first()['harga_dibayar'] ?? 0;
+
+
+                $this->salesOrderInvoiceModel->update($invoiceId, [
+                    'status_pelunasan' => 'PAID',
+                    'pay_amount'      => $totalBayar
+                ]);
+            }
+        }
+
+        if (!$data) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => false,
+                'message' => 'Data pembayaran tidak ditemukan.'
+            ]);
+        }
+
+        $result = $this->jurnalController->insertDataPembayaranInvoice($id);
+
+
+        if ($result) {
+            $this->pembayaranInvoiceModel
+                ->where('id', $id)
+                ->set([
+                    'status_posting' => 1,
+                    'payment_date' => date('Y-m-d H:i:s')
+                ])
+                ->update();
+        }
+
+        return response()->setJSON([
+            'token' => csrf_hash(),
+            'status' => $result,
+            'message' => $result ? "Pembayaran berhasil diposting" : "Terjadi Kesalahan Saat Input Data Transaksi Ke Jurnal Umum"
+        ]);
+    }
+
+    public function unpostingLokal()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $data = $this->pembayaranInvoiceModel->where('id', $id)->first();
+
+        if ($data) {
+            // ambil semua invoice yang terlibat di pembayaran ini
+            $invoiceIds = $this->pembayaranInvoiceDetailModel
+                ->select('sales_order_invoice_id')
+                ->where('pembayaran_invoice_id', $id)
+                ->where('deletedAt', NULL)
+                ->groupBy('sales_order_invoice_id')
+                ->findAll();
+
+            foreach ($invoiceIds as $inv) {
+
+                $invoiceId = $inv['sales_order_invoice_id'];
+
+                // update invoice
+                $this->salesOrderInvoiceModel->update($invoiceId, [
+                    'status_pelunasan' => 'UNPAID',
+                    'pay_amount'      => 0,
+                ]);
+            }
+        }
+
+        if (!$data) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => false,
+                'message' => 'Data pembayaran tidak ditemukan.'
+            ]);
+        }
+
+        // unposting tetap pakai fungsi yang sama (bisa disesuaikan kalau ada versi khusus)
+        $result = $this->jurnalController->unpostDataPembayaranInvoice($id);
+
+        if ($result) {
+            $this->pembayaranInvoiceModel
+                ->where('id', $id)
+                ->set([
+                    'status_posting' => 0,
+                    'payment_date' => date('Y-m-d H:i:s')
+                ])
+                ->update();
+        }
+
+        return response()->setJSON([
+            'token' => csrf_hash(),
+            'status' => $result,
+            'message' => $result ? "Pembayaran berhasil di-unposting" : "Terjadi Kesalahan Saat Input Data Transaksi Ke Jurnal Umum"
+        ]);
+    }
+
+
     public function posting()
     {
         $id = decrypt($this->request->getVar('id'));
@@ -2918,11 +3040,9 @@ class PembayaranInvoice extends BaseController
             ]);
         }
 
-        if ($data['type_invoice'] === "PROFORMA INVOICE") {
-            $result = $this->jurnalController->insertDataPembayaranInvoiceInternasional($id);
-        } else {
-            $result = $this->jurnalController->insertDataPembayaranInvoice($id);
-        }
+      
+        $result = $this->jurnalController->insertDataPembayaranInvoice($id);
+        
 
         if ($result) {
             $this->pembayaranInvoiceModel
