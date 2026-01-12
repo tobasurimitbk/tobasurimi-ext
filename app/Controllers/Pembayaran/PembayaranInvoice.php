@@ -2909,6 +2909,7 @@ class PembayaranInvoice extends BaseController
             $invoiceIds = $this->pembayaranInvoiceDetailModel
                 ->select('sales_order_invoice_id')
                 ->where('pembayaran_invoice_id', $id)
+                ->where('deletedAt', NULL)
                 ->groupBy('sales_order_invoice_id')
                 ->findAll();
 
@@ -2970,10 +2971,24 @@ class PembayaranInvoice extends BaseController
         $data = $this->pembayaranInvoiceModel->where('id', $id)->first();
 
         if ($data) {
-            $this->salesOrderExportModel->update(
-                $data['invoice_id'],
-                ['already_paid' => 0]
-            );
+            // ambil semua invoice yang terlibat di pembayaran ini
+            $invoiceIds = $this->pembayaranInvoiceDetailModel
+                ->select('sales_order_invoice_id')
+                ->where('pembayaran_invoice_id', $id)
+                ->where('deletedAt', NULL)
+                ->groupBy('sales_order_invoice_id')
+                ->findAll();
+
+            foreach ($invoiceIds as $inv) {
+
+                $invoiceId = $inv['sales_order_invoice_id'];
+
+                // update invoice
+                $this->salesOrderInvoiceModel->update($invoiceId, [
+                    'status_pelunasan' => 'UNPAID',
+                    'pay_amount'      => 0,
+                ]);
+            }
         }
 
         if (!$data) {
