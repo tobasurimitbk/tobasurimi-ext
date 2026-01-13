@@ -137,15 +137,22 @@ class SalesInvoiceList extends BaseController
         $no = 1;
 
         foreach ($dataSalesOrderInvoice['data'] as $data) {
-            $tanggalFaktur = new \DateTime($data->tanggal_faktur);
-            $tanggalJatuhTempo = new \DateTime($data->tanggal_jatuh_tempo);
+            // parse tanggal dengan format dd/mm/yyyy
+            $tanggalFaktur = \DateTime::createFromFormat('d/m/Y', $data->tanggal_faktur);
+            $tanggalJatuhTempo = \DateTime::createFromFormat('d/m/Y', $data->tanggal_jatuh_tempo);
+
+            // fallback jika parsing gagal
+            if (!$tanggalFaktur) $tanggalFaktur = new \DateTime();
+            if (!$tanggalJatuhTempo) $tanggalJatuhTempo = clone $tanggalFaktur;
 
             array_push($dataAllSalesOrderInvoice, [
                 "no" => $no++,
                 "id" => encrypt($data->id),
                 "no_faktur" => $data->no_faktur,
                 "tanggal_faktur" => $tanggalFaktur->format('d/m/Y'),
-                "tanggal_jatuh_tempo" => $data->termin == "COD" ? $tanggalFaktur->format('d/m/Y') : $tanggalJatuhTempo->format('d/m/Y'),
+                "tanggal_jatuh_tempo" => $data->termin == "COD" 
+                    ? $tanggalFaktur->format('d/m/Y') 
+                    : $tanggalJatuhTempo->format('d/m/Y'),
                 "nama_pelanggan" => $data->nama_pelanggan,
                 "nama_sales" => $data->salesName,
                 "total_invoice" => number_format((float)$data->sum_amount_invoice),
