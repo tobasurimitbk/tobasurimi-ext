@@ -7,15 +7,24 @@
     <title>Daftar Upah Karyawan</title>
     <style>
         body {
-            height: 100%;
-            font-family: 'Times New Roman', Times, serif;
-            letter-spacing: 1px;
-            font-size: 8;
+            font-family: "Times New Roman", Times, serif;
+            font-size: 10px;
         }
 
         @page {
-            size: 9.5in 11in landscape;
-            margin: 100px 25px 25px 25px;
+            margin: 100px 10px 10px 10px;
+        }
+
+        thead {
+            display: table-header-group;
+        }
+
+        tfoot {
+            display: table-footer-group;
+        }
+
+        tr {
+            page-break-inside: avoid;
         }
 
         hr {
@@ -29,7 +38,7 @@
 
         #dashed-border-table th,
         #dashed-border-table td {
-            border: 1px dashed #000;
+            border: 1px solid #000;
             padding: 5px;
             text-align: center;
         }
@@ -76,27 +85,30 @@
         </table>
     </div>
     <div class="content">
-        <table width="100%" style="margin-top: 10px;" border="1" id="dashed-border-table">
-            <?php foreach ($payrollData['dataPayroll'] as $bagian): ?>
-                <tr>
-                    <td colspan="12" style="font-weight: bold; text-align:left;">
-                        BAGIAN : <?= $bagian['namaBagian'] ?>
-                    </td>
-                </tr>
-                <tr align="center">
-                    <td>No</td>
-                    <td>Kode</td>
-                    <td>Karyawan</td>
-                    <td>J.Hr</td>
-                    <td>Total Upah <br> (Rp)</td>
-                    <td>Uang Makan <br> (Rp)</td>
-                    <td>Upah Pokok <br> (Rp)</td>
-                    <td>Lembur Kerja <br> (Rp)</td>
-                    <td>Tunj.Ksjh <br> (Rp)</td>
-                    <td>Potongan <br> (Rp)</td>
-                    <td>Jumlah Upah <br> (Rp)</td>
-                    <td>Tanda Tangan</td>
-                </tr>
+        <?php foreach ($payrollData['dataPayroll'] as $i => $bagian): ?>
+
+            <table style="page-break-before: <?= $i > 0 ? 'always' : 'auto' ?>" id="dashed-border-table">
+                <thead>
+                    <tr>
+                        <td colspan="12" style="font-weight: bold; text-align:left;">
+                            BAGIAN : <?= $bagian['namaBagian'] ?>
+                        </td>
+                    </tr>
+                    <tr align="center">
+                        <th>No</th>
+                        <th>Kode</th>
+                        <th>Karyawan</th>
+                        <th>J.Hr</th>
+                        <th>Total Upah <br> (Rp)</th>
+                        <th>Uang Makan <br> (Rp)</th>
+                        <th>Upah Pokok <br> (Rp)</th>
+                        <th>Lembur Kerja <br> (Rp)</th>
+                        <th>Tunj.Ksjh <br> (Rp)</th>
+                        <th>Potongan <br> (Rp)</th>
+                        <th>Jumlah Upah <br> (Rp)</th>
+                        <th>Tanda Tangan</th>
+                    </tr>
+                </thead>
                 <?php $no = 1; ?>
 
                 <?php foreach ($bagian['employees'] as $b) : ?>
@@ -132,8 +144,7 @@
                     <td></td>
                 </tr>
 
-            <?php endforeach; ?>
-            <!-- <tr>
+                <!-- <tr>
                 <td colspan="4" style="text-align: right;">
                     Total Keseluruhan
                 </td>
@@ -146,7 +157,8 @@
                 <td><?= number_format($payrollData['total']['subTotalJumlahUpah'], 2, ',', '.') ?></td>
                 <td></td>
             </tr> -->
-        </table>
+            </table>
+        <?php endforeach; ?>
 
         <table width="100%" style="margin-top: 20px;">
             <tr align="left" style="font-size:12px;">

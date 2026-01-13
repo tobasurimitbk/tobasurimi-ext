@@ -10,12 +10,11 @@
             height: 100%;
             font-family: 'Times New Roman', Times, serif;
             letter-spacing: 1px;
-            font-size: 8;
+            font-size: 10px;
         }
 
         @page {
-            size: 9.5in 11in landscape;
-            margin: 100px 25px 25px 25px;
+            margin: 100px 10px 10px 10px;
         }
 
         h4 {
@@ -26,7 +25,7 @@
 
         hr {
             border: none;
-            border-top: 1px dashed #000;
+            border-top: 1px solid #000;
         }
 
         #dashed-border-table {
@@ -35,7 +34,7 @@
 
         #dashed-border-table th,
         #dashed-border-table td {
-            border: 1px dashed #000;
+            border: 1px solid #000;
             padding: 5px;
             text-align: center;
         }
@@ -45,6 +44,10 @@
             top: -90px;
             left: 0;
             right: 0;
+        }
+
+        thead {
+            font-weight: bold;
         }
 
         .content {
@@ -74,7 +77,7 @@
                 <td>SUMMARY JUMLAH UPAH & JUMLAH JAM KERJA</td>
             </tr>
             <tr align="center" style=" font-size:12px">
-                <td> Bulan <?= date('M', strtotime("{$year}-{$month}-01")) ?> Tahun <?= $year ?> Periode 1</td>
+                <td> Bulan <?= convertMonthIndo($month) ?> Tahun <?= $year ?> Periode 1</td>
             </tr>
             <tr align="center" style=" font-size:12px">
                 <td>Pembayaran dari tanggal <?= $startDate ?> s/d tanggal <?= $endDate ?> </td>

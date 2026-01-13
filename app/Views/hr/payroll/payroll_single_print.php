@@ -12,9 +12,7 @@
         }
 
         @page {
-            size: 9.5in 11in landscape;
-            margin: 25px;
-            padding: 25px;
+            margin: 20px 10px 10px 10px;
         }
 
         .page-break {
@@ -23,7 +21,8 @@
 
         .karyawan-row {
             border-bottom: 1px dashed #000;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
+            margin-top: 20px;
         }
 
         .slip-container {
@@ -87,7 +86,7 @@
                     <td style="width:50%; vertical-align:top;">
                         <div class="slip">
                             <h4>TANDA TERIMA UPAH</h4>
-                            <table style="line-height: 8px;">
+                            <table style="line-height: 9px;">
                                 <tr>
                                     <td colspan="3">Tenaga Kerja Harian Tetap</td>
                                 </tr>
@@ -118,9 +117,9 @@
 
                             <hr style="border: 0.5px dashed #000;">
 
-                            <table style="line-height: 8px;" border="0">
+                            <table style="line-height: 9px;" border="0">
                                 <tr>
-                                    <td style="width:260px;">Hari Kerja</td>
+                                    <td style="width:150px;">Hari Kerja</td>
                                     <td style="width: 5px; text-align:right;">:</td>
                                     <td><?= $payroll['hadir_final'] ?> Hari</td>
                                 </tr>
@@ -177,7 +176,7 @@
 
                             <hr style="border: 0.5px dashed #000;">
 
-                            <table style="line-height: 8px;" border="0">
+                            <table style="line-height: 9px;" border="0">
                                 <tr>
                                     <td>Total Gaji & Lembur</td>
                                     <td>:</td>
@@ -190,7 +189,7 @@
                                 </tr>
                                 <?php foreach ($perhitunganGaji as $p): ?>
                                     <tr>
-                                        <td style="width:260px;"><?= ucfirst(strtolower($p['name'])) ?></td>
+                                        <td style="width:150px;"><?= ucfirst(strtolower($p['name'])) ?></td>
                                         <td style="width: 5px;">:</td>
                                         <td><?= "Rp " . number_format($p['nominal'], 2, ',', '.') ?></td>
                                     </tr>
@@ -199,9 +198,9 @@
                             </table>
 
                             <hr style="border: 0.5px dashed #000;">
-                            <table style="line-height: 8px;" border="0">
+                            <table style="line-height: 9px;" border="0">
                                 <tr>
-                                    <td style="width:260px;">Sisa Diterima</td>
+                                    <td style="width:150px;">Sisa Diterima</td>
                                     <td style="width: 5px;">:</td>
                                     <td><?= "Rp " . number_format($payroll['nominal_gaji_diterima'], 2, ',', '.') ?></td>
                                 </tr>
