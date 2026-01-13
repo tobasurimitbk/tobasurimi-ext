@@ -179,7 +179,7 @@
                     <td class="txt-center"><?= $detail->kodeSatuan ?></td>
                 </tr>
             <?php endforeach; ?>
-            <?php for ($i = 0; $i < (8 - count($soDet)); $i++) : ?>
+            <?php for ($i = 0; $i < (6 - count($soDet)); $i++) : ?>
                 <tr>
                     <td>&nbsp;</td>
                     <td>&nbsp;</td>

@@ -59,7 +59,7 @@ class CustomersSalesByItems extends BaseController
         ];
 
         // =============================
-        // 1️⃣ HEADER ONLY (AJAX PERTAMA)
+        // HEADER ONLY (AJAX PERTAMA)
         // =============================
         if ($headerOnly) {
 
@@ -87,7 +87,7 @@ class CustomersSalesByItems extends BaseController
         }
 
         // =============================
-        // 2️⃣ DATA TABLE (AJAX KEDUA)
+        // DATA TABLE (AJAX KEDUA)
         // =============================
         $length = (int)($this->request->getGet('length') ?? 25);
         $start  = (int)($this->request->getGet('start') ?? 0);
@@ -140,7 +140,6 @@ class CustomersSalesByItems extends BaseController
         ]);
     }
 
-
     public function LaporanPenjualanPrint($tglAwal, $tglAkhir, $filter)
     {
         ini_set('memory_limit', '-1');
@@ -161,30 +160,26 @@ class CustomersSalesByItems extends BaseController
             'filter_customer' => $filter === 'all' ? null : $filter
         ];
 
-        $dataDetail = $this->salesOrderInvoiceModel
-            ->getCustomerItemDetail($condition, $addCondition);
+        // Ambil data header & detail
+        $dataHeader = $this->salesOrderInvoiceModel->getPivotHeader($condition, $addCondition);
+        $dataDetail = $this->salesOrderInvoiceModel->getCustomerItemDetail($condition, $addCondition);
 
         // =============================
-        // HEADER BARANG (SORT BY BARANG)
+        // HEADER BARANG (sesuai DataTable)
         // =============================
-        $dataHeader = [];
-        foreach ($dataDetail as $row) {
-            $dataHeader[$row->barang_id] = [
-                'barang_id'   => $row->barang_id,
-                'nama_barang' => $row->nama_barang
+        $header = [];
+        foreach ($dataHeader as $h) {
+            $header[$h->barang_id] = [
+                'barang_id' => $h->barang_id,
+                'nama_barang' => $h->nama_barang
             ];
         }
-        $dataHeader = array_values($dataHeader);
-
-        usort($dataHeader, fn($a, $b) =>
-            strcmp($a['nama_barang'], $b['nama_barang'])
-        );
+        $header = array_values($header); // agar urutannya sama seperti DataTable
 
         // =============================
         // PIVOT CUSTOMER
         // =============================
         $pivotCustomer = [];
-
         foreach ($dataDetail as $row) {
             $cId = $row->customer_id;
             $bId = $row->barang_id;
@@ -208,9 +203,7 @@ class CustomersSalesByItems extends BaseController
         unset($c);
 
         // SORT CUSTOMER (A–Z)
-        usort($pivotCustomer, fn($a, $b) =>
-            strcmp($a['customer_name'], $b['customer_name'])
-        );
+        usort($pivotCustomer, fn($a, $b) => strcmp($a['customer_name'], $b['customer_name']));
 
         // =============================
         // FOOTER TOTAL
@@ -219,7 +212,7 @@ class CustomersSalesByItems extends BaseController
         $footerGrand = 0;
 
         foreach ($pivotCustomer as $customer) {
-            foreach ($dataHeader as $h) {
+            foreach ($header as $h) {
                 $bId = $h['barang_id'];
                 $amount = $customer['items'][$bId] ?? 0;
 
@@ -229,7 +222,7 @@ class CustomersSalesByItems extends BaseController
         }
 
         $data = [
-            'header' => $dataHeader,
+            'header' => $header,
             'rows'   => $pivotCustomer,
             'footer' => [
                 'per_barang' => $footerTotal,
@@ -239,14 +232,11 @@ class CustomersSalesByItems extends BaseController
             'dateEnd'   => $tglAkhir ?: 'All'
         ];
 
-        $dompdf->loadHtml(
-            view('Laporan/LaporanSales/LaporanCustomersSalesByItems/print', $data)
-        );
-
+        $dompdf->loadHtml(view('Laporan/LaporanSales/LaporanCustomersSalesByItems/print', $data));
         $dompdf->setPaper('legal', 'landscape');
         $dompdf->render();
         $dompdf->stream(
-            "Laporan_Customers_Sales_By_Items.pdf",
+            "Laporan_Customers_Sales_By_Items_" . date('Ymd_His') . ".pdf",
             ["Attachment" => false]
         );
         exit;
@@ -278,32 +268,27 @@ class CustomersSalesByItems extends BaseController
         ];
 
         // =============================
-        // AMBIL DATA DETAIL
+        // AMBIL HEADER & DATA DETAIL
         // =============================
-        $dataDetail = $this->salesOrderInvoiceModel
-            ->getCustomerItemDetail($condition, $addCondition);
+        $dataHeader = $this->salesOrderInvoiceModel->getPivotHeader($condition, $addCondition);
+        $dataDetail = $this->salesOrderInvoiceModel->getCustomerItemDetail($condition, $addCondition);
 
         // =============================
-        // HEADER BARANG (UNIK + SORT A–Z)
+        // HEADER BARANG (URUTAN SAMA SEPERTI DATATABLE)
         // =============================
         $headerBarang = [];
-        foreach ($dataDetail as $row) {
-            $headerBarang[$row->barang_id] = [
-                'id'   => $row->barang_id,
-                'nama' => $row->nama_barang
+        foreach ($dataHeader as $h) {
+            $headerBarang[$h->barang_id] = [
+                'id'   => $h->barang_id,
+                'nama' => $h->nama_barang
             ];
         }
         $headerBarang = array_values($headerBarang);
-
-        usort($headerBarang, fn($a, $b) =>
-            strcmp($a['nama'], $b['nama'])
-        );
 
         // =============================
         // PIVOT CUSTOMER
         // =============================
         $pivot = [];
-
         foreach ($dataDetail as $row) {
             $cId = $row->customer_id;
             $bId = $row->barang_id;
@@ -327,9 +312,7 @@ class CustomersSalesByItems extends BaseController
         unset($p);
 
         // SORT CUSTOMER A–Z
-        usort($pivot, fn($a, $b) =>
-            strcmp($a['customer'], $b['customer'])
-        );
+        usort($pivot, fn($a, $b) => strcmp($a['customer'], $b['customer']));
 
         // =============================
         // FOOTER TOTAL
@@ -348,7 +331,7 @@ class CustomersSalesByItems extends BaseController
         // =============================
         // BUAT EXCEL
         // =============================
-        $spreadsheet = new Spreadsheet();
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
         // =============================
@@ -364,37 +347,37 @@ class CustomersSalesByItems extends BaseController
             ($tglAkhir ? date('d/m/Y', strtotime($tglAkhir)) : 'All')
         );
 
-        $lastCol = chr(65 + count($headerBarang) + 1);
+        $lastColIndex = count($headerBarang) + 2; // +1 Customer, +1 Total
+        $lastCol = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($lastColIndex);
+
         $sheet->mergeCells("A1:{$lastCol}1");
         $sheet->mergeCells("A2:{$lastCol}2");
         $sheet->mergeCells("A3:{$lastCol}3");
 
         $sheet->getStyle("A1:A3")->getAlignment()
-            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle("A1:A3")->getFont()->setBold(true);
 
         // =============================
         // HEADER TABLE
         // =============================
         $rowHeader = 5;
-        $col = 'A';
+        $colIndex = 1;
 
-        $sheet->setCellValue($col.$rowHeader, 'Customer');
-        $col++;
+        $sheet->setCellValueByColumnAndRow($colIndex++, $rowHeader, 'Customer');
 
         foreach ($headerBarang as $h) {
-            $sheet->setCellValue($col.$rowHeader, $h['nama']);
-            $col++;
+            $sheet->setCellValueByColumnAndRow($colIndex++, $rowHeader, $h['nama']);
         }
 
-        $sheet->setCellValue($col.$rowHeader, 'Total');
+        $sheet->setCellValueByColumnAndRow($colIndex++, $rowHeader, 'Total');
 
-        $sheet->getStyle("A{$rowHeader}:{$col}{$rowHeader}")->applyFromArray([
+        $sheet->getStyle("A{$rowHeader}:{$lastCol}{$rowHeader}")->applyFromArray([
             'font' => ['bold' => true],
-            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-            'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
+            'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
+            'borders' => ['allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN]],
             'fill' => [
-                'fillType' => Fill::FILL_SOLID,
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
                 'startColor' => ['argb' => 'FFD9D9D9']
             ]
         ]);
@@ -405,76 +388,60 @@ class CustomersSalesByItems extends BaseController
         $rowExcel = $rowHeader + 1;
 
         foreach ($pivot as $p) {
-            $col = 'A';
-            $sheet->setCellValue($col.$rowExcel, $p['customer']);
-            $col++;
+            $colIndex = 1;
+            $sheet->setCellValueByColumnAndRow($colIndex++, $rowExcel, $p['customer']);
 
             foreach ($headerBarang as $h) {
-                $sheet->setCellValueExplicit(
-                    $col.$rowExcel,
-                    $p['items'][$h['id']] ?? 0,
-                    DataType::TYPE_NUMERIC
-                );
-
-                $sheet->getStyle($col.$rowExcel)
+                $sheet->setCellValueByColumnAndRow($colIndex, $rowExcel, $p['items'][$h['id']] ?? 0);
+                $sheet->getStyleByColumnAndRow($colIndex, $rowExcel)
                     ->getNumberFormat()
-                    ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
-
-                $col++;
+                    ->setFormatCode('#,##0.00'); // <-- nominal numeric dengan ribuan + 2 desimal
+                $sheet->getStyleByColumnAndRow($colIndex, $rowExcel)
+                    ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+                $colIndex++;
             }
 
-            $sheet->setCellValueExplicit(
-                $col.$rowExcel,
-                $p['total'],
-                DataType::TYPE_NUMERIC
-            );
-
-            $sheet->getStyle($col.$rowExcel)
+            $sheet->setCellValueByColumnAndRow($colIndex, $rowExcel, $p['total']);
+            $sheet->getStyleByColumnAndRow($colIndex, $rowExcel)
                 ->getNumberFormat()
-                ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+                ->setFormatCode('#,##0.00');
+            $sheet->getStyleByColumnAndRow($colIndex, $rowExcel)
+                ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
 
             $rowExcel++;
         }
 
+        $lastDataRow = $rowExcel;
+
         // =============================
         // FOOTER TOTAL
-        // =============================
-        $col = 'A';
-        $sheet->setCellValue($col.$rowExcel, 'TOTAL');
-        $col++;
+        $colIndex = 1;
+        $sheet->setCellValueByColumnAndRow($colIndex++, $rowExcel, 'TOTAL');
 
         foreach ($headerBarang as $h) {
-            $sheet->setCellValueExplicit(
-                $col.$rowExcel,
-                $footerBarang[$h['id']] ?? 0,
-                DataType::TYPE_NUMERIC
-            );
-
-            $sheet->getStyle($col.$rowExcel)
+            $sheet->setCellValueByColumnAndRow($colIndex, $rowExcel, $footerBarang[$h['id']] ?? 0);
+            $sheet->getStyleByColumnAndRow($colIndex, $rowExcel)
                 ->getNumberFormat()
-                ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
-
-            $col++;
+                ->setFormatCode('#,##0.00');
+            $sheet->getStyleByColumnAndRow($colIndex, $rowExcel)
+                ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+            $colIndex++;
         }
 
-        $sheet->setCellValueExplicit(
-            $col.$rowExcel,
-            $grandTotal,
-            DataType::TYPE_NUMERIC
-        );
-
-        $sheet->getStyle($col.$rowExcel)
+        $sheet->setCellValueByColumnAndRow($colIndex, $rowExcel, $grandTotal);
+        $sheet->getStyleByColumnAndRow($colIndex, $rowExcel)
             ->getNumberFormat()
-            ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+            ->setFormatCode('#,##0.00');
+        $sheet->getStyleByColumnAndRow($colIndex, $rowExcel)
+            ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
 
-        $sheet->getStyle("A{$rowExcel}:{$col}{$rowExcel}")
-            ->getFont()->setBold(true);
+        $sheet->getStyle("A{$rowExcel}:{$lastCol}{$rowExcel}")->getFont()->setBold(true);
 
         // =============================
         // AUTO WIDTH
-        // =============================
-        foreach (range('A', $col) as $c) {
-            $sheet->getColumnDimension($c)->setAutoSize(true);
+        for ($i = 1; $i <= $colIndex; $i++) {
+            $sheet->getColumnDimension(\PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($i))
+                ->setAutoSize(true);
         }
 
         // =============================
@@ -485,7 +452,7 @@ class CustomersSalesByItems extends BaseController
         header('Content-Disposition: attachment;filename="'.$filename.'"');
         header('Cache-Control: max-age=0');
 
-        $writer = new Xlsx($spreadsheet);
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
         $writer->save('php://output');
         exit;
     }

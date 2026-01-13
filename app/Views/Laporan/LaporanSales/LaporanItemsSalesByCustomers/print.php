@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Laporan Customers Sales By Items</title>
+    <title>Laporan Items Sales By Customers</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             font-size: 8px;
+        }
+
+        h2, h3, p {
+            margin: 3px 0;
         }
 
         table {
@@ -16,7 +20,7 @@
 
         th, td {
             border: 1px solid #000;
-            padding: 2px;
+            padding: 3px;
             word-wrap: break-word;
         }
 
@@ -27,39 +31,42 @@
         }
 
         .text-right { text-align: right; }
-        .text-left { text-align: left; }
+        .text-left  { text-align: left; }
+        .text-center{ text-align: center; }
+
         .total-row {
-            background: #eaeaea;
+            background: #e0e0e0;
             font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-<h3 style="text-align:center">TOBA FISH</h3>
-<h2 style="text-align:center;color:red">Customers Sales By Items</h2>
-<p style="text-align:center">
-    Periode: <?= $dateStart ?> - <?= $dateEnd ?>
+<h3 style="text-align:center;">TOBA FISH</h3>
+<h2 style="text-align:center; color:red;">ITEMS SALES BY CUSTOMERS</h2>
+<p style="text-align:center;">
+    Periode: <?= esc($dateStart) ?> - <?= esc($dateEnd) ?>
 </p>
 
 <table>
     <thead>
         <tr>
-            <th style="width:200px">Customer</th>
-            <?php foreach ($header as $h): ?>
-                <th class="text-right"><?= $h['nama_barang'] ?></th>
+            <th style="width:180px;">Barang</th>
+
+            <?php foreach ($header as $cId): ?>
+                <th><?= esc($customerNames[$cId] ?? $cId) ?></th>
             <?php endforeach; ?>
-            <th class="text-right">Total</th>
+            <th>Total</th>
         </tr>
     </thead>
 
     <tbody>
         <?php foreach ($rows as $row): ?>
             <tr>
-                <td class="text-left"><?= $row['customer_name'] ?></td>
+                <td class="text-left"><?= esc($row['nama_barang']) ?></td>
 
-                <?php foreach ($header as $h): ?>
-                    <td class="text-right"><?= number_format($row['items'][$h['barang_id']] ?? 0, 0) ?></td>
+                <?php foreach ($header as $cId): ?>
+                    <td class="text-right"><?= number_format($row['customers'][$cId] ?? 0, 0) ?></td>
                 <?php endforeach; ?>
 
                 <td class="text-right"><?= number_format($row['total'], 0) ?></td>
@@ -71,8 +78,8 @@
         <tr class="total-row">
             <td class="text-center">TOTAL</td>
 
-            <?php foreach ($header as $h): ?>
-                <td class="text-right"><?= number_format($footer['per_barang'][$h['barang_id']] ?? 0, 0) ?></td>
+            <?php foreach ($header as $cId): ?>
+                <td class="text-right"><?= number_format($footer['per_customer'][$cId] ?? 0, 0) ?></td>
             <?php endforeach; ?>
 
             <td class="text-right"><?= number_format($footer['grand_total'], 0) ?></td>
