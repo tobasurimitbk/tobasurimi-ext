@@ -127,6 +127,8 @@
 
         if (!$('.dateStart').val() || !$('.dateEnd').val()) return;
 
+        setLoading();
+
         // Destroy lama
         if ($.fn.DataTable.isDataTable('#pivotTable')) {
             table.destroy();
@@ -136,7 +138,7 @@
         }
 
         // =========================
-        // 1️⃣ AMBIL HEADER DULU
+        // AMBIL HEADER DULU
         // =========================
         $.ajax({
             url: "<?= base_url('laporan-sales/items-sales-by-customers/all') ?>",
@@ -206,8 +208,14 @@
                             d.filter    = $('.filter_customer').val();
                         }
                     },
-                    columns: columns
+                    columns: columns,
+                    initComplete: function() {
+                        stopLoading(); // <--- SELESAI LOADING
+                    }
                 });
+            },
+            error: function() {
+                stopLoading(); // <--- JIKA AJAX HEADER GAGAL, STOP LOADING
             }
         });
     }

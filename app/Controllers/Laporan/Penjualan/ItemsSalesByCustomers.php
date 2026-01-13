@@ -175,6 +175,9 @@ class ItemsSalesByCustomers extends BaseController
 
         $dompdf = new \Dompdf\Dompdf();
 
+        // =============================
+        // BASE CONDITION
+        // =============================
         $condition = [
             'h.deletedAt'    => null,
             'h.tipe_invoice' => 'LOKAL'
@@ -186,80 +189,74 @@ class ItemsSalesByCustomers extends BaseController
             'filter_customer' => $filter === 'all' ? null : $filter
         ];
 
+        // =============================
+        // AMBIL DATA DETAIL PERSIS DATATABLE
+        // =============================
+        $dataHeaders = $this->salesOrderInvoiceModel
+            ->getPivotHeaderCustomer($condition, $addCondition);
+
         $dataDetail = $this->salesOrderInvoiceModel
-            ->getCustomerItemDetail($condition, $addCondition);
+            ->getPivotBarangData($condition, $addCondition);
 
         // =============================
-        // HEADER BARANG (SORT BY BARANG)
+        // HEADER CUSTOMER (kolom)
         // =============================
         $dataHeader = [];
-        foreach ($dataDetail as $row) {
-            $dataHeader[$row->barang_id] = [
-                'barang_id'   => $row->barang_id,
-                'nama_barang' => $row->nama_barang
-            ];
+        $customerNames = [];
+        foreach ($dataHeaders as $row) {
+            $dataHeader[$row->customer_id] = $row->customer_id;
+            $customerNames[$row->customer_id] = $row->customer_name;
         }
         $dataHeader = array_values($dataHeader);
-
-        usort($dataHeader, fn($a, $b) =>
-            strcmp($a['nama_barang'], $b['nama_barang'])
-        );
+        $customerNames = array_unique($customerNames);
 
         // =============================
-        // PIVOT CUSTOMER
+        // PIVOT BARANG (baris = barang)
         // =============================
-        $pivotCustomer = [];
-
+        $pivotBarang = [];
         foreach ($dataDetail as $row) {
-            $cId = $row->customer_id;
             $bId = $row->barang_id;
-            $amount = (float)$row->amount;
+            $cId = $row->customer_id;
 
-            if (!isset($pivotCustomer[$cId])) {
-                $pivotCustomer[$cId] = [
-                    'customer_name' => $row->customer_name,
-                    'items' => [],
+            if (!isset($pivotBarang[$bId])) {
+                $pivotBarang[$bId] = [
+                    'nama_barang' => $row->nama_barang,
+                    'customers' => [],
                     'total' => 0
                 ];
             }
 
-            $pivotCustomer[$cId]['items'][$bId] =
-                ($pivotCustomer[$cId]['items'][$bId] ?? 0) + $amount;
+            $pivotBarang[$bId]['customers'][$cId] =
+                ($pivotBarang[$bId]['customers'][$cId] ?? 0) + (float)$row->amount;
         }
 
-        foreach ($pivotCustomer as &$c) {
-            $c['total'] = array_sum($c['items']);
+        foreach ($pivotBarang as &$p) {
+            $p['total'] = array_sum($p['customers']);
         }
-        unset($c);
-
-        // SORT CUSTOMER (A–Z)
-        usort($pivotCustomer, fn($a, $b) =>
-            strcmp($a['customer_name'], $b['customer_name'])
-        );
+        unset($p);
 
         // =============================
-        // FOOTER TOTAL
+        // FOOTER TOTAL PER CUSTOMER
         // =============================
         $footerTotal = [];
-        $footerGrand = 0;
+        $grandTotal = 0;
 
-        foreach ($pivotCustomer as $customer) {
-            foreach ($dataHeader as $h) {
-                $bId = $h['barang_id'];
-                $amount = $customer['items'][$bId] ?? 0;
-
-                $footerTotal[$bId] = ($footerTotal[$bId] ?? 0) + $amount;
-                $footerGrand += $amount;
+        foreach ($pivotBarang as $p) {
+            foreach ($dataHeader as $cId) {
+                $val = $p['customers'][$cId] ?? 0;
+                $footerTotal[$cId] = ($footerTotal[$cId] ?? 0) + $val;
+                $grandTotal += $val;
             }
         }
 
         $data = [
-            'header' => $dataHeader,
-            'rows'   => $pivotCustomer,
-            'footer' => [
-                'per_barang' => $footerTotal,
-                'grand_total' => $footerGrand
+            'header'    => $dataHeader,
+            'rows'      => $pivotBarang,
+            'footer'    => [
+                'per_customer' => $footerTotal,
+                'grand_total'  => $grandTotal
             ],
+            'customerNames' => $customerNames,
             'dateStart' => $tglAwal ?: 'All',
             'dateEnd'   => $tglAkhir ?: 'All'
         ];
@@ -271,7 +268,7 @@ class ItemsSalesByCustomers extends BaseController
         $dompdf->setPaper('legal', 'landscape');
         $dompdf->render();
         $dompdf->stream(
-            "Laporan_Customers_Sales_By_Items" . date('Ymd_His') . ".pdf",
+            "Items_Sales_By_Customers_" . date('Ymd_His') . ".pdf",
             ["Attachment" => false]
         );
         exit;
@@ -293,79 +290,70 @@ class ItemsSalesByCustomers extends BaseController
         ];
 
         $addCondition = [
-            'dateStart' => $tglAwal
-                ? date('Y-m-d', strtotime(str_replace('/', '-', $tglAwal)))
-                : null,
-            'dateEnd' => $tglAkhir
-                ? date('Y-m-d', strtotime(str_replace('/', '-', $tglAkhir)))
-                : null,
+            'dateStart' => $tglAwal ? date('Y-m-d', strtotime(str_replace('/', '-', $tglAwal))) : null,
+            'dateEnd'   => $tglAkhir ? date('Y-m-d', strtotime(str_replace('/', '-', $tglAkhir))) : null,
             'filter_customer' => $filter === 'all' ? null : $filter
         ];
 
         // =============================
-        // AMBIL DATA DETAIL
+        // HEADER CUSTOMER
+        // =============================
+        $dataHeaders = $this->salesOrderInvoiceModel
+            ->getPivotHeaderCustomer($condition, $addCondition);
+
+        $customerIds = [];
+        $customerNames = [];
+        foreach ($dataHeaders as $h) {
+            $customerIds[] = $h->customer_id;
+            $customerNames[$h->customer_id] = $h->customer_name;
+        }
+
+        // =============================
+        // DATA DETAIL (pivot barang)
         // =============================
         $dataDetail = $this->salesOrderInvoiceModel
-            ->getCustomerItemDetail($condition, $addCondition);
+            ->getPivotBarangData($condition, $addCondition);
 
-        // =============================
-        // HEADER BARANG (UNIK + SORT A–Z)
-        // =============================
-        $headerBarang = [];
-        foreach ($dataDetail as $row) {
-            $headerBarang[$row->barang_id] = [
-                'id'   => $row->barang_id,
-                'nama' => $row->nama_barang
-            ];
-        }
-        $headerBarang = array_values($headerBarang);
-
-        usort($headerBarang, fn($a, $b) =>
-            strcmp($a['nama'], $b['nama'])
-        );
-
-        // =============================
-        // PIVOT CUSTOMER
-        // =============================
         $pivot = [];
+        $barangList = [];
 
         foreach ($dataDetail as $row) {
-            $cId = $row->customer_id;
             $bId = $row->barang_id;
-            $amount = (float)$row->amount;
+            $cId = $row->customer_id;
 
-            if (!isset($pivot[$cId])) {
-                $pivot[$cId] = [
-                    'customer' => $row->customer_name,
-                    'items' => [],
+            // Simpan list barang unik
+            if (!isset($barangList[$bId])) {
+                $barangList[$bId] = $row->nama_barang;
+            }
+
+            if (!isset($pivot[$bId])) {
+                $pivot[$bId] = [
+                    'nama_barang' => $row->nama_barang,
+                    'customers' => [],
                     'total' => 0
                 ];
             }
 
-            $pivot[$cId]['items'][$bId] =
-                ($pivot[$cId]['items'][$bId] ?? 0) + $amount;
+            $pivot[$bId]['customers'][$cId] =
+                ($pivot[$bId]['customers'][$cId] ?? 0) + (float)$row->amount;
         }
 
+        // Hitung total per barang
         foreach ($pivot as &$p) {
-            $p['total'] = array_sum($p['items']);
+            $p['total'] = array_sum($p['customers']);
         }
         unset($p);
 
-        // SORT CUSTOMER A–Z
-        usort($pivot, fn($a, $b) =>
-            strcmp($a['customer'], $b['customer'])
-        );
-
         // =============================
-        // FOOTER TOTAL
+        // FOOTER TOTAL PER CUSTOMER
         // =============================
-        $footerBarang = [];
+        $footerTotal = [];
         $grandTotal = 0;
 
         foreach ($pivot as $p) {
-            foreach ($headerBarang as $h) {
-                $val = $p['items'][$h['id']] ?? 0;
-                $footerBarang[$h['id']] = ($footerBarang[$h['id']] ?? 0) + $val;
+            foreach ($customerIds as $cId) {
+                $val = $p['customers'][$cId] ?? 0;
+                $footerTotal[$cId] = ($footerTotal[$cId] ?? 0) + $val;
                 $grandTotal += $val;
             }
         }
@@ -380,22 +368,19 @@ class ItemsSalesByCustomers extends BaseController
         // JUDUL
         // =============================
         $sheet->setCellValue('A1', 'TOBA FISH');
-        $sheet->setCellValue('A2', 'CUSTOMERS SALES BY ITEMS');
-        $sheet->setCellValue(
-            'A3',
-            'Periode: ' .
-            ($tglAwal ? date('d/m/Y', strtotime($tglAwal)) : 'All') .
-            ' - ' .
+        $sheet->setCellValue('A2', 'ITEMS SALES BY CUSTOMERS');
+        $sheet->setCellValue('A3', 'Periode: ' . 
+            ($tglAwal ? date('d/m/Y', strtotime($tglAwal)) : 'All') . 
+            ' - ' . 
             ($tglAkhir ? date('d/m/Y', strtotime($tglAkhir)) : 'All')
         );
 
-        $lastCol = chr(65 + count($headerBarang) + 1);
+        $lastCol = chr(65 + count($customerIds) + 1);
         $sheet->mergeCells("A1:{$lastCol}1");
         $sheet->mergeCells("A2:{$lastCol}2");
         $sheet->mergeCells("A3:{$lastCol}3");
 
-        $sheet->getStyle("A1:A3")->getAlignment()
-            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle("A1:A3")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle("A1:A3")->getFont()->setBold(true);
 
         // =============================
@@ -404,11 +389,11 @@ class ItemsSalesByCustomers extends BaseController
         $rowHeader = 5;
         $col = 'A';
 
-        $sheet->setCellValue($col.$rowHeader, 'Customer');
+        $sheet->setCellValue($col.$rowHeader, 'Barang');
         $col++;
 
-        foreach ($headerBarang as $h) {
-            $sheet->setCellValue($col.$rowHeader, $h['nama']);
+        foreach ($customerIds as $cId) {
+            $sheet->setCellValue($col.$rowHeader, $customerNames[$cId]);
             $col++;
         }
 
@@ -431,19 +416,19 @@ class ItemsSalesByCustomers extends BaseController
 
         foreach ($pivot as $p) {
             $col = 'A';
-            $sheet->setCellValue($col.$rowExcel, $p['customer']);
+            $sheet->setCellValue($col.$rowExcel, $p['nama_barang']);
             $col++;
 
-            foreach ($headerBarang as $h) {
+            foreach ($customerIds as $cId) {
                 $sheet->setCellValueExplicit(
                     $col.$rowExcel,
-                    $p['items'][$h['id']] ?? 0,
+                    $p['customers'][$cId] ?? 0,
                     DataType::TYPE_NUMERIC
                 );
 
                 $sheet->getStyle($col.$rowExcel)
                     ->getNumberFormat()
-                    ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+                    ->setFormatCode('#,##0.00');
 
                 $col++;
             }
@@ -453,10 +438,9 @@ class ItemsSalesByCustomers extends BaseController
                 $p['total'],
                 DataType::TYPE_NUMERIC
             );
-
             $sheet->getStyle($col.$rowExcel)
                 ->getNumberFormat()
-                ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+                ->setFormatCode('#,##0.00');
 
             $rowExcel++;
         }
@@ -468,17 +452,15 @@ class ItemsSalesByCustomers extends BaseController
         $sheet->setCellValue($col.$rowExcel, 'TOTAL');
         $col++;
 
-        foreach ($headerBarang as $h) {
+        foreach ($customerIds as $cId) {
             $sheet->setCellValueExplicit(
                 $col.$rowExcel,
-                $footerBarang[$h['id']] ?? 0,
+                $footerTotal[$cId] ?? 0,
                 DataType::TYPE_NUMERIC
             );
-
             $sheet->getStyle($col.$rowExcel)
                 ->getNumberFormat()
-                ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
-
+                ->setFormatCode('#,##0.00');
             $col++;
         }
 
@@ -487,13 +469,11 @@ class ItemsSalesByCustomers extends BaseController
             $grandTotal,
             DataType::TYPE_NUMERIC
         );
-
         $sheet->getStyle($col.$rowExcel)
             ->getNumberFormat()
-            ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+            ->setFormatCode('#,##0.00');
 
-        $sheet->getStyle("A{$rowExcel}:{$col}{$rowExcel}")
-            ->getFont()->setBold(true);
+        $sheet->getStyle("A{$rowExcel}:{$col}{$rowExcel}")->getFont()->setBold(true);
 
         // =============================
         // AUTO WIDTH
@@ -505,7 +485,7 @@ class ItemsSalesByCustomers extends BaseController
         // =============================
         // OUTPUT
         // =============================
-        $filename = "Customers_Sales_By_Items_" . date('Ymd_His') . ".xlsx";
+        $filename = "Items_Sales_By_Customers_" . date('Ymd_His') . ".xlsx";
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="'.$filename.'"');
         header('Cache-Control: max-age=0');

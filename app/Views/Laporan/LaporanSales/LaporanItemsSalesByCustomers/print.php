@@ -51,12 +51,11 @@
 <table>
     <thead>
         <tr>
-            <th style="width:180px;">Customer</th>
+            <th style="width:180px;">Barang</th>
 
-            <?php foreach ($header as $h): ?>
-                <th><?= esc($h['nama_barang']) ?></th>
+            <?php foreach ($header as $cId): ?>
+                <th><?= esc($customerNames[$cId] ?? $cId) ?></th>
             <?php endforeach; ?>
-
             <th>Total</th>
         </tr>
     </thead>
@@ -64,19 +63,13 @@
     <tbody>
         <?php foreach ($rows as $row): ?>
             <tr>
-                <td class="text-left">
-                    <?= esc($row['customer_name']) ?>
-                </td>
+                <td class="text-left"><?= esc($row['nama_barang']) ?></td>
 
-                <?php foreach ($header as $h): ?>
-                    <td class="text-right">
-                        <?= number_format($row['items'][$h['barang_id']] ?? 0, 0) ?>
-                    </td>
+                <?php foreach ($header as $cId): ?>
+                    <td class="text-right"><?= number_format($row['customers'][$cId] ?? 0, 0) ?></td>
                 <?php endforeach; ?>
 
-                <td class="text-right">
-                    <?= number_format($row['total'], 0) ?>
-                </td>
+                <td class="text-right"><?= number_format($row['total'], 0) ?></td>
             </tr>
         <?php endforeach; ?>
     </tbody>
@@ -85,15 +78,11 @@
         <tr class="total-row">
             <td class="text-center">TOTAL</td>
 
-            <?php foreach ($header as $h): ?>
-                <td class="text-right">
-                    <?= number_format($footer['per_barang'][$h['barang_id']] ?? 0, 0) ?>
-                </td>
+            <?php foreach ($header as $cId): ?>
+                <td class="text-right"><?= number_format($footer['per_customer'][$cId] ?? 0, 0) ?></td>
             <?php endforeach; ?>
 
-            <td class="text-right">
-                <?= number_format($footer['grand_total'], 0) ?>
-            </td>
+            <td class="text-right"><?= number_format($footer['grand_total'], 0) ?></td>
         </tr>
     </tfoot>
 </table>
