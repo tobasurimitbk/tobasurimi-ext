@@ -275,6 +275,9 @@ class StokList extends BaseController
                 $warehouse  = trim($val[5] ?? '');
                 $qty        = (float) ($val[6] ?? 0);
                 $raw = trim($val[8] ?? '');
+                $noDaftar = trim($val[9]) ?? '';
+                $noAju = trim($val[10]) ?? '';
+                $supplierName = trim($val[11]) ?? '';
 
                 if (is_numeric($raw)) {
                     $tanggal = Date::excelToDateTimeObject($raw)->format('Y-m-d');
@@ -363,6 +366,21 @@ class StokList extends BaseController
                     $message = "Tanggal stok tidak valid";
                 }
 
+                // VALIDASI SUPPLIER
+                $supplierFirst = null;
+                if ($supplierName != '') {
+                    $supplierFirst = $this->supplierModel
+                        ->where('company_id', $this->this_company_id)
+                        ->where('deletedAt', null)
+                        ->where('TRIM(name)', $supplierName)
+                        ->first();
+
+                    if ($supplierFirst == null) {
+                        $status = false;
+                        $message = "Nama supplier tidak ditemukan di master data supplier";
+                    }
+                }
+
                 // =========================
                 // 💾 Simpan ke array result
                 // =========================
@@ -383,7 +401,10 @@ class StokList extends BaseController
                     'reference_type'   => 'INISIASI',
                     'status'           => 'IN',
                     'keterangan'       => 'INISIASI',
-                    'tanggal' => $tanggal
+                    'tanggal' => $tanggal,
+                    'no_aju' => $noAju,
+                    'no_daftar' => $noDaftar,
+                    'supplier_id' => $supplierFirst['id'] ?? null,
                 ];
 
                 $dataPreview[] = [
@@ -397,6 +418,9 @@ class StokList extends BaseController
                     'qty'           => $qty,
                     'kode_satuan'   => $barangMasterSpesifikasi['kode_satuan'] ?? null,
                     'tanggal'       => $tanggal,
+                    'no_aju' => $noAju,
+                    'no_daftar' => $noDaftar,
+                    'supplier_name' => $supplierFirst['name'] ?? null,
                     'status'        => $status,
                     'message'       => $message,
                 ];
@@ -429,14 +453,17 @@ class StokList extends BaseController
         try {
             foreach (json_decode($_POST['list_stock']) as $l) {
                 $data = (array)$l;
-                unset($data['tanggal']);
+                unset($data['tanggal'], $data['no_aju'], $data['no_daftar'], $data['supplier_id']);
                 $stockDetailId = $this->stockRevampModel->insertStockRevamp(
                     $db,
                     $data
                 );
                 $this->inisiasiStockRevampModel->insert([
                     'stock_detail_id' => $stockDetailId,
-                    'tanggal' => $l->tanggal
+                    'tanggal' => $l->tanggal,
+                    'no_aju' => empty($l->no_aju) ? null : $l->no_aju,
+                    'no_daftar' => empty($l->no_daftar) ? null : $l->no_daftar,
+                    'supplier_id' => empty($l->supplier_id) ? null : $l->supplier_id,
                 ]);
             }
             $db->transCommit();

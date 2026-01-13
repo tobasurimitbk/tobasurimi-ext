@@ -54,6 +54,9 @@
                                 <th>Qty</th>
                                 <th>Satuan</th>
                                 <th>Tgl Stok</th>
+                                <th>No Aju (Opsional)</th>
+                                <th>No Daftar (Opsional)</th>
+                                <th>Supplier (Opsional)</th>
                                 <th>Status</th>
                                 <th>Keterangan</th>
                             </tr>
@@ -63,7 +66,7 @@
                         </tbody>
                         <tfoot class="foot-detail-table" id="foot-detail-table">
                             <tr>
-                                <td style="text-align: left;" colspan="12">
+                                <td style="text-align: left;" colspan="15">
                                     Tidak ada data
                                 </td>
                             </tr>
@@ -197,7 +200,7 @@
         var no = 1;
         if (listPreview.length == 0) {
             var newRow = $('<tr>');
-            newRow.append($('<td  colspan="12">').text("Tidak Ada Data"));
+            newRow.append($('<td  colspan="15">').text("Tidak Ada Data"));
             table.find('tfoot').append(newRow);
         } else {
             var isOke = true;
@@ -217,6 +220,9 @@
                 newRow.append($('<td>').text(greatFormatRupiah(v.qty)));
                 newRow.append($('<td>').text(v.kode_satuan));
                 newRow.append($('<td>').text(v.tanggal));
+                newRow.append($('<td>').text(v.no_aju));
+                newRow.append($('<td>').text(v.no_daftar));
+                newRow.append($('<td>').text(v.supplier_name));
                 if (v.status == true) {
                     newRow.append($('<td>').html(`
                         <div class="text-success">

@@ -968,6 +968,7 @@ class StockRevampModel extends Model
         $whereDateAdjusment = "";
         $whereDatePenerimaanMutasi = "";
         $whereDatePenerimaanMutasiGlobal = "";
+        $whereDateInisiasi = "";
 
         $searchPoLokalBb = "";
         $searchPoBp = "";
@@ -999,6 +1000,7 @@ class StockRevampModel extends Model
             $whereDateAdjusment = "AND adjusment.tanggal  BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
             $whereDatePenerimaanMutasi = "AND penerimaan_mutasi.tanggal  BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
             $whereDatePenerimaanMutasiGlobal = "AND penerimaan_mutasi_global.tanggal  BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
+            $whereDateInisiasi = "AND inisiasi_stock_revamp.tanggal  BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
         }
 
         if (!empty($condition['type_barang'])) {
@@ -1020,6 +1022,19 @@ class StockRevampModel extends Model
         if (!empty($condition['barang_id'])) {
             $where[] = "stock_revamp.barang_master_id = '$condition[barang_id]'";
         }
+
+        if (!empty($condition['reference_type'])) {
+            $where[] = "stock_revamp_detail.reference_type = '$condition[reference_type]'";
+        }
+
+        if (!empty($condition['stock_id'])) {
+            $where[] = "stock_revamp_detail.stock_id = '$condition[stock_id]'";
+        }
+
+        if (!empty($condition['stock_ids']) && is_array($condition['stock_ids'])) {
+            $where[] = "stock_id IN (" . implode(',', $condition['stock_ids']) . ")";
+        }
+
         if (!empty($condition['search'])) {
             $search = $db->escapeLikeString(trim($condition['search']));
             $searchPoLokalBb = "
@@ -1188,7 +1203,8 @@ class StockRevampModel extends Model
                 stock_revamp_detail.reference_id,
                 stock_revamp_detail.po_type,
                 stock_revamp_detail.po_id,
-                stock_revamp_detail.qty_bersih
+                stock_revamp_detail.qty_bersih,
+                stock_revamp_detail.stock_id
             FROM 
                 stock_revamp_detail
             LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
@@ -1243,7 +1259,8 @@ class StockRevampModel extends Model
                 stock_revamp_detail.reference_id,
                 stock_revamp_detail.po_type,
                 stock_revamp_detail.po_id,
-                stock_revamp_detail.qty_bersih
+                stock_revamp_detail.qty_bersih,
+                stock_revamp_detail.stock_id
             FROM 
                 stock_revamp_detail
             LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
@@ -1299,7 +1316,8 @@ class StockRevampModel extends Model
                 stock_revamp_detail.reference_id,
                 stock_revamp_detail.po_type,
                 stock_revamp_detail.po_id,
-                stock_revamp_detail.qty_diterima
+                stock_revamp_detail.qty_bersih,
+                stock_revamp_detail.stock_id
             FROM 
                 stock_revamp_detail
             LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
@@ -1355,7 +1373,8 @@ class StockRevampModel extends Model
                 stock_revamp_detail.reference_id,
                 stock_revamp_detail.po_type,
                 stock_revamp_detail.po_id,
-                stock_revamp_detail.qty_diterima
+                stock_revamp_detail.qty_bersih,
+                stock_revamp_detail.stock_id
             FROM 
                 stock_revamp_detail
             LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
@@ -1410,7 +1429,8 @@ class StockRevampModel extends Model
                 stock_revamp_detail.reference_id,
                 stock_revamp_detail.po_type,
                 stock_revamp_detail.po_id,
-                stock_revamp_detail.qty_diterima
+                stock_revamp_detail.qty_bersih,
+                stock_revamp_detail.stock_id
             FROM
                 stock_revamp_detail
             LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
@@ -1461,7 +1481,8 @@ class StockRevampModel extends Model
                 stock_revamp_detail.reference_id,
                 stock_revamp_detail.po_type,
                 stock_revamp_detail.po_id,
-                stock_revamp_detail.qty_diterima
+                stock_revamp_detail.qty_bersih,
+                stock_revamp_detail.stock_id
             FROM
                 stock_revamp_detail
             LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
@@ -1511,7 +1532,8 @@ class StockRevampModel extends Model
                 stock_revamp_detail.reference_id,
                 stock_revamp_detail.po_type,
                 stock_revamp_detail.po_id,
-                stock_revamp_detail.qty_diterima
+                stock_revamp_detail.qty_bersih,
+                stock_revamp_detail.stock_id
             FROM
                 stock_revamp_detail
             LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
@@ -1560,7 +1582,8 @@ class StockRevampModel extends Model
                 stock_revamp_detail.reference_id,
                 stock_revamp_detail.po_type,
                 stock_revamp_detail.po_id,
-                stock_revamp_detail.qty_diterima
+                stock_revamp_detail.qty_bersih,
+                stock_revamp_detail.stock_id
             FROM
                 stock_revamp_detail
             LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
@@ -1609,7 +1632,8 @@ class StockRevampModel extends Model
                 stock_revamp_detail.reference_id,
                 stock_revamp_detail.po_type,
                 stock_revamp_detail.po_id,
-                stock_revamp_detail.qty_diterima
+                stock_revamp_detail.qty_bersih,
+                stock_revamp_detail.stock_id
             FROM
                 stock_revamp_detail
             LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
@@ -1640,7 +1664,7 @@ class StockRevampModel extends Model
                 '' AS po_no,
                 '' AS po_date,
                 inisiasi_stock_revamp.tanggal AS lpb_date,
-                '' AS supplier_name,
+                suppliers.name AS supplier_name,
                 '' AS reference_no,
                 satuans.kode_satuan,
                 divisis.divisi,
@@ -1658,7 +1682,8 @@ class StockRevampModel extends Model
                 stock_revamp_detail.reference_id,
                 stock_revamp_detail.po_type,
                 stock_revamp_detail.po_id,
-                stock_revamp_detail.qty_diterima
+                stock_revamp_detail.qty_bersih,
+                stock_revamp_detail.stock_id
             FROM
                 stock_revamp_detail
             LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
@@ -1668,9 +1693,11 @@ class StockRevampModel extends Model
             LEFT JOIN divisis ON divisis.id = stock_revamp.divisi_id
             LEFT JOIN warehouses ON warehouses.id = stock_revamp.warehouse_id
             LEFT JOIN inisiasi_stock_revamp ON inisiasi_stock_revamp.stock_detail_id = stock_revamp_detail.id
+            LEFT JOIN suppliers ON suppliers.id = inisiasi_stock_revamp.supplier_id
             WHERE stock_revamp_detail.deletedAt IS NULL
             AND stock_revamp_detail.reference_type='INISIASI'
             $filterCondition
+            $whereDateInisiasi
         )
         UNION ALL
         (
@@ -1705,7 +1732,8 @@ class StockRevampModel extends Model
                 stock_revamp_detail.reference_id,
                 stock_revamp_detail.po_type,
                 stock_revamp_detail.po_id,
-                stock_revamp_detail.qty_diterima
+                stock_revamp_detail.qty_bersih,
+                stock_revamp_detail.stock_id
             FROM
                 stock_revamp_detail
             LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
@@ -1754,7 +1782,8 @@ class StockRevampModel extends Model
                 stock_revamp_detail.reference_id,
                 stock_revamp_detail.po_type,
                 stock_revamp_detail.po_id,
-                stock_revamp_detail.qty_diterima
+                stock_revamp_detail.qty_bersih,
+                stock_revamp_detail.stock_id
             FROM
                 stock_revamp_detail
             LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
@@ -1804,7 +1833,8 @@ class StockRevampModel extends Model
                 stock_revamp_detail.reference_id,
                 stock_revamp_detail.po_type,
                 stock_revamp_detail.po_id,
-                stock_revamp_detail.qty_diterima
+                stock_revamp_detail.qty_bersih,
+                stock_revamp_detail.stock_id
             FROM
                 stock_revamp_detail
             LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id

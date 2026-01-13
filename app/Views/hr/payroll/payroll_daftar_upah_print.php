@@ -7,10 +7,8 @@
     <title>Daftar Upah Karyawan</title>
     <style>
         body {
-            height: 100%;
-            font-family: 'Times New Roman', Times, serif;
-            letter-spacing: 1px;
-            font-size: 8;
+            font-family: "Times New Roman", Times, serif;
+            font-size: 10px;
         }
 
         @page {
@@ -40,7 +38,7 @@
 
         #dashed-border-table th,
         #dashed-border-table td {
-            border: 1px dashed #000;
+            border: 1px solid #000;
             padding: 5px;
             text-align: center;
         }
@@ -87,8 +85,9 @@
         </table>
     </div>
     <div class="content">
-        <table width="100%" style="margin-top: 10px;" border="1" id="dashed-border-table">
-            <?php foreach ($payrollData['dataPayroll'] as $bagian): ?>
+        <?php foreach ($payrollData['dataPayroll'] as $i => $bagian): ?>
+
+            <table style="page-break-before: <?= $i > 0 ? 'always' : 'auto' ?>" id="dashed-border-table">
                 <thead>
                     <tr>
                         <td colspan="12" style="font-weight: bold; text-align:left;">
@@ -145,8 +144,7 @@
                     <td></td>
                 </tr>
 
-            <?php endforeach; ?>
-            <!-- <tr>
+                <!-- <tr>
                 <td colspan="4" style="text-align: right;">
                     Total Keseluruhan
                 </td>
@@ -159,7 +157,8 @@
                 <td><?= number_format($payrollData['total']['subTotalJumlahUpah'], 2, ',', '.') ?></td>
                 <td></td>
             </tr> -->
-        </table>
+            </table>
+        <?php endforeach; ?>
 
         <table width="100%" style="margin-top: 20px;">
             <tr align="left" style="font-size:12px;">

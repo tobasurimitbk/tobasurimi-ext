@@ -12,9 +12,7 @@
         }
 
         @page {
-            size: 9.5in 11in landscape;
-            margin: 25px;
-            padding: 25px;
+            margin: 20px 10px 10px 10px;
         }
 
         .page-break {
@@ -23,7 +21,8 @@
 
         .karyawan-row {
             border-bottom: 1px dashed #000;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
+            margin-top: 20px;
         }
 
         .slip-container {
@@ -81,7 +80,7 @@
 
 <body>
     <?php foreach (array_chunk($payrollData['data'], 2) as $chunk): ?>
-        <div class="page-break">
+        <div class="<?= count($chunk) == 0 ? "page-break" : "" ?>">
             <?php foreach ($chunk as $p): ?>
                 <div class="karyawan-row" style="margin-top: -40px;">
                     <table class="slip-container">
@@ -91,7 +90,7 @@
                                     <div class="slip">
                                         <br>
                                         <h4>TANDA TERIMA UPAH</h4>
-                                        <table style="line-height: 8px;">
+                                        <table style="line-height: 9px;">
                                             <tr>
                                                 <td colspan="3">Tenaga Kerja Harian Tetap</td>
                                             </tr>
@@ -122,9 +121,9 @@
 
                                         <hr style="border: 0.5px dashed #000;">
 
-                                        <table style="line-height: 8px;" border="0">
+                                        <table style="line-height: 9px;" border="0">
                                             <tr>
-                                                <td style="width:260px;">Hari Kerja</td>
+                                                <td style="width:150px;">Hari Kerja</td>
                                                 <td style="width: 5px; text-align:right;">:</td>
                                                 <td><?= $p['payroll']['hadir_final'] ?> Hari</td>
                                             </tr>
@@ -181,7 +180,7 @@
 
                                         <hr style="border: 0.5px dashed #000;">
 
-                                        <table style="line-height: 8px;" border="0">
+                                        <table style="line-height: 9px;" border="0">
                                             <tr>
                                                 <td>Total Gaji & Lembur</td>
                                                 <td>:</td>
@@ -194,7 +193,7 @@
                                             </tr>
                                             <?php foreach ($p['perhitunganGaji'] as $g): ?>
                                                 <tr>
-                                                    <td style="width:260px;"><?= ucfirst(strtolower($g['name'])) ?></td>
+                                                    <td style="width:150px;"><?= ucfirst(strtolower($g['name'])) ?></td>
                                                     <td style="width: 5px;">:</td>
                                                     <td><?= "Rp " . number_format($g['nominal'], 2, ',', '.') ?></td>
                                                 </tr>
@@ -203,9 +202,9 @@
                                         </table>
 
                                         <hr style="border: 0.5px dashed #000;">
-                                        <table style="line-height: 8px; font-size:12px;" border="0">
+                                        <table style="line-height: 9px; font-size:12px;" border="0">
                                             <tr>
-                                                <td style="width:260px;">Sisa Diterima</td>
+                                                <td style="width:150px;">Sisa Diterima</td>
                                                 <td style="width: 5px;">:</td>
                                                 <td><?= "Rp " . number_format($p['payroll']['nominal_gaji_diterima'], 2, ',', '.') ?></td>
                                             </tr>
