@@ -104,7 +104,6 @@ class MaterialRequest extends BaseController
 
     public function createView()
     {
-
         //Get Satuan
         $dataSatuan = $this->satuanModel->asObject()->find();
 
@@ -118,6 +117,7 @@ class MaterialRequest extends BaseController
             ->where('work_orders.deletedAt', null)
             ->where('work_order_details.deletedAt', null)
             ->groupBy('work_order_details.work_order_id')
+            ->orderBy('work_orders.id', 'DESC')
             ->find();
         $dataTipeBarang = $this->metaDataModel
             ->where('deletedAt', null)
