@@ -36,9 +36,10 @@ class SalesInvoiceList extends BaseController
 
     public function allTransaksi()
     {
-        $pageSize = $this->request->getGet("length");
-        $currentPage = ($this->request->getGet("start") / $this->request->getGet("length")) + 1;
-        $offset = $currentPage - 1;
+        $pageSize = $this->request->getGet("length") ?: 25;
+        $offset = $this->request->getGet("start") ?: 0;
+
+        $currentPage = floor($offset / $pageSize) + 1;
 
         $payload = [
             "pageSize" => $pageSize,
@@ -70,7 +71,7 @@ class SalesInvoiceList extends BaseController
             ->getAllSalesOrderInvoiceLokal($condition, $addCondition, $pageSize, $offset);
 
         $dataAllSalesOrderInvoice = [];
-        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+        $no = $offset + 1;
 
         foreach ($dataSalesOrderInvoice['data'] as $data) {
             $tanggalFaktur = new \DateTime($data->tanggal_faktur);
