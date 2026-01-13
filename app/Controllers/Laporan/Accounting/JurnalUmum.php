@@ -233,9 +233,9 @@ class JurnalUmum extends BaseController
         // =============================
         // PARAMETER
         // =============================
-        $dateStart  = $tglAwal;
-        $dateEnd    = $tglAkhir;
-        $Filter     = $filter != "all"
+        $dateStart = $tglAwal;
+        $dateEnd   = $tglAkhir;
+        $Filter    = $filter != "all"
             ? $this->encrypter->decrypt(hex2bin($filter))
             : "";
 
@@ -260,6 +260,8 @@ class JurnalUmum extends BaseController
         // =============================
         switch ($this->this_company_id) {
             case "1":
+                $companyId = [1, 2];
+                break;
             case "2":
                 $companyId = [1, 2];
                 break;
@@ -285,12 +287,12 @@ class JurnalUmum extends BaseController
                 SUM(jurnal_umum.kredit) AS kredit,
                 transaksi_jurnal.valas,
                 transaksi_jurnal.exchange_rate,
-                suppliers.name as supplier,
+                suppliers.name AS supplier,
                 jurnal_umum.keterangan,
                 CASE 
                     WHEN jurnal_umum.divisi_id = 0 OR jurnal_umum.divisi_id IS NULL THEN 'ALL'
                     ELSE divisis.divisi 
-                END as department
+                END AS department
             ")
             ->join('sub_akuns', 'jurnal_umum.id_coa = sub_akuns.id', 'left')
             ->join('transaksi_jurnal', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
@@ -308,17 +310,6 @@ class JurnalUmum extends BaseController
             ])
             ->orderBy('tanggal_jurnal', 'asc')
             ->findAll();
-
-        // =============================
-        // HELPER FORMAT
-        // =============================
-        $fmtRp = function ($n) {
-            return number_format((float)$n, 2, ',', '.');
-        };
-
-        $fmtCur = function ($n, $cur) {
-            return number_format((float)$n, 2, ',', '.') . ' ' . $cur;
-        };
 
         // =============================
         // TITLE
@@ -343,14 +334,15 @@ class JurnalUmum extends BaseController
         ], null, "A{$row}");
 
         $sheet->getStyle("A{$row}:M{$row}")->getFont()->setBold(true);
-        $sheet->getStyle('A:M')->getAlignment()
+        $sheet->getStyle("A{$row}:M{$row}")
+            ->getAlignment()
             ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
         // =============================
         // DATA
         // =============================
         $row++;
-        $totalDebit = 0;
+        $totalDebit  = 0;
         $totalCredit = 0;
 
         foreach ($data as $d) {
@@ -363,39 +355,60 @@ class JurnalUmum extends BaseController
             $sheet->setCellValue("G{$row}", $d->nama_sub);
             $sheet->setCellValue("H{$row}", $d->keterangan);
             $sheet->setCellValue("I{$row}", '');
-            $sheet->setCellValue("J{$row}", $fmtCur($d->debit + $d->kredit, $d->valas ?? 'IDR'));
-            $sheet->setCellValue("K{$row}", number_format((float)$d->exchange_rate, 2, ',', '.'));
-            $sheet->setCellValue("L{$row}", $fmtRp($d->debit));
-            $sheet->setCellValue("M{$row}", $fmtRp($d->kredit));
+            $sheet->setCellValue("J{$row}", number_format($d->debit + $d->kredit, 2, ',', '.') . " " . $d->valas ?? 'IDR');
 
-            $totalDebit  += $d->debit;
-            $totalCredit += $d->kredit;
+            // ANGKA MURNI
+            $sheet->setCellValue("K{$row}", (float)$d->exchange_rate);
+            $sheet->setCellValue("L{$row}", (float)$d->debit);
+            $sheet->setCellValue("M{$row}", (float)$d->kredit);
+
+            $totalDebit  += (float)$d->debit;
+            $totalCredit += (float)$d->kredit;
+
             $row++;
         }
 
-        // Debit
-        $sheet->getStyle("A5:J{$row}")
+        $lastDataRow = $row - 1;
+
+        // =============================
+        // ALIGNMENT
+        // =============================
+        $sheet->getStyle("A5:J{$lastDataRow}")
             ->getAlignment()
             ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
-        
-            // Exchange Rate
-        $sheet->getStyle("K5:M{$row}")
+
+        $sheet->getStyle("K5:M{$lastDataRow}")
             ->getAlignment()
             ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+
+        // =============================
+        // NUMBER FORMAT (EXCEL)
+        // =============================
+        $sheet->getStyle("K5:K{$lastDataRow}")
+            ->getNumberFormat()
+            ->setFormatCode('#,##0.00');
+
+        $sheet->getStyle("L5:M{$lastDataRow}")
+            ->getNumberFormat()
+            ->setFormatCode('#,##0.00');
 
         // =============================
         // FOOTER TOTAL
         // =============================
         $sheet->mergeCells("J{$row}:K{$row}");
         $sheet->setCellValue("J{$row}", 'Total');
-        $sheet->setCellValue("L{$row}", $fmtRp($totalDebit));
-        $sheet->setCellValue("M{$row}", $fmtRp($totalCredit));
+
+        $sheet->setCellValue("L{$row}", (float)$totalDebit);
+        $sheet->setCellValue("M{$row}", (float)$totalCredit);
 
         $sheet->getStyle("A{$row}:M{$row}")->getFont()->setBold(true);
         $sheet->getStyle("L{$row}:M{$row}")
+            ->getNumberFormat()
+            ->setFormatCode('#,##0.00');
+
+        $sheet->getStyle("L{$row}:M{$row}")
             ->getAlignment()
             ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
-
 
         // =============================
         // AUTO WIDTH
