@@ -278,6 +278,7 @@ class JurnalUmum extends BaseController
             ->select("
                 jurnal_umum.tanggal_jurnal,
                 transaksi_jurnal.no_bukti,
+                transaksi_jurnal.no_transaksi,
                 sub_akuns.no_sub,
                 sub_akuns.nama_sub,
                 SUM(jurnal_umum.debit) AS debit,
@@ -355,7 +356,7 @@ class JurnalUmum extends BaseController
         foreach ($data as $d) {
             $sheet->setCellValue("A{$row}", date('d/m/Y', strtotime($d->tanggal_jurnal)));
             $sheet->setCellValue("B{$row}", $d->department);
-            $sheet->setCellValue("C{$row}", $d->no_bukti);
+            $sheet->setCellValue("C{$row}", $d->no_bukti ?? $d->no_transaksi);
             $sheet->setCellValue("D{$row}", $d->supplier ?? '');
             $sheet->setCellValue("E{$row}", '');
             $sheet->setCellValue("F{$row}", $d->no_sub);
