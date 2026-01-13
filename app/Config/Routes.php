@@ -3135,6 +3135,11 @@ $routes->get('/laporan-sales/customers-sales-by-items', 'Laporan\Penjualan\Custo
 $routes->get('/laporan-sales/customers-sales-by-items/all', 'Laporan\Penjualan\CustomersSalesByItems::allTransaksi', ['filter' => 'Auth']);
 $routes->get('/laporan-sales/customers-sales-by-items/printPDF/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\CustomersSalesByItems::LaporanPenjualanPrint/$1/$2/$3', ['filter' => 'Auth']);
 $routes->get('/laporan-sales/customers-sales-by-items/printExcel/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\CustomersSalesByItems::exportExcel/$1/$2/$3', ['filter' => 'Auth']);
+
+$routes->get('/laporan-sales/items-sales-by-customers', 'Laporan\Penjualan\ItemsSalesByCustomers::index', ['filter' => 'Auth']);
+$routes->get('/laporan-sales/items-sales-by-customers/all', 'Laporan\Penjualan\ItemsSalesByCustomers::allTransaksi', ['filter' => 'Auth']);
+$routes->get('/laporan-sales/items-sales-by-customers/printPDF/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\ItemsSalesByCustomers::LaporanPenjualanPrint/$1/$2/$3', ['filter' => 'Auth']);
+$routes->get('/laporan-sales/items-sales-by-customers/printExcel/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\ItemsSalesByCustomers::exportExcel/$1/$2/$3', ['filter' => 'Auth']);
 // RETUR LOKAL BB
 $routes->get('/retur-po-lokal-bb', 'ReturPembelian\ReturPembelianLokalBB::index', ['filter' => 'Auth']);
 $routes->get('/retur-po-lokal-bb/all', 'ReturPembelian\ReturPembelianLokalBB::all', ['filter' => 'Auth']);

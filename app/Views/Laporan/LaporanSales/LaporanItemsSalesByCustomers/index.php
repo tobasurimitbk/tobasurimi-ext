@@ -25,14 +25,14 @@
 
 <section class="section">
     <div class="section-header">
-        <h1>Laporan Customers Sales By Items</h1>
+        <h1>Laporan Items Sales By Customers</h1>
 
         <button style="right: 10px;" class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" data-bs-toggle="dropdown">
             Export
         </button>
         <ul class="dropdown-menu">
-            <li><button class="dropdown-item" onclick="printPDF('<?= base_url("/laporan-sales/customers-sales-by-items/printPDF"); ?>')">PDF</button></li>
-            <li><button class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-sales/customers-sales-by-items/printExcel"); ?>')">EXCEL</button></li>
+            <li><button class="dropdown-item" onclick="printPDF('<?= base_url("/laporan-sales/items-sales-by-customers/printPDF"); ?>')">PDF</button></li>
+            <li><button class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-sales/items-sales-by-customers/printExcel"); ?>')">EXCEL</button></li>
         </ul>
     </div>
 
@@ -62,16 +62,16 @@
                                 <select class="form-select filter_customer" name="filter_customer" id="filter_customer">
                                     <option value=""></option>
                                     <?php
-                                    if (!empty($customer)) {
-                                        foreach ($customer as $sub) {
+                                    if (!empty($barang)) {
+                                        foreach ($barang as $sub) {
                                     ?>
-                                            <option value="<?= $sub->id; ?>"><?= $sub->kode; ?> <?= $sub->name; ?></option>
+                                            <option value="<?= $sub->id; ?>"><?= $sub->kode_barang; ?> <?= $sub->barang_name; ?></option>
                                     <?php
                                         }
                                     }
                                     ?>
                                 </select>
-                                <label for="floatingInput">Pelanggan</label>
+                                <label for="floatingInput">Barang</label>
                             </div>
                         </div>
                     </div>
@@ -127,8 +127,6 @@
 
         if (!$('.dateStart').val() || !$('.dateEnd').val()) return;
 
-        setLoading(); // <--- MULAI LOADING
-
         // Destroy lama
         if ($.fn.DataTable.isDataTable('#pivotTable')) {
             table.destroy();
@@ -138,10 +136,10 @@
         }
 
         // =========================
-        // AMBIL HEADER DULU
+        // 1️⃣ AMBIL HEADER DULU
         // =========================
         $.ajax({
-            url: "<?= base_url('laporan-sales/customers-sales-by-items/all') ?>",
+            url: "<?= base_url('laporan-sales/items-sales-by-customers/all') ?>",
             dataType: "json",
             data: {
                 dateStart: $('.dateStart').val(),
@@ -155,20 +153,25 @@
                 // BUILD HEADER & FOOTER
                 // =========================
                 let columns = [
-                    { data: 'customer_name', title: 'Customer', className: 'text-left' }
+                    { data: 'nama_barang', title: 'Barang', className: 'text-left' }
                 ];
 
                 let footerHtml = '<th>Total</th>';
 
                 res.header.forEach(h => {
+
                     columns.push({
-                        data: h.barang_id,
-                        title: h.nama_barang,
+                        data: h.customer_id,
+                        title: h.customer_name,
                         className: 'text-right',
                         render: d => greatFormatRupiah(d ?? 0)
                     });
 
-                    footerHtml += `<th class="text-right">${greatFormatRupiah(res.footer.per_barang[h.barang_id] ?? 0)}</th>`;
+                    footerHtml += `
+                        <th class="text-right">
+                            ${greatFormatRupiah(res.footer.per_customer[h.customer_id] ?? 0)}
+                        </th>
+                    `;
                 });
 
                 columns.push({
@@ -178,7 +181,12 @@
                     render: d => greatFormatRupiah(d ?? 0)
                 });
 
-                footerHtml += `<th class="text-right">${greatFormatRupiah(res.footer.grand_total)}</th>`;
+                footerHtml += `
+                    <th class="text-right">
+                        ${greatFormatRupiah(res.footer.grand_total)}
+                    </th>
+                `;
+
                 $('#pivotTable tfoot tr').html(footerHtml);
 
                 // =========================
@@ -191,21 +199,15 @@
                     searching: false,
                     pageLength: 25,
                     ajax: {
-                        url: "<?= base_url('laporan-sales/customers-sales-by-items/all') ?>",
+                        url: "<?= base_url('laporan-sales/items-sales-by-customers/all') ?>",
                         data: d => {
                             d.dateStart = $('.dateStart').val();
                             d.dateEnd   = $('.dateEnd').val();
                             d.filter    = $('.filter_customer').val();
                         }
                     },
-                    columns: columns,
-                    initComplete: function() {
-                        stopLoading(); // <--- SELESAI LOADING
-                    }
+                    columns: columns
                 });
-            },
-            error: function() {
-                stopLoading(); // <--- JIKA AJAX HEADER GAGAL, STOP LOADING
             }
         });
     }
@@ -231,7 +233,6 @@
 
         $('.dateStart, .dateEnd, .filter_customer').on('change', reloadPivot);
     });
-
     const convertDateFormat = function(dateString) {
         // Memisahkan tanggal, bulan, dan tahun dari string
         var dateParts = dateString.split("/");
@@ -241,7 +242,6 @@
 
         return formattedDate;
     }
-
     const printPDF = function(url) {
         var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "all";
         var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
@@ -250,7 +250,6 @@
         // console.log(url2);
         window.open(url2, "_blank");
     }
-
     const printExcel = function(url) {
         var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "all";
         var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";

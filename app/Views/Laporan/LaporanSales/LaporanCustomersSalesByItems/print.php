@@ -47,9 +47,9 @@
         <tr>
             <th style="width:200px">Customer</th>
             <?php foreach ($header as $h): ?>
-                <th><?= $h['nama_barang'] ?></th>
+                <th class="text-right"><?= $h['nama_barang'] ?></th>
             <?php endforeach; ?>
-            <th>Total</th>
+            <th class="text-right">Total</th>
         </tr>
     </thead>
 
@@ -59,14 +59,10 @@
                 <td class="text-left"><?= $row['customer_name'] ?></td>
 
                 <?php foreach ($header as $h): ?>
-                    <td class="text-right">
-                        <?= number_format($row['items'][$h['barang_id']] ?? 0, 0) ?>
-                    </td>
+                    <td class="text-right"><?= number_format($row['items'][$h['barang_id']] ?? 0, 0) ?></td>
                 <?php endforeach; ?>
 
-                <td class="text-right">
-                    <?= number_format($row['total'], 0) ?>
-                </td>
+                <td class="text-right"><?= number_format($row['total'], 0) ?></td>
             </tr>
         <?php endforeach; ?>
     </tbody>
@@ -76,14 +72,10 @@
             <td class="text-center">TOTAL</td>
 
             <?php foreach ($header as $h): ?>
-                <td class="text-right">
-                    <?= number_format($footer['per_barang'][$h['barang_id']] ?? 0, 0) ?>
-                </td>
+                <td class="text-right"><?= number_format($footer['per_barang'][$h['barang_id']] ?? 0, 0) ?></td>
             <?php endforeach; ?>
 
-            <td class="text-right">
-                <?= number_format($footer['grand_total'], 0) ?>
-            </td>
+            <td class="text-right"><?= number_format($footer['grand_total'], 0) ?></td>
         </tr>
     </tfoot>
 </table>
