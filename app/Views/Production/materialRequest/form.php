@@ -249,7 +249,7 @@
 
                         <div class="col-md-4 mb-3">
                             <div class="input-group input-group-password">
-                                <input autocomplete="one-time-code" class="form-control input-picker dateStartRequest" id="dateStartRequest" name="dateStartRequest" placeholder="Filter Tanggal Awal Barang (Opsional)">
+                                <input autocomplete="one-time-code" class="form-control input-picker dateStartRequest" id="dateStartRequest" name="dateStartRequest" placeholder="Filter Tanggal Awal Barang (Opsional)" onchange="changeDate()">
                                 <div class="input-group-prepend group-prepend-password align-items-center">
                                     <i style="cursor: pointer; z-index: 99; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
                                 </div>
@@ -257,7 +257,7 @@
                         </div>
                         <div class="col-md-4 mb-3">
                             <div class="input-group input-group-password">
-                                <input autocomplete="one-time-code" class="form-control input-picker dateEndRequest" id="dateEndRequest" name="dateEndRequest" placeholder="Filter Tanggal Akhir Barang (Opsional)">
+                                <input autocomplete="one-time-code" class="form-control input-picker dateEndRequest" id="dateEndRequest" name="dateEndRequest" placeholder="Filter Tanggal Akhir Barang (Opsional)" onchange="changeDate()">
                                 <div class="input-group-prepend group-prepend-password align-items-center">
                                     <i style="cursor: pointer; z-index: 99; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                                 </div>
@@ -2901,6 +2901,17 @@
         } else {
             $(".barang_jadi").val("");
             $(".standart_production").val("");
+        }
+    }
+
+    function changeDate(){
+        console.log('change date');
+        let dateStartRequest = $(".dateStartRequest").val();
+        let dateEndRequest = $(".dateEndRequest").val();
+        let spesifikasiId = $(".spesifikasi_id option:selected").val();
+        if (dateStartRequest && dateEndRequest && spesifikasiId) {
+            console.log('run trigger change date');
+            getListDokumenPabeanBahanBaku();
         }
     }
 </script>
