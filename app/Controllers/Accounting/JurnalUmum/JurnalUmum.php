@@ -2411,7 +2411,7 @@ class JurnalUmum extends BaseController
                 $id_transaksi_jurnal = $this->transaksiJurnalModel->insertTransaksiJurnal($resultTransaksiJurnal);
 
                 foreach ($detailPembayaran as $detail) {
-                    $nominal = floatval(str_replace([',', '.'], '', $detail['jumlah']));
+                    $nominal = floatval($detail['jumlah']);
                     $tanggal = date('Y-m-d', strtotime(str_replace('/', '-', $detail['tanggal_pembayaran'])));
 
                     // 2. Buat jurnal umum: kredit akun kas, debit akun selisih
