@@ -108,6 +108,7 @@ class MaterialRequestPenolong extends BaseController
             ->where('work_orders.deletedAt', null)
             ->where('work_order_details.deletedAt', null)
             ->groupBy('work_order_details.work_order_id')
+            ->orderBy('work_orders.id', 'DESC')
             ->find();
         $dataTipeBarang = $this->metaDataModel
             ->where('deletedAt', null)
@@ -140,7 +141,7 @@ class MaterialRequestPenolong extends BaseController
             ->select('work_orders.*, GROUP_CONCAT(work_order_details.nama_barang SEPARATOR \', \') AS nama_barang')
             ->join('work_order_details', 'work_order_details.work_order_id = work_orders.id', 'left')
             ->where('company_id', $this->this_company_id)
-            ->where('work_orders.is_posted', "0")
+            // ->where('work_orders.is_posted', "0")
             ->where('work_orders.deletedAt', null)
             ->where('work_order_details.deletedAt', null)
             ->groupBy('work_order_details.work_order_id')
@@ -434,9 +435,8 @@ class MaterialRequestPenolong extends BaseController
                 $no = $reqNo;
             }
 
-            $kodeProduksi = $this->request->getVar("kode_produksi");
             $dataMaterial = [
-                'work_order_id' => $kodeProduksi !== null ? (is_array($kodeProduksi) ? implode(",", $kodeProduksi) : $kodeProduksi) : null,
+                'work_order_id' => implode(",", $this->request->getVar("kode_produksi")),
                 'company_id' => $this->this_company_id,
                 'divisi_id' => $this->request->getVar("department_id"),
                 'warehouse_id' => $this->request->getVar("warehouse_id"),
@@ -447,11 +447,11 @@ class MaterialRequestPenolong extends BaseController
                 'createdBy' => session()->get("login")->user_id,
             ];
 
-            $id = $this->materialRequestModel->insert($dataMaterial);
             $mr_detail = json_decode($this->request->getVar("listMaterial"));
 
-            // var_dump($mr_detail);
+            // var_dump($mr_detail, $dataMaterial);
             // exit;
+            $id = $this->materialRequestModel->insert($dataMaterial);
 
             foreach ($mr_detail as $item) {
                 $stockId = ($item->stock_id);
@@ -486,6 +486,7 @@ class MaterialRequestPenolong extends BaseController
                     'harga_bulanan' => (float)$item->harga_bulanan,
                     'kondisi_barang' => 'request',
                     'keterangan' => $item->keterangan ?? null,
+                    'note' => $item->note ?? null,
                 ];
 
                 // Handle vendor items differently if needed
@@ -627,7 +628,7 @@ class MaterialRequestPenolong extends BaseController
             }
 
             $dataMaterial = [
-                'work_order_id' => $this->request->getVar("kode_produksi"),
+                'work_order_id' => implode(",", $this->request->getVar("kode_produksi")),
                 "production_date" => $this->request->getVar("date_production") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_production")))) : "",
                 "request_date" => $this->request->getVar("date_request") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_request")))) : "",
                 "req_no" => $no,
@@ -672,6 +673,7 @@ class MaterialRequestPenolong extends BaseController
                         'harga_bulanan' => (float)$item->harga_bulanan,
                         'kondisi_barang' => 'request',
                         'keterangan' => $item->keterangan ?? null,
+                        'note' => $item->note ?? null,
                     ];
 
                     // Handle vendor items differently if needed
@@ -723,6 +725,7 @@ class MaterialRequestPenolong extends BaseController
                             'harga_bulanan' => (float)$item->harga_bulanan,
                             'kondisi_barang' => 'request',
                             'keterangan' => $item->keterangan,
+                            'note' => $item->note ?? null,
                         ];
                         $this->materialRequestDetailsModel->insert($dataMaterialDetail);
                     }

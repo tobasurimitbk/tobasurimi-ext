@@ -1,5 +1,23 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
+<style>
+    .kode_produksi+.select2-container--bootstrap-5 .select2-selection__choice {
+        font-size: 13px !important;
+    }
+
+    .dataTables_length {
+        display: block !important;
+    }
+
+    .custom-file,
+    .custom-file-label,
+    .custom-select,
+    .custom-file-label:after,
+    .form-control[type='color'],
+    select.form-control:not([size]):not([multiple]) {
+        width: calc(3.25rem + 5px) !important;
+    }
+</style>
 
 <!-- Begin Page Content -->
 <section class="section">
@@ -44,7 +62,7 @@
     </div>
     <div class="card">
         <div class="card-body">
-            <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
+            <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
                 <input autocomplete="one-time-code" type="hidden" value="<?= !empty($ids) ? $ids : ""; ?>" class="id" name="id" id="id" />
                 <?= csrf_field() ?>
                 <div class="row mt-3">
@@ -55,16 +73,21 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <?php if (isset($dataMaterialRequestswithwo)) { ?>
-                                <input value="<?= ($dataMaterialRequestswithwo) ? $dataMaterialRequestswithwo->wo_no : "" ?>" autocomplete="one-time-code" type="text" class="form-control kode_produksi_detail" name="kode_produksi_detail" id="kode_produksi_detail" placeholder="Kode Produksi" readonly>
-                            <?php } else { ?>
-                                <select class="form-select kode_produksi" name="kode_produksi" id="kode_produksi" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                    <?php foreach ($dataWorkOrder ?? [] as $dataWO) : ?>
-                                        <option value="<?= $dataWO->id ?>" data-nama-barang="<?= $dataWO->nama_barang ?>" data-standart-production="<?= $dataWO->standart_production ?>"><?= $dataWO->wo_no ?> - <?= $dataWO->nama_barang ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            <?php } ?>
+                            <select class="form-select kode_produksi" name="kode_produksi[]" id="kode_produksi[]" aria-label="Floating label select example" multiple>
+                                <option value=""></option>
+                                <?php
+                                $selectedWO = explode(",", $dataMaterialRequests->work_order_id ?? "");
+                                foreach ($dataWorkOrder ?? [] as $dataWO) :
+                                ?>
+                                    <option
+                                        value="<?= $dataWO->id ?>"
+                                        data-nama-barang="<?= $dataWO->nama_barang ?>"
+                                        data-standart-production="<?= $dataWO->standart_production ?>"
+                                        <?= (in_array($dataWO->id, $selectedWO ?? [])) ? 'selected' : '' ?>>
+                                        <?= $dataWO->wo_no ?> - <?= $dataWO->nama_barang ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
                             <label for="floatingInput">Kode Produksi</label>
                         </div>
                     </div>
@@ -274,6 +297,7 @@
                                 <th style="text-align: center;">Satuan</th>
                                 <th style="text-align: center;">Qty Awal</th>
                                 <th style="text-align: center;">Qty Direquest</th>
+                                <th style="text-align: center;">Note Request</th>
                                 <th style="text-align: center;">Action</th>
                             </tr>
                         </thead>
@@ -327,7 +351,8 @@
                 type_barang: '<?= $materialRequestDetails->barang_type ?>',
                 type_barang_text: '<?= $materialRequestDetails->barang_type_text ?>',
                 warehouseID: '<?= $materialRequestDetails->warehouse_id ?>',
-                warehouseText: '<?= $materialRequestDetails->warehouse_text ?>'
+                warehouseText: '<?= $materialRequestDetails->warehouse_text ?>',
+                note: '<?= $materialRequestDetails->note ?>',
             });
         <?php endforeach; ?>
         // console.log(listStockSelectedBahan);
@@ -473,9 +498,9 @@
 
         // Kode Produksi
         $('.kode_produksi').select2({
-            placeholder: "Pilih kode Produksi",
+            placeholder: "",
             theme: "bootstrap-5",
-            allowClear: true
+            // allowClear: true
         });
 
         //CSS SELECT2 FLOATING LABEL
@@ -1011,8 +1036,8 @@
             } else {
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                    <div class="form-check">
-                        <input  data-id="${v.id}" data-stok_total="${v.stok_total}" autocomplete="one-time-code" class="form-check-input child" type="checkbox">
+                    <div class="form-check" style="margin-top: -12px; padding-left: 0px;">
+                        <input  data-id="${v.id}" data-stok_total="${v.stok_total}" autocomplete="one-time-code" class="form-check-input child" type="checkbox" style="width:30px; height:30px;">
                     </div>
                 `
                 ));
@@ -1216,7 +1241,12 @@
             ));
             newRow.append($('<td style="text-align: center;">').html(
                 `
-                <button <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "disabled" : ""; ?> type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahan(${v.id}, ${v.id_material_request_detail})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control note-bahan-request" autocomplete="one-time-code" data-id="${v.id}" data-index="${i}" class="form-control" type="text" value="${v.note ?? ""}">
+            `
+            ));
+            newRow.append($('<td style="text-align: center;">').html(
+                `
+                <button <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "disabled" : ""; ?> type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahan('${v.id}', '${v.id_material_request_detail}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
             `
             ));
             table.find('tbody').append(newRow);
@@ -1260,6 +1290,15 @@
             listStockSelectedBahan[index].qty2 = input_user;
             updateTotalQtyRequest()
         });
+
+        $('.note-bahan-request').on('input change', function() {
+            var index = $(this).data('index'); // Dapatkan indeks item dari atribut data-index
+            var stok_max = $(this).data('stok_total');
+            var input_user = $(this).val();
+
+            listStockSelectedBahan[index].note = input_user;
+            updateTotalQtyRequest()
+        });
     }
 
     function updateTotalQtyRequest() {
@@ -1279,7 +1318,9 @@
     }
 
     function deleteDetailBahan(id, iddetail) {
-        if (id) {
+        console.log(id, iddetail);
+        
+        if (id != undefined || id != '' || id != 'undefined') {
             var indexToRemove = -1;
             for (var i = 0; i < listStockSelectedBahan.length; i++) {
                 if (listStockSelectedBahan[i].id == id) {
@@ -1292,7 +1333,7 @@
                 drawTableSelectedItemBahan(listStockSelectedBahan);
             }
         }
-        if (iddetail) {
+        if (iddetail != undefined || iddetail != '' || iddetail != 'undefined') {
             console.log(iddetail);
             Swal.fire({
                 icon: 'question',
