@@ -57,7 +57,7 @@ class ItemsSalesByCustomers extends BaseController
             'dateEnd' => $this->request->getGet('dateEnd')
                 ? date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getGet('dateEnd'))))
                 : null,
-            'filter_customer' => $this->request->getGet('filter') ?: null
+            'filter_barang' => $this->request->getGet('filter') ?: null
         ];
 
         // =============================
@@ -186,7 +186,7 @@ class ItemsSalesByCustomers extends BaseController
         $addCondition = [
             'dateStart' => $tglAwal ? date('Y-m-d', strtotime(str_replace('/', '-', $tglAwal))) : null,
             'dateEnd'   => $tglAkhir ? date('Y-m-d', strtotime(str_replace('/', '-', $tglAkhir))) : null,
-            'filter_customer' => $filter === 'all' ? null : $filter
+            'filter_barang' => $filter === 'all' ? null : $filter
         ];
 
         // =============================
@@ -292,7 +292,7 @@ class ItemsSalesByCustomers extends BaseController
         $addCondition = [
             'dateStart' => $tglAwal ? date('Y-m-d', strtotime(str_replace('/', '-', $tglAwal))) : null,
             'dateEnd'   => $tglAkhir ? date('Y-m-d', strtotime(str_replace('/', '-', $tglAkhir))) : null,
-            'filter_customer' => $filter === 'all' ? null : $filter
+            'filter_barang' => $filter === 'all' ? null : $filter
         ];
 
         // =============================
