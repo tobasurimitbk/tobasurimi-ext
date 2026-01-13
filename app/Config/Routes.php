@@ -1427,6 +1427,7 @@ $routes->get('/stock-list/export-kartu-stock-masuk', 'Inventori\StokList::export
 $routes->get('/stock-list/export-kartu-stock-keluar', 'Inventori\StokList::exportKartuStockKeluar', ['filter' => 'Auth']);
 $routes->get('/stock-list/all-kartu-stock-saldo-akhir', 'Inventori\StokList::allDetailSaldoAkhir', ['filter' => 'Auth']);
 $routes->get('/stock-list/export-kartu-stock-saldo-akhir', 'Inventori\StokList::exportDetailSaldo', ['filter' => 'Auth']);
+$routes->get('/stock-list/all-stock-list', 'Inventori\StokAdjusment::allStockList', ['filter' => 'Auth']);
 
 // STOK ADJUSMENT
 $routes->get('/stock-adjusment', 'Inventori\StokAdjusment::index', ['filter' => 'Auth']);

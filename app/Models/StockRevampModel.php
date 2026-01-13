@@ -1060,6 +1060,7 @@ class StockRevampModel extends Model
                         CONCAT(barang_master.barang_name, ' ',barang_master_spesifikasi.spesifikasi) LIKE '%{$search}%'
                         OR barang_master.kode_barang LIKE '%{$search}%'
                         OR proses_rebus.no_rebus LIKE '%{$search}%'
+                        OR suppliers.name LIKE '%{$search}%'
                     )
             ";
             $searchJasaVendor = "
@@ -1068,6 +1069,7 @@ class StockRevampModel extends Model
                         CONCAT(barang_master.barang_name, ' ',barang_master_spesifikasi.spesifikasi) LIKE '%{$search}%'
                         OR barang_master.kode_barang LIKE '%{$search}%'
                         OR jasa_vendor_in.no_penerimaan_surat_jalan LIKE '%{$search}%'
+                        OR vendors.name LIKE '%{$search}%'
                     )
             ";
             $searchHasilProduksi = "

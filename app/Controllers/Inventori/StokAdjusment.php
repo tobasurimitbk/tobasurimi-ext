@@ -260,6 +260,28 @@ class StokAdjusment extends BaseController
             $condition['dateEnd']
         );
 
+        // SUM TOTAL STOK
+        if (empty($condition['search']) && !empty($condition['spesifikasi_id'])) {
+            // jika ada filter search & spesifikasi_id ga kosong
+            $dataTotal =  $this->stockRevampModel->getStockListAll(
+                $condition,
+                $orderColumnIndex,
+                $orderDir,
+                100000000,
+                0,
+                false
+            );
+        } else {
+            // jika tidak ada
+            $dataTotal = $data;
+        }
+
+        $totalStock = 0;
+        foreach ($dataTotal['data'] as $d) {
+            $totalStock += (float)$d['qty_diterima'];
+        }
+
+
         $dataResult = array();
         $no = $start + 1;
         foreach ($data['data'] as $d) {
@@ -307,6 +329,7 @@ class StokAdjusment extends BaseController
             'draw' => intval($draw),
             'recordsTotal' => intval($data['totalData'] ?? 0),
             'recordsFiltered' => intval($data['totalFilteredData'] ?? 0),
+            'footerTotals' => $totalStock,
             'data' => $dataResult,
         ]);
     }

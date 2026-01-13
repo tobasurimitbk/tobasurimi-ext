@@ -63,33 +63,18 @@
                 </div>
             </div>
             <div class="row justify-content-end">
-                <div class="col-sm-3 mb-2">
-                    <div class="input-group">
-                        <div class="form-floating" style="height: 50px;">
-                            <input value="01/09/2025" placeholder="" class="form-control dateStart" id="dateStart" name="dateStart" />
-                            <label style="z-index: 1;" style="z-index: 1;">Tgl Awal Masuk</label>
-                        </div>
-                        <div class="input-group-append" style="height:50px;">
-                            <button disabled class="btn btn-secondary" type="button">
-                                <i class="fas fa-calendar-alt"></i>
-                            </button>
-                        </div>
+                <div class="col-md-4 mb-3">
+                    <div class="form-floating">
+                        <select class="form-select sumber_barang" id="sumber_barang" name="sumber_barang">
+                            <option value=""></option>
+                            <?php foreach ($sumberBarang as $s) : ?>
+                                <option <?= $s == "PO LOKAL BAKU" ? "selected" : "" ?> value="<?= $s; ?>"><?= $s; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label style="z-index: 1;">Sumber Barang</label>
                     </div>
                 </div>
-                <div class="col-sm-3 mb-2">
-                    <div class="input-group">
-                        <div class="form-floating" style="height: 50px;">
-                            <input value="<?= date('d/m/Y') ?>" placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" />
-                            <label style="z-index: 1;" style="z-index: 1;">Tgl Akhir Masuk</label>
-                        </div>
-                        <div class="input-group-append" style="height:50px;">
-                            <button disabled class="btn btn-secondary" type="button">
-                                <i class="fas fa-calendar-alt"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-2">
+                <div class="col-md-4 mb-3">
                     <div class="form-floating" style="height: 50px;">
                         <input placeholder="Cari Data" class="form-control search" id="search" name="search" />
                         <label style="z-index: 1;" style="z-index: 1;">Cari Data</label>
@@ -98,30 +83,26 @@
             </div>
             <div class="row">
                 <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-inventori" id="dataTable" width="100%" cellspacing="0">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable stok-dokumen-supplier-table" id="dataTable_supplier" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
                                 <th>No</th>
-                                <th>No Spp</th>
-                                <th>Sumber</th>
                                 <th>Supplier / Vendor</th>
-                                <th>Tgl Masuk</th>
-                                <th>Ref No</th>
+                                <th>Kode Barang</th>
+                                <th>Barang</th>
+                                <th>Spesifikasi</th>
                                 <th>Doc</th>
+                                <th>No Po</th>
+                                <th>Ref No</th>
+                                <th>Tgl Po</th>
+                                <th>No Daftar</th>
+                                <th>No Aju</th>
                                 <th>Qty</th>
-                                <th>Satuan</th>
-                                <th>Keterangan</th>
+                                <th>Unit</th>
                             </tr>
                         </thead>
                         <tbody class="body-detail-table" id="body-detail-table">
                         </tbody>
-                        <tfoot>
-                            <tr>
-                                <th colspan="7" class="text-right">GRAND TOTAL</th>
-                                <th class="text-left total_stock" id="total_stock"></th>
-                                <th colspan="2"></th>
-                            </tr>
-                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -131,15 +112,19 @@
 </section>
 
 <script>
+    let sort = "stock_revamp_detail.id";
+    let sortType = "desc";
+
+
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
 
-    var table = $('.table-inventori').DataTable({
+    const table = $('.dataTable').DataTable({
         processing: true,
         serverSide: true,
         ordering: true,
         order: [
-            [0, 'desc']
+            [4, 'desc']
         ],
         fixedHeader: true,
         lengthMenu: [
@@ -148,16 +133,14 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url('stock-list/all-stock-list'); ?>",
-            type: "GET",
+            url: "<?= base_url("stock-list/all-stock-detail"); ?>",
+            dataSrc: "data",
             data: function(data) {
-                data.spesifikasi_id = "<?= $stock['spesifikasi_id'] ?>";
-                data.divisi_id = "<?= $stock['divisi_id'] ?>";
-                data.warehouse_id = "<?= $stock['warehouse_id'] ?>";
-                data.dateStart = $("#dateStart").val();
-                data.dateEnd = $("#dateEnd").val();
-                data.type_barang = "<?= $stock['type_barang'] ?>";
-                data.search = $("#search").val();
+                data.search = $(".search").val();
+                data.id = "<?= encrypt($stock['id']) ?>";
+                data.sumber_barang = $("#sumber_barang option:selected").val();
+                data.sort = sort;
+                data.sortType = sortType;
             },
 
         },
@@ -174,28 +157,43 @@
                 orderable: false
             },
             {
-                data: "spp_no",
-                className: "text-left"
-            },
-            {
-                data: "reference_type",
-                className: "text-left"
-            },
-
-            {
                 data: "supplier_name",
                 className: "text-left"
             },
             {
-                data: "lpb_date",
+                data: "kode_barang",
                 className: "text-left"
             },
             {
-                data: "reference_no",
+                data: "barang_name",
                 className: "text-left"
             },
             {
-                data: "bc_detail",
+                data: "spesifikasi",
+                className: "text-left",
+            },
+            {
+                data: "type_bc",
+                className: "text-left"
+            },
+            {
+                data: "po_no",
+                className: "text-left"
+            },
+            {
+                data: "ref_no",
+                className: "text-left"
+            },
+            {
+                data: "po_date",
+                className: "text-left"
+            },
+            {
+                data: "no_daftar",
+                className: "text-left"
+            },
+            {
+                data: "no_aju",
                 className: "text-left"
             },
             {
@@ -208,11 +206,6 @@
             {
                 data: "kode_satuan",
                 className: "text-left"
-            },
-            {
-                data: "keterangan",
-                className: "text-left",
-                orderable: false
             },
         ],
         "drawCallback": function(settings) {
@@ -232,62 +225,28 @@
                 previous: '<i class="fa fa-angle-left"></i>',
                 next: '<i class="fa fa-angle-right"></i>'
             }
-        },
-        footerCallback: function(row, data, start, end, display) {
-            const api = this.api();
-            const total = api.ajax.json().footerTotals || 0;
-
-            if (total) {
-                $('.total_stock').html(greatFormatRupiah(total.toFixed(2)));
-            } else {
-                $('.total_stock').html(greatFormatRupiah(0));
-
-            }
-        },
-    });
-
-    $('.table-inventori').on('preXhr.dt', function(e, settings, data) {
-        if (data.order[0].column === 0 || data.order[0].column === 4) {
-            data.order[0].column = 13;
-        }
-        if (data.order[0].column === 1) {
-            data.order[0].column = 4;
-        }
-        if (data.order[0].column === 2) {
-            data.order[0].column = 5;
-        }
-        if (data.order[0].column === 3) {
-            data.order[0].column = 2;
-        }
-        if (data.order[0].column === 5) {
-            data.order[0].column = 14;
-        }
-        if (data.order[0].column === 6) {
-            data.order[0].column = 10;
-        }
-        if (data.order[0].column === 7) {
-            data.order[0].column = 15;
-        }
-        if (data.order[0].column === 8) {
-            data.order[0].column = 16;
         }
     });
 
-    $("#dateStart,#dateEnd").datepicker({
-        todayHighlight: true,
-        format: "dd/mm/yyyy",
-        orientation: "bottom auto",
-        autoclose: true
-    });
 
-    $('#dateStart,#dateEnd').change(function(e) {
-        e.preventDefault();
-        table.ajax.reload();
+    $('#sumber_barang').select2({
+        placeholder: "Pilih Sumber Barang",
+        theme: "bootstrap-5",
+    }).change(function() {
+        table.ajax.reload()
     });
 
     $('#search').keyup(function(e) {
         e.preventDefault();
         table.ajax.reload();
     });
+
+    $("#sumber_barang")
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
 </script>
 <?= $this->endSection(); ?>
