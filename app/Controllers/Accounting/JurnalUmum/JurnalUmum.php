@@ -2375,8 +2375,9 @@ class JurnalUmum extends BaseController
                     ->findAll();
 
                 $totalNominal = array_reduce($detailPembayaran, function ($carry, $item) {
-                    return $carry + floatval(str_replace([',', '.'], '', $item['jumlah']));
+                    return $carry + floatval($item['jumlah']);
                 }, 0);
+
 
                 $isFirstTransaction = true;
 
