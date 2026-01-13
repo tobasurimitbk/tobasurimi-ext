@@ -132,6 +132,7 @@ class JurnalUmum extends BaseController
             ->select("
                 transaksi_jurnal.id as id_transaksi,
                 transaksi_jurnal.no_bukti,
+                transaksi_jurnal.no_transaksi,
                 jurnal_umum.tanggal_jurnal,
                 sub_akuns.no_sub,
                 sub_akuns.nama_sub,
@@ -183,7 +184,7 @@ class JurnalUmum extends BaseController
         foreach ($data as $row) {
 
             // IDENTIKAN KEY PEMBAGI GROUP
-            $currentGroup = $row->no_bukti . "-" . $row->keterangan;
+            $currentGroup = $row->no_transaksi;
 
             if ($lastGroup !== $currentGroup) {
                 // HEADER ROW
@@ -191,7 +192,7 @@ class JurnalUmum extends BaseController
                     "is_header"     => true,
                     "tanggal_jurnal"=> date('d/m/Y', strtotime($row->tanggal_jurnal)),
                     "nama_divisi"   => $row->nama_divisi,
-                    "desc"          => $row->no_bukti . " - " . $row->keterangan,
+                    "desc"          => $row->no_transaksi . " - " . $row->keterangan,
                     "reference"     => "",
                     "supplier"      => "",
                     "currency"      => "",
