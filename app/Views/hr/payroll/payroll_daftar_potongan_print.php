@@ -10,13 +10,25 @@
             height: 100%;
             font-family: 'Times New Roman', Times, serif;
             letter-spacing: 1px;
-            font-size: 8;
+            font-size: 7;
         }
 
         @page {
-            size: 8.5in 15in landscape;
-            margin-top: 100px;
+            margin: 100px 10px 10px 10px;
         }
+
+        thead {
+            display: table-header-group;
+        }
+
+        tfoot {
+            display: table-footer-group;
+        }
+
+        tr {
+            page-break-inside: avoid;
+        }
+
 
         h4 {
             font-weight: normal;
@@ -59,7 +71,7 @@
 </head>
 
 <body>
-    <div class="header">
+    <div class="header" style="margin-left:50px;">
         <table width="100%" style="line-height: 0.7;">
             <tr align="left">
                 <td>Hal : <span class="page-number"></span></td>
@@ -89,33 +101,34 @@
     <div class="content">
         <table width="100%" border="1" id="dashed-border-table" style="margin-top: 30px;">
             <?php foreach ($payrollData['res'] as $payroll) : ?>
-                <tr>
-                    <td colspan="19" style="font-weight: bold; text-align:left;">
-                        BAGIAN : <?= $payroll['bagian'] ?>
-                    </td>
-                </tr>
-                <tr>
-                    <td>No</td>
-                    <td>Kode</td>
-                    <td>Kode Kop</td>
-                    <td>Nama Karyawan</td>
-                    <td>Pot. Iuran Koperasi</td>
-                    <td>Pot. Stm</td>
-                    <td>Pot. BPJS</td>
-                    <td>Pot. Spm</td>
-                    <td>Pot. Tutup Mulut</td>
-                    <td>Pot. Baju Seragam</td>
-                    <td>Pot. Sepatu, Celana, Topi</td>
-                    <td>Pot. Denda</td>
-                    <td>Pot. Kartu</td>
-                    <td>Pot. Bon Koperasi</td>
-                    <td>Pot. Pinjaman Koperasi</td>
-                    <td>Pot. Pinjaman</td>
-
-                    <td>Pot. Kantin</td>
-                    <td>Pot. Pinjaman Lain-lain</td>
-                    <td>Total Potongan</td>
-                </tr>
+                <thead>
+                    <tr>
+                        <th colspan="19" style="font-weight:bold; text-align:left;">
+                            BAGIAN : <?= $payroll['bagian'] ?>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>No</th>
+                        <th>Kode</th>
+                        <th>Kode Kop</th>
+                        <th>Nama Karyawan</th>
+                        <th>Pot. Iuran Koperasi</th>
+                        <th>Pot. Stm</th>
+                        <th>Pot. BPJS</th>
+                        <th>Pot. Spm</th>
+                        <th>Pot. Tutup Mulut</th>
+                        <th>Pot. Baju Seragam</th>
+                        <th>Pot. Sepatu, Celana, Topi</th>
+                        <th>Pot. Denda</th>
+                        <th>Pot. Kartu</th>
+                        <th>Pot. Bon Koperasi</th>
+                        <th>Pot. Pinjaman Koperasi</th>
+                        <th>Pot. Pinjaman</th>
+                        <th>Pot. Kantin</th>
+                        <th>Pot. Pinjaman Lain-lain</th>
+                        <th>Total Potongan</th>
+                    </tr>
+                </thead>
                 <?php $no = 1; ?>
                 <?php foreach ($payroll['detail'] as $i => $pd) : ?>
                     <tr>

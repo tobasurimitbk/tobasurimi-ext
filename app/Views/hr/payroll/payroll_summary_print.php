@@ -14,8 +14,7 @@
         }
 
         @page {
-            size: 9.5in 11in landscape;
-            margin: 100px 25px 25px 25px;
+            margin: 100px 10px 10px 10px;
         }
 
         h4 {
