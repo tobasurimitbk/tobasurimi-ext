@@ -31,7 +31,6 @@
                 <div class="col-sm-4 mt-2">
                     <div class="form-floating">
                         <select class="form-select" name="parent_type" id="parent_type" aria-label="Floating label select example">
-                            <option value=""></option>
                             <?php foreach ($tipeBarang as $t) : ?>
                                 <option <?= $t['description'] == "bahan_baku" ? 'selected' : '' ?> value="<?= $t['description'] ?>">
                                     <?= strtoupper($t['value']); ?>
