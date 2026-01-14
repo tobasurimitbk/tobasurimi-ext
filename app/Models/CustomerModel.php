@@ -547,4 +547,72 @@ class CustomerModel extends Model
             ->findAll();
         return $resQry;
     }
+
+    public function getListAgingReceivableSummary($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'name'              => 'customers.name',
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'customers.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "
+                    customers.name,
+                    sales_order_invoice.total_invoice,
+                    SUM(sales_order_invoice.total_invoice) AS sum_total_invoice
+                ";
+
+        $customerDataQry = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->where('tipe_customer', 'LOKAL')
+            ->join('sales_order_invoice', 'sales_order_invoice.id_customer = customers.id', 'left');
+
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_customer']) {
+            $customerDataQry->groupStart();
+        }
+
+        if ($addCondition['search']) {
+            $customerDataQry
+                ->like('customers.name', $addCondition['search'])
+                ->orLike('customers.kode', $addCondition['search']);
+        }
+
+        if ($addCondition['filter_customer']) {
+            $customerDataQry->where('customers.id', $addCondition['filter_customer']);
+        }
+
+        if ($addCondition['dateStart']) {
+            $customerDataQry->where('sales_order_invoice.tanggal_faktur >=',  $addCondition['dateStart']);
+        }
+        
+        if ($addCondition['dateEnd']) {
+            $customerDataQry->where('sales_order_invoice.tanggal_faktur <=', $addCondition['dateEnd']);
+        }
+
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_customer']) {
+            $customerDataQry->groupEnd();
+        }
+
+        $totalData = $customerDataQry->countAllResults(false);
+        $totalFilteredData = $customerDataQry->countAllResults(false);
+        if ($limit && $offset) {
+            $data = $customerDataQry->orderBy($sort, $sortType)
+                ->findAll($limit, $offset);
+        } else {
+            $data = $customerDataQry->orderBy($sort, $sortType)
+                ->findAll();
+        }
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'              => $sort,
+            'sortType'          => $sortType
+        ];
+    }
 }

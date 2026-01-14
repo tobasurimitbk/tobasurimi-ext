@@ -1063,7 +1063,7 @@ class Payroll extends BaseController
         ];
 
         $dompdf->loadHtml(view('hr/payroll/payroll_daftar_upah_print', $data));
-        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
         $dompdf->stream("Daftar Upah Karyawan ", array("Attachment" => false));
 
@@ -1141,7 +1141,7 @@ class Payroll extends BaseController
         ];
 
         $dompdf->loadHtml(view('hr/payroll/payroll_summary_print', $data));
-        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
         $dompdf->stream("Sumarry Jumlah Upah dan Jam Kerja ", array("Attachment" => false));
 
@@ -1177,7 +1177,7 @@ class Payroll extends BaseController
         ];
 
         $dompdf->loadHtml(view('hr/payroll/payroll_daftar_potongan_print', $data));
-        $dompdf->setPaper('legal', 'landscape');
+        $dompdf->setPaper('A4', 'landscape');
         $dompdf->render();
         $dompdf->stream("Daftar Potongan " . $yearMonth, array("Attachment" => false));
 

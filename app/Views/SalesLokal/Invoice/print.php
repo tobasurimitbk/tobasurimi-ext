@@ -7,16 +7,16 @@
     <title>Invoice Penjualan Lokal</title>
     <style>
         body {
-            font-size: 10px;
+            font-size: 7px;
             font-family: 'DejaVu Sans Mono';
             font-weight: 500;
         }
 
         @page {
-            size: 8.27in 5.50in landscape;
+            /* size: 8.27in 5.50in landscape; */
             margin-top: 10px !important;
-            margin: 15px;
-            padding: 15px;
+            margin: 25px;
+            padding: 25px;
         }
 
         .company-name {
@@ -77,7 +77,7 @@
         .rounded-border {
             border: 0.5px solid;
             border-radius: 5px;
-            padding: 3px;
+            padding: 2px;
             /* Padding diperkecil */
         }
 
@@ -127,7 +127,7 @@
                 </div>
             </td>
             <td align="right" style="width: 40%; text-align: right;">
-                <div class="txt-bold txt-center" style="font-size: 25px;margin-bottom:2px;">Sales Invoice</div>
+                <div class="txt-bold txt-center" style="font-size: 20px;margin-bottom:2px;">SALES INVOICE</div>
                 <table class="w-100 rounded-border" style="margin-left: auto;margin-right: 0">
                     <tr>
                         <td style="border-right: 0.5px solid;border-right-style: dashed;width: 50%;">
@@ -152,7 +152,7 @@
 
                             $cleaned_string_document_no = str_replace($unwanted_characters, '', $invData->document_no);
                             ?>
-                            <div class="txt-center" style="font-size: 10px;"><?= $cleaned_string_document_no ?>&nbsp;</div>
+                            <div class="txt-center" style="font-size: 7px;"><?= $cleaned_string_document_no ?>&nbsp;</div>
                         </td>
                     </tr>
                 </table>
@@ -206,7 +206,7 @@
 
     <table class="w-100" style="border-spacing: 3px 0;border: 0.5px;">
         <tr>
-            <td style="width: 40px;" valign="top">Say : </td>
+            <td style="width: 30px;" valign="top">Say : </td>
             <td class="rounded-border" style="width: 65%;" valign="top">
                 <?= (isset($invData->status_tax) && isset($invData->status_tax)) ? terbilang($invData->total_invoice) : terbilang($invData->total_invoice) ?>
             </td>
@@ -263,7 +263,7 @@
                 <div class="rounded-border">
                     <table class="w-100 txt-bold" style="border-collapse: collapse;">
                         <tr>
-                            <td style="border-right: 0.5px solid;width: 100px;">Total Invoice</td>
+                            <td style="border-right: 0.5px solid;width: 70px;">Total Invoice</td>
                             <td class="txt-right">Rp. <?= number_format($invData->total_invoice) ?></td>
                         </tr>
                     </table>

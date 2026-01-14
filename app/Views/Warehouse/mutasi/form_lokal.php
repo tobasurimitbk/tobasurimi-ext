@@ -471,7 +471,7 @@
     var listStockInventori = [];
     var listStockSelected = [];
     $('.form-fifo').hide();
-    <?php if (!empty($mutasiDetail)) : ?>
+    <?php if (!empty($mutasi)) : ?>
         listStockSelected = <?= json_encode($mutasiDetail) ?>;
         drawTableSelectedItem(listStockSelected);
     <?php else: ?>

@@ -7,13 +7,13 @@
     <title>Surat Jalan</title>
     <style>
         body {
-            font-size: 11px;
+            font-size: 8px;
             font-family: 'DejaVu Sans Mono';
             font-weight: 500;
         }
 
         @page {
-            size: 8.27in 5.50in landscape;
+            /* size: 8.27in 5.50in landscape; */
             margin-top: 10px !important;
             margin: 25px;
             padding: 25px;
@@ -26,15 +26,16 @@
             border-radius: 7px;
             margin-bottom: 10px;
             display: inline-block;
-            min-width: 70px
+            min-width: 70px;
+            font-size: 9px;
         }
 
         .description-container {
             border: 0.5px solid;
             border-radius: 7px;
-            height: 65px;
+            height: 50px;
             margin-top: 8px;
-            width: 60%;
+            width: 70%;
             position: relative;
             padding-top: 7px;
             padding-left: 17px;
@@ -113,7 +114,7 @@
                 </div>
             </td>
             <td align="right">
-                <div class="txt-bold txt-center" style="font-size:25px;margin-bottom:3px;">SURAT JALAN</div>
+                <div class="txt-bold txt-center" style="font-size:20px;margin-bottom:3px;">SURAT JALAN</div>
                 <table class="w-100" style="border:0.5px solid;border-radius:7px;margin-left:auto;">
                     <tr>
                         <td style="border-right:0.5px dashed;width:50%;">
@@ -241,7 +242,7 @@
         </tr>
         <tr>
             <td style="width:1px;">Terbilang</td>
-            <td style="border:0.5px solid;width: 400px;">
+            <td style="border:0.5px solid;width: 300px;">
                 <div><?= terbilang($totalInv) ?></div>
             </td>
             <td class="txt-right">Total Faktur:</td>
@@ -251,13 +252,13 @@
 
     <table class="w-100">
         <tr>
-            <td style="width:375px;">
+            <td style="width:300px;">
                 <div>Catatan: </div>
                 <div>Surat Jalan ini tidak berfungsi sebagai Penagihan</div>
                 <div>Barang yang sudah diterima tidak dapat dikembalikan</div>
                 <div>Kecuali memenuhi ketentuan perjanjian BS Exp Date</div>
             </td>
-            <td style="padding-left:50px">
+            <td style="padding-left:10px">
                 <div class="description-container">
                     <label class="description-label">Description: </label>
                     <?= $sjData->note ?? '' ?>

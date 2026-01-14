@@ -127,7 +127,7 @@
 
         if (!$('.dateStart').val() || !$('.dateEnd').val()) return;
 
-        setLoading(); // <--- MULAI LOADING
+        setLoading();
 
         // Destroy lama
         if ($.fn.DataTable.isDataTable('#pivotTable')) {

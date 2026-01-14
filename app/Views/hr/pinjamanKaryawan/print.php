@@ -23,7 +23,7 @@
 
         #dashed-border-table th,
         #dashed-border-table td {
-            border: 1px dashed #000;
+            border: 1px solid #000;
             padding: 5px;
             text-align: center;
         }
@@ -81,7 +81,7 @@
 
     <table width="100%" style="margin-top: 10px;" border="1" id="dashed-border-table">
         <thead>
-            <tr align="center">
+            <tr align="center" style="font-weight: bold;">
                 <td>No</td>
                 <td>Nip</td>
                 <td>Nama Karyawan</td>

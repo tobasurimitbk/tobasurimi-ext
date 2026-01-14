@@ -788,47 +788,49 @@ class RequestStock extends BaseController
 
                         $result = $stockRevampModel->outStockRevamp($db, $dataOut);
                         if ($result) {
-                            $stockData = $stockRevampModel->find($value['stock_id']);
-                            $dataIn = [
-                                "company_id"       => $this->this_company_id,
-                                "spesifikasi_id"   => $value["barang2_id"],
-                                "barang_master_id" => $value["barang1_id"],
-                                "unit_id"          => $stockData["unit_id"],
-                                "divisi_id"        => $value["divisi_tujuan_id"],
-                                "warehouse_id"     => $value["warehouse_tujuan_id"],
-                                "no_dokumen"       => $materialRequestData["req_no"],
-                                "bc_id"            => $value['bc_id'],
-                                "type_bc"          => $value['ref_no'] == null ? "NON PABEAN" : $value['ref_no'],
-                                "qty_diterima"     => $value['qty'],
-                                "qty_bersih"       => $value['qty'],
-                                "reference_id"     => $id,
-                                "po_type"          => "LOKAL PENOLONG",
-                                "reference_type"   => "MATERIAL REQUEST PENOLONG",
-                                "status"           => "IN"
-                            ];
-
-                            $stockDetailId = $stockRevampModel->insertStockRevamp($db, $dataIn);
-                            if ($stockDetailId) {
-                                $getStockIdNew = $stockRevampDetailModel->find($stockDetailId);
-
-                                $this->materialRequestPenolongDetailsModel->update(
-                                    $value['id'],
-                                    [
-                                        'stock_tujuan_id' => $getStockIdNew['stock_id'],
-                                        'stock_detail_tujuan_id' => $stockDetailId
-                                    ]
-                                );
-                                $db->table('stock_revamp_history')->insert([
-                                    'stock_detail_asal'    => $value['stock_detail_id'],
-                                    'stock_detail_akhir'   => $stockDetailId,
-                                    'qty_bersih_asal'      => $getStockIdOld['qty_bersih'],
-                                    'qty_diterima_asal'    => $getStockIdOld['qty_diterima'],
-                                    'qty_bersih_akhir'     => $value['qty'], // hasil rumus
-                                    'qty_diterima_akhir'   => $value['qty'], // bisa disamakan kalau proporsional
-                                    'status'               => 'IN',
-                                    'createdAt'            => date('Y-m-d H:i:s'),
-                                    'updatedAt'            => date('Y-m-d H:i:s'),
-                                ]);
+                            if ($value['kondisi_barang'] == "request") {
+                                $stockData = $stockRevampModel->find($value['stock_id']);
+                                $dataIn = [
+                                    "company_id"       => $this->this_company_id,
+                                    "spesifikasi_id"   => $value["barang2_id"],
+                                    "barang_master_id" => $value["barang1_id"],
+                                    "unit_id"          => $stockData["unit_id"],
+                                    "divisi_id"        => $value["divisi_tujuan_id"],
+                                    "warehouse_id"     => $value["warehouse_tujuan_id"],
+                                    "no_dokumen"       => $materialRequestData["req_no"],
+                                    "bc_id"            => $value['bc_id'],
+                                    "type_bc"          => $value['ref_no'] == null ? "NON PABEAN" : $value['ref_no'],
+                                    "qty_diterima"     => $value['qty'],
+                                    "qty_bersih"       => $value['qty'],
+                                    "reference_id"     => $id,
+                                    "po_type"          => "LOKAL PENOLONG",
+                                    "reference_type"   => "MATERIAL REQUEST PENOLONG",
+                                    "status"           => "IN"
+                                ];
+    
+                                $stockDetailId = $stockRevampModel->insertStockRevamp($db, $dataIn);
+                                if ($stockDetailId) {
+                                    $getStockIdNew = $stockRevampDetailModel->find($stockDetailId);
+    
+                                    $this->materialRequestPenolongDetailsModel->update(
+                                        $value['id'],
+                                        [
+                                            'stock_tujuan_id' => $getStockIdNew['stock_id'],
+                                            'stock_detail_tujuan_id' => $stockDetailId
+                                        ]
+                                    );
+                                    $db->table('stock_revamp_history')->insert([
+                                        'stock_detail_asal'    => $value['stock_detail_id'],
+                                        'stock_detail_akhir'   => $stockDetailId,
+                                        'qty_bersih_asal'      => $getStockIdOld['qty_bersih'],
+                                        'qty_diterima_asal'    => $getStockIdOld['qty_diterima'],
+                                        'qty_bersih_akhir'     => $value['qty'], // hasil rumus
+                                        'qty_diterima_akhir'   => $value['qty'], // bisa disamakan kalau proporsional
+                                        'status'               => 'IN',
+                                        'createdAt'            => date('Y-m-d H:i:s'),
+                                        'updatedAt'            => date('Y-m-d H:i:s'),
+                                    ]);
+                                }
                             }
                         }
                     } else {

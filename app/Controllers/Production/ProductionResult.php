@@ -285,6 +285,33 @@ class ProductionResult extends BaseController
             }
         }
 
+        $productionResDetSelectBSST = "production_result_details.*, barang_master.barang_name AS barang_name, CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS nama_barang, barang_master.kode_barang AS kode_barang, satuans.kode_satuan";
+        $productionResDetDataBSST = $this->productionResultDetailModel->asObject()
+            ->select($productionResDetSelectBSST)
+            ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+            ->where('production_result_details.type', 'SUSUT')
+            ->where('production_result_details.production_result_id', $id)
+            ->findAll();
+        foreach ($productionResDetDataBSST as $key => &$value) {
+            if ($value->barang_type == "bahan_baku") {
+                $value->type_barang_text = "BAHAN BAKU";
+            } elseif ($value->barang_type == "bahan_penolong") {
+                $value->type_barang_text = "BAHAN PENOLONG";
+            } elseif ($value->barang_type == "bahan_jadi") {
+                $value->type_barang_text = "BARANG JADI";
+            } elseif ($value->barang_type == "bahan_scrap") {
+                $value->type_barang_text = "BARANG SCRAP";
+            } elseif ($value->barang_type == "bahan_modal") {
+                $value->type_barang_text = "BARANG MODAL";
+            } elseif ($value->barang_type == "bahan_setengah_jadi") {
+                $value->type_barang_text = "BAHAN SETENGAH JADI";
+            } else {
+                $value->type_barang_text = "Bahan Return";
+            }
+        }
+
         $barangData = $this->barangMasterModel->asObject()
             ->select('barang_master.*')
             // ->join('satuans', 'satuans.id = work_orders.id', 'left')
@@ -342,18 +369,18 @@ class ProductionResult extends BaseController
         $combinedRequestDates = implode(', ', $requestDates);
 
         $data = [
-            'data'                  => $productionResData,
-            'dataResultBarangJadi'                  => $productionResDetDataBJ,
-            'dataResultBarangScrap'                  => $productionResDetDataBS,
-            'dataResultBarangDigunakan'                  => $productionResDetDataBD,
-            'dataResultBarangReturn'                  => $productionResDetDataBR,
-            'dataWorkOrder' => $dataWorkOrder,
-            'dataWarehouse' => $dataWarehouse,
-            'dataDivisi' => $dataDivisi,
-            'tipeBarang' => $dataTipeBarang,
-            'dataMaterialRequest' => $dataMaterialRequest,
-            'dataMaterialRequestNo' => $combinedReqNos,
-            'dataMaterialRequestDate' => $combinedRequestDates,
+            'data'                          => $productionResData,
+            'dataResultBarangJadi'          => $productionResDetDataBJ,
+            'dataResultBarangScrap'         => $productionResDetDataBS,
+            'dataResultBarangDigunakan'     => $productionResDetDataBD,
+            'dataResultBarangReturn'        => $productionResDetDataBR,
+            'dataWorkOrder'                 => $dataWorkOrder,
+            'dataWarehouse'                 => $dataWarehouse,
+            'dataDivisi'                    => $dataDivisi,
+            'tipeBarang'                    => $dataTipeBarang,
+            'dataMaterialRequest'           => $dataMaterialRequest,
+            'dataMaterialRequestNo'         => $combinedReqNos,
+            'dataMaterialRequestDate'       => $combinedRequestDates,
         ];
         // var_dump($data['dataResultBarangJadi']);
         // exit;
@@ -440,9 +467,7 @@ class ProductionResult extends BaseController
             $barangDigunakanPenolong = json_decode($this->request->getVar("digunakan_penolong"));
             $barangScrap = json_decode($this->request->getVar("scrap"));
             $barangFilling = json_decode($this->request->getVar("filling"));
-
-            // var_dump($datas, $barangJadi, $barangDigunakan, $barangDigunakanPenolong, $barangScrap, $barangFilling);
-            // exit;
+            $barangSusut = json_decode($this->request->getVar("susut"));
 
             $productionResID = $this->productionResultModel->insert($datas);
 
@@ -507,39 +532,6 @@ class ProductionResult extends BaseController
                     "harga_bulanan" => (float) isset($bd->harga_bulanan) ? $bd->harga_bulanan : 0,
                 ];
                 $this->productionResultDetailModel->insert($datasbd);
-
-                // if (!$barangFilling && $qty2 != 0) {
-                //     $datasbr = [
-                //         "production_result_id" => $productionResID,
-                //         "material_request_detail_id" => $bd->material_request_detail_id,
-                //         "material_request_id" => $bd->material_request_id,
-                //         "barang1_id" => $bd->barang1_id,
-                //         "barang2_id" => $bd->barang2_id,
-                //         "warehouse_id" => $bd->warehouse_id,
-                //         "divisi_id" => $bd->divisi_id,
-                //         "bc_id" => $bd->bc_id ?? 0,
-                //         "stock_dokumen" => $bd->stock_dokumen,
-                //         "stock_date" => $bd->stock_date,
-                //         "stock_id" => $bd->stock_id ?? 0,
-                //         "stock_detail_id" => $bd->stock_detail_id ?? 0,
-                //         "no_aju" => $bd->no_aju == "-" ? "-" : $bd->no_aju,
-                //         "barang_type" => $bd->type_barang,
-                //         "type" => "RETURN",
-                //         "no_ref" => $bd->ref_no,
-                //         "qty" => $qtySisa,
-                //         "kondisi_barang" => "ditapak",
-                //         "harga_umum" => (float) isset($bd->harga_umum) ? $bd->harga_umum :  0,
-                //         "harga_harian" => (float) isset($bd->harga_harian) ? $bd->harga_harian : 0,
-                //         "harga_bulanan" => (float) isset($bd->harga_bulanan) ? $bd->harga_bulanan : 0,
-                //     ];
-                //     $this->productionResultDetailModel->insert($datasbr);
-                //     $this->accountBarangModel->insertAccountBarang(
-                //         $this->this_company_id,
-                //         $bd->divisi_id,
-                //         $bd->barang1_id,
-                //         $bd->barang2_id
-                //     );
-                // }
             }
 
             foreach ($barangDigunakanPenolong as $bdp) {
@@ -624,6 +616,7 @@ class ProductionResult extends BaseController
                     "type" => "RETURN",
                     "no_ref" => "NON PABEAN",
                     "qty" => (float) $bf->qty,
+                    "kondisi_barang" => $bf->kondisi_barang,
                     "harga_umum" => (float) isset($bf->harga_umum) ? $bf->harga_umum :  0,
                     "harga_harian" => (float) isset($bf->harga_harian) ? $bf->harga_harian : 0,
                     "harga_bulanan" => (float) isset($bf->harga_bulanan) ? $bf->harga_bulanan : 0,
@@ -636,6 +629,30 @@ class ProductionResult extends BaseController
                     decrypt($bf->barang1_id),
                     decrypt($bf->barang2_id)
                 );
+            }
+
+            foreach ($barangSusut as $bs) {
+                $datasbs = [
+                    "production_result_id" => $productionResID,
+                    "barang1_id" => decrypt($bs->barang1_id),
+                    "barang2_id" => decrypt($bs->barang2_id),
+                    "warehouse_id" => $bs->warehouse_id,
+                    "divisi_id" => $bs->divisi_id,
+                    "bc_id" => 0,
+                    "stock_dokumen" => $productionResData['pr_no'],
+                    "stock_id" => 0,
+                    "stock_detail_id" => 0,
+                    "no_aju" => "-",
+                    "barang_type" => $bs->type_barang,
+                    "type" => "SUSUT",
+                    "kondisi_barang" => "susut",
+                    "no_ref" => "NON PABEAN",
+                    "qty" => (float) $bs->qty,
+                    "harga_umum" => (float) isset($bs->harga_umum) ? $bs->harga_umum :  0,
+                    "harga_harian" => (float) isset($bs->harga_harian) ? $bs->harga_harian : 0,
+                    "harga_bulanan" => (float) isset($bs->harga_bulanan) ? $bs->harga_bulanan : 0,
+                ];
+                $this->productionResultDetailModel->insert($datasbs);
             }
 
             $data = [
@@ -687,6 +704,7 @@ class ProductionResult extends BaseController
             $barangDigunakanPenolong = json_decode($this->request->getVar("digunakan_penolong"));
             $barangScrap = json_decode($this->request->getVar("scrap"));
             $barangFilling = json_decode($this->request->getVar("filling"));
+            $barangSusut = json_decode($this->request->getVar("susut"));
 
             // var_dump($barangDigunakan);exit;
 
@@ -931,6 +949,7 @@ class ProductionResult extends BaseController
                         "type" => "RETURN",
                         "no_ref" => "NON PABEAN",
                         "qty" => (float) $bf->qty,
+                        "kondisi_barang" => $bf->kondisi_barang,
                         "harga_umum" => (float) isset($bf->harga_umum) ? $bf->harga_umum :  0,
                         "harga_harian" => (float) isset($bf->harga_harian) ? $bf->harga_harian : 0,
                         "harga_bulanan" => (float) isset($bf->harga_bulanan) ? $bf->harga_bulanan : 0,
@@ -943,6 +962,37 @@ class ProductionResult extends BaseController
                         decrypt($bf->barang1_id),
                         decrypt($bf->barang2_id)
                     );
+                }
+            }
+
+            foreach ($barangSusut as $bs) {
+                if (isset($bs->production_result_detail_id)) {
+                    $datasbs = [
+                        "qty" => (float) $bs->qty,
+                    ];
+                    $this->productionResultDetailModel->update($bs->production_result_detail_id, $datasbs);
+                } else {
+                    $datasbs = [
+                        "production_result_id" => $productionResID,
+                        "barang1_id" => decrypt($bs->barang1_id),
+                        "barang2_id" => decrypt($bs->barang2_id),
+                        "warehouse_id" => $bs->warehouse_id,
+                        "divisi_id" => $bs->divisi_id,
+                        "bc_id" => 0,
+                        "stock_dokumen" => $productionResData['pr_no'],
+                        "stock_id" => 0,
+                        "stock_detail_id" => 0,
+                        "no_aju" => "-",
+                        "barang_type" => $bs->type_barang,
+                        "type" => "SUSUT",
+                        "kondisi_barang" => "susut",
+                        "no_ref" => "NON PABEAN",
+                        "qty" => (float) $bs->qty,
+                        "harga_umum" => (float) isset($bs->harga_umum) ? $bs->harga_umum :  0,
+                        "harga_harian" => (float) isset($bs->harga_harian) ? $bs->harga_harian : 0,
+                        "harga_bulanan" => (float) isset($bs->harga_bulanan) ? $bs->harga_bulanan : 0,
+                    ];
+                    $this->productionResultDetailModel->insert($datasbs);
                 }
             }
 

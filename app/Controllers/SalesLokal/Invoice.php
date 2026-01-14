@@ -971,28 +971,32 @@ class Invoice extends BaseController
 
     public function printInvoice($id)
     {
-
         $id = decrypt($id);
-        $domPdf = new Dompdf();
 
-        $fileName = 'Invoice';
-        $soIds = [];
-
+        /* =========================
+        * DATA PERUSAHAAN
+        * ========================= */
         $companyData = $this->companyModel->asObject()
             ->find($this->this_company_id);
 
-        $invSelectQry = "sales_order_invoice.*,
-        DATE_FORMAT(sales_order_invoice.tanggal_faktur, '%d/%m/%Y') AS tanggal_faktur,
-        users.name AS seller_name,
-        customers.name AS customer_name,
-        customers.phone AS customer_phone,
-        customers.address AS customer_address,
-        sales_order_invoice.status_tax AS status_tax,
-        sales_order_invoice.termasuk_pa AS termasuk_pa,
-        sales_order.jenis_penjualan,
-        sales_order.no_po, 
-        sales_order.nama_ecommerce,
-        metadata.value as terms";
+        /* =========================
+        * DATA INVOICE
+        * ========================= */
+        $invSelectQry = "
+            sales_order_invoice.*,
+            DATE_FORMAT(sales_order_invoice.tanggal_faktur, '%d/%m/%Y') AS tanggal_faktur,
+            users.name AS seller_name,
+            customers.name AS customer_name,
+            customers.phone AS customer_phone,
+            customers.address AS customer_address,
+            sales_order_invoice.status_tax AS status_tax,
+            sales_order_invoice.termasuk_pa AS termasuk_pa,
+            sales_order.jenis_penjualan,
+            sales_order.no_po, 
+            sales_order.nama_ecommerce,
+            metadata.value AS terms
+        ";
+
         $invData = $this->SalesOrderInvoiceModel->asObject()
             ->select($invSelectQry)
             ->join('users', 'users.id = sales_order_invoice.id_user', 'left')
@@ -1002,65 +1006,103 @@ class Invoice extends BaseController
             ->join('metadata', 'metadata.id = sales_order_invoice.terms', 'left')
             ->find($id);
 
-        // if ($invData->document_type == 'pengiriman') {
-        //     $sjData = $this->SuratJalanModel->asObject()
-        //         ->find($invData->document_id);
+        if (!$invData) {
+            throw new \RuntimeException("Invoice dengan ID {$id} tidak ditemukan.");
+        }
 
-        //     $soIds = json_decode($sjData->multiple_id_so);
-        // } else {
-        //     $soIds = json_decode($invData->document_id);
-        // }
+        /* =========================
+        * DETAIL INVOICE
+        * ========================= */
+        $soSelectQry = "
+            sales_order_invoice_detail.id AS id,
+            sales_order_invoice_detail.id_barang_invoice AS id_barang,
+            barang_master_sales.kode_barang AS kode_barang,
+            barang_master_sales.barang_name AS nama_barang,
+            sales_order_invoice_detail.qty_invoice AS qty_invoice,
+            satuans.kode_satuan AS satuan,
+            sales_order_invoice_detail.discount_percentage_invoice AS disc,
+            sales_order_invoice_detail.tax_invoice AS tax,
+            sales_order_invoice_detail.amount_invoice AS amount,
+            sales_order_invoice_detail.id_sales_order,
+            sales_order_invoice_detail.harga_barang_invoice AS harga_barang
+        ";
 
-        $soSelectQry = "sales_order_invoice_detail.id AS id,
-        sales_order_invoice_detail.id_barang_invoice AS id_barang,
-        barang_master_sales.kode_barang AS kode_barang,
-          barang_master_sales.barang_name AS nama_barang,
-          sales_order_invoice_detail.qty_invoice AS qty_invoice,
-          satuans.kode_satuan AS satuan,
-          sales_order_invoice_detail.discount_percentage_invoice AS disc,
-          sales_order_invoice_detail.tax_invoice AS tax,
-          sales_order_invoice_detail.amount_invoice AS amount,
-          sales_order_invoice_detail.id_sales_order,
-          sales_order_invoice_detail.harga_barang_invoice AS harga_barang";
         $salesOrderDetailData = $this->SalesOrderInvoiceDetailModel->asObject()
             ->select($soSelectQry)
-            ->join('barang_master_sales', 'barang_master_sales.id = sales_order_invoice_detail.id_barang_invoice AND barang_master_sales.deletedAt IS NULL')
-            ->join('satuans', 'satuans.id = barang_master_sales.satuan_id', 'LEFT')
-            // ->where('qty_sekarang !=', 0)
+            ->join(
+                'barang_master_sales',
+                'barang_master_sales.id = sales_order_invoice_detail.id_barang_invoice 
+                AND barang_master_sales.deletedAt IS NULL'
+            )
+            ->join('satuans', 'satuans.id = barang_master_sales.satuan_id', 'left')
             ->where('id_sales_order_invoice', $id)
             ->orderBy('barang_master_sales.barang_name', 'ASC')
             ->findAll();
 
-        // $invTotal = $salesOrderDetailData[0]->total_harga + $salesOrderDetailData[0]->estimated_freight;
-
-        // $invData->docNo = ($invData->document_type == 'pengiriman') ? $sjData->no_surat_jalan : $salesOrderData[0]->no_sales_order;
-
+        /* =========================
+        * DATA VIEW
+        * ========================= */
         $data = [
-            'companyName'   => $companyData->company,
-            'companyAccount' => $companyData->invoice_account,
-            'invData'       => $invData,
-            'soData'        => $salesOrderDetailData,
-            // 'invTotal'      => $invTotal
+            'companyName'     => $companyData->company ?? '',
+            'companyAccount'  => $companyData->invoice_account ?? '',
+            'invData'         => $invData,
+            'soData'          => $salesOrderDetailData,
         ];
 
-        $this->SalesOrderInvoiceModel->update($id, ['counter_print' => $invData->counter_print + 1]);
+        /* =========================
+        * UPDATE COUNTER PRINT
+        * ========================= */
+        $this->SalesOrderInvoiceModel->update(
+            $id,
+            ['counter_print' => $invData->counter_print + 1]
+        );
 
-        // return view('SalesLokal/Invoice/print', $data);
+        /* =========================
+        * DOMPDF OPTION (SAMA DENGAN OF)
+        * ========================= */
+        $options = new \Dompdf\Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isRemoteEnabled', true);
+        $options->set('defaultFont', 'DejaVu Sans Mono');
+        $options->set('dpi', 72); // DOT MATRIX SCALE
+        $options->set('isFontSubsettingEnabled', true);
 
-        // load HTML content
+        $domPdf = new \Dompdf\Dompdf($options);
         $domPdf->loadHtml(view('SalesLokal/Invoice/print', $data));
 
-        // (optional) setup the paper size and orientation
-        $domPdf->setPaper('A4', 'landscape');
-        $domPdf->set_option('defaultFont', 'DejaVu Sans Mono');
+        /* === PAPER SIZE SAMA DENGAN ORDER FORM === */
+        $domPdf->setPaper([0, 0, 592, 425]);
 
-        // render html as PDF
+        /* =========================
+        * RENDER PDF
+        * ========================= */
         $domPdf->render();
 
-        // output the generated pdf
-        $domPdf->stream($fileName, array("Attachment" => false));
+        /* =========================
+        * SIMPAN KE CACHE SERVER
+        * ========================= */
+        $cacheDir = WRITEPATH . 'pdf_cache/';
+        if (!is_dir($cacheDir)) {
+            mkdir($cacheDir, 0755, true);
+        }
 
-        exit();
+        $fileNameRaw = 'Invoice_' . ($invData->no_faktur ?? 'INV');
+        $fileName = preg_replace('/[\/\\\\]+/', '-', $fileNameRaw) . '.pdf';
+        $fullPath = $cacheDir . $fileName;
+
+        file_put_contents($fullPath, $domPdf->output());
+
+        /* =========================
+        * PREVIEW PDF INLINE
+        * ========================= */
+        return response()
+            ->setHeader('Content-Type', 'application/pdf')
+            ->setHeader('Content-Disposition', 'inline; filename="'.$fileName.'"')
+            ->setHeader('Content-Length', filesize($fullPath))
+            ->setHeader('X-Content-Type-Options', 'nosniff')
+            ->setHeader('Cache-Control', 'private, max-age=0, must-revalidate')
+            ->setHeader('Pragma', 'public')
+            ->setBody(file_get_contents($fullPath));
     }
 
     private function getDocNumberList(string $documentType, $customer_id, $condition = null, array $currentDocumentIds = []): array

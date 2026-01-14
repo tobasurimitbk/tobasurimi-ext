@@ -179,6 +179,7 @@ class SalesOrderInvoiceModel extends Model
         if ($addCondition['dateStart']) {
             $salesOrderInvoiceLokal->where('sales_order_invoice.tanggal_faktur >=',  $addCondition['dateStart']);
         }
+        
         if ($addCondition['dateEnd']) {
             $salesOrderInvoiceLokal->where('sales_order_invoice.tanggal_faktur <=', $addCondition['dateEnd']);
         }
@@ -320,8 +321,8 @@ class SalesOrderInvoiceModel extends Model
             $builder->where('h.tanggal_faktur <=', $addCondition['dateEnd']);
         }
 
-        if (!empty($addCondition['filter_customer'])) {
-            $builder->where('h.id_customer', $addCondition['filter_customer']);
+        if (!empty($addCondition['filter_barang'])) {
+            $builder->where('d.id_barang_invoice', $addCondition['filter_barang']);
         }
 
         return $builder
@@ -352,8 +353,8 @@ class SalesOrderInvoiceModel extends Model
             $builder->where('h.tanggal_faktur <=', $addCondition['dateEnd']);
         }
 
-        if (!empty($addCondition['filter_customer'])) {
-            $builder->where('h.id_customer', $addCondition['filter_customer']);
+        if (!empty($addCondition['filter_barang'])) {
+            $builder->where('d.id_barang_invoice', $addCondition['filter_barang']);
         }
 
         return $builder

@@ -51,15 +51,17 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-                                <th>Tanggal Dibuat</th>
-                                <th onclick="changeSort('divisi')" class="sort">Departemen</th>
+                                <th onclick="changeSort('poDate')" class="sort">Tgl</th>
+                                <th onclick="changeSort('divisi')" class="sort">Dept</th>
+                                <th onclick="changeSort('warehouse_name')" class="sort">Warehouse</th>
                                 <th onclick="changeSort('poNo')" class="sort">No. PO</th>
                                 <th onclick="changeSort('supplier')" class="sort">Supplier</th>
                                 <th onclick="changeSort('total_before_pph')" class="sort">Total Sebelum PPH</th>
                                 <th onclick="changeSort('total_after_pph')" class="sort">Total Setelah PPH</th>
                                 <th>Item Order</th>
                                 <th>Qty</th>
-                                <th onclick="changeSort('statusPenerimaan')" class="sort">Status</th>
+                                <th onclick="changeSort('bc_type')" class="sort">Doc</th>
+                                <!-- <th onclick="changeSort('statusPenerimaan')" class="sort">Status</th> -->
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -193,52 +195,58 @@
             },
             {
                 data: "po_date",
-                className: "text-center",
-                sortable: false,
-                orderable: false,
+                className: "text-left",
             },
             {
                 data: "divisi",
-                className: "text-center"
+                className: "text-left"
+            },
+            {
+                data: "warehouse_name",
+                className: "text-left"
             },
             {
                 data: "po_no",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "supplierName",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "total_before_pph",
-                className: "text-center",
+                className: "text-left",
                 // render: function(param) {
                 //     return greatFormatRupiah(param);
                 // }
             },
             {
                 data: "total_after_pph",
-                className: "text-center",
+                className: "text-left",
                 // render: function(param) {
                 //     return greatFormatRupiah(param);
                 // }
             },
             {
                 data: "itemCount",
-                className: "text-center",
+                className: "text-left",
                 searchable: false,
                 sortable: false,
             },
             {
                 data: "qtyTotal",
-                className: "text-center",
+                className: "text-left",
                 searchable: false,
                 sortable: false,
             },
             {
-                data: "status_penerimaan",
-                className: "text-center"
+                data: "bc_name",
+                className: "text-left"
             },
+            // {
+            //     data: "status_penerimaan",
+            //     className: "text-left"
+            // },
             {
                 data: "id",
                 className: "text-center actions",

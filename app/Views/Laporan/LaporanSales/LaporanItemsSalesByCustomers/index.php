@@ -59,7 +59,7 @@
                         </div>
                         <div class="col-md-3">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select filter_customer" name="filter_customer" id="filter_customer">
+                                <select class="form-select filter_barang" name="filter_barang" id="filter_barang">
                                     <option value=""></option>
                                     <?php
                                     if (!empty($barang)) {
@@ -127,6 +127,8 @@
 
         if (!$('.dateStart').val() || !$('.dateEnd').val()) return;
 
+        setLoading();
+
         // Destroy lama
         if ($.fn.DataTable.isDataTable('#pivotTable')) {
             table.destroy();
@@ -136,7 +138,7 @@
         }
 
         // =========================
-        // 1️⃣ AMBIL HEADER DULU
+        // AMBIL HEADER DULU
         // =========================
         $.ajax({
             url: "<?= base_url('laporan-sales/items-sales-by-customers/all') ?>",
@@ -144,7 +146,7 @@
             data: {
                 dateStart: $('.dateStart').val(),
                 dateEnd: $('.dateEnd').val(),
-                filter: $('.filter_customer').val(),
+                filter: $('.filter_barang').val(),
                 headerOnly: true
             },
             success: function (res) {
@@ -203,11 +205,17 @@
                         data: d => {
                             d.dateStart = $('.dateStart').val();
                             d.dateEnd   = $('.dateEnd').val();
-                            d.filter    = $('.filter_customer').val();
+                            d.filter    = $('.filter_barang').val();
                         }
                     },
-                    columns: columns
+                    columns: columns,
+                    initComplete: function() {
+                        stopLoading(); // <--- SELESAI LOADING
+                    }
                 });
+            },
+            error: function() {
+                stopLoading(); // <--- JIKA AJAX HEADER GAGAL, STOP LOADING
             }
         });
     }
@@ -219,8 +227,8 @@
 
         loadPivot();
 
-        $('.filter_customer').select2({
-            placeholder: "Filter Pelanggan",
+        $('.filter_barang').select2({
+            placeholder: "Filter Barang",
             theme: "bootstrap-5",
             allowClear: true
         });
@@ -231,7 +239,7 @@
             autoclose: true
         });
 
-        $('.dateStart, .dateEnd, .filter_customer').on('change', reloadPivot);
+        $('.dateStart, .dateEnd, .filter_barang').on('change', reloadPivot);
     });
     const convertDateFormat = function(dateString) {
         // Memisahkan tanggal, bulan, dan tahun dari string
@@ -245,7 +253,7 @@
     const printPDF = function(url) {
         var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "all";
         var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
-        var filter = $(".filter_customer").val() ? $(".filter_customer").val() : "all";
+        var filter = $(".filter_barang").val() ? $(".filter_barang").val() : "all";
         url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter;
         // console.log(url2);
         window.open(url2, "_blank");
@@ -253,7 +261,7 @@
     const printExcel = function(url) {
         var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "all";
         var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
-        var filter = $(".filter_customer").val() ? $(".filter_customer").val() : "all";
+        var filter = $(".filter_barang").val() ? $(".filter_barang").val() : "all";
         url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter;
         window.open(url2, "_blank");
     }
