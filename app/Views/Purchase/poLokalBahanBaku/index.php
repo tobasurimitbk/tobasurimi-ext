@@ -51,7 +51,7 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-                                <th>Tanggal Dibuat</th>
+                                <th onclick="changeSort('poDate')" class="sort">Tgl</th>
                                 <th onclick="changeSort('divisi')" class="sort">Dept</th>
                                 <th onclick="changeSort('warehouse_name')" class="sort">Warehouse</th>
                                 <th onclick="changeSort('poNo')" class="sort">No. PO</th>
@@ -196,8 +196,6 @@
             {
                 data: "po_date",
                 className: "text-left",
-                sortable: false,
-                orderable: false,
             },
             {
                 data: "divisi",
