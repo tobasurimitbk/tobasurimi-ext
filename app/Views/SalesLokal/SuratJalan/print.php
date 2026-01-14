@@ -96,28 +96,28 @@
     ?>
     <table class="w-100">
         <tr>
-            <td style="width:70%;padding-right:100px">
-                <div class="company-name"><?= $companyName ?? '' ?></div>
+            <td style="width: 70%;padding-right: 100px">
+                <div class="company-name">
+                    Toba Fish
+                    (<?= $companyName ?>)
+                </div>
                 <div>
                     <table class="w-100">
                         <tr>
-                            <td style="width:1px;vertical-align:top">Customer: </td>
-                            <td style="border:0.5px solid;border-radius:7px;padding:5px">
-                                <div class="txt-bold">
-                                    <?= $firstSO->customerName ?? '-' ?>
-                                    <?= !empty($firstSO->phone) ? ' - ' . $firstSO->phone : '' ?>
-                                </div>
-                                <div class="txt-bold"><?= $firstSO->customerAddress ?? '-' ?></div>
+                            <td style="width: 1px;vertical-align: top">Customer: </td>
+                            <td style="border: 0.5px solid;border-radius: 7px;padding: 5px">
+                                <div class="txt-bold"><?= $firstSO->customerName ?> - <?= $firstSO->phone ?></div>
+                                <div><?= $firstSO->customerAddress ?></div>
                             </td>
                         </tr>
                     </table>
                 </div>
             </td>
-            <td align="right">
-                <div class="txt-bold txt-center" style="font-size:20px;margin-bottom:3px;">SURAT JALAN</div>
-                <table class="w-100" style="border:0.5px solid;border-radius:7px;margin-left:auto;">
+            <td style="width: 35%;text-align: right;">
+                <div class="txt-bold txt-center" style="font-size: 20px; margin-bottom:3px;">SURAT JALAN</div>
+                <table class="w-100" style="border: 0.5px solid;border-radius: 7px;margin-right: 0">
                     <tr>
-                        <td style="border-right:0.5px dashed;width:50%;">
+                        <td style="border-right: 0.5px solid;border-right-style: dashed">
                             <div>Tgl</div>
                             <div class="txt-center"><?= $sjData->shipping_date ?? '' ?></div>
                         </td>
@@ -127,7 +127,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td style="border-right:0.5px dashed;border-top:0.5px dashed;width:50%;">
+                        <td style="border: 0.5px solid;border-style: dashed dashed hidden hidden">
                             <div>No. Order</div>
                             <div class="txt-center">
                                 <?php
@@ -145,7 +145,7 @@
                                 ?>
                             </div>
                         </td>
-                        <td style="border-top:0.5px dashed">
+                        <td style="border-top: 0.5px solid;border-top-style: dashed">
                             <div>PO. No.</div>
                             <div class="txt-center"><?= $sjData->no_po ?? '' ?>&nbsp;</div>
                         </td>
