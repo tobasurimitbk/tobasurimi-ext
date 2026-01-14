@@ -299,6 +299,8 @@ class POLokalBahanBaku extends BaseController
                 "total_before_pph" => number_format($data->total_before_pph, 2),
                 "is_posted"     => $data->is_posted,
                 "status_penerimaan" => $data->status_penerimaan === "0" ? "OPEN" : "CLOSED",
+                "bc_name"   => $data->bc_name,
+                "warehouse_name" => $data->warehouse_name
                 // "un_posting" => $unPostingCheck == null ? 0 : 1,
             ]);
         }

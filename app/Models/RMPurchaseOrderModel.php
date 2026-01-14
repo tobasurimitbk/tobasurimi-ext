@@ -121,6 +121,8 @@ class RMPurchaseOrderModel extends Model
             'poDate'            => 'rm_purchase_orders.po_date',
             'poNo'              => 'rm_purchase_orders.po_no',
             'divisi'       => 'divisis.divisi',
+            'warehouses_name'       => 'warehouses.warehouse_name',
+            'bc_type' => 'rm_purchase_orders.bc_type',
             'supplier'          => 'suppliers.name',
             'createdAt'         => 'rm_purchase_orders.createdAt',
             'statusPenerimaan'  => 'rm_purchase_orders.status_penerimaan',
@@ -148,6 +150,8 @@ class RMPurchaseOrderModel extends Model
             suppliers.no_npwp as supplierNPWP,
             companies.company AS companyName,
             divisis.divisi,
+            warehouses.warehouse_name,
+            metadata.value AS bc_name,
             COUNT(rm_purchase_order_details.id) AS itemCount,
             SUM(rm_purchase_order_details.qty) AS totalQty";
 
@@ -158,6 +162,8 @@ class RMPurchaseOrderModel extends Model
             ->join('companies', 'rm_purchase_orders.company_id = companies.id', 'left')
             ->join('rm_purchase_order_details', 'rm_purchase_orders.id = rm_purchase_order_details.rm_purchase_order_id', 'left')
             ->join('divisis', 'divisis.id = rm_purchase_orders.divisi_id', 'left')
+            ->join('warehouses', 'warehouses.id = rm_purchase_orders.warehouse_id', 'left')
+            ->join('metadata', 'metadata.id = rm_purchase_orders.bc_type', 'left')
             ->groupBy(('rm_purchase_orders.id'))
             ->orderBy($sort, $sortType);
 
@@ -191,7 +197,10 @@ class RMPurchaseOrderModel extends Model
                 ->groupStart()
                 ->like('po_no', $addCondition['search']);
             $bbLokalDataQry->orLike('suppliers.name', $addCondition['search']);
-            $bbLokalDataQry->orLike('divisis.divisi', $addCondition['search'])
+            $bbLokalDataQry->orLike('divisis.divisi', $addCondition['search']);
+            $bbLokalDataQry->orLike('warehouses.warehouse_name', $addCondition['search']);
+            $bbLokalDataQry->orLike('metadata.value', $addCondition['search'])
+
                 ->groupEnd();
         }
         if ($addCondition['search']) {
