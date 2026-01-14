@@ -80,8 +80,8 @@ class PenjualanPerPelanggan extends BaseController
             array_push($dataAllSalesOrderInvoice, [
                 "no" => $no++,
                 "id" => encrypt($data->id),
-                "total_invoice" => number_format(floatval($data->total_invoice)),
-                "total_invoice_before_ppn" => number_format(floatval($data->total_invoice) - floatval($data->ppn)),
+                "total_invoice" => number_format(floatval($data->sum_total_invoice)),
+                "total_invoice_before_ppn" => number_format(floatval($data->sum_total_invoice) - floatval($data->sum_ppn)),
                 "nama_pelanggan" => $data->nama_pelanggan,
                 "kode_pelanggan" => $data->kode_pelanggan,
                 "nama_penjual" => $namaPenjual,
@@ -132,8 +132,8 @@ class PenjualanPerPelanggan extends BaseController
         $totalAllInvoiceBeforePPN = 0;
 
         foreach ($dataSalesOrderInvoice['data'] as $data) {
-            $totalInvoice = floatval($data->total_invoice);
-            $totalInvoiceBeforePPN = floatval($data->total_invoice) - floatval($data->ppn);
+            $totalInvoice = floatval($data->sum_total_invoice);
+            $totalInvoiceBeforePPN = floatval($data->sum_total_invoice) - floatval($data->sum_ppn);
             $totalAllInvoice += $totalInvoice;
             $totalAllInvoiceBeforePPN += $totalInvoiceBeforePPN;
 
@@ -233,8 +233,8 @@ class PenjualanPerPelanggan extends BaseController
         $totalAllInvoiceBeforePPN = 0;
 
         foreach ($dataSalesOrderInvoice['data'] as $data) {
-            $totalInvoice = floatval($data->total_invoice);
-            $totalInvoiceBeforePPN = floatval($data->total_invoice) - floatval($data->ppn);
+            $totalInvoice = floatval($data->sum_total_invoice);
+            $totalInvoiceBeforePPN = floatval($data->sum_total_invoice) - floatval($data->sum_ppn);
             $totalAllInvoice += $totalInvoice;
             $totalAllInvoiceBeforePPN += $totalInvoiceBeforePPN;
 
@@ -307,8 +307,8 @@ class PenjualanPerPelanggan extends BaseController
         $totalAllInvoice = 0;
         $totalAllInvoiceBeforePPN = 0;
         foreach ($dataSalesOrderInvoice['data'] as $data) {
-            $totalInvoice = floatval($data->total_invoice);
-            $totalInvoiceBeforePPN = floatval($data->total_invoice) - floatval($data->ppn);
+            $totalInvoice = floatval($data->sum_total_invoice);
+            $totalInvoiceBeforePPN = floatval($data->sum_total_invoice) - floatval($data->sum_ppn);
             $totalAllInvoice += $totalInvoice;
             $totalAllInvoiceBeforePPN += $totalInvoiceBeforePPN;
 
@@ -439,8 +439,8 @@ class PenjualanPerPelanggan extends BaseController
             $totalPerPenjualBeforePPN = 0;
 
             foreach ($pelangganList as $data) {
-                $totalInvoice = floatval($data->total_invoice);
-                $totalInvoiceBeforePPN = floatval($data->total_invoice) - floatval($data->ppn);
+                $totalInvoice = floatval($data->sum_total_invoice);
+                $totalInvoiceBeforePPN = floatval($data->sum_total_invoice) - floatval($data->sum_ppn);
                 $totalPerPenjual += $totalInvoice;
                 $totalPerPenjualBeforePPN += $totalInvoiceBeforePPN;
 

@@ -387,7 +387,9 @@ class SalesOrderInvoiceModel extends Model
                     SUM(sales_order_invoice_detail.qty_invoice) AS sum_qty_invoice,
                     SUM(sales_order_invoice_detail.amount_invoice) AS sum_amount_invoice,
                     sales_order_invoice.total_invoice,
+                    SUM(sales_order_invoice.total_invoice) AS sum_total_invoice,
                     sales_order_invoice.ppn,
+                    SUM(sales_order_invoice.ppn) AS sum_ppn,
                     COUNT(DISTINCT sales_order_invoice.id) AS count_invoice,
                     employees.name AS salesName";
 
