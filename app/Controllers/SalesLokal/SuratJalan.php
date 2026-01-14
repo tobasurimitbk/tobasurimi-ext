@@ -766,22 +766,24 @@ class SuratJalan extends BaseController
     public function printSJ($id)
     {
         $id = decrypt($id);
-        $domPdf = new Dompdf();
-        $fileName = 'Order Form';
 
-        // Ambil data perusahaan
+        /* =========================
+        * AMBIL DATA PERUSAHAAN
+        * ========================= */
         $companyData = $this->companyModel->asObject()
             ->find($this->this_company_id);
 
-        // Data Surat Jalan + Customer
+        /* =========================
+        * DATA SURAT JALAN + CUSTOMER
+        * ========================= */
         $sjData = $this->SuratJalanModel->asObject()
             ->select('surat_jalan_so.*,
-                  customers.kode AS customerCode,
-                  customers.phone AS phone,
-                  customers.name AS customerName,
-                  customers.address AS customerAddress,
-                  metadata.value AS termin,
-                  DATE_FORMAT(surat_jalan_so.shipping_date, "%d %b %Y") AS shipping_date')
+                customers.kode AS customerCode,
+                customers.phone AS phone,
+                customers.name AS customerName,
+                customers.address AS customerAddress,
+                metadata.value AS termin,
+                DATE_FORMAT(surat_jalan_so.shipping_date, "%d %b %Y") AS shipping_date')
             ->join('customers', 'customers.id = surat_jalan_so.id_customer', 'left')
             ->join('metadata', 'metadata.id = customers.termin', 'left')
             ->find($id);
@@ -790,34 +792,42 @@ class SuratJalan extends BaseController
             throw new \RuntimeException("Surat Jalan dengan ID {$id} tidak ditemukan.");
         }
 
-        // Detail Surat Jalan
+        /* =========================
+        * DETAIL SURAT JALAN
+        * ========================= */
         $dataSuratJalanDetail = $this->SuratJalanDetailModel->getItemListByIds($id);
 
-        // Update counter_print
+        /* =========================
+        * UPDATE COUNTER PRINT
+        * ========================= */
         $this->SuratJalanModel->update($id, [
             'counter_print' => (int)($sjData->counter_print ?? 0) + 1
         ]);
 
-        // Ambil Sales Order terkait (untuk info header dan fallback)
+        /* =========================
+        * SALES ORDER TERKAIT
+        * ========================= */
         $soIds = json_decode($sjData->multiple_id_so, true) ?: [];
         $soIds = array_values(array_filter($soIds, fn($v) => $v !== null && $v !== ''));
 
         $salesOrderData = [];
         if (!empty($soIds)) {
-            $soSelectQry = "sales_order.*,
-            DATE_FORMAT(sales_order.order_date, '%d %b %Y') AS order_date, 
-            DATE_FORMAT(sales_order.shipping_date, '%d %b %Y') AS shipping_date, 
-            customers.kode AS customerCode, 
-            customers.phone AS phone, 
-            customers.name AS customerName, 
-            customers.address AS customerAddress,
-            metadata.value AS termin,
-            barang_master_sales.barang_name AS namaBarang, 
-            barang_master_sales.kode_barang AS kodeBarang, 
-            sales_order_detail.qty AS qty, 
-            satuans.kode_satuan AS kodeSatuan,
-            sales_order_detail.discount_percentage AS disc_pct,
-            sales_order_detail.amount AS amt";
+            $soSelectQry = "
+                sales_order.*,
+                DATE_FORMAT(sales_order.order_date, '%d %b %Y') AS order_date, 
+                DATE_FORMAT(sales_order.shipping_date, '%d %b %Y') AS shipping_date, 
+                customers.kode AS customerCode, 
+                customers.phone AS phone, 
+                customers.name AS customerName, 
+                customers.address AS customerAddress,
+                metadata.value AS termin,
+                barang_master_sales.barang_name AS namaBarang, 
+                barang_master_sales.kode_barang AS kodeBarang, 
+                sales_order_detail.qty AS qty, 
+                satuans.kode_satuan AS kodeSatuan,
+                sales_order_detail.discount_percentage AS disc_pct,
+                sales_order_detail.amount AS amt
+            ";
 
             $salesOrderData = $this->SalesOrderModel->asObject()
                 ->select($soSelectQry)
@@ -831,22 +841,62 @@ class SuratJalan extends BaseController
                 ->findAll();
         }
 
+        /* =========================
+        * DATA VIEW
+        * ========================= */
         $data = [
-            'companyName'   => $companyData->company,
+            'companyName'   => $companyData->company ?? '',
             'sjData'        => $sjData,
             'soData'        => $salesOrderData,
             'sjDetailData'  => $dataSuratJalanDetail
         ];
 
-        // return view('SalesLokal/SuratJalan/print', $data);
+        /* =========================
+        * DOMPDF OPTION (SAMA DENGAN OF)
+        * ========================= */
+        $options = new \Dompdf\Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isRemoteEnabled', true);
+        $options->set('defaultFont', 'DejaVu Sans Mono');
+        $options->set('dpi', 72); // DOT MATRIX SCALE
+        $options->set('isFontSubsettingEnabled', true);
 
-        // --- jika mau PDF, pindahkan return view dan pakai Dompdf ---
+        $domPdf = new \Dompdf\Dompdf($options);
         $domPdf->loadHtml(view('SalesLokal/SuratJalan/print', $data));
-        $domPdf->setPaper('A4', 'landscape');
-        $domPdf->set_option('defaultFont', 'DejaVu Sans Mono');
+
+        /* === PAPER SIZE SAMA DENGAN ORDER FORM === */
+        $domPdf->setPaper([0, 0, 592, 425]);
+
+        /* =========================
+        * RENDER PDF
+        * ========================= */
         $domPdf->render();
-        $domPdf->stream($fileName, ["Attachment" => false]);
-        exit();
+
+        /* =========================
+        * SIMPAN KE CACHE SERVER
+        * ========================= */
+        $cacheDir = WRITEPATH . 'pdf_cache/';
+        if (!is_dir($cacheDir)) {
+            mkdir($cacheDir, 0755, true);
+        }
+
+        $fileNameRaw = 'Surat_Jalan_' . ($sjData->no_surat_jalan ?? 'SJ');
+        $fileName = preg_replace('/[\/\\\\]+/', '-', $fileNameRaw) . '.pdf';
+        $fullPath = $cacheDir . $fileName;
+
+        file_put_contents($fullPath, $domPdf->output());
+
+        /* =========================
+        * PREVIEW PDF INLINE
+        * ========================= */
+        return response()
+            ->setHeader('Content-Type', 'application/pdf')
+            ->setHeader('Content-Disposition', 'inline; filename="'.$fileName.'"')
+            ->setHeader('Content-Length', filesize($fullPath))
+            ->setHeader('X-Content-Type-Options', 'nosniff')
+            ->setHeader('Cache-Control', 'private, max-age=0, must-revalidate')
+            ->setHeader('Pragma', 'public')
+            ->setBody(file_get_contents($fullPath));
     }
 
     public function generateNomorSuratJalan()

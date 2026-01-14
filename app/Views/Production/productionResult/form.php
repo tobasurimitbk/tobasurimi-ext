@@ -143,6 +143,7 @@
                                 <button class="nav-link" id="nav-material-penolong-tab" data-bs-toggle="tab" data-bs-target="#nav-barang-material-request-penolong" type="button" role="tab" aria-controls="nav-barang-material-request-penolong" aria-selected="false">Barang Material Request Penolong</button>
                                 <button class="nav-link" id="nav-scrap-tab" data-bs-toggle="tab" data-bs-target="#nav-scrap" type="button" role="tab" aria-controls="nav-scrap" aria-selected="false">Scrap</button>
                                 <button class="nav-link" id="nav-filling-tab" data-bs-toggle="tab" data-bs-target="#nav-filling" type="button" role="tab" aria-controls="nav-filling" aria-selected="false">Sisa Produksi</button>
+                                <button class="nav-link" id="nav-susut-tab" data-bs-toggle="tab" data-bs-target="#nav-susut" type="button" role="tab" aria-controls="nav-susut" aria-selected="false">Susut Masak</button>
                                 <!-- <button class="nav-link" id="nav-barang-jadi-tab" data-bs-toggle="tab" data-bs-target="#nav-barang-jadi" type="button" role="tab" aria-controls="nav-barang-setengah-jadi" aria-selected="false">Barang Setengah Jadi</button> -->
                             </div>
                         </nav>
@@ -320,6 +321,51 @@
 
                                         </tbody>
                                         <tfoot class="tfoot-table-barang-filling" id="tfoot-barang-filling">
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="nav-susut" role="tabpanel" aria-labelledby="nav-susut-tab">
+                                <form class="formBarangSusut" id="formBarangSusut">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-floating mb-3" style="height: 50px;">
+                                                <input autocomplete="one-time-code" type="hidden" class="kode" name="kode" id="kode" />
+                                                <select class="form-select kode_barang_susut" name="kode_barang_susut" id="kode_barang_susut" aria-label="Floating label select example">
+                                                    <option data-barang_id="" data-nama="" data-satuan="" value=""></option>
+                                                </select>
+                                                <label for="floatingInput">Kode Barang</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-floating mb-3" style="height: 50px;">
+                                                <input autocomplete="one-time-code" type="text" oninput="preventNegativeInput(this)" class="form-control qty_susut" name="qty_susut" id="qty_susut" placeholder="Qty">
+                                                <label for="floatingInput">Qty</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12 mb-3">
+                                            <button type="button" class="btn btn-primary button-add-susut" style="float: right;">Tambah Barang Susut</button>
+                                        </div>
+                                    </div>
+                                </form>
+                                <div class="table-responsive">
+                                    <table class="table nowrap table-hover-tobasurimi tableBarangSusut dataTable" id="tableBarangSusut" width="100%" cellspacing="0">
+                                        <thead class="thead-dark text-center">
+                                            <tr>
+                                                <th>No.</th>
+                                                <th>Kode Barang</th>
+                                                <th>Nama Barang</th>
+                                                <th>Jumlah</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="body-table-barang-susut" id="body-table-barang-susut" style="cursor: pointer;">
+
+                                        </tbody>
+                                        <tfoot class="tfoot-table-barang-susut" id="tfoot-barang-susut">
                                         </tfoot>
                                     </table>
                                 </div>
@@ -579,6 +625,7 @@
     let list_items_barang_digunakan_penolong = [];
     let list_items_barang_scrap = [];
     let list_items_barang_filling = [];
+    let list_items_barang_susut = [];
     let tempBarangList = [];
 
     function drawTempTable() {
@@ -851,7 +898,7 @@
         });
 
         // KODE BARANG
-        $('.kode_barang, .kode_barang_scrap, .kode_barang_filling').select2({
+        $('.kode_barang, .kode_barang_scrap, .kode_barang_filling, .kode_barang_susut').select2({
             placeholder: "Pilih Kode Barang",
             theme: "bootstrap-5",
             allowClear: true
@@ -872,14 +919,14 @@
         })
 
         //CSS SELECT2 FLOATING LABEL
-        $('.kode_barang, .kode_barang_scrap, .kode_barang_filling, .kode_barang_add, .kode_barang_add_ditapak')
+        $('.kode_barang, .kode_barang_scrap, .kode_barang_filling, .kode_barang_add, .kode_barang_add_ditapak, .kode_barang_susut')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.kode_barang, .kode_barang_scrap, .kode_barang_filling, .kode_barang_add, .kode_barang_add_ditapak')
+        $('.kode_barang, .kode_barang_scrap, .kode_barang_filling, .kode_barang_add, .kode_barang_add_ditapak, .kode_barang_susut')
             .parent('div')
             .children('span')
             .children('span')
@@ -887,7 +934,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.kode_barang, .kode_barang_scrap, .kode_barang_filling, .kode_barang_add, .kode_barang_add_ditapak')
+        $('.kode_barang, .kode_barang_scrap, .kode_barang_filling, .kode_barang_add, .kode_barang_add_ditapak, .kode_barang_susut')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -1044,6 +1091,28 @@
                         $(".kode_barang_filling").append(`<option data-barang_name_master="${item.barang_name_master}" data-barang_spesifikasi_id="${item.barang_master_spesifikasi_id}" data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_1}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
                     })
                     $(".kode_barang_filling").val("").change();
+                    stopLoading()
+                }
+            })
+        });
+
+        $("#nav-susut-tab").click(function() {
+            var type = "bahan_baku";
+            setLoading();
+            $.ajax({
+                url: `<?= base_url("barang/dropdown/type"); ?>`,
+                method: "GET",
+                dataType: "json",
+                data: {
+                    type: type
+                },
+                success: function(res) {
+                    $(".kode_barang_susut").empty();
+                    $(".kode_barang_susut").append(`<option data-barang_name_master="" data-barang_id="" data-nama="" data-satuan_id="" data-satuan="" value=""></option>`);
+                    res.data.forEach(function(item) {
+                        $(".kode_barang_susut").append(`<option data-barang_name_master="${item.barang_name_master}" data-barang_spesifikasi_id="${item.barang_master_spesifikasi_id}" data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_1}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
+                    })
+                    $(".kode_barang_susut").val("").change();
                     stopLoading()
                 }
             })
@@ -1253,6 +1322,7 @@
                             data.append("digunakan_penolong", JSON.stringify(list_items_barang_digunakan_penolong));
                             data.append("scrap", JSON.stringify(list_items_barang_scrap));
                             data.append("filling", JSON.stringify(list_items_barang_filling));
+                            data.append("susut", JSON.stringify(list_items_barang_susut));
 
                             // UPDATE
                             if (id) {
@@ -1828,36 +1898,6 @@
                     'kondisi_barang': kondisiBarang,
                     'kondisi_barang_text': kondisiBarangText
                 });
-                // list_items_barang_filling.push({
-                //     'barang_detail_id': getID(),
-                //     'material_request_detail_id': material_request_detail_id,
-                //     'material_request_id': material_request_id,
-                //     'bc_id': bc_id,
-                //     'stock_id': stock_id,
-                //     'stock_detail_id': stock_detail_id,
-                //     'stock_date': stock_date,
-                //     'stock_dokumen': stock_dokumen,
-                //     'barang1_id': barang1_id,
-                //     'barang2_id': barang2_id,
-                //     'kode_barang': kode_barang,
-                //     'satuan': satuan,
-                //     'nama_barang': nama_barang,
-                //     'note': note,
-                //     'qty': qtyBarang,
-                //     'ref_no': ref_no,
-                //     'no_aju': no_aju,
-                //     'type_barang': type_barang,
-                //     'type_barang_text': type_barang_text,
-                //     'unit': unit,
-                //     'warehouse_id': warehouse_id,
-                //     'divisi_id': divisi_id,
-                //     'kondisi_barang': kondisiBarang,
-                //     'kondisi_barang_text': kondisiBarangText,
-                //     'harga_umum': harga_umum,
-                //     'harga_harian': harga_harian,
-                //     'harga_bulanan': harga_bulanan,
-                // });
-
                 drawTableBarangFilling(); // Menggambar tabel
                 resetFormDetailFilling(); // Mengatur ulang form
             } else {
@@ -1867,6 +1907,50 @@
                 if (!kondisiBarang) $(".kondisi_barang").closest('.form-floating').append('<span class="error-message text-danger">Harap pilih kondisi barang.</span>');
                 if (!departmentId) $(".department_id_filling").closest('.form-floating').append('<span class="error-message text-danger">Harap pilih department tujuan.</span>');
                 if (!warehouseId) $(".warehouse_id_filling").closest('.form-floating').append('<span class="error-message text-danger">Harap pilih warehouse tujuan.</span>');
+            }
+        });
+
+        // Event click untuk tombol "Tambah Barang susut"
+        $(".button-add-susut").click(function() {
+            // Menghapus pesan kesalahan sebelumnya
+            $('.error-message').remove();
+
+            // Mengambil nilai dari setiap input
+            let kodeBarang = $(".kode_barang_susut option:selected").val();
+            let qtyBarang = $(".qty_susut").val();
+
+            // Memeriksa apakah semua input terisi
+            if (kodeBarang && qtyBarang) {
+                let barang1_id = $(".kode_barang_susut option:selected").data("barang_id");
+                let barang2_id = $(".kode_barang_susut option:selected").data("barang_spesifikasi_id");
+                let nama_barang = $(".kode_barang_susut option:selected").data("nama");
+                let kode_barang = $(".kode_barang_susut option:selected").val();
+                let satuan = $(".kode_barang_susut option:selected").data("satuan");
+                let satuan_id = $(".kode_barang_susut option:selected").data("satuan_id");
+
+                list_items_barang_susut.push({
+                    'barang_detail_id': getID(),
+                    'barang1_id': barang1_id,
+                    'barang2_id': barang2_id,
+                    'nama_barang': nama_barang,
+                    'kode_barang': kode_barang,
+                    'satuan': satuan,
+                    'unit': satuan_id,
+                    'qty': qtyBarang,
+                    'type_barang': 'bahan_baku',
+                    'type_barang_text': 'BAHAN BAKU',
+                    'warehouse_id': 0,
+                    'divisi_id': 0
+                });
+
+                console.log(list_items_barang_susut);
+                
+                drawTableBarangSusut(); // Menggambar tabel
+                resetFormDetailSusut(); // Mengatur ulang form
+            } else {
+                // Menampilkan pesan kesalahan di bawah input yang kosong
+                if (!kodeBarang) $(".kode_barang_susut").closest('.form-floating').append('<span class="error-message text-danger">Harap pilih kode barang.</span>');
+                if (!qtyBarang) $(".qty_susut").closest('.form-floating').append('<span class="error-message text-danger">Harap masukkan jumlah barang.</span>');
             }
         });
     });
@@ -2194,6 +2278,43 @@
         }
     }
 
+    const drawTableBarangSusut = function() {
+        $('.body-table-barang-susut').empty();
+        $('.tfoot').empty();
+        var row = '';
+        var no = 1;
+
+        // Cek apakah data barang susut ada
+        if (list_items_barang_susut.length === 0) {
+            row += `
+                <tr>
+                    <td colspan="5" class="text-center">Data Barang Tidak Ada</td>
+                </tr>
+            `;
+            $('.tfoot').append(row);
+        } else {
+            // Looping untuk menampilkan data barang susut
+            list_items_barang_susut.map(item => {
+                row += '<tr style="color:whitesmoke;">';
+                row += '<td>' + no + '</td>';
+                row += '<td>' + item.kode_barang + '</td>';
+                row += '<td>' + item.nama_barang + '</td>';
+                row += '<td>' + greatFormatRupiah(item.qty) + '</td>';
+
+                // Hanya tampilkan tombol delete jika data belum diposting
+                row += `
+                    <td>
+                        <button type="button" class="btn btn-danger" onclick="deleteRowDetailSusut('${item.barang_detail_id}', '${item.production_result_detail_id}')">
+                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                        </button>
+                    </td>
+                `;
+                no++;
+            });
+            $('.body-table-barang-susut').append(row);
+        }
+    }
+
     const deleteRowDetailJadi = function(id, iddetail) {
         console.log(id);
         console.log(iddetail);
@@ -2373,6 +2494,66 @@
         $(".kondisi_barang").val('').change()
         $(".department_id_filling").val('').change()
         $(".warehouse_id_filling").val('').change()
+    }
+
+    const deleteRowDetailSusut = function(id, iddetail) {
+        console.log(id);
+        console.log(iddetail);
+        if (id && iddetail == "undefined") {
+            const indexToRemove = list_items_barang_susut.findIndex(item => item.barang_detail_id === id);
+            if (indexToRemove !== -1) {
+                list_items_barang_susut.splice(indexToRemove, 1);
+            }
+            drawTableBarangSusut();
+        }
+        if (iddetail && iddetail != "undefined") {
+            Swal.fire({
+                icon: 'question',
+                title: 'Yakin akan di hapus?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Kembali',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const csrf = $(`[name="${csrfToken}"]`);
+                    $.ajax({
+                        url: "<?= base_url("production-result/delete-detail"); ?>",
+                        data: {
+                            id: iddetail,
+                        },
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        location.reload();
+                                    })
+                            }
+                        },
+                    });
+                }
+            })
+        }
+    }
+    const resetFormDetailSusut = function() {
+        $(".kode_barang_susut").val('').change()
+        $(".qty_susut").val('')
     }
 
     function preventNegativeInput(inputElement) {

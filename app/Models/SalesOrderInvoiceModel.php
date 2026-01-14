@@ -179,6 +179,7 @@ class SalesOrderInvoiceModel extends Model
         if ($addCondition['dateStart']) {
             $salesOrderInvoiceLokal->where('sales_order_invoice.tanggal_faktur >=',  $addCondition['dateStart']);
         }
+        
         if ($addCondition['dateEnd']) {
             $salesOrderInvoiceLokal->where('sales_order_invoice.tanggal_faktur <=', $addCondition['dateEnd']);
         }
