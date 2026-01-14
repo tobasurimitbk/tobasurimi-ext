@@ -2113,41 +2113,77 @@ class JurnalUmum extends BaseController
                     'id_inputer'     => session()->get("login")->user_id
                 ];
 
-                // 🔹 Tambahan (kalau ada)
-                if (!empty($ttf['tambahan']) && $ttf['tambahan'] > 0) {
+                if (!empty($det['tambahan']) && $det['tambahan'] > 0) {
+
+                    // Debit tambahan
                     $result[] = [
                         'id_transaksi'   => $id_transaksi_jurnal,
-                        'id_coa'         => $POlocal['akun_kas'],
+                        'id_coa'         => $det['tambahan_debit_account_id'],
                         'company_id'     => $POlocal['company_id'],
                         'divisi_id'      => $divisi,
                         'supplier_id'    => $POlocal['supplier_id'],
                         'tanggal_jurnal' => $tanggal,
-                        'debit'          => $ttf['tambahan'],
+                        'debit'          => $det['tambahan'],
                         'kredit'         => 0,
                         'valas'          => '30',
                         'kurs'           => 1,
-                        'keterangan'     => "Tambahan dari {$keteranganTTF}",
+                        'keterangan'     => "Tambahan {$keteranganTTF}",
                         'id_inputer'     => session()->get("login")->user_id
                     ];
-                }
 
-                // 🔹 Potongan (kalau ada)
-                if (!empty($ttf['potongan']) && $ttf['potongan'] > 0) {
+                    // Kredit tambahan
                     $result[] = [
                         'id_transaksi'   => $id_transaksi_jurnal,
-                        'id_coa'         => $POlocal['akun_selisih'],
+                        'id_coa'         => $det['tambahan_credit_account_id'],
                         'company_id'     => $POlocal['company_id'],
                         'divisi_id'      => $divisi,
                         'supplier_id'    => $POlocal['supplier_id'],
                         'tanggal_jurnal' => $tanggal,
                         'debit'          => 0,
-                        'kredit'         => $ttf['potongan'],
+                        'kredit'         => $det['tambahan'],
                         'valas'          => '30',
                         'kurs'           => 1,
-                        'keterangan'     => "Potongan dari {$keteranganTTF}",
+                        'keterangan'     => "Tambahan {$keteranganTTF}",
                         'id_inputer'     => session()->get("login")->user_id
                     ];
                 }
+
+
+                if (!empty($det['potongan']) && $det['potongan'] > 0) {
+
+                    // Debit potongan
+                    $result[] = [
+                        'id_transaksi'   => $id_transaksi_jurnal,
+                        'id_coa'         => $det['potongan_debit_account_id'],
+                        'company_id'     => $POlocal['company_id'],
+                        'divisi_id'      => $divisi,
+                        'supplier_id'    => $POlocal['supplier_id'],
+                        'tanggal_jurnal' => $tanggal,
+                        'debit'          => $det['potongan'],
+                        'kredit'         => 0,
+                        'valas'          => '30',
+                        'kurs'           => 1,
+                        'keterangan'     => "Potongan {$keteranganTTF}",
+                        'id_inputer'     => session()->get("login")->user_id
+                    ];
+
+                    // Kredit potongan
+                    $result[] = [
+                        'id_transaksi'   => $id_transaksi_jurnal,
+                        'id_coa'         => $det['potongan_credit_account_id'],
+                        'company_id'     => $POlocal['company_id'],
+                        'divisi_id'      => $divisi,
+                        'supplier_id'    => $POlocal['supplier_id'],
+                        'tanggal_jurnal' => $tanggal,
+                        'debit'          => 0,
+                        'kredit'         => $det['potongan'],
+                        'valas'          => '30',
+                        'kurs'           => 1,
+                        'keterangan'     => "Potongan {$keteranganTTF}",
+                        'id_inputer'     => session()->get("login")->user_id
+                    ];
+                }
+
 
                 // 🔹 Pajak per tanda terima (kalau ada)
                 $pajakTandaTerimaFakturModel = new PajakTandaTerimaFakturModel();

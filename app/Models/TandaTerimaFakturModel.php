@@ -302,16 +302,29 @@ class TandaTerimaFakturModel extends Model
         return $filteredResults;
     }
 
-
-
     public function getByID($tandaTerimaFakturID)
     {
         $res = $this->select("
             tanda_terima_faktur.*,
             GROUP_CONCAT(DISTINCT tanda_terima_faktur_detail.lpb_no ORDER BY tanda_terima_faktur_detail.lpb_no SEPARATOR ', ') AS list_lpb,
-            (tanda_terima_faktur.nominal_faktur - COALESCE(tanda_terima_faktur.total_paid, 0)) AS sisa_bayar
+            (tanda_terima_faktur.nominal_faktur - COALESCE(tanda_terima_faktur.total_paid, 0)) AS sisa_bayar,
+            tanda_terima_faktur.potongan,
+            tanda_terima_faktur.tambahan,
+            lpd.potongan_debit_account_id,
+            lpd.potongan_credit_account_id,
+            lpd.tambahan_debit_account_id,
+            lpd.tambahan_credit_account_id,
+            CONCAT(potongan_debit.no_sub, ' - ', potongan_debit.nama_sub) as potongan_debit_account_name,
+            CONCAT(potongan_credit.no_sub, ' - ', potongan_credit.nama_sub) as potongan_credit_account_name,
+            CONCAT(tambahan_debit.no_sub, ' - ', tambahan_debit.nama_sub) as tambahan_debit_account_name,
+            CONCAT(tambahan_credit.no_sub, ' - ', tambahan_credit.nama_sub) as tambahan_credit_account_name
         ")
             ->join('tanda_terima_faktur_detail', 'tanda_terima_faktur_detail.tanda_terima_faktur_id = tanda_terima_faktur.id', 'left')
+            ->join('local_po_payment_details as lpd', 'lpd.tanda_terima_faktur_id = tanda_terima_faktur.id AND lpd.deletedAt IS NULL', 'left')
+            ->join('sub_akuns as potongan_debit', 'potongan_debit.id = lpd.potongan_debit_account_id', 'left')
+            ->join('sub_akuns as potongan_credit', 'potongan_credit.id = lpd.potongan_credit_account_id', 'left')
+            ->join('sub_akuns as tambahan_debit', 'tambahan_debit.id = lpd.tambahan_debit_account_id', 'left')
+            ->join('sub_akuns as tambahan_credit', 'tambahan_credit.id = lpd.tambahan_credit_account_id', 'left')
             ->where('tanda_terima_faktur.id', $tandaTerimaFakturID)
             ->where('tanda_terima_faktur.deletedAt', null)
             ->groupBy('tanda_terima_faktur.id')
