@@ -521,20 +521,26 @@ class Attendance extends BaseController
     {
         $timeParts = explode(':', $timeFormat);
         if (count($timeParts) < 2) return 0;
-        
-        $hours = (int)$timeParts[0];
-        $minutes = (int)$timeParts[1];
-        
-        if ($minutes >= 45 && $minutes <= 60) {
+
+        $hours   = (int) $timeParts[0];
+        $minutes = (int) $timeParts[1];
+
+        // ✅ FIX: menit 00 → stay
+        if ($minutes === 0) {
+            return (float) $hours;
+        }
+
+        if ($minutes >= 45 && $minutes <= 59) {
             return $hours + 0.75;
         } elseif ($minutes >= 30 && $minutes <= 44) {
             return $hours + 0.5;
         } elseif ($minutes >= 15 && $minutes <= 29) {
             return $hours + 0.25;
         } else {
-            return $hours + 0;
+            return (float) $hours;
         }
     }
+
 
     /**
      * Untuk JAM MASUK - rumus dari "Jam masuke" YANG BENAR
@@ -543,11 +549,16 @@ class Attendance extends BaseController
     {
         $timeParts = explode(':', $timeFormat);
         if (count($timeParts) < 2) return 0;
-        
-        $hours = (int)$timeParts[0];
-        $minutes = (int)$timeParts[1];
-        
-        if ($minutes >= 46 && $minutes <= 60) {
+
+        $hours   = (int) $timeParts[0];
+        $minutes = (int) $timeParts[1];
+
+        // ✅ FIX: kalau menit = 00, jangan naik
+        if ($minutes === 0) {
+            return (float) $hours;
+        }
+
+        if ($minutes >= 46 && $minutes <= 59) {
             return $hours + 1;
         } elseif ($minutes >= 31 && $minutes <= 45) {
             return $hours + 0.75;
@@ -557,6 +568,7 @@ class Attendance extends BaseController
             return $hours + 0.25;
         }
     }
+
 
     /**
      * Konversi format 24 jam (H:i:s) ke format HH:MM
