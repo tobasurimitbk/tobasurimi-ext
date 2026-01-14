@@ -135,16 +135,6 @@ class PembayaranPOLokal extends BaseController
 
             $pembayaranList = json_decode($this->request->getVar('pembayaranList'));
 
-            // CHECK
-            // $check = $localPOPaymentBPModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->where('payment_no',  $this->request->getVar('no_bukti_pembayaran'))->first();
-
-            // if ($check != null) {
-            //     return response()->setJSON([
-            //         'token' => csrf_hash(),
-            //         'message' => "No pembayaran sudah digunakan",
-            //         'status' => false
-            //     ]);
-            // }
 
             $id = $localPOPaymentBPModel->insert([
                 'company_id' => $this->this_company_id,
@@ -167,10 +157,16 @@ class PembayaranPOLokal extends BaseController
 
             foreach ($pembayaranList as $l) {
                 $localPOPaymentDetailModel->insert([
-                    "local_po_payment_id"    => $id,
-                    "tanda_terima_faktur_id" => $l->id,
-                    "tipe"                   => "BP",
-                    "total"                  => repairDouble($l->nominal_pembayaran)
+                    "local_po_payment_id"        => $id,
+                    "tanda_terima_faktur_id"     => $l->id,
+                    "tipe"                       => "BP",
+                    "total"                      => repairDouble($l->nominal_pembayaran),
+                    "potongan"                   => repairDouble($l->potongan ?? 0),
+                    "potongan_debit_account_id"  => $l->potongan_debit_account_id ?? null,
+                    "potongan_credit_account_id" => $l->potongan_credit_account_id ?? null,
+                    "tambahan"                   => repairDouble($l->tambahan ?? 0),
+                    "tambahan_debit_account_id"  => $l->tambahan_debit_account_id ?? null,
+                    "tambahan_credit_account_id" => $l->tambahan_credit_account_id ?? null
                 ]);
 
                 $current = $tandaTerimaFakturModel->select('total_paid')->where('id', $l->id)->first();
@@ -226,6 +222,12 @@ class PembayaranPOLokal extends BaseController
                 throw new \Exception("Format pembayaranList tidak valid");
             }
 
+            $amount = 0;
+            foreach ($pembayaranList as $l) {
+                $amount += repairDouble($l->nominal_pembayaran);
+            }
+
+
             // ===============================
             // START TRANSACTION
             // ===============================
@@ -241,7 +243,7 @@ class PembayaranPOLokal extends BaseController
                 'bank_id'           => $this->request->getVar('bank_id'),
                 'supplier_id'       => $this->request->getVar('supplier_id'),
                 'jenis_pembayaran'  => $this->request->getVar('jenis_pembayaran'),
-                'amount'            => repairDouble($this->request->getVar('total_pembayaran')),
+                'amount'            => $amount,
                 'payment_method'    => $this->request->getVar('payment_method'),
                 'keterangan'        => $this->request->getVar('keterangan'),
                 'supplier'          => $this->request->getVar('supplier'),
@@ -275,13 +277,18 @@ class PembayaranPOLokal extends BaseController
             foreach ($pembayaranList as $l) {
                 $nominal = repairDouble($l->nominal_pembayaran);
 
-                if ($nominal <= 0) continue;
 
                 $localPOPaymentDetailModel->insert([
                     "local_po_payment_id"    => $id,
                     "tanda_terima_faktur_id" => $l->id,
                     "tipe"                   => "BP",
-                    "total"                  => $nominal
+                    "total"                  => $nominal,
+                    "potongan"                   => repairDouble($l->potongan ?? 0),
+                    "potongan_debit_account_id"  => $l->potongan_debit_account_id ?? null,
+                    "potongan_credit_account_id" => $l->potongan_credit_account_id ?? null,
+                    "tambahan"                   => repairDouble($l->tambahan ?? 0),
+                    "tambahan_debit_account_id"  => $l->tambahan_debit_account_id ?? null,
+                    "tambahan_credit_account_id" => $l->tambahan_credit_account_id ?? null
                 ]);
 
                 $affectedTTF[] = $l->id;
@@ -1650,37 +1657,6 @@ class PembayaranPOLokal extends BaseController
         ]);
     }
 
-    // public function generatePaymentNoBP()
-    // {
-    //     $localPOPaymentBPModel = new LocalPOPaymentBPModel();
-
-    //     $paymentNo = "BP/";
-    //     $month = date('m');
-    //     $year = date('Y');
-
-    //     $numberTemplate = $paymentNo . "$year/$month/";
-    //     $lastData = $localPOPaymentBPModel->asObject()
-    //         ->like('payment_no', $numberTemplate, 'after')
-    //         ->orderBy('createdAt', 'DESC')
-    //         ->first();
-
-    //     $paymentNo = "{$numberTemplate}001";
-
-    //     if (!empty($lastData)) {
-    //         $exploded = explode('/', $lastData->payment_no);
-    //         $lastIncrement = (int)$exploded[3] + 1;
-
-    //         $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
-    //         $paymentNo = $numberTemplate . $paddedNumber;
-    //     }
-
-    //     return response()->setJSON([
-    //         'paymentNo' => $paymentNo,
-    //         'token' => csrf_hash(),
-    //         'success' => true,
-
-    //     ]);
-    // }
 
     public function generatePaymentNoBPNew()
     {   

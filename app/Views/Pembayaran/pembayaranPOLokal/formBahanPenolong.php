@@ -221,13 +221,12 @@
                                                     <th style="text-align: center;">Potongan</th>
                                                     <th style="text-align: center;">Tambahan</th>
                                                     <th style="text-align: center;">Total Tagihan</th>
-                                                    <th style="text-align: center;">Total Di Bayar</th>
-                                                    <th style="text-align: center;">Sisa Tagihan</th>
+                                                    <th style="text-align: center;">Total Di bayar</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-table" style="text-align: center;">
                                                 <tr style="color: whitesmoke;">
-                                                    <td colspan="10">Tidak Ada Pembayaran</td>
+                                                    <td colspan="9">Tidak Ada Pembayaran</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -242,6 +241,70 @@
         </div>
     </div>
 </section>
+
+
+    <div class="modal fade" id="adjustmentModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content shadow">
+                
+                <!-- HEADER -->
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="adjustmentTitle">
+                        Penyesuaian
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <!-- BODY -->
+                <div class="modal-body">
+
+                    <input type="hidden" id="adjustmentId">
+                    <input type="hidden" id="adjustmentType">
+
+                    <!-- NOMINAL -->
+                    <div class="form-floating mb-3">
+                        <input type="text"
+                            class="form-control text-start fw-bold"
+                            id="adjustmentValue"
+                            placeholder="0"
+                            readonly
+                            onkeyup="this.value = greatFormatRupiah(this.value)">
+                        <label>Nominal</label>
+                    </div>
+
+                    <!-- DEBIT -->
+                    <div class="form-floating mb-3">
+                        <select class="form-control select2-ajax"
+                            id="debit_account_id">
+                        </select>
+                        <label for="floatingInput" style="z-index: 1;">Debit</label>
+                    </div>
+
+                    <!-- KREDIT -->
+                    <div class="form-floating mb-3">
+                        <select class="form-control select2-ajax"
+                            id="credit_account_id">
+                        </select>
+                       <label for="floatingInput" style="z-index: 1;">Kredit</label>
+                    </div>
+
+
+
+                </div>
+
+                <!-- FOOTER -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">
+                        Batal
+                    </button>
+                    <button type="button" class="btn btn-sm btn-primary fw-bold" onclick="saveAdjustment()">
+                        Simpan
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
@@ -284,18 +347,46 @@
                 $.each(res.data, function (i, v) {
                     const tanggal = v.invoice_date.split('-');
                     const tglFormat = `${tanggal[2]}/${tanggal[1]}/${tanggal[0]}`;
-                    const totalTagihan = Number(v.sisa_bayar);
-                    grandTotalTagihan += totalTagihan;
+                    const totalBayar = Number(v.total_paid || 0);
+                    grandTotalTagihan += totalBayar;
+
 
                     const row = $('<tr>');
                     row.append($('<td>').text(no++));
                     row.append($('<td>').text(tglFormat));
                     row.append($('<td>').text(v.faktur_no));
                     row.append($('<td>').text(v.list_lpb));
-                    row.append($('<td>').text(greatFormatRupiah(v.potongan)));
-                    row.append($('<td>').text(greatFormatRupiah(v.tambahan)));
+
+                    // Di refreshTableAdjustment(), bagian render badge:
+                    // Kolom potongan
+                    row.append(`
+                        <td class="text-center">
+                            <span class="badge ${getAdjustmentBadgeClass(v.potongan, v.potongan_debit_account_id, v.potongan_credit_account_id)}
+                                cursor-pointer px-3 py-2"
+                                ${v.potongan > 0
+                                    ? `onclick="openAdjustmentModal(${v.id}, 'potongan', ${v.potongan})"`
+                                    : ''}
+                            >
+                                ${greatFormatRupiah(v.potongan)}
+                            </span>
+                        </td>
+                    `);
+
+                    // Kolom tambahan
+                    row.append(`
+                        <td class="text-center">
+                            <span class="badge ${getAdjustmentBadgeClass(v.tambahan, v.tambahan_debit_account_id, v.tambahan_credit_account_id)}
+                                cursor-pointer px-3 py-2"
+                                ${v.tambahan > 0
+                                    ? `onclick="openAdjustmentModal(${v.id}, 'tambahan', ${v.tambahan})"`
+                                    : ''}
+                            >
+                                ${greatFormatRupiah(v.tambahan)}
+                            </span>
+                        </td>
+                    `);
+
                     row.append($('<td>').text(greatFormatRupiah(v.nominal_faktur)));
-                    row.append($('<td>').text(greatFormatRupiah(v.total_paid)));
 
                     // Kolom input pembayaran
                     const inputCell = $('<td>').html(`
@@ -303,8 +394,8 @@
                             class="form-control form-control-sm text-end nominal_pembayaran"
                             style="font-weight:bold;"
                             onkeyup="this.value = greatFormatRupiah(this.value)"
-                            oninput="limitInputBayar(this, ${totalTagihan})"
-                            value="${greatFormatRupiah(totalTagihan)}"
+                            oninput="limitInputBayar(this, ${v.nominal_faktur})"
+                            value="${greatFormatRupiah(totalBayar)}"
                             data-id="${v.id}">
                     `);
                     row.append(inputCell);
@@ -315,7 +406,7 @@
                 // Footer total
                 const footerRow = $('<tr class="table-dark text-end">');
                 footerRow.append($('<td></td>'));
-                footerRow.append($('<td colspan="7"><b>GRAND TOTAL</b></td>'));
+                footerRow.append($('<td colspan="6"><b>GRAND TOTAL</b></td>'));
                 footerRow.append($(`
                     <td>
                         <input type="text"
@@ -459,6 +550,13 @@
 
         $('.jatuh_tempo_element').hide();
 
+        // Di dalam $(document).ready(), perbaiki pemanggilan:
+        $('#adjustmentModal').on('shown.bs.modal', function () {
+            initSelect2Akun('#debit_account_id', 'Pilih Debit');
+            initSelect2Akun('#credit_account_id', 'Pilih Kredit');
+        });
+
+
         $("#payment_date").datepicker({
             todayHighlight: true,
             format: "dd/mm/yyyy",
@@ -479,13 +577,6 @@
         }).change(function() {
             generatePaymentNumber();
         });
-
-        // $('#status_pph').select2({
-        //     placeholder: "Status PPH",
-        //     theme: "bootstrap-5"
-        // }).change(function() {
-        //     listBarangDetail();
-        // });
 
         $('#akun_selisih').select2({
             placeholder: "Akun Selisih (Opsional)",
@@ -718,6 +809,15 @@
 
     })
 
+
+    function getAdjustmentBadgeClass(value, debitId, creditId) {
+        if (Number(value) <= 0) return 'bg-light text-muted';
+        if (!debitId || !creditId) return 'bg-warning text-dark';
+        return 'bg-success text-white';
+    }
+
+
+
     function listBarangDetail() {
         const id = $('#tanda_terima_supplier').val();
 
@@ -752,18 +852,44 @@
                 $.each(res.data, function (i, v) {
                     const tanggal = v.invoice_date.split('-');
                     const tglFormat = `${tanggal[2]}/${tanggal[1]}/${tanggal[0]}`;
-                    const totalTagihan = Number(v.sisa_bayar);
-                    grandTotalTagihan += totalTagihan;
+                    const totalBayar = Number(v.total_paid || 0);
+                    grandTotalTagihan += totalBayar;
+
 
                     const row = $('<tr>');
                     row.append($('<td>').text(no++));
                     row.append($('<td>').text(tglFormat));
                     row.append($('<td>').text(v.faktur_no));
                     row.append($('<td>').text(v.list_lpb));
-                    row.append($('<td>').text(greatFormatRupiah(v.potongan)));
-                    row.append($('<td>').text(greatFormatRupiah(v.tambahan)));
+
+                    // MENJADI:
+                    row.append(`
+                        <td class="text-center">
+                            <span class="badge ${getAdjustmentBadgeClass(v.potongan, v.potongan_debit_account_id, v.potongan_credit_account_id)}
+                                cursor-pointer px-3 py-2"
+                                ${Number(v.potongan) > 0
+                                    ? `onclick="openAdjustmentModal(${v.id}, 'potongan', ${v.potongan})"`
+                                    : ''}
+                            >
+                                ${greatFormatRupiah(v.potongan)}
+                            </span>
+                        </td>
+                    `);
+
+                    row.append(`
+                        <td class="text-center">
+                            <span class="badge ${getAdjustmentBadgeClass(v.tambahan, v.tambahan_debit_account_id, v.tambahan_credit_account_id)}
+                                cursor-pointer px-3 py-2"
+                                ${Number(v.tambahan) > 0
+                                    ? `onclick="openAdjustmentModal(${v.id}, 'tambahan', ${v.tambahan})"`
+                                    : ''}
+                            >
+                                ${greatFormatRupiah(v.tambahan)}
+                            </span>
+                        </td>
+                    `);
+
                     row.append($('<td>').text(greatFormatRupiah(v.nominal_faktur)));
-                    row.append($('<td>').text(greatFormatRupiah(v.total_paid)));
 
                     // Kolom input pembayaran
                     const inputCell = $('<td>').html(`
@@ -771,8 +897,8 @@
                             class="form-control form-control-sm text-end nominal_pembayaran"
                             style="font-weight:bold;"
                             onkeyup="this.value = greatFormatRupiah(this.value)"
-                            oninput="limitInputBayar(this, ${totalTagihan})"
-                            value="${greatFormatRupiah(totalTagihan)}"
+                            oninput="limitInputBayar(this, ${v.nominal_faktur})"
+                            value="${greatFormatRupiah(totalBayar)}"
                             data-id="${v.id}">
                     `);
                     row.append(inputCell);
@@ -783,7 +909,7 @@
                 // Footer total
                 const footerRow = $('<tr class="table-dark text-end">');
                 footerRow.append($('<td></td>'));
-                footerRow.append($('<td colspan="7"><b>GRAND TOTAL</b></td>'));
+                footerRow.append($('<td colspan="6"><b>GRAND TOTAL</b></td>'));
                 footerRow.append($(`
                     <td>
                         <input type="text"
@@ -802,76 +928,347 @@
         });
     }
 
+    function openAdjustmentModal(id, type, value) {
+        console.log('openAdjustmentModal called:', {id, type, value});
+        
+        const rowData = listPembayaran.find(x => x.id == id);
+        console.log('rowData:', rowData);
+        
+        $('#adjustmentId').val(id);
+        $('#adjustmentType').val(type);
+        $('#adjustmentValue').val(greatFormatRupiah(value));
+        $('#adjustmentValue').prop('readonly', true);
+        
+        // Reset select2
+        $('#debit_account_id').val(null).trigger('change');
+        $('#credit_account_id').val(null).trigger('change');
+        
+        // 🔥 BEDAKAN BERDASARKAN TYPE
+        if (type === 'potongan') {
+            console.log('Loading POTONGAN accounts:', {
+                debit: rowData.potongan_debit_account_id,
+                credit: rowData.potongan_credit_account_id
+            });
+            
+            if (rowData.potongan_debit_account_id) {
+                setSelect2Value(
+                    '#debit_account_id',
+                    rowData.potongan_debit_account_id,
+                    rowData.potongan_debit_account_name || ''
+                );
+            }
+            
+            if (rowData.potongan_credit_account_id) {
+                setSelect2Value(
+                    '#credit_account_id',
+                    rowData.potongan_credit_account_id,
+                    rowData.potongan_credit_account_name || ''
+                );
+            }
+            
+        } else if (type === 'tambahan') {
+            console.log('Loading TAMBAHAN accounts:', {
+                debit: rowData.tambahan_debit_account_id,
+                credit: rowData.tambahan_credit_account_id
+            });
+            
+            if (rowData.tambahan_debit_account_id) {
+                setSelect2Value(
+                    '#debit_account_id',
+                    rowData.tambahan_debit_account_id,
+                    rowData.tambahan_debit_account_name || ''
+                );
+            }
+            
+            if (rowData.tambahan_credit_account_id) {
+                setSelect2Value(
+                    '#credit_account_id',
+                    rowData.tambahan_credit_account_id,
+                    rowData.tambahan_credit_account_name || ''
+                );
+            }
+        }
+        
+        $('#adjustmentModal').modal('show');
+    }
 
-    // function drawPaidTable(res) {
-    //     const table = $('#dataTable');
-    //     const tbody = table.find('tbody');
-    //     tbody.empty();
 
-    //     if (!res.data || res.data.length === 0) {
-    //         tbody.html('<tr><td colspan="10" style="color: whitesmoke;">Tidak Ada Pembayaran</td></tr>');
-    //         return;
-    //     }
+    function saveAdjustment() {
+        const id = $('#adjustmentId').val();
+        const type = $('#adjustmentType').val();
+        
+        const debitAccountId = $('#debit_account_id').val();
+        const creditAccountId = $('#credit_account_id').val();
+        
+        // Ambil TEXT dari Select2
+        const debitSelect2 = $('#debit_account_id').select2('data');
+        const creditSelect2 = $('#credit_account_id').select2('data');
+        
+        const debitAccountText = debitSelect2.length > 0 ? debitSelect2[0].text : '';
+        const creditAccountText = creditSelect2.length > 0 ? creditSelect2[0].text : '';
+        
+        console.log('Saving adjustment:', {
+            id, type,
+            debitAccountId, debitAccountText,
+            creditAccountId, creditAccountText
+        });
+        
+        // 🔥 UPDATE KE PROPERTI YANG BERBEDA BERDASARKAN TYPE
+        listPembayaran = listPembayaran.map(item => {
+            if (item.id == id) {
+                if (type === 'potongan') {
+                    // Simpan ke akun potongan
+                    item.potongan_debit_account_id = debitAccountId;
+                    item.potongan_credit_account_id = creditAccountId;
+                    item.potongan_debit_account_name = debitAccountText;
+                    item.potongan_credit_account_name = creditAccountText;
+                    
+                    // Untuk kompatibilitas (jika perlu)
+                    item.debit_account_id = debitAccountId;
+                    item.credit_account_id = creditAccountId;
+                    
+                } else if (type === 'tambahan') {
+                    // Simpan ke akun tambahan
+                    item.tambahan_debit_account_id = debitAccountId;
+                    item.tambahan_credit_account_id = creditAccountId;
+                    item.tambahan_debit_account_name = debitAccountText;
+                    item.tambahan_credit_account_name = creditAccountText;
+                }
+                
+                console.log('Updated item:', item);
+            }
+            return item;
+        });
+        
+        // Refresh tabel
+        refreshTableAdjustment();
+        
+        $('#adjustmentModal').modal('hide');
+        showToast('Akun debit/kredit berhasil disimpan', 'success');
+    }
 
-    //     let no = 1;
-    //     let grandTotal = 0;
-    //     let grandTotalBayar = 0;
-    //     let grandSisa = 0;
 
-    //     res.data.forEach((item) => {
-    //         const detail = item.detail;
-    //         const list = item.list;
-    //         const paymentDetail = item.paymentDetail || [];
-    //         const totalBayar = paymentDetail.reduce((a, b) => a + Number(b.amount || 0), 0);
-    //         const sisaTagihan = Number(detail.nominal_faktur) - totalBayar;
+    function refreshTableAdjustment() {
+        console.log('refreshTableAdjustment called, listPembayaran:', listPembayaran);
+        
+        const table = $('#dataTable');
+        const tbody = table.find('tbody');
+        tbody.empty();
+        
+        if (!listPembayaran || listPembayaran.length === 0) {
+            tbody.html('<tr><td colspan="10" style="color: whitesmoke;">Tidak Ada Pembayaran</td></tr>');
+            return;
+        }
+        
+        let no = 1;
+        let grandTotalTagihan = 0;
+        
+        $.each(listPembayaran, function (i, v) {
+            // Format tanggal
+            let tglFormat = '';
+            if (v.invoice_date) {
+                const tanggal = v.invoice_date.split('-');
+                if (tanggal.length === 3) {
+                    tglFormat = `${tanggal[2]}/${tanggal[1]}/${tanggal[0]}`;
+                }
+            }
+            
+            const totalBayar = Number(v.total_paid || 0);
+            grandTotalTagihan += totalBayar;
+            
+            // Gunakan nilai yang benar
+            const potonganValue = Number(v.potongan || 0);
+            const tambahanValue = Number(v.tambahan || 0);
+            
+            const row = $('<tr>');
+            row.append($('<td>').text(no++));
+            row.append($('<td>').text(tglFormat));
+            row.append($('<td>').text(v.faktur_no || ''));
+            row.append($('<td>').text(v.list_lpb || ''));
+            
+            // Kolom potongan - gunakan nilai sebenarnya
+            row.append(`
+                <td class="text-center">
+                    <span class="badge ${getAdjustmentBadgeClass(v.potongan, v.potongan_debit_account_id, v.potongan_credit_account_id)}
+                        cursor-pointer px-3 py-2"
+                        ${Number(v.potongan) > 0
+                            ? `onclick="openAdjustmentModal(${v.id}, 'potongan', ${v.potongan})"`
+                            : ''}
+                    >
+                        ${greatFormatRupiah(v.potongan)}
+                    </span>
+                </td>
+            `);
 
-    //         // Loop setiap item barang di dalam satu faktur
-    //         list.forEach((v, idx) => {
-    //             const dateSplit = v.lpb_date.split('-');
-    //             const tanggal = `${dateSplit[2]}/${dateSplit[1]}/${dateSplit[0]}`;
-    //             const row = $('<tr>');
-    //             row.append($('<td>').text(no++));
-    //             row.append($('<td>').text(tanggal));
-    //             row.append($('<td>').text(v.faktur_no));
-    //             row.append($('<td>').text(v.lpb_no));
-    //             row.append($('<td>').text(v.item_name));
-    //             row.append($('<td>').text(v.qty));
-    //             row.append($('<td>').text(v.unit));
-    //             row.append($('<td>').text(greatFormatRupiah(v.price)));
-    //             row.append($('<td>').text('-')); // total tagihan per item (kosong, tampil per faktur di bawah)
-    //             row.append($('<td>').text('-'));
-    //             tbody.append(row);
-    //         });
+            row.append(`
+                <td class="text-center">
+                    <span class="badge ${getAdjustmentBadgeClass(v.tambahan, v.tambahan_debit_account_id, v.tambahan_credit_account_id)}
+                        cursor-pointer px-3 py-2"
+                        ${Number(v.tambahan) > 0
+                            ? `onclick="openAdjustmentModal(${v.id}, 'tambahan', ${v.tambahan})"`
+                            : ''}
+                    >
+                        ${greatFormatRupiah(v.tambahan)}
+                    </span>
+                </td>
+            `);
+            
+            row.append($('<td>').text(greatFormatRupiah(v.nominal_faktur || 0)));
+            
+            // Input pembayaran
+            const inputCell = $('<td>').html(`
+                <input type="text"
+                    class="form-control form-control-sm text-end nominal_pembayaran"
+                    style="font-weight:bold;"
+                    onkeyup="this.value = greatFormatRupiah(this.value)"
+                    oninput="limitInputBayar(this, ${v.nominal_faktur})"
+                    value="${greatFormatRupiah(totalBayar)}"
+                    data-id="${v.id}">
+            `);
+            row.append(inputCell);
+            
+            tbody.append(row);
+        });
+        
+        // Footer total
+        const footerRow = $('<tr class="table-dark text-end">');
+        footerRow.append($('<td></td>'));
+        footerRow.append($('<td colspan="6"><b>GRAND TOTAL</b></td>'));
+        footerRow.append($(`
+            <td>
+                <input type="text"
+                    id="total_pembayaran"
+                    name="total_pembayaran"
+                    class="form-control form-control-sm text-end fw-bold"
+                    value="${greatFormatRupiah(grandTotalTagihan)}"
+                    readonly>
+            </td>
+        `));
+        tbody.append(footerRow);
+        
+        console.log('Table refreshed');
+    }
 
-    //         // Baris ringkasan per faktur
-    //         const summaryRow = $('<tr class="table-info font-weight-bold">');
-    //         summaryRow.append($('<td colspan="7" style="text-align:right;">').html(`<b>${detail.faktur_no}</b>`));
-    //         summaryRow.append($('<td>').html(`<b>${greatFormatRupiah(detail.nominal_faktur)}</b>`)); // Total Tagihan
-    //         summaryRow.append($('<td>').html(`<b>${greatFormatRupiah(totalBayar)}</b>`)); // Total Bayar
-    //         summaryRow.append($('<td>').html(`<b>${greatFormatRupiah(sisaTagihan)}</b>`)); // Sisa
-    //         tbody.append(summaryRow);
+    function setSelect2Value(selector, id, text) {
+        if (!id) return;
+        
+        // Jika text sudah ada (dari listPembayaran)
+        if (text) {
+            // Hapus spasi ekstra di awal/akhir
+            text = text.trim();
+            
+            // Cek apakah option sudah ada
+            let optionExists = false;
+            $(selector).find('option').each(function() {
+                if ($(this).val() == id) {
+                    optionExists = true;
+                    return false; // break loop
+                }
+            });
+            
+            if (!optionExists) {
+                // Tambah option baru
+                const newOption = new Option(text, id, true, true);
+                $(selector).append(newOption);
+            }
+            
+            // Set value dan trigger change
+            $(selector).val(id).trigger('change');
+        } else {
+            // Jika text tidak ada, load via AJAX untuk mendapatkan text
+            $.ajax({
+                url: "<?= base_url('/sub-account/dropdown-new'); ?>",
+                method: "GET",
+                data: { 
+                    search: '',
+                    id: id // Kirim ID untuk mencari spesifik
+                },
+                dataType: "json",
+                success: function(response) {
+                    if (response.results && response.results.length > 0) {
+                        // Cari item dengan id yang sesuai
+                        const item = response.results.find(r => r.id == id);
+                        if (item) {
+                            const newOption = new Option(item.text, id, true, true);
+                            $(selector).append(newOption).trigger('change');
+                        }
+                    }
+                }
+            });
+        }
+    }
 
-    //         grandTotal += Number(detail.nominal_faktur);
-    //         grandTotalBayar += totalBayar;
-    //         grandSisa += sisaTagihan;
-    //     });
+    function initSelect2Akun(selector, placeholderText) {
+        $(selector).select2({
+            theme: "bootstrap-5",
+            placeholder: placeholderText,
+            allowClear: true,
+            dropdownParent: $('#adjustmentModal'),
+            ajax: {
+                url: "<?= base_url('/sub-account/dropdown-new'); ?>",
+                dataType: "json",
+                delay: 250,
+                data: function (params) {
+                    return {
+                        search: params.term
+                    };
+                },
+                processResults: function (data) {
+                    // 🔥 LANGSUNG pakai data.results karena sudah format yang benar
+                    return {
+                        results: data.results
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 3
+        });
+    }
 
-    //     // Footer total keseluruhan
-    //     const footerRow = $('<tr class="table-dark">');
-    //     footerRow.append($('<td colspan="7" style="text-align:right;">').html('<b>GRAND TOTAL</b>'));
-    //     footerRow.append($('<td>').html(`<b>${greatFormatRupiah(grandTotal)}</b>`));
-    //     footerRow.append($('<td>').html(`<b>${greatFormatRupiah(grandTotalBayar)}</b>`));
-    //     footerRow.append($('<td>').html(`<b>${greatFormatRupiah(grandSisa)}</b>`));
-    //     tbody.append(footerRow);
+    function validateBeforeSubmit() {
+        // Cek potongan yang belum ada akun
+        const potonganInvalid = listPembayaran.some(item =>
+            Number(item.potongan || 0) > 0 &&
+            (!item.potongan_debit_account_id || !item.potongan_credit_account_id)
+        );
+        
+        // Cek tambahan yang belum ada akun
+        const tambahanInvalid = listPembayaran.some(item =>
+            Number(item.tambahan || 0) > 0 &&
+            (!item.tambahan_debit_account_id || !item.tambahan_credit_account_id)
+        );
+        
+        if (potonganInvalid) {
+            alert('Masih ada potongan yang belum dipilih akun Debit/Kredit');
+            return false;
+        }
+        
+        if (tambahanInvalid) {
+            alert('Masih ada tambahan yang belum dipilih akun Debit/Kredit');
+            return false;
+        }
+        
+        return true;
+    }
 
-    //     // Baris input editable di pojok kanan bawah
-    //     const inputRow = $('<tr class="bg-light">');
-    //     inputRow.append($('<td colspan="9" style="text-align:right;">').text('Nominal Pembayaran:'));
-    //     const inputCell = $('<td style="text-align:center;">');
-    //     inputCell.append('<input type="text" class="form-control form-control-sm text-end nominalPembayaranInput" placeholder="Ketik nominal..." style="font-weight:bold;">');
-    //     inputRow.append(inputCell);
-    //     tbody.append(inputRow);
-    // }
+
+    function showToast(message, type = 'success') {
+        // Hapus toast sebelumnya
+        $('.toast').remove();
+        
+        const toast = $(`
+            <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0 position-fixed bottom-0 end-0 m-3" role="alert">
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+        `);
+        $('body').append(toast);
+        const bsToast = new bootstrap.Toast(toast[0]);
+        bsToast.show();
+        setTimeout(() => toast.remove(), 3000);
+    }
 
     function remove(id) {
         const csrfToken = '<?= csrf_token() ?>';

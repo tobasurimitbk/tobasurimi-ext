@@ -23,7 +23,13 @@ class LocalPOPaymentDetailModel extends Model
         'rm_purchase_order_details_id',
         'total',
         'total_pay_pph',
-        'tipe'
+        'tipe',
+        'potongan',
+        'tambahan',
+        'potongan_debit_account_id',
+        'potongan_credit_account_id',
+        'tambahan_debit_account_id',
+        'tambahan_credit_account_id'
     ];
 
     // Dates
