@@ -33,12 +33,12 @@
         .description-container {
             border: 0.5px solid;
             border-radius: 7px;
-            height: 50px;
-            margin-top: 8px;
-            width: 70%;
+            height: 30px;
+            margin-left: -50px;
+            width: 100%;
             position: relative;
             padding-top: 7px;
-            padding-left: 17px;
+            padding-left: 5px;
         }
 
         .description-label {
@@ -96,10 +96,9 @@
     ?>
     <table class="w-100">
         <tr>
-            <td style="width: 70%;padding-right: 100px">
+            <td style="width: 70%;padding-right: 20px">
                 <div class="company-name">
                     Toba Fish
-                    (<?= $companyName ?>)
                 </div>
                 <div>
                     <table class="w-100">
@@ -113,7 +112,7 @@
                     </table>
                 </div>
             </td>
-            <td style="width: 35%;text-align: right;">
+            <td style="width: 40%;text-align: right;">
                 <div class="txt-bold txt-center" style="font-size: 20px; margin-bottom:3px;">SURAT JALAN</div>
                 <table class="w-100" style="border: 0.5px solid;border-radius: 7px;margin-right: 0">
                     <tr>
@@ -258,7 +257,7 @@
                 <div>Barang yang sudah diterima tidak dapat dikembalikan</div>
                 <div>Kecuali memenuhi ketentuan perjanjian BS Exp Date</div>
             </td>
-            <td style="padding-left:10px">
+            <td>
                 <div class="description-container">
                     <label class="description-label">Description: </label>
                     <?= $sjData->note ?? '' ?>

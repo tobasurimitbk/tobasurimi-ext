@@ -7,7 +7,7 @@
     <title>Invoice Penjualan Lokal</title>
     <style>
         body {
-            font-size: 7px;
+            font-size: 8px;
             font-family: 'DejaVu Sans Mono';
             font-weight: 500;
         }
@@ -33,7 +33,8 @@
         .description-container {
             border: 0.5px solid;
             border-radius: 5px;
-            min-height: 50px;
+            font-size: 7px;
+            min-height: 30px;
             margin-top: 3px;
             padding-left: 5px;
         }
@@ -77,7 +78,8 @@
         .rounded-border {
             border: 0.5px solid;
             border-radius: 5px;
-            padding: 2px;
+            padding-left: 2px;
+            padding-top: 0px;
             /* Padding diperkecil */
         }
 
@@ -152,7 +154,7 @@
 
                             $cleaned_string_document_no = str_replace($unwanted_characters, '', $invData->document_no);
                             ?>
-                            <div class="txt-center" style="font-size: 7px;"><?= $cleaned_string_document_no ?>&nbsp;</div>
+                            <div class="txt-center" style="font-size: 8px;"><?= $cleaned_string_document_no ?>&nbsp;</div>
                         </td>
                     </tr>
                 </table>
@@ -204,7 +206,7 @@
         </tbody>
     </table>
 
-    <table class="w-100" style="border-spacing: 3px 0;border: 0.5px;">
+    <table class="w-100" style="border-spacing: 3px 0;border: 0.5px; margin-top: -3px;">
         <tr>
             <td style="width: 30px;" valign="top">Say : </td>
             <td class="rounded-border" style="width: 65%;" valign="top">
@@ -225,7 +227,7 @@
         </tr>
     </table>
 
-    <table class="w-100">
+    <table class="w-100" style="margin-top: -2px;">
         <tr>
             <td style="width: 70%;" valign="top">
                 <table class="w-100">
@@ -233,7 +235,7 @@
                         <td valign="top" style="width: 65%;">
                             <div class="description-container">
                                 <label class="description-label">Description: </label>
-                                <ol class="payment-list" style="margin-left: -23px;">
+                                <ol class="payment-list" style="margin-left: -23px; margin-top: 1px; margin-bottom: 1px;">
                                     <?= $companyAccount ?>
                                 </ol>
                                 <?= $invData->keterangan ?>
@@ -253,13 +255,13 @@
                 </table>
             </td>
             <td valign="top">
-                <table class="w-100 rounded-border" style="margin-bottom: 3px;">
+                <table class="w-100 rounded-border" style="margin-bottom: 1px;">
                     <tr>
                         <td>Tot Sub Stlh Pjk</td>
                         <td class="txt-right"><?= number_format($invData->total_invoice) ?></td>
                     </tr>
                 </table>
-                <div class="rounded-border" style="margin-bottom: 3px;">&nbsp;</div>
+                <div class="rounded-border" style="margin-bottom: 1px;">&nbsp;</div>
                 <div class="rounded-border">
                     <table class="w-100 txt-bold" style="border-collapse: collapse;">
                         <tr>
