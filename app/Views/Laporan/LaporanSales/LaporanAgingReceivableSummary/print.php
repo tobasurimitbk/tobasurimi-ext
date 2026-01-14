@@ -1,52 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sales Invoices List</title>
+    <title>Aging Receivable Summary</title>
     <style>
         body { font-family: Arial, sans-serif; font-size: 11px; }
         table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #ddd; padding: 8px; }
-        th { background-color: #f2f2f2; text-align: center; font-size: 12px; }
-        .text-center { text-align: center; }
+        th, td { border: 1px solid #000; padding: 6px; }
+        th { background: #f2f2f2; text-align: center; }
         .text-right { text-align: right; }
         .text-left { text-align: left; }
-        .txt-bold { font-weight: bold; }
-        .customer-row { background-color: #e6e6e6; }
-        .total-row { background-color: #f2f2f2; }
+        .text-center { text-align: center; }
     </style>
 </head>
 <body>
-    <h3 style="text-align: center;">TOBA FISH</h3>
-    <h2 style="text-align: center; color: red;">Sales Invoices List</h2>
-    <p style="text-align: center;">Periode: <?= $dateStart ?> - <?= $dateEnd ?></p>
-    
-    <table>
-        <thead>
+
+<h3 style="text-align:center;">TOBA FISH</h3>
+<h2 style="text-align:center;">Aging Receivable Summary</h2>
+<p style="text-align:center;">Hingga: <?= $dateEnd ?></p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Customer Name</th>
+            <th>Total Invoice</th>
+            <th>Not Yet</th>
+            <th>1 - 30</th>
+            <th>31 - 60</th>
+            <th>61 - 90</th>
+            <th>91 - 120</th>
+            <th>> 120</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($data as $row): ?>
             <tr>
-                <th>No. Faktur</th>
-                <th>Tanggal Faktur</th>
-                <th>Tanggal Jatuh Tempo</th>
-                <th>Nama Pelanggan</th>
-                <th>Nama Penjual</th>
-                <th>Total Invoice</th>
-                <th>Total Belum Dibayar</th>
-                <th>Keterangan</th>
+                <td class="text-left"><?= $row['customer_name'] ?></td>
+                <td class="text-right"><?= $row['total_invoice'] ?></td>
+                <td class="text-right"><?= $row['not_yet'] ?></td>
+                <td class="text-right"><?= $row['aging_1_30'] ?></td>
+                <td class="text-right"><?= $row['aging_31_60'] ?></td>
+                <td class="text-right"><?= $row['aging_61_90'] ?></td>
+                <td class="text-right"><?= $row['aging_91_120'] ?></td>
+                <td class="text-right"><?= $row['over_120'] ?></td>
             </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($data as $row): ?>
-                <tr>
-                    <td class="text-left"><?= $row['no_faktur'] ?></td>
-                    <td class="text-left"><?= $row['tanggal_faktur'] ?></td>
-                    <td class="text-left"><?= $row['tanggal_jatuh_tempo'] ?></td>
-                    <td class="text-left"><?= $row['nama_pelanggan'] ?></td>
-                    <td class="text-left"><?= $row['nama_sales'] ?></td>
-                    <td class="text-right"><?= $row['total_invoice'] ?></td>
-                    <td class="text-right"><?= $row['pay_amount'] ?></td>
-                    <td class="text-left"><?= $row['keterangan'] ?></td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
 </body>
 </html>

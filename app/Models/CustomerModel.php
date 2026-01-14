@@ -569,7 +569,8 @@ class CustomerModel extends Model
             ->select($selectQry)
             ->where($condition)
             ->where('tipe_customer', 'LOKAL')
-            ->join('sales_order_invoice', 'sales_order_invoice.id_customer = customers.id', 'left');
+            ->join('sales_order_invoice', 'sales_order_invoice.id_customer = customers.id AND sales_order_invoice.deletedAt IS NULL', 'left')
+            ->groupBy('customers.id');
 
         if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_customer']) {
             $customerDataQry->groupStart();

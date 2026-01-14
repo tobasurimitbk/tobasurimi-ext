@@ -3144,6 +3144,7 @@ $routes->get('/laporan-sales/items-sales-by-customers/printExcel/(:segment)/(:se
 
 $routes->get('/laporan-sales/aging-receivable-summary', 'Laporan\Penjualan\AgingReceivableSummary::index', ['filter' => 'Auth']);
 $routes->get('/laporan-sales/aging-receivable-summary/all', 'Laporan\Penjualan\AgingReceivableSummary::allTransaksi', ['filter' => 'Auth']);
+$routes->get('/laporan-sales/aging-receivable-summary/detail', 'Laporan\Penjualan\AgingReceivableSummary::detailAgingInvoice', ['filter' => 'Auth']);
 $routes->get('/laporan-sales/aging-receivable-summary/printPDF/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\AgingReceivableSummary::LaporanPenjualanPrint/$1/$2/$3/$4', ['filter' => 'Auth']);
 $routes->get('/laporan-sales/aging-receivable-summary/printExcel/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\AgingReceivableSummary::exportExcel/$1/$2/$3/$4', ['filter' => 'Auth']);
 // RETUR LOKAL BB

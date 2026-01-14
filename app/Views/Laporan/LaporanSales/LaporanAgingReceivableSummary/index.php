@@ -4,6 +4,14 @@
     .txt-bold {
         font-weight: 700 !important;
     }
+    .aging-link {
+        color: #0d6efd;
+        cursor: pointer;
+        text-decoration: underline;
+    }
+    .aging-link:hover {
+        color: #0a58ca;
+    }
 </style>
 
 <!-- Begin Page Content -->
@@ -30,14 +38,6 @@
                     <div class="row">
                         <div class="col-md-3 mb-3">
                             <div class="input-group" style="height: 50px;">
-                                <input style="height: auto;" autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Mulai Tanggal Transaksi">
-                                <div class="input-group-prepend group-prepend-password align-items-center">
-                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <div class="input-group" style="height: 50px;">
                                 <input style="height: auto;" autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Selesai Tanggal Transaksi">
                                 <div class="input-group-prepend group-prepend-password align-items-center">
                                     <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
@@ -60,9 +60,6 @@
                                 </select>
                                 <label for="floatingInput">Pelanggan</label>
                             </div>
-                        </div>
-                        <div class="col-md-3" style="height: 50px;">
-                            <input style="height: auto;" autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
                         </div>
                     </div>
                 </div>
@@ -90,7 +87,33 @@
             </div>
         </div>
     </div>
+    <!-- MODAL DRILLDOWN -->
+    <div class="modal" id="invoiceModal">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detail Invoice Aging</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered" id="invoiceTable">
+                        <thead>
+                            <tr>
+                                <th>No Faktur</th>
+                                <th>Tgl Faktur</th>
+                                <th>Jatuh Tempo</th>
+                                <th>Aging (Hari)</th>
+                                <th>Sisa Invoice</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
+
 
 <script>
     let sort = "tanggal_jatuh_tempo";
@@ -113,11 +136,11 @@
     
     $(document).ready(function() {
         const csrfToken = '<?= csrf_token() ?>';
-        const table = $('.dataTable').DataTable({
-
+        const table = $('#dataTable').DataTable({
             processing: true,
             serverSide: true,
             ordering: true,
+            searching: false,
             order: [
                 [1, 'desc']
             ],
@@ -128,62 +151,26 @@
             ],
             pageLength: 25,
             ajax: {
-                url: "<?= base_url("laporan-sales/aging-receivable-summary/all"); ?>",
-                dataSrc: "data",
-                data: function(data) {
-                    data.search = $(".search").val();
-                    data.filter = $(".filter_customer").val();
-                    data.dateStart = $(".dateStart").val();
-                    data.dateEnd = $(".dateEnd").val();
-                    data.sort = sort;
-                    data.sortType = sortType;
+                url: "<?= base_url('laporan-sales/aging-receivable-summary/all'); ?>",
+                data: function(d) {
+                    d.search = $('.search').val();
+                    d.filter = $('.filter_customer').val();
+                    d.dateStart = $('.dateStart').val();
+                    d.dateEnd = $('.dateEnd').val();
                 }
             },
-            "initComplete": function(settings, json) {
-                $('.dataTables_length').empty();
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-            },
-            display: "stripe",
-            searching: false,
-            columns: [{
-                data: "no_faktur",
-                className: "text-left",
-            }, {
-                data: "tanggal_faktur",
-                className: "text-left",
-            }, {
-                data: "tanggal_jatuh_tempo",
-                className: "text-left",
-            }, {
-                data: "nama_pelanggan",
-                className: "text-left",
-            }, {
-                data: "nama_sales",
-                className: "text-left",
-            }, {
-                data: "total_invoice",
-                className: "text-right",
-            }, {
-                data: "pay_amount",
-                className: "text-right",
-            }, {
-                data: "keterangan",
-                className: "text-left",
-            } ],
-            columnDefs: [{
-                defaultContent: "-",
-                targets: "_all"
-            }],
-            language: {
-                emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
-                }
-            }
+            columns: [
+                { data: 'customer_name' },
+                { data: 'total_invoice', className: 'text-end txt-bold' },
+                agingColumn('not_yet', 'not_yet'),
+                agingColumn('1_30', '1_30'),
+                agingColumn('31_60', '31_60'),
+                agingColumn('61_90', '61_90'),
+                agingColumn('91_120', '91_120'),
+                agingColumn('over_120', 'over_120 text-danger')
+            ]
         });
+
         //CSS SELECT2 FLOATING LABEL
         $('.filter_customer').select2({
             placeholder: "Filter Pelanggan",
@@ -241,6 +228,67 @@
         })
 
     });
+
+    function agingColumn(key, cls) {
+        return {
+            data: key,
+            className: 'text-end ' + cls,
+            render: function(data, type, row) {
+                if (data === '0' || data === '-' || !data) return '-';
+                return `
+                    <span class="aging-link"
+                        onclick="showInvoice('${row.customer_id}','${key}')">
+                        ${data}
+                    </span>
+                `;
+            }
+        };
+    }
+    function showInvoice(customerId, aging) {
+        $.ajax({
+            url: "<?= base_url('laporan-sales/aging-receivable-summary/detail'); ?>",
+            type: "GET",
+            dataType: "json",
+            beforeSend: function(xhr) {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading()
+            },
+            data: {
+                customer_id: customerId,
+                aging: aging
+            },
+            success: function (res) {
+
+                if (!res || !res.data) {
+                    alert('Data invoice tidak ditemukan');
+                    return;
+                }
+
+                let html = '';
+                res.data.forEach(row => {
+                    html += `
+                        <tr>
+                            <td>${row.no_faktur}</td>
+                            <td>${row.tanggal_faktur}</td>
+                            <td>${row.tanggal_jatuh_tempo}</td>
+                            <td class="text-center">${row.aging_hari}</td>
+                            <td class="text-end">${greatFormatRupiah(row.sisa_invoice)}</td>
+                        </tr>
+                    `;
+                });
+
+                $('#invoiceTable tbody').html(html);
+                $('#invoiceModal').modal('show');
+                $('.modal-backdrop').remove();
+            },
+            error: function(xhr) {
+                console.error(xhr.responseText);
+                alert('Gagal mengambil detail invoice');
+            }
+        });
+    }
     const convertDateFormat = function(dateString) {
         // Memisahkan tanggal, bulan, dan tahun dari string
         var dateParts = dateString.split("/");

@@ -104,6 +104,7 @@ class SalesOrderInvoiceModel extends Model
         sales_order_invoice.document_type AS doc_type,
         sales_order_invoice.document_id AS document_id,
         sales_order_invoice.pay_amount AS pay_amount,
+        sales_order_invoice.id_customer,
         termin_data.value AS termin,
         DATE_ADD(
             sales_order_invoice.tanggal_faktur,
@@ -212,6 +213,164 @@ class SalesOrderInvoiceModel extends Model
             'totalData'         => $totalData,
             'totalFilteredData' => $totalFilteredData
         ];
+    }
+
+    public function getAgingReceivableSummary($condition, $addCondition, $limit = 25, $offset = 0)
+    {
+        $builder = $this->db->table('sales_order_invoice');
+
+        $builder->select("
+            customers.id AS customer_id,
+            customers.name AS customer_name,
+
+            SUM(
+                CASE 
+                    WHEN DATEDIFF(CURDATE(), tanggal_jatuh_tempo) < 0
+                    THEN sisa_invoice ELSE 0
+                END
+            ) AS not_yet,
+
+            SUM(
+                CASE 
+                    WHEN DATEDIFF(CURDATE(), tanggal_jatuh_tempo) BETWEEN 1 AND 30
+                    THEN sisa_invoice ELSE 0
+                END
+            ) AS aging_1_30,
+
+            SUM(
+                CASE 
+                    WHEN DATEDIFF(CURDATE(), tanggal_jatuh_tempo) BETWEEN 31 AND 60
+                    THEN sisa_invoice ELSE 0
+                END
+            ) AS aging_31_60,
+
+            SUM(
+                CASE 
+                    WHEN DATEDIFF(CURDATE(), tanggal_jatuh_tempo) BETWEEN 61 AND 90
+                    THEN sisa_invoice ELSE 0
+                END
+            ) AS aging_61_90,
+
+            SUM(
+                CASE 
+                    WHEN DATEDIFF(CURDATE(), tanggal_jatuh_tempo) BETWEEN 91 AND 120
+                    THEN sisa_invoice ELSE 0
+                END
+            ) AS aging_91_120,
+
+            SUM(
+                CASE 
+                    WHEN DATEDIFF(CURDATE(), tanggal_jatuh_tempo) > 120
+                    THEN sisa_invoice ELSE 0
+                END
+            ) AS aging_over_120,
+
+            SUM(sisa_invoice) AS total_invoice
+        ");
+
+        // JOIN
+        $builder->join('customers', 'customers.id = sales_order_invoice.id_customer');
+        $builder->join('metadata AS termin_data', 'termin_data.id = sales_order_invoice.terms', 'left');
+
+        // HITUNG JATUH TEMPO + SISA INVOICE
+        $builder->join("
+            (
+                SELECT 
+                    soi.id,
+                    DATE_ADD(
+                        soi.tanggal_faktur,
+                        INTERVAL 
+                            CASE 
+                                WHEN md.value = 'COD' THEN 0
+                                ELSE CAST(md.value AS UNSIGNED)
+                            END DAY
+                    ) AS tanggal_jatuh_tempo,
+                    (SUM(soid.amount_invoice) - soi.pay_amount) AS sisa_invoice
+                FROM sales_order_invoice soi
+                LEFT JOIN sales_order_invoice_detail soid 
+                    ON soid.id_sales_order_invoice = soi.id
+                LEFT JOIN metadata md ON md.id = soi.terms
+                WHERE soi.deletedAt IS NULL
+                GROUP BY soi.id
+            ) inv_calc
+        ", "inv_calc.id = sales_order_invoice.id", "INNER");
+
+        // WHERE BASE
+        $builder->where($condition);
+        $builder->where('inv_calc.sisa_invoice >', 0);
+
+        // FILTER
+        if (!empty($addCondition['filter_customer'])) {
+            $builder->where('sales_order_invoice.id_customer', $addCondition['filter_customer']);
+        }
+
+        if (!empty($addCondition['dateEnd'])) {
+            $builder->where('sales_order_invoice.tanggal_faktur <=', $addCondition['dateEnd']);
+        }
+
+        // GROUP BY CUSTOMER
+        $builder->groupBy('customers.id');
+
+        // TOTAL DATA
+        $totalData = clone $builder;
+        $recordsTotal = $totalData->countAllResults(false);
+
+        // PAGINATION
+        if ($limit !== null) {
+            $builder->limit($limit, $offset);
+        }
+
+        $data = $builder->get()->getResult();
+
+        return [
+            'data' => $data,
+            'totalData' => $recordsTotal,
+            'totalFilteredData' => $recordsTotal
+        ];
+    }
+
+    public function getInvoiceByAging($customerId, $agingType)
+    {
+        $range = [
+            'not_yet' => "DATEDIFF(CURDATE(), jatuh_tempo) < 0",
+            '1_30'    => "DATEDIFF(CURDATE(), jatuh_tempo) BETWEEN 1 AND 30",
+            '31_60'   => "DATEDIFF(CURDATE(), jatuh_tempo) BETWEEN 31 AND 60",
+            '61_90'   => "DATEDIFF(CURDATE(), jatuh_tempo) BETWEEN 61 AND 90",
+            '91_120'  => "DATEDIFF(CURDATE(), jatuh_tempo) BETWEEN 91 AND 120",
+            'over_120'=> "DATEDIFF(CURDATE(), jatuh_tempo) > 120",
+        ];
+
+        $whereAging = $range[$agingType];
+
+        return $this->db->query("
+            SELECT
+                soi.no_faktur,
+                DATE_FORMAT(soi.tanggal_faktur, '%d/%m/%Y') AS tanggal_faktur,
+                DATE_FORMAT(jatuh_tempo, '%d/%m/%Y') AS tanggal_jatuh_tempo,
+                DATEDIFF(CURDATE(), jatuh_tempo) AS aging_hari,
+                (SUM(soid.amount_invoice) - soi.pay_amount) AS sisa_invoice
+            FROM sales_order_invoice soi
+            LEFT JOIN sales_order_invoice_detail soid
+                ON soid.id_sales_order_invoice = soi.id
+            LEFT JOIN (
+                SELECT 
+                    sales_order_invoice.id,
+                    DATE_ADD(tanggal_faktur,
+                        INTERVAL 
+                            CASE 
+                                WHEN md.value = 'COD' THEN 0
+                                ELSE CAST(md.value AS UNSIGNED)
+                            END DAY
+                    ) AS jatuh_tempo
+                FROM sales_order_invoice
+                LEFT JOIN metadata md ON md.id = terms
+            ) jt ON jt.id = soi.id
+            WHERE soi.id_customer = ?
+            AND $whereAging
+            GROUP BY soi.id
+            HAVING sisa_invoice > 0
+            ORDER BY jatuh_tempo ASC
+        ", [$customerId])->getResult();
     }
 
     public function getCustomerItemDetail($condition, $addCondition) {
