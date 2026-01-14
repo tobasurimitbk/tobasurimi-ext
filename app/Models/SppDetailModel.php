@@ -25,7 +25,7 @@ class SppDetailModel extends Model
     ];
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'createdAt';
     protected $updatedField  = 'updatedAt';
@@ -60,7 +60,7 @@ class SppDetailModel extends Model
                     barang_master_spesifikasi.spesifikasi";
 
         $condition = [
-            "purchase_request_id" => $id,
+            "purchase_request_details.purchase_request_id" => $id,
         ];
 
         $sppDetailData = $this->asObject()
@@ -69,6 +69,7 @@ class SppDetailModel extends Model
             ->join('barang_master', 'purchase_request_details.barang1_id = barang_master.id', 'left')
             ->join('satuans', 'purchase_request_details.unit = satuans.id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = purchase_request_details.barang2_id', 'left')
+            ->where('purchase_request_details.deletedAt', null)
             ->findAll();
 
         foreach ($sppDetailData as $i => $d) {

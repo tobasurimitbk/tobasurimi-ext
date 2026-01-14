@@ -290,10 +290,15 @@ class SPP extends BaseController
         $id_detail_all = [];
 
         foreach ($spp_detail as $s) {
-            $check = $this->SppDetailModel->where('id', $s->barang_detail_id)->first();
+            $check = $this->SppDetailModel
+                ->where('id', $s->barang_detail_id)
+                ->where('purchase_request_id', $id)
+                ->where('deletedAt', null)
+                ->first();
+
             if ($check != null) {
+                // UPDATE DETAIL
                 $this->SppDetailModel->update($check['id'], [
-                    'purchase_request_id' => $id,
                     'barang1_id' => decrypt($s->barang_id),
                     'barang2_id' => decrypt($s->barang_spesifikasi_id),
                     'nama_barang' => $s->nama_barang,
@@ -318,10 +323,10 @@ class SPP extends BaseController
             }
         }
 
-        $this->SppDetailModel
-            ->where('purchase_request_id', $id)
-            ->whereNotIn('id', $id_detail_all)
-            ->delete();
+        // $this->SppDetailModel
+        //     ->where('purchase_request_id', $id)
+        //     ->whereNotIn('id', $id_detail_all)
+        //     ->delete();
 
         $this->updateKeteranganPo($id);
 
