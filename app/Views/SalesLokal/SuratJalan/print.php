@@ -98,7 +98,7 @@
         <tr>
             <td style="width: 70%;padding-right: 20px">
                 <div class="company-name">
-                    Toba Fish
+                    TOBA FISH
                 </div>
                 <div>
                     <table class="w-100">
@@ -241,7 +241,7 @@
         </tr>
         <tr>
             <td style="width:1px;">Terbilang</td>
-            <td style="border:0.5px solid;width: 300px;">
+            <td style="border:0.5px solid;width: 300px; padding-left: 3px;">
                 <div><?= terbilang($totalInv) ?></div>
             </td>
             <td class="txt-right">Total Faktur:</td>

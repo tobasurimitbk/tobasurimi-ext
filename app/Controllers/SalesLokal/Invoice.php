@@ -974,12 +974,6 @@ class Invoice extends BaseController
         $id = decrypt($id);
 
         /* =========================
-        * DATA PERUSAHAAN
-        * ========================= */
-        $companyData = $this->companyModel->asObject()
-            ->find($this->this_company_id);
-
-        /* =========================
         * DATA INVOICE
         * ========================= */
         $invSelectQry = "
@@ -1009,6 +1003,12 @@ class Invoice extends BaseController
         if (!$invData) {
             throw new \RuntimeException("Invoice dengan ID {$id} tidak ditemukan.");
         }
+
+        /* =========================
+        * DATA PERUSAHAAN
+        * ========================= */
+        $companyData = $this->companyModel->asObject()
+            ->find($invData->id_company);
 
         /* =========================
         * DETAIL INVOICE

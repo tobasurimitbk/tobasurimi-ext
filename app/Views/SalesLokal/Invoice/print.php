@@ -112,7 +112,7 @@
         <tr>
             <td style="width: 70%; padding-right: 20px;">
                 <div class="company-name">
-                    Toba Fish (<?= $companyName ?>)
+                    TOBA FISH (<?= $companyName ?>)
                 </div>
 
                 <div>
@@ -142,20 +142,48 @@
                         </td>
                     </tr>
                     <tr>
-                        <td style="border: 0.5px solid;border-style: dashed dashed hidden hidden">
-                            <div>No. PO</div>
-                            <div class="txt-center"><?= $invData->no_po ?>&nbsp;</div>
-                        </td>
+                        <?php
+                            $unwanted_characters = ['[', '"', ']'];
+                            $cleaned_string_document_no = str_replace(
+                                $unwanted_characters,
+                                '',
+                                $invData->document_no
+                            );
 
-                        <td style="border-top: 0.5px solid;border-top-style: dashed">
-                            <div>SJ/OF No.</div>
-                            <?php
-                            $unwanted_characters = array('[', '"', ']');
+                            // hitung jumlah SJ/OF
+                            $sjofArray = array_filter(explode(',', $cleaned_string_document_no));
+                            $jumlahSJOF = count($sjofArray);
 
-                            $cleaned_string_document_no = str_replace($unwanted_characters, '', $invData->document_no);
-                            ?>
-                            <div class="txt-center" style="font-size: 8px;"><?= $cleaned_string_document_no ?>&nbsp;</div>
-                        </td>
+                            // ambil 1 SJ/OF saja
+                            $sjofSatu = $sjofArray[0] ?? '';
+                        ?>
+
+                        <?php if (!empty($invData->no_po) || $jumlahSJOF === 1) : ?>
+                            <!-- No PO (tetap tampil walau kosong) -->
+                            <td style="border: 0.5px solid;border-style: dashed dashed hidden hidden">
+                                <div>No. PO</div>
+                                <div class="txt-center">
+                                    <?= !empty($invData->no_po) ? $invData->no_po : '&nbsp;' ?>
+                                </div>
+                            </td>
+
+                            <!-- SJ/OF No (1 data saja) -->
+                            <td style="border-top: 0.5px solid;border-top-style: dashed">
+                                <div>SJ/OF No.</div>
+                                <div class="txt-center" style="font-size: 8px;">
+                                    <?= $sjofSatu ?>&nbsp;
+                                </div>
+                            </td>
+
+                        <?php else : ?>
+                            <!-- SJ/OF No lebih dari 1 & no_po kosong -->
+                            <td style="border-top: 0.5px solid;border-top-style: dashed" colspan="2">
+                                <div>SJ/OF No.</div>
+                                <div class="txt-center" style="font-size: 8px;">
+                                    <?= $cleaned_string_document_no ?>&nbsp;
+                                </div>
+                            </td>
+                        <?php endif; ?>
                     </tr>
                 </table>
             </td>
@@ -209,7 +237,7 @@
     <table class="w-100" style="border-spacing: 3px 0;border: 0.5px; margin-top: -3px;">
         <tr>
             <td style="width: 30px;" valign="top">Say : </td>
-            <td class="rounded-border" style="width: 65%;" valign="top">
+            <td class="rounded-border" style="width: 65%; padding-left: 5px;" valign="top">
                 <?= (isset($invData->status_tax) && isset($invData->status_tax)) ? terbilang($invData->total_invoice) : terbilang($invData->total_invoice) ?>
             </td>
             <td class="rounded-border">
