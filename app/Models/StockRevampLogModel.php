@@ -1106,7 +1106,7 @@ class StockRevampLogModel extends Model
             $whereDateProsesRebus = "AND proses_rebus.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
             $whereDateJasaVendor = "AND jasa_vendor_in.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
             $whereDateHasilProduksi = "AND production_results.receive_date BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
-            $whereDateInisiasi = "AND DATE(stock_revamp_log.createdAt) BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
+            $whereDateInisiasi = "AND inisiasi_stock_revamp.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
             $whereDateAdjusment = "AND adjusment.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
             $whereDatePenerimaanMutasi = "AND penerimaan_mutasi.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
             $whereDatePenerimaanMutasiGlobal = "AND penerimaan_mutasi_global.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
@@ -1448,12 +1448,12 @@ class StockRevampLogModel extends Model
                 stock_revamp_detail.stock_id,
                 stock_revamp_log.id,
                 stock_revamp_detail.reference_type,
-                '' AS supplier_name,
+                suppliers.name AS supplier_name,
                 '' AS spp_no,
                 '' AS po_no,
                 '' AS reference_no,
                 '' AS po_date,
-                DATE(stock_revamp_log.createdAt) AS lpb_date,
+                inisiasi_stock_revamp.tanggal AS lpb_date,
                 stock_revamp_log.qty_diterima AS qty_diterima,
                 stock_revamp_log.keterangan,
                 satuans.kode_satuan
@@ -1461,6 +1461,8 @@ class StockRevampLogModel extends Model
             LEFT JOIN stock_revamp_detail ON stock_revamp_detail.id = stock_revamp_log.stock_detail_id
             LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
             LEFT JOIN satuans ON satuans.id = stock_revamp.unit_id
+            LEFT JOIN inisiasi_stock_revamp ON inisiasi_stock_revamp.stock_detail_id = stock_revamp_detail.id
+            LEFT JOIN suppliers ON suppliers.id = inisiasi_stock_revamp.supplier_id
             WHERE stock_revamp_log.deletedAt IS NULL
             AND stock_revamp_detail.reference_type='INISIASI'
             AND stock_revamp_log.status='IN'
@@ -2563,7 +2565,7 @@ class StockRevampLogModel extends Model
             $whereDateProsesRebus = "AND proses_rebus.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
             $whereDateJasaVendor = "AND jasa_vendor_in.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
             $whereDateHasilProduksi = "AND production_results.receive_date BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
-            $whereDateInisiasi = "AND DATE(stock_revamp_log.createdAt) BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
+            $whereDateInisiasi = "AND inisiasi_stock_revamp.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
             $whereDateAdjusment = "AND adjusment.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
             $whereDatePenerimaanMutasi = "AND penerimaan_mutasi.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
             $whereDatePenerimaanMutasiGlobal = "AND penerimaan_mutasi_global.tanggal BETWEEN '$condition[dateStart]' AND '$condition[dateEnd]'";
@@ -2867,7 +2869,7 @@ class StockRevampLogModel extends Model
                 stock_revamp_log.id,
                 stock_revamp_detail.reference_type,
                 '' AS reference_no,
-                DATE(stock_revamp_log.createdAt) AS tanggal,
+                inisiasi_stock_revamp.tanggal,
                 '' AS po_no,
                 stock_revamp_log.keterangan,
                 stock_revamp_log.qty_diterima AS qty_masuk,
@@ -2877,6 +2879,7 @@ class StockRevampLogModel extends Model
             LEFT JOIN stock_revamp_detail ON stock_revamp_detail.id = stock_revamp_log.stock_detail_id
             LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
             LEFT JOIN satuans ON satuans.id = stock_revamp.unit_id
+            LEFT JOIN inisiasi_stock_revamp ON inisiasi_stock_revamp.stock_detail_id = stock_revamp_detail.id
             WHERE stock_revamp_log.deletedAt IS NULL
             AND stock_revamp_detail.reference_type='INISIASI'
             AND stock_revamp_log.status='IN'
