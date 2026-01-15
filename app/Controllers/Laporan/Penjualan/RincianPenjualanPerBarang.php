@@ -14,20 +14,27 @@ class RincianPenjualanPerBarang extends BaseController
 {
     protected $this_company_id;
     protected $barangMasterSalesModel;
+    protected $customerModel;
     protected $salesOrderInvoiceModel;
 
     public function __construct()
     {
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->barangMasterSalesModel = new BarangMasterSalesModel();
+        $this->customerModel = new CustomerModel();
         $this->salesOrderInvoiceModel = new SalesOrderInvoiceModel();
     }
 
     public function index()
     {
         $barangMasterSalesData = $this->barangMasterSalesModel->asObject()->findAll();
+        $customerData = $this->customerModel->asObject()->where([
+            'deletedAt' => null,
+            'tipe_customer' => 'LOKAL'
+        ])->orderBy('name', 'ASC')->findAll();
         $data = [
-            'barangMasterSalesData' => $barangMasterSalesData
+            'barangMasterSalesData' => $barangMasterSalesData,
+            'customer' => $customerData
         ];
         return view('Laporan/LaporanSales/LaporanRincianPerBarang/index', $data);
     }
@@ -59,6 +66,7 @@ class RincianPenjualanPerBarang extends BaseController
             "sortType" => $this->request->getGet("sortType"),
             "filter_jenis_dokumen" => $this->request->getGet("filter_jenis_dokumen"),
             "filter_barang" => $this->request->getGet("filter"),
+            "filter_customer" => $this->request->getGet("filter_customer"),
             "dateStart" => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "dateEnd" => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
@@ -163,7 +171,7 @@ class RincianPenjualanPerBarang extends BaseController
         return;
     }
 
-    public function printPDFAll($tglAwal = "all", $tglAkhir = "now", $filter = "all", $search = "all")
+    public function printPDFAll($tglAwal = "all", $tglAkhir = "now", $filter = "all", $search = "all", $filter_customer = "all")
     {
         ini_set('memory_limit', '-1');
         set_time_limit(0);
@@ -179,6 +187,7 @@ class RincianPenjualanPerBarang extends BaseController
             "search" => $search != "all" ? $search : null,
             "filter_jenis_dokumen" => $this->request->getGet("filter_jenis_dokumen") ?? null,
             "filter_barang" => $filter != "all" ? $filter : null,
+            "filter_customer" => $filter_customer != "all" ? $filter_customer : null,
             "dateStart" => $tglAwal != "all" ? date("Y-m-d", strtotime($tglAwal)) : "",
             "dateEnd" => $tglAkhir != "now" ? date("Y-m-d", strtotime($tglAkhir)) : "",
         ];
@@ -288,7 +297,7 @@ class RincianPenjualanPerBarang extends BaseController
         exit(0);
     }
 
-    public function printExcelAll($tglAwal = "all", $tglAkhir = "now", $filter = "all", $search = "all")
+    public function printExcelAll($tglAwal = "all", $tglAkhir = "now", $filter = "all", $search = "all", $filter_customer = "all")
     {
         ini_set('memory_limit', '-1');
         set_time_limit(0);
@@ -305,6 +314,7 @@ class RincianPenjualanPerBarang extends BaseController
             "search" => $search != "all" ? $search : null,
             "filter_jenis_dokumen" => $this->request->getGet("filter_jenis_dokumen") ?? null,
             "filter_barang" => $filter != "all" ? $filter : null,
+            "filter_customer" => $filter_customer != "all" ? $filter_customer : null,
             "dateStart" => $tglAwal != "all" ? date("Y-m-d", strtotime($tglAwal)) : "",
             "dateEnd" => $tglAkhir != "now" ? date("Y-m-d", strtotime($tglAkhir)) : "",
         ];

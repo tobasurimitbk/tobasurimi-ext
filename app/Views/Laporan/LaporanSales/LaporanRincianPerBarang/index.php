@@ -56,9 +56,26 @@
                                 <label for="floatingInput">Barang</label>
                             </div>
                         </div>
-                        <div class="col-md-3" style="height: 50px;">
-                            <input style="height: auto;" autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select filter_customer" name="filter_customer" id="filter_customer">
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($customer)) {
+                                        foreach ($customer as $sub) {
+                                    ?>
+                                            <option value="<?= $sub->id; ?>"><?= $sub->kode; ?> <?= $sub->name; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <label for="floatingInput">Pelanggan</label>
+                            </div>
                         </div>
+                        <!-- <div class="col-md-3" style="height: 50px;">
+                            <input style="height: auto;" autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
+                        </div> -->
                     </div>
                 </div>
             </div>
@@ -137,6 +154,7 @@
                 data: function(data) {
                     data.search = $(".search").val();
                     data.filter = $(".filter_barang").val();
+                    data.filter_customer = $(".filter_customer").val();
                     data.dateStart = $(".dateStart").val();
                     data.dateEnd = $(".dateEnd").val();
                     data.sort = sort;
@@ -232,14 +250,19 @@
             theme: "bootstrap-5",
             allowClear: true
         });
-        $('.filter_barang')
+        $('.filter_customer').select2({
+            placeholder: "Filter Customer",
+            theme: "bootstrap-5",
+            allowClear: true
+        });
+        $('.filter_barang, .filter_customer')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.filter_barang')
+        $('.filter_barang, .filter_customer')
             .parent('div')
             .children('span')
             .children('span')
@@ -247,7 +270,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.filter_barang')
+        $('.filter_barang, .filter_customer')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -278,7 +301,7 @@
             table.ajax.reload();
         })
 
-        $(".dateStart, .dateEnd, .filter_barang").change(function() {
+        $(".dateStart, .dateEnd, .filter_barang, .filter_customer").change(function() {
             table.ajax.reload();
         })
 
@@ -297,7 +320,8 @@
         var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
         var search = $(".search").val() ? $(".search").val() : "all";
         var filter = $(".filter_barang").val() ? $(".filter_barang").val() : "all";
-        url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter + "/" + search;
+        var filter_customer = $(".filter_customer").val() ? $(".filter_customer").val() : "all";
+        url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter + "/" + search + "/" + filter_customer;
         // console.log(url2);
         window.open(url2, "_blank");
     }
@@ -306,7 +330,8 @@
         var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
         var search = $(".search").val() ? $(".search").val() : "all";
         var filter = $(".filter_barang").val() ? $(".filter_barang").val() : "all";
-        url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter + "/" + search;
+        var filter_customer = $(".filter_customer").val() ? $(".filter_customer").val() : "all";
+        url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter + "/" + search + "/" + filter_customer;
         // console.log(url2);
         window.open(url2, "_blank");
     }

@@ -725,7 +725,11 @@ class SalesOrderInvoiceModel extends Model
         }
 
         if ($addCondition['filter_barang']) {
-            $salesOrderInvoiceLokal->where('sales_order_invoice_detail.id_barang_invoice', $addCondition['filter_customer']);
+            $salesOrderInvoiceLokal->where('sales_order_invoice_detail.id_barang_invoice', $addCondition['filter_barang']);
+        }
+
+        if ($addCondition['filter_customer']) {
+            $salesOrderInvoiceLokal->where('sales_order_invoice.id_customer', $addCondition['filter_customer']);
         }
 
         if ($addCondition['filter_jenis_dokumen'] == "pengiriman") {
