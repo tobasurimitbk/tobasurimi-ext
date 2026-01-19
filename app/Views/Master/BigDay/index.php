@@ -49,9 +49,11 @@
 <section class="section">
     <div class="section-header">
         <h1>Hari Besar</h1>
-        <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </button>
+        <?php if (can('Personalia', 'Hari Besar', 'c')): ?>
+            <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+            </button>
+        <?php endif; ?>
     </div>
     <div class="card">
         <div class="card-body">

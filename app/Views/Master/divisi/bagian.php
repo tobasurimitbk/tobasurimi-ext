@@ -57,9 +57,11 @@
                         <label class="form-label font-weight-bold modal-sub-title">List Bagian</label>
                     </div>
                     <div class="col-md-6">
-                        <button class="btn btn-add btn-block float-right" onclick="submitForm()" id="btn-submit-bagian">
-                            <i class="fa fa-plus fa-sm mr-1" aria-hidden="true"></i> Tambah
-                        </button>
+                        <?php if (can('Master Data', 'Departemen', 'c')): ?>
+                            <button class="btn btn-add btn-block float-right" onclick="submitForm()" id="btn-submit-bagian">
+                                <i class="fa fa-plus fa-sm mr-1" aria-hidden="true"></i> Tambah
+                            </button>
+                        <?php endif; ?>
                         <button style="border-color: #e7323a !important; background-color: #e7323a !important; margin-right: 10px !important;" class="btn btn-add btn-block float-right" onclick="resetForm()">
                             <i class="fa-solid fa-rotate-right mr-1"></i> Reset
                         </button>

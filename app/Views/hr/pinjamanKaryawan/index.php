@@ -6,9 +6,11 @@
     <div class="section-header">
         <h1>List Pinjaman Karyawan</h1>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right" data-bs-toggle="modal" id="generateModalBtn" data-bs-target="#generateModal" href="#">
-                <i class="fa-solid fa-clock-rotate-left"></i> Generate
-            </a>
+            <?php if (can('Personalia', 'Pinjaman Karyawan', 'c')): ?>
+                <a class="btn btn-hide-form btn-discard float-right" data-bs-toggle="modal" id="generateModalBtn" data-bs-target="#generateModal" href="#">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Generate
+                </a>
+            <?php endif; ?>
             <?php if (can('Personalia', 'Pinjaman Karyawan', 'p')): ?>
                 <button class="btn btn-warning btn-print float-right" onclick="exportPinjaman()">
                     <i class="fa fa-download"></i> Export

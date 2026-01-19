@@ -105,9 +105,11 @@
     <div class="section-header">
         <h1>Data Absensi</h1>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right mr-2" data-bs-toggle="modal" data-bs-target="#generateModal" href="#" onclick="resetFormGenerateLog()">
-                <i class="fa-solid fa-clock-rotate-left"></i> Generate
-            </a>
+            <?php if (can('Personalia', 'Data Absensi', 'c')): ?>
+                <a class="btn btn-hide-form btn-discard float-right mr-2" data-bs-toggle="modal" data-bs-target="#generateModal" href="#" onclick="resetFormGenerateLog()">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Generate
+                </a>
+            <?php endif; ?>
             <?php if (can('Personalia', 'Data Absensi', 'p')): ?>
                 <button class="btn btn-warning btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fa fa-download"></i> Export
