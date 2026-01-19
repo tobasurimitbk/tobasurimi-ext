@@ -10,10 +10,11 @@ helper(['custom_helper']);
 
         <div class="sidebar-brand">
             <?php if (session()->get('theme') == 'dark'): ?>
-                <img src="<?= base_url("assets/img/logo_dark.jpg"); ?>">
+                <img src="<?= base_url("assets/img/logo_dark.jpg"); ?>" style="width: 80%;margin-top:-8px;">
             <?php else: ?>
-                <img src="<?= base_url("assets/img/logo.png"); ?>">
+                <img src="<?= base_url("assets/img/logo.png"); ?>" style="width: 80%;margin-top:-8px;">
             <?php endif; ?>
+            <i class="fa-solid fa-circle-plus" style="font-size: 20px;color:#E02A35;"></i>
         </div>
 
         <div class="sidebar-brand sidebar-brand-sm">

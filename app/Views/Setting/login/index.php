@@ -14,7 +14,7 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="d-flex justify-content-center align-items-center mb-5">
-                                <img src="<?= base_url("assets/img/logo.png"); ?>">
+                                <img src="<?= base_url("assets/img/logo.png"); ?>"> <i class="fa-solid fa-circle-plus" style="font-size: 20px;color:#E02A35;"></i>
                             </div>
                             <form class="user" role="form" method="POST" enctype="multipart/form-data">
                                 <?= csrf_field() ?>
