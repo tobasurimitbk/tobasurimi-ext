@@ -29,7 +29,8 @@ class AttendancesModel extends Model
         'reason',
         'year_month',
         'isApproved',
-        'abaikan_sync_log'
+        'abaikan_sync_log',
+        'sync_status'
     ];
 
     // Dates

@@ -1122,7 +1122,8 @@ class Attendance extends BaseController
                 'status' => $statusKehadiran,
                 'reason' => $reason,
                 'isApproved' => $isApproved,
-                'abaikan_sync_log' => $abaikanSyncLog
+                'abaikan_sync_log' => $abaikanSyncLog,
+                'sync_status' => "MANUAL"
             ]);
 
             $attendance = $this->AttendanceModel->where('id', $attendenceID)->first();
@@ -1138,11 +1139,13 @@ class Attendance extends BaseController
                     'employee_id'  => $attendance['employee_id'],
                     'tanggal' => $attendance['periode'],
                     'nominal' => $nominalUangMakan,
+                    'sync_status' => "MANUAL"
                 ]);
             } else {
                 // Jika uang makan harian sudah ada maka update
                 $this->UangMakanHarianModel->update($uangMakanHarian['id'], [
-                    'nominal' => $nominalUangMakan
+                    'nominal' => $nominalUangMakan,
+                    'sync_status' => "MANUAL"
                 ]);
             }
 
@@ -1157,11 +1160,13 @@ class Attendance extends BaseController
                     'employee_id'  => $attendance['employee_id'],
                     'tanggal' => $attendance['periode'],
                     'nominal' => $nominalDendaKeterlambatan,
+                    'sync_status' => "MANUAL"
                 ]);
             } else {
                 // Update
                 $this->DendaAbsenHarianModel->update($dendaAbsenHarian['id'], [
                     'nominal' => $nominalDendaKeterlambatan,
+                    'sync_status' => "MANUAL"
                 ]);
             }
 
@@ -1175,7 +1180,8 @@ class Attendance extends BaseController
                     $this->AttendanceKeteranganModel->insert([
                         'employee_id' => $attendance['employee_id'],
                         'tanggal' => $attendance['periode'],
-                        'reason' => $reason
+                        'reason' => $reason,
+                        'sync_status' => "MANUAL"
                     ]);
                 }
             } else {
@@ -1183,7 +1189,8 @@ class Attendance extends BaseController
                     $this->AttendanceKeteranganModel->update($keterangan['id'], [
                         'employee_id' => $attendance['employee_id'],
                         'tanggal' => $attendance['periode'],
-                        'reason' => $reason
+                        'reason' => $reason,
+                        'sync_status' => "MANUAL"
                     ]);
                 } else {
                     $this->AttendanceKeteranganModel->delete($keterangan['id']);
