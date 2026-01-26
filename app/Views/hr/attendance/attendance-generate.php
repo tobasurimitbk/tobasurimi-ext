@@ -404,6 +404,7 @@
                         <div class="col-sm">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select name="statusKehadiran" class="form-select" id="statusKehadiran">
+                                    <option value="">LIBUR</option>
                                     <?php foreach ($statusPerizinanAll as $sk) : ?>
                                         <option value="<?= $sk['value']; ?>"><?= explode("_", $sk['value'])[0] . " (" . explode("_", $sk['value'])[1] . ")"; ?></option>
                                     <?php endforeach ?>

@@ -480,7 +480,7 @@ class Attendance extends BaseController
         $dataDivisi = $this->DivisiModel->getDivisiAccess();
         $dataStatusPerizinanAll = $this->MetadataModel
             ->where('name', "Status Perizinan")
-            ->whereNotIn('value', ['LIBUR_L'])
+            // ->whereNotIn('value', ['LIBUR_L'])
             ->orderBy("FIELD(value, 'HADIR_H') DESC", '', false) // biar HADIR_H duluan
             ->orderBy('name', "ASC")
             ->findAll();
@@ -1110,6 +1110,13 @@ class Attendance extends BaseController
             $nominalDendaKeterlambatan = $this->request->getVar('nominal_denda_keterlambatan');
             $abaikanSyncLog = $this->request->getVar('abaikan_sync_log');
             $reason = $reasonCheckin . "-" . $reassonCheckout;
+
+
+            if ($statusKehadiran == "LIBUR_L") {
+                $checkIN = null;
+                $checkOut = null;
+                $isApproved = '0';
+            }
 
             if ($statusKehadiran != "HADIR_H") {
                 $checkIN = null;
