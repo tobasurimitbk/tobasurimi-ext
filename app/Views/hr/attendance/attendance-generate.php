@@ -404,7 +404,8 @@
                         <div class="col-sm">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select name="statusKehadiran" class="form-select" id="statusKehadiran">
-                                    <option value="">LIBUR</option>
+                                    <option value=""></option>
+                                    <option value="LIBUR_L">LIBUR (L)</option>
                                     <?php foreach ($statusPerizinanAll as $sk) : ?>
                                         <option value="<?= $sk['value']; ?>"><?= explode("_", $sk['value'])[0] . " (" . explode("_", $sk['value'])[1] . ")"; ?></option>
                                     <?php endforeach ?>
@@ -862,6 +863,11 @@
                 sortable: false,
             },
             {
+                data: "total_off",
+                className: "text-left",
+                sortable: false,
+            },
+            {
                 data: "total_libur",
                 className: "text-left",
                 sortable: false,
@@ -974,6 +980,11 @@
                             if (colClass.includes('bg-cuti-keguguran')) {
                                 return renderCell(data, '#75321a');
                             }
+
+                            if (colClass.includes('bg-off')) {
+                                return renderCell(data, '#aba535');
+                            }
+
 
                             function renderCell(data, bgColor) {
                                 return `<div style="
@@ -1925,7 +1936,7 @@
             // $('#reasonForm').hide();
             $('#approvalForm').show();
             $('#formInOut').show();
-        } else if ($(this).val() == "ALPHA_A" || $(this).val() == "LIBUR_L" || $(this).val() == "RL_RL") {
+        } else if ($(this).val() == "ALPHA_A" || $(this).val() == "RL_RL") {
             $('#approvalForm').hide();
         } else {
             // izin

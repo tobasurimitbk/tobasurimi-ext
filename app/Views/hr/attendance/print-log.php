@@ -175,6 +175,11 @@
                                 <td style="background-color: #17a2b8; color:white;">
                                     <b><?= $statusKode ?></b>
                                 </td>
+                            <?php elseif ($perizinanCheck['status'] == "OFF_OFF") : ?>
+                                <!-- Ada off  -->
+                                <td style="background-color: #17a2b8; color:white;">
+                                    <b><?= $statusKode ?></b>
+                                </td>
                             <?php elseif ($perizinanCheck['status'] == "IJIN_I") : ?>
                                 <!-- Ada potong gaji  -->
                                 <td style="background-color: #616030; color:white;">

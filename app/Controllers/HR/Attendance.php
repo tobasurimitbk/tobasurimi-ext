@@ -241,7 +241,8 @@ class Attendance extends BaseController
                         'DINAS_D' => 'bg-dinas',
                         'CUTI KEGUGURAN_CKG' => 'bg-cuti-keguguran',
                         'IJIN_I' => 'bg-ijin',
-                        'HADIR_H' => 'bg-hadir'
+                        'HADIR_H' => 'bg-hadir',
+                        'OFF_OFF' => 'bg-off'
                     ];
 
                     $row['day_' . $d . '_in_class']  = $mapping[$statusIzin];
@@ -386,6 +387,7 @@ class Attendance extends BaseController
             $totalLibur          = 0;
             $totalDinas          = 0;
             $totalCutiKeguguran  = 0;
+            $totalOff            = 0;
 
             // Loop setiap tanggal dalam bulan
             for ($d = 1; $d <= $totalDaysInMonth; $d++) {
@@ -440,6 +442,9 @@ class Attendance extends BaseController
                     case 'IJIN_I':
                         $totalIjin++;
                         break;
+                    case 'OFF_OFF':
+                        $totalOff++;
+                        break;
                 }
 
                 // Jika hadir (ada in/out)
@@ -462,6 +467,7 @@ class Attendance extends BaseController
             $row['total_dinas']           = $totalDinas;
             $row['total_cuti_keguguran']  = $totalCutiKeguguran;
             $row['total_pg']              = $totalPg;
+            $row['total_off']             = $totalOff;
 
             $resultData[] = $row;
         }
@@ -480,7 +486,7 @@ class Attendance extends BaseController
         $dataDivisi = $this->DivisiModel->getDivisiAccess();
         $dataStatusPerizinanAll = $this->MetadataModel
             ->where('name', "Status Perizinan")
-            // ->whereNotIn('value', ['LIBUR_L'])
+            ->whereNotIn('value', ['LIBUR_L'])
             ->orderBy("FIELD(value, 'HADIR_H') DESC", '', false) // biar HADIR_H duluan
             ->orderBy('name', "ASC")
             ->findAll();
@@ -630,7 +636,8 @@ class Attendance extends BaseController
                         'DINAS_D' => 'bg-dinas',
                         'CUTI KEGUGURAN_CKG' => 'bg-cuti-keguguran',
                         'IJIN_I' => 'bg-ijin',
-                        'HADIR_H' => 'bg-hadir'
+                        'HADIR_H' => 'bg-hadir',
+                        'OFF_OFF' => 'bg-off'
                     ];
 
                     $row['day_' . $d . '_in_class']  = $mapping[$statusIzin];
@@ -785,6 +792,7 @@ class Attendance extends BaseController
             $totalLibur          = 0;
             $totalDinas          = 0;
             $totalCutiKeguguran  = 0;
+            $totalOff            = 0;
 
             // Loop setiap tanggal dalam bulan
             for ($d = 1; $d <= $totalDaysInMonth; $d++) {
@@ -839,6 +847,9 @@ class Attendance extends BaseController
                     case 'IJIN_I':
                         $totalIjin++;
                         break;
+                    case 'OFF_OFF':
+                        $totalOff++;
+                        break;
                 }
 
                 // Jika hadir (ada in/out)
@@ -861,6 +872,7 @@ class Attendance extends BaseController
             $row['total_dinas']           = $totalDinas;
             $row['total_cuti_keguguran']  = $totalCutiKeguguran;
             $row['total_pg']              = $totalPg;
+            $row['total_off']             = $totalOff;
 
             $resultData[] = $row;
         }
@@ -1121,6 +1133,12 @@ class Attendance extends BaseController
             if ($statusKehadiran != "HADIR_H") {
                 $checkIN = null;
                 $checkOut = null;
+            }
+
+            if ($statusKehadiran == "OFF_OFF") {
+                $checkIN = null;
+                $checkOut = null;
+                $isApproved = '0';
             }
 
             $this->AttendanceModel->update($attendenceID, [
@@ -1511,7 +1529,8 @@ class Attendance extends BaseController
             'Libur',
             'Dinas',
             'Cuti Keguguran',
-            'Potong Gaji'
+            'Potong Gaji',
+            'Off'
         ];
         $colIndex = 1;
         $rowHeader2 = 3;
@@ -1539,7 +1558,7 @@ class Attendance extends BaseController
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $e['divisi']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $e['bagian']);
 
-            $total = ['ct' => 0, 'chd' => 0, 'chl' => 0, 'cm' => 0, 'ijin' => 0, 'sakit' => 0, 'rl' => 0, 'hadir' => 0, 'alpha' => 0, 'libur' => 0, 'dinas' => 0, 'ckg' => 0, 'pg' => 0];
+            $total = ['ct' => 0, 'chd' => 0, 'chl' => 0, 'cm' => 0, 'ijin' => 0, 'sakit' => 0, 'rl' => 0, 'hadir' => 0, 'alpha' => 0, 'libur' => 0, 'dinas' => 0, 'ckg' => 0, 'pg' => 0, 'off' => 0];
 
             for ($d = 1; $d <= $totalDaysInMonth; $d++) {
                 $tanggal = sprintf("%04d-%02d-%02d", $year, $month, $d);
@@ -1586,6 +1605,9 @@ class Attendance extends BaseController
                     case 'IJIN_I':
                         $total['ijin']++;
                         break;
+                    case 'OFF_OFF':
+                        $total['off']++;
+                        break;
                 }
 
                 if (!empty($in) || !empty($out)) {
@@ -1606,6 +1628,7 @@ class Attendance extends BaseController
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['dinas']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['ckg']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['pg']);
+            $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['off']);
 
             $rowIndex++;
         }
@@ -2219,7 +2242,8 @@ class Attendance extends BaseController
             'Libur',
             'Dinas',
             'Cuti Keguguran',
-            'Potong Gaji'
+            'Potong Gaji',
+            'Off'
         ];
         $colIndex = 1;
         $rowHeader2 = 3;
@@ -2261,7 +2285,8 @@ class Attendance extends BaseController
                 'libur' => 0,
                 'dinas' => 0,
                 'ckg' => 0,
-                'pg' => 0
+                'pg' => 0,
+                'off' => 0
             ];
 
             for ($d = 1; $d <= $totalDaysInMonth; $d++) {
@@ -2309,6 +2334,9 @@ class Attendance extends BaseController
                     case 'POTONG GAJI_PG':
                         $total['pg']++;
                         break;
+                    case 'OFF_OFF':
+                        $total['off']++;
+                        break;
                 }
 
                 if (!empty($in) || !empty($out)) {
@@ -2329,6 +2357,7 @@ class Attendance extends BaseController
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['dinas']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['ckg']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['pg']);
+            $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['off']);
 
             $rowIndex++;
         }

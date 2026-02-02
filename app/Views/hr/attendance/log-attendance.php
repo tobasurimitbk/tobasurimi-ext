@@ -590,6 +590,11 @@
                 sortable: false,
             },
             {
+                data: "total_off",
+                className: "text-left",
+                sortable: false,
+            },
+            {
                 data: "total_libur",
                 className: "text-left",
                 sortable: false,
@@ -699,6 +704,9 @@
                             }
                             if (colClass.includes('bg-cuti-keguguran')) {
                                 return renderCell(data, '#75321a');
+                            }
+                            if (colClass.includes('bg-off')) {
+                                return renderCell(data, '#aba535');
                             }
 
 

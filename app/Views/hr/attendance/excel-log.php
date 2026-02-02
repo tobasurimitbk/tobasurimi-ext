@@ -102,6 +102,11 @@ header("Content-Disposition: attachment; filename=LogAbsensi_" . $yearMonth . ".
                             <td style="background-color: #17a2b8;; color:white;">
                                 <b><?= $statusKode ?></b>
                             </td>
+                        <?php elseif ($perizinanCheck['status'] == "OFF_OFF") : ?>
+                            <!-- Ada ijin -->
+                            <td style="background-color: #17a2b8;; color:white;">
+                                <b><?= $statusKode ?></b>
+                            </td>
                         <?php elseif ($perizinanCheck['status'] == "SAKIT_S") : ?>
                             <!-- Ada sakit -->
                             <td style="background-color: #28a745; color:white;">

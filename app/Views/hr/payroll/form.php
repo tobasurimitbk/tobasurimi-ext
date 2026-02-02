@@ -97,10 +97,16 @@
                 </div>
             </div> -->
             <div class="row mt-2">
-                <div class="col-sm-2 mt-1">
+                <div class="col-sm-1 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input readonly autocomplete="one-time-code" type="text" required name="totalAlpha" id="totalAlpha" class="form-control target input-picker" value="<?= $payrollDetail['alpha'] ?? 0 ?> Kali">
                         <label for="floatingInput">Alpha</label>
+                    </div>
+                </div>
+                <div class="col-sm-1 mt-1">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input readonly autocomplete="one-time-code" type="text" required name="totalOff" id="totalOff" class="form-control target input-picker" value="<?= $payrollDetail['off'] ?? 0 ?> Kali">
+                        <label for="floatingInput">Off</label>
                     </div>
                 </div>
                 <div class="col-sm-1 mt-1">

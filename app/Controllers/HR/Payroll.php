@@ -225,7 +225,7 @@ class Payroll extends BaseController
                         'CUTI HAID_CHD'     => 0,
                         'CUTI HAMIL_CHL'    => 0,
                         'CUTI MELAHIRKAN_CM' => 0,
-                        'POTONG GAJI_PG'            => 0,
+                        'POTONG GAJI_PG'    => 0,
                         'SAKIT_S'           => 0,
                         'RL_RL'             => 0,
                         'HADIR_H'           => 0,
@@ -233,7 +233,8 @@ class Payroll extends BaseController
                         'ALPHA_A'           => 0,
                         'DINAS_D'           => 0,
                         'CUTI KEGUGURAN_CKG' => 0,
-                        'IJIN_I' => 0
+                        'IJIN_I' => 0,
+                        'OFF_OFF' => 0
                     ];
                 }
                 $mapStatusAttendance[$empId][$s['status']] = $s['total'];
@@ -267,6 +268,7 @@ class Payroll extends BaseController
                     "alpha"                        => $att["ALPHA_A"] ?? 0,
                     "dinas"                        => $att["DINAS_D"] ?? 0,
                     "cuti_keguguran"               => $att["CUTI KEGUGURAN_CKG"] ?? 0,
+                    "off"                          => $att['OFF_OFF'],
                     "hadir_final"                  => 0,
                     "total_perizinan_not_approved" => 0,
                     "total_perizinan_approved"     => 0,
@@ -575,6 +577,7 @@ class Payroll extends BaseController
                         'ALPHA_A'           => 0,
                         'DINAS_D'           => 0,
                         'CUTI KEGUGURAN_CKG' => 0,
+                        'OFF_OFF' => 0,
                         'IJIN_I' => 0
                     ];
                 }
@@ -608,6 +611,7 @@ class Payroll extends BaseController
                     "alpha"                        => $att["ALPHA_A"] ?? 0,
                     "dinas"                        => $att["DINAS_D"] ?? 0,
                     "cuti_keguguran"               => $att["CUTI KEGUGURAN_CKG"] ?? 0,
+                    "off"                          => $att['OFF_OFF'],
                     "hadir_final"                  => 0,
                     "total_perizinan_not_approved" => 0,
                     "total_perizinan_approved"     => 0,

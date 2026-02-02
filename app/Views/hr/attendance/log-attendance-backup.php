@@ -265,6 +265,15 @@
                                                         <b><?= $statusKode  ?></b>
                                                     </td>
                                                     </td>
+                                                <?php elseif ($perizinanCheck['status'] == "OFF_OFF") : ?>
+                                                    <!-- Ada Pg -->
+                                                    <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#17a2b8; color:white;cursor:pointer;'>
+                                                        <b><?= $statusKode ?></b>
+                                                    </td>
+                                                    <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#17a2b8; color:white;cursor:pointer;'>
+                                                        <b><?= $statusKode  ?></b>
+                                                    </td>
+                                                    </td>
                                                 <?php elseif ($perizinanCheck['status'] == "IJIN_I") : ?>
                                                     <!-- Ada ijin -->
                                                     <td class="detail" data-tanggal="<?= $dateFormat; ?>" data-employee_id="<?= $res_user[$i]['employeeID'] ?>" width=25 align=center style='background-color:#616030; color:white;cursor:pointer;'>
