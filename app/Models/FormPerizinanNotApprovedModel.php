@@ -143,6 +143,7 @@ class FormPerizinanNotApprovedModel extends Model
             ->where('periode >=', $startDate)
             ->where('periode <=', $endDate)
             ->groupEnd()
+            ->groupBy(['periode', 'employee_id'])
             ->findAll();
 
         $dataResult = [];       // untuk insert batch ke form_perizinan_not_approved
