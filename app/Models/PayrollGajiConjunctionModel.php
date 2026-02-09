@@ -257,13 +257,17 @@ class PayrollGajiConjunctionModel extends Model
 
     public function getPerhitunganKomponenGajiPayrollPrint($payrollID)
     {
+        $payrollModel = new PayrollsModel();
+        $payroll = $payrollModel->where('id', $payrollID)->first();
+
         $gajiConjunction = $this->asArray()
             ->select("payroll_gaji_conjunction.*, tunjangan.name, tunjangan.tipe")
             ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id')
             ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
             ->where('tunjangan.is_gaji_harian !=', 1)
             ->where('tunjangan.is_cadangan !=', 1)
-            ->where('tunjangan.name !=', "UANG MAKAN") // semua komponen gaji get kecuali uang makan
+            ->whereNotIn('tunjangan.name', ["UANG MAKAN", "TUNJANGAN TIDAK TETAP"]) // semua komponen gaji get kecuali uang makan
+            ->where('payroll_gaji_conjunction.year_month', $payroll['year_month'])
             ->orderBy('tunjangan.name', "ASC")
             ->findAll();
 
@@ -285,15 +289,15 @@ class PayrollGajiConjunctionModel extends Model
             }
         }
 
-        $dataResult[] = [
-            'name' => 'Pot. Iuaran/Pinj/Bon Koperasi',
-            'nominal' => $koperasiNominal
-        ];
+        // $dataResult[] = [
+        //     'name' => 'Pot. Iuaran/Pinj/Bon Koperasi',
+        //     'nominal' => $koperasiNominal
+        // ];
 
-        $dataResult[] = [
-            'name' => 'Pot. Perlengkapan Kerja',
-            'nominal' => $potonganNominal
-        ];
+        // $dataResult[] = [
+        //     'name' => 'Pot. Perlengkapan Kerja',
+        //     'nominal' => $potonganNominal
+        // ];
 
         return $dataResult;
     }
@@ -305,6 +309,23 @@ class PayrollGajiConjunctionModel extends Model
             ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id')
             ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
             ->where('tunjangan.name', "UANG MAKAN") // ambil uang makan
+            ->orderBy('tunjangan.name', "ASC")
+            ->first();
+
+        return $gajiConjunction == null ? 0 : $gajiConjunction['nominal'];
+    }
+
+    public function getPayrollTunjanganTidakTetap($payrollID)
+    {
+        $payrollModel = new PayrollsModel();
+        $payroll = $payrollModel->where('id', $payrollID)->first();
+
+        $gajiConjunction = $this->asArray()
+            ->select("payroll_gaji_conjunction.*, tunjangan.name, tunjangan.tipe")
+            ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id')
+            ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
+            ->where('payroll_gaji_conjunction.year_month', $payroll['year_month'])
+            ->where('tunjangan.name', "TUNJANGAN TIDAK TETAP") // ambil tunjangan tidak tetap
             ->orderBy('tunjangan.name', "ASC")
             ->first();
 

@@ -997,6 +997,7 @@ class Payroll extends BaseController
         $perhitunganGaji = $this->payrollGajiConjunctionModel->getPerhitunganKomponenGajiPayrollPrint($payrollID);
         $uangMakan = $this->payrollGajiConjunctionModel->getPayrollUangMakan($payrollID);
         $payrollDetail['total_gaji_harian_plus_cadangan'] = $payrollDetail['nominal_gaji_harian'] + $payrollDetail['nominal_cadangan'];
+        $tunjanganTidakTetap = $this->payrollGajiConjunctionModel->getPayrollTunjanganTidakTetap($payrollID);
 
         $data = [
             'payroll' => $payrollDetail,
@@ -1010,7 +1011,8 @@ class Payroll extends BaseController
             'company' => $company,
             'tunjanganGajiPokok' => $tunjanganGajiPokok,
             'tunjanganCadangan' => $tunjanganCadangan,
-            'totalPinjamanDiambil' => $totalPinjamanDiambil
+            'totalPinjamanDiambil' => $totalPinjamanDiambil,
+            'tunjanganTidakTetap' => $tunjanganTidakTetap
         ];
 
         $dompdf->loadHtml(view('hr/payroll/payroll_single_print', $data));
