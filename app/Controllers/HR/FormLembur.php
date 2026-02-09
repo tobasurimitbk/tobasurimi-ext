@@ -368,12 +368,32 @@ class FormLembur extends BaseController
                 ->where('tunjangan.is_gaji_harian', 1)
                 ->findAll();
 
+            $cadangan = $this->GajiConjunctionModel->select("tunjangan.name, gaji_conjunction.nominal, tunjangan.is_cadangan")
+                ->join('tunjangan', 'tunjangan.id = gaji_conjunction.tunjangan_id')
+                ->where('gaji_conjunction.employee_id', $employeeID)
+                ->where('tunjangan.tipe', "PLUS")
+                ->where('tunjangan.is_cadangan', 1)
+                ->findAll();
+
             // get gaji pokok
             foreach ($gaji as $g) {
                 if ($g['is_gaji_harian'] == 1) {
                     $gajiPokok = $gajiPokokPerHari == "-" ? $g['nominal'] : $gajiPokokPerHari;
                 }
             }
+
+            // get cadangan
+            $gajiCadangan = 0;
+            foreach ($cadangan as $c) {
+                if ($c['is_cadangan'] == 1) {
+                    $gajiCadangan = $c['nominal'];
+                }
+            }
+
+            // var_dump($gaji, $cadangan);
+            // die;
+
+            $gajiPokok = $gajiPokok + $gajiCadangan;
 
             // hitung total jam lembur
             $waktuSelisihPulangLembur = static::selisihWaktu(
@@ -437,7 +457,7 @@ class FormLembur extends BaseController
                     'jumlahJamIstirahat' => $jumlahJamIstirahat,
                     'jumlahJamKerjaBersih' => $jumlahJamKerjaBersih
                 ],
-                'komponenGaji' => $gaji,
+                'komponenGaji' => array_merge($gaji, $cadangan),
                 'upah' => $gajiPokok,
                 'lembur' => [
                     'lemburJamPertama' => [

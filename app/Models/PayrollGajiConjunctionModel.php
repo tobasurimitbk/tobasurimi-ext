@@ -238,11 +238,16 @@ class PayrollGajiConjunctionModel extends Model
 
     public function getPerhitunganKomponenGajiPayroll($payrollID)
     {
+        $payrollModel = new PayrollsModel();
+        $payroll = $payrollModel->where('id', $payrollID)->first();
+
         $gajiConjunction = $this->asArray()->select("payroll_gaji_conjunction.*, tunjangan.name, tunjangan.tipe")
             ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id')
             ->where('payroll_gaji_conjunction.payroll_id', $payrollID)
+            ->where('payroll_gaji_conjunction.year_month', $payroll['year_month'])
             ->where('tunjangan.is_gaji_harian != ', 1)
             ->where('tunjangan.is_cadangan != ', 1)
+            ->where('tunjangan.deletedAt', null)
             ->orderBy('tunjangan.name', "ASC")
             ->findAll();
 

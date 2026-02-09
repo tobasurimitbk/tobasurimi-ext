@@ -343,6 +343,7 @@
                 processData: false,
                 contentType: false,
                 success: function(response) {
+                    console.log(response);
                     if (response.status) {
                         var table = $('#tabelGaji');
                         table.find('tbody').empty();
@@ -354,7 +355,7 @@
                         $.each(response.komponenGaji, function(index, data) {
                             var newRow = $('<tr style="color:whitesmoke; font-weight:bold;">');
                             var indexNumber = index + 1;
-                            var nominal = "<?= !empty($lemburDetail) ? $lemburDetail['gaji_pokok_per_hari'] : "-" ?>"
+                            var nominal = "-";
                             newRow.append($('<td>').text(indexNumber));
                             newRow.append($('<td>').text(data.name));
                             newRow.append($('<td>').text(data.nominal != null ? greatFormatRupiah(nominal == "-" ? data.nominal : nominal) : 0));
