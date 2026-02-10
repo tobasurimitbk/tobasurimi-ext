@@ -247,7 +247,7 @@ class GajiConjunctionModel extends Model
 
         return [
             'gajiHarian' => $mapGajiHarian,
-            'cadangan' => $cadangan
+            'cadangan' => $mapCadangan
         ];
     }
 }

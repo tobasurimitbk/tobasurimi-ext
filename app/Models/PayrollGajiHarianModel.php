@@ -42,9 +42,14 @@ class PayrollGajiHarianModel extends Model
 
     public function getList($payrollID)
     {
+        $payrollModel = new PayrollsModel();
+
+        $payroll = $payrollModel->where('id', $payrollID)->first();
+
         $result = $this->asArray()->select('payroll_gaji_harian.*, jam_kerja.jenis')
             ->join('jam_kerja', 'jam_kerja.id = payroll_gaji_harian.jam_kerja_id', 'left')
             ->where('payroll_gaji_harian.payroll_id', $payrollID)
+            ->where('payroll_gaji_harian.year_month', $payroll['year_month'])
             ->orderBy('tanggal', "asc")
             ->findAll();
         return $result;
