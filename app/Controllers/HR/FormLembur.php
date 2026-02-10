@@ -301,15 +301,15 @@ class FormLembur extends BaseController
             }
 
             // cek hari besar
-            $hariBesar = $this->BigdaysModel->where('date', $tanggal)->where('company_id', $this->this_company_id)->first();
-            // jika hari besar yha libur gak ada lembur
-            if ($hariBesar != null) {
-                return response()->setJSON([
-                    'message' => "$tanggal adalah hari besar " . $hariBesar['name'] . ". jadi ga bisa ambil lembur di hari tersebut",
-                    'status' => false,
-                    'code' => 400
-                ]);
-            }
+            // $hariBesar = $this->BigdaysModel->where('date', $tanggal)->where('company_id', $this->this_company_id)->first();
+            // // jika hari besar yha libur gak ada lembur
+            // if ($hariBesar != null) {
+            //     return response()->setJSON([
+            //         'message' => "$tanggal adalah hari besar " . $hariBesar['name'] . ". jadi ga bisa ambil lembur di hari tersebut",
+            //         'status' => false,
+            //         'code' => 400
+            //     ]);
+            // }
 
             // check apakah sudah presensi pulang di log
             if ($logAttendance[0]->checkout == $logAttendance[0]->checkin) {
