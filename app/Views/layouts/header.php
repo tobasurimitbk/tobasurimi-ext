@@ -12,9 +12,11 @@
                     <i class="fa fa-building fa-sm mr-2" aria-hidden="true"></i><?= session()->get("login")->this_company; ?>
                 </button>
                 <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButton1">
-                    <?php foreach (session()->get("login")->arr_company as $allCompany) { ?>
-                        <li onclick="changeCompanyAccount(<?= $allCompany["id"]; ?>)"><a class="<?= $allCompany["id"] == session()->get("login")->this_company_id ? "dropdown-item active" : "dropdown-item" ?>"><i class="fa fa-building fa-sm mr-2" aria-hidden="true"></i><?= $allCompany["company"]; ?></a></li>
-                    <?php } ?>
+                    <?php if (isset(session()->get("login")->arr_company)): ?>
+                        <?php foreach (session()->get("login")->arr_company as $allCompany) { ?>
+                            <li onclick="changeCompanyAccount(<?= $allCompany["id"]; ?>)"><a class="<?= $allCompany["id"] == session()->get("login")->this_company_id ? "dropdown-item active" : "dropdown-item" ?>"><i class="fa fa-building fa-sm mr-2" aria-hidden="true"></i><?= $allCompany["company"]; ?></a></li>
+                        <?php } ?>
+                    <?php endif; ?>
                 </ul>
             </div>
             <div class="search-backdrop"></div>
