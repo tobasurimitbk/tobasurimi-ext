@@ -244,6 +244,7 @@ class FormLembur extends BaseController
             $tanggal = date('Y-m-d', strtotime(str_replace('/', '-', $tanggal)));
             $jamKerja = $this->EmployeeJamKerjaModel->getJamKerjaUsedByEmployeeId($tanggal, $employeeID);
             $lintas_hari = $jamKerja['lintas_hari'] == "yes" ? true : false;
+            $dayName = date('D', strtotime($tanggal)); // get nama hari
 
             if ($jamKerja['lintas_hari'] == "yes") {
                 // jam kerja lintas hari
@@ -301,8 +302,8 @@ class FormLembur extends BaseController
             }
 
             // cek hari besar
-            // $hariBesar = $this->BigdaysModel->where('date', $tanggal)->where('company_id', $this->this_company_id)->first();
-            // // jika hari besar yha libur gak ada lembur
+            $hariBesar = $this->BigdaysModel->where('date', $tanggal)->where('company_id', $this->this_company_id)->first();
+            // jika hari besar yha libur gak ada lembur
             // if ($hariBesar != null) {
             //     return response()->setJSON([
             //         'message' => "$tanggal adalah hari besar " . $hariBesar['name'] . ". jadi ga bisa ambil lembur di hari tersebut",
@@ -413,11 +414,16 @@ class FormLembur extends BaseController
                 ]);
             }
 
-            // chek apakah lembur lebih dari satu jam
-            if ($totalJamLembur >= 1) {
+
+            // var_dump($tanggal);
+            // die;
+
+            if ($hariBesar || $dayName == 'Sun') {
+                // Libur
+                // chek apakah lembur lebih dari satu jam
                 // jam pertama
-                $totalLemburJamPertama = 1;
-                $bayaranLemburJamPertama = ((1 / 173) * 25 * 1.5) * 1 * $gajiPokok;
+                $totalLemburJamPertama = 0;
+                $bayaranLemburJamPertama = 0;
                 // sisanya
                 $sisaWaktu = static::kurangiWaktu(
                     $waktuSelisihPulangLembur['jam'] . ":" . $waktuSelisihPulangLembur['menit'],
@@ -425,18 +431,37 @@ class FormLembur extends BaseController
                 );
 
                 // lebih satu jam
-                $totalLemburJamBerikutnya = $sisaWaktu;
+                $totalLemburJamBerikutnya = $sisaWaktu + 1;
+                // var_dump($totalLemburJamBerikutnya);
+                // die;
                 $bayaranLemburJamBerikutnya = ((1 / 173) * 25 * 2) * $sisaWaktu * $gajiPokok;
-            } else if ($totalJamLembur > 1 && $totalJamLembur < 2) {
-                // cuma satu jam
-                $totalLemburJamPertama = $totalJamLembur;
-                $bayaranLemburJamPertama = ((1 / 173) * 25 * 1.5) * 1 * $gajiPokok;
             } else {
-                $totalLemburJamPertama = $totalJamLembur;
-                $bayaranLemburJamPertama = ((1 / 173) * 25 * 1.5) * 0.5 * $gajiPokok;
+                // Normal
+                // chek apakah lembur lebih dari satu jam
+                if ($totalJamLembur >= 1) {
+                    // jam pertama
+                    $totalLemburJamPertama = 1;
+                    $bayaranLemburJamPertama = ((1 / 173) * 25 * 1.5) * 1 * $gajiPokok;
+                    // sisanya
+                    $sisaWaktu = static::kurangiWaktu(
+                        $waktuSelisihPulangLembur['jam'] . ":" . $waktuSelisihPulangLembur['menit'],
+                        60.00 // satu jam
+                    );
+
+                    // lebih satu jam
+                    $totalLemburJamBerikutnya = $sisaWaktu;
+                    $bayaranLemburJamBerikutnya = ((1 / 173) * 25 * 2) * $sisaWaktu * $gajiPokok;
+                } else if ($totalJamLembur > 1 && $totalJamLembur < 2) {
+                    // cuma satu jam
+                    $totalLemburJamPertama = $totalJamLembur;
+                    $bayaranLemburJamPertama = ((1 / 173) * 25 * 1.5) * 1 * $gajiPokok;
+                } else {
+                    $totalLemburJamPertama = $totalJamLembur;
+                    $bayaranLemburJamPertama = ((1 / 173) * 25 * 1.5) * 0.5 * $gajiPokok;
+                }
             }
 
-            if ($totalLemburJamPertama <= 0) {
+            if (($totalLemburJamPertama + $totalLemburJamBerikutnya) <= 0) {
                 return response()->setJSON([
                     'message' => "Tidak memenuhi syarat melakukan lembur karena pegawai checkout sebelum jam pulang, silahkan cek menu log absensi",
                     'status' => \false,
