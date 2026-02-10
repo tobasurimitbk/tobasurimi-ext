@@ -221,16 +221,24 @@ class FormPerizinanNotApprovedModel extends Model
 
     public function rekap($payrollID)
     {
+        $payrollModel = new PayrollsModel();
+        $payroll = $payrollModel->where('id', $payrollID)->first();
+
         return $this->asArray()->select('form_perizinan_not_approved.*, attendances.status')
-            ->where('payroll_id', $payrollID)
+            ->where('form_perizinan_not_approved.payroll_id', $payrollID)
+            ->where('form_perizinan_not_approved.year_month', $payroll['year_month'])
             ->join('attendances', 'attendances.id = form_perizinan_not_approved.attendances_id')
             ->findAll();
     }
 
     public function getTotalRekap($payrollID)
     {
+        $payrollModel = new PayrollsModel();
+        $payroll = $payrollModel->where('id', $payrollID)->first();
+
         $data = $this->asArray()->select('SUM(form_perizinan_not_approved.nominal_pengurangan) as total')
-            ->where('payroll_id', $payrollID)
+            ->where('form_perizinan_not_approved.payroll_id', $payrollID)
+            ->where('form_perizinan_not_approved.year_month', $payroll['year_month'])
             ->join('attendances', 'attendances.id = form_perizinan_not_approved.attendances_id')
             ->findAll();
 

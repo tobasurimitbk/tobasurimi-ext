@@ -348,15 +348,14 @@ class Payroll extends BaseController
                 $mapDendaAbsenHarian,
                 $employeeIds,
                 $this->this_company_id,
-                $yearMonth
+                $yearMonth,
+                $mapStatusAttendance,
             );
             if (count($dataPayrollGajiConjunction) != 0) {
                 $this->payrollGajiConjunctionModel->insertBatch($dataPayrollGajiConjunction);
             }
 
-            //--------------------------------------
-            // Perizinan Not Approved
-            //---------------------------------------
+            // GET GAJI HARIAN & CADANGAN
             $gajiHarian = $this->payrollGajiConjunctionModel->getGajiHarianGajiCadanganAmt($payrollIds);
 
             $mapGajiHarian = [];
@@ -368,6 +367,10 @@ class Payroll extends BaseController
             foreach ($gajiHarian['gajiCadangan'] as $g) {
                 $mapGajiCadangan[$g['employee_id']] = $g['nominal'];
             }
+
+            //--------------------------------------
+            // Perizinan Not Approved
+            //---------------------------------------
 
             $dataFormPerizinanNotApproved = $this->formPerizinanNotApprovedModel->generateAmt(
                 $mapStatusAttendance,
@@ -690,15 +693,14 @@ class Payroll extends BaseController
                 $mapDendaAbsenHarian,
                 $employeeIds,
                 $this->this_company_id,
-                $yearMonth
+                $yearMonth,
+                $mapStatusAttendance,
             );
             if (count($dataPayrollGajiConjunction) != 0) {
                 $this->payrollGajiConjunctionModel->insertBatch($dataPayrollGajiConjunction);
             }
 
-            //--------------------------------------
-            // Perizinan Not Approved
-            //---------------------------------------
+            // GET GAJI HARIAN & CADANGAN
             $gajiHarian = $this->payrollGajiConjunctionModel->getGajiHarianGajiCadanganAmt($payrollIds);
 
             $mapGajiHarian = [];
@@ -710,6 +712,10 @@ class Payroll extends BaseController
             foreach ($gajiHarian['gajiCadangan'] as $g) {
                 $mapGajiCadangan[$g['employee_id']] = $g['nominal'];
             }
+
+            //--------------------------------------
+            // Perizinan Not Approved
+            //---------------------------------------
 
             $dataFormPerizinanNotApproved = $this->formPerizinanNotApprovedModel->generateAmt(
                 $mapStatusAttendance,
@@ -972,6 +978,7 @@ class Payroll extends BaseController
 
     public function exportPdfPayrollSingle($payrollID)
     {
+        ini_set('memory_limit', '512M');
         $dompdf = new Dompdf();
 
         if (is_numeric($payrollID)) {
@@ -1025,6 +1032,7 @@ class Payroll extends BaseController
 
     public function exportPdfDaftarUpah()
     {
+        ini_set('memory_limit', '512M');
         $dompdf = new Dompdf();
         $yearMonth = $this->request->getVar('month');
         $divisionID = $this->request->getVar('divisi_id');
@@ -1078,6 +1086,7 @@ class Payroll extends BaseController
 
     public function exportPdfSlipGajiAll()
     {
+        ini_set('memory_limit', '512M');
         $dompdf = new Dompdf();
         $yearMonth = $this->request->getVar('month');
         $divisionID = $this->request->getVar('divisi_id');
@@ -1113,6 +1122,7 @@ class Payroll extends BaseController
 
     public function exportPdfSummary()
     {
+        ini_set('memory_limit', '512M');
         $dompdf = new Dompdf();
         $yearMonth = $this->request->getVar('month');
         $divisionID = $this->request->getVar('divisi_id');
@@ -1156,6 +1166,7 @@ class Payroll extends BaseController
 
     public function exportPdfPotongan()
     {
+        ini_set('memory_limit', '512M');
         $dompdf = new Dompdf();
         $yearMonth = $this->request->getVar('month');
         $divisionID = $this->request->getVar('divisi_id');

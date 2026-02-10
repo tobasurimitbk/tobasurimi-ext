@@ -214,4 +214,40 @@ class GajiConjunctionModel extends Model
         // var_dump($gajiConjunctionDeleted, $gajiConjunctionInserted);
         // die;
     }
+
+    public function getMapGajiHarianDanCadangan(
+        $employeeIds
+    ) {
+        $gajiPokok = $this->asArray()
+            ->select('employee_id, nominal')
+            ->join('tunjangan', 'tunjangan.id = gaji_conjunction.tunjangan_id')
+            ->whereIn('gaji_conjunction.employee_id', $employeeIds)
+            ->where('tunjangan.is_gaji_harian', 1)
+            ->where('gaji_conjunction.deletedAt', null)
+            ->findAll();
+
+        $cadangan = $this->asArray()
+            ->select('employee_id, nominal')
+            ->join('tunjangan', 'tunjangan.id = gaji_conjunction.tunjangan_id')
+            ->whereIn('gaji_conjunction.employee_id', $employeeIds)
+            ->where('tunjangan.is_cadangan', 1)
+            ->where('gaji_conjunction.deletedAt', null)
+            ->findAll();
+
+        $mapGajiHarian = [];
+        $mapCadangan = [];
+
+        foreach ($gajiPokok as $g) {
+            $mapGajiHarian[$g['employee_id']] = $g['nominal'];
+        }
+
+        foreach ($cadangan as $c) {
+            $mapCadangan[$c['employee_id']] = $c['nominal'];
+        }
+
+        return [
+            'gajiHarian' => $mapGajiHarian,
+            'cadangan' => $cadangan
+        ];
+    }
 }

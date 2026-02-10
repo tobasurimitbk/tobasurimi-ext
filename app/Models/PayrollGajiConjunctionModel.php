@@ -91,8 +91,19 @@ class PayrollGajiConjunctionModel extends Model
         $mapDendaAbsenHarian,
         $employeeIds,
         $companyId,
-        $yearMonth
+        $yearMonth,
+        $mapStatusAttendance
     ) {
+        $gajiConjunctionModel = new GajiConjunctionModel();
+
+        $mapGajiPokokCadangan = $gajiConjunctionModel->getMapGajiHarianDanCadangan(
+            $employeeIds
+        );
+
+        // get map gaji pokok & cadangan
+        $mapGajiHarian = $mapGajiPokokCadangan['gajiHarian'];
+        $mapGajiCadangan = $mapGajiPokokCadangan['cadangan'];
+
         // get map komponen gaji
         $mapKomponenGajiHistory = $this->getMapKomponenGajiHistory(
             $employeeIds,
@@ -106,7 +117,6 @@ class PayrollGajiConjunctionModel extends Model
             ->where('year_month', $yearMonth)
             ->delete();
 
-        $gajiConjunctionModel = new GajiConjunctionModel();
         $gajiList = $gajiConjunctionModel
             ->select('gaji_conjunction.*,tunjangan.name AS tunjangan_name,tunjangan.tipe')
             ->join('tunjangan', 'tunjangan.id = gaji_conjunction.tunjangan_id', 'left')
@@ -115,15 +125,11 @@ class PayrollGajiConjunctionModel extends Model
 
         $dataList = array();
 
-        //  elseif ($g['tunjangan_name'] == "DENDA") {
-        //         if (empty($mapDendaAbsenHarian[$g['employee_id']])) {
-        //             $nominal = $g['nominal'];
-        //         } else {
-        //             $nominal = $mapDendaAbsenHarian[$g['employee_id']] ?? 0;
-        //         }
-        //     }
 
         foreach ($gajiList as $g) {
+            $nominalGajiHarian = !empty($mapGajiHarian[$g['employee_id']]) ? $mapGajiHarian[$g['employee_id']] : 0;
+            $nominalGajiCadangan = !empty($mapGajiCadangan[$g['employee_id']]) ? $mapGajiCadangan[$g['employee_id']] : 0;
+
             if ($g['tunjangan_name'] == "UANG MAKAN") {
                 if (empty($mapUangMakanHarian[$g['employee_id']])) {
                     $nominal = $g['nominal'];
@@ -132,6 +138,8 @@ class PayrollGajiConjunctionModel extends Model
                 }
             } else {
                 if ($g['tipe'] == "MINUS") {
+                    $totalPg = !empty($mapStatusAttendance[$g['employee_id']]) ? $mapStatusAttendance[$g['employee_id']]['POTONG GAJI_PG'] : 0;
+
                     $gajiHistory = $mapKomponenGajiHistory[$g['employee_id']][$g['tunjangan_id']][$yearMonth] ?? 0;
                     if ($g['tunjangan_name'] == "DENDA") {
                         // DENDA BELUM ADA DAN HARUS DI RECALCULATE
@@ -140,8 +148,12 @@ class PayrollGajiConjunctionModel extends Model
                         } else {
                             $nominal = $mapDendaAbsenHarian[$g['employee_id']] ?? 0;
                         }
-                    } elseif ($gajiHistory == 0 && $g['tunjangan_name'] != "DENDA") {
+                    } elseif ($gajiHistory == 0 && $g['tunjangan_name'] != "DENDA" && $g['tunjangan_name'] != "POTONGAN ABSENSI") {
                         $nominal = $g['nominal'];
+                    } elseif ($g['tunjangan_name'] == "POTONGAN ABSENSI" && $totalPg != 0) {
+                        // JIKA PG MAKA MASUKKAN KE KOMPONEN POTONGAN ABSENSI
+                        $nominalDenda = $totalPg * ($nominalGajiCadangan + $nominalGajiHarian);
+                        $nominal = $nominalDenda;
                     } else {
                         $nominal = $gajiHistory;
                     }
