@@ -63,7 +63,8 @@ class PayrollGajiHarianModel extends Model
         $employeeIds,
         $yearMonth,
         $startDate,
-        $endDate
+        $endDate,
+        $payrollIds
     ) {
         // models
         $AttendancesModel = new AttendancesModel();
@@ -75,6 +76,11 @@ class PayrollGajiHarianModel extends Model
         $this->db->table('payroll_gaji_harian')
             ->whereIn('employee_id', $employeeIds)
             ->where('year_month', $yearMonth)
+            ->delete();
+
+        // delete by payroll if exists
+        $this->db->table('payroll_gaji_harian')
+            ->whereIn('payroll_id', $payrollIds)
             ->delete();
 
         // Ambil semua jam kerja detail untuk semua employee dalam range SEKALI (anti N+1)

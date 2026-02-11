@@ -124,7 +124,8 @@ class FormPerizinanNotApprovedModel extends Model
         $companyId,
         $yearMonth,
         $startDate,
-        $endDate
+        $endDate,
+        $payrollIds
     ) {
         $attendancesModel = new AttendancesModel();
         $bigDaysModel = new BigDaysModel();
@@ -133,6 +134,11 @@ class FormPerizinanNotApprovedModel extends Model
         $this->db->table('form_perizinan_not_approved')
             ->whereIn('employee_id', $employeeIds)
             ->where('year_month', $yearMonth)
+            ->delete();
+
+        // delete by payroll if exists
+        $this->db->table('form_perizinan_not_approved')
+            ->whereIn('payroll_id', $payrollIds)
             ->delete();
 
         // Ambil absensi dalam range

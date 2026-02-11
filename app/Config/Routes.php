@@ -46,7 +46,8 @@ $routes->get('/403', function () {
 
 $routes->post('/update-tgl-stock', 'Warehouse\Penomoran_::updateTglStock');
 $routes->get('/generate-tgl-stock-view', 'Warehouse\Penomoran_::generateTglStockView');
-$routes->post('/stock-bp', 'Warehouse\Penomoran_::stockBpAction');
+$routes->get('/check-duplicate', 'Warehouse\Penomoran_::checkDuplicateAbsensi');
+$routes->get('/remove-duplikasi', 'Warehouse\Penomoran_::removeDuplicateAbsensi');
 
 // $routes->get('/generate-stock-revamp-nonpabean', 'Warehouse\Penomoran_::generateStokRevampNonPabean');
 // $routes->get('/generate-stock-revamp-pabean', 'Warehouse\Penomoran_::generateStokRevampPabean');

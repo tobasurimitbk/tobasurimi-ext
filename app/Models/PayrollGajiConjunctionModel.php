@@ -92,7 +92,8 @@ class PayrollGajiConjunctionModel extends Model
         $employeeIds,
         $companyId,
         $yearMonth,
-        $mapStatusAttendance
+        $mapStatusAttendance,
+        $payrollIds
     ) {
         $gajiConjunctionModel = new GajiConjunctionModel();
 
@@ -117,9 +118,15 @@ class PayrollGajiConjunctionModel extends Model
             ->where('year_month', $yearMonth)
             ->delete();
 
+        // delete by payroll if exists
+        $this->db->table('payroll_gaji_conjunction')
+            ->whereIn('payroll_id', $payrollIds)
+            ->delete();
+
         $gajiList = $gajiConjunctionModel
             ->select('gaji_conjunction.*,tunjangan.name AS tunjangan_name,tunjangan.tipe')
             ->join('tunjangan', 'tunjangan.id = gaji_conjunction.tunjangan_id', 'left')
+            ->where('tunjangan.company_id', $companyId)
             ->whereIn('employee_id', $employeeIds)
             ->findAll();
 

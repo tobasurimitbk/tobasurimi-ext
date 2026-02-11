@@ -350,6 +350,7 @@ class Payroll extends BaseController
                 $this->this_company_id,
                 $yearMonth,
                 $mapStatusAttendance,
+                $payrollIds
             );
             if (count($dataPayrollGajiConjunction) != 0) {
                 $this->payrollGajiConjunctionModel->insertBatch($dataPayrollGajiConjunction);
@@ -381,7 +382,8 @@ class Payroll extends BaseController
                 $this->this_company_id,
                 $yearMonth,
                 $startDate,
-                $endDate
+                $endDate,
+                $payrollIds
             );
             if (count($dataFormPerizinanNotApproved['dataFormPerizinan']) != 0) {
                 $this->formPerizinanNotApprovedModel->insertBatch($dataFormPerizinanNotApproved['dataFormPerizinan']);
@@ -403,7 +405,8 @@ class Payroll extends BaseController
                 $employeeIds,
                 $yearMonth,
                 $startDate,
-                $endDate
+                $endDate,
+                $payrollIds
             );
 
             if (count($dataPayrollGajiHarian['rows']) != 0) {
@@ -695,6 +698,7 @@ class Payroll extends BaseController
                 $this->this_company_id,
                 $yearMonth,
                 $mapStatusAttendance,
+                $payrollIds
             );
             if (count($dataPayrollGajiConjunction) != 0) {
                 $this->payrollGajiConjunctionModel->insertBatch($dataPayrollGajiConjunction);
@@ -726,7 +730,8 @@ class Payroll extends BaseController
                 $this->this_company_id,
                 $yearMonth,
                 $startDate,
-                $endDate
+                $endDate,
+                $payrollIds
             );
 
             if (count($dataFormPerizinanNotApproved['dataFormPerizinan']) != 0) {
@@ -749,7 +754,8 @@ class Payroll extends BaseController
                 $employeeIds,
                 $yearMonth,
                 $startDate,
-                $endDate
+                $endDate,
+                $payrollIds
             );
 
             if (count($dataPayrollGajiHarian['rows']) != 0) {

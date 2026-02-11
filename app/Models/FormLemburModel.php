@@ -200,19 +200,32 @@ class FormLemburModel extends Model
     public function getTotalLemburJamPertamaKeduaByDateRange($employeeID, $startDate, $endDate)
     {
         $formLemburModel = new FormLemburModel();
+        $bigDaysModel = new BigDaysModel();
+
         $lemburList = $formLemburModel->rekapLemburDateRange($employeeID, $startDate, $endDate);
+        $hariBesarList = $bigDaysModel->where('company_id', session()->get('login')->this_company_id)->where('deletedAt', null)->findAll();
+        $tanggalHariBesarArr = array_column($hariBesarList, 'date');
+
 
         $lemburJamPertamaMenit = 0;
         $lemburJamKeduaMenit = 0;
 
         foreach ($lemburList as $lembur) {
             $totalMenit = $this->jamMenitKeMenit($lembur['total_jam_lembur']);
+            $dayName = date('D', strtotime($lembur['periode'])); // get nama hari
 
-            if ($totalMenit <= 60) {
-                $lemburJamPertamaMenit += $totalMenit;
+            // cek hari minggu atau hari besar
+            if (in_array($lembur['periode'], $tanggalHariBesarArr) || $dayName == 'Sun') {
+                // LANGSUNG HITUNG JAM 2
+                $lemburJamKeduaMenit += ($totalMenit);
             } else {
-                $lemburJamPertamaMenit += 60;
-                $lemburJamKeduaMenit += ($totalMenit - 60);
+                // hari biasa
+                if ($totalMenit <= 60) {
+                    $lemburJamPertamaMenit += $totalMenit;
+                } else {
+                    $lemburJamPertamaMenit += 60;
+                    $lemburJamKeduaMenit += ($totalMenit - 60);
+                }
             }
         }
 

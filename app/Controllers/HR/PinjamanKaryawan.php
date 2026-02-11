@@ -221,8 +221,8 @@ class PinjamanKaryawan extends BaseController
                     'tidak_hadir'     => $tidakHadir,
                     'hadir'           => $hadir,
                     'is_boleh_minjam' => ($hadir >= 8) ? '1' : '0',
-                    'status_pinjaman' => ($hadir >= 8 && $e['tipe'] == "HARIAN TETAP") ? '1' : '0',
-                    'is_ambil'        => ($hadir >= 8 && $e['tipe'] == "HARIAN TETAP") ? '1' : '0',
+                    'status_pinjaman' => ($hadir >= 8) ? '1' : '0',
+                    'is_ambil'        => ($hadir >= 8) ? '1' : '0',
                     'nominal'         => ($hadir >= 8) ? $nominalPinjaman : null,
                     'tanggal_ambil'   => $tanggalAmbil
                 ];
