@@ -3471,4 +3471,151 @@ class Attendance extends BaseController
     {
         return preg_match('/^(2[0-3]|[01][0-9]):[0-5][0-9](:[0-5][0-9])?$/', $str);
     }
+
+    public function getInternalAttendance()
+    {
+        try {
+
+            $startDate = formatDMYtoYMD($this->request->getVar('start_date'));
+            $endDate   = formatDMYtoYMD($this->request->getVar('end_date'));
+
+            // ===============================
+            // CEK KONEKSI INTERNAL
+            // ===============================
+            try {
+
+                $internalDb = \Config\Database::connect('internal');
+                $internalDb->initialize();
+
+                if (!$internalDb->connID) {
+                    throw new \Exception('Koneksi ke database INTERNAL gagal.');
+                }
+            } catch (\Throwable $e) {
+
+                return response()->setJSON([
+                    'message' => 'Gagal koneksi ke database INTERNAL: ' . $e->getMessage(),
+                    'token'   => csrf_hash(),
+                    'status'  => false
+                ]);
+            }
+
+            $externalDb = \Config\Database::connect();
+
+            // ===============================
+            // 1️⃣ Ambil data INTERNAL
+            // ===============================
+            $internalData = $internalDb->table('attendances')
+                ->groupStart()
+                ->where('periode >=', $startDate)
+                ->where('periode <=', $endDate)
+                ->groupEnd()
+                ->where('company_id', $this->this_company_id)
+                ->get()
+                ->getResultArray();
+
+            if (empty($internalData)) {
+                return response()->setJSON([
+                    'message' => 'Data absensi internal belum ada',
+                    'token'   => csrf_hash(),
+                    'status'  => false
+                ]);
+            }
+
+            // ===============================
+            // 2️⃣ Ambil data EXTERNAL (sekali query)
+            // ===============================
+            $externalRows = $externalDb->table('attendances')
+                ->select('company_id, employee_id, periode, sync_status')
+                ->groupStart()
+                ->where('periode >=', $startDate)
+                ->where('periode <=', $endDate)
+                ->groupEnd()
+                ->where('company_id', $this->this_company_id)
+                ->get()
+                ->getResultArray();
+
+            $existing = [];
+            foreach ($externalRows as $row) {
+                $key = $row['company_id'] . '_' . $row['employee_id'] . '_' . $row['periode'];
+                $existing[$key] = $row;
+            }
+
+            $insertData = [];
+            $updateData = [];
+
+            // ===============================
+            // 3️⃣ Proses di memory (NO QUERY)
+            // ===============================
+            foreach ($internalData as $row) {
+
+                $key = $row['company_id'] . '_' . $row['employee_id'] . '_' . $row['periode'];
+
+                if (!isset($existing[$key])) {
+
+                    // ===== INSERT BARU =====
+                    $insertData[] = [
+                        'company_id'        => $row['company_id'],
+                        'division_id'       => $row['division_id'],
+                        'employee_id'       => $row['employee_id'],
+                        'periode'           => $row['periode'],
+                        'checkin'           => $row['checkin'],
+                        'checkout'          => $row['checkout'],
+                        'status'            => $row['status'],
+                        'reason'            => $row['reason'],
+                        'year_month'        => $row['year_month'],
+                        'isApproved'        => $row['isApproved'],
+                        'abaikan_sync_log'  => $row['abaikan_sync_log'],
+                        'sync_status'       => 'AUTO',
+                    ];
+                } else {
+
+                    // ===== UPDATE HANYA JIKA AUTO =====
+                    if ($existing[$key]['sync_status'] === 'AUTO') {
+
+                        $updateData[] = [
+                            'company_id'        => $row['company_id'],
+                            'employee_id'       => $row['employee_id'],
+                            'periode'           => $row['periode'],
+                            'division_id'       => $row['division_id'],
+                            'checkin'           => $row['checkin'],
+                            'checkout'          => $row['checkout'],
+                            'status'            => $row['status'],
+                            'reason'            => $row['reason'],
+                            'year_month'        => $row['year_month'],
+                            'isApproved'        => $row['isApproved'],
+                            'abaikan_sync_log'  => $row['abaikan_sync_log'],
+                        ];
+                    }
+                }
+            }
+
+            // ===============================
+            // 4️⃣ BULK INSERT
+            // ===============================
+            if (!empty($insertData)) {
+                $externalDb->table('attendances')->insertBatch($insertData);
+            }
+
+            // ===============================
+            // 5️⃣ BULK UPDATE (BY COMPOSITE KEY)
+            // ===============================
+            if (!empty($updateData)) {
+                $externalDb->table('attendances')
+                    ->updateBatch($updateData, ['company_id', 'employee_id', 'periode']);
+            }
+
+            return response()->setJSON([
+                'message' => 'Sinkronisasi berhasil',
+                'token'   => csrf_hash(),
+                'status'  => true
+            ]);
+        } catch (\Throwable $e) {
+
+            return response()->setJSON([
+                'message' => $e->getMessage(),
+                'token'   => csrf_hash(),
+                'status'  => false
+            ]);
+        }
+    }
 }

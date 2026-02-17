@@ -46,8 +46,7 @@ $routes->get('/403', function () {
 
 $routes->post('/update-tgl-stock', 'Warehouse\Penomoran_::updateTglStock');
 $routes->get('/generate-tgl-stock-view', 'Warehouse\Penomoran_::generateTglStockView');
-$routes->get('/check-duplicate', 'Warehouse\Penomoran_::checkDuplicateAbsensi');
-$routes->get('/remove-duplikasi', 'Warehouse\Penomoran_::removeDuplicateAbsensi');
+$routes->get('/check-repair-duplicate', 'Warehouse\Penomoran_::checkDuplicateAbsensi');
 
 // $routes->get('/generate-stock-revamp-nonpabean', 'Warehouse\Penomoran_::generateStokRevampNonPabean');
 // $routes->get('/generate-stock-revamp-pabean', 'Warehouse\Penomoran_::generateStokRevampPabean');
@@ -2203,6 +2202,7 @@ $routes->get('/list-attendance/export-harian', 'HR\Attendance::exportExcelPresen
 $routes->post('/list-attendance/get-bagian', 'Master\Bagian::getBagianByDivisionNoEncrypt', ['filter' => 'Auth']);
 $routes->get('/list-attendance/export-bulanan-employee', 'HR\Attendance::exportExcelPresensiKaryawanBulanan', ['filter' => 'Auth']);
 $routes->post('/list-attendance/get-all-data-finger', 'HR\Attendance::getListDataFingerAllByAttendance', ['filter' => 'Auth']);
+$routes->post('/list-attendance/get-internal-attendance', 'HR\Attendance::getInternalAttendance', ['filter' => 'Auth']);
 
 // Big Day
 $routes->get('/big-days', 'Master\BigDays::ListBigDay', ['filter' => 'Auth']);

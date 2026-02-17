@@ -105,6 +105,9 @@
     <div class="section-header">
         <h1>Data Absensi</h1>
         <div class="col-button-tambah-spp">
+            <a class="btn btn-hide-form btn-discard float-right mr-2" id="btnTarikDataInternal" href="#">
+                <i class="fa-solid fa-clock-rotate-left"></i> Tarik Data
+            </a>
             <?php if (can('Personalia', 'Data Absensi', 'c')): ?>
                 <a class="btn btn-hide-form btn-discard float-right mr-2" data-bs-toggle="modal" data-bs-target="#generateModal" href="#" onclick="resetFormGenerateLog()">
                     <i class="fa-solid fa-clock-rotate-left"></i> Generate
@@ -764,6 +767,54 @@
             </form>
         </div>
     </div>
+</div>
+
+<div class="modal" id="tarikDataInternalModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tarik data presensi</h5>
+            </div>
+            <form id="formTarikDataPresensi" role="form" method="POST">
+                <div class="modal-body">
+                    <div class="row mb-2">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <div class="form-floating mb-2" style="height: 50px;">
+                                    <input type="text" id="start_date_tanggal_absensi" name="start_date_tanggal_absensi" class="form-control start_date_tanggal_absensi" placeholder="Tanggal Mulai">
+                                    <label for="start_date">Tanggal Mulai Absensi</label>
+                                </div>
+                                <div class="input-group-append" style="height:50px;">
+                                    <button disabled class="btn btn-secondary" type="button">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <div class="form-floating mb-2" style="height: 50px;">
+                                    <input type="text" id="end_date_tanggal_absensi" name="end_date_tanggal_absensi" class="form-control end_date_tanggal_absensi" placeholder="Tanggal Selesai">
+                                    <label for="end_date">Tanggal Selesai Absensi</label>
+                                </div>
+                                <div class="input-group-append" style="height:50px;">
+                                    <button disabled class="btn btn-secondary" type="button">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-hide-form btn-discard mr-3" id="btnHideTarikDataInternal">Kembali</button>
+                    <button type="button" class="btn btn-submit-form" id="btnSubmitTarikDataInternal">Tarik Data</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
 </div>
 
 <script>
@@ -1747,6 +1798,24 @@
         autoclose: true
     });
 
+    $("#start_date_tanggal_absensi").datepicker({
+        placeholder: "Pilih Tanggal Mulai Absensi",
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
+
+
+    $("#end_date_tanggal_absensi").datepicker({
+        placeholder: "Pilih Tanggal Mulai Absensi",
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
+
+
     $('#tanggalMesinFinger').change(function(e) {
         e.preventDefault();
         e.preventDefault();
@@ -2131,6 +2200,80 @@
         e.preventDefault();
         $('#tarikDataFingerModal').modal('hide');
     });
+
+    $('#btnTarikDataInternal').click(function(e) {
+        e.preventDefault();
+        $('#start_date_tanggal_absensi,#end_date_tanggal_absensi').val(null);
+        $('#tarikDataInternalModal').modal('show');
+    });
+
+    $('#btnHideTarikDataInternal').click(function(e) {
+        e.preventDefault();
+        $('#tarikDataInternalModal').modal('hide');
+    });
+
+    $('#btnSubmitTarikDataInternal').click(function(e) {
+        e.preventDefault();
+        var start_date = $('#start_date_tanggal_absensi').val();
+        var end_date = $('#end_date_tanggal_absensi').val();
+        const csrf = $(`[name="${csrfToken}"]`);
+        const formData = new FormData();
+        formData.append('start_date', start_date);
+        formData.append('end_date', end_date);
+
+        if (start_date == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pilih tanggal mulai',
+                confirmButtonColor: '#4e73df',
+            });
+            return;
+        } else if (end_date == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pilih tanggal selesai',
+                confirmButtonColor: '#4e73df',
+            });
+            return;
+        } else {
+            $.ajax({
+                url: "<?= base_url("list-attendance/get-internal-attendance"); ?>",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                data: formData,
+                method: "POST",
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    csrf.val(response.token);
+                    if (response.status) {
+                        Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                            .then(() => {
+                                $('#tarikDataInternalModal').modal('hide');
+                                attendanceTable.ajax.reload(null, false);
+                                attendanceTotalTable.ajax.reload(null, false);
+                            })
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                    }
+                }
+            });
+        }
+    })
 
     function format_ymd_to_dmy(tanggal) {
         const dateStr = tanggal;
