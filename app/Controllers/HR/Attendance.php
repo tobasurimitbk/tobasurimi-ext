@@ -1138,7 +1138,7 @@ class Attendance extends BaseController
             if ($statusKehadiran == "OFF_OFF") {
                 $checkIN = null;
                 $checkOut = null;
-                $isApproved = '0';
+                $isApproved = '1';
             }
 
             $this->AttendanceModel->update($attendenceID, [
