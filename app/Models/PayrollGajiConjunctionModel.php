@@ -130,6 +130,7 @@ class PayrollGajiConjunctionModel extends Model
             ->whereIn('employee_id', $employeeIds)
             ->findAll();
 
+
         $dataList = array();
 
 
@@ -156,6 +157,9 @@ class PayrollGajiConjunctionModel extends Model
                             $nominal = $mapDendaAbsenHarian[$g['employee_id']] ?? 0;
                         }
                     } elseif ($gajiHistory == 0 && $g['tunjangan_name'] != "DENDA" && $g['tunjangan_name'] != "POTONGAN ABSENSI") {
+                        $nominal = $g['nominal'];
+                    } elseif ($g['tunjangan_name'] == "BPJS") {
+                        // Jika Bpjs ambil dari komponen gaji
                         $nominal = $g['nominal'];
                     } elseif ($g['tunjangan_name'] == "POTONGAN ABSENSI" && $totalPg != 0) {
                         // JIKA PG MAKA MASUKKAN KE KOMPONEN POTONGAN ABSENSI

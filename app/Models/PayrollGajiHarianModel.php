@@ -168,19 +168,25 @@ class PayrollGajiHarianModel extends Model
                 $nominalDiterima = $customGajiHarian != null ? $customGajiHarian['nominal'] : ($nominalGajiHarian + $nominalGajiCadangan);
             } else {
                 // ga di approve 
-                if (!$p['isApproved'] && in_array($p['status'], ["POTONG GAJI_PG"])) {
-                    // JIKA PG TETEP DIGAJI (TAPI UDAH MASUK KE POTONGAN ABSENSI)
-                    $customGajiHarian = $mapCustomGajiHarian[$employeeID][$tanggal] ?? null;
+                // if (!$p['isApproved'] && in_array($p['status'], ["POTONG GAJI_PG"])) {
+                //     // JIKA PG TETEP DIGAJI (TAPI UDAH MASUK KE POTONGAN ABSENSI)
+                //     $customGajiHarian = $mapCustomGajiHarian[$employeeID][$tanggal] ?? null;
 
-                    $nominalGajiHarian = $customGajiHarian != null ? $customGajiHarian['nominal_gaji_harian'] : ($mapGajiHarian[$employeeID] ?? 0);
-                    $nominalGajiCadangan = $customGajiHarian != null ? $customGajiHarian['nominal_cadangan'] : ($mapGajiCadangan[$employeeID] ?? 0);
-                    $nominalDiterima = $customGajiHarian != null ? $customGajiHarian['nominal'] : ($nominalGajiHarian + $nominalGajiCadangan);
-                } else {
-                    // LANGSUNG KASIH 0
-                    $nominalDiterima = 0;
-                    $nominalGajiHarian = 0;
-                    $nominalGajiCadangan = 0;
-                }
+                //     $nominalGajiHarian = $customGajiHarian != null ? $customGajiHarian['nominal_gaji_harian'] : ($mapGajiHarian[$employeeID] ?? 0);
+                //     $nominalGajiCadangan = $customGajiHarian != null ? $customGajiHarian['nominal_cadangan'] : ($mapGajiCadangan[$employeeID] ?? 0);
+                //     $nominalDiterima = $customGajiHarian != null ? $customGajiHarian['nominal'] : ($nominalGajiHarian + $nominalGajiCadangan);
+                // } else {
+                //     // LANGSUNG KASIH 0
+                //     $nominalDiterima = 0;
+                //     $nominalGajiHarian = 0;
+                //     $nominalGajiCadangan = 0;
+                // }
+
+                $customGajiHarian = $mapCustomGajiHarian[$employeeID][$tanggal] ?? null;
+
+                $nominalGajiHarian = $customGajiHarian != null ? $customGajiHarian['nominal_gaji_harian'] : ($mapGajiHarian[$employeeID] ?? 0);
+                $nominalGajiCadangan = $customGajiHarian != null ? $customGajiHarian['nominal_cadangan'] : ($mapGajiCadangan[$employeeID] ?? 0);
+                $nominalDiterima = $customGajiHarian != null ? $customGajiHarian['nominal'] : ($nominalGajiHarian + $nominalGajiCadangan);
             }
 
             $insertRows[] = [
