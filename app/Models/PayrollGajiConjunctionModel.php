@@ -161,7 +161,7 @@ class PayrollGajiConjunctionModel extends Model
                     } elseif ($g['tunjangan_name'] == "BPJS") {
                         // Jika Bpjs ambil dari komponen gaji
                         $nominal = $g['nominal'];
-                    } elseif ($g['tunjangan_name'] == "POTONGAN ABSENSI" && $totalPg != 0) {
+                    } elseif ($g['tunjangan_name'] == "POTONGAN ABSENSI") {
                         // JIKA PG MAKA MASUKKAN KE KOMPONEN POTONGAN ABSENSI
                         $nominalDenda = $totalPg * ($nominalGajiCadangan + $nominalGajiHarian);
                         $nominal = $nominalDenda;
