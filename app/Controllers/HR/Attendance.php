@@ -2564,6 +2564,15 @@ class Attendance extends BaseController
                         $formLembur['jam_mulai_lembur'],
                         $formLembur['jam_selesai_lembur']
                     );
+                    if ($selisih['jam'] == "00" && $selisih['menit'] == "00") {
+                        // Jika kosong coba cari lintas hari
+                        $selisih = $this->formLembur::selisihWaktu(
+                            $formLembur['jam_mulai_lembur'],
+                            $formLembur['jam_selesai_lembur'],
+                            true
+                        );
+                    }
+
                     $lembur = (float)$selisih['jam'] . " Jam, " . $selisih['menit'] . " Menit";
                 }
 
