@@ -333,6 +333,8 @@
                                     'type': 'text',
                                     'name': data.id,
                                     'class': 'form-control komponen-gaji',
+                                    'data-komponen': data.name,
+                                    'id': data.name,
                                     'value': (data.nominal == null) ?
                                         "0,00" : greatFormatRupiah(data.nominal),
                                     'onkeyup': "this.value = greatFormatRupiah(this.value)",
@@ -600,6 +602,30 @@
         $(".zip_code").val($(".city_id option:selected").attr("data-code"))
     });
 
+    $(document).on('keyup', '.komponen-gaji', function() {
+
+        var gajiPokok = 0;
+        var tunjanganTetap = 0;
+
+        $('.komponen-gaji').each(function() {
+
+            var komponen = $(this).data('komponen');
+            var value = destroyFormatRupiah($(this).val() || 0);
+
+            if (komponen === "GAJI POKOK") {
+                gajiPokok = value;
+            }
+
+            if (komponen === "TUNJANGAN TETAP") {
+                tunjanganTetap = value;
+            }
+
+        });
+
+        var bpjs = ((gajiPokok + tunjanganTetap) * 0.04) * 25;
+
+        $('#BPJS').val(greatFormatRupiah(bpjs));
+    });
     var validator = $("#create-form").validate({
         rules: {
             nip: {
@@ -868,6 +894,8 @@
                                     'type': 'text',
                                     'name': data.id,
                                     'class': 'form-control komponen-gaji',
+                                    'data-komponen': data.name,
+                                    'id': data.name,
                                     'value': (data.nominal == null) ?
                                         "0,00" : greatFormatRupiah(data.nominal),
                                     'onkeyup': 'this.value = greatFormatRupiah(this.value);'
