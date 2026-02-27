@@ -67,9 +67,9 @@
             <tr align="left">
                 <td>Hal : <span class="page-number"></span></td>
             </tr>
-            <tr align="left">
+            <!-- <tr align="left">
                 <td>Tgl : <?= date('d/m/Y') ?></td>
-            </tr>
+            </tr> -->
             <tr align="center">
                 <td style="font-size:12px;">PT TOBA SURIMI</td>
             </tr>

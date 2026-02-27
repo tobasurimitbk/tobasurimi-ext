@@ -71,11 +71,11 @@
                 </td>
 
             </tr>
-            <tr>
+            <!-- <tr>
                 <td style="border:none; text-align:left;">
                     Tgl : <?= date('d/m/Y') ?>
                 </td>
-            </tr>
+            </tr> -->
             <tr>
                 <td style="border:none; text-align:center; font-size:12px;">
                     PT TOBA SURIMI
