@@ -90,7 +90,7 @@
             <table style="page-break-before: <?= $i > 0 ? 'always' : 'auto' ?>" id="dashed-border-table">
                 <thead>
                     <tr>
-                        <td colspan="12" style="font-weight: bold; text-align:left;">
+                        <td colspan="11" style="font-weight: bold; text-align:left;">
                             BAGIAN : <?= $bagian['namaBagian'] ?>
                         </td>
                     </tr>
@@ -99,9 +99,9 @@
                         <th>Kode</th>
                         <th>Karyawan</th>
                         <th>J.Hr</th>
-                        <th>Total Upah <br> (Rp)</th>
-                        <th>Uang Makan <br> (Rp)</th>
+                        <!-- <th>Total Upah <br> (Rp)</th> -->
                         <th>Upah Pokok <br> (Rp)</th>
+                        <th>Tunj. Tdk Tetap <br> (Rp)</th>
                         <th>Lembur Kerja <br> (Rp)</th>
                         <th>Tunj.Ksjh <br> (Rp)</th>
                         <th>Potongan <br> (Rp)</th>
@@ -117,9 +117,9 @@
                         <td><?= $b['nip'] ?></td>
                         <td><?= $b['name'] ?></td>
                         <td><?= $b['hariKerja'] ?></td>
-                        <td><?= number_format($b['totalUpah'], 2, ',', '.') ?></td>
-                        <td><?= number_format($b['uangMakan'], 2, ',', '.') ?></td>
+                        <!-- <td><?= number_format($b['totalUpah'], 2, ',', '.') ?></td> -->
                         <td><?= number_format($b['upahPokok'], 2, ',', '.') ?></td>
+                        <td><?= number_format($b['tunjanganTidakTetap'], 2, ',', '.') ?></td>
                         <td><?= number_format($b['lemburKerja'], 2, ',', '.') ?></td>
                         <td><?= number_format($b['tunjanganKesejahteraan'], 2, ',', '.') ?></td>
                         <td><?= number_format($b['potongan'], 2, ',', '.') ?></td>
@@ -134,9 +134,9 @@
                     <td colspan="4" style="text-align: right;">
                         Total
                     </td>
-                    <td><?= number_format($bagian['totalTotalUpah'], 2, ',', '.')  ?></td>
-                    <td><?= number_format($bagian['totalUangMakan'], 2, ',', '.')  ?></td>
+                    <!-- <td><?= number_format($bagian['totalTotalUpah'], 2, ',', '.')  ?></td> -->
                     <td><?= number_format($bagian['totalUpahPokok'], 2, ',', '.')  ?></td>
+                    <td><?= number_format($bagian['totalTunjanganTidakTetap'], 2, ',', '.')  ?></td>
                     <td><?= number_format($bagian['totalLemburKerja'], 2, ',', '.')  ?></td>
                     <td><?= number_format($bagian['totalTunjanganKesejahteraan'], 2, ',', '.')  ?></td>
                     <td><?= number_format($bagian['totalPotongan'], 2, ',', '.')  ?></td>
@@ -159,67 +159,7 @@
             </tr> -->
             </table>
         <?php endforeach; ?>
-
-        <table width="100%" style="margin-top: 20px;">
-            <tr align="left" style="font-size:12px;">
-                <td>PERINCIAN</td>
-            </tr>
-        </table>
-        <br>
-
-        <table>
-            <tbody>
-                <?php $tunjanganDisplay = ["Tunjangan Seragam", "Tunjangan Makan Malam", "Tunjangan Transport"]; ?>
-                <?php $tunjanganTotalDisplay = 0; ?>
-                <?php $gajiDivisiModel = new \App\Models\GajiDivisiModel(); ?>
-                <?php foreach ($tunjanganDisplay as  $t) : ?>
-                    <?php $nominalTunjDisplay = $gajiDivisiModel->getNominalByKomponenName($divisi['id'], $t); ?>
-                    <?php $tunjanganTotalDisplay += $nominalTunjDisplay; ?>
-                    <tr>
-                        <td><?= $t; ?></td>
-                        <td>:</td>
-                        <td>Rp <?= number_format($nominalTunjDisplay, 2, ',', '.')  ?></td>
-                    </tr>
-                <?php endforeach; ?>
-                <tr>
-                    <td>Jumlah Tunjangan</td>
-                    <td>:</td>
-                    <td>Rp <?= $tunjanganTotalDisplay; ?></td>
-                </tr>
-            </tbody>
-        </table>
-
-        <table width="100%" style="margin-top: 10px;">
-            <tr align="left" style="font-size:12px;">
-                <td>KETERANGAN</td>
-            </tr>
-        </table>
-        <br>
-        <?php $resultKeterangan = App\Models\PayrollsModel::convertionIDRMoneyTotal($payrollData['total']['subTotalJumlahUpah']); ?>
-        <table>
-            <?php foreach ($resultKeterangan as $i => $r) : ?>
-                <?php if ($i % 3 == 0) : ?>
-                    <tr>
-                    <?php endif; ?>
-                    <td>
-                        <?= $r['lembar'] ?>
-                    </td>
-                    <td>:</td>
-                    <td style="width:50px">
-                        <?= $r['totalLembar'] ?>
-                    </td>
-                    <?php if (($i + 1) % 3 == 0) : ?>
-                    </tr>
-                <?php endif; ?>
-            <?php endforeach; ?>
-        </table>
-
     </div>
-
-
-
-
 </body>
-
 
 </html>

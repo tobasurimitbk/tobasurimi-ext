@@ -518,17 +518,29 @@ class PayrollsModel extends Model
         // Ambil semua payroll_id untuk map uang makan sekaligus
         $payrollIds = array_map(fn($p) => $p->id, $payrolls);
 
+        $tunjanganTidakTetapList = [];
         $uangMakanList = [];
         if (!empty($payrollIds)) {
-            $map = $payrollGajiConjunctionModel
+            $mapUangMakan = $payrollGajiConjunctionModel
                 ->select('payroll_id, nominal')
                 ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id', 'left')
                 ->where('tunjangan.name', 'UANG MAKAN')
                 ->whereIn('payroll_id', $payrollIds)
                 ->findAll();
 
-            foreach ($map as $u) {
-                $uangMakanList[$u['payroll_id']] = $u['nominal'];
+            $mapTunjanganTidakTetap = $payrollGajiConjunctionModel
+                ->select('payroll_id, nominal')
+                ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id', 'left')
+                ->where('tunjangan.name', 'TUNJANGAN TIDAK TETAP')
+                ->whereIn('payroll_id', $payrollIds)
+                ->findAll();
+
+            foreach ($mapUangMakan as $m) {
+                $uangMakanList[$m['payroll_id']] = $m['nominal'];
+            }
+
+            foreach ($mapTunjanganTidakTetap as $m) {
+                $tunjanganTidakTetapList[$m['payroll_id']] = $m['nominal'];
             }
         }
 
@@ -539,16 +551,18 @@ class PayrollsModel extends Model
         $subTotalUpahPokok = $subTotalLemburKerja = 0;
         $subTotalTunjanganKesejahteraan = $subTotalPotongan = 0;
         $subTotalJumlahUpah = 0;
+        $subTotalTunjanganTidakTetap = 0;
 
         foreach ($payrolls as $p) {
             $totalUpah = $p->nominal_gaji_diterima;
             $uangMakan = $uangMakanList[$p->id] ?? 0;
+            $tunjanganTidakTetap = $tunjanganTidakTetapList[$p->id] ?? 0;
             // $upahPokok = ($p->nominal_gaji_harian + $p->nominal_cadangan) * $p->hadir_final;
             $upahPokok = $p->nominal_uang_gaji;
             $lemburKerja = $p->nominal_uang_lembur;
             $tunjanganKesejahteraan = 0;
             $potongan = $p->nominal_pengurangan_gaji;
-            $jumlahUpah = $upahPokok + $lemburKerja - $potongan;
+            $jumlahUpah = $upahPokok + $lemburKerja - $potongan + $tunjanganTidakTetap;
 
             // sum
             $subTotalUpah += $totalUpah;
@@ -558,6 +572,7 @@ class PayrollsModel extends Model
             $subTotalTunjanganKesejahteraan += $tunjanganKesejahteraan;
             $subTotalPotongan += $potongan;
             $subTotalJumlahUpah += $jumlahUpah;
+            $subTotalTunjanganTidakTetap += $tunjanganTidakTetap;
 
             $dataPayRolls[] = [
                 "id" => $p->id,
@@ -574,6 +589,7 @@ class PayrollsModel extends Model
                 "tunjanganKesejahteraan" => $tunjanganKesejahteraan,
                 "potongan" => $potongan,
                 "jumlahUpah" => $jumlahUpah,
+                'tunjanganTidakTetap' => $tunjanganTidakTetap
             ];
         }
 
@@ -594,6 +610,7 @@ class PayrollsModel extends Model
                     "totalTunjanganKesejahteraan" => 0,
                     "totalPotongan" => 0,
                     "totalJumlahUpah" => 0,
+                    "totalTunjanganTidakTetap" => 0,
                     "employees" => [],
                 ];
             }
@@ -606,6 +623,7 @@ class PayrollsModel extends Model
             $grouped[$bagian]['totalTunjanganKesejahteraan'] += $d['tunjanganKesejahteraan'];
             $grouped[$bagian]['totalPotongan'] += $d['potongan'];
             $grouped[$bagian]['totalJumlahUpah'] += $d['jumlahUpah'];
+            $grouped[$bagian]['totalTunjanganTidakTetap'] += $d['tunjanganTidakTetap'];
 
             // Simpan detail pegawai (opsional)
             $grouped[$bagian]['employees'][] = $d;
@@ -623,7 +641,8 @@ class PayrollsModel extends Model
                 'subTotalLemburKerja' => $subTotalLemburKerja,
                 'subTotalTunjanganKesejahteraan' => $subTotalTunjanganKesejahteraan,
                 'subTotalPotongan' => $subTotalPotongan,
-                'subTotalJumlahUpah' => $subTotalJumlahUpah
+                'subTotalJumlahUpah' => $subTotalJumlahUpah,
+                'subTotalTunjanganTidakTetap' => $subTotalTunjanganTidakTetap
             ]
         ];
     }
