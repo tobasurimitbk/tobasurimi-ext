@@ -101,6 +101,7 @@ $routes->post('/employee/sync-employee-finger', 'Master\Employee::syncEmployeeFi
 $routes->post('/employee/delete-employee-in-finger', 'Master\Employee::deleteFinger', ['filter' => 'Auth']);
 $routes->get('/employee/create', 'Master\Employee::createView', ['filter' => 'Auth']);
 $routes->get('/employee/get-employee-sync-finger', 'Master\Employee::getListStatusFinger', ['filter' => 'Auth']);
+$routes->get('/employee/all-riwayat-payroll', 'Master\Employee::allRiwayatPayroll', ['filter' => 'Auth']);
 // CUSTOMER
 $routes->get('/customer', 'Master\Customer::customer', ['filter' => 'Auth']);
 $routes->get('/customer/all', 'Master\Customer::allCustomer', ['filter' => 'Auth']);

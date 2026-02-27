@@ -824,4 +824,59 @@ class Employee extends BaseController
             ]);
         }
     }
+
+    public function allRiwayatPayroll()
+    {
+        $payload = [
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+        ];
+
+        $condition = [
+            'payrolls.deletedAt' => null,
+            "payrolls.employee_id" => decrypt($this->request->getVar('employee_id')),
+        ];
+
+        $addCondition = [
+            "sort"               => $this->request->getGet("sort"),
+            "sortType"           => $this->request->getGet("sortType")
+        ];
+
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+        $year = $this->request->getGet('year');
+
+        $payrollData = $this->PayrollModel->getListRiwayatPayroll(
+            $condition,
+            $addCondition,
+            $year,
+            $limit,
+            $offset
+        );
+        $dataPayRolls = [];
+
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($payrollData['data'] as $p) {
+            array_push($dataPayRolls, [
+                "no" => $no++,
+                "id" => encrypt($p->id),
+                "year_month" => $p->year_month,
+                "nominal_gaji_diterima" => (float)$p->nominal_gaji_diterima,
+            ]);
+        }
+
+        $data = [
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $payrollData['totalData'],
+            "recordsFiltered"   => $payrollData['totalFilteredData'],
+            "data"              => $dataPayRolls,
+            "payload"           => $payload,
+            'test' => $addCondition
+        ];
+
+        return response()->setJSON($data);
+    }
 }

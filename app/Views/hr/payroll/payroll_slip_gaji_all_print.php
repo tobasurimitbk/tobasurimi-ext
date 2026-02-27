@@ -128,16 +128,6 @@
                                                 <td><?= $p['payroll']['hadir_final'] ?> Hari</td>
                                             </tr>
                                             <tr>
-                                                <td>Tambahan Hari Libur Tidak Kerja</td>
-                                                <td>:</td>
-                                                <td>0 Hari</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Tambahan Hari Libur Resmi</td>
-                                                <td>:</td>
-                                                <td>0 Hari</td>
-                                            </tr>
-                                            <tr>
                                                 <td><?= $tunjanganGajiPokok == null ? "" : ucfirst(strtolower($tunjanganGajiPokok['name'])) ?></td>
                                                 <td>:</td>
                                                 <td><?= "Rp " . number_format($p['payroll']['nominal_gaji_harian'], 2, ',', '.') ?>/Hari</td>
@@ -157,6 +147,13 @@
                                                 </td>
                                             </tr>
                                             <tr>
+                                                <td>Tunjangan Tidak Tetap</td>
+                                                <td>:</td>
+                                                <td>
+                                                    <?= "Rp " . number_format($p['tunjanganTidakTetap'], 2, ',', '.') ?>
+                                                </td>
+                                            </tr>
+                                            <tr>
                                                 <td>Lembur I</td>
                                                 <td>:</td>
                                                 <td><?= $p['totalLemburJamPertama'] ?> Jam</td>
@@ -170,11 +167,6 @@
                                                 <td>Total Uang Lembur I & II</td>
                                                 <td>:</td>
                                                 <td><?= "Rp " . number_format($p['payroll']['nominal_uang_lembur'], 2, ',', '.') ?></td>
-                                            </tr>
-                                            <tr>
-                                                <td>Uang Makan</td>
-                                                <td>:</td>
-                                                <td><?= "Rp " . number_format($p['uangMakan'], 2, ',', '.') ?></td>
                                             </tr>
                                         </table>
 

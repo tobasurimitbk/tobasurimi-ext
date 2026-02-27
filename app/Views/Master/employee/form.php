@@ -46,28 +46,32 @@
                             <label class="form-label font-weight-bold lable-title">
                                 Riwayat Payroll
                             </label>
+                            <div class="row">
+                                <div class="col-sm-12 mt-3">
+                                    <div class="input-group">
+                                        <div class="form-floating" style="height: 50px;">
+                                            <input placeholder="" value="<?= date('Y') ?>" class="form-control year" id="year" name="year" />
+                                            <label style="z-index: 1;" style="z-index: 1;">Pilih Tahun</label>
+                                        </div>
+                                        <div class="input-group-append" style="height:50px;">
+                                            <button disabled class="btn btn-secondary" type="button">
+                                                <i class="fas fa-calendar-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="table-responsive mt-2 mb-3">
                                 <table class="table table-borderd nowrap table-hover-tobasurimi" width="100%" cellspacing="0" id="tabel-riwayat-payroll">
                                     <thead class="thead-dark">
                                         <tr>
                                             <th width="10" style="text-align: center;">No</th>
-                                            <th style="text-align: center;">Periode</th>
-                                            <th style="text-align: center;">Gaji Diterima</th>
-                                            <th style="text-align: center;">Slip Gaji</th>
+                                            <th onclick="changeSort('payrolls.year_month')">Periode</th>
+                                            <th onclick="changeSort('payrolls.nominal_gaji_diterima')">Gaji Diterima (THP)</th>
+                                            <th>Slip</th>
                                         </tr>
                                     </thead>
                                     <tbody class="body-detail-table" id="body-detail-table">
-                                        <?php $no = 1; ?>
-                                        <?php foreach ($payrollList as $p) : ?>
-                                            <tr>
-                                                <td style="text-align: center;"><?= $no++ ?></td>
-                                                <td style="text-align: center;"><?= date('M-Y', strtotime($p['year_month'])) ?></td>
-                                                <td style="text-align: center;"><?= toRupiah($p['nominal_gaji_diterima']) ?></td>
-                                                <td style="text-align: center;">
-                                                    <a href="<?= base_url('payroll/print/single/' . encrypt($p['id'])) ?>"><span class="badge badge-primary">Unduh Slip</span></a>
-                                                </td>
-                                            </tr>
-                                        <?php endforeach; ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -350,6 +354,110 @@
 
             },
         });
+
+
+        var sort = "payrolls.year_month";
+        var sortType = "desc";
+        var tabelRiwayatPayroll = $('#tabel-riwayat-payroll').DataTable({
+            processing: true,
+            serverSide: true,
+            ordering: true,
+            order: [
+                [1, 'asc']
+            ],
+            fixedHeader: true,
+            lengthMenu: [
+                [12],
+                [12],
+            ],
+            pageLength: 12,
+            ajax: {
+                url: "<?= base_url("employee/all-riwayat-payroll"); ?>",
+                dataSrc: "data",
+                data: function(data) {
+                    data.employee_id = "<?= encrypt($data['id']) ?>";
+                    data.year = $('#year').val();
+                    data.sort = sort;
+                    data.sortType = sortType;
+                }
+            },
+            "initComplete": function(settings, json) {
+                $('.dataTables_length').empty();
+                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+            },
+            display: "stripe",
+            searching: false,
+            columns: [{
+                    data: "no",
+                    className: "text-center",
+                    sortable: false,
+                    width: "3%"
+                },
+                {
+                    data: "year_month",
+                    className: "text-left"
+                },
+                {
+                    data: "nominal_gaji_diterima",
+                    className: "text-right",
+                    render: function(data) {
+                        return greatFormatRupiah(data);
+                    }
+                },
+                {
+                    data: "id",
+                    className: "text-center actions",
+                    searchable: false,
+                    sortable: false,
+                    render: function(data, type, row) {
+                        let id = row.id;
+                        let res = '';
+
+                        res += `
+                            <?php if (can('Personalia', 'Karyawan', 'p')): ?>
+                                <a target="_blank" data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" href='<?= base_url("payroll/print/single/"); ?>${id}' style="box-shadow: none !important;">
+                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                </a>
+                            <?php endif ?>
+                        `;
+
+                        return res;
+                    }
+                }
+            ],
+            columnDefs: [{
+                defaultContent: "-",
+                targets: "_all"
+            }],
+            "drawCallback": function(settings) {
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+                var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl)
+                });
+            },
+            language: {
+                lengthMenu: "Show _MENU_ entries",
+                paginate: {
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: '<i class="fa fa-angle-right"></i>'
+                }
+            }
+        });
+
+        $('.year').change(function(e) {
+            e.preventDefault();
+            tabelRiwayatPayroll.ajax.reload();
+        });
+
+        function changeSort(val) {
+            if (sort !== val) {
+                sortType = "asc";
+                sort = val;
+            } else {
+                sortType = sortType === "asc" ? "desc" : "asc";
+            }
+        }
     </script>
 <?php endif; ?>
 <script>
@@ -403,6 +511,14 @@
     $('#status').select2({
         placeholder: "Pilih Status Karyawan",
         theme: "bootstrap-5",
+    });
+    $("#year").datepicker({
+        format: "yyyy",
+        startView: "years",
+        minViewMode: "years",
+        autoclose: true,
+        todayHighlight: true,
+        orientation: "bottom auto"
     });
     $('.form-select')
         .parent('div')
@@ -779,31 +895,6 @@
         let file = document.getElementById("employeeImg").files[0];
         document.getElementById("preview_photo").src = window.URL.createObjectURL(file);
     }
-
-    var tabelRiwayatPayroll = $('#tabel-riwayat-payroll').DataTable({
-        lengthChange: true,
-        info: false,
-        paging: true,
-        searching: false,
-        ordering: false,
-        order: [],
-        fixedHeader: true,
-        "initComplete": function(settings, json) {
-            $('.dataTables_length').empty();
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-        },
-        display: "stripe",
-        searching: false,
-        language: {
-            emptyTable: "Tidak Ada Riwayat Payroll",
-            lengthMenu: "Show _MENU_ entries",
-            paginate: {
-                previous: '<i class="fa fa-angle-left"></i>',
-                next: '<i class="fa fa-angle-right"></i>'
-            }
-        }
-    });
 </script>
 
 <?= $this->endSection(); ?>

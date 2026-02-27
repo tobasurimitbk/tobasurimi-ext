@@ -645,6 +645,7 @@ class PayrollsModel extends Model
         $divisiModel = new DivisisModel();
         $pinjamanKaryawanModel = new PinjamanKaryawanModel();
         $payrollGajiConjunctionModel = new PayrollGajiConjunctionModel();
+        $tunjanganModel = new TunjanganModel();
 
         $employeePayroll = $this->asArray()->select('payrolls.*, employees.division_id')
             ->join('employees', 'employees.id = payrolls.employee_id', 'left')
@@ -662,6 +663,9 @@ class PayrollsModel extends Model
         $employeePayroll->orderBy('employees.nip', "asc");
         $data = [];
 
+        $tunjanganGajiPokok = $tunjanganModel->where('company_id', $companyID)->where('is_gaji_harian', 1)->where('deletedAt', null)->first();
+        $tunjanganCadangan = $tunjanganModel->where('company_id', $companyID)->where('is_cadangan', 1)->where('deletedAt', null)->first();
+
         foreach ($employeePayroll->findAll() as $ep) {
             $payrollDetail = $payrollModel->where('id', $ep['id'])->first();
             $employee = $employeeModel->getSingleEmployee($ep['employee_id']);
@@ -673,7 +677,9 @@ class PayrollsModel extends Model
             $payrollDetail['total_gaji_harian_plus_cadangan'] = $payrollDetail['nominal_gaji_harian'] + $payrollDetail['nominal_cadangan'];
             $totalPinjamanDiambil = $pinjamanKaryawanModel->getTotalPinjamanKaryawanDiambil($payrollDetail['employee_id'], $payrollDetail['year_month']);
             $perhitunganGaji = $payrollGajiModel->getPerhitunganKomponenGajiPayrollPrint($ep['id']);
-            $uangMakan = $payrollGajiConjunctionModel->getPayrollUangMakan($payrollDetail['id']);
+            // $uangMakan = $payrollGajiConjunctionModel->getPayrollUangMakan($payrollDetail['id']);
+            $tunjanganTidakTetap = $payrollGajiConjunctionModel->getPayrollTunjanganTidakTetap($payrollDetail['id']);
+
 
             $data[] = [
                 'payroll' => $payrollDetail,
@@ -681,8 +687,11 @@ class PayrollsModel extends Model
                 'totalLemburJamPertama' => number_format($splitJamLembur['jamPertama'], 1),
                 'totalLemburJamKedua' => number_format($splitJamLembur['jamKedua'], 1),
                 'perhitunganGaji' => $perhitunganGaji,
+                'uangMakan' => 0,
+                'tunjanganGajiPokok' => $tunjanganGajiPokok,
+                'tunjanganCadangan' => $tunjanganCadangan,
                 'totalPinjamanDiambil' => $totalPinjamanDiambil,
-                'uangMakan' => $uangMakan
+                'tunjanganTidakTetap' => $tunjanganTidakTetap
             ];
         }
 
@@ -1309,5 +1318,42 @@ class PayrollsModel extends Model
         $result = $this->asArray()->where('deletedAt', null)->findAll();
         $payrollIds = array_column($result, 'id');
         return $payrollIds;
+    }
+
+    public function getListRiwayatPayroll(
+        $condition,
+        $addCondition,
+        $year,
+        $limit = 10,
+        $offset = 0
+    ) {
+        $availableSort = [
+            'payrolls.year_month' => 'payrolls.year_month',
+            'payrolls.nominal_gaji_diterima' => 'payrolls.nominal_gaji_diterima',
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+        $sort = $availableSort[$addCondition['sort'] ?? 'payrolls.year_month'] ?? 'payrolls.year_month';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'desc';
+
+        $selectQry = "payrolls.*";
+
+        $dataQry = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->like('payrolls.year_month', $year, 'after')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $dataQry->countAllResults(false);
+        $totalFilteredData = $dataQry->countAllResults(false);
+        $data = $dataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'              => $sort,
+            'sortType'          => $sortType
+        ];
     }
 }

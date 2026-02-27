@@ -71,10 +71,73 @@ class GajiConjunctionModel extends Model
         return ($res == null) ? 0 : $res['nominal'];
     }
 
+    // public function updateBulkGajiHarian($divisiId)
+    // {
+    //     $gajiDivisiModel = new GajiDivisiModel();
+    //     $gajiHarianDivisi = $gajiDivisiModel
+    //         ->select('gaji_divisi.*')
+    //         ->join('tunjangan', 'tunjangan.id = gaji_divisi.tunjangan_id', 'left')
+    //         ->where('tunjangan.is_gaji_harian', 1)
+    //         ->where('gaji_divisi.division_id', $divisiId)
+    //         ->where('gaji_divisi.deletedAt', null)
+    //         ->first();
+
+    //     $gajiCadanganDivisi = $gajiDivisiModel
+    //         ->select('gaji_divisi.*')
+    //         ->join('tunjangan', 'tunjangan.id = gaji_divisi.tunjangan_id', 'left')
+    //         ->where('tunjangan.is_cadangan', 1)
+    //         ->where('gaji_divisi.division_id', $divisiId)
+    //         ->where('gaji_divisi.deletedAt', null)
+    //         ->first();
+
+    //     if ($gajiHarianDivisi != null && $gajiCadanganDivisi) {
+    //         $gajiConjunctionList =  $this
+    //             ->select('gaji_conjunction.*,tunjangan.name')
+    //             ->join('employees', 'employees.id = gaji_conjunction.employee_id', 'left')
+    //             ->where('gaji_conjunction.deletedAt', null)
+    //             ->where('employees.division_id', $divisiId)
+    //             ->where('gaji_conjunction.tunjangan_id', $gajiHarianDivisi['tunjangan_id'])
+    //             ->orWhere('gaji_conjunction.tunjangan_id', $gajiCadanganDivisi['tunjangan_id'])
+    //             ->findAll();
+
+    //         $gajiPokok = 0;
+    //         $tunjanganTetap = 0;
+
+    //         foreach ($gajiConjunctionList as $g) {
+    //             if ($g['name'] == "GAJI POKOK") {
+    //                 $gajiPokok = $g['nominal'];
+    //             } elseif ($g['name'] == "TUNJANGAN TETAP") {
+    //                 $tunjanganTetap = $g['nominal'];
+    //             }
+    //         }
+
+    //         $nilaiBpjs = ($tunjanganTetap + $gajiPokok) * 0.04;
+    //         $updatedData = array();
+    //         foreach ($gajiConjunctionList as $g) {
+    //             $nominal = $g['nominal'];
+
+    //             if ($g['name'] == "BPJS") {
+    //                 // INI BPJS
+    //                 $nominal = $nilaiBpjs;
+    //             }
+
+    //             array_push($updatedData, [
+    //                 'nominal' => $nominal,
+    //                 'id' => $g['id']
+    //             ]);
+    //         }
+
+    //         if (count($updatedData) != 0) {
+    //             $this->updateBatch($updatedData, 'id');
+    //         }
+    //     }
+    // }
+
     public function updateBulkGajiHarian($divisiId)
     {
         $gajiDivisiModel = new GajiDivisiModel();
-        $gajiDivisi = $gajiDivisiModel
+
+        $gajiHarianDivisi = $gajiDivisiModel
             ->select('gaji_divisi.*')
             ->join('tunjangan', 'tunjangan.id = gaji_divisi.tunjangan_id', 'left')
             ->where('tunjangan.is_gaji_harian', 1)
@@ -82,24 +145,76 @@ class GajiConjunctionModel extends Model
             ->where('gaji_divisi.deletedAt', null)
             ->first();
 
-        if ($gajiDivisi != null) {
-            $gajiConjunctionList =  $this
-                ->select('gaji_conjunction.*')
+        $gajiCadanganDivisi = $gajiDivisiModel
+            ->select('gaji_divisi.*')
+            ->join('tunjangan', 'tunjangan.id = gaji_divisi.tunjangan_id', 'left')
+            ->where('tunjangan.is_cadangan', 1)
+            ->where('gaji_divisi.division_id', $divisiId)
+            ->where('gaji_divisi.deletedAt', null)
+            ->first();
+
+        if ($gajiHarianDivisi !== null && $gajiCadanganDivisi !== null) {
+
+            $gajiConjunctionList = $this
+                ->select('gaji_conjunction.*, tunjangan.name, employees.id as employee_id')
                 ->join('employees', 'employees.id = gaji_conjunction.employee_id', 'left')
+                ->join('tunjangan', 'tunjangan.id = gaji_conjunction.tunjangan_id', 'left')
                 ->where('gaji_conjunction.deletedAt', null)
                 ->where('employees.division_id', $divisiId)
-                ->where('gaji_conjunction.tunjangan_id', $gajiDivisi['tunjangan_id'])
+                ->groupStart()
+                ->where('gaji_conjunction.tunjangan_id', $gajiHarianDivisi['tunjangan_id'])
+                ->orWhere('gaji_conjunction.tunjangan_id', $gajiCadanganDivisi['tunjangan_id'])
+                ->orWhere('tunjangan.name', "BPJS")
+                ->groupEnd()
                 ->findAll();
 
-            $updatedData = array();
-            foreach ($gajiConjunctionList as $g) {
-                array_push($updatedData, [
-                    'nominal' => $gajiDivisi['nominal'],
-                    'id' => $g['id']
-                ]);
+            // 🔥 Kelompokkan per karyawan
+            $groupedByEmployee = [];
+
+            foreach ($gajiConjunctionList as $row) {
+                $groupedByEmployee[$row['employee_id']][] = $row;
             }
 
-            if (count($updatedData) != 0) {
+            $updatedData = [];
+
+            foreach ($groupedByEmployee as $employeeId => $rows) {
+
+                $gajiPokok = 0;
+                $tunjanganTetap = 0;
+
+                // Cari nilai gaji pokok & tunjangan tetap per karyawan
+                foreach ($rows as $r) {
+                    if ($r['name'] === "GAJI POKOK") {
+                        $gajiPokok = $gajiHarianDivisi['nominal'];
+                    } elseif ($r['name'] === "TUNJANGAN TETAP") {
+                        $tunjanganTetap = $gajiCadanganDivisi['nominal'];
+                    }
+                }
+
+                $nilaiBpjs = (($gajiPokok + $tunjanganTetap) * 0.04) * 25;
+
+                foreach ($rows as $r) {
+
+                    $nominal = $r['nominal'];
+
+                    if ($r['name'] === "BPJS") {
+                        $nominal = $nilaiBpjs;
+                    };
+
+                    if ($r['name'] === "GAJI POKOK") {
+                        $nominal = $gajiHarianDivisi['nominal'];
+                    } elseif ($r['name'] === "TUNJANGAN TETAP") {
+                        $nominal = $gajiCadanganDivisi['nominal'];
+                    }
+
+                    $updatedData[] = [
+                        'id'      => $r['id'],
+                        'nominal' => $nominal
+                    ];
+                }
+            }
+
+            if (!empty($updatedData)) {
                 $this->updateBatch($updatedData, 'id');
             }
         }
