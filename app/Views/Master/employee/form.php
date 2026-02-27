@@ -624,7 +624,7 @@
 
         var bpjs = ((gajiPokok + tunjanganTetap) * 0.04) * 25;
 
-        $('#BPJS').val(greatFormatRupiah(bpjs));
+        $('#BPJS').val(greatFormatRupiah(parseFloat(bpjs).toFixed(2)));
     });
     var validator = $("#create-form").validate({
         rules: {
