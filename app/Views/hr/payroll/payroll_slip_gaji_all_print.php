@@ -79,147 +79,184 @@
 </head>
 
 <body>
-    <?php foreach (array_chunk($payrollData['data'], 2) as $chunk): ?>
-        <div class="<?= count($chunk) == 0 ? "page-break" : "" ?>">
-            <?php foreach ($chunk as $p): ?>
-                <div class="karyawan-row" style="margin-top: -40px;">
-                    <table class="slip-container">
-                        <tr>
-                            <?php foreach (['Karyawan', 'Perusahaan'] as $tipeSlip): ?>
-                                <td style="width:50%; vertical-align:top;">
-                                    <div class="slip">
-                                        <br>
-                                        <h4>TANDA TERIMA UPAH</h4>
-                                        <table style="line-height: 9px;">
-                                            <tr>
-                                                <td colspan="3">Tenaga Kerja Harian Tetap</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="width: 120px;">Kode Karyawan</td>
-                                                <td style="width: 10px;">:</td>
-                                                <td><?= $p['employee']['nip'] ?></td>
-                                            </tr>
-                                            <tr>
-                                                <td>Tahun / Bulan</td>
-                                                <td>:</td>
-                                                <td>Tahun : <?= explode('-', $p['payroll']['year_month'])[0] ?> Bulan : <?= explode('-', $p['payroll']['year_month'])[1] ?> Periode : 1</td>
-                                            </tr>
-                                            <tr>
-                                                <td>No. Induk</td>
-                                                <td>:</td>
-                                                <td>
-                                                    <?= $p['employee']['nip'] ?>
-                                                    Bagian : <?= $p['employee']['nama_bagian'] ?>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Nama</td>
-                                                <td>:</td>
-                                                <td><?= $p['employee']['name'] ?></td>
-                                            </tr>
-                                        </table>
+    <table width="100%" cellpadding="5" cellspacing="0">
 
-                                        <hr style="border: 0.5px dashed #000;">
+        <?php foreach (array_chunk($payrollData['data'], 2) as $chunk): ?>
+            <tr>
 
-                                        <table style="line-height: 9px;" border="0">
-                                            <tr>
-                                                <td style="width:150px;">Hari Kerja</td>
-                                                <td style="width: 5px; text-align:right;">:</td>
-                                                <td><?= $p['payroll']['hadir_final'] ?> Hari</td>
-                                            </tr>
-                                            <tr>
-                                                <td><?= $tunjanganGajiPokok == null ? "" : ucfirst(strtolower($tunjanganGajiPokok['name'])) ?></td>
-                                                <td>:</td>
-                                                <td><?= "Rp " . number_format($p['payroll']['nominal_gaji_harian'], 2, ',', '.') ?>/Hari</td>
-                                            </tr>
-                                            <tr>
-                                                <td><?= $tunjanganCadangan == null ? "" : ucfirst(strtolower($tunjanganCadangan['name'])) ?></td>
-                                                <td>:</td>
-                                                <td>
-                                                    <?= "Rp " . number_format($p['payroll']['nominal_cadangan'], 2, ',', '.') ?>/Hari
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Total Gaji</td>
-                                                <td>:</td>
-                                                <td>
-                                                    <?= "Rp " . number_format($p['payroll']['total_gaji_harian_plus_cadangan'], 2, ',', '.') ?>/Hari : <?= "Rp. " . number_format($p['payroll']['nominal_uang_gaji'], 2, ',', '.') ?>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Tunjangan Tidak Tetap</td>
-                                                <td>:</td>
-                                                <td>
-                                                    <?= "Rp " . number_format($p['tunjanganTidakTetap'], 2, ',', '.') ?>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Lembur I</td>
-                                                <td>:</td>
-                                                <td><?= $p['totalLemburJamPertama'] ?> Jam</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Lembur II</td>
-                                                <td>:</td>
-                                                <td><?= $p['totalLemburJamKedua'] ?> Jam</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Total Uang Lembur I & II</td>
-                                                <td>:</td>
-                                                <td><?= "Rp " . number_format($p['payroll']['nominal_uang_lembur'], 2, ',', '.') ?></td>
-                                            </tr>
-                                        </table>
+                <?php foreach ($chunk as $p): ?>
+                    <td width="50%" valign="top">
 
-                                        <hr style="border: 0.5px dashed #000;">
+                        <div style=" width:100%;">
 
-                                        <table style="line-height: 9px;" border="0">
-                                            <tr>
-                                                <td>Total Gaji & Lembur</td>
-                                                <td>:</td>
-                                                <td><?= "Rp " . number_format($p['payroll']['nominal_uang_gaji'] + $p['payroll']['nominal_uang_lembur'] + $p['uangMakan'], 2, ',', '.') ?></td>
-                                            </tr>
-                                            <tr>
-                                                <td>Potongan Pinjaman</td>
-                                                <td>:</td>
-                                                <td><?= "Rp " . number_format($p['totalPinjamanDiambil'], 2, ',', '.') ?></td>
-                                            </tr>
-                                            <?php foreach ($p['perhitunganGaji'] as $g): ?>
-                                                <tr>
-                                                    <td style="width:150px;"><?= ucfirst(strtolower($g['name'])) ?></td>
-                                                    <td style="width: 5px;">:</td>
-                                                    <td><?= "Rp " . number_format($g['nominal'], 2, ',', '.') ?></td>
-                                                </tr>
-                                            <?php endforeach; ?>
+                            <h4 style="margin:5px 0;">TANDA TERIMA UPAH</h4>
 
-                                        </table>
+                            <table style="line-height: 9px;" border="0">
+                                <tr>
+                                    <td colspan="3">Tenaga Kerja Harian Tetap</td>
+                                </tr>
+                                <tr>
+                                    <td width="120px">Kode Karyawan</td>
+                                    <td width="10px">:</td>
+                                    <td><?= $p['employee']['nip'] ?></td>
+                                </tr>
+                                <tr>
+                                    <td>Tahun / Bulan</td>
+                                    <td>:</td>
+                                    <td>
+                                        Tahun : <?= explode('-', $p['payroll']['year_month'])[0] ?>
+                                        Bulan : <?= explode('-', $p['payroll']['year_month'])[1] ?>
+                                        Periode : 1
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>No. Induk</td>
+                                    <td>:</td>
+                                    <td>
+                                        <?= $p['employee']['nip'] ?>
+                                        Bagian : <?= $p['employee']['nama_bagian'] ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Nama</td>
+                                    <td>:</td>
+                                    <td><?= $p['employee']['name'] ?></td>
+                                </tr>
+                            </table>
 
-                                        <hr style="border: 0.5px dashed #000;">
-                                        <table style="line-height: 9px; font-size:12px;" border="0">
-                                            <tr>
-                                                <td style="width:150px;">Sisa Diterima</td>
-                                                <td style="width: 5px;">:</td>
-                                                <td><?= "Rp " . number_format($p['payroll']['nominal_gaji_diterima'], 2, ',', '.') ?></td>
-                                            </tr>
+                            <hr style="border:0.5px dashed #000; margin:5px 0;">
 
-                                        </table>
-                                        <hr style="border: 0.5px dashed #000;">
+                            <table style="line-height: 9px;" border="0">
+                                <tr>
+                                    <td width="150px">Hari Kerja</td>
+                                    <td width="5px">:</td>
+                                    <td><?= $p['payroll']['hadir_final'] ?> Hari</td>
+                                </tr>
+                                <tr>
+                                    <td><?= $tunjanganGajiPokok == null ? "" : ucfirst(strtolower($tunjanganGajiPokok['name'])) ?></td>
+                                    <td>:</td>
+                                    <td>
+                                        Rp <?= number_format($p['payroll']['nominal_gaji_harian'], 2, ',', '.') ?>/Hari
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><?= $tunjanganCadangan == null ? "" : ucfirst(strtolower($tunjanganCadangan['name'])) ?></td>
+                                    <td>:</td>
+                                    <td>
+                                        Rp <?= number_format($p['payroll']['nominal_cadangan'], 2, ',', '.') ?>/Hari
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Total Gaji</td>
+                                    <td>:</td>
+                                    <td>
+                                        Rp <?= number_format($p['payroll']['total_gaji_harian_plus_cadangan'], 2, ',', '.') ?>/Hari
+                                        :
+                                        Rp <?= number_format($p['payroll']['nominal_uang_gaji'], 2, ',', '.') ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Tunjangan Tidak Tetap</td>
+                                    <td>:</td>
+                                    <td>
+                                        Rp <?= number_format($p['tunjanganTidakTetap'], 2, ',', '.') ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Lembur I</td>
+                                    <td>:</td>
+                                    <td><?= $p['totalLemburJamPertama'] ?> Jam</td>
+                                </tr>
+                                <tr>
+                                    <td>Lembur II</td>
+                                    <td>:</td>
+                                    <td><?= $p['totalLemburJamKedua'] ?> Jam</td>
+                                </tr>
+                                <tr>
+                                    <td>Total Uang Lembur I & II</td>
+                                    <td>:</td>
+                                    <td>
+                                        Rp <?= number_format($p['payroll']['nominal_uang_lembur'], 2, ',', '.') ?>
+                                    </td>
+                                </tr>
+                            </table>
 
+                            <hr style="border:0.5px dashed #000; margin:5px 0;">
 
-                                        <table width="100%">
-                                            <tr>
-                                                <td class="signature">JURU BAYAR<br><br><br>(__________________)</td>
-                                                <td class="signature">PENERIMA<br><br><br>(__________________)</td>
-                                            </tr>
-                                        </table>
-                                    </div>
-                                </td>
-                            <?php endforeach; ?>
-                        </tr>
-                    </table>
-                </div>
-            <?php endforeach; ?>
-        </div>
-    <?php endforeach; ?>
+                            <table width="100%" style="line-height: 9px;">
+                                <tr>
+                                    <td width="150px">Total Gaji & Lembur</td>
+                                    <td width="5px">:</td>
+                                    <td>
+                                        Rp <?= number_format(
+                                                $p['payroll']['nominal_uang_gaji']
+                                                    + $p['payroll']['nominal_uang_lembur']
+                                                    + $p['uangMakan'],
+                                                2,
+                                                ',',
+                                                '.'
+                                            ) ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Potongan Pinjaman</td>
+                                    <td>:</td>
+                                    <td>
+                                        Rp <?= number_format($p['totalPinjamanDiambil'], 2, ',', '.') ?>
+                                    </td>
+                                </tr>
+
+                                <?php foreach ($p['perhitunganGaji'] as $g): ?>
+                                    <tr>
+                                        <td><?= ucfirst(strtolower($g['name'])) ?></td>
+                                        <td>:</td>
+                                        <td>
+                                            Rp <?= number_format($g['nominal'], 2, ',', '.') ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </table>
+
+                            <hr style="border:0.5px dashed #000; margin:5px 0;">
+
+                            <table width="100%">
+                                <tr>
+                                    <td width="150px">Sisa Diterima</td>
+                                    <td width="5px">:</td>
+                                    <td>
+                                        Rp <?= number_format($p['payroll']['nominal_gaji_diterima'], 2, ',', '.') ?>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <hr style="border:0.5px dashed #000; margin:5px 0;">
+
+                            <table width="100%" style="margin-top:10px;">
+                                <tr>
+                                    <td align="center">
+                                        JURU BAYAR<br><br><br>
+                                        (__________________)
+                                    </td>
+                                    <td align="center">
+                                        PENERIMA<br><br><br>
+                                        (__________________)
+                                    </td>
+                                </tr>
+                            </table>
+
+                        </div>
+
+                    </td>
+                <?php endforeach; ?>
+
+                <?php if (count($chunk) == 1): ?>
+                    <td width="50%" style="border:1px solid #000;"></td>
+                <?php endif; ?>
+
+            </tr>
+        <?php endforeach; ?>
+
+    </table>
 </body>
 
 </html>
