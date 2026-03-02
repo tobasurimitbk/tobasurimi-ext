@@ -240,7 +240,8 @@ class Perijinan extends BaseController
 
             return response()->setJSON([
                 'message' => "Form Perijinan berhasil disimpan",
-                'status' => true
+                'status' => true,
+                'token' => csrf_hash()
             ]);
         } catch (Exception $e) {
             $db->transRollback();
@@ -302,7 +303,8 @@ class Perijinan extends BaseController
             return response()->setJSON([
                 'message' => "Form Perijinan berhasil diupdate",
                 'kode' => $kode,
-                'status' => true
+                'status' => true,
+                'token' => csrf_hash()
             ]);
         } catch (Exception $e) {
             $db->transRollback();
@@ -321,7 +323,8 @@ class Perijinan extends BaseController
             $this->FormPerijinanModel->where('kode', $kode)->delete();
             return response()->setJSON([
                 'status' => true,
-                'message' => "Form perizinan berhasil dihapus"
+                'message' => "Form perizinan berhasil dihapus",
+                'token' => csrf_hash()
             ]);
         } catch (Exception $e) {
             return response()->setJSON([
