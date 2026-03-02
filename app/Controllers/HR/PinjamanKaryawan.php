@@ -142,14 +142,14 @@ class PinjamanKaryawan extends BaseController
                 ->delete();
 
             // ✅ preload izin sekali saja
-            $izinData = $this->formPerijinanModel
-                ->whereIn('employee_id', $employeeIds)
-                ->whereIn('periode', $dateList)
-                ->findAll();
-            $izinMap = [];
-            foreach ($izinData as $i) {
-                $izinMap[$i['employee_id'] . '_' . $i['periode']] = $i;
-            }
+            // $izinData = $this->formPerijinanModel
+            //     ->whereIn('employee_id', $employeeIds)
+            //     ->whereIn('periode', $dateList)
+            //     ->findAll();
+            // $izinMap = [];
+            // foreach ($izinData as $i) {
+            //     $izinMap[$i['employee_id'] . '_' . $i['periode']] = $i;
+            // }
 
             // ✅ preload hari libur
             $liburData = $this->bigDaysModel->whereIn('date', $dateList)->findAll();
@@ -157,7 +157,7 @@ class PinjamanKaryawan extends BaseController
 
             // ✅ preload attendance log
             $logs = $this->attendancesModel
-                ->select("employee_id, periode AS tgl, checkin, checkout")
+                ->select("employee_id, periode AS tgl, checkin, checkout, status")
                 ->whereIn('employee_id', $employeeIds)
                 ->where("periode >=", $startDate)
                 ->where("periode <=", $endDate)
@@ -186,7 +186,7 @@ class PinjamanKaryawan extends BaseController
                 $tidakHadir = 0;
 
                 foreach ($dateList as $tgl) {
-                    $izin    = $izinMap[$e['id'] . '_' . $tgl] ?? null;
+                    $izin    = $logMap[$e['id'] . '_' . $tgl] ?? null;
                     $libur   = $liburMap[$tgl] ?? null;
                     $logAbsen = $logMap[$e['id'] . '_' . $tgl] ?? null;
 
@@ -308,14 +308,14 @@ class PinjamanKaryawan extends BaseController
             }
 
             // preload izin, hari libur, dan attendance log supaya ga query berulang
-            $izinList = $this->formPerijinanModel
-                ->where('employee_id', $employee['id'])
-                ->whereIn('periode', $dateList)
-                ->findAll();
-            $izinMap = [];
-            foreach ($izinList as $izin) {
-                $izinMap[$izin['periode']] = $izin;
-            }
+            // $izinList = $this->formPerijinanModel
+            //     ->where('employee_id', $employee['id'])
+            //     ->whereIn('periode', $dateList)
+            //     ->findAll();
+            // $izinMap = [];
+            // foreach ($izinList as $izin) {
+            //     $izinMap[$izin['periode']] = $izin;
+            // }
 
             $hariLiburList = $this->bigDaysModel
                 ->whereIn('date', $dateList)
@@ -323,7 +323,7 @@ class PinjamanKaryawan extends BaseController
             $hariLiburMap = array_column($hariLiburList, null, 'date');
 
             $attLogs = $this->attendancesModel
-                ->select("periode as tanggal, checkin, checkout")
+                ->select("periode as tanggal, checkin, checkout, status")
                 ->where('employee_id', $employee['id'])
                 ->whereIn("periode", $dateList)
                 ->groupBy('periode')
@@ -376,6 +376,7 @@ class PinjamanKaryawan extends BaseController
                 'hadir'           => $hadir,
                 'is_boleh_minjam' => ($hadir >= 8) ? '1' : '0',
                 'status_pinjaman' => ($hadir >= 8) ? '1' : '0',
+                'is_ambil'        => ($hadir >= 8) ? '1' : '0',
                 'nominal'         => ($hadir >= 8) ? $nominalPinjaman : null,
                 'tanggal_ambil'   => $tanggalAmbil
             ]);
