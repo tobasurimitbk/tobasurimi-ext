@@ -428,12 +428,13 @@ class FormLembur extends BaseController
                 $sisaWaktu = static::kurangiWaktu(
                     $waktuSelisihPulangLembur['jam'] . ":" . $waktuSelisihPulangLembur['menit'],
                     60.00 // satu jam
-                );
+                ) + 1;
+
+                // var_dump($sisaWaktu, $gajiPokok, $waktuSelisihPulangLembur['jam'] . ":" . $waktuSelisihPulangLembur['menit']);
+                // die;
 
                 // lebih satu jam
                 $totalLemburJamBerikutnya = $sisaWaktu + 1;
-                // var_dump($totalLemburJamBerikutnya);
-                // die;
                 $bayaranLemburJamBerikutnya = ((1 / 173) * 25 * 2) * $sisaWaktu * $gajiPokok;
             } else {
                 // Normal
