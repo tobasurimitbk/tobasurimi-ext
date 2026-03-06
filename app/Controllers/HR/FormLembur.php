@@ -434,7 +434,7 @@ class FormLembur extends BaseController
                 // die;
 
                 // lebih satu jam
-                $totalLemburJamBerikutnya = $sisaWaktu + 1;
+                $totalLemburJamBerikutnya = $sisaWaktu;
                 $bayaranLemburJamBerikutnya = ((1 / 173) * 25 * 2) * $sisaWaktu * $gajiPokok;
             } else {
                 // Normal
