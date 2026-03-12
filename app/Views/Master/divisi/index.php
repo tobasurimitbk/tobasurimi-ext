@@ -480,7 +480,7 @@
                     $("input[name='komponenGaji[]']").each(function() {
                         let komponenId = $(this).val();
                         let isSelected = res.komponenGaji.some(function(komponen) {
-                            return komponen.id === komponenId;
+                            return komponen.id === komponenId && komponen.is_check;
                         });
                         if (isSelected) {
                             $(this).prop('checked', true);

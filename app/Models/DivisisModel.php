@@ -134,6 +134,8 @@ class DivisisModel extends Model
 
     public function getTunjanganByDivisi($divisionID)
     {
+        $gajiDivisiModel = new GajiDivisiModel();
+
         $select = "
             tunjangan.*, gaji_divisi.nominal
         ";
@@ -148,13 +150,20 @@ class DivisisModel extends Model
 
         $res = [];
         foreach ($data as $d) {
+
+            $check = $gajiDivisiModel->where('tunjangan_id', $d->id)
+                ->where('division_id', $divisionID)
+                ->where('deletedAt', null)
+                ->first();
+
             $res[] = [
                 'id' => $d->id,
                 'nominal' => (float)$d->nominal,
                 'name' => $d->name,
                 'is_cadangan' => $d->is_cadangan,
                 'is_gaji_harian' => $d->is_gaji_harian,
-                'tipe' => $d->tipe
+                'tipe' => $d->tipe,
+                'is_check' => $check == null ? false : true
             ];
         }
 
