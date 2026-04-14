@@ -85,7 +85,7 @@
                 <td>No</td>
                 <td>Nip</td>
                 <td>Nama Karyawan</td>
-                <td>J.Hr.Krj</td>
+                <!-- <td>J.Hr.Krj</td> -->
                 <td>Jlh. Pinj</td>
                 <td>Tanda Tangan</td>
             </tr>
@@ -106,13 +106,13 @@
                         <td><?= $no++; ?></td>
                         <td><?= $p['nip'] ?></td>
                         <td><?= $p['name'] ?></td>
-                        <td><?= $p['hadir'] ?></td>
+                        <!-- <td><?= $p['hadir'] ?></td> -->
                         <td><?= number_format($p['nominal'] == null ? 0 : $p['nominal'], 2) ?></td>
                         <td style="padding: 30px;"></td>
                     </tr>
                 <?php endforeach; ?>
                 <tr>
-                    <td colspan="4" align="right" style="text-align: right;">Total</td>
+                    <td colspan="3" align="right" style="text-align: right;">Total</td>
                     <td>Rp <?= number_format($total, 2)  ?></td>
                     <td></td>
                 </tr>
