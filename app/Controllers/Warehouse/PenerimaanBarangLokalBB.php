@@ -155,7 +155,7 @@ class PenerimaanBarangLokalBB extends BaseController
                 "multiple_po_no"        => str_replace(',', ', ', str_replace(['[', ']', '"', "\\"], '', $data->multiple_po_no)),
                 "status_post"           => $data->status_post,
                 "bc_type"               => $data->bc_type,
-                "in_bc"                 => $data->bc_purchase_order_id != null ? 'in' : 'out',
+                "in_bc"                 => 'out',
                 "akun_coa"              => $akunCoaMap[$data->id] ?? false,
                 "bc_type_name"          => $data->bc_type_name == null ? "NON PABEAN" : $data->bc_type_name
             ]);

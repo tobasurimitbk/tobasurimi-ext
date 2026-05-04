@@ -746,6 +746,9 @@ class POLokalBahanBaku extends BaseController
                     // Cek apakah PO sudah diposting
                     $unPostingCheck = $this->penerimaanBarangModel->where('tipe_bahan', "BAKU")->where('status_penerimaan', "LOKAL")->where('deletedAt', null)->like('multiple_po_id', $id)->first();
 
+                    var_dump($unPostingCheck);
+                    die;
+
                     if ($unPostingCheck) {
                         return response()->setJSON([
                             "status"    => false,
@@ -762,23 +765,23 @@ class POLokalBahanBaku extends BaseController
                         $penerimaanBarangId = $this->penerimaanBarangModel->generateLpbBB($detail['id'], $detail['warehouse_id'], $detail['bc_type'], $detail['po_date']);
                         // if ($detail['status_external'] == "no") {
                         // JIka Status Eksternal Tidak Maka ga masuk kedalam stok
-                        $result = $this->jurnalController->insertDataPembelian($id, "BAHAN BAKU", "LOKAL", "pembelian", $penerimaanBarangId);
+                        // $result = $this->jurnalController->insertDataPembelian($id, "BAHAN BAKU", "LOKAL", "pembelian", $penerimaanBarangId);
 
-                        if ($result) {
-                            $responseBody = json_decode($result->getBody(), true);
-                            if ($responseBody && isset($responseBody['status'])) {
-                                $this->penerimaanBarangModel->delete($penerimaanBarangId);
-                                $this->penerimaanBarangDetailModel->where('penerimaan_barang_id', $penerimaanBarangId)->delete();
-                                $data = [
-                                    "status"    => false,
-                                    "message"   => $responseBody['message'],
-                                    "payload"   => "",
-                                    'token'     => csrf_hash()
-                                ];
-                                echo json_encode($data);
-                                return;
-                            }
-                        }
+                        // if ($result) {
+                        //     $responseBody = json_decode($result->getBody(), true);
+                        //     if ($responseBody && isset($responseBody['status'])) {
+                        //         $this->penerimaanBarangModel->delete($penerimaanBarangId);
+                        //         $this->penerimaanBarangDetailModel->where('penerimaan_barang_id', $penerimaanBarangId)->delete();
+                        //         $data = [
+                        //             "status"    => false,
+                        //             "message"   => $responseBody['message'],
+                        //             "payload"   => "",
+                        //             'token'     => csrf_hash()
+                        //         ];
+                        //         echo json_encode($data);
+                        //         return;
+                        //     }
+                        // }
                         // }
                     }
                 }
