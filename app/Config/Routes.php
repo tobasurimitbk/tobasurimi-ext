@@ -48,6 +48,8 @@ $routes->post('/update-tgl-stock', 'Warehouse\Penomoran_::updateTglStock');
 $routes->get('/generate-tgl-stock-view', 'Warehouse\Penomoran_::generateTglStockView');
 $routes->get('/check-repair-duplicate', 'Warehouse\Penomoran_::checkDuplicateAbsensi');
 
+$routes->get('/repair-form-lembur', 'Warehouse\Penomoran_::repairFormLembur');
+
 // $routes->get('/generate-stock-revamp-nonpabean', 'Warehouse\Penomoran_::generateStokRevampNonPabean');
 // $routes->get('/generate-stock-revamp-pabean', 'Warehouse\Penomoran_::generateStokRevampPabean');
 // $routes->get('/generate-stock-detail-id-lpb-non-pabean', 'Warehouse\Penomoran_::generateStockDetailIdPenerimaanBarangDetailNonPabean');
@@ -323,6 +325,9 @@ $routes->get('/po-lokal-bahan-baku/dropdown/get-detail-barang-spp', 'Purchase\PO
 $routes->get('/po-lokal-bahan-baku/get-spesifikasi-barang-supplier', 'Purchase\POLokalBahanBaku::getBarangAndSupplier', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-baku/print-pengeluaran/(:segment)', 'Purchase\POLokalBahanBaku::printPengeluaran/$1', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-baku/get-supplier-harga-detail', 'Purchase\POLokalBahanBaku::getSupplierHargaById', ['filter' => 'Auth']);
+$routes->get('/po-lokal-bahan-baku/import', 'Purchase\PoLokalBahanBakuImport::index', ['filter' => 'Auth']);
+$routes->post('/po-lokal-bahan-baku/import-preview', 'Purchase\PoLokalBahanBakuImport::importPreview', ['filter' => 'Auth']);
+$routes->post('/po-lokal-bahan-baku/import-data', 'Purchase\PoLokalBahanBakuImport::importData', ['filter' => 'Auth']);
 
 // BAHAN BAKU PO PENOLONG
 $routes->get('/po-lokal-bahan-penolong', 'Purchase\POLokalBahanPenolong::poLokalBahanPenolong', ['filter' => 'Auth']);

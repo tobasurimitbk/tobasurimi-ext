@@ -6,9 +6,13 @@
     <div class="section-header">
         <h1>PO Lokal Bahan Baku</h1>
         <?php if (can('Pembelian', 'PO Lokal BB', 'c')): ?>
-            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("po-lokal-bahan-baku/create"); ?>">
+            <a class="btn btn-show-form btn-add btn-dropdown-export dropdown-toggle float-right" href="#" id="dropdownMenuButtonExport2" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #4E8A00 !important; border-color:#4E8A00 !important;">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonExport2">
+                <li><a href="<?= base_url("po-lokal-bahan-baku/create"); ?>" class="dropdown-item"><b>Tambah</b></a></li>
+                <li><a href="<?= base_url("po-lokal-bahan-baku/import"); ?>" class="dropdown-item"><b>Import</b></a></li>
+            </ul>
         <?php endif; ?>
     </div>
     <div class="card">

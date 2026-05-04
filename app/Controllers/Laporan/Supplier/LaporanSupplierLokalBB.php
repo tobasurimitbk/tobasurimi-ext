@@ -81,7 +81,7 @@ class LaporanSupplierLokalBB extends BaseController
         $condition = [
             'rm_purchase_orders.deletedAt' => null,
             'rm_purchase_order_details.deletedAt' => null,
-            'rm_purchase_orders.company_id' => $this->this_company_id,
+            // 'rm_purchase_orders.company_id' => $this->this_company_id,
             'rm_purchase_orders.status_external' => 'no',
         ];
 
@@ -1611,7 +1611,7 @@ class LaporanSupplierLokalBB extends BaseController
             // Normalize strings
             $supplier = trim(preg_replace('/\s+/', ' ', $row->supplierName ?? '-'));
             $barang   = trim(preg_replace('/\s+/', ' ', $row->barangName ?? '-'));
-            
+
             // Atau gunakan case-insensitive jika perlu
             $key = strtolower($supplier) . '||' . strtolower($barang);
 
