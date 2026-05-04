@@ -50,6 +50,7 @@ class PoLokalBahanBakuImport extends BaseController
 
     public function importPreview()
     {
+        ini_set('memory_limit', '1024M');
         try {
             $file = $this->request->getFile('file');
             $ekstensiFile = $file->getClientExtension();
