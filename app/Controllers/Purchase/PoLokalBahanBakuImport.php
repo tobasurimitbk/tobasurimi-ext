@@ -111,7 +111,7 @@ class PoLokalBahanBakuImport extends BaseController
                     $_
                 ] = array_pad($row, 22, null);
 
-                if (empty($no)) continue;
+                if (empty($poNo)) continue;
 
                 $poNo = trim($poNo);
 
