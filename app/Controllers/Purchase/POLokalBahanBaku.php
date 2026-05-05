@@ -746,8 +746,6 @@ class POLokalBahanBaku extends BaseController
                     // Cek apakah PO sudah diposting
                     $unPostingCheck = $this->penerimaanBarangModel->where('tipe_bahan', "BAKU")->where('status_penerimaan', "LOKAL")->where('deletedAt', null)->like('multiple_po_id', $id)->first();
 
-                    var_dump($unPostingCheck);
-                    die;
 
                     if ($unPostingCheck) {
                         return response()->setJSON([
