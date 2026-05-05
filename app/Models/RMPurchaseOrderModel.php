@@ -55,7 +55,10 @@ class RMPurchaseOrderModel extends Model
         'nilai_total_bulanan',
         'nilai_total_tambahan',
         'nilai_total_qty',
-        'from_import'
+        'from_import',
+        'createdAt',
+        'updatedAt',
+        'deletedAt'
     ];
 
     // Dates
