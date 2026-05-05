@@ -22,7 +22,6 @@
                 <div class="row">
                     <div class="col-md-12">
                         <input autocomplete="one-time-code" type="file" class="form-control file" id="file" name="file">
-                        <a href="<?= base_url('assets/import/import_jurnal.xlsx') ?>">Unduh Template Import</a>
 
                     </div>
                 </div>
