@@ -49,6 +49,8 @@ $routes->get('/generate-tgl-stock-view', 'Warehouse\Penomoran_::generateTglStock
 $routes->get('/check-repair-duplicate', 'Warehouse\Penomoran_::checkDuplicateAbsensi');
 
 $routes->get('/repair-form-lembur', 'Warehouse\Penomoran_::repairFormLembur');
+$routes->get('change-company-id-bb', 'Warehouse\Penomoran_::changeCompanyIdBb');
+$routes->get('hapus-po-lokal-bb', 'Warehouse\Penomoran_::hapusPOBakuAndLpb');
 
 // $routes->get('/generate-stock-revamp-nonpabean', 'Warehouse\Penomoran_::generateStokRevampNonPabean');
 // $routes->get('/generate-stock-revamp-pabean', 'Warehouse\Penomoran_::generateStokRevampPabean');

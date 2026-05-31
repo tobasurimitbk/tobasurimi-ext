@@ -867,6 +867,15 @@ class POLokalBahanBaku extends BaseController
                 $nilaiPph = 0.9975;
             }
 
+            if ($dataPO->tanggal_cetak == null) {
+                $this->RMPurchaseOrderModel->update($id, [
+                    'tanggal_cetak' => date('Y-m-d H:i:s')
+                ]);
+                $dataPO = $this->RMPurchaseOrderModel->getPoBBLokalById($id);
+            }
+
+            $dataPO->tanggalCetak = date('d/m/Y H:i:s', strtotime($dataPO->tanggal_cetak));
+
             $dataBarang = array();
             $totalQty = 0;
             foreach ($dataPODetail as $detail) {
@@ -1043,6 +1052,13 @@ class POLokalBahanBaku extends BaseController
             $dataPO->lpb = null;
             $dataPO->lpbDetail = null;
 
+            if ($dataPO->tanggal_cetak_kasbon == null) {
+                $this->RMPurchaseOrderModel->update($id, [
+                    'tanggal_cetak_kasbon' => date('Y-m-d H:i:s')
+                ]);
+            }
+
+
             if ($dataPO) {
                 $dataPODetail = $this->RMPurchaseOrderDetailModel->getPoBBLokalDetailById($id);
 
@@ -1072,6 +1088,7 @@ class POLokalBahanBaku extends BaseController
                 $dataPO->totalDailyPaidTerbilang = terbilang($dataPO->totalDailyPaid);
                 $dataPO->totalMonthlyPaidTerbilang = terbilang($dataPO->totalMonthlyPaid);
                 $dataPO->totalTambahanPaidTerbilang = terbilang($dataPO->totalTambahanPaid);
+                $dataPO->tanggalCetak = date('d/m/Y H:i:s', strtotime($dataPO->tanggal_cetak_kasbon));
 
                 // Siapkan data sebagai array untuk view
                 $data = (array) $dataPO;

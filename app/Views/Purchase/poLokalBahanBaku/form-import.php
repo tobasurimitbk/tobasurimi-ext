@@ -47,12 +47,14 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th rowspan="2">No</th>
-                                <th onclick="changeSort('supplierName')" class="sort" rowspan="2">Supplier</th>
-                                <th onclick="changeSort('poNum')" class="sort" rowspan="2">No PO</th>
-                                <th onclick="changeSort('poDate')" class="sort" rowspan="2">Tgl PO</th>
-                                <th onclick="changeSort('barangName')" class="sort" rowspan="2">Bahan Baku</th>
-                                <th onclick="changeSort('divisiName')" class="sort" rowspan="2">Department</th>
-                                <th onclick="changeSort('warehouseName')" class="sort" rowspan="2">Gudang</th>
+                                <th rowspan="2">Supplier</th>
+                                <th rowspan="2">No PO</th>
+                                <th rowspan="2">Tgl PO</th>
+                                <th rowspan="2">Bahan Baku</th>
+                                <th rowspan="2">Peti/Cong</th>
+                                <th rowspan="2">Size</th>
+                                <th rowspan="2">Department</th>
+                                <th rowspan="2">Gudang</th>
                                 <th rowspan="2">Qty</th>
                                 <th rowspan="2">Satuan</th>
                                 <th rowspan="2">Unit</th>
@@ -84,7 +86,7 @@
 
                         <tfoot id="foot-detail-table">
                             <tr>
-                                <td colspan="25" class="text-left">Tidak ada data</td>
+                                <td colspan="27" class="text-left">Tidak ada data</td>
                             </tr>
                         </tfoot>
                     </table>
@@ -248,7 +250,7 @@
         if (!dataPreview || dataPreview.length === 0) {
             tfoot.append(`
             <tr>
-                <td colspan="25" class="text-left">Tidak Ada Data</td>
+                <td colspan="27" class="text-left">Tidak Ada Data</td>
             </tr>
         `);
             return;
@@ -269,6 +271,8 @@
             row.append(`<td>${v.po_no || '-'}</td>`);
             row.append(`<td>${v.po_date || '-'}</td>`);
             row.append(`<td>${v.barang_name || '-'}</td>`);
+            row.append(`<td>${v.peti || '-'}</td>`);
+            row.append(`<td>${v.size || '-'}</td>`);
             row.append(`<td>${v.divisi || '-'}</td>`);
             row.append(`<td>${v.warehouse_name || '-'}</td>`);
             row.append(`<td class="text-end">${greatFormatRupiah(v.qty)}</td>`);
@@ -354,7 +358,7 @@
         // =========================
         tfoot.append(`
         <tr class="table-secondary fw-bold">
-            <td colspan="10" class="text-end">TOTAL</td>
+            <td colspan="12" class="text-end">TOTAL</td>
 
             <td class="text-end">${greatFormatRupiah(total.dpp_umum.toFixed(2))}</td>
             <td class="text-end">${greatFormatRupiah(total.pph_umum.toFixed(2))}</td>

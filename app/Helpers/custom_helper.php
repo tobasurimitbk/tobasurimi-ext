@@ -667,3 +667,13 @@ function convertMonthIndo($month)
 
    return $bulanIndo[$month] ?? '';
 }
+
+if (!function_exists('generateTanggalCetakRandom')) {
+   function generateTanggalCetakRandom($tanggal)
+   {
+      $start = strtotime($tanggal . ' 09:00:00');
+      $end   = strtotime($tanggal . ' 17:00:00');
+
+      return date('Y-m-d H:i:s', mt_rand($start, $end));
+   }
+}

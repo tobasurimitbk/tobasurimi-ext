@@ -389,7 +389,7 @@
                     </tr>
                 <?php endforeach ?>
                 <tr>
-                    <td class="txt-left" style="border-top: 1px solid black; height:5%;font-size:11px;">Tgl Cetak : <?= date('d/m/Y H:i:s') ?></td>
+                    <td class="txt-left" style="border-top: 1px solid black; height:5%;font-size:11px;">Tgl Cetak : <?= date('d/m/Y H:i:s', strtotime($dataPO->tanggal_cetak)) ?></td>
                     <td colspan="2" style="border-top: 1px solid black;border-left: none!important;text-align: right; height:5%;font-size:14px;">Total Qty</td>
                     <td class="txt-right" style="border-top: 1px solid black; border-left: 1px solid black; border-bottom: 1px solid black; height:5%;font-size:14px;"><?= number_format($totalQty, 2) ?></td>
                     <td class="txt-right" style="border-top: 1px solid black; border-left: 1px solid black; height:5%;font-size:14px;">JUMLAH</td>

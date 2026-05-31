@@ -237,6 +237,10 @@
                 <td class="txt-center"><?= $supplierName ?></td>
             </tr>
         </table>
+        <br>
+        <span style="font-size: 12px;">
+            TGL CETAK : <?= $tanggalCetak ?>
+        </span>
     </div>
 
     <div class="dotted-line"></div>
@@ -356,6 +360,10 @@
                 <td class="txt-center"><?= $supplierName ?></td>
             </tr>
         </table>
+        <br>
+        <span style="font-size: 12px;">
+            TGL CETAK : <?= $tanggalCetak ?>
+        </span>
     </div>
 
     <div class="dotted-line"></div>
@@ -474,6 +482,10 @@
                 <td class="txt-center"><?= $supplierName ?></td>
             </tr>
         </table>
+        <br>
+        <span style="font-size: 12px;">
+            TGL CETAK : <?= $tanggalCetak ?>
+        </span>
     </div>
 
 
@@ -593,6 +605,10 @@
                     <td class="txt-center"><?= $supplierName ?></td>
                 </tr>
             </table>
+            <br>
+            <span style="font-size: 12px;">
+                TGL CETAK : <?= $tanggalCetak ?>
+            </span>
         </div>
 
     <?php } ?>

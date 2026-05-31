@@ -56,6 +56,8 @@ class RMPurchaseOrderModel extends Model
         'nilai_total_tambahan',
         'nilai_total_qty',
         'from_import',
+        'tanggal_cetak',
+        'tanggal_cetak_kasbon',
         'createdAt',
         'updatedAt',
         'deletedAt'
