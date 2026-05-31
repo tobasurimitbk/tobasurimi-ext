@@ -380,9 +380,9 @@
                 ?>
                 <?php foreach ($dataBarang as $detail): ?>
                     <tr>
-                        <td style="border-left: 1px solid black; border-right: 1px solid black;font-size:13px;height:4%;"><?= $detail['peti'] ?></td>
+                        <td style="border-left: 1px solid black; border-right: 1px solid black;font-size:13px;height:4%;"><?= $dataPO->po_date <= "2025-10-31" ? $detail['note'] :  $detail['peti'] ?></td>
                         <td style="border-left: 1px solid black; border-right: 1px solid black;font-size:13px;"><?= $detail['divisi'] ?></td>
-                        <td style="border-left: 1px solid black; border-right: 1px solid black;font-size:13px;"><?= $detail['note'] ?></td>
+                        <td style="border-left: 1px solid black; border-right: 1px solid black;font-size:13px;"><?= $dataPO->po_date <= "2025-10-31" ? $detail['peti'] :  $detail['note'] ?></td>
                         <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;font-size:13px;"><?= $detail['qty'] ?></td>
                         <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;font-size:13px;"><?= number_format($detail['general_price'], 2) ?></td>
                         <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;font-size:13px;"><?= number_format($detail['general_price_total'], 2) ?></td>
