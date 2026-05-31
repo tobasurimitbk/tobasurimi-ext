@@ -869,7 +869,7 @@ class POLokalBahanBaku extends BaseController
 
             if ($dataPO->tanggal_cetak == null) {
                 $this->RMPurchaseOrderModel->update($id, [
-                    'tanggal_cetak' => date('Y-m-d H:i:s')
+                    'tanggal_cetak' => generateTanggalCetakRandom($dataPO->po_date)
                 ]);
                 $dataPO = $this->RMPurchaseOrderModel->getPoBBLokalById($id);
             }
@@ -1054,7 +1054,7 @@ class POLokalBahanBaku extends BaseController
 
             if ($dataPO->tanggal_cetak_kasbon == null) {
                 $this->RMPurchaseOrderModel->update($id, [
-                    'tanggal_cetak_kasbon' => date('Y-m-d H:i:s')
+                    'tanggal_cetak_kasbon' => generateTanggalCetakRandom($dataPO->po_date)
                 ]);
             }
 
