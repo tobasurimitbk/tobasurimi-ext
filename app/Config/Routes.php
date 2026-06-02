@@ -330,6 +330,7 @@ $routes->get('/po-lokal-bahan-baku/get-supplier-harga-detail', 'Purchase\POLokal
 $routes->get('/po-lokal-bahan-baku/import', 'Purchase\PoLokalBahanBakuImport::index', ['filter' => 'Auth']);
 $routes->post('/po-lokal-bahan-baku/import-preview', 'Purchase\PoLokalBahanBakuImport::importPreview', ['filter' => 'Auth']);
 $routes->post('/po-lokal-bahan-baku/import-data', 'Purchase\PoLokalBahanBakuImport::importData', ['filter' => 'Auth']);
+$routes->get('/po-lokal-bahan-baku/print-pengeluaran-multi', 'Purchase\POLokalBahanBaku::printPengeluaranMulti', ['filter' => 'Auth']);
 
 // BAHAN BAKU PO PENOLONG
 $routes->get('/po-lokal-bahan-penolong', 'Purchase\POLokalBahanPenolong::poLokalBahanPenolong', ['filter' => 'Auth']);

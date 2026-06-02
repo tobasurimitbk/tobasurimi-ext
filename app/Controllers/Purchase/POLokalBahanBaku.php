@@ -1108,6 +1108,54 @@ class POLokalBahanBaku extends BaseController
         }
     }
 
+    public function printPengeluaranMulti()
+    {
+        try {
+            $startDate = formatDMYtoYMD($this->request->getVar('start_date'));
+            $endDate = formatDMYtoYMD($this->request->getVar('end_date'));
+
+            $selectQry = "
+                rm_purchase_orders.*,
+                barang_master.barang_name,
+                suppliers.name AS supplier_name
+            ";
+
+            $dataQry = $this->RMPurchaseOrderModel->select($selectQry);
+            $dataQry->join('barang_master', 'barang_master.id = rm_purchase_orders.barang_id', 'left');
+            $dataQry->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left');
+            $dataQry->where('rm_purchase_orders.deletedAt', null);
+            $dataQry->where('rm_purchase_orders.company_id', $this->this_company_id);
+            $dataQry->where('po_date >=', $startDate);
+            $dataQry->where('po_date <=', $endDate);
+            $dataQry->orderBy('po_no', "asc");
+            $dataResult = $dataQry->findAll();
+            $filename = "Bukti Pengeluaran " . $startDate . " s.d " . $endDate;
+
+
+            $data = [
+                'data' => $dataResult,
+                'filename' => $filename
+            ];
+
+            $this->dompdf->loadHtml(view('Purchase/poLokalBahanBaku/print-pengeluaran-range', $data));
+            $width_mm = 216;
+            $height_mm = 330;
+            $width_pt = $width_mm * 2.83464567;
+            $height_pt = $height_mm * 2.83464567;
+
+            $this->dompdf->setPaper([0, 0, $width_pt, $height_pt], 'portrait');
+            $this->dompdf->render();
+            $this->dompdf->stream($filename, array("Attachment" => false));
+            exit(0);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => 'Terjadi kesalahan : ' . $e->getMessage() . '; di file ' . $e->getFile()
+            ]);
+        }
+    }
+
     public function dropdownHistoriPenerimaanBarang()
     {
         $id = decrypt($this->request->getVar('id'));

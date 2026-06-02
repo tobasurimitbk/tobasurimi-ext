@@ -5,15 +5,22 @@
 <section class="section">
     <div class="section-header">
         <h1>PO Lokal Bahan Baku</h1>
-        <?php if (can('Pembelian', 'PO Lokal BB', 'c')): ?>
-            <a class="btn btn-show-form btn-add btn-dropdown-export dropdown-toggle float-right" href="#" id="dropdownMenuButtonExport2" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #4E8A00 !important; border-color:#4E8A00 !important;">
-                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonExport2">
-                <li><a href="<?= base_url("po-lokal-bahan-baku/create"); ?>" class="dropdown-item"><b>Tambah</b></a></li>
-                <li><a href="<?= base_url("po-lokal-bahan-baku/import"); ?>" class="dropdown-item"><b>Import</b></a></li>
-            </ul>
-        <?php endif; ?>
+        <div class="col-button-tambah-spp">
+            <?php if (can('Pembelian', 'PO Lokal BB', 'c')): ?>
+                <a class="btn btn-show-form btn-add btn-dropdown-export dropdown-toggle float-right" href="#" id="dropdownMenuButtonExport2" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #4E8A00 !important; border-color:#4E8A00 !important;">
+                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonExport2">
+                    <li><a href="<?= base_url("po-lokal-bahan-baku/create"); ?>" class="dropdown-item"><b>Tambah</b></a></li>
+                    <li><a href="<?= base_url("po-lokal-bahan-baku/import"); ?>" class="dropdown-item"><b>Import</b></a></li>
+                </ul>
+            <?php endif; ?>
+            <?php if (can('Pembelian', 'PO Lokal BB', 'p')): ?>
+                <a class="btn btn-warning btn-print float-right" href="#" id="btnExport" style="margin-right:140px;">
+                    <i class="fa fa-download"></i> Export
+                </a>
+            <?php endif; ?>
+        </div>
     </div>
     <div class="card">
         <?= csrf_field() ?>
@@ -130,6 +137,54 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
             </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal detail-modal" id="cetakBuktiPengeluaranModal" tabindex="1">
+    <div class="modal-dialog" style="min-width: 700px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary">
+                    Cetak Bukti Pengeluaran
+                </h5>
+            </div>
+            <form class="form-sinkronisasi" role="form" method="POST">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <div class="form-floating mb-2" style="height: 50px;">
+                                    <input type="text" id="start_date" name="start_date" class="form-control start_date" placeholder="Tanggal Mulai Log Absensi">
+                                    <label for="start_date">Tanggal Mulai PO</label>
+                                </div>
+                                <div class="input-group-append" style="height:50px;">
+                                    <button disabled class="btn btn-secondary" type="button">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <div class="form-floating mb-2" style="height: 50px;">
+                                    <input type="text" id="end_date" name="end_date" class="form-control end_date" placeholder="Tanggal Selesai Log Absensi">
+                                    <label for="end_date">Tanggal Selesai PO</label>
+                                </div>
+                                <div class="input-group-append" style="height:50px;">
+                                    <button disabled class="btn btn-secondary" type="button">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-discard mr-2" id="btnHideCetakPengeluaran">Kembali</button>
+                    <button type="button" class="btn btn-submit-form" id="btnSubmitCetakPengeluaran">Cetak</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -378,7 +433,7 @@
     });
 
     $(document).ready(function() {
-        $(".dateStart").datepicker({
+        $(".dateStart,.start_date,.end_date").datepicker({
             todayHighlight: true,
             format: "dd/mm/yyyy",
             orientation: "bottom auto",
@@ -413,7 +468,36 @@
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
             location.replace(`<?= base_url("po-lokal-bahan-baku/id"); ?>/${data.id}`);
-        })
+        });
+
+        $('#btnExport').click(function(e) {
+            e.preventDefault();
+            $('#start_date,#end_date').val(null);
+            $('#cetakBuktiPengeluaranModal').modal('show');
+        });
+
+        $('#btnHideCetakPengeluaran').click(function(e) {
+            e.preventDefault();
+            $('#cetakBuktiPengeluaranModal').modal('hide');
+        });
+
+        $('#btnSubmitCetakPengeluaran').click(function(e) {
+            e.preventDefault();
+            var startDate = $('#start_date').val();
+            var endDate = $('#end_date').val();
+
+            if (startDate == '' || endDate == '') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Tanggal mulai & tanggal selesai wajib diisi !',
+                    confirmButtonColor: '#4e73df',
+                });
+            } else {
+                var url = "<?= base_url('po-lokal-bahan-baku/print-pengeluaran-multi') ?>?start_date=" + startDate + "&end_date=" + endDate;
+                window.open(url, "_blank");
+            }
+
+        });
     })
 
     const posting = function(id, status_posting) {
