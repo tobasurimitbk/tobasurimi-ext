@@ -240,7 +240,7 @@
             </table>
             <br>
             <span style="font-size: 12px;">
-                TGL CETAK : <?= $d['tanggal_cetak_kasbon'] ?>
+                TGL CETAK : <?= $d['tanggal_cetak'] ?>
             </span>
         </div>
         <div class="dotted-line"></div>

@@ -1088,7 +1088,7 @@ class POLokalBahanBaku extends BaseController
                 $dataPO->totalDailyPaidTerbilang = terbilang($dataPO->totalDailyPaid);
                 $dataPO->totalMonthlyPaidTerbilang = terbilang($dataPO->totalMonthlyPaid);
                 $dataPO->totalTambahanPaidTerbilang = terbilang($dataPO->totalTambahanPaid);
-                $dataPO->tanggalCetak = date('d/m/Y H:i:s', strtotime($dataPO->tanggal_cetak_kasbon));
+                $dataPO->tanggalCetak = date('d/m/Y H:i:s', strtotime($dataPO->tanggal_cetak));
 
                 // Siapkan data sebagai array untuk view
                 $data = (array) $dataPO;
