@@ -881,11 +881,11 @@ class POLokalBahanBaku extends BaseController
             foreach ($dataPODetail as $detail) {
 
                 if ($pphMode == "Company") {
-                    $generalPrice = $detail->general_price / $nilaiPph;
-                    $generalPriceTotal = ($detail->general_price / $nilaiPph) * $detail->qty;
+                    $generalPrice = round($detail->general_price) / $nilaiPph;
+                    $generalPriceTotal = (round($detail->general_price) / $nilaiPph) * $detail->qty;
                 } else {
-                    $generalPrice = $detail->general_price;
-                    $generalPriceTotal = $detail->general_price * $detail->qty;
+                    $generalPrice = round($detail->general_price);
+                    $generalPriceTotal = round($detail->general_price) * $detail->qty;
                 }
 
                 $dataBarang[] = [
