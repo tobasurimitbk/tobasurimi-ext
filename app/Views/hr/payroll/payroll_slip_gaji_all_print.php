@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
-<title>Payroll <?= $yearMonth ?>, Dept. <?= $divisi['divisi'] ?> Bag. <?= $bagian == null ? 'All' : $bagian['nama_bagian'] ?></title>
+<title>Payroll <?= $yearMonth ?>, Dept. <?= $divisi['divisi'] ?> Bag.
+    <?= $bagian == null ? 'All' : $bagian['nama_bagian'] ?>
+</title>
 
 <head>
     <style>
@@ -98,7 +100,7 @@
                                 <tr>
                                     <td width="120px">Kode Karyawan</td>
                                     <td width="10px">:</td>
-                                    <td><?= $p['employee']['nip'] ?></td>
+                                    <td><?= isset($p['employee']['nip']) ? $p['employee']['nip'] : '' ?></td>
                                 </tr>
                                 <tr>
                                     <td>Tahun / Bulan</td>
@@ -113,14 +115,15 @@
                                     <td>No. Induk</td>
                                     <td>:</td>
                                     <td>
-                                        <?= $p['employee']['nip'] ?>
-                                        Bagian : <?= $p['employee']['nama_bagian'] ?>
+                                        <?= isset($p['employee']['nip']) ? $p['employee']['nip'] : '' ?>
+                                        Bagian :
+                                        <?= isset($p['employee']['nama_bagian']) ? $p['employee']['nama_bagian'] : '' ?>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>Nama</td>
                                     <td>:</td>
-                                    <td><?= $p['employee']['name'] ?></td>
+                                    <td><?= isset($p['employee']['name']) ? $p['employee']['name'] : '' ?></td>
                                 </tr>
                             </table>
 
@@ -133,14 +136,16 @@
                                     <td><?= $p['payroll']['hadir_final'] ?> Hari</td>
                                 </tr>
                                 <tr>
-                                    <td><?= $tunjanganGajiPokok == null ? "" : ucfirst(strtolower($tunjanganGajiPokok['name'])) ?></td>
+                                    <td><?= $tunjanganGajiPokok == null ? "" : ucfirst(strtolower($tunjanganGajiPokok['name'])) ?>
+                                    </td>
                                     <td>:</td>
                                     <td>
                                         Rp <?= number_format($p['payroll']['nominal_gaji_harian'], 2, ',', '.') ?>/Hari
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td><?= $tunjanganCadangan == null ? "" : ucfirst(strtolower($tunjanganCadangan['name'])) ?></td>
+                                    <td><?= $tunjanganCadangan == null ? "" : ucfirst(strtolower($tunjanganCadangan['name'])) ?>
+                                    </td>
                                     <td>:</td>
                                     <td>
                                         Rp <?= number_format($p['payroll']['nominal_cadangan'], 2, ',', '.') ?>/Hari
@@ -150,7 +155,8 @@
                                     <td>Total Gaji</td>
                                     <td>:</td>
                                     <td>
-                                        Rp <?= number_format($p['payroll']['total_gaji_harian_plus_cadangan'], 2, ',', '.') ?>/Hari
+                                        Rp
+                                        <?= number_format($p['payroll']['total_gaji_harian_plus_cadangan'], 2, ',', '.') ?>/Hari
                                         :
                                         Rp <?= number_format($p['payroll']['nominal_uang_gaji'], 2, ',', '.') ?>
                                     </td>
@@ -189,13 +195,13 @@
                                     <td width="5px">:</td>
                                     <td>
                                         Rp <?= number_format(
-                                                $p['payroll']['nominal_uang_gaji']
-                                                    + $p['payroll']['nominal_uang_lembur']
-                                                    + $p['uangMakan'],
-                                                2,
-                                                ',',
-                                                '.'
-                                            ) ?>
+                                            $p['payroll']['nominal_uang_gaji']
+                                            + $p['payroll']['nominal_uang_lembur']
+                                            + $p['uangMakan'],
+                                            2,
+                                            ',',
+                                            '.'
+                                        ) ?>
                                     </td>
                                 </tr>
                                 <tr>
