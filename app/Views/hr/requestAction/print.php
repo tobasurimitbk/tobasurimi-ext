@@ -132,7 +132,7 @@
             display: inline-block;
             width: 35mm;
             border-bottom: 1px solid #000;
-            height: 5mm;
+            height: 8mm;
         }
 
         .page-break {
@@ -226,11 +226,12 @@
                             </td>
                         </tr>
                     </table>
-
+                    <br>
+                    <span>cc : Accounting, Kasir</span>
                 </div>
 
                 <?php if ($index < count($forms) - 1): ?>
-                    <div class="separator" style="margin-top:30px;"></div>
+                    <div class="separator" style="margin-top:60px;"></div>
                 <?php endif; ?>
 
             <?php endforeach; ?>
