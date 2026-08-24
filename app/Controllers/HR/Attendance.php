@@ -79,6 +79,10 @@ class Attendance extends BaseController
         $this->DendaAbsenHarianModel = new DendaAbsenHarianModel();
         $this->jamKerjaModel = new JamKerjaModel();
         $this->AttendanceKeteranganModel = new AttendanceKeteranganModel();
+
+        // set groub by
+        $db = \Config\Database::connect();
+        $db->query("SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
     }
 
     public function indexLog()
@@ -128,29 +132,29 @@ class Attendance extends BaseController
         $limit = empty($this->request->getVar('length')) ? 25 : $this->request->getVar("length");
         $offset = empty($this->request->getVar('start')) ? 0 : $this->request->getVar("start");
         $payload = [
-            "pageSize"      => $this->request->getVar("length"),
-            "currentPage"   => ($this->request->getVar("start") / $length) + 1,
+            "pageSize" => $this->request->getVar("length"),
+            "currentPage" => ($this->request->getVar("start") / $length) + 1,
 
         ];
 
         $condition = [
             "employees.company_id" => $this->this_company_id,
-            "employees.deletedAt"  => null,
+            "employees.deletedAt" => null,
         ];
 
         $addCondition = [
-            "order"        => $this->request->getVar('order')[0] ?? null,
-            "columns"    => $this->request->getVar('columns') ?? [],
-            "divisi_id"   => $this->request->getVar('divisi_id'),
-            "tipe"        => $this->request->getVar('tipe'),
+            "order" => $this->request->getVar('order')[0] ?? null,
+            "columns" => $this->request->getVar('columns') ?? [],
+            "divisi_id" => $this->request->getVar('divisi_id'),
+            "tipe" => $this->request->getVar('tipe'),
             "employee_id" => $this->request->getVar("employee_id"),
             "bagian_id" => $this->request->getVar("bagian_id")
         ];
 
         // ambil list karyawan (sudah paginate)
-        $employees    = $this->EmployeesModel->getEmployeeListAttendances($condition, $addCondition, $limit, $offset);
+        $employees = $this->EmployeesModel->getEmployeeListAttendances($condition, $addCondition, $limit, $offset);
         $employeeData = $employees['data'];
-        $employeeIds  = array_column($employeeData, 'id');
+        $employeeIds = array_column($employeeData, 'id');
 
 
         // ambil log absensi
@@ -163,7 +167,7 @@ class Attendance extends BaseController
         $mapLog = [];
         foreach ($logData as $l) {
             $mapLog[$l['employees_id']][$l['periode']] = [
-                'in'  => $l['check_in'],
+                'in' => $l['check_in'],
                 'out' => $l['check_out'],
                 'status' => $l['status']
             ];
@@ -177,10 +181,10 @@ class Attendance extends BaseController
         $resultData = [];
         foreach ($employeeData as $e) {
             $row = [];
-            $row['no']     = $no++;
-            $row['id']     = $e['id'];
-            $row['nip']    = $e['nip'];
-            $row['name']   = $e['name'];
+            $row['no'] = $no++;
+            $row['id'] = $e['id'];
+            $row['nip'] = $e['nip'];
+            $row['name'] = $e['name'];
             $row['divisi'] = $e['divisi'];
             $row['bagian'] = $e['bagian'];
 
@@ -194,34 +198,34 @@ class Attendance extends BaseController
                 }
 
                 if (isset($mapLog[$e['id']][$tanggal])) {
-                    $in  = $mapLog[$e['id']][$tanggal]['in'];
+                    $in = $mapLog[$e['id']][$tanggal]['in'];
                     $out = $mapLog[$e['id']][$tanggal]['out'];
                     if ($in == $out) {
                         $out = "";
                     }
-                    $statusIzin =  $mapLog[$e['id']][$tanggal]['status'];
+                    $statusIzin = $mapLog[$e['id']][$tanggal]['status'];
                 } else {
-                    $in  = '';
+                    $in = '';
                     $out = '';
                     $statusIzin = '';
                 }
 
 
                 // isi data
-                $row['day_' . $d . '_in']  = $in;
+                $row['day_' . $d . '_in'] = $in;
                 $row['day_' . $d . '_out'] = $out;
                 $row['day_' . $d . '_date'] = $tanggal;
 
 
                 // Kalau Libur
                 if (($dayName === 'Sun' || $statusLibur) && empty($in)) {
-                    $row['day_' . $d . '_in_class']  = 'bg-libur';
+                    $row['day_' . $d . '_in_class'] = 'bg-libur';
                     $row['day_' . $d . '_out_class'] = 'bg-libur';
                 }
 
                 // Kalau Alpha Masuk
                 if (empty($in) && $dayName != 'Sun' && !$statusLibur) {
-                    $row['day_' . $d . '_in_class']  = 'bg-alpha';
+                    $row['day_' . $d . '_in_class'] = 'bg-alpha';
                 }
 
                 // Kalau Alpha Pulang
@@ -245,19 +249,19 @@ class Attendance extends BaseController
                         'OFF_OFF' => 'bg-off'
                     ];
 
-                    $row['day_' . $d . '_in_class']  = $mapping[$statusIzin];
-                    $row['day_' . $d . '_out_class']  = $mapping[$statusIzin];
-                    $row['day_' . $d . '_in']  = explode('_', $statusIzin)[1];
-                    $row['day_' . $d . '_out']  = explode('_', $statusIzin)[1];
+                    $row['day_' . $d . '_in_class'] = $mapping[$statusIzin];
+                    $row['day_' . $d . '_out_class'] = $mapping[$statusIzin];
+                    $row['day_' . $d . '_in'] = explode('_', $statusIzin)[1];
+                    $row['day_' . $d . '_out'] = explode('_', $statusIzin)[1];
                 }
 
                 // Kalau memang hadir
                 if (!empty($in)) {
-                    $row['day_' . $d . '_in_class']  = 'bg-hadir';
+                    $row['day_' . $d . '_in_class'] = 'bg-hadir';
                 }
 
                 if (!empty($out)) {
-                    $row['day_' . $d . '_out_class']  = 'bg-hadir';
+                    $row['day_' . $d . '_out_class'] = 'bg-hadir';
                 }
             }
 
@@ -277,27 +281,27 @@ class Attendance extends BaseController
             $dayName = date('D', strtotime($dateStr));
 
             $columns[] = [
-                "data"      => "day_" . $d . "_in",
-                "title"     => "IN <br>" . $d,
+                "data" => "day_" . $d . "_in",
+                "title" => "IN <br>" . $d,
                 "className" => "text-center", // cukup ini saja
-                "sortable"  => false
+                "sortable" => false
             ];
             $columns[] = [
-                "data"      => "day_" . $d . "_out",
-                "title"     => "OUT <br>" . $d,
+                "data" => "day_" . $d . "_out",
+                "title" => "OUT <br>" . $d,
                 "className" => "text-center", // cukup ini saja
-                "sortable"  => false
+                "sortable" => false
             ];
         }
 
 
         $data = [
-            "draw"            => intval($this->request->getVar("draw")),
-            "recordsTotal"    => $employees['totalData'],
+            "draw" => intval($this->request->getVar("draw")),
+            "recordsTotal" => $employees['totalData'],
             "recordsFiltered" => $employees['totalFilteredData'],
-            "columns"         => $columns,
-            "data"            => $resultData,
-            "payload"         => $payload
+            "columns" => $columns,
+            "data" => $resultData,
+            "payload" => $payload
         ];
 
         return $this->response->setJSON($data);
@@ -310,33 +314,33 @@ class Attendance extends BaseController
         [$year, $month] = explode('-', $monthReq);
 
         // DataTable pagination
-        $length  = $this->request->getVar("length") ?: 25;
-        $offset  = $this->request->getVar('start') ?: 0;
+        $length = $this->request->getVar("length") ?: 25;
+        $offset = $this->request->getVar('start') ?: 0;
         $payload = [
-            "pageSize"    => $length,
+            "pageSize" => $length,
             "currentPage" => ($offset / $length) + 1,
         ];
 
         // Filter default
         $condition = [
             "employees.company_id" => $this->this_company_id,
-            "employees.deletedAt"  => null,
+            "employees.deletedAt" => null,
         ];
 
         // Filter tambahan
         $addCondition = [
-            "order"       => $this->request->getVar('order')[0] ?? null,
-            "columns"     => $this->request->getVar('columns') ?? [],
-            "divisi_id"   => $this->request->getVar('divisi_id'),
-            "tipe"        => $this->request->getVar('tipe'),
+            "order" => $this->request->getVar('order')[0] ?? null,
+            "columns" => $this->request->getVar('columns') ?? [],
+            "divisi_id" => $this->request->getVar('divisi_id'),
+            "tipe" => $this->request->getVar('tipe'),
             "employee_id" => $this->request->getVar("employee_id"),
             "bagian_id" => $this->request->getVar("bagian_id")
         ];
 
         // Ambil list karyawan (sudah dipaginate)
-        $employees    = $this->EmployeesModel->getEmployeeListAttendances($condition, $addCondition, $length, $offset);
+        $employees = $this->EmployeesModel->getEmployeeListAttendances($condition, $addCondition, $length, $offset);
         $employeeData = $employees['data'];
-        $employeeIds  = array_column($employeeData, 'id');
+        $employeeIds = array_column($employeeData, 'id');
 
         // Ambil log absensi per karyawan
         $logData = !empty($employeeIds)
@@ -347,57 +351,57 @@ class Attendance extends BaseController
         $mapLog = [];
         foreach ($logData as $l) {
             $mapLog[$l['employees_id']][$l['periode']] = [
-                'in'     => $l['check_in'],
-                'out'    => $l['check_out'],
+                'in' => $l['check_in'],
+                'out' => $l['check_out'],
                 'status' => $l['status'],
             ];
         }
 
         // Ambil tanggal hari besar (libur)
-        $bigDays       = $this->BigDaysModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll();
+        $bigDays = $this->BigDaysModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll();
         $tanggalBigDay = array_column($bigDays, 'date');
 
         // Total hari dalam bulan
         $totalDaysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 
-        $no         = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
         $resultData = [];
 
         foreach ($employeeData as $e) {
             $row = [
-                'no'     => $no++,
-                'id'     => $e['id'],
-                'nip'    => $e['nip'],
-                'name'   => $e['name'],
+                'no' => $no++,
+                'id' => $e['id'],
+                'nip' => $e['nip'],
+                'name' => $e['name'],
                 'divisi' => $e['divisi'],
                 'bagian' => $e['bagian'],
             ];
 
             // Inisialisasi counter
-            $totalCutiTahunan    = 0;
-            $totalCutiHaid       = 0;
-            $totalCutiHamil      = 0;
+            $totalCutiTahunan = 0;
+            $totalCutiHaid = 0;
+            $totalCutiHamil = 0;
             $totalCutiMelahirkan = 0;
-            $totalIjin           = 0;
-            $totalPg             = 0;
-            $totalSakit          = 0;
-            $totalRl             = 0;
-            $totalHadir          = 0;
-            $totalAlpha          = 0;
-            $totalLibur          = 0;
-            $totalDinas          = 0;
-            $totalCutiKeguguran  = 0;
-            $totalOff            = 0;
+            $totalIjin = 0;
+            $totalPg = 0;
+            $totalSakit = 0;
+            $totalRl = 0;
+            $totalHadir = 0;
+            $totalAlpha = 0;
+            $totalLibur = 0;
+            $totalDinas = 0;
+            $totalCutiKeguguran = 0;
+            $totalOff = 0;
 
             // Loop setiap tanggal dalam bulan
             for ($d = 1; $d <= $totalDaysInMonth; $d++) {
-                $tanggal   = sprintf("%04d-%02d-%02d", $year, $month, $d);
-                $dayName   = date('D', strtotime($tanggal));
+                $tanggal = sprintf("%04d-%02d-%02d", $year, $month, $d);
+                $dayName = date('D', strtotime($tanggal));
                 $statusLibur = in_array($tanggal, $tanggalBigDay);
 
                 // Ambil log per tanggal
-                $in        = $mapLog[$e['id']][$tanggal]['in']     ?? '';
-                $out       = $mapLog[$e['id']][$tanggal]['out']    ?? '';
+                $in = $mapLog[$e['id']][$tanggal]['in'] ?? '';
+                $out = $mapLog[$e['id']][$tanggal]['out'] ?? '';
                 $statusIzin = $mapLog[$e['id']][$tanggal]['status'] ?? '';
 
                 // Jika libur (Minggu / hari besar) dan tidak ada absen
@@ -454,30 +458,30 @@ class Attendance extends BaseController
             }
 
             // Simpan hasil per karyawan
-            $row['total_cuti_tahunan']    = $totalCutiTahunan;
-            $row['total_cuti_haid']       = $totalCutiHaid;
-            $row['total_cuti_hamil']      = $totalCutiHamil;
+            $row['total_cuti_tahunan'] = $totalCutiTahunan;
+            $row['total_cuti_haid'] = $totalCutiHaid;
+            $row['total_cuti_hamil'] = $totalCutiHamil;
             $row['total_cuti_melahirkan'] = $totalCutiMelahirkan;
-            $row['total_ijin']            = $totalIjin;
-            $row['total_sakit']           = $totalSakit;
-            $row['total_rl']              = $totalRl;
-            $row['total_hadir']           = $totalHadir;
-            $row['total_alpha']           = $totalAlpha;
-            $row['total_libur']           = $totalLibur;
-            $row['total_dinas']           = $totalDinas;
-            $row['total_cuti_keguguran']  = $totalCutiKeguguran;
-            $row['total_pg']              = $totalPg;
-            $row['total_off']             = $totalOff;
+            $row['total_ijin'] = $totalIjin;
+            $row['total_sakit'] = $totalSakit;
+            $row['total_rl'] = $totalRl;
+            $row['total_hadir'] = $totalHadir;
+            $row['total_alpha'] = $totalAlpha;
+            $row['total_libur'] = $totalLibur;
+            $row['total_dinas'] = $totalDinas;
+            $row['total_cuti_keguguran'] = $totalCutiKeguguran;
+            $row['total_pg'] = $totalPg;
+            $row['total_off'] = $totalOff;
 
             $resultData[] = $row;
         }
 
         // tinggal return untuk datatable
         return $this->response->setJSON([
-            "draw"            => intval($this->request->getVar("draw")),
-            "recordsTotal"    => $employees['totalData'],
+            "draw" => intval($this->request->getVar("draw")),
+            "recordsTotal" => $employees['totalData'],
             "recordsFiltered" => $employees['totalFilteredData'],
-            "data"            => $resultData,
+            "data" => $resultData,
         ]);
     }
 
@@ -521,29 +525,29 @@ class Attendance extends BaseController
         $limit = empty($this->request->getVar('length')) ? 25 : $this->request->getVar("length");
         $offset = empty($this->request->getVar('start')) ? 0 : $this->request->getVar("start");
         $payload = [
-            "pageSize"      => $this->request->getVar("length"),
-            "currentPage"   => ($this->request->getVar("start") / $length) + 1,
+            "pageSize" => $this->request->getVar("length"),
+            "currentPage" => ($this->request->getVar("start") / $length) + 1,
 
         ];
 
         $condition = [
             "employees.company_id" => $this->this_company_id,
-            "employees.deletedAt"  => null,
+            "employees.deletedAt" => null,
         ];
 
         $addCondition = [
-            "order"        => $this->request->getVar('order')[0] ?? null,
-            "columns"    => $this->request->getVar('columns') ?? [],
-            "divisi_id"   => $this->request->getVar('divisi_id'),
-            "tipe"        => $this->request->getVar('tipe'),
+            "order" => $this->request->getVar('order')[0] ?? null,
+            "columns" => $this->request->getVar('columns') ?? [],
+            "divisi_id" => $this->request->getVar('divisi_id'),
+            "tipe" => $this->request->getVar('tipe'),
             "employee_id" => $this->request->getVar("employee_id"),
-            "bagian_id"     => $this->request->getVar('bagian_id'),
+            "bagian_id" => $this->request->getVar('bagian_id'),
         ];
 
         // ambil list karyawan (sudah paginate)
-        $employees    = $this->EmployeesModel->getEmployeeListAttendances($condition, $addCondition, $limit, $offset);
+        $employees = $this->EmployeesModel->getEmployeeListAttendances($condition, $addCondition, $limit, $offset);
         $employeeData = $employees['data'];
-        $employeeIds  = array_column($employeeData, 'id');
+        $employeeIds = array_column($employeeData, 'id');
 
         // ambil data absensi
         if (count($employeeIds) != 0) {
@@ -559,7 +563,7 @@ class Attendance extends BaseController
         $mapAttendance = [];
         foreach ($attendanceData as $l) {
             $mapAttendance[$l['employee_id']][$l['periode']] = [
-                'in'  => $l['checkin'],
+                'in' => $l['checkin'],
                 'out' => $l['checkout'],
                 'status' => $l['status']
             ];
@@ -573,10 +577,10 @@ class Attendance extends BaseController
         $resultData = [];
         foreach ($employeeData as $e) {
             $row = [];
-            $row['no']     = $no++;
-            $row['id']     = $e['id'];
-            $row['nip']    = $e['nip'];
-            $row['name']   = $e['name'];
+            $row['no'] = $no++;
+            $row['id'] = $e['id'];
+            $row['nip'] = $e['nip'];
+            $row['name'] = $e['name'];
             $row['divisi'] = $e['divisi'];
             $row['bagian'] = $e['bagian'];
 
@@ -590,31 +594,31 @@ class Attendance extends BaseController
                 }
 
                 if (isset($mapAttendance[$e['id']][$tanggal])) {
-                    $in  = $mapAttendance[$e['id']][$tanggal]['in'];
+                    $in = $mapAttendance[$e['id']][$tanggal]['in'];
                     $out = $mapAttendance[$e['id']][$tanggal]['out'];
-                    $statusIzin =  $mapAttendance[$e['id']][$tanggal]['status'];
+                    $statusIzin = $mapAttendance[$e['id']][$tanggal]['status'];
                 } else {
-                    $in  = '';
+                    $in = '';
                     $out = '';
                     $statusIzin = '';
                 }
 
 
                 // isi data
-                $row['day_' . $d . '_in']  = $in;
+                $row['day_' . $d . '_in'] = $in;
                 $row['day_' . $d . '_out'] = $out;
                 $row['day_' . $d . '_date'] = $tanggal;
 
 
                 // Kalau Libur
                 if (($dayName === 'Sun' || $statusLibur) && empty($in)) {
-                    $row['day_' . $d . '_in_class']  = 'bg-libur';
+                    $row['day_' . $d . '_in_class'] = 'bg-libur';
                     $row['day_' . $d . '_out_class'] = 'bg-libur';
                 }
 
                 // Kalau Alpha Masuk
                 if (empty($in) && $dayName != 'Sun' && !$statusLibur) {
-                    $row['day_' . $d . '_in_class']  = 'bg-alpha';
+                    $row['day_' . $d . '_in_class'] = 'bg-alpha';
                 }
 
                 // Kalau Alpha Pulang
@@ -640,19 +644,19 @@ class Attendance extends BaseController
                         'OFF_OFF' => 'bg-off'
                     ];
 
-                    $row['day_' . $d . '_in_class']  = $mapping[$statusIzin];
-                    $row['day_' . $d . '_out_class']  = $mapping[$statusIzin];
-                    $row['day_' . $d . '_in']  = explode('_', $statusIzin)[1];
-                    $row['day_' . $d . '_out']  = explode('_', $statusIzin)[1];
+                    $row['day_' . $d . '_in_class'] = $mapping[$statusIzin];
+                    $row['day_' . $d . '_out_class'] = $mapping[$statusIzin];
+                    $row['day_' . $d . '_in'] = explode('_', $statusIzin)[1];
+                    $row['day_' . $d . '_out'] = explode('_', $statusIzin)[1];
                 }
 
                 // Kalau memang hadir
                 if (!empty($in)) {
-                    $row['day_' . $d . '_in_class']  = 'bg-hadir';
+                    $row['day_' . $d . '_in_class'] = 'bg-hadir';
                 }
 
                 if (!empty($out)) {
-                    $row['day_' . $d . '_out_class']  = 'bg-hadir';
+                    $row['day_' . $d . '_out_class'] = 'bg-hadir';
                 }
             }
 
@@ -672,27 +676,27 @@ class Attendance extends BaseController
             $dayName = date('D', strtotime($dateStr));
 
             $columns[] = [
-                "data"      => "day_" . $d . "_in",
-                "title"     => "IN <br>" . $d,
+                "data" => "day_" . $d . "_in",
+                "title" => "IN <br>" . $d,
                 "className" => "text-center", // cukup ini saja
-                "sortable"  => false
+                "sortable" => false
             ];
             $columns[] = [
-                "data"      => "day_" . $d . "_out",
-                "title"     => "OUT <br>" . $d,
+                "data" => "day_" . $d . "_out",
+                "title" => "OUT <br>" . $d,
                 "className" => "text-center", // cukup ini saja
-                "sortable"  => false
+                "sortable" => false
             ];
         }
 
 
         $data = [
-            "draw"            => intval($this->request->getVar("draw")),
-            "recordsTotal"    => $employees['totalData'],
+            "draw" => intval($this->request->getVar("draw")),
+            "recordsTotal" => $employees['totalData'],
             "recordsFiltered" => $employees['totalFilteredData'],
-            "columns"         => $columns,
-            "data"            => $resultData,
-            "payload"         => $payload
+            "columns" => $columns,
+            "data" => $resultData,
+            "payload" => $payload
         ];
 
         return $this->response->setJSON($data);
@@ -713,29 +717,29 @@ class Attendance extends BaseController
         $limit = empty($this->request->getVar('length')) ? 25 : $this->request->getVar("length");
         $offset = empty($this->request->getVar('start')) ? 0 : $this->request->getVar("start");
         $payload = [
-            "pageSize"      => $this->request->getVar("length"),
-            "currentPage"   => ($this->request->getVar("start") / $length) + 1,
+            "pageSize" => $this->request->getVar("length"),
+            "currentPage" => ($this->request->getVar("start") / $length) + 1,
 
         ];
 
         $condition = [
             "employees.company_id" => $this->this_company_id,
-            "employees.deletedAt"  => null,
+            "employees.deletedAt" => null,
         ];
 
         $addCondition = [
-            "order"        => $this->request->getVar('order')[0] ?? null,
-            "columns"    => $this->request->getVar('columns') ?? [],
-            "divisi_id"   => $this->request->getVar('divisi_id'),
-            "tipe"        => $this->request->getVar('tipe'),
+            "order" => $this->request->getVar('order')[0] ?? null,
+            "columns" => $this->request->getVar('columns') ?? [],
+            "divisi_id" => $this->request->getVar('divisi_id'),
+            "tipe" => $this->request->getVar('tipe'),
             "employee_id" => $this->request->getVar("employee_id"),
             "bagian_id" => $this->request->getVar("bagian_id")
         ];
 
         // ambil list karyawan (sudah paginate)
-        $employees    = $this->EmployeesModel->getEmployeeListAttendances($condition, $addCondition, $limit, $offset);
+        $employees = $this->EmployeesModel->getEmployeeListAttendances($condition, $addCondition, $limit, $offset);
         $employeeData = $employees['data'];
-        $employeeIds  = array_column($employeeData, 'id');
+        $employeeIds = array_column($employeeData, 'id');
 
         // ambil data absensi
         if (count($employeeIds) != 0) {
@@ -751,7 +755,7 @@ class Attendance extends BaseController
         $mapAttendance = [];
         foreach ($attendanceData as $l) {
             $mapAttendance[$l['employee_id']][$l['periode']] = [
-                'in'  => $l['checkin'],
+                'in' => $l['checkin'],
                 'out' => $l['checkout'],
                 'status' => $l['status']
             ];
@@ -759,50 +763,50 @@ class Attendance extends BaseController
 
 
         // Ambil tanggal hari besar (libur)
-        $bigDays       = $this->BigDaysModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll();
+        $bigDays = $this->BigDaysModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll();
         $tanggalBigDay = array_column($bigDays, 'date');
 
         // Total hari dalam bulan
         $totalDaysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 
-        $no         = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
         $resultData = [];
 
         foreach ($employeeData as $e) {
             $row = [
-                'no'     => $no++,
-                'id'     => $e['id'],
-                'nip'    => $e['nip'],
-                'name'   => $e['name'],
+                'no' => $no++,
+                'id' => $e['id'],
+                'nip' => $e['nip'],
+                'name' => $e['name'],
                 'divisi' => $e['divisi'],
                 'bagian' => $e['bagian'],
             ];
 
             // Inisialisasi counter
-            $totalCutiTahunan    = 0;
-            $totalCutiHaid       = 0;
-            $totalCutiHamil      = 0;
+            $totalCutiTahunan = 0;
+            $totalCutiHaid = 0;
+            $totalCutiHamil = 0;
             $totalCutiMelahirkan = 0;
-            $totalIjin           = 0;
-            $totalPg             = 0;
-            $totalSakit          = 0;
-            $totalRl             = 0;
-            $totalHadir          = 0;
-            $totalAlpha          = 0;
-            $totalLibur          = 0;
-            $totalDinas          = 0;
-            $totalCutiKeguguran  = 0;
-            $totalOff            = 0;
+            $totalIjin = 0;
+            $totalPg = 0;
+            $totalSakit = 0;
+            $totalRl = 0;
+            $totalHadir = 0;
+            $totalAlpha = 0;
+            $totalLibur = 0;
+            $totalDinas = 0;
+            $totalCutiKeguguran = 0;
+            $totalOff = 0;
 
             // Loop setiap tanggal dalam bulan
             for ($d = 1; $d <= $totalDaysInMonth; $d++) {
-                $tanggal   = sprintf("%04d-%02d-%02d", $year, $month, $d);
-                $dayName   = date('D', strtotime($tanggal));
+                $tanggal = sprintf("%04d-%02d-%02d", $year, $month, $d);
+                $dayName = date('D', strtotime($tanggal));
                 $statusLibur = in_array($tanggal, $tanggalBigDay);
 
                 // Ambil log per tanggal
-                $in        = $mapAttendance[$e['id']][$tanggal]['in']     ?? '';
-                $out       = $mapAttendance[$e['id']][$tanggal]['out']    ?? '';
+                $in = $mapAttendance[$e['id']][$tanggal]['in'] ?? '';
+                $out = $mapAttendance[$e['id']][$tanggal]['out'] ?? '';
                 $statusIzin = $mapAttendance[$e['id']][$tanggal]['status'] ?? '';
 
                 // Jika libur (Minggu / hari besar) dan tidak ada absen
@@ -859,30 +863,30 @@ class Attendance extends BaseController
             }
 
             // Simpan hasil per karyawan
-            $row['total_cuti_tahunan']    = $totalCutiTahunan;
-            $row['total_cuti_haid']       = $totalCutiHaid;
-            $row['total_cuti_hamil']      = $totalCutiHamil;
+            $row['total_cuti_tahunan'] = $totalCutiTahunan;
+            $row['total_cuti_haid'] = $totalCutiHaid;
+            $row['total_cuti_hamil'] = $totalCutiHamil;
             $row['total_cuti_melahirkan'] = $totalCutiMelahirkan;
-            $row['total_ijin']            = $totalIjin;
-            $row['total_sakit']           = $totalSakit;
-            $row['total_rl']              = $totalRl;
-            $row['total_hadir']           = $totalHadir;
-            $row['total_alpha']           = $totalAlpha;
-            $row['total_libur']           = $totalLibur;
-            $row['total_dinas']           = $totalDinas;
-            $row['total_cuti_keguguran']  = $totalCutiKeguguran;
-            $row['total_pg']              = $totalPg;
-            $row['total_off']             = $totalOff;
+            $row['total_ijin'] = $totalIjin;
+            $row['total_sakit'] = $totalSakit;
+            $row['total_rl'] = $totalRl;
+            $row['total_hadir'] = $totalHadir;
+            $row['total_alpha'] = $totalAlpha;
+            $row['total_libur'] = $totalLibur;
+            $row['total_dinas'] = $totalDinas;
+            $row['total_cuti_keguguran'] = $totalCutiKeguguran;
+            $row['total_pg'] = $totalPg;
+            $row['total_off'] = $totalOff;
 
             $resultData[] = $row;
         }
 
         // tinggal return untuk datatable
         return $this->response->setJSON([
-            "draw"            => intval($this->request->getVar("draw")),
-            "recordsTotal"    => $employees['totalData'],
+            "draw" => intval($this->request->getVar("draw")),
+            "recordsTotal" => $employees['totalData'],
             "recordsFiltered" => $employees['totalFilteredData'],
-            "data"            => $resultData,
+            "data" => $resultData,
         ]);
     }
 
@@ -1161,7 +1165,7 @@ class Attendance extends BaseController
             if ($uangMakanHarian == null) {
                 // Jika uang makan harian null maka insert
                 $this->UangMakanHarianModel->insert([
-                    'employee_id'  => $attendance['employee_id'],
+                    'employee_id' => $attendance['employee_id'],
                     'tanggal' => $attendance['periode'],
                     'nominal' => $nominalUangMakan,
                     'sync_status' => "MANUAL"
@@ -1182,7 +1186,7 @@ class Attendance extends BaseController
             if ($dendaAbsenHarian == null) {
                 // insert
                 $this->DendaAbsenHarianModel->insert([
-                    'employee_id'  => $attendance['employee_id'],
+                    'employee_id' => $attendance['employee_id'],
                     'tanggal' => $attendance['periode'],
                     'nominal' => $nominalDendaKeterlambatan,
                     'sync_status' => "MANUAL"
@@ -1296,7 +1300,7 @@ class Attendance extends BaseController
             ->select($selectQry)
             ->join('attendances_unit', 'attendances_unit.id = attendances_log.attendances_unit_id', 'left')
             ->where('employees_id', $employeeID)
-            ->where("DATE_FORMAT(date_create, '%Y-%m-%d')",  $tanggal)
+            ->where("DATE_FORMAT(date_create, '%Y-%m-%d')", $tanggal)
             ->groupBy('DATE_FORMAT(date_create, \'%Y-%m-%d\')')
             ->limit(2)
             ->get()
@@ -1368,17 +1372,17 @@ class Attendance extends BaseController
         // ambil data employees
         $condition = [
             "employees.company_id" => $this->this_company_id,
-            "employees.deletedAt"  => null,
+            "employees.deletedAt" => null,
         ];
         $addCondition = [
-            "divisi_id"   => $this->request->getVar('divisi_id'),
-            "tipe"        => $this->request->getVar('tipe'),
+            "divisi_id" => $this->request->getVar('divisi_id'),
+            "tipe" => $this->request->getVar('tipe'),
             "employee_id" => $this->request->getVar("employee_id"),
-            "bagian_id"   => $this->request->getVar("bagian_id")
+            "bagian_id" => $this->request->getVar("bagian_id")
         ];
-        $employees    = $this->EmployeesModel->getEmployeeListAttendances($condition, $addCondition, 0, 10000000);
+        $employees = $this->EmployeesModel->getEmployeeListAttendances($condition, $addCondition, 0, 10000000);
         $employeeData = $employees['data'];
-        $employeeIds  = array_column($employeeData, 'id');
+        $employeeIds = array_column($employeeData, 'id');
 
         // log attendance
         $logData = !empty($employeeIds)
@@ -1388,8 +1392,8 @@ class Attendance extends BaseController
         $mapLog = [];
         foreach ($logData as $l) {
             $mapLog[$l['employees_id']][$l['periode']] = [
-                'in'     => $l['check_in'],
-                'out'    => $l['check_out'],
+                'in' => $l['check_in'],
+                'out' => $l['check_out'],
                 'status' => $l['status'],
             ];
         }
@@ -1447,7 +1451,7 @@ class Attendance extends BaseController
                 'font' => ['bold' => true],
                 'alignment' => [
                     'horizontal' => Alignment::HORIZONTAL_CENTER,
-                    'vertical'   => Alignment::VERTICAL_CENTER
+                    'vertical' => Alignment::VERTICAL_CENTER
                 ],
                 'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'DDDDDD']],
                 'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
@@ -1466,9 +1470,9 @@ class Attendance extends BaseController
 
             for ($d = 1; $d <= $totalDaysInMonth; $d++) {
                 $tanggal = sprintf("%04d-%02d-%02d", $year, $month, $d);
-                $dayLog  = $mapLog[$e['id']][$tanggal] ?? null;
+                $dayLog = $mapLog[$e['id']][$tanggal] ?? null;
 
-                $in  = $dayLog['in'] ?? '';
+                $in = $dayLog['in'] ?? '';
                 $out = $dayLog['out'] ?? '';
                 $status = $dayLog['status'] ?? '';
 
@@ -1563,10 +1567,10 @@ class Attendance extends BaseController
             for ($d = 1; $d <= $totalDaysInMonth; $d++) {
                 $tanggal = sprintf("%04d-%02d-%02d", $year, $month, $d);
                 $dayName = date('D', strtotime($tanggal));
-                $log     = $mapLog[$e['id']][$tanggal] ?? null;
-                $in      = $log['in'] ?? '';
-                $out     = $log['out'] ?? '';
-                $status  = $log['status'] ?? '';
+                $log = $mapLog[$e['id']][$tanggal] ?? null;
+                $in = $log['in'] ?? '';
+                $out = $log['out'] ?? '';
+                $status = $log['status'] ?? '';
 
                 if (($dayName === 'Sun' || in_array($tanggal, $tanggalBigDay)) && empty($in)) {
                     $total['libur']++;
@@ -1660,22 +1664,22 @@ class Attendance extends BaseController
     public function exportExcelLogPresensiHarian()
     {
         $startDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('start_date'))));
-        $endDate   = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('end_date'))));
+        $endDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('end_date'))));
 
         // ambil data employees
         $condition = [
             "employees.company_id" => $this->this_company_id,
-            "employees.deletedAt"  => null,
+            "employees.deletedAt" => null,
         ];
         $addCondition = [
-            "divisi_id"   => $this->request->getVar('divisi_id'),
-            "tipe"        => $this->request->getVar('tipe'),
+            "divisi_id" => $this->request->getVar('divisi_id'),
+            "tipe" => $this->request->getVar('tipe'),
             "employee_id" => $this->request->getVar("employee_id"),
-            "bagian_id"   => $this->request->getVar("bagian_id")
+            "bagian_id" => $this->request->getVar("bagian_id")
         ];
-        $employees    = $this->EmployeesModel->getEmployeeListAttendances($condition, $addCondition, 0, 10000000);
+        $employees = $this->EmployeesModel->getEmployeeListAttendances($condition, $addCondition, 0, 10000000);
         $employeeData = $employees['data'];
-        $employeeIds  = array_column($employeeData, 'id');
+        $employeeIds = array_column($employeeData, 'id');
 
         // log attendance
         $logData = !empty($employeeIds)
@@ -1695,8 +1699,8 @@ class Attendance extends BaseController
                 $status = $l['status'] != null ? explode("_", $l['status'])[1] : "";
             }
             $mapLog[$l['employees_id']][$l['periode']] = [
-                'in'     => $l['check_in'],
-                'out'    => $l['check_out'],
+                'in' => $l['check_in'],
+                'out' => $l['check_out'],
                 'status' => $status,
             ];
         }
@@ -1776,13 +1780,13 @@ class Attendance extends BaseController
             // isi data per karyawan
             $no = 1;
             foreach ($employeeData as $emp) {
-                $nip    = $emp['nip'] ?? '';
-                $nama   = $emp['name'] ?? '';
+                $nip = $emp['nip'] ?? '';
+                $nama = $emp['name'] ?? '';
                 $divisi = $emp['divisi'] ?? '';
                 $bagian = $emp['bagian'] ?? '';
 
-                $in     = $mapLog[$emp['id']][$tgl]['in'] ?? '';
-                $out    = $mapLog[$emp['id']][$tgl]['out'] ?? '';
+                $in = $mapLog[$emp['id']][$tgl]['in'] ?? '';
+                $out = $mapLog[$emp['id']][$tgl]['out'] ?? '';
                 $status = $mapLog[$emp['id']][$tgl]['status'] ?? '';
                 $uangMakan = $mapUangMakanHarian[$emp['id']][$tgl]['nominal'] ?? 0;
                 $keterlambatanMenit = "";
@@ -1793,7 +1797,7 @@ class Attendance extends BaseController
                         $formLembur['jam_mulai_lembur'],
                         $formLembur['jam_selesai_lembur']
                     );
-                    $totalJamLembur = (float)$waktuSelisihPulangLembur['jam'] . " Jam, " . $waktuSelisihPulangLembur['menit'] . " Menit";
+                    $totalJamLembur = (float) $waktuSelisihPulangLembur['jam'] . " Jam, " . $waktuSelisihPulangLembur['menit'] . " Menit";
                 }
 
                 // cek jika tanggal masuk big day
@@ -1863,19 +1867,19 @@ class Attendance extends BaseController
                 // Hitung total status per karyawan
                 if (!isset($rekapKaryawan[$emp['id']])) {
                     $rekapKaryawan[$emp['id']] = [
-                        'nip'            => $nip,
-                        'nama'           => $nama,
-                        'hadir'          => 0,
-                        'alpa'           => 0,
-                        'libur'          => 0,
-                        'cuti_tahunan'   => 0,
-                        'cuti_haid'      => 0,
-                        'cuti_hamil'     => 0,
+                        'nip' => $nip,
+                        'nama' => $nama,
+                        'hadir' => 0,
+                        'alpa' => 0,
+                        'libur' => 0,
+                        'cuti_tahunan' => 0,
+                        'cuti_haid' => 0,
+                        'cuti_hamil' => 0,
                         'cuti_melahirkan' => 0,
-                        'ijin'           => 0,
-                        'sakit'          => 0,
-                        'rl'             => 0,
-                        'dinas'          => 0,
+                        'ijin' => 0,
+                        'sakit' => 0,
+                        'rl' => 0,
+                        'dinas' => 0,
                         'cuti_keguguran' => 0,
                         'potong_gaji' => 0
                     ];
@@ -2003,21 +2007,21 @@ class Attendance extends BaseController
 
         $monthName = strtoupper(date('F Y', strtotime("$year-$month-01"))); // contoh: SEPTEMBER 2025
         $startDate = sprintf('%04d-%02d-01', $year, $month);
-        $endDate   = sprintf('%04d-%02d-%02d', $year, $month, cal_days_in_month(CAL_GREGORIAN, $month, $year));
+        $endDate = sprintf('%04d-%02d-%02d', $year, $month, cal_days_in_month(CAL_GREGORIAN, $month, $year));
 
         // ambil data employees
         $condition = [
             "employees.company_id" => $this->this_company_id,
-            "employees.deletedAt"  => null,
+            "employees.deletedAt" => null,
         ];
         $addCondition = [
-            "divisi_id"   => $this->request->getVar('divisi_id'),
-            "tipe"        => $this->request->getVar('tipe'),
+            "divisi_id" => $this->request->getVar('divisi_id'),
+            "tipe" => $this->request->getVar('tipe'),
             "bagian_id" => $this->request->getVar("bagian_id")
         ];
-        $employees    = $this->EmployeesModel->getEmployeeListAttendances($condition, $addCondition, 0, 10000000);
+        $employees = $this->EmployeesModel->getEmployeeListAttendances($condition, $addCondition, 0, 10000000);
         $employeeData = $employees['data'];
-        $employeeIds  = array_column($employeeData, 'id');
+        $employeeIds = array_column($employeeData, 'id');
 
         // log attendance
         $logData = !empty($employeeIds)
@@ -2027,8 +2031,8 @@ class Attendance extends BaseController
         $mapLog = [];
         foreach ($logData as $l) {
             $mapLog[$l['employee_id']][$l['periode']] = [
-                'in'     => $l['checkin'],
-                'out'    => $l['checkout'],
+                'in' => $l['checkin'],
+                'out' => $l['checkout'],
                 'status' => $l['status'],
             ];
         }
@@ -2110,7 +2114,7 @@ class Attendance extends BaseController
                 'font' => ['bold' => true],
                 'alignment' => [
                     'horizontal' => Alignment::HORIZONTAL_CENTER,
-                    'vertical'   => Alignment::VERTICAL_CENTER
+                    'vertical' => Alignment::VERTICAL_CENTER
                 ],
                 'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'DDDDDD']],
                 'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
@@ -2131,8 +2135,8 @@ class Attendance extends BaseController
 
             for ($d = 1; $d <= $totalDaysInMonth; $d++) {
                 $tanggal = sprintf("%04d-%02d-%02d", $year, $month, $d);
-                $dayLog  = $mapLog[$e['id']][$tanggal] ?? null;
-                $dendaKeterlambatan = (float)($mapDendaKeterlambatan[$e['id']][$tanggal]['nominal'] ?? 0);
+                $dayLog = $mapLog[$e['id']][$tanggal] ?? null;
+                $dendaKeterlambatan = (float) ($mapDendaKeterlambatan[$e['id']][$tanggal]['nominal'] ?? 0);
 
                 $totalDendaBulan += $dendaKeterlambatan;
 
@@ -2147,10 +2151,10 @@ class Attendance extends BaseController
                         $formLembur['jam_mulai_lembur'],
                         $formLembur['jam_selesai_lembur']
                     );
-                    $totalJamLembur = (float)$waktuSelisihPulangLembur['jam'] . " Jam, " . $waktuSelisihPulangLembur['menit'] . " Menit";
+                    $totalJamLembur = (float) $waktuSelisihPulangLembur['jam'] . " Jam, " . $waktuSelisihPulangLembur['menit'] . " Menit";
                 }
 
-                $in  = $dayLog['in'] ?? '';
+                $in = $dayLog['in'] ?? '';
                 $out = $dayLog['out'] ?? '';
                 $status = $dayLog['status'] ?? '';
 
@@ -2178,7 +2182,7 @@ class Attendance extends BaseController
                 $sheet1->setCellValueByColumnAndRow($colIndex++, $rowIndex, $totalJamLembur);
 
                 // UANG MAKAN
-                $uangMakan = (float)($mapUangMakan[$e['id']][$tanggal] ?? 0);
+                $uangMakan = (float) ($mapUangMakan[$e['id']][$tanggal] ?? 0);
                 $sheet1->setCellValueByColumnAndRow($colIndex, $rowIndex, $uangMakan);
                 $sheet1->getStyleByColumnAndRow($colIndex, $rowIndex)
                     ->getNumberFormat()
@@ -2292,10 +2296,10 @@ class Attendance extends BaseController
             for ($d = 1; $d <= $totalDaysInMonth; $d++) {
                 $tanggal = sprintf("%04d-%02d-%02d", $year, $month, $d);
                 $dayName = date('D', strtotime($tanggal));
-                $log     = $mapLog[$e['id']][$tanggal] ?? null;
-                $in      = $log['in'] ?? '';
-                $out     = $log['out'] ?? '';
-                $status  = $log['status'] ?? '';
+                $log = $mapLog[$e['id']][$tanggal] ?? null;
+                $in = $log['in'] ?? '';
+                $out = $log['out'] ?? '';
+                $status = $log['status'] ?? '';
 
                 if (($dayName === 'Sun' || in_array($tanggal, $tanggalBigDay)) && empty($in)) {
                     $total['libur']++;
@@ -2389,17 +2393,17 @@ class Attendance extends BaseController
     public function exportExcelPresensiKaryawanBulanan()
     {
         $startDate = formatDMYtoYMD($this->request->getVar('start_date'));
-        $endDate   = formatDMYtoYMD($this->request->getVar('end_date'));
+        $endDate = formatDMYtoYMD($this->request->getVar('end_date'));
         $employeeId = $this->request->getVar('employee_id');
 
         // ambil data employees
         $condition = [
             "employees.company_id" => $this->this_company_id,
-            "employees.deletedAt"  => null,
+            "employees.deletedAt" => null,
         ];
         $addCondition = [
             "divisi_id" => $this->request->getVar('divisi_id'),
-            "tipe"      => $this->request->getVar('tipe'),
+            "tipe" => $this->request->getVar('tipe'),
             "bagian_id" => $this->request->getVar("bagian_id"),
             'employee_id' => $employeeId == 'null' || $employeeId == '' ? '' : $employeeId
         ];
@@ -2411,9 +2415,9 @@ class Attendance extends BaseController
             ->first();
         $jamKerjaTerlambat = $jamKerja != null ? $jamKerja['jam_terlambat'] . ":00" : "08:15:00";
 
-        $employees    = $this->EmployeesModel->getEmployeeListAttendances($condition, $addCondition, 0, 10000000);
+        $employees = $this->EmployeesModel->getEmployeeListAttendances($condition, $addCondition, 0, 10000000);
         $employeeData = $employees['data'];
-        $employeeIds  = array_column($employeeData, 'id');
+        $employeeIds = array_column($employeeData, 'id');
 
         // mapping keterangan 
         $attendanceKeterangan = !empty($employeeIds) ? $this->AttendanceKeteranganModel->getKeteranganByDateRangeAmt(
@@ -2438,12 +2442,12 @@ class Attendance extends BaseController
         foreach ($logData as $l) {
             $reason = $l['reason'];
             if ($reason == '') {
-                $reason = $mapAttendanceKeterangan[$l['employee_id']][$l['periode']]['reason']  ?? '';
+                $reason = $mapAttendanceKeterangan[$l['employee_id']][$l['periode']]['reason'] ?? '';
             }
 
             $mapLog[$l['employee_id']][$l['periode']] = [
-                'in'     => $l['checkin'],
-                'out'    => $l['checkout'],
+                'in' => $l['checkin'],
+                'out' => $l['checkout'],
                 'status' => $l['status'],
                 'reason' => $reason
             ];
@@ -2526,11 +2530,11 @@ class Attendance extends BaseController
             while ($dateLoop <= $endDate) {
 
                 $tanggal = $dateLoop;
-                $dayLog  = $mapLog[$e['id']][$tanggal] ?? null;
+                $dayLog = $mapLog[$e['id']][$tanggal] ?? null;
 
-                $denda = (float)($mapDendaKeterlambatan[$e['id']][$tanggal]['nominal'] ?? 0);
+                $denda = (float) ($mapDendaKeterlambatan[$e['id']][$tanggal]['nominal'] ?? 0);
 
-                $in  = $dayLog['in'] ?? '';
+                $in = $dayLog['in'] ?? '';
                 $out = $dayLog['out'] ?? '';
                 $status = $dayLog['status'] ?? '';
                 $reason = $dayLog['reason'] ?? '';
@@ -2547,7 +2551,7 @@ class Attendance extends BaseController
                     if ($reason != '' && $reason != '-') {
                         $parts = explode('-', $reason, 2);
 
-                        $ketIn  = trim($parts[0] ?? '');
+                        $ketIn = trim($parts[0] ?? '');
                         $ketOut = trim($parts[1] ?? '');
                     }
                 }
@@ -2573,20 +2577,20 @@ class Attendance extends BaseController
                         );
                     }
 
-                    $lembur = (float)$selisih['jam'] . " Jam, " . $selisih['menit'] . " Menit";
+                    $lembur = (float) $selisih['jam'] . " Jam, " . $selisih['menit'] . " Menit";
                 }
 
                 // uang makan
-                $uangMakan = (float)($mapUangMakanHarian[$e['id']][$tanggal]['nominal'] ?? 0);
+                $uangMakan = (float) ($mapUangMakanHarian[$e['id']][$tanggal]['nominal'] ?? 0);
                 if (in_array($e['divisi'], ["BULANAN", "KANTOR"])) {
                     // khusus departemen kantor & bulanan aja kasih tanda is_terlambat, yang lain mengabaikan keterlambatan
                     if (($reason == '' || $reason == '-') && $this->is_format_waktu($in) && $status == "HADIR_H") {
-                        $isTerlambat =  $this->is_terlambat($jamKerjaTerlambat, $in);
+                        $isTerlambat = $this->is_terlambat($jamKerjaTerlambat, $in);
                     } else {
                         $isTerlambat = false;
                     }
                 } else {
-                    $isTerlambat =  false;
+                    $isTerlambat = false;
                 }
 
                 // isi row
@@ -2613,13 +2617,13 @@ class Attendance extends BaseController
                     $sheet->getStyleByColumnAndRow(3, $row)->applyFromArray([
                         'font' => [
                             'color' => ['rgb' => 'FF0000'], // merah
-                            'bold'  => true
+                            'bold' => true
                         ]
                     ]);
                     $sheet->getStyleByColumnAndRow(4, $row)->applyFromArray([
                         'font' => [
                             'color' => ['rgb' => 'FF0000'], // merah
-                            'bold'  => true
+                            'bold' => true
                         ]
                     ]);
                 }
@@ -2650,11 +2654,11 @@ class Attendance extends BaseController
     public function exportTriwulanPresensi()
     {
         $startMonth = $this->request->getVar('start_month');
-        $endMonth   = $this->request->getVar('end_month');
-        $divisiId   = $this->request->getVar('divisi_id');
+        $endMonth = $this->request->getVar('end_month');
+        $divisiId = $this->request->getVar('divisi_id');
 
         $startDateTime = DateTime::createFromFormat('Y-m', $startMonth);
-        $endDateTime   = DateTime::createFromFormat('Y-m', $endMonth);
+        $endDateTime = DateTime::createFromFormat('Y-m', $endMonth);
 
         if ($startDateTime > $endDateTime) {
             return redirect()->back()->with('error', 'Selesai Bulan tidak boleh lebih kecil dari mulai Bulan.');
@@ -2666,7 +2670,7 @@ class Attendance extends BaseController
         $middleMonthDt->modify('+1 month');
         $middleMonth = $middleMonthDt->format('Y-m');
 
-        $divisi  = $this->DivisiModel->where('id', $divisiId)->first();
+        $divisi = $this->DivisiModel->where('id', $divisiId)->first();
         $company = $this->CompanyModel->where('id', $this->this_company_id)->first();
 
         $data = $this->AttendanceModel->getTriwulan(
@@ -2677,11 +2681,11 @@ class Attendance extends BaseController
 
         $data = [
             'middleMonth' => $middleMonth,
-            'startMonth'  => $startMonth,
-            'endMonth'    => $endMonth,
-            'unit'        => $company, // contoh, bisa ambil dari DB
-            'divisi'      => $divisi,
-            'data'        => $data
+            'startMonth' => $startMonth,
+            'endMonth' => $endMonth,
+            'unit' => $company, // contoh, bisa ambil dari DB
+            'divisi' => $divisi,
+            'data' => $data
         ];
 
         // ✅ Mulai bikin Excel
@@ -2785,22 +2789,22 @@ class Attendance extends BaseController
     public function exportExcelPresensiHarian()
     {
         $startDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('start_date'))));
-        $endDate   = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('end_date'))));
+        $endDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('end_date'))));
 
         // ambil data employees
         $condition = [
             "employees.company_id" => $this->this_company_id,
-            "employees.deletedAt"  => null,
+            "employees.deletedAt" => null,
         ];
         $addCondition = [
-            "divisi_id"   => $this->request->getVar('divisi_id'),
-            "tipe"        => $this->request->getVar('tipe'),
+            "divisi_id" => $this->request->getVar('divisi_id'),
+            "tipe" => $this->request->getVar('tipe'),
             "employee_id" => $this->request->getVar("employee_id"),
             "bagian_id" => $this->request->getVar("bagian_id")
         ];
-        $employees    = $this->EmployeesModel->getEmployeeListAttendances($condition, $addCondition, 0, 10000000);
+        $employees = $this->EmployeesModel->getEmployeeListAttendances($condition, $addCondition, 0, 10000000);
         $employeeData = $employees['data'];
-        $employeeIds  = array_column($employeeData, 'id');
+        $employeeIds = array_column($employeeData, 'id');
 
         // log attendance
         $logData = !empty($employeeIds)
@@ -2820,8 +2824,8 @@ class Attendance extends BaseController
                 $status = $l['status'] != null ? explode("_", $l['status'])[1] : "";
             }
             $mapLog[$l['employee_id']][$l['periode']] = [
-                'in'     => $l['checkin'],
-                'out'    => $l['checkout'],
+                'in' => $l['checkin'],
+                'out' => $l['checkout'],
                 'status' => $status,
                 'reason' => $l['reason']
             ];
@@ -2929,14 +2933,14 @@ class Attendance extends BaseController
             // isi data per karyawan
             $no = 1;
             foreach ($employeeData as $emp) {
-                $nip    = $emp['nip'] ?? '';
-                $nama   = $emp['name'] ?? '';
+                $nip = $emp['nip'] ?? '';
+                $nama = $emp['name'] ?? '';
                 $divisi = $emp['divisi'] ?? '';
                 $bagian = $emp['bagian'] ?? '';
                 $reason = $mapLog[$emp['id']][$tgl]['reason'] ?? '';
 
-                $in     = $mapLog[$emp['id']][$tgl]['in'] ?? '';
-                $out    = $mapLog[$emp['id']][$tgl]['out'] ?? '';
+                $in = $mapLog[$emp['id']][$tgl]['in'] ?? '';
+                $out = $mapLog[$emp['id']][$tgl]['out'] ?? '';
                 $status = $mapLog[$emp['id']][$tgl]['status'] ?? '';
                 $uangMakan = $mapUangMakanHarian[$emp['id']][$tgl]['nominal'] ?? 0;
                 $uangDendaKeterlambatan = $mapDendaKeterlambatan[$emp['id']][$tgl]['nominal'] ?? 0;
@@ -2949,7 +2953,7 @@ class Attendance extends BaseController
                         $formLembur['jam_mulai_lembur'],
                         $formLembur['jam_selesai_lembur']
                     );
-                    $totalJamLembur = (float)$waktuSelisihPulangLembur['jam'] . " Jam, " . $waktuSelisihPulangLembur['menit'] . " Menit";
+                    $totalJamLembur = (float) $waktuSelisihPulangLembur['jam'] . " Jam, " . $waktuSelisihPulangLembur['menit'] . " Menit";
                 }
 
                 if ($reason == '') {
@@ -3036,21 +3040,21 @@ class Attendance extends BaseController
                 // Hitung total status per karyawan
                 if (!isset($rekapKaryawan[$emp['id']])) {
                     $rekapKaryawan[$emp['id']] = [
-                        'nip'            => $nip,
-                        'nama'           => $nama,
-                        'hadir'          => 0,
-                        'alpa'           => 0,
-                        'libur'          => 0,
-                        'cuti_tahunan'   => 0,
-                        'cuti_haid'      => 0,
-                        'cuti_hamil'     => 0,
+                        'nip' => $nip,
+                        'nama' => $nama,
+                        'hadir' => 0,
+                        'alpa' => 0,
+                        'libur' => 0,
+                        'cuti_tahunan' => 0,
+                        'cuti_haid' => 0,
+                        'cuti_hamil' => 0,
                         'cuti_melahirkan' => 0,
-                        'ijin'           => 0,
-                        'sakit'          => 0,
-                        'rl'             => 0,
-                        'dinas'          => 0,
+                        'ijin' => 0,
+                        'sakit' => 0,
+                        'rl' => 0,
+                        'dinas' => 0,
                         'cuti_keguguran' => 0,
-                        'potong_gaji'   => 0
+                        'potong_gaji' => 0
                     ];
                 }
 
@@ -3194,7 +3198,7 @@ class Attendance extends BaseController
 
 
             if ($checkInTimestamp > $jamTerlambatTimestamp) {
-                $result  = "Terlambat";
+                $result = "Terlambat";
             } else {
                 $result = "Tepat Waktu";
             }
@@ -3206,13 +3210,13 @@ class Attendance extends BaseController
     static function getDayIndonesia($day)
     {
         $translations = [
-            'Sunday'    => 'Minggu',
-            'Monday'    => 'Senin',
-            'Tuesday'   => 'Selasa',
+            'Sunday' => 'Minggu',
+            'Monday' => 'Senin',
+            'Tuesday' => 'Selasa',
             'Wednesday' => 'Rabu',
-            'Thursday'  => 'Kamis',
-            'Friday'    => 'Jumat',
-            'Saturday'  => 'Sabtu',
+            'Thursday' => 'Kamis',
+            'Friday' => 'Jumat',
+            'Saturday' => 'Sabtu',
         ];
 
         return isset($translations[$day]) ? $translations[$day] : $day;
@@ -3255,7 +3259,7 @@ class Attendance extends BaseController
 
             $attendanceUnitId = $this->request->getVar('attendances_unit_id');
             $startDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('start_date_unit'))));
-            $endDate   = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('end_date_unit'))));
+            $endDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('end_date_unit'))));
 
             $dataFromFinger = $this->AttendancesApi->get_sync_attendance(
                 $attendanceUnitId
@@ -3276,7 +3280,7 @@ class Attendance extends BaseController
 
             // Konversi start & end ke datetime (biar full range harian)
             $startDateTime = date('Y-m-d 00:00:00', strtotime($startDate));
-            $endDateTime   = date('Y-m-d 23:59:59', strtotime($endDate));
+            $endDateTime = date('Y-m-d 23:59:59', strtotime($endDate));
 
             // Filter dataAttendance berdasarkan date_create
             $filteredData = array_filter($dataAttendance, function ($item) use ($startDateTime, $endDateTime) {
@@ -3324,7 +3328,7 @@ class Attendance extends BaseController
 
             $attendanceUnitId = $this->request->getVar('attendances_unit_id');
             $startDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('start_date_unit'))));
-            $endDate   = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('end_date_unit'))));
+            $endDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('end_date_unit'))));
 
             // Ambil data dari mesin finger
             $dataFromFinger = $this->AttendancesApi->get_sync_attendance($attendanceUnitId);
@@ -3342,7 +3346,7 @@ class Attendance extends BaseController
 
             // Buat range datetime lengkap
             $startDateTime = $startDate . " 00:00:00";
-            $endDateTime   = $endDate . " 23:59:59";
+            $endDateTime = $endDate . " 23:59:59";
 
             // Filter data dari mesin finger sesuai rentang tanggal
             $filteredData = array_filter($dataAttendance, function ($item) use ($startDateTime, $endDateTime) {
@@ -3486,7 +3490,7 @@ class Attendance extends BaseController
         try {
 
             $startDate = formatDMYtoYMD($this->request->getVar('start_date'));
-            $endDate   = formatDMYtoYMD($this->request->getVar('end_date'));
+            $endDate = formatDMYtoYMD($this->request->getVar('end_date'));
 
             // ===============================
             // CEK KONEKSI INTERNAL
@@ -3503,8 +3507,8 @@ class Attendance extends BaseController
 
                 return response()->setJSON([
                     'message' => 'Gagal koneksi ke database INTERNAL: ' . $e->getMessage(),
-                    'token'   => csrf_hash(),
-                    'status'  => false
+                    'token' => csrf_hash(),
+                    'status' => false
                 ]);
             }
 
@@ -3525,8 +3529,8 @@ class Attendance extends BaseController
             if (empty($internalData)) {
                 return response()->setJSON([
                     'message' => 'Data absensi internal belum ada',
-                    'token'   => csrf_hash(),
-                    'status'  => false
+                    'token' => csrf_hash(),
+                    'status' => false
                 ]);
             }
 
@@ -3563,18 +3567,18 @@ class Attendance extends BaseController
 
                     // ===== INSERT BARU =====
                     $insertData[] = [
-                        'company_id'        => $row['company_id'],
-                        'division_id'       => $row['division_id'],
-                        'employee_id'       => $row['employee_id'],
-                        'periode'           => $row['periode'],
-                        'checkin'           => $row['checkin'],
-                        'checkout'          => $row['checkout'],
-                        'status'            => $row['status'],
-                        'reason'            => $row['reason'],
-                        'year_month'        => $row['year_month'],
-                        'isApproved'        => $row['isApproved'],
-                        'abaikan_sync_log'  => $row['abaikan_sync_log'],
-                        'sync_status'       => 'AUTO',
+                        'company_id' => $row['company_id'],
+                        'division_id' => $row['division_id'],
+                        'employee_id' => $row['employee_id'],
+                        'periode' => $row['periode'],
+                        'checkin' => $row['checkin'],
+                        'checkout' => $row['checkout'],
+                        'status' => $row['status'],
+                        'reason' => $row['reason'],
+                        'year_month' => $row['year_month'],
+                        'isApproved' => $row['isApproved'],
+                        'abaikan_sync_log' => $row['abaikan_sync_log'],
+                        'sync_status' => 'AUTO',
                     ];
                 } else {
 
@@ -3582,17 +3586,17 @@ class Attendance extends BaseController
                     if ($existing[$key]['sync_status'] === 'AUTO') {
 
                         $updateData[] = [
-                            'company_id'        => $row['company_id'],
-                            'employee_id'       => $row['employee_id'],
-                            'periode'           => $row['periode'],
-                            'division_id'       => $row['division_id'],
-                            'checkin'           => $row['checkin'],
-                            'checkout'          => $row['checkout'],
-                            'status'            => $row['status'],
-                            'reason'            => $row['reason'],
-                            'year_month'        => $row['year_month'],
-                            'isApproved'        => $row['isApproved'],
-                            'abaikan_sync_log'  => $row['abaikan_sync_log'],
+                            'company_id' => $row['company_id'],
+                            'employee_id' => $row['employee_id'],
+                            'periode' => $row['periode'],
+                            'division_id' => $row['division_id'],
+                            'checkin' => $row['checkin'],
+                            'checkout' => $row['checkout'],
+                            'status' => $row['status'],
+                            'reason' => $row['reason'],
+                            'year_month' => $row['year_month'],
+                            'isApproved' => $row['isApproved'],
+                            'abaikan_sync_log' => $row['abaikan_sync_log'],
                         ];
                     }
                 }
@@ -3615,15 +3619,15 @@ class Attendance extends BaseController
 
             return response()->setJSON([
                 'message' => 'Sinkronisasi berhasil',
-                'token'   => csrf_hash(),
-                'status'  => true
+                'token' => csrf_hash(),
+                'status' => true
             ]);
         } catch (\Throwable $e) {
 
             return response()->setJSON([
                 'message' => $e->getMessage(),
-                'token'   => csrf_hash(),
-                'status'  => false
+                'token' => csrf_hash(),
+                'status' => false
             ]);
         }
     }

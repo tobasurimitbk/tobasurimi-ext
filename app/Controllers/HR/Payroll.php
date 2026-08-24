@@ -67,6 +67,10 @@ class Payroll extends BaseController
         $this->uangMakanHarianModel = new UangMakanHarianModel();
         $this->tunjanganModel = new TunjanganModel();
         $this->dendaAbsenHarianModel = new DendaAbsenHarianModel();
+
+        // set groub by
+        $db = \Config\Database::connect();
+        $db->query("SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
     }
 
     public function index()
@@ -84,10 +88,10 @@ class Payroll extends BaseController
     public function all()
     {
         $payload = [
-            "pageSize"      => $this->request->getGet("length"),
-            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType"),
+            "pageSize" => $this->request->getGet("length"),
+            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType"),
         ];
 
         $condition = [
@@ -97,12 +101,12 @@ class Payroll extends BaseController
         ];
 
         $addCondition = [
-            "divisi_id"          => $this->request->getGet("divisi_id"),
-            "bagian_id"          => $this->request->getGet("bagian_id"),
-            "employee_id"        => $this->request->getGet("employee_id"),
-            "tipe"               => json_decode($this->request->getGet("golongan"), true) ?? [],
-            "sort"               => $this->request->getGet("sort"),
-            "sortType"           => $this->request->getGet("sortType")
+            "divisi_id" => $this->request->getGet("divisi_id"),
+            "bagian_id" => $this->request->getGet("bagian_id"),
+            "employee_id" => $this->request->getGet("employee_id"),
+            "tipe" => json_decode($this->request->getGet("golongan"), true) ?? [],
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType")
         ];
 
         $limit = $this->request->getGet("length");
@@ -120,13 +124,13 @@ class Payroll extends BaseController
                 "employee_id" => $p->employee_id,
                 "nip" => $p->nip,
                 "namaBagian" => $p->nama_bagian,
-                "name"  => $p->name,
+                "name" => $p->name,
                 "divisi" => $p->divisi,
                 "hariKerja" => $p->hadir_final . " Hari",
                 "startDate" => date('d/m/Y', strtotime($p->start_date)),
                 "endDate" => date('d/m/Y', strtotime($p->end_date)),
                 "upahBersih" => $p->nominal_uang_gaji,
-                "totalLembur" =>  $p->nominal_uang_lembur,
+                "totalLembur" => $p->nominal_uang_lembur,
                 "totalGajiLembur" => $p->nominal_uang_gaji + $p->nominal_uang_lembur,
                 "totalPenguranganGaji" => $p->nominal_pengurangan_gaji,
                 "sisaGaji" => $p->nominal_gaji_diterima
@@ -134,11 +138,11 @@ class Payroll extends BaseController
         }
 
         $data = [
-            "draw"              => intval($this->request->getGet("draw")),
-            "recordsTotal"      => $payrollData['totalData'],
-            "recordsFiltered"   => $payrollData['totalFilteredData'],
-            "data"              => $dataPayRolls,
-            "payload"           => $payload,
+            "draw" => intval($this->request->getGet("draw")),
+            "recordsTotal" => $payrollData['totalData'],
+            "recordsFiltered" => $payrollData['totalFilteredData'],
+            "data" => $dataPayRolls,
+            "payload" => $payload,
             'test' => $addCondition
         ];
 
@@ -163,8 +167,8 @@ class Payroll extends BaseController
             if ($totalAbsensi == 0) {
                 return response()->setJSON([
                     'message' => "Data absensi bulan " . $yearMonth . " tidak ada",
-                    'status'  => false,
-                    'token'   => csrf_hash()
+                    'status' => false,
+                    'token' => csrf_hash()
                 ]);
             }
 
@@ -182,8 +186,8 @@ class Payroll extends BaseController
                 $db->transRollback();
                 return response()->setJSON([
                     'message' => "Data karyawan tidak ditemukan",
-                    'status'  => false,
-                    'token'   => csrf_hash()
+                    'status' => false,
+                    'token' => csrf_hash()
                 ]);
             }
 
@@ -204,7 +208,7 @@ class Payroll extends BaseController
 
             // Mapping divisi
             $divisiList = $this->employeeModel->getDivisiByEmployeeAmt($employeeIds);
-            $mapDivisi  = [];
+            $mapDivisi = [];
             foreach ($divisiList as $d) {
                 $mapDivisi[$d['id']] = $d['division_id'];
             }
@@ -221,17 +225,17 @@ class Payroll extends BaseController
                 $empId = $s['employee_id'];
                 if (!isset($mapStatusAttendance[$empId])) {
                     $mapStatusAttendance[$empId] = [
-                        'CUTI TAHUNAN_CT'   => 0,
-                        'CUTI HAID_CHD'     => 0,
-                        'CUTI HAMIL_CHL'    => 0,
+                        'CUTI TAHUNAN_CT' => 0,
+                        'CUTI HAID_CHD' => 0,
+                        'CUTI HAMIL_CHL' => 0,
                         'CUTI MELAHIRKAN_CM' => 0,
-                        'POTONG GAJI_PG'    => 0,
-                        'SAKIT_S'           => 0,
-                        'RL_RL'             => 0,
-                        'HADIR_H'           => 0,
-                        'LIBUR_L'           => 0,
-                        'ALPHA_A'           => 0,
-                        'DINAS_D'           => 0,
+                        'POTONG GAJI_PG' => 0,
+                        'SAKIT_S' => 0,
+                        'RL_RL' => 0,
+                        'HADIR_H' => 0,
+                        'LIBUR_L' => 0,
+                        'ALPHA_A' => 0,
+                        'DINAS_D' => 0,
                         'CUTI KEGUGURAN_CKG' => 0,
                         'IJIN_I' => 0,
                         'OFF_OFF' => 0
@@ -251,37 +255,37 @@ class Payroll extends BaseController
                 $att = $mapStatusAttendance[$e] ?? [];
 
                 $dataPayroll[] = [
-                    "company_id"                   => $this->this_company_id,
-                    "employee_id"                  => $e,
-                    "division_id"                  => $mapDivisi[$e],
-                    "year_month"                   => $yearMonth,
-                    "cuti_tahunan"                 => $att["CUTI TAHUNAN_CT"] ?? 0,
-                    "cuti_haid"                    => $att["CUTI HAID_CHD"] ?? 0,
-                    "cuti_hamil"                   => $att["CUTI HAMIL_CHL"] ?? 0,
-                    "cuti_melahirkan"              => $att["CUTI MELAHIRKAN_CM"] ?? 0,
-                    "pg"                           => $att["POTONG GAJI_PG"] ?? 0,
-                    "izin"                         => $att["IJIN_I"] ?? 0,
-                    "sakit"                        => $att["SAKIT_S"] ?? 0,
-                    "rl"                           => $att["RL_RL"] ?? 0,
-                    "hadir"                        => $att["HADIR_H"] ?? 0,
-                    "libur"                        => $att["LIBUR_L"] ?? 0,
-                    "alpha"                        => $att["ALPHA_A"] ?? 0,
-                    "dinas"                        => $att["DINAS_D"] ?? 0,
-                    "cuti_keguguran"               => $att["CUTI KEGUGURAN_CKG"] ?? 0,
-                    "off"                          => $att['OFF_OFF'] ?? 0,
-                    "hadir_final"                  => 0,
+                    "company_id" => $this->this_company_id,
+                    "employee_id" => $e,
+                    "division_id" => $mapDivisi[$e],
+                    "year_month" => $yearMonth,
+                    "cuti_tahunan" => $att["CUTI TAHUNAN_CT"] ?? 0,
+                    "cuti_haid" => $att["CUTI HAID_CHD"] ?? 0,
+                    "cuti_hamil" => $att["CUTI HAMIL_CHL"] ?? 0,
+                    "cuti_melahirkan" => $att["CUTI MELAHIRKAN_CM"] ?? 0,
+                    "pg" => $att["POTONG GAJI_PG"] ?? 0,
+                    "izin" => $att["IJIN_I"] ?? 0,
+                    "sakit" => $att["SAKIT_S"] ?? 0,
+                    "rl" => $att["RL_RL"] ?? 0,
+                    "hadir" => $att["HADIR_H"] ?? 0,
+                    "libur" => $att["LIBUR_L"] ?? 0,
+                    "alpha" => $att["ALPHA_A"] ?? 0,
+                    "dinas" => $att["DINAS_D"] ?? 0,
+                    "cuti_keguguran" => $att["CUTI KEGUGURAN_CKG"] ?? 0,
+                    "off" => $att['OFF_OFF'] ?? 0,
+                    "hadir_final" => 0,
                     "total_perizinan_not_approved" => 0,
-                    "total_perizinan_approved"     => 0,
-                    "nominal_cadangan"             => 0,
-                    "nominal_gaji_harian"          => 0,
-                    "nominal_pinjaman_karyawan"    => 0,
-                    "nominal_uang_gaji"            => 0,
-                    "nominal_uang_lembur"          => 0,
-                    "nominal_pengurangan_gaji"     => 0,
-                    "nominal_gaji_diterima"        => 0,
-                    "nominal_penambahan_gaji"      => 0,
-                    "start_date"                   => $startDate,
-                    "end_date"                     => $endDate
+                    "total_perizinan_approved" => 0,
+                    "nominal_cadangan" => 0,
+                    "nominal_gaji_harian" => 0,
+                    "nominal_pinjaman_karyawan" => 0,
+                    "nominal_uang_gaji" => 0,
+                    "nominal_uang_lembur" => 0,
+                    "nominal_pengurangan_gaji" => 0,
+                    "nominal_gaji_diterima" => 0,
+                    "nominal_penambahan_gaji" => 0,
+                    "start_date" => $startDate,
+                    "end_date" => $endDate
                 ];
             }
 
@@ -465,17 +469,17 @@ class Payroll extends BaseController
             $db->transCommit();
 
             return response()->setJSON([
-                'token'   => csrf_hash(),
+                'token' => csrf_hash(),
                 'message' => "Generate payroll sukses",
-                'status'  => true
+                'status' => true
             ]);
         } catch (Exception $e) {
             $db->transRollback();
 
             return response()->setJSON([
                 'message' => $e->getMessage() . " at " . $e->getFile() . " in line " . $e->getLine(),
-                'status'  => false,
-                'token'   => csrf_hash()
+                'status' => false,
+                'token' => csrf_hash()
             ]);
         }
     }
@@ -486,9 +490,9 @@ class Payroll extends BaseController
         $db->transBegin();
 
         try {
-            $yearMonth       = $this->request->getVar('yearMonth');
-            $startDate       = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('startDate'))));
-            $endDate         = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('finishDate'))));
+            $yearMonth = $this->request->getVar('yearMonth');
+            $startDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('startDate'))));
+            $endDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('finishDate'))));
             $divisionGlobalID = $this->request->getVar('divisionGlobalID');
 
             // Cek absensi
@@ -504,8 +508,8 @@ class Payroll extends BaseController
                 $db->transRollback();
                 return response()->setJSON([
                     'message' => "Data absensi bulan " . $yearMonth . " tidak ada",
-                    'status'  => false,
-                    'token'   => csrf_hash()
+                    'status' => false,
+                    'token' => csrf_hash()
                 ]);
             }
 
@@ -533,8 +537,8 @@ class Payroll extends BaseController
                 $db->transRollback();
                 return response()->setJSON([
                     'message' => "Data karyawan tidak ditemukan",
-                    'status'  => false,
-                    'token'   => csrf_hash()
+                    'status' => false,
+                    'token' => csrf_hash()
                 ]);
             }
 
@@ -554,7 +558,7 @@ class Payroll extends BaseController
 
             // Mapping divisi
             $divisiList = $this->employeeModel->getDivisiByEmployeeAmt($employeeIds);
-            $mapDivisi  = [];
+            $mapDivisi = [];
             foreach ($divisiList as $d) {
                 $mapDivisi[$d['id']] = $d['division_id'];
             }
@@ -571,17 +575,17 @@ class Payroll extends BaseController
                 $empId = $s['employee_id'];
                 if (!isset($mapStatusAttendance[$empId])) {
                     $mapStatusAttendance[$empId] = [
-                        'CUTI TAHUNAN_CT'   => 0,
-                        'CUTI HAID_CHD'     => 0,
-                        'CUTI HAMIL_CHL'    => 0,
+                        'CUTI TAHUNAN_CT' => 0,
+                        'CUTI HAID_CHD' => 0,
+                        'CUTI HAMIL_CHL' => 0,
                         'CUTI MELAHIRKAN_CM' => 0,
-                        'POTONG GAJI_PG'            => 0,
-                        'SAKIT_S'           => 0,
-                        'RL_RL'             => 0,
-                        'HADIR_H'           => 0,
-                        'LIBUR_L'           => 0,
-                        'ALPHA_A'           => 0,
-                        'DINAS_D'           => 0,
+                        'POTONG GAJI_PG' => 0,
+                        'SAKIT_S' => 0,
+                        'RL_RL' => 0,
+                        'HADIR_H' => 0,
+                        'LIBUR_L' => 0,
+                        'ALPHA_A' => 0,
+                        'DINAS_D' => 0,
                         'CUTI KEGUGURAN_CKG' => 0,
                         'OFF_OFF' => 0,
                         'IJIN_I' => 0
@@ -600,37 +604,37 @@ class Payroll extends BaseController
                 $att = $mapStatusAttendance[$e] ?? [];
 
                 $dataPayroll[] = [
-                    "company_id"                   => $this->this_company_id,
-                    "employee_id"                  => $e,
-                    "division_id"                  => $mapDivisi[$e],
-                    "year_month"                   => $yearMonth,
-                    "cuti_tahunan"                 => $att["CUTI TAHUNAN_CT"] ?? 0,
-                    "cuti_haid"                    => $att["CUTI HAID_CHD"] ?? 0,
-                    "cuti_hamil"                   => $att["CUTI HAMIL_CHL"] ?? 0,
-                    "cuti_melahirkan"              => $att["CUTI MELAHIRKAN_CM"] ?? 0,
-                    "pg"                         => $att["POTONG GAJI_PG"] ?? 0,
-                    "izin"                           => $att["IJIN_I"] ?? 0,
-                    "sakit"                        => $att["SAKIT_S"] ?? 0,
-                    "rl"                           => $att["RL_RL"] ?? 0,
-                    "hadir"                        => $att["HADIR_H"] ?? 0,
-                    "libur"                        => $att["LIBUR_L"] ?? 0,
-                    "alpha"                        => $att["ALPHA_A"] ?? 0,
-                    "dinas"                        => $att["DINAS_D"] ?? 0,
-                    "cuti_keguguran"               => $att["CUTI KEGUGURAN_CKG"] ?? 0,
-                    "off"                          => $att['OFF_OFF'] ?? 0,
-                    "hadir_final"                  => 0,
+                    "company_id" => $this->this_company_id,
+                    "employee_id" => $e,
+                    "division_id" => $mapDivisi[$e],
+                    "year_month" => $yearMonth,
+                    "cuti_tahunan" => $att["CUTI TAHUNAN_CT"] ?? 0,
+                    "cuti_haid" => $att["CUTI HAID_CHD"] ?? 0,
+                    "cuti_hamil" => $att["CUTI HAMIL_CHL"] ?? 0,
+                    "cuti_melahirkan" => $att["CUTI MELAHIRKAN_CM"] ?? 0,
+                    "pg" => $att["POTONG GAJI_PG"] ?? 0,
+                    "izin" => $att["IJIN_I"] ?? 0,
+                    "sakit" => $att["SAKIT_S"] ?? 0,
+                    "rl" => $att["RL_RL"] ?? 0,
+                    "hadir" => $att["HADIR_H"] ?? 0,
+                    "libur" => $att["LIBUR_L"] ?? 0,
+                    "alpha" => $att["ALPHA_A"] ?? 0,
+                    "dinas" => $att["DINAS_D"] ?? 0,
+                    "cuti_keguguran" => $att["CUTI KEGUGURAN_CKG"] ?? 0,
+                    "off" => $att['OFF_OFF'] ?? 0,
+                    "hadir_final" => 0,
                     "total_perizinan_not_approved" => 0,
-                    "total_perizinan_approved"     => 0,
-                    "nominal_cadangan"             => 0,
-                    "nominal_gaji_harian"          => 0,
-                    "nominal_pinjaman_karyawan"    => 0,
-                    "nominal_uang_gaji"            => 0,
-                    "nominal_uang_lembur"          => 0,
-                    "nominal_pengurangan_gaji"     => 0,
-                    "nominal_gaji_diterima"        => 0,
-                    "nominal_penambahan_gaji"      => 0,
-                    "start_date"                   => $startDate,
-                    "end_date"                     => $endDate
+                    "total_perizinan_approved" => 0,
+                    "nominal_cadangan" => 0,
+                    "nominal_gaji_harian" => 0,
+                    "nominal_pinjaman_karyawan" => 0,
+                    "nominal_uang_gaji" => 0,
+                    "nominal_uang_lembur" => 0,
+                    "nominal_pengurangan_gaji" => 0,
+                    "nominal_gaji_diterima" => 0,
+                    "nominal_penambahan_gaji" => 0,
+                    "start_date" => $startDate,
+                    "end_date" => $endDate
                 ];
             }
 
@@ -813,17 +817,17 @@ class Payroll extends BaseController
             $db->transCommit();
 
             return response()->setJSON([
-                'token'   => csrf_hash(),
+                'token' => csrf_hash(),
                 'message' => "Generate payroll sukses",
-                'status'  => true
+                'status' => true
             ]);
         } catch (Exception $e) {
             $db->transRollback();
 
             return response()->setJSON([
                 'message' => $e->getMessage() . " at " . $e->getFile() . " in line " . $e->getLine(),
-                'status'  => false,
-                'token'   => csrf_hash()
+                'status' => false,
+                'token' => csrf_hash()
             ]);
         }
     }
@@ -890,7 +894,7 @@ class Payroll extends BaseController
             for ($i = 0; $i < count($komponenGajiId); $i++) {
                 array_push($mapKomponenGaji, [
                     'id' => $komponenGajiId[$i],
-                    'nominal' => (float)$nominal[$i]
+                    'nominal' => (float) $nominal[$i]
                 ]);
             }
 
@@ -918,7 +922,7 @@ class Payroll extends BaseController
     {
         $id = $this->request->getVar('rekapKeterlambatanPresensiID');
         $payrollID = $this->request->getVar('payrollID');
-        $nominal =  $this->request->getVar('nominal');
+        $nominal = $this->request->getVar('nominal');
 
         $this->attendanceKeterlambatanModel->update($id, [
             'nominal_pengurangan' => $nominal,
@@ -1003,7 +1007,7 @@ class Payroll extends BaseController
             $payrollDetail['start_date'],
             $payrollDetail['end_date']
         );
-        $company =  $this->companyModel->where('id', $this->this_company_id)->first();
+        $company = $this->companyModel->where('id', $this->this_company_id)->first();
         $tunjanganGajiPokok = $this->tunjanganModel->where('company_id', $this->this_company_id)->where('is_gaji_harian', 1)->where('deletedAt', null)->first();
         $tunjanganCadangan = $this->tunjanganModel->where('company_id', $this->this_company_id)->where('is_cadangan', 1)->where('deletedAt', null)->first();
         $totalPinjamanDiambil = $this->pinjamanKaryawanModel->getTotalPinjamanKaryawanDiambil($payrollDetail['employee_id'], $payrollDetail['year_month']);
