@@ -134,16 +134,16 @@ class Employee extends BaseController
     public function all()
     {
         $payload = [
-            "pageSize"      => $this->request->getGet("length"),
-            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search"        => $this->request->getGet("search"),
-            "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType"),
-            "company_id"    => $this->this_company_id,
+            "pageSize" => $this->request->getGet("length"),
+            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search" => $this->request->getGet("search"),
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType"),
+            "company_id" => $this->this_company_id,
         ];
 
         $condition = [
-            "employees.company_id"  => $this->this_company_id,
+            "employees.company_id" => $this->this_company_id,
             "employees.deletedAt" => null,
             // "divisis.deletedAt" => null,
             // "bagian.deletedAt" => null
@@ -170,28 +170,28 @@ class Employee extends BaseController
         foreach ($dataModel['data'] as $data) {
 
             array_push($dataEmployee, [
-                "no"                    => $no++,
-                "id"                    => encrypt($data->id),
-                "id_text"               => $data->id,
-                "nip"                   => $data->nip,
-                "name"                  => $data->name,
-                "divisionName"          => $data->divisi,
-                "dob"                   => $data->dob == "0000-00-00" ? '-' : date('d/m/Y', strtotime($data->dob)),
-                'attendance_sync'       => $data->attendance_sync,
-                "gender"                => strtoupper($data->gender),
-                "acc_no"                => strtoupper($data->acc_no),
-                "tipe"                  => strtoupper($data->tipe),
-                "status"                => strtoupper($data->status),
-                "bagianName"            => strtoupper($data->nama_bagian)
+                "no" => $no++,
+                "id" => encrypt($data->id),
+                "id_text" => $data->id,
+                "nip" => $data->nip,
+                "name" => $data->name,
+                "divisionName" => $data->divisi,
+                "dob" => $data->dob == "0000-00-00" ? '-' : date('d/m/Y', strtotime($data->dob)),
+                'attendance_sync' => $data->attendance_sync,
+                "gender" => strtoupper($data->gender),
+                "acc_no" => strtoupper($data->acc_no),
+                "tipe" => strtoupper($data->tipe),
+                "status" => strtoupper($data->status),
+                "bagianName" => strtoupper($data->nama_bagian)
             ]);
         }
 
         $data = [
-            "draw"              => intval($this->request->getGet("draw")),
-            "recordsTotal"      => $dataModel['totalData'],
-            "recordsFiltered"   => $dataModel['totalFilteredData'],
-            "data"              => $dataEmployee,
-            "payload"           => $payload
+            "draw" => intval($this->request->getGet("draw")),
+            "recordsTotal" => $dataModel['totalData'],
+            "recordsFiltered" => $dataModel['totalFilteredData'],
+            "data" => $dataEmployee,
+            "payload" => $payload
         ];
 
         return response()->setJSON($data);
@@ -214,8 +214,8 @@ class Employee extends BaseController
         $search = $this->request->getVar('search');
 
         $values = [
-            "company_id"    => $this->this_company_id,
-            "search"        => $search
+            "company_id" => $this->this_company_id,
+            "search" => $search
         ];
 
         $totalRecords = $this->EmployeesModel->total_list(array());
@@ -245,7 +245,7 @@ class Employee extends BaseController
                 "gender" => $res[$i]["gender"],
                 "acc_no" => $res[$i]["acc_no"],
                 "status" => $res[$i]["status"],
-                "tipe" => $res[$i]['tipe'] ==  null ? "-" : $res[$i]['tipe'],
+                "tipe" => $res[$i]['tipe'] == null ? "-" : $res[$i]['tipe'],
                 "bagianName" => ($bagian == null) ? "-" : $bagian['nama_bagian']
             );
         }
@@ -273,7 +273,7 @@ class Employee extends BaseController
                 "gender" => $this->request->getPost("gender"), // required
                 "join_date" => $this->request->getPost("join_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("join_date")))) : "",
                 "dob" => $this->request->getPost("dob") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dob")))) : "",
-                "division_id" =>  decrypt($this->request->getPost("division_id")), // required
+                "division_id" => decrypt($this->request->getPost("division_id")), // required
                 "phone_no" => $this->request->getPost("phone_no") ?? "",
                 "acc_no" => $this->request->getPost("acc_no") ?? "",
                 "email" => $this->request->getPost("email") ?? "",
@@ -289,7 +289,7 @@ class Employee extends BaseController
                 "jabatan_id" => decrypt($this->request->getPost("jabatan_id")) ?? "", // required
                 "bank_name" => $this->request->getPost("bank_name") ?? "",
                 "owner_name" => $this->request->getPost("owner_name") ?? "",
-                "pin"  => $this->request->getPost("pin") ?? "",
+                "pin" => $this->request->getPost("pin") ?? "",
                 "pendidikan" => decrypt($this->request->getPost("pendidikan")) ?? 0,
                 "tipe" => $this->request->getPost('tipe'),
                 "bagian_id" => $this->request->getPost('bagian_id')
@@ -376,7 +376,7 @@ class Employee extends BaseController
                 "gender" => $this->request->getPost("gender"), // required
                 "join_date" => $this->request->getPost("join_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("join_date")))) : "",
                 "dob" => $this->request->getPost("dob") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dob")))) : "",
-                "division_id" =>  decrypt($this->request->getPost("division_id")), // required
+                "division_id" => decrypt($this->request->getPost("division_id")), // required
                 "phone_no" => $this->request->getPost("phone_no") ?? "",
                 "acc_no" => $this->request->getPost("acc_no") ?? "",
                 "email" => $this->request->getPost("email") ?? "",
@@ -392,7 +392,7 @@ class Employee extends BaseController
                 "jabatan_id" => decrypt($this->request->getPost("jabatan_id")) ?? "", // required
                 "bank_name" => $this->request->getPost("bank_name") ?? "",
                 "owner_name" => $this->request->getPost("owner_name") ?? "",
-                "pin"  => $this->request->getPost("pin") ?? "",
+                "pin" => $this->request->getPost("pin") ?? "",
                 "pendidikan" => decrypt($this->request->getPost("pendidikan")) ?? 0,
                 "tipe" => $this->request->getPost('tipe'),
                 "bagian_id" => $this->request->getPost('bagian_id')
@@ -434,8 +434,8 @@ class Employee extends BaseController
                     $this->GajiConjunctionModel->insertBatch($res);
 
                     return response()->setJSON([
-                        "status"    => true,
-                        "message"   => "Data Employee Berhasil Diupdate",
+                        "status" => true,
+                        "message" => "Data Employee Berhasil Diupdate",
                         'token' => csrf_hash()
                     ]);
                 } else {
@@ -477,22 +477,22 @@ class Employee extends BaseController
 
             if ($res) {
                 $data = [
-                    "status"  => true,
-                    "data"  => $res,
+                    "status" => true,
+                    "data" => $res,
                 ];
                 echo json_encode($data);
             } else {
                 $message = 'Data Gagal Ditemukan';
                 $data = [
                     "status" => false,
-                    "message"  => $message
+                    "message" => $message
                 ];
                 echo json_encode($data);
             }
         } else {
             $data = [
-                "status"            => false,
-                "message"    => "Tidak Ada Id"
+                "status" => false,
+                "message" => "Tidak Ada Id"
             ];
             echo json_encode($data);
         }
@@ -513,32 +513,32 @@ class Employee extends BaseController
                 if ($this->EmployeesModel->update($id, $values)) {
                     $this->GajiConjunctionModel->where('employee_id', $id)->delete();
                     $data = [
-                        "status"            => true,
-                        "message"   => "Data Berhasil dihapus",
+                        "status" => true,
+                        "message" => "Data Berhasil dihapus",
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
                 } else {
                     $message = 'Data Gagal Dihapus';
                     $data = [
-                        "status"            => false,
-                        "message"    => $message,
+                        "status" => false,
+                        "message" => $message,
                         'token' => csrf_hash()
                     ];
                     echo json_encode($data);
                 }
             } else {
                 $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Dihapus",
+                    "status" => false,
+                    "message" => "Data Gagal Dihapus",
                     'token' => csrf_hash()
                 ];
                 echo json_encode($data);
             }
         } catch (\Exception $e) {
             $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                "status" => false,
+                "message" => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
                 'token' => csrf_hash()
             ];
             echo json_encode($data);
@@ -565,7 +565,7 @@ class Employee extends BaseController
     public function updateView($id)
     {
         $id = decrypt($id);
-        $data =  $this->EmployeesModel->find($id);
+        $data = $this->EmployeesModel->find($id);
 
         if ($data == null) {
             return redirect()->to('employee');
@@ -665,7 +665,7 @@ class Employee extends BaseController
             }
 
             // TEST FINGER
-            $timeout  = 2;
+            $timeout = 2;
             $timeout = max(1, min(5, $timeout));
             $isAlive = icmpPing($attendanceUnit['ip'], $timeout);
 
@@ -782,7 +782,7 @@ class Employee extends BaseController
 
             // TODO REMOVE DI FINGER
             // TEST FINGER
-            $timeout  = 2;
+            $timeout = 2;
             $timeout = max(1, min(5, $timeout));
             $isAlive = icmpPing($attendanceUnit['ip'], $timeout);
 
@@ -828,10 +828,10 @@ class Employee extends BaseController
     public function allRiwayatPayroll()
     {
         $payload = [
-            "pageSize"      => $this->request->getGet("length"),
-            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType"),
+            "pageSize" => $this->request->getGet("length"),
+            "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType"),
         ];
 
         $condition = [
@@ -840,8 +840,8 @@ class Employee extends BaseController
         ];
 
         $addCondition = [
-            "sort"               => $this->request->getGet("sort"),
-            "sortType"           => $this->request->getGet("sortType")
+            "sort" => $this->request->getGet("sort"),
+            "sortType" => $this->request->getGet("sortType")
         ];
 
         $limit = $this->request->getGet("length");
@@ -864,19 +864,233 @@ class Employee extends BaseController
                 "no" => $no++,
                 "id" => encrypt($p->id),
                 "year_month" => $p->year_month,
-                "nominal_gaji_diterima" => (float)$p->nominal_gaji_diterima,
+                "nominal_gaji_diterima" => (float) $p->nominal_gaji_diterima,
             ]);
         }
 
         $data = [
-            "draw"              => intval($this->request->getGet("draw")),
-            "recordsTotal"      => $payrollData['totalData'],
-            "recordsFiltered"   => $payrollData['totalFilteredData'],
-            "data"              => $dataPayRolls,
-            "payload"           => $payload,
+            "draw" => intval($this->request->getGet("draw")),
+            "recordsTotal" => $payrollData['totalData'],
+            "recordsFiltered" => $payrollData['totalFilteredData'],
+            "data" => $dataPayRolls,
+            "payload" => $payload,
             'test' => $addCondition
         ];
 
         return response()->setJSON($data);
+    }
+
+    public function syncInternalEmployee()
+    {
+        try {
+            // ===============================
+            // Cek koneksi internal
+            // ===============================
+            try {
+                $internalDb = \Config\Database::connect('internal');
+                $internalDb->initialize();
+                if (!$internalDb->connID) {
+                    throw new \Exception('Koneksi ke database INTERNAL gagal sync employee.');
+                }
+            } catch (\Throwable $e) {
+                return response()->setJSON([
+                    'message' => 'Gagal koneksi ke database INTERNAL sync employee: ' . $e->getMessage(),
+                    'token' => csrf_hash(),
+                    'status' => false
+                ]);
+            }
+
+            $externalDb = \Config\Database::connect();
+
+            // ===============================
+            // 1️⃣ Ambil id terakhir dari EXTERNAL
+            // ===============================
+            $lastRow = $externalDb->table('employees')
+                ->selectMax('id', 'max_id')
+                ->get()
+                ->getRowArray();
+
+            $lastIdEmployee = (int) ($lastRow['max_id'] ?? 0);
+
+            // ===============================
+            // 2️⃣ Ambil data baru dari INTERNAL
+            // ===============================
+            $internalData = $internalDb->query(
+                "SELECT * FROM employees WHERE id > ? ORDER BY id ASC",
+                [$lastIdEmployee]
+            )->getResultArray();
+
+            if (empty($internalData)) {
+                return response()->setJSON([
+                    'message' => 'Tidak ada data karyawan internal yang baru',
+                    'token' => csrf_hash(),
+                    'status' => false
+                ]);
+            }
+
+            // ===============================
+            // 3️⃣ Filter yang belum ada di EXTERNAL (company_id + nip)
+            // ===============================
+            $existingRows = $externalDb->table('employees')
+                ->select('company_id, nip')
+                ->get()
+                ->getResultArray();
+
+            $existing = [];
+            foreach ($existingRows as $r) {
+                $existing[$r['company_id'] . '_' . $r['nip']] = true;
+            }
+
+            $newEmployees = [];
+            $newEmployeeIds = [];
+
+            foreach ($internalData as $row) {
+                $key = $row['company_id'] . '_' . $row['nip'];
+                if (isset($existing[$key])) {
+                    continue;
+                }
+                $existing[$key] = true; // cegah duplikat dalam 1 batch
+                $newEmployees[] = $row;
+                $newEmployeeIds[] = $row['id'];
+            }
+
+            if (empty($newEmployees)) {
+                return response()->setJSON([
+                    'message' => 'Tidak ada data karyawan internal yang baru',
+                    'token' => csrf_hash(),
+                    'status' => false
+                ]);
+            }
+
+            // ===============================
+            // 4️⃣ Ambil SEMUA gaji_conjunction SEKALI (bukan N+1)
+            // ===============================
+            $gajiGrouped = [];
+            if (!empty($newEmployeeIds)) {
+                $gajiRows = $internalDb->table('gaji_conjunction')
+                    ->whereIn('employee_id', $newEmployeeIds)
+                    ->get()
+                    ->getResultArray();
+
+                foreach ($gajiRows as $g) {
+                    $gajiGrouped[$g['employee_id']][] = $g;
+                }
+            }
+
+            // Cek existing gaji di external untuk hindari duplikat
+            $existingGaji = [];
+            if (!empty($newEmployeeIds)) {
+                $existingGajiRows = $externalDb->table('gaji_conjunction')
+                    ->select('employee_id, tunjangan_id')
+                    ->whereIn('employee_id', $newEmployeeIds)
+                    ->get()
+                    ->getResultArray();
+
+                foreach ($existingGajiRows as $eg) {
+                    $existingGaji[$eg['employee_id'] . '_' . $eg['tunjangan_id']] = true;
+                }
+            }
+
+            // ===============================
+            // 5️⃣ Susun data insert (employees & gaji_conjunction)
+            // ===============================
+            $insertData = [];
+            $gajiInsertData = [];
+
+            foreach ($newEmployees as $row) {
+                $insertData[] = [
+                    'id' => $row['id'],
+                    'company_id' => $row['company_id'],
+                    'division_id' => $row['division_id'],
+                    'jabatan_id' => $row['jabatan_id'],
+                    'bagian_id' => $row['bagian_id'],
+                    'join_date' => $row['join_date'],
+                    'nik' => $row['nik'],
+                    'nip' => $row['nip'],
+                    'pin' => $row['pin'],
+                    'name' => $row['name'],
+                    'gender' => $row['gender'],
+                    'dob' => $row['dob'],
+                    'phone_no' => $row['phone_no'],
+                    'acc_no' => $row['acc_no'],
+                    'bank_name' => $row['bank_name'],
+                    'owner_name' => $row['owner_name'],
+                    'email' => $row['email'],
+                    'address' => $row['address'],
+                    'province_id' => $row['province_id'],
+                    'city_id' => $row['city_id'],
+                    'postal_code' => $row['postal_code'],
+                    'religion_id' => $row['religion_id'],
+                    'marriage_id' => $row['marriage_id'],
+                    'child' => $row['child'],
+                    'employee_img' => $row['employee_img'],
+                    'status' => $row['status'],
+                    'pendidikan' => $row['pendidikan'],
+                    'attendance_sync' => $row['attendance_sync'],
+                    'tipe' => $row['tipe'],
+                    'createdAt' => $row['createdAt'],
+                    'updatedAt' => $row['updatedAt'],
+                    'deletedAt' => $row['deletedAt'],
+                    'sync_status' => $row['sync_status'],
+                ];
+
+                if (!empty($gajiGrouped[$row['id']])) {
+                    foreach ($gajiGrouped[$row['id']] as $g) {
+                        $gKey = $g['employee_id'] . '_' . $g['tunjangan_id'];
+                        if (isset($existingGaji[$gKey])) {
+                            continue;
+                        }
+                        $existingGaji[$gKey] = true;
+
+                        $gajiInsertData[] = [
+                            'employee_id' => $g['employee_id'],
+                            'tunjangan_id' => $g['tunjangan_id'],
+                            'nominal' => $g['nominal'],
+                        ];
+                    }
+                }
+            }
+
+            // var_dump($insertData, $gajiInsertData);
+            // die;
+
+            // ===============================
+            // 6️⃣ Transaksi + BULK INSERT (employees dulu, baru gaji)
+            // ===============================
+            $externalDb->transStart();
+
+            if (!empty($insertData)) {
+                $externalDb->table('employees')->insertBatch($insertData);
+            }
+
+            if (!empty($gajiInsertData)) {
+                $externalDb->table('gaji_conjunction')->insertBatch($gajiInsertData);
+            }
+
+            $externalDb->transComplete();
+
+            if ($externalDb->transStatus() === false) {
+                return response()->setJSON([
+                    'message' => 'Sinkronisasi gagal, transaksi di-rollback.',
+                    'token' => csrf_hash(),
+                    'status' => false
+                ]);
+            }
+
+            return response()->setJSON([
+                'message' => 'Sinkronisasi berhasil. '
+                    . count($insertData) . ' karyawan, '
+                    . count($gajiInsertData) . ' data gaji ditambahkan.',
+                'token' => csrf_hash(),
+                'status' => true
+            ]);
+
+        } catch (\Throwable $e) {
+            return response()->setJSON([
+                'message' => $e->getMessage(),
+                'token' => csrf_hash(),
+                'status' => false
+            ]);
+        }
     }
 }

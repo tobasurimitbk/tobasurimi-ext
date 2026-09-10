@@ -14,13 +14,16 @@
     <div class="section-header">
         <h1>Karyawan</h1>
         <?php if (can('Personalia', 'Karyawan', 'c')): ?>
-            <button class="btn btn-sync btn-add" float-right style="right:110px;">
+            <!-- <button class="btn btn-sync btn-add" float-right style="right:110px;">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Sync Karyawan ke Fingerprint
             </button>
             <a class="btn btn btn-show-form btn-save float-right" href="<?= base_url('employee/create') ?>">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-            </a>
+            </a> -->
         <?php endif; ?>
+        <a class="btn btn btn-show-form btn-save float-right" href="#" onclick="syncKaryawan()">
+            <i class="fas fa-sync mr-2"></i> Sinkronisasi Karyawan
+        </a>
     </div>
     <div class="card">
         <?= csrf_field() ?>
@@ -30,7 +33,7 @@
                     <div class="form-floating" style="height: 50px;">
                         <select name="division_id" id="division_id" class="form-control form-select division_id">
                             <option value="">Pilih Departemen</option>
-                            <?php foreach ($divisi as $d) : ?>
+                            <?php foreach ($divisi as $d): ?>
                                 <option value="<?= encrypt($d['id']) ?>">
                                     <?= strtoupper($d['divisi']) ?>
                                 </option>
@@ -41,7 +44,8 @@
                 </div>
                 <div class="col-md-3 mt-1">
                     <div class="form-floating" style="height: 50px;">
-                        <select class="form-select bagian_id" name="bagian_id" id="bagian_id" aria-label="Floating label select example">
+                        <select class="form-select bagian_id" name="bagian_id" id="bagian_id"
+                            aria-label="Floating label select example">
                             <option value=""></option>
                         </select>
                         <label for="floatingInput" style="z-index: 1;">Bagian </label>
@@ -49,9 +53,10 @@
                 </div>
                 <div class="col-md-3 mt-1">
                     <div class="form-floating" style="height: 50px;">
-                        <select class="form-select tipe" name="tipe" id="tipe" aria-label="Floating label select example">
+                        <select class="form-select tipe" name="tipe" id="tipe"
+                            aria-label="Floating label select example">
                             <option value=""></option>
-                            <?php foreach ($tipeEmployee as $t) : ?>
+                            <?php foreach ($tipeEmployee as $t): ?>
                                 <option value="<?= $t['golongan_name'] ?>">
                                     <?= strtoupper($t['golongan_name']) ?>
                                 </option>
@@ -62,14 +67,16 @@
                 </div>
                 <div class="col-md-3 mt-1">
                     <div class="form-floating" style="height: 50px;">
-                        <input autocomplete="one-time-code" type="text" class="form-control search" id="search" name="search" placeholder="">
+                        <input autocomplete="one-time-code" type="text" class="form-control search" id="search"
+                            name="search" placeholder="">
                         <label for="floatingInput">Cari Berdasarkan NIP/Nama </label>
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTableKaryawan" width="100%" cellspacing="0">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTableKaryawan"
+                        width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
                                 <th>No</th>
@@ -103,14 +110,16 @@
                 <h5 class="modal-title">Sinkronisasi Karyawan yang Belum Terdaftar di Fingerprint</h5>
             </div>
             <div class="modal-body">
-                <form class="create-form form-add-spp form-sinkronisasi" role="form" method="POST" enctype="multipart/form-data">
+                <form class="create-form form-add-spp form-sinkronisasi" role="form" method="POST"
+                    enctype="multipart/form-data">
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-floating" style="height: 50px;">
-                                <select name="attendances_unit_id" id="attendances_unit_id" class="form-control form-select attendances_unit_id">
+                                <select name="attendances_unit_id" id="attendances_unit_id"
+                                    class="form-control form-select attendances_unit_id">
                                     <option value="">Pilih Mesin Finger</option>
-                                    <?php foreach ($dataAttendanceUnit as $d) : ?>
+                                    <?php foreach ($dataAttendanceUnit as $d): ?>
                                         <option value="<?= $d['id'] ?>">
                                             <?= $d['name'] ?>
                                         </option>
@@ -124,7 +133,8 @@
                                 <div class="col-md-6">
                                 </div>
                                 <div class="col-md-6">
-                                    <button class="btn btn-show-detail btn-add btn-block float-right" id="btnPilihSemua" type="button" style="width: 90% !important;">
+                                    <button class="btn btn-show-detail btn-add btn-block float-right" id="btnPilihSemua"
+                                        type="button" style="width: 90% !important;">
                                         <i class="fa-solid fa-users"></i> Pilih Semua
                                     </button>
                                 </div>
@@ -133,7 +143,8 @@
                         <div class="col-md-12 mt-3">
                             <div class="form-floating mb-3" style="height: 150px;">
                                 <div class="form-floating-custom">
-                                    <select multiple class="form-select employee_id" name="employee_id[]" id="employee_id[]">
+                                    <select multiple class="form-select employee_id" name="employee_id[]"
+                                        id="employee_id[]">
 
                                     </select>
                                 </div>
@@ -167,14 +178,17 @@
                         </div>
                         <div class="col-sm-12">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" readonly type="text" class="form-control nama_karyawan" id="nama_karyawan" name="nama_karyawan" placeholder="Nama Karyawan">
+                                <input autocomplete="one-time-code" readonly type="text"
+                                    class="form-control nama_karyawan" id="nama_karyawan" name="nama_karyawan"
+                                    placeholder="Nama Karyawan">
                                 <label for="floatingInput">Nama Karyawan</label>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="table-responsive">
-                            <table class="table nowrap table-hover-tobasurimi dataTable" id="listFingerTable" width="100%" cellspacing="0">
+                            <table class="table nowrap table-hover-tobasurimi dataTable" id="listFingerTable"
+                                width="100%" cellspacing="0">
                                 <thead class="thead-dark">
                                     <tr>
                                         <th>No</th>
@@ -193,7 +207,8 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-copy btn-discard mr-2" id="btnHideListFingerprint">Kembali</button>
+                <button type="button" class="btn btn-hide-copy btn-discard mr-2"
+                    id="btnHideListFingerprint">Kembali</button>
             </div>
         </div>
     </div>
@@ -225,7 +240,7 @@
         ajax: {
             url: "<?= base_url("employee/all"); ?>",
             dataSrc: "data",
-            data: function(data) {
+            data: function (data) {
                 data.search = $(".search").val();
                 data.tipe = $('.tipe').val();
                 data.bagian_id = $('.bagian_id').val();
@@ -236,7 +251,7 @@
 
         },
         // scrollX: true,
-        "initComplete": function(settings, json) {
+        "initComplete": function (settings, json) {
             $('.dataTables_length').empty();
             $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
             $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
@@ -276,7 +291,7 @@
         }, {
             data: "attendance_sync",
             className: "text-center",
-            render: function(data, type, row) {
+            render: function (data, type, row) {
                 let attendance_sync = row.attendance_sync;
                 let htmlRes = '';
 
@@ -298,7 +313,7 @@
         }, {
             data: "status",
             className: "text-center",
-            render: function(data, type, row) {
+            render: function (data, type, row) {
                 let status = row.status;
                 let htmlRes = '';
 
@@ -322,7 +337,7 @@
             searchable: false,
             sortable: false,
             width: "10%",
-            render: function(data, type, row) {
+            render: function (data, type, row) {
                 let id = row.id;
                 let res = '';
 
@@ -352,9 +367,9 @@
             defaultContent: "-",
             targets: "_all"
         }],
-        "drawCallback": function(settings) {
+        "drawCallback": function (settings) {
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
-            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl)
             });
         },
@@ -372,25 +387,25 @@
         placeholder: "Pilih Departemen",
         theme: "bootstrap-5",
         allowClear: true
-    }).change(function() {
+    }).change(function () {
         let csrf = $(`[name="${csrfToken}"]`);
         var formData = new FormData();
         formData.append('divisionID', $(this).val());
         $.ajax({
             url: `<?= base_url("employee/get-bagian"); ?>`,
             data: formData,
-            beforeSend: function(xhr) {
+            beforeSend: function (xhr) {
                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
             },
             method: "POST",
             dataType: "json",
             processData: false,
             contentType: false,
-            success: function(result) {
+            success: function (result) {
                 csrf.val(result.token);
                 $("select[name='bagian_id']").empty()
                 $("select[name='bagian_id']").append(`<option value=""></option>`)
-                result.data.forEach(function(item) {
+                result.data.forEach(function (item) {
                     $("select[name='bagian_id']").append(`<option value="${item.id}">${item.kode_bagian.toUpperCase()} - ${item.nama_bagian.toUpperCase()}</option>`)
                 });
 
@@ -403,7 +418,7 @@
         placeholder: "Pilih Bagian",
         theme: "bootstrap-5",
         allowClear: true
-    }).change(function() {
+    }).change(function () {
         table.ajax.reload();
     });
 
@@ -411,7 +426,7 @@
         placeholder: "Pilih Tipe / Golongan",
         theme: "bootstrap-5",
         allowClear: true
-    }).change(function() {
+    }).change(function () {
         table.ajax.reload();
     });
 
@@ -424,7 +439,7 @@
         .css('margin-top', '22px').css('margin-left', '-7px').css('height', ' calc(3.5rem + 2px)');
 
 
-    $('.search').keyup(function() {
+    $('.search').keyup(function () {
         table.ajax.reload();
     });
 
@@ -440,12 +455,12 @@
         allowClear: false,
     });
 
-    $('#attendances_unit_id').change(function(e) {
+    $('#attendances_unit_id').change(function (e) {
         e.preventDefault();
         dropdownEmployeeSyncFinger();
     });
 
-    $('.employee_id').change(function(e) {
+    $('.employee_id').change(function (e) {
         e.preventDefault();
         let arr = $(this).val();
         employeeIdSelectedFinger = [];
@@ -465,7 +480,7 @@
         },
         errorElement: 'span',
         errorClass: 'text-danger',
-        errorPlacement: function(error, element) {
+        errorPlacement: function (error, element) {
             var elem = $(element);
             if (elem.hasClass("select2-hidden-accessible")) {
                 element = $("#select2-" + elem.attr("id") + "-container").parent();
@@ -474,19 +489,19 @@
                 error.insertAfter(element);
             }
         },
-        highlight: function(element) {
+        highlight: function (element) {
             $(element).closest('.form-group').addClass('has-error');
             $(element).addClass('select-class');
 
         },
-        unhighlight: function(element) {
+        unhighlight: function (element) {
             $(element).closest('.form-group').removeClass('has-error');
             $(element).removeClass('select-class');
         },
     });
 
 
-    $('#btnPilihSemua').click(function(e) {
+    $('#btnPilihSemua').click(function (e) {
         e.preventDefault();
         if (employeeIdArr.length === 0) {
             Swal.fire({
@@ -503,7 +518,7 @@
                 .attr("value", "")
                 .text("Pilih Karyawan");
             employeeSelect.append(emptyOption);
-            $.each(employeeIdArr, function(index, data) {
+            $.each(employeeIdArr, function (index, data) {
                 employeeIdSelectedFinger.push(data.id);
                 var option = $("<option selected></option>")
                     .attr("value", data.id)
@@ -521,7 +536,7 @@
     //     $('#search').val('');
     // });
 
-    $('.btn-sync').click(function(e) {
+    $('.btn-sync').click(function (e) {
         e.preventDefault();
         $('#attendances_unit_id').val(null).change();
         employeeIdArr = [];
@@ -530,11 +545,11 @@
         $('.sync-fingerprint-modal').modal('show');
     });
 
-    $('.btn-discard').click(function() {
+    $('.btn-discard').click(function () {
         $('.sync-fingerprint-modal').modal('hide');
     });
 
-    $('#btnSinkronisasi').click(function(e) {
+    $('#btnSinkronisasi').click(function (e) {
         e.preventDefault();
         if (employeeIdSelectedFinger.length === 0) {
             Swal.fire({
@@ -557,14 +572,14 @@
                 data: formData,
                 processData: false,
                 contentType: false,
-                beforeSend: function(xhr) {
+                beforeSend: function (xhr) {
                     setLoading();
                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
                 },
-                complete: function() {
+                complete: function () {
                     stopLoading();
                 },
-                success: function(response) {
+                success: function (response) {
                     csrf.val(response.token);
                     if (response.status) {
                         Swal.fire({
@@ -587,7 +602,7 @@
         }
     });
 
-    $('#btnHideListFingerprint').click(function(e) {
+    $('#btnHideListFingerprint').click(function (e) {
         e.preventDefault();
         $('.list-fingerprint-modal').modal('hide');
     });
@@ -609,16 +624,48 @@
             data: {
                 attendance_unit_id: attendanceUnitId,
             },
-            beforeSend: function(xhr) {
+            beforeSend: function (xhr) {
                 setLoading();
             },
-            complete: function() {
+            complete: function () {
                 stopLoading();
             },
             method: "GET",
-            success: function(result) {
+            success: function (result) {
                 employeeIdArr = result.data;
                 drawDropdownEmployee(employeeIdArr);
+            }
+        });
+    }
+
+
+    function syncKaryawan() {
+        $.ajax({
+            url: `<?= base_url("employee/sync-internal"); ?>`,
+            beforeSend: function (xhr) {
+                setLoading();
+            },
+            complete: function () {
+                stopLoading();
+            },
+            method: "GET",
+            success: function (response) {
+                if (response.status) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: response.message,
+                        confirmButtonColor: '#4e73df',
+                    })
+                        .then(() => {
+                            table.ajax.reload()
+                        })
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: response.message,
+                        confirmButtonColor: '#4e73df',
+                    })
+                }
             }
         });
     }
@@ -631,7 +678,7 @@
             .attr("value", "")
             .text("Pilih Karyawan");
         employeeSelect.append(emptyOption);
-        $.each(employeIdArr, function(index, data) {
+        $.each(employeIdArr, function (index, data) {
             var option = $("<option></option>")
                 .attr("value", data.id)
                 .text(data.name);
@@ -639,7 +686,7 @@
         });
     }
 
-    const changeSort = function(val) {
+    const changeSort = function (val) {
         if (sort !== val) {
             sortType = "asc";
             sort = val;
@@ -675,23 +722,23 @@
                     data: {
                         id: id
                     },
-                    beforeSend: function(xhr) {
+                    beforeSend: function (xhr) {
                         setLoading();
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
                     },
-                    complete: function() {
+                    complete: function () {
                         stopLoading()
                     },
                     method: "POST",
                     dataType: "json",
-                    success: function(response) {
+                    success: function (response) {
                         csrf.val(response.token);
                         if (response.status) {
                             Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
                                 .then(() => {
                                     table.ajax.reload()
                                 })
@@ -711,13 +758,13 @@
                 employee_id: employeeId
             },
             method: "GET",
-            beforeSend: function(xhr) {
+            beforeSend: function (xhr) {
                 setLoading();
             },
-            complete: function() {
+            complete: function () {
                 stopLoading();
             },
-            success: function(result) {
+            success: function (result) {
                 if (result.status) {
                     var data = result.data;
                     $('#nama_karyawan').val(data.employee.name);
@@ -725,7 +772,7 @@
                     var tableBody = $('#listFingerTable tbody');
                     tableBody.empty(); // hapus isi sebelumnya
 
-                    $.each(data.finger, function(i, v) {
+                    $.each(data.finger, function (i, v) {
                         let actionBtn = '';
                         let statusBadge = v.status ?
                             `<div class="text-success text-center">
@@ -791,23 +838,23 @@
                         attendance_unit_id: attendanceUnitId,
                         employee_id: employeeId
                     },
-                    beforeSend: function(xhr) {
+                    beforeSend: function (xhr) {
                         setLoading();
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
                     },
-                    complete: function() {
+                    complete: function () {
                         stopLoading()
                     },
                     method: "POST",
                     dataType: "json",
-                    success: function(response) {
+                    success: function (response) {
                         csrf.val(response.token);
                         if (response.status) {
                             Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
                                 .then(() => {
                                     table.ajax.reload();
                                     $('.list-fingerprint-modal').modal('hide');
